@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}الأندية{% endblock %}
+{% block content %}
+{% if perms.clubs.add_club %}
+<a href="{% url 'clubs:create' %}">أنشئ</a>
+{% endif %}
+{% if clubs %}
+    <ul>
+    {% for club in clubs %}
+        <li><a href="{% url 'clubs:show' club.id %}">{{ club.name }}
+        </a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>لا توجد أية أندية.</p>
+{% endif %}
+{% endblock %}

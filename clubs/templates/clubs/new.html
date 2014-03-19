@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{% if form.has_changed %} تعديل {{ form.name.value }}{% else %} نادٍ جديد {% endif %}{% endblock %}
+{% block content %}
+<h2>{% if form.has_changed %} تعديل {{ form.name.value }} {% else %} نادٍ جديد {% endif %}</h2>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% if form.has_changed %}{% url 'clubs:edit' club_id %}{% else %}{% url 'clubs:create' %}{% endif %}" method="post">
+{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" value="أرسل" />
+{% endblock %}

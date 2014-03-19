@@ -1,0 +1,52 @@
+{% load staticfiles %}
+<!doctype html>
+<html dir="rtl" lang="ar">
+  
+  <head>
+    <title>بوابة الطلاب الإلكرتونية | {% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <link rel="stylesheet" href="{% static 'bootstrap.rtl.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap-responsive.rtl.css' %}">
+	 <script src="{% static 'jquery.js' %}"></script>
+    <script src="{% static 'bootstrap.min.js' %}"></script>
+    <script src="{% static 'jquery.backstretch.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'site.css' %}">
+  </head>
+  
+  <body>
+    <div class="container-narrow thumbnails thumbnail">
+      <div class="masthead">
+        <a href="{% url 'home' %}"><div class="hero-unit">
+          <h1>بوابة الطلاب الإلكترونية</h1>
+        </div></a><div style="text-align:left;">{% if user.is_authenticated %}<a href="{% url 'userena_signout' %}">اخرج</a>{% else %}<a href="{% url 'userena_signin' %}">ادخل</a> - <a href="{% url 'userena_signup' %}">سجّل</a>{% endif %}</div>
+          <div class="row-fluid">
+{% block content %}{% endblock %}
+      </div>
+		<hr>
+      <div class="footer">
+			<div class="xxx">
+						<div class="pull-right">
+                  <span>برعاية الطلاب (مب العمادة!)</span>
+                  <br>
+                  ما أمزح!
+						</div>
+                  
+                <div class="pull-left">
+                  <span>حرية النسخ</span>
+                  <br>
+                  <a href="copy.html"><i class=" icon-edit"></i> انسخ</a>
+                  <a href="development.html"><i class=" icon-wrench"></i> عن</a>
+                  </div>
+
+			</div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+	 <script>
+  	   $.backstretch("img/background.jpg");
+	 </script>
+	 
+</html>

@@ -1,0 +1,73 @@
+@import url(http://openfontlibrary.org/face/droid-arabic-naskh);
+@import url(http://openfontlibrary.org/face/droid-arabic-kufi);
+
+      /* Custom container */
+      .container-narrow {
+        margin: 0 auto;
+        max-width: 900px;
+
+    background: none repeat scroll 0 0 rgba(255, 255, 255, 0.95);
+      }
+ 
+      .hero-unit {
+
+    background: none ;
+      }
+
+    a:link { text-decoration:none;}      /* unvisited link */
+    a:visited { text-decoration:none;}  /* visited link */
+    a:hover { text-decoration:none;}  /* mouse over link */
+    a:active { text-decoration:none;}  /* selected link */
+
+
+
+      .container-narrow {
+        margin: 0 auto;
+        max-width: 900px;
+    background: none repeat scroll 0 0 rgba(255, 255, 255, 0.95);
+      }
+
+
+
+#content {
+    background: none repeat scroll 0 0 rgba(255, 255, 255, 0.95);
+    margin: 0 auto;
+    padding: 10px 40px 20px;
+    width: 880px;
+}
+
+h1, h2, h3{
+    font-family: 'Droid Arabic Naskh','arial';
+}
+
+h3{
+font-size: 20px;
+}
+
+.hero-unit {
+    padding-bottom: 0px;
+}
+.hero-unit h1{
+    line-height: 1.5;
+}
+
+.lead{;
+text-align: center;
+text-align:justify;
+}
+
+p {
+    text-align:justify;
+}
+
+td
+{
+height:50px;
+} 
+
+body{
+font-size: 15px;
+font-family: 'Droid Arabic Kufi',serif;
+line-height: 160% !important;
+}
+

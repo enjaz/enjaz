@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ activity.name }}{% endblock %}
+{% block content %}
+<h2>{{ activity.name }}</h2>
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+{% if not review %}
+<big style="color:red;">
+{% if activity.is_approved == None %}
+هذا النشاط لم يراجع بعد
+{% elif activity.is_approved == True %}
+هذا النشاط اعتمد!
+{% elif activity.is_approved == False %}
+هذا النشاط رُفض!
+{% endif %}
+</big>
+<br/>
+{% endif %}
+
+<b>الوصف:</b>  {{ activity.description }}
+<br/>
+<b>عدد المشتركين:</b> {{ activity.participants }}
+<br/>
+<b>عدد المنظمين:</b> {{ activity.organizers }}
+<br/>
+<b>المتطلبات:</b> {{ activity.requirements }}
+<br/>
+<b>المتعاونون من داخل الجامعة:</b> {{ activity.inside_collaborators }}
+<br/>
+<b>المتعاونون من خارج الجامعة:</b> {{ activity.outside_collaborators }}
+<br/>
+<b>النوادي:</b>
+<br/>
+<ul>
+{% for club in activity.clubs.all %}
+<li><a href="{% url 'clubs:show' club.pk %}">{{ club.name }}</a></li>
+{% endfor %}
+</ul>
+
+
+{% if review %}
+<form action="{% url 'activities:review' activity.pk %}" method="post">
+{% csrf_token %}
+
+<input type="radio" name="review" value="accept" id="accept"/><label for="accept">اقبل</label><br/>
+<input type="radio" name="review" value="reject" id="reject"/><label for="reject">ارفض</label><br/>
+<input type="submit" value="أرسل" />
+</form>
+
+</form>
+{% endif %}
+
+{% if activity.is_editable %}
+<small><a href="{% url 'activities:edit' activity.pk %}">عدّل</a></small>
+{% endif %}
+{% if not review and not activity.is_approved and perms.activities.review_activity %}
+<small><a href="{% url 'activities:review' activity.pk %}">راجع</a></small>
+{% endif %}
+{% endblock %}

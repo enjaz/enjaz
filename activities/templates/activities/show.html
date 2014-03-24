@@ -3,7 +3,7 @@
 {% block content %}
 <h2>{{ activity.name }}</h2>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-{% if not review %}
+{% if not is_review %}
 <big style="color:red;">
 {% if activity.is_approved == None %}
 هذا النشاط لم يراجع بعد
@@ -17,27 +17,50 @@
 {% endif %}
 
 <b>الوصف:</b>  {{ activity.description }}
+{% if is_review %}
+{{ review_form.description_notes.label_tag }} {{ review_form.description_notes }}
+{% endif %}
 <br/>
 <b>عدد المشتركين:</b> {{ activity.participants }}
+{% if is_review %}
+{{ review_form.participants_notes.label_tag }} {{ review_form.participants_notes }}
+{% endif %}
 <br/>
 <b>عدد المنظمين:</b> {{ activity.organizers }}
+{% if is_review %}
+{{ review_form.organizers_notes.label_tag }} {{ review_form.organizers_notes }}
+{% endif %}
 <br/>
 <b>المتطلبات:</b> {{ activity.requirements }}
+{% if is_review %}
+{{ review_form.requirements_notes.label_tag }} {{ review_form.requirements_notes }}
+{% endif %}
 <br/>
 <b>المتعاونون من داخل الجامعة:</b> {{ activity.inside_collaborators }}
+{% if is_review %}
+{{ review_form.inside_notes.label_tag }} {{ review_form.inside_notes }}
+{% endif %}
 <br/>
 <b>المتعاونون من خارج الجامعة:</b> {{ activity.outside_collaborators }}
+{% if is_review %}
+{{ review_form.outside_notes.label_tag }} {{ review_form.outside_notes }}
+{% endif %}
 <br/>
-<b>النوادي:</b>
+<b>النادي المنظم:</b> <a href="{% url 'clubs:show' activity.primary_club.pk %}">{{ activity.primary_club }}</a>
 <br/>
+{% if activity.secondary_club.all %}
+<b>النوادي المساندة:</b>
 <ul>
-{% for club in activity.clubs.all %}
+{% for club in activity.secondary_club.all %}
 <li><a href="{% url 'clubs:show' club.pk %}">{{ club.name }}</a></li>
 {% endfor %}
 </ul>
+{% endif %}
+{% if is_review %}
+{{ review_form.clubs_notes.label_tag }} {{ review_form.clubs_notes }}
+{% endif %}
 
-
-{% if review %}
+{% if is_review %}
 <form action="{% url 'activities:review' activity.pk %}" method="post">
 {% csrf_token %}
 
@@ -49,10 +72,15 @@
 </form>
 {% endif %}
 
-{% if activity.is_editable %}
+{% if activity.is_editable and can_edit %}
 <small><a href="{% url 'activities:edit' activity.pk %}">عدّل</a></small>
 {% endif %}
-{% if not review and not activity.is_approved and perms.activities.review_activity %}
-<small><a href="{% url 'activities:review' activity.pk %}">راجع</a></small>
+{% if not is_review and not activity.is_approved and perms.activities.add_review %}
+<small><a href="{% url 'activities:review' activity.pk %}">راجع واعتمد</a></small>
+{% endif %}
+{% if can_view_participation and activity.collect_participants %}
+<small><a href="{% url 'activities:view_participation' activity.pk %}">شاهد طلبات المشاركة</a></small>
+{% elif user.is_authenticated and activity.collect_participants %}
+<small><a href="{% url 'activities:participate' activity.pk %}">شارك!</a></small>
 {% endif %}
 {% endblock %}

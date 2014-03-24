@@ -3,14 +3,36 @@
 {% block content %}
 {% if perms.activities.add_activity %}<a href="{% url 'activities:create' %}">أنشئ</a>{% endif %}
 
-{% if latest_activities %}
+{% if page_activities %}
+<p>رتّب النشاطات حسب:
+<a href="{% url 'activities:list' %}">تاريخ الإرسال</a>
+<a href="{% url 'activities:list' %}?order=date">تاريخ العقد</a>
+<a href="{% url 'activities:list' %}?order=club">النادي المنظم</a>
+</p>
     <ul>
-    {% for activity in latest_activities %}
+    {% for activity in page_activities %}
         <li><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}
         </a></li>
     {% endfor %}
     </ul>
+<div class="pagination">
+    <span class="step-links">
+        {% if page_activities.has_previous %}
+            <a href="?page={{ page_activities.previous_page_number }}">السابق</a>
+        {% endif %}
+
+        <span class="current">
+            الصفحة {{ page_activities.number }} من {{ page_activities.paginator.num_pages }}.
+        </span>
+
+        {% if page_activities.has_next %}
+            <a href="?page={{ page_activities.next_page_number }}">التالي</a>
+        {% endif %}
+    </span>
+</div>
+
 {% else %}
     <p>لا توجد أية نشاطات.</p>
 {% endif %}
+
 {% endblock %}

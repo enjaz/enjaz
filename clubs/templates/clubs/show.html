@@ -10,8 +10,8 @@
 <br/>
 <b>البريد الإلكرتوني:</b> {{ club.email }}
 <br/>
-<b>النادي الأب:</b> {{ club.parent }}
-<br/>
+{% if club.parent %}<b>النادي الأب:</b> {{ club.parent }}
+<br/>{% endif %}
 <b>المنسق:</b> {{ club.coordinator.name }}
 <br/>
 <b>تاريخ الإنشاء:</b> {{ club.creation_date }}
@@ -26,5 +26,10 @@
 {% endif %}
 {% if can_edit %}
 <small><a href="{% url 'clubs:edit' club.pk %}">عدّل</a></small>
+{% endif %}
+{% if can_view_applications and club.open_membership %}
+<small><a href="{% url 'clubs:view_applications' club.pk %}">راجع طلبات الانضمام</a></small>
+{% elif user.is_authenticated and club.open_membership %}
+<small><a href="{% url 'clubs:join' club.pk %}">انضم للنادي!</a></small>
 {% endif %}
 {% endblock %}

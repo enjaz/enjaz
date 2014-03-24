@@ -1,6 +1,17 @@
 {% extends "base.html" %}
 {% block title %}{% if form.has_changed %} تعديل {{ form.name.value }} {% else %} نشاط جديد {% endif %}{% endblock %}
 {% block content %}
+ <script>
+$(function() {
+$( "#id_date" ).datepicker({
+showOn: "button",
+buttonImage: "images/calendar.gif",
+buttonImageOnly: true,
+regional: 'ar',
+});
+});
+</script>
+
 <h2>{% if form.has_changed %} تعديل {{ form.name.value }} {% else %} نشاط جديد {% endif %}</h2>
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
@@ -10,35 +21,4 @@
 {{ form.as_p }}
 <input type="submit" value="أرسل" />
 </form>
-<!--
-
-
-<label class="required" for="clubs"></label>
-<select id="clubs" name="clubs" multiple="multiple">
-{% for club in clubs %}
-    <option value="{{ club.id }}">{{ club.name }}</option>
-{% endfor %}
-</select>
-<br/>
-<label for="name">الاسم</lable>
-<input id="name" name="name" type="text"/>
-<br/>
-<label for="description">الوصف</lable>
-<textarea id="description" name="description"></textarea>
-<br/>
-<label for="date">التاريخ</lable>
-<input id="date" name="date" type="date"/>
-<br/>
-<label for="requirements">متطلبات</lable>
-<textarea id="requirements" name="requirements"></textarea>
-<br/>
-<label for="inside_collaborators">متعاونون من الجامعة</lable>
-<textarea id="inside_collaborators" name="inside_collaborators"></textarea>
-<br/>
-<label for="outside_collaborators">متعاونون من خارج الجامعة</lable>
-<textarea id="outside_collaborators" name="outside_collaborators"></textarea>
-<br/>
-
-
--->
 {% endblock %}

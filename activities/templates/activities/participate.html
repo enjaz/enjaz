@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}اشترك في {{ activity.name }}{% endblock %}
+{% block content %}
+<h2>الاشتراك في {{ activity.name }}</h2>
+
+{% if error_message == 'already_applied' %}
+
+سبق أن سجلت في هذا النشاط!
+{% elif error_message == 'unknown' %}
+خطأ غير معروف!
+{% else %}
+هل تريد الاشتراك حقا؟
+<form action="{% url 'activities:participate' activity.id %}" method="post">
+{% csrf_token %}
+<input type="hidden" name="status" value="1"/>
+<input type="submit" value="اشترك" />
+<input type="button" value="عُد" onClick="history.go(-1);return true;">
+</form>
+{% endif %}
+{% endblock %}
+

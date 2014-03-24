@@ -13,16 +13,17 @@ class ActivityForm(ModelForm):
     class Meta:
         model = Activity
         fields = ['primary_club', 'secondary_clubs',
-                  'name','description', 'date', 'participants',
-                  'organizers', 'requirements',
-                  'inside_collaborators', 'outside_collaborators',
-                  'collect_participants']
+                  'name','description', 'date', 'time',
+                  'custom_datetime', 'participants', 'organizers',
+                  'requirements', 'inside_collaborators',
+                  'outside_collaborators', 'collect_participants']
 
 class ReviewForm(ModelForm):
     class Meta:
         model = Review
         fields = ['clubs_notes', 'name_notes', 'description_notes',
-                  'requirement_notes', 'inside_notes', 'outside_notes',
+                  'datetime_notes', 'requirement_notes',
+                  'inside_notes', 'outside_notes',
                   'participants_notes', 'organizers_notes']
 
 def list(request):

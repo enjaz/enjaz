@@ -3,11 +3,22 @@
 {% block content %}
  <script>
 $(function() {
-$( "#id_date" ).datepicker({
-showOn: "button",
-buttonImage: "images/calendar.gif",
-buttonImageOnly: true,
-regional: 'ar',
+$('#id_date').datepicker();
+$('#id_date').change(function(){
+    if($(this).val().length != 0){
+        $('#id_custom_datetime').attr('disabled', 'disabled');
+    }else{
+        $('#id_custom_datetime').removeAttr('disabled');
+}
+});
+$('#id_custom_datetime').change(function(){
+    if($(this).val().length != 0){
+        $('#id_date').attr('disabled', 'disabled');
+        $('#id_time').attr('disabled', 'disabled');
+    }else{
+        $('#id_date').removeAttr('disabled');
+        $('#id_time').removeAttr('disabled');
+}
 });
 });
 </script>

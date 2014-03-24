@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}اشترك في {{ club.name }}{% endblock %}
+{% block content %}
+<h2>الاشتراك في {{ club.name }}</h2>
+
+{% if error_message == 'closed_membership' %}
+التسجيل في هذا النادي مغلق!
+{% elif error_message == 'already_applied' %}
+سبق أن سجلت في هذا النادي!
+{% elif error_message == 'already_in' %}
+أنت عضو في النادي!
+{% else %}
+<form action="{% url 'clubs:join' club.id %}" method="post">
+{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" value="أرسل" />
+{% endif %}
+{% endblock %}

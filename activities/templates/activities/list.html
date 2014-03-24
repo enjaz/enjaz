@@ -4,11 +4,16 @@
 {% if perms.activities.add_activity %}<a href="{% url 'activities:create' %}">أنشئ</a>{% endif %}
 
 {% if page_activities %}
-<p>رتّب النشاطات حسب:
-<a href="{% url 'activities:list' %}">تاريخ الإرسال</a>
-<a href="{% url 'activities:list' %}?order=date">تاريخ العقد</a>
+<div style="float:left; font-size: 0.7em; text-align: left !important;"><p>رتّب النشاطات حسب:
+<a href="{% url 'activities:list' %}">تاريخ الإرسال</a> - 
+<a href="{% url 'activities:list' %}?order=date">تاريخ العقد</a> - 
 <a href="{% url 'activities:list' %}?order=club">النادي المنظم</a>
+</p>{% if perms.activities.add_review %}
+<p>اعرض فقط:
+<a href="{% url 'activities:list' %}?pending=1">النشاطات المُعلّقة</a>
 </p>
+{% endif %}
+</div>
     <ul>
     {% for activity in page_activities %}
         <li><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}

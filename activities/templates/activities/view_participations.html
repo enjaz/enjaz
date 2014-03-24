@@ -2,10 +2,14 @@
 {% block title %}مشاهدة طلبات المشاركة في {{ activity.name }}{% endblock %}
 {% block content %}
 <h2>طلبات المشاركة في {{ activity.name }}</h2>
+{% if participations %}
 <ul>
 {% for participation in participations %}
 <li>{{ participation.user.username }} - {{ participation.submission_date }}</li>
 {% endfor %}
 </ul>
+{% else %}
+لا توجد طلبات مشاركة.
+{% endif %}
 {% endblock %}
 

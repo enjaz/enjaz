@@ -85,8 +85,14 @@ def show(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id)
     if request.user.is_authenticated():
         user_clubs = request.user.memberships.all() | request.user.coordination.all()
+        can_edit = request.user.has_perm('activities.change_activity') or \
+                   activity.primary_club in request.user.coordination.all()
+        can_view_participation = request.user.has_perm('activities.view_participation') or \
+                                 activity.primary_club in request.user.coordination.all()
     else:
         user_clubs = Activity.objects.none()
+        can_edit = False
+        can_view_participation = False
     activity_primary_club = activity.primary_club
     activity_secondary_clubs = activity.secondary_clubs.all()
     activity_clubs = [activity_primary_club] + [club for club in activity_secondary_clubs]
@@ -103,11 +109,6 @@ def show(request, activity_id):
        not any([club in activity_clubs for club in user_clubs]) and \
        not request.user == activity.submitter:
         raise PermissionDenied
-
-    can_edit = request.user.has_perm('activities.change_activity') or \
-               activity.primary_club in request.user.coordination.all()
-    can_view_participation = request.user.has_perm('activities.view_participation') or \
-                             activity.primary_club in request.user.coordination.all()
 
     context = {'activity': activity, 'can_edit': can_edit,
                'can_view_participation': can_view_participation}

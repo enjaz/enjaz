@@ -23,7 +23,8 @@ class Club(models.Model):
                                      related_name="memberships")
     open_membership = models.BooleanField(default=False,
                                                verbose_name=u"اسمح بالتسجيل؟")
-    creation_date = models.DateTimeField('date created')
+    creation_date = models.DateTimeField('date created',
+                                         auto_now_add=True)
     edit_date = models.DateTimeField('date edited', auto_now=True)
 
     def __unicode__(self):
@@ -33,7 +34,8 @@ class MembershipApplication(models.Model):
     club = models.ForeignKey(Club, related_name='club')
     user = models.ForeignKey(User, related_name='user')
     note = models.TextField(verbose_name=u"لماذا تريد الانضمام؟")
-    submission_date = models.DateTimeField('date submitted', auto_now=True)
+    submission_date = models.DateTimeField('date submitted',
+                                           auto_now_add=True)
 
     class Meta:
         permissions = (

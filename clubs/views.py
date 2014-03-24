@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.forms import ModelForm
@@ -54,8 +52,7 @@ def show(request, club_id):
 def create(request):
     if request.method == 'POST':
         # Set the submission_date automatically.
-        club = Club(creation_date=datetime.now())
-        form = ClubForm(request.POST, instance=club)
+        form = ClubForm(request.POST)
         if form.is_valid():
             print form.cleaned_data
             form.save()

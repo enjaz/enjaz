@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{% if form.has_changed %} تعديل {{ form.name.value }} {% else %} نشاط جديد {% endif %}{% endblock %}
+{% block title %}{% if edit %} تعديل {{ form.name.value }} {% else %} نشاط جديد {% endif %}{% endblock %}
 {% block content %}
  <script>
 $(function() {
@@ -12,11 +12,11 @@ regional: 'ar',
 });
 </script>
 
-<h2>{% if form.has_changed %} تعديل {{ form.name.value }} {% else %} نشاط جديد {% endif %}</h2>
+<h2>{% if edit %} تعديل {{ form.name.value }} {% else %} نشاط جديد {% endif %}</h2>
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="{% if form.has_changed %}{% url 'activities:edit' activity_id %}{% else %}{% url 'activities:create' %}{% endif %}" method="post">
+<form action="{% if edit %}{% url 'activities:edit' activity_id %}{% else %}{% url 'activities:create' %}{% endif %}" method="post">
 {% csrf_token %}
 {{ form.as_p }}
 <input type="submit" value="أرسل" />

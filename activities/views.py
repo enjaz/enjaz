@@ -151,7 +151,8 @@ def edit(request, activity_id):
         return HttpResponseRedirect(reverse('activities:list'))
     else:
         form = ActivityForm(instance=activity)
-        context = {'form': form, 'activity_id': activity_id}
+        context = {'form': form, 'activity_id': activity_id,
+                   'edit': True}
         return render(request, 'activities/new.html', context)
 
 @permission_required('activities.add_review', raise_exception=True)

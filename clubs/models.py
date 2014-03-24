@@ -5,9 +5,10 @@ from django.contrib.auth.models import User
 class Club(models.Model):
     name = models.CharField(max_length=200, verbose_name=u"الاسم")
     english_name = models.CharField(max_length=200, verbose_name=u"الاسم الإنجليزي")
-    description = models.TextField(max_length=200, verbose_name=u"الوصف")
+    description = models.TextField(verbose_name=u"الوصف")
     email = models.EmailField(max_length=254, verbose_name=u"البريد الإلكتروني")
     parent = models.ForeignKey('self', null=True, blank=True,
+                               related_name="parenthood",
                                on_delete=models.SET_NULL,
                                default=None, verbose_name=u"النادي الأب")
     coordinator = models.ForeignKey(User, null=True,
@@ -20,13 +21,24 @@ class Club(models.Model):
                                      verbose_name=u"الأعضاء",
                                      blank=True,
                                      related_name="memberships")
+    open_membership = models.BooleanField(default=False,
+                                               verbose_name=u"اسمح بالتسجيل؟")
     creation_date = models.DateTimeField('date created')
     edit_date = models.DateTimeField('date edited', auto_now=True)
 
+    def __unicode__(self):
+        return self.name
+
+class MembershipApplication(models.Model):
+    club = models.ForeignKey(Club, related_name='club')
+    user = models.ForeignKey(User, related_name='user')
+    note = models.TextField(verbose_name=u"لماذا تريد الانضمام؟")
+    submission_date = models.DateTimeField('date submitted', auto_now=True)
+
     class Meta:
         permissions = (
-            #("edit_club", "Can edit club details."),
+            ("view_application", "Can view all available applications."),
         )
 
     def __unicode__(self):
-        return self.name
+        return self.user

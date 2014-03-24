@@ -1,2 +1,0 @@
-Here is your activation key:
-{{ activation_key }}

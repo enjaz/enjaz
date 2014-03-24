@@ -22,7 +22,8 @@ class Activity(models.Model):
                                     verbose_name=u"المتطلبات")
     submitter = models.ForeignKey(User, null=True,
                                   on_delete=models.SET_NULL)
-    submission_date = models.DateTimeField('date submitted')
+    submission_date = models.DateTimeField('date submitted',
+                                           auto_now_add=True)
     date = models.DateTimeField('date')
     edit_date = models.DateTimeField('date edited', auto_now=True)
     approval_date = models.DateTimeField(null=True,
@@ -55,7 +56,7 @@ class Review(models.Model):
     activity = models.OneToOneField(Activity, verbose_name=u" النشاط")
     reviewer = models.ForeignKey(User, null=True,
                                  on_delete=models.SET_NULL)
-    review_date = models.DateTimeField('date reviewed', auto_now=True)
+    review_date = models.DateTimeField('date reviewed', auto_now_add=True)
     clubs_notes = models.TextField(blank=True,
                                    verbose_name=u"ملاحظات على الأندية")
     name_notes = models.TextField(blank=True,
@@ -85,7 +86,7 @@ class Participation(models.Model):
     activity = models.OneToOneField(Activity, verbose_name=u" طاشنلا")
     user = models.ForeignKey(User, null=True,
                              on_delete=models.SET_NULL)
-    submission_date = models.DateTimeField(auto_now=True)
+    submission_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         permissions = (

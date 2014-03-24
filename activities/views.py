@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.contrib.auth.decorators import permission_required, login_required
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
@@ -118,8 +116,7 @@ def show(request, activity_id):
 def create(request):
     if request.method == 'POST':
         # Set the submission_date automatically.
-        activity = Activity(submission_date=datetime.now(),
-                            submitter=request.user)
+        activity = Activity(submitter=request.user)
         form = ActivityForm(request.POST, instance=activity)
         if form.is_valid():
             form.save()

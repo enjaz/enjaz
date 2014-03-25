@@ -24,7 +24,11 @@ class Activity(models.Model):
                                   on_delete=models.SET_NULL)
     submission_date = models.DateTimeField('date submitted',
                                            auto_now_add=True)
-    date = models.DateTimeField('date')
+    date = models.DateField(u'التاريخ', null=True, blank=True)
+    time = models.CharField(max_length=200, verbose_name=u'الوقت',
+                            blank=True)
+    custom_datetime = models.TextField(verbose_name=u"تاريخ ووقت مخصّص",
+                                   blank=True)
     edit_date = models.DateTimeField('date edited', auto_now=True)
     approval_date = models.DateTimeField(null=True,
                                          verbose_name=u"تاريخ الاعتماد")
@@ -61,6 +65,8 @@ class Review(models.Model):
                                    verbose_name=u"ملاحظات على الأندية")
     name_notes = models.TextField(blank=True,
                                   verbose_name=u"ملاحظات على الاسم")
+    datetime_notes = models.TextField(blank=True,
+                                  verbose_name=u"ملاحظات على التاريخ والوقت")
     description_notes = models.TextField(blank=True,
                                         verbose_name=u"ملاحظات على الوصف")
     requirement_notes = models.TextField(blank=True,

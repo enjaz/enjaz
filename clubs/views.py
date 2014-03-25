@@ -37,7 +37,7 @@ def show(request, club_id):
         activities = club.primary_activity.all() | club.secondary_activity.all()
     else:
         activities = club.primary_activity.filter(is_approved=True) |\
-                     club.seconday_activity.filter(is_approved=True)
+                     club.secondary_activity.filter(is_approved=True)
 
     can_edit = request.user == club.coordinator or \
                request.user.has_perm('clubs.change_club')
@@ -62,7 +62,6 @@ def create(request):
             return render(request, 'clubs/new.html', context)
     else:
         form = ClubForm()
-        print form.has_changed()
         context = {'form': form}
         return render(request, 'clubs/new.html', context)
 

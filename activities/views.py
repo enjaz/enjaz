@@ -13,16 +13,17 @@ class ActivityForm(ModelForm):
     class Meta:
         model = Activity
         fields = ['primary_club', 'secondary_clubs',
-                  'name','description', 'date', 'participants',
-                  'organizers', 'requirements',
-                  'inside_collaborators', 'outside_collaborators',
-                  'collect_participants']
+                  'name','description', 'date', 'time',
+                  'custom_datetime', 'participants', 'organizers',
+                  'requirements', 'inside_collaborators',
+                  'outside_collaborators', 'collect_participants']
 
 class ReviewForm(ModelForm):
     class Meta:
         model = Review
         fields = ['clubs_notes', 'name_notes', 'description_notes',
-                  'requirement_notes', 'inside_notes', 'outside_notes',
+                  'datetime_notes', 'requirement_notes',
+                  'inside_notes', 'outside_notes',
                   'participants_notes', 'organizers_notes']
 
 def list(request):
@@ -84,8 +85,14 @@ def show(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id)
     if request.user.is_authenticated():
         user_clubs = request.user.memberships.all() | request.user.coordination.all()
+        can_edit = request.user.has_perm('activities.change_activity') or \
+                   activity.primary_club in request.user.coordination.all()
+        can_view_participation = request.user.has_perm('activities.view_participation') or \
+                                 activity.primary_club in request.user.coordination.all()
     else:
         user_clubs = Activity.objects.none()
+        can_edit = False
+        can_view_participation = False
     activity_primary_club = activity.primary_club
     activity_secondary_clubs = activity.secondary_clubs.all()
     activity_clubs = [activity_primary_club] + [club for club in activity_secondary_clubs]
@@ -102,11 +109,6 @@ def show(request, activity_id):
        not any([club in activity_clubs for club in user_clubs]) and \
        not request.user == activity.submitter:
         raise PermissionDenied
-
-    can_edit = request.user.has_perm('activities.change_activity') or \
-               activity.primary_club in request.user.coordination.all()
-    can_view_participation = request.user.has_perm('activities.view_participation') or \
-                             activity.primary_club in request.user.coordination.all()
 
     context = {'activity': activity, 'can_edit': can_edit,
                'can_view_participation': can_view_participation}
@@ -151,7 +153,8 @@ def edit(request, activity_id):
         return HttpResponseRedirect(reverse('activities:list'))
     else:
         form = ActivityForm(instance=activity)
-        context = {'form': form, 'activity_id': activity_id}
+        context = {'form': form, 'activity_id': activity_id,
+                   'edit': True}
         return render(request, 'activities/new.html', context)
 
 @permission_required('activities.add_review', raise_exception=True)

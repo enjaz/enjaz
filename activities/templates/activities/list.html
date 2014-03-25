@@ -1,20 +1,63 @@
 {% extends "base.html" %}
 {% block title %}النشاطات{% endblock %}
 {% block content %}
-{% if perms.activities.add_activity %}<a href="{% url 'activities:create' %}">أنشئ</a>{% endif %}
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#ccc;}
+.tg td{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;}
+.tg th{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
+</style>
+
+{% if perms.activities.add_activity %}<a href="{% url 'activities:create' %}">أضف نشاطًا</a>{% endif %}
 
 {% if page_activities %}
-<p>رتّب النشاطات حسب:
-<a href="{% url 'activities:list' %}">تاريخ الإرسال</a>
-<a href="{% url 'activities:list' %}?order=date">تاريخ العقد</a>
+<div style="float:left; font-size: 0.7em; text-align: left !important;"><p>رتّب النشاطات حسب:
+<a href="{% url 'activities:list' %}">تاريخ الإرسال</a> - 
+<a href="{% url 'activities:list' %}?order=date">تاريخ العقد</a> - 
 <a href="{% url 'activities:list' %}?order=club">النادي المنظم</a>
+</p>{% if perms.activities.add_review %}
+<p>اعرض فقط:
+<a href="{% url 'activities:list' %}?pending=1">النشاطات المُعلّقة</a>
 </p>
-    <ul>
-    {% for activity in page_activities %}
-        <li><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}
-        </a></li>
+{% endif %}
+</div>
+<table class="tg">
+  <tr>
+    <th>#</th>
+    <th>الاسم</th>
+    <th>النادي المنظم</th>
+    <th>تاريخ الإرسال</th>
+    <th>تاريخ الانعقاد</th>
+    <th>الحالة</th>
+  </tr>
+    {% for activity in page_activities %}<li>
+{% if activity.is_approved == None %}
+  <tr>
+{% elif activity.is_approved == True %}
+  <tr style="background-color:#A9F5A9;">
+{% elif activity.is_approved == False %}
+  <tr style="background-color:#F5BCA9;">
+{% endif %}
+    <td>{{ activity.id }}</td>
+    <td><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}</a></td>
+    <td><a href="{% url 'clubs:show' activity.primary_club.id %}">{{ activity.primary_club.name }}<a/></td>
+    <td>{{ activity.submission_date|date:"j F" }}</td>
+    <td>{{ activity.date|date:"j F" }}</td>
+    <td>
+{% if activity.is_approved == None %}
+{% if perms.activities.add_review %}
+    <a href="{% url 'activities:review' activity.id %}">مُعلّق</a>
+{% else %}
+    مُعلّق
+{% endif %}
+{% elif activity.is_approved == True %}
+    معتمد
+{% elif activity.is_approved == False %}
+    مرفوض
+{% endif %}
+    </td>
+  </tr>
     {% endfor %}
-    </ul>
+</table>
 <div class="pagination">
     <span class="step-links">
         {% if page_activities.has_previous %}

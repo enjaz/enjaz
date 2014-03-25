@@ -1,22 +1,33 @@
 {% extends "base.html" %}
-{% block title %}{% if form.has_changed %} تعديل {{ form.name.value }} {% else %} نشاط جديد {% endif %}{% endblock %}
+{% block title %}{% if edit %} تعديل {{ form.name.value }} {% else %} نشاط جديد {% endif %}{% endblock %}
 {% block content %}
  <script>
 $(function() {
-$( "#id_date" ).datepicker({
-showOn: "button",
-buttonImage: "images/calendar.gif",
-buttonImageOnly: true,
-regional: 'ar',
+$('#id_date').datepicker();
+$('#id_date').change(function(){
+    if($(this).val().length != 0){
+        $('#id_custom_datetime').attr('disabled', 'disabled');
+    }else{
+        $('#id_custom_datetime').removeAttr('disabled');
+}
+});
+$('#id_custom_datetime').change(function(){
+    if($(this).val().length != 0){
+        $('#id_date').attr('disabled', 'disabled');
+        $('#id_time').attr('disabled', 'disabled');
+    }else{
+        $('#id_date').removeAttr('disabled');
+        $('#id_time').removeAttr('disabled');
+}
 });
 });
 </script>
 
-<h2>{% if form.has_changed %} تعديل {{ form.name.value }} {% else %} نشاط جديد {% endif %}</h2>
+<h2>{% if edit %} تعديل {{ form.name.value }} {% else %} نشاط جديد {% endif %}</h2>
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="{% if form.has_changed %}{% url 'activities:edit' activity_id %}{% else %}{% url 'activities:create' %}{% endif %}" method="post">
+<form action="{% if edit %}{% url 'activities:edit' activity_id %}{% else %}{% url 'activities:create' %}{% endif %}" method="post">
 {% csrf_token %}
 {{ form.as_p }}
 <input type="submit" value="أرسل" />

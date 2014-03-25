@@ -1,35 +1,62 @@
 {% extends "base.html" %}
 {% block content %}
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#ccc;}
+.tg td{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;}
+.tg th{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
+</style>
 
 <h2>{{ club.name }}</h2>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
-<b>الاسم الإنجليزي:</b>  {{ club.english_name }}
-<br/>
-<b>الوصف:</b>  {{ club.description }}
-<br/>
-<b>البريد الإلكرتوني:</b> {{ club.email }}
-<br/>
-{% if club.parent %}<b>النادي الأب:</b> {{ club.parent }}
-<br/>{% endif %}
-<b>المنسق:</b> {{ club.coordinator.name }}
-<br/>
-<b>تاريخ الإنشاء:</b> {{ club.creation_date }}
-<br/>
-{% if activities %}
-<h3>النشاطات</h3>
-<ul>
+<table class="tg">
+  <tr>
+    <th>#</th>
+    <td>{{ club.id }}</td>
+  </tr>
+  <tr>
+    <th>الاسم الإنجليزي</th>
+    <td style="direction:ltr;">{{ club.english_name }}</td>
+  </tr>
+  <tr>
+    <th>الوصف</th>
+    <td>{{ club.description }}</td>
+  </tr>
+  <tr>
+    <th>البريد الإلكرتوني</th>
+    <td style="direction:ltr;">{{ club.email }}</td>
+  </tr>
+{% if club.parent %}
+  <tr>
+    <th>النادي الأب</th>
+    <td>{{ club.parent }}</td>
+  </tr>
+{% endif %}{% if club.coordinator.name %}
+  <tr>
+    <th>المنسق</th>
+    <td>{{ club.coordinator.name }}</td>
+  </tr>{% endif %}
+  <tr>
+    <th>تاريخ الإنشاء</th>
+    <td>{{ club.creation_date|date:"j F Y" }}</td>
+  </tr>{% if activities %}
+  <tr>
+    <th>النشاطات</th>
+    <td><ul>
 {% for activity in activities %}
 <li><a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a></li>
 {% endfor %}
 </ul>
-{% endif %}
+</td>
+  </tr>{% endif %}
+</table>
+<div style="float:left; font-size: 85%">
 {% if can_edit %}
-<small><a href="{% url 'clubs:edit' club.pk %}">عدّل</a></small>
+<a href="{% url 'clubs:edit' club.pk %}">عدّل</a>
 {% endif %}
 {% if can_view_applications and club.open_membership %}
-<small><a href="{% url 'clubs:view_applications' club.pk %}">راجع طلبات الانضمام</a></small>
+<a href="{% url 'clubs:view_applications' club.pk %}">راجع طلبات الانضمام</a>
 {% elif user.is_authenticated and club.open_membership %}
-<small><a href="{% url 'clubs:join' club.pk %}">انضم للنادي!</a></small>
+<a href="{% url 'clubs:join' club.pk %}">انضم للنادي!</a>
 {% endif %}
+</div>
 {% endblock %}

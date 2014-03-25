@@ -30,12 +30,16 @@
     <th>الحالة</th>
   </tr>
     {% for activity in page_activities %}<li>
-{% if activity.is_approved == None %}
+{% if activity.review %}
+{% if activity.review.is_approved == None %}
   <tr>
-{% elif activity.is_approved == True %}
+{% elif activity.review.is_approved == True %}
   <tr style="background-color:#A9F5A9;">
-{% elif activity.is_approved == False %}
+{% elif activity.review.is_approved == False %}
   <tr style="background-color:#F5BCA9;">
+{% endif %}
+{% else %}
+  <tr>
 {% endif %}
     <td>{{ activity.id }}</td>
     <td><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}</a></td>
@@ -43,16 +47,20 @@
     <td>{{ activity.submission_date|date:"j F" }}</td>
     <td>{{ activity.date|date:"j F" }}</td>
     <td>
-{% if activity.is_approved == None %}
+{% if activity.review %}
+{% if activity.review.is_approved == None %}
+    ينتظر تعديلا
+{% elif activity.review.is_approved == True %}
+    معتمد
+{% elif activity.review.is_approved == False %}
+    مرفوض
+{% endif %}
+{% else %}
 {% if perms.activities.add_review %}
     <a href="{% url 'activities:review' activity.id %}">مُعلّق</a>
 {% else %}
     مُعلّق
 {% endif %}
-{% elif activity.is_approved == True %}
-    معتمد
-{% elif activity.is_approved == False %}
-    مرفوض
 {% endif %}
     </td>
   </tr>

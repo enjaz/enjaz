@@ -30,13 +30,6 @@ class Activity(models.Model):
     custom_datetime = models.TextField(verbose_name=u"تاريخ ووقت مخصّص",
                                    blank=True)
     edit_date = models.DateTimeField('date edited', auto_now=True)
-    approval_date = models.DateTimeField(null=True,
-                                         verbose_name=u"تاريخ الاعتماد")
-    # For is_approved, we have three chocies:
-    #   None: Not reviewed yet.
-    #   True: Accepted.
-    #   False: Rejected.
-    is_approved = models.NullBooleanField(default=None)
     is_editable = models.BooleanField(default=True)
     collect_participants = models.BooleanField(default=False,
                                                verbose_name=u"اسمح بالتسجيل؟")
@@ -79,6 +72,15 @@ class Review(models.Model):
                                           verbose_name=u"ملاحظات على عدد المشاركين")
     organizers_notes = models.TextField(blank=True,
                                         verbose_name=u"ملاحظات على عدد المنظمين")
+
+    approval_choices = (
+        (None, u"أبقِ معلقًا"),
+        (True, u"اقبل"),
+        (False, u"ارفض"),
+        )
+    is_approved = models.NullBooleanField(choices=approval_choices,
+                                          verbose_name=u"الحالة")
+
     class Meta:
         permissions = (
             ("view_review", "Can view all available activities."),

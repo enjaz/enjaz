@@ -1,24 +1,46 @@
 from django.test import TestCase
 
-from niqati.models import Code, Code_Order
+from niqati.models import Category, Code, Code_Collection, Code_Order
+from clubs.models import Club
+from activities.models import Activity
+"""
+def db_setup():
+    c = Club()
+    c.name = "AAAAAAA CLUB"
+    c.english_name = "ENGLISH NAME"
+    c.description = "MY veRy Beautiful deScription"
+    c.email = "aaa@aaa.aaa"
+    c.save()
+    
+    a = Activity()
+    a.primary_club = c
+    a.name = "My Beautiful Activity"
+    a.description = "My Beautiful Description"
+    a.participants = 10
+    a.organizers = 1
+    a.save()
+    return a # return activity
 
-class Code_Tests(TestCase):
+class Code_Create_Tests(TestCase):
     
-    def test_new_code_is_unique(self):
-        for i in range(100):
-            c = Code()
-            c.generate_unique()
-            new_code = c.code_string
-            all = Code.objects
-            self.assertEqual(len(all.filter(code_string=new_code)), 0)
-            c.save()
-    
+    def test_create_codes(self):
+        a = db_setup()
+        orig_code_count = len(Code.objects.all())
+        print "Original Code Count: %s" % orig_code_count
+        o = Code_Order(activity=a)
+        o.save()
         
-class Code_Order_Tests(TestCase):
-    
-    def test_order_process(self):
-        base_code_count = len(Code.objects.all())
-        o = Code_Order(idea_code_count=1, organizer_code_count=3, participant_code_count=10)
+        # create the Code_Collections
+        for cat in CODE_CATEGORIES:
+            collec = Code_Collection(parent_order=o,
+                                     activity=o.activity,
+                                     code_category=cat,
+                                     code_count=1,
+                                     delivery_type='0')
+            collec.save()
+        o.save()
         o.process()
-        new_code_count = len(Code.objects.all())
-        self.assertGreater(new_code_count, base_code_count)
+        current_code_count = len(Code.objects.all())
+        print "Current Code Count: %s" % current_code_count
+        self.assertGreater(current_code_count, orig_code_count)
+"""

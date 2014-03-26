@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}إدخال النقاط{% endblock %}
+{% block content %}
+
+{% if message %}
+<div class="alert alert{{ message_type }}">
+  {{ message }}
+</div>
+{% endif %}
+
+<form action="{% url 'niqati:submit' %}" method="post">
+{% csrf_token %}
+<div class="input-append">
+  <input class="span12" id="appendedInputButton" name="code" type="text" placeholder="أدخل رمز نقاطي" value="{{ code_to_redeem }}">
+  <button class="btn" type="submit">إدخال</button>
+</div>
+{% endblock %}

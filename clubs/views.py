@@ -36,8 +36,8 @@ def show(request, club_id):
        club in request.user.memberships.coordination):
         activities = club.primary_activity.all() | club.secondary_activity.all()
     else:
-        activities = club.primary_activity.filter(is_approved=True) |\
-                     club.secondary_activity.filter(is_approved=True)
+        activities = club.primary_activity.filter(review__is_approved=True) |\
+                     club.secondary_activity.filter(review__is_approved=True)
 
     can_edit = request.user == club.coordinator or \
                request.user.has_perm('clubs.change_club')

@@ -8,32 +8,36 @@
 </style>
 <h2>{{ activity.name }}</h2>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-{% if not is_review %}
+{% if not is_review or can_view_review and review %}
 <big style="color:red;">
-{% if activity.is_approved == None %}
-هذا النشاط لم يراجع بعد
-{% elif activity.is_approved == True %}
+{% if activity.review %}
+{% if activity.review.is_approved == None %}
+هذا النشاط ينتظر التعديل!
+{% elif activity.review.is_approved == True %}
 هذا النشاط اعتمد!
-{% elif activity.is_approved == False %}
+{% elif activity.review.is_approved == False %}
 هذا النشاط رُفض!
+{% endif %}
+{% else %}
+هذا النشاط لم يراجع بعد.
 {% endif %}
 </big>
 <br/>
 {% endif %}
-{% if is_review %}
+{% if is_review or can_view_review and review %}
 <form action="{% url 'activities:review' activity.pk %}" method="post">
 {% csrf_token %}
 {% endif %}
 <table class="tg">
   <tr>
     <th>الوصف</th>
-    <td>{{ activity.description }}</td>{% if is_review %}
-    <td>{{ review_form.description_notes }}</td>{% endif %}
+    <td>{{ activity.description }}</td>{% if is_review or can_view_review and review %}
+    <td>{{ review.description_notes }}</td>{% endif %}
   </tr>
   <tr>
     <th>النادي المنظم</th>
-    <td><a href="{% url 'clubs:show' activity.primary_club.pk %}">{{ activity.primary_club }}</a></td>{% if is_review %}
-    <td>{{ review_form.clubs_notes }}</td>{% endif %}
+    <td><a href="{% url 'clubs:show' activity.primary_club.pk %}">{{ activity.primary_club }}</a></td>{% if is_review or can_view_review and review %}
+    <td>{{ review.clubs_notes }}</td>{% endif %}
   </tr>{% if activity.secondary_club.all %}
   <tr>
     <th>النوادي المساندة</th>
@@ -43,65 +47,64 @@
     <li><a href="{% url 'clubs:show' club.pk %}">{{ club.name }}</a></li>
     {% endfor %}
     </ul>
-    </td>{% if is_review %}
+    </td>{% if is_review or can_view_review and review %}
     <td></td>{% endif %}
   </tr>{% endif %}
   <tr>
     <th>التاريخ والوقت</th>
-    <td>{% if activity.date %}{{ activity.date|date:"j F Y" }}<br/>{{ activity.time }}{% else %}{{ activity.custom_datetime }}{% endif %}</td>{% if is_review %}
-    <td>{{ review_form.datetime_notes }}</td>{% endif %}
+    <td>{% if activity.date %}{{ activity.date|date:"j F Y" }}<br/>{{ activity.time }}{% else %}{{ activity.custom_datetime }}{% endif %}</td>{% if is_review or can_view_review and review %}
+    <td>{{ review.datetime_notes }}</td>{% endif %}
   </tr>
   <tr>
     <th>عدد المشتركين</th>
-    <td>{{ activity.participants }}</td>{% if is_review %}
-    <td>{{ review_form.participants_notes }}</td>{% endif %}
+    <td>{{ activity.participants }}</td>{% if is_review or can_view_review and review %}
+    <td>{{ review.participants_notes }}</td>{% endif %}
   </tr>
   <tr>
     <th>عدد المنظمين</th>
-    <td>{{ activity.organizers }}</td>{% if is_review %}
-    <td>{{ review_form.organizers_notes }}</td>{% endif %}
+    <td>{{ activity.organizers }}</td>{% if is_review or can_view_review and review %}
+    <td>{{ review.organizers_notes }}</td>{% endif %}
   </tr>{% if activity.requirements %}
   <tr>
     <th>المتطلبات</th>
-    <td>{{ activity.requirements }}</td>{% if is_review %}
-    <td>{{ review_form.requirements_notes }}</td>{% endif %}
+    <td>{{ activity.requirements }}</td>{% if is_review or can_view_review and review %}
+    <td>{{ review.requirement_notes }}</td>{% endif %}
   </tr>{% endif %}{% if activity.inside_collaborators %}
   <tr>
     <th>المتعاونون من داخل الجامعة</th>
-    <td>{{ activity.inside_collaborators }}</td>{% if is_review %}
-    <td>{{ review_form.inside_notes }}</td>{% endif %}
+    <td>{{ activity.inside_collaborators }}</td>{% if is_review or can_view_review and review %}
+    <td>{{ review.inside_notes }}</td>{% endif %}
   </tr>{% endif %}{% if activity.outside_collaborators %}
   <tr>
     <th>المتعاونون من خارج الجامعة</th>
-    <td>{{ activity.outside_collaborators }}</td>{% if is_review %}
-    <td>{{ review_form.outside_notes }}</td>{% endif %}
+    <td>{{ activity.outside_collaborators }}</td>{% if is_review or can_view_review and review %}
+    <td>{{ review.outside_notes }}</td>{% endif %}
   </tr>{% endif %}
   <tr>
     <th>تاريخ الإرسال</th>
-    <td {% if is_review %}colspan="2"{% endif %}>{{ activity.submission_date|date:"j F Y" }}</td>
+    <td {% if is_review or can_view_review and review %}colspan="2"{% endif %}>{{ activity.submission_date|date:"j F Y" }}</td>
   </tr>
   <tr>
     <th>المُرسل</th>
-    <td {% if is_review %}colspan="2"{% endif %}>{{ activity.submitter.username }}</td>
+    <td {% if is_review or can_view_review and review %}colspan="2"{% endif %}>{{ activity.submitter.username }}</td>
   </tr>
 </table>
 {% if is_review %}
-<input type="radio" name="review" value="accept" id="accept"/><label for="accept">اقبل</label><br/>
-<input type="radio" name="review" value="reject" id="reject"/><label for="reject">ارفض</label><br/>
+{{ review.is_approved.label_tag }} {{ review.is_approved }}
+
 <input type="submit" value="أرسل" />
 </form>
-{% endif %}
-
-
+{% else %}
 {% if activity.is_editable and can_edit %}
 <small><a href="{% url 'activities:edit' activity.pk %}">عدّل</a></small>
 {% endif %}
-{% if not is_review and not activity.is_approved and perms.activities.add_review %}
+{% if not review.is_approved and perms.activities.add_review %}
 <small><a href="{% url 'activities:review' activity.pk %}">راجع واعتمد</a></small>
 {% endif %}
 {% if can_view_participation and activity.collect_participants %}
 <small><a href="{% url 'activities:view_participation' activity.pk %}">شاهد طلبات المشاركة</a></small>
 {% elif user.is_authenticated and activity.collect_participants %}
 <small><a href="{% url 'activities:participate' activity.pk %}">شارك!</a></small>
+{% endif %}
 {% endif %}
 {% endblock %}

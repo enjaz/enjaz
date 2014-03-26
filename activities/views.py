@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.forms import ModelForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
 from activities.models import Activity, Review, Participation
 
@@ -24,7 +24,7 @@ class ReviewForm(ModelForm):
         fields = ['clubs_notes', 'name_notes', 'description_notes',
                   'datetime_notes', 'requirement_notes',
                   'inside_notes', 'outside_notes',
-                  'participants_notes', 'organizers_notes']
+                  'participants_notes', 'organizers_notes', 'is_approved']
 
 def list(request):
     # If the user is part of the head of the Student Club, or part of
@@ -34,11 +34,11 @@ def list(request):
     # they have memberships in (regardless of their status).
     if request.user.has_perm('activities.view_activity'):
         if request.GET.get('pending') == "1":
-            activities = Activity.objects.filter(is_approved=None)
+            activities = Activity.objects.filter(review__is_approved=None)
         else:
             activities = Activity.objects.all()
     else:
-        approved_activities = Activity.objects.filter(is_approved=True)
+        approved_activities = Activity.objects.filter(review__is_approved=True)
         if request.user.is_authenticated():
             user_activities = request.user.activity_set.all()
             user_clubs = request.user.memberships.all() | request.user.coordination.all()
@@ -83,19 +83,35 @@ def show(request, activity_id):
     # of the related clubs and the person who submitted it can see it.
 
     activity = get_object_or_404(Activity, pk=activity_id)
+    context = {'activity': activity}
     if request.user.is_authenticated():
         user_clubs = request.user.memberships.all() | request.user.coordination.all()
-        can_edit = request.user.has_perm('activities.change_activity') or \
-                   activity.primary_club in request.user.coordination.all()
-        can_view_participation = request.user.has_perm('activities.view_participation') or \
-                                 activity.primary_club in request.user.coordination.all()
+        is_coordinator = activity.primary_club in request.user.coordination.all()
+
+        if request.user.has_perm('activities.change_activity') or \
+           is_coordinator:
+            context['can_edit'] = True
+        if request.user.has_perm('activities.view_participation') or \
+           is_coordinator:
+            context['can_view_participation'] = True
+        if request.user.has_perm('activities.view_review') or \
+           is_coordinator:
+            context['can_view_review'] = True
+            try:
+                review = Review.objects.get(activity=activity)
+                context['review'] = review
+            except ObjectDoesNotExist:
+                pass
     else:
         user_clubs = Activity.objects.none()
-        can_edit = False
-        can_view_participation = False
+
     activity_primary_club = activity.primary_club
     activity_secondary_clubs = activity.secondary_clubs.all()
     activity_clubs = [activity_primary_club] + [club for club in activity_secondary_clubs]
+    try:
+        activity_status = activity.review.is_approved
+    except ObjectDoesNotExist:
+        activity_status = False
 
     # The third test condition, that is:
     #   any([club in activity_clubs for club in user_clubs])
@@ -104,14 +120,12 @@ def show(request, activity_id):
     #  will be True if any club is one of the organizers and it will
     #  be False if none is.
 
-    if not activity.is_approved and \
+    if not activity_status and \
        not request.user.has_perm('activities.view_activity') and \
        not any([club in activity_clubs for club in user_clubs]) and \
        not request.user == activity.submitter:
         raise PermissionDenied
 
-    context = {'activity': activity, 'can_edit': can_edit,
-               'can_view_participation': can_view_participation}
     return render(request, 'activities/show.html', context)
 
 @permission_required('activities.add_activity', raise_exception=True)
@@ -159,25 +173,26 @@ def edit(request, activity_id):
 
 @permission_required('activities.add_review', raise_exception=True)
 def review(request, activity_id):
+    activity = get_object_or_404(Activity, pk=activity_id)
     if request.method == 'POST':
-        activity = get_object_or_404(Activity, pk=activity_id)
-        if "review" in request.POST:
-            if 'accept' in request.POST['review']:
-                activity.is_approved = True
-            elif 'reject' in request.POST['review']:
-                activity.is_approved = False
-            activity.is_editable = False
-            activity.save()
-            return HttpResponseRedirect(reverse('activities:show', args=(activity_id,)))
-        else:
-            return HttpResponse("You are reviewing activity #%s." % activity_id)
+        review_object = Review(activity=activity, reviewer=request.user)
+        review = ReviewForm(request.POST, instance=review_object)
+        if review.is_valid():
+            review.save()
+            if review.cleaned_data['is_approved']:
+                activity.is_editable = False
+                activity.save()
+            return HttpResponseRedirect(reverse('activities:show',
+                                                args=(activity_id,)))
     else:
-        activity = get_object_or_404(Activity, pk=activity_id)
-        review = Review(reviewer=request.user, activity=activity)
-        review_form = ReviewForm(instance=review)
-        context = {'activity': activity, 'is_review': True,
-                   'review_form': review_form}
-        return render(request, 'activities/show.html', context)
+        try: # If the review is already there, edit it.
+            review_object = Review.objects.get(activity=activity)
+            review = ReviewForm(instance=review_object)
+        except ObjectDoesNotExist:
+            review = ReviewForm()
+    context = {'activity': activity, 'is_review': True,
+               'review': review}
+    return render(request, 'activities/show.html', context)
 
 @login_required
 def participate(request, activity_id):
@@ -192,8 +207,10 @@ def participate(request, activity_id):
         
     if request.method == 'POST':
         if request.POST['status'] == '1':
-            Participation.objects.create(activity=activity, user=request.user)
-            return HttpResponseRedirect(reverse('activities:show', args=(activity_id,)))
+            Participation.objects.create(activity=activity,
+                                         user=request.user)
+            return HttpResponseRedirect(reverse('activities:show',
+                                                args=(activity_id,)))
         else:
             context['error_message'] = 'unknown'
             return render(request, 'activities/participate.html', context)

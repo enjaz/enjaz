@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>%title%</title>
+<style type="text/css">
+@font-face {font-family: "GE Dinar One"; font-weight: lighter; src: url('http://msarabi95.comyr.com/HelpMacNet-Fonts-563.otf');} 
+@font-face {font-family: "GE Dinar One"; font-weight: normal; src: url('http://msarabi95.comyr.com/HelpMacNet-Fonts-565.otf');}
+#card {
+    page-break-inside: avoid;
+	width: 6.75in;
+	border-style: solid;
+	height: 2.8in;
+	background-image: url(http://msarabi95.comyr.com/niqaticardbackground.png);
+	background-size: auto 4.4in;
+	background-position: 0% -176%;
+    clear: both;
+}
+#left {
+	float: left;
+	width: 2in;
+	padding-top: 10px;
+	padding-right: 0px;
+	padding-bottom: 10px;
+	padding-left: 10px;
+	text-align: center;
+	height: 100%;
+}
+#instructions {
+	font-size: x-small;
+}
+#right {
+	float: right;
+	width: 4.5in;
+	height: 100%;
+	padding-top: 10px;
+	padding-right: 10px;
+	padding-bottom: 10px;
+}
+#logos img {
+	width: 290px;
+	height: auto;
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+	position: relative;
+	left: 80px;
+	top: -6px;
+}
+#code {
+	background-color: #FFFFFF;
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+	width: 3.5in;
+	text-align: center;
+	font-size: 26px;
+	font-family: "Courier New";
+	font-style: normal;
+	font-weight: 400;
+	position: relative;
+	top: -8px;
+}
+#qr img {
+	background-color: #FFFFFF;
+	padding-top: 4px;
+	padding-right: 4px;
+	padding-bottom: 4px;
+	padding-left: 4px;
+}
+#activity {
+	font-family: "GE Dinar One", "Arial";
+    font-size: 16px;
+	font-weight: lighter;
+}
+#role    {
+	font-weight: lighter;
+}
+#title {
+	font-weight: normal;
+}
+#instructions img {
+	height: 1.75in;
+	width: auto;
+}
+</style>
+</head>
+
+<body>
+    {% for code in collec %}
+
+        <div id="card">
+          <div id="left">
+            <div id="qr"><img src="{{ code.asset }}" width="180" height="180" alt=""/></div>
+            <div dir="rtl" id="activity">
+              <div id="title">{{ code.activity.name }}</div>
+              <div id="role">{{ code.category.label }}</div>
+            </div>
+          </div>
+          <div id="right">
+            <div id="instructions"><img src="%instructions%"alt=""/></div>
+            <div id="code">{{ code.code_string }}</div>
+        <div id="logos"><img src="http://msarabi95.comyr.com/niqatiformheader.png" alt=""/></div>
+          </div>
+        </div>
+    
+    {% endfor %}
+</body>
+</html>

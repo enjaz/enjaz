@@ -60,6 +60,7 @@ class Code(models.Model):
     # Generation-related
     collection = models.ForeignKey('Code_Collection')
     generation_date = models.DateTimeField(auto_now_add=True)
+    asset = models.CharField(max_length=300, blank=True) # either (1) short link or (2) link to QR (depending on delivery_type of parent collection)
     
     # Redeem-related
     user = models.ForeignKey(User, null=True, blank=True)
@@ -118,24 +119,29 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
     parent_order = models.ForeignKey('Code_Order') # --- relation to activity is through the Code_Order
     
     # Approval-related
-    approved = models.BooleanField(default=False) # for idea codes
+    #   Approval choices:
+    #       None: Unreviewed
+    #       True: Approved
+    #       False: Rejected
+    approved = models.NullBooleanField(default=None) # for idea codes
     
     # Delivery-related
     delivery_type = models.CharField(max_length=1, choices=DELIVERY_TYPE_CHOICES)
-    date_created = models.DateTimeField(null=True, blank=True) # date/time of actual code generation (after approval)
-    asset = "" # either the PDF file for coupons or the list of short links (as txt/html?)
+    date_created = models.DateTimeField(null=True, blank=True, default=None) # date/time of actual code generation (after approval)
+    asset = models.FileField(upload_to='codes') # either the PDF file for coupons or the list of short links (as txt/html?)
     # thought: txt or html file not for download; instead read as strings and displayed in browser
     
-    """
     def process(self):
-        if (not self.code_category == "I") or self.approved:
+        if self.approved and (not self.date_created == None):
             for i in range(self.code_count):
-                c = Code(code_type=self.code_category)
-                c.activity = self.activity
+                c = Code(category=self.code_category,
+                         activity=self.parent_order.activity,
+                         collection=self)
                 c.generate_unique()
                 c.save()
             self.date_created = timezone.now()
-    """
+            self.save()
+    
     
 class Code_Order(models.Model): # consists of one Code_Collection or more
     activity = models.ForeignKey(Activity)

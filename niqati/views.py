@@ -85,6 +85,8 @@ def create_codes(request):
     if request.method == 'POST':
         form = Order_Form(request.POST)
         if form.is_valid():
+            # if codes > 0:
+            
             # create the Code_Order
             
             o = Code_Order(activity=form.cleaned_data['activity'])
@@ -95,12 +97,11 @@ def create_codes(request):
             idea_c = form.cleaned_data['idea'] # idea count
             org_c = form.cleaned_data['organizer'] # org count
             par_c = form.cleaned_data['participant'] # participant count
-            
             counts = [idea_c, org_c, par_c]
-            
             d = form.cleaned_data['delivery_type']
             
             for cat in Category.objects.all():
+                # if code count > 0:
                 x = Code_Collection(code_count=counts[cat.pk-1],
                                     code_category=cat,
                                     delivery_type=d,
@@ -111,19 +112,14 @@ def create_codes(request):
             o.save()
             
             # create the Codes
-            
             for collec in o.code_collection_set.all():
-                # if collec.approved:
-                for i in range(collec.code_count):
-                    c = Code(collection=collec,
-                             activity=o.activity,
-                             category=collec.code_category)
-                    c.generate_unique()
-                    c.save()
-            
+                collec.process()
+                
+                # generate pdf or short links
+                
             # ---
             form = Order_Form()
-            msg = "Codes created"
+            msg = "Codes created. Any idea codes will have to be approved first."
         else: # i.e. form.is_valid() == False
             msg = "Please correct the issues below"
             
@@ -142,7 +138,21 @@ def view_orders(request):
 # Management Views
 
 def approve_codes(request):
-    return HttpResponse("No idea requests up to the moment. Enjoy your day!")
+    if request.method == 'POST':
+        pk = request.POST['pk']
+        if request.POST['action'] == "approve":
+            collec = Code_Collection.objects.get(pk=pk)
+            collec.approved = True
+            collec.process()
+            collec.save()
+        else:
+            collec = Code_Collection.objects.get(pk=pk)
+            collec.approved = False
+            collec.save()
+
+    unapproved_collec = Code_Collection.objects.filter(approved=None)
+    context = {'unapproved_collec': unapproved_collec}
+    return render(request, 'niqati/approve.html', context)
 
 def general_report(request):
     return HttpResponse("Here is a report of all students")

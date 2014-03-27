@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render
+from django import forms
 from django.forms import ModelForm
 from django.utils import timezone
 
@@ -13,11 +14,11 @@ class Order_Form(ModelForm):
     class Meta:
         model = Code_Order
         fields = ['activity']
-        
-class Collection_Form(ModelForm):
-    class Meta:
-        model = Code_Collection
-        fields = ['code_count', 'delivery_type']
+    
+    idea = forms.IntegerField()
+    organizer = forms.IntegerField()
+    participant = forms.IntegerField()
+    delivery_type = forms.ChoiceField(choices=Code_Collection.DELIVERY_TYPE_CHOICES)
 
 def index(request):
     return HttpResponseRedirect(reverse('niqati:submit')) 
@@ -82,44 +83,57 @@ def student_report(request):
 
 def create_codes(request):
     if request.method == 'POST':
-        r = request.POST
-        print r
-        form_data = {'activity': r['activity'][0]}
-        form = Order_Form(form_data)
-                        
-        print form.is_valid()
+        form = Order_Form(request.POST)
         if form.is_valid():
             # create the Code_Order
-            form.save()
-            o = Code_Order.objects.get(pk=form_data['activity'])
-            print o.pk
+            
+            o = Code_Order(activity=form.cleaned_data['activity'])
+            o.save()            
+            
+            # create the Code_Collections
+            
+            idea_c = form.cleaned_data['idea'] # idea count
+            org_c = form.cleaned_data['organizer'] # org count
+            par_c = form.cleaned_data['participant'] # participant count
+            
+            counts = [idea_c, org_c, par_c]
+            
+            d = form.cleaned_data['delivery_type']
+            
             for cat in Category.objects.all():
-                subform_data = {'code_count': r['code_count'],
-                                'delivery_type': r['delivery_type']
-                                }
-                print "subform data"
-                print subform_data
-                subform = Collection_Form(subform_data)
-                print "subform validation"
-                print subform.is_valid()
-                if subform.is_valid():
-                    subform['parent_order'] = o
-                    subform['code_category'] = cat
-                    if not cat.requires_approval:
-                        subform['approved'] = True
-                    subform.save()
+                x = Code_Collection(code_count=counts[cat.pk-1],
+                                    code_category=cat,
+                                    delivery_type=d,
+                                    parent_order=o)
+                if not cat.requires_approval: # set to approved=True if approval is not required for this category
+                    x.approved = True
+                x.save()
             o.save()
-            print "hello"
-                
+            
+            # create the Codes
+            
+            for collec in o.code_collection_set.all():
+                # if collec.approved:
+                for i in range(collec.code_count):
+                    c = Code(collection=collec,
+                             activity=o.activity,
+                             category=collec.code_category)
+                    c.generate_unique()
+                    c.save()
+            
+            # ---
+            form = Order_Form()
+            msg = "Codes created"
+        else: # i.e. form.is_valid() == False
+            msg = "Please correct the issues below"
+            
         
-        return render(request, 'niqati/create.html') 
+        context = {'form': form, 'msg': msg}
+        return render(request, 'niqati/create.html', context) 
     else:
-        order_form = Order_Form()
-        subforms = []
-        for cat in Category.objects.all():
-            subforms.append(Collection_Form())
         
-        context = {'order_form': order_form, 'subforms': subforms}
+        form = Order_Form()
+        context = {'form': form}
         return render(request, 'niqati/create.html', context) 
 
 def view_orders(request):

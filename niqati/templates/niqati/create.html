@@ -4,16 +4,11 @@
  
 <h2>إنشاء نقاط</h2>
 
-{% if message %}<p><strong>{{ message }}</strong></p>{% endif %}
+{% if msg %}<p><strong>{{ msg }}</strong></p>{% endif %}
 
 <form action="{% url 'niqati:create' %}" method="post" class="form-horizontal">
 {% csrf_token %}
-{{ order_form.as_p }}
-{% for category in subforms %}
-
-    {{ category.as_p }}
-    
-{% endfor %}
+{{ form.as_p }}
 <button type="submit" class="btn">أرسل</button>
 </form>
 {% endblock %}

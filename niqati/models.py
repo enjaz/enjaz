@@ -7,7 +7,6 @@ from django.utils import timezone
 from activities.models import Activity
 from clubs.models import Club
 
-"""
 def generate_code(length):
     chars = ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
            'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
@@ -19,7 +18,7 @@ def generate_code(length):
         j = random.randint(0, 35)
         code += chars[j]
     return code
-
+"""
 
 #######                             vvvvv
 # Must find solution to categories (below) 
@@ -68,7 +67,7 @@ class Code(models.Model):
     
     def __unicode__(self):
         return self.code_string
-"""    
+    
     def generate_unique(self):
         if not self.code_string: # only works when there is no string (when code is created for first time)
             unique = False
@@ -80,16 +79,15 @@ class Code(models.Model):
                     return
                 else:
                     unique = False
-            
+"""
     def points(self):
         return {
                 PARTICIPANT: 1,
                 ORGANIZER: 2,
                 IDEA_GENERATOR: 3,
                 }[self.code_type]
-"""
 
-"""
+
 When a club requests codes for a certain activity, a Code_Order is created. This Code_Order contains several
 Code_Collections, each corresponding to a code category (idea, organizer, etc.). Each Code_Collection contains all information
 and methods for creation of codes of its specific category. The Code_Order just houses the different Code_Collections
@@ -101,15 +99,16 @@ Code_Order is a container that contains all Code_Collections of a single order
 Management approves idea Code_Collections, not Code_Orders
 For each activity, Clubs see a list of Code_Orders, with each containing files (e.g. PDFs) representing the Code_Collections
 """
-    
-COUPON = '0'
-SHORT_LINK = '1'
-DELIVERY_TYPE_CHOICES = (
-    (COUPON, "Coupon"),
-    (SHORT_LINK, "Short link"),
-)
-    
+
 class Code_Collection(models.Model): # group of codes that are (1) of the same type & (2) of the same Code_Order
+    
+    COUPON = '0'
+    SHORT_LINK = '1'
+    DELIVERY_TYPE_CHOICES = (
+        (COUPON, "Coupon"),
+        (SHORT_LINK, "Short link"),
+    )
+    
     # Basics
     date_ordered = models.DateTimeField(auto_now_add=True)
     

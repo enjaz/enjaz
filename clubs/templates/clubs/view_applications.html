@@ -2,10 +2,14 @@
 {% block title %}مشاهدة طلبات الانضمام إلى {{ club.name }}{% endblock %}
 {% block content %}
 <h2>طلبات الانضمام إلى <a href="{% url 'clubs:show' club.pk %}">{{ club.name }}</a></h2>
+{% if applications %}
 <ul>
 {% for application in applications %}
 <li>{{ application.user.username }} - {{ application.note }} - {{ application.submission_date }}</li>
 {% endfor %}
 </ul>
+{% else %}
+<p>لا توجد أية طلبات.</p>
+{% endif %}
 {% endblock %}
 

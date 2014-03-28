@@ -97,15 +97,15 @@
 
 {% block sidebar %}
 {% if not is_review and activity.is_editable and can_edit %}
-<p style="font-size:1em;"><a href="{% url 'activities:edit' activity.pk %}">عدّل</a></p>
+<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:edit' activity.pk %}">عدّل</a></li></ul></p>
 {% endif %}
 {% if not review.is_approved and perms.activities.add_review %}
-<p style="font-size:1em;"><a href="{% url 'activities:review' activity.pk %}">راجع واعتمد</a></p>
+<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:review' activity.pk %}">راجع واعتمد</a></li></ul></p>
 {% endif %}
 {% if can_view_participation and activity.collect_participants %}
-<p style="font-size:1em;"><a href="{% url 'activities:view_participation' activity.pk %}">شاهد طلبات المشاركة</a></p>
-{% elif user.is_authenticated and activity.collect_participants %}
-<p style="font-size:1em;"><a href="{% url 'activities:participate' activity.pk %}">شارك!</a></p>
+<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:view_participation' activity.pk %}">شاهد طلبات المشاركة</a></li></ul></p>
+{% elif not is_review and user.is_authenticated and activity.collect_participants %}
+<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:participate' activity.pk %}">شارك!</a></li></ul></p>
 {% endif %}
 
 {% endblock %}

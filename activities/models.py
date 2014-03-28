@@ -37,8 +37,10 @@ class Activity(models.Model):
                                             verbose_name=u"المتعاونون من داخل الجامعة")
     outside_collaborators = models.TextField(blank=True,
                                              verbose_name=u"المتعاونون من خارج الجامعة")
-    participants = models.IntegerField(verbose_name=u"عدد المشاركين")
-    organizers = models.IntegerField(verbose_name=u"عدد المنظمين")
+    participants = models.IntegerField(verbose_name=u"عدد المشاركين",
+                                       help_text=u"العدد المتوقع للمستفيدين من النشاط")
+    organizers = models.IntegerField(verbose_name=u"عدد المنظمين",
+                                       help_text=u"عدد الطلاب الذين سينظمون النشاط")
 
     class Meta:
         permissions = (

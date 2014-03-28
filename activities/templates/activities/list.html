@@ -8,8 +8,6 @@
 
 </div><!--/add row-->
 
-
-{% if page_activities %}
 {% block sidebar %}
 {% if perms.activities.add_activity %}
 <p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:create' %}">أضف نشاطًا</a></li></ul></p>
@@ -25,6 +23,7 @@
 {% endif %}
 {% endblock %}
 {% block content %}
+{% if page_activities %}
 <table class="tg table">
   <tr>
     <th>#</th>
@@ -86,10 +85,8 @@
         {% endif %}
     </span>
 </div>
-{% endblock %}
 {% else %}
-{% block solecontent %}
     <p>لا توجد أية نشاطات.</p>
-{% endblock %}
 {% endif %}
+{% endblock %}
 

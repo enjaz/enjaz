@@ -1,11 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ activity.name }}{% endblock %}
 {% block content %}
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;border-color:#ccc;}
-.tg td{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;}
-.tg th{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
-</style>
 <h2>{{ activity.name }}</h2>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 {% if not is_review or can_view_review and review %}
@@ -28,7 +23,7 @@
 <form action="{% url 'activities:review' activity.pk %}" method="post">
 {% csrf_token %}
 {% endif %}
-<table class="tg">
+<table class="tg table-hover">
   <tr>
     <th>الوصف</th>
     <td>{{ activity.description }}</td>{% if is_review or can_view_review and review %}

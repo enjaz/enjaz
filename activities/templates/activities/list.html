@@ -1,26 +1,31 @@
 {% extends "base.html" %}
 {% block title %}النشاطات{% endblock %}
-{% block content %}
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;border-color:#ccc;}
-.tg td{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;}
-.tg th{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
-</style>
 
-{% if perms.activities.add_activity %}<a href="{% url 'activities:create' %}">أضف نشاطًا</a>{% endif %}
+
+<div class="row">
+
+<div class="col-md-">
+
+</div><!--/add row-->
+
 
 {% if page_activities %}
-<div style="float:left; font-size: 0.7em; text-align: left !important;"><p>رتّب النشاطات حسب:
-<a href="{% url 'activities:list' %}">تاريخ الإرسال</a> - 
-<a href="{% url 'activities:list' %}?order=date">تاريخ العقد</a> - 
-<a href="{% url 'activities:list' %}?order=club">النادي المنظم</a>
-</p>{% if perms.activities.add_review %}
-<p>اعرض فقط:
-<a href="{% url 'activities:list' %}?pending=1">النشاطات المُعلّقة</a>
-</p>
+{% block sidebar %}
+{% if perms.activities.add_activity %}
+<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:create' %}">أضف نشاطًا</a></li></ul></p>
 {% endif %}
-</div>
-<table class="tg">
+<p style="font-size:1em;"><strong>رتّب النشاطات حسب:</strong>
+<ul class="list-unstyled">
+<li><a href="{% url 'activities:list' %}">تاريخ الإرسال</a></li>
+<li><a href="{% url 'activities:list' %}?order=date">تاريخ العقد</a></li>
+<li><a href="{% url 'activities:list' %}?order=club">النادي المنظم</a></li></ul></p>
+{% if perms.activities.add_review %}
+<p style="font-size:1em;">اعرض فقط:
+<ul class="list-unstyled"><li><a href="{% url 'activities:list' %}?pending=1">النشاطات المُعلّقة</a></li></ul></p>
+{% endif %}
+{% endblock %}
+{% block content %}
+<table class="tg table">
   <tr>
     <th>#</th>
     <th>الاسم</th>
@@ -29,7 +34,7 @@
     <th>تاريخ الانعقاد</th>
     <th>الحالة</th>
   </tr>
-    {% for activity in page_activities %}<li>
+    {% for activity in page_activities %}
 {% if activity.review %}
 {% if activity.review.is_approved == None %}
   <tr>
@@ -43,7 +48,7 @@
 {% endif %}
     <td>{{ activity.id }}</td>
     <td><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}</a></td>
-    <td><a href="{% url 'clubs:show' activity.primary_club.id %}">{{ activity.primary_club.name }}<a/></td>
+    <td><a href="{% url 'clubs:show' activity.primary_club.id %}">{{ activity.primary_club.name }}</a></td>
     <td>{{ activity.submission_date|date:"j F" }}</td>
     <td>{{ activity.date|date:"j F" }}</td>
     <td>
@@ -66,7 +71,7 @@
   </tr>
     {% endfor %}
 </table>
-<div class="pagination">
+<div style="text-align:center;">
     <span class="step-links">
         {% if page_activities.has_previous %}
             <a href="?page={{ page_activities.previous_page_number }}">السابق</a>
@@ -81,9 +86,10 @@
         {% endif %}
     </span>
 </div>
-
+{% endblock %}
 {% else %}
+{% block solecontent %}
     <p>لا توجد أية نشاطات.</p>
+{% endblock %}
 {% endif %}
 
-{% endblock %}

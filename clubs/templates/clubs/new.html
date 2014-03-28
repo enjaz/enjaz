@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load bootstrap3 %}
 {% block title %}{% if form.has_changed %} تعديل {{ form.name.value }}{% else %} نادٍ جديد {% endif %}{% endblock %}
 {% block content %}
 <h2>{% if form.has_changed %} تعديل {{ form.name.value }} {% else %} نادٍ جديد {% endif %}</h2>
@@ -7,6 +7,10 @@
 
 <form action="{% if form.has_changed %}{% url 'clubs:edit' club_id %}{% else %}{% url 'clubs:create' %}{% endif %}" method="post">
 {% csrf_token %}
-{{ form.as_p }}
-<input type="submit" value="أرسل" />
+    {% bootstrap_form form %}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "star" %} أرسل
+        </button>
+    {% endbuttons %}
 {% endblock %}

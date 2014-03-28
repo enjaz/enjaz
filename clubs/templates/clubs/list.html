@@ -1,16 +1,28 @@
 {% extends "base.html" %}
 {% block title %}الأندية{% endblock %}
-{% block content %}
+{% block sidebar %}
 {% if perms.clubs.add_club %}
-<a href="{% url 'clubs:create' %}">أنشئ</a>
+<p style="font-size:1em;"><a href="{% url 'clubs:create' %}">أضف ناديًا</a></p>
 {% endif %}
+{% endblock %}
+{% block content %}
 {% if clubs %}
-    <ul>
+<table class="tg table">
+  <tr>
+    <th>الاسم</th>
+    <th># الأعضاء</th>
+    <th>المنسق</th>
+    <th>حالة التسجيل</th>
+  </tr>
     {% for club in clubs %}
-        <li><a href="{% url 'clubs:show' club.id %}">{{ club.name }}
-        </a></li>
+  <tr>
+    <td><a href="{% url 'clubs:show' club.id %}">{{ club.name }}</a></td>
+    <td>{% if club.members.all|length %}{{ club.members.all|length }}{% else %}لا يوجد{% endif %}</td>
+    <td>{% if club.coordinator %} {{ club.coordinator }} {% else %} لا يوجد {% endif %}</td>
+    <td>{% if club.open_membership %} مفتوح {% else %} مغلق {% endif %}</td>
+   </tr>
     {% endfor %}
-    </ul>
+</table>
 {% else %}
     <p>لا توجد أية أندية.</p>
 {% endif %}

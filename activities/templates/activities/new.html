@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load bootstrap3 %}
 {% block title %}{% if edit %} تعديل {{ form.name.value }} {% else %} نشاط جديد {% endif %}{% endblock %}
 {% block content %}
  <script>
@@ -29,7 +29,11 @@ $('#id_custom_datetime').change(function(){
 
 <form action="{% if edit %}{% url 'activities:edit' activity_id %}{% else %}{% url 'activities:create' %}{% endif %}" method="post">
 {% csrf_token %}
-{{ form.as_p }}
-<input type="submit" value="أرسل" />
+    {% bootstrap_form form %}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "star" %} أرسل
+        </button>
+    {% endbuttons %}
 </form>
 {% endblock %}

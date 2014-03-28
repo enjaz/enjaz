@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}إنشاء نقاط{% endblock %}
+{% block content %}
+ 
+<h2>إنشاء نقاط</h2>
+
+{% if msg %}<p><strong>{{ msg }}</strong></p>{% endif %}
+
+<form action="{% url 'niqati:create' %}" method="post" class="form-horizontal">
+{% csrf_token %}
+{{ form.as_p }}
+<button type="submit" class="btn">أرسل</button>
+</form>
+{% endblock %}

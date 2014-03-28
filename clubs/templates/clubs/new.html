@@ -5,7 +5,7 @@
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="{% if form.has_changed %}{% url 'clubs:edit' club_id %}{% else %}{% url 'clubs:create' %}{% endif %}" method="post">
+<form action="{% if form.has_changed %}{% else %}{% url 'clubs:create' %}{% endif %}" method="post">
 {% csrf_token %}
     {% bootstrap_form form %}
     {% buttons %}

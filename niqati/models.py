@@ -1,54 +1,154 @@
 import random
 
-from django.db import models
+from django.db import models, IntegrityError
 from django.contrib.auth.models import User
-from django.db import IntegrityError
+from django.utils import timezone
 
 from activities.models import Activity
+from clubs.models import Club
+
+def generate_code(length):
+    chars = ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+           'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+           'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6',
+           '7', '8', '9', '0')
+    code = ''
+    for i in range(length):
+        # select a random char
+        j = random.randint(0, 35)
+        code += chars[j]
+    return code
+"""
+
+#######                             vvvvv
+# Must find solution to categories (below) 
+#                                   vvvvv
+#######
+
+PARTICIPANT = 'P'
+ORGANIZER = 'O'
+IDEA_GENERATOR = 'I'
+CODE_CATEGORY_CHOICES = (
+                     (PARTICIPANT, "Participant"),
+                     (ORGANIZER, "Organizer"),
+                     (IDEA_GENERATOR, "Idea Generator"),
+                    )
+
+CODE_CATEGORIES = {
+                   IDEA_GENERATOR: {'label': "Idea", 'points': 3},
+                   ORGANIZER: {'label': "Organizer", 'points': 2},
+                   PARTICIPANT: {'label': "Participant", 'points': 1},
+                   }
+
+#######
+"""
+class Category(models.Model):
+    label = models.CharField(max_length=20)
+    ar_label = models.CharField(max_length=20)
+    points = models.IntegerField()
+    requires_approval = models.BooleanField(default=False)
+    
+    def __unicode__(self):
+        return self.label
 
 class Code(models.Model):
-    # Each code_string is a 16-digit string which is unique
-    # throughout all the db
-    code_string = models.CharField(max_length=16, unique=True)
-#    activity = models.ForeignKey(Activity)
+    # Basic Properties
+    code_string = models.CharField(max_length=16, unique=True) # a 16-digit string, unique throughout all the db
+    category = models.ForeignKey(Category)
+    activity = models.ForeignKey(Activity)
+    
+    # Generation-related
+    collection = models.ForeignKey('Code_Collection')
     generation_date = models.DateTimeField(auto_now_add=True)
+    asset = models.CharField(max_length=300, blank=True) # either (1) short link or (2) link to QR (depending on delivery_type of parent collection)
+    
+    # Redeem-related
     user = models.ForeignKey(User, null=True, blank=True)
     redeem_date = models.DateTimeField(null=True, blank=True)
     
     def __unicode__(self):
         return self.code_string
     
-    # --- Override the save() function
-    # This function assigns a unique string to each code before
-    # saving it to the database
-    # The reason this is bound to save() rather than any other function
-    # is to make sure no codes exist elsewhere in the system other than the db
-    # and new codes only have to be compared to one source
-    def save(self, *args, **kwargs):
-        duplicate_code = True # it should be false actually but the while loop won't start then
-        # Keep generating codes until unique code is generated
-        while duplicate_code:
-            duplicate_code = False
-            self.code_string = generate_code(16)
-            try:
-                # call original save
-                super(Code, self).save(*args, **kwargs)
-                break
-            except IntegrityError: # This is raised when there is duplication (self.code_string has unique=True)
-                duplicate_code = True
-                
+    def generate_unique(self):
+        if not self.code_string: # only works when there is no string (when code is created for first time)
+            unique = False
+            while unique == False:
+                new_code = generate_code(16)
+                unique = True
+                if len(Code.objects.filter(code_string=new_code)) == 0:
+                    self.code_string = new_code
+                    return
+                else:
+                    unique = False
+"""
+    def points(self):
+        return {
+                PARTICIPANT: 1,
+                ORGANIZER: 2,
+                IDEA_GENERATOR: 3,
+                }[self.code_type]
+
+
+When a club requests codes for a certain activity, a Code_Order is created. This Code_Order contains several
+Code_Collections, each corresponding to a code category (idea, organizer, etc.). Each Code_Collection contains all information
+and methods for creation of codes of its specific category. The Code_Order just houses the different Code_Collections
+together.
+---
+Code_Collection is the "functional unit" of the code generation process
+Code_Order is a container that contains all Code_Collections of a single order
+---
+Management approves idea Code_Collections, not Code_Orders
+For each activity, Clubs see a list of Code_Orders, with each containing files (e.g. PDFs) representing the Code_Collections
+"""
+
+class Code_Collection(models.Model): # group of codes that are (1) of the same type & (2) of the same Code_Order
     
-def generate_code(length):
-    chars = ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-           'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-           'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6',
-           '7', '8', '9', '0')
+    COUPON = '0'
+    SHORT_LINK = '1'
+    DELIVERY_TYPE_CHOICES = (
+        (COUPON, "Coupon"),
+        (SHORT_LINK, "Short link"),
+    )
     
-    code = ''
+    # Basics
+    date_ordered = models.DateTimeField(auto_now_add=True)
     
-    for i in range(length):
-        # select a random char
-        j = random.randint(0, 35)
-        code += chars[j]
+    # Generation-related
+    code_category = models.ForeignKey(Category)
+    code_count = models.IntegerField()
+    parent_order = models.ForeignKey('Code_Order') # --- relation to activity is through the Code_Order
     
-    return code
+    # Approval-related
+    #   Approval choices:
+    #       None: Unreviewed
+    #       True: Approved
+    #       False: Rejected
+    approved = models.NullBooleanField(default=None) # for idea codes
+    
+    # Delivery-related
+    delivery_type = models.CharField(max_length=1, choices=DELIVERY_TYPE_CHOICES)
+    date_created = models.DateTimeField(null=True, blank=True, default=None) # date/time of actual code generation (after approval)
+    asset = models.FileField(upload_to='codes') # either the PDF file for coupons or the list of short links (as txt/html?)
+    # thought: txt or html file not for download; instead read as strings and displayed in browser
+    
+    def process(self):
+        if self.approved and (not self.date_created == None):
+            for i in range(self.code_count):
+                c = Code(category=self.code_category,
+                         activity=self.parent_order.activity,
+                         collection=self)
+                c.generate_unique()
+                c.save()
+            self.date_created = timezone.now()
+            self.save()
+    
+    
+class Code_Order(models.Model): # consists of one Code_Collection or more
+    activity = models.ForeignKey(Activity)
+    date_ordered = models.DateTimeField(auto_now_add=True)
+    
+    """
+    def process(self):
+        for collec in self.code_collection_set.all():
+            collec.process()
+    """

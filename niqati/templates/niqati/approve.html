@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}مراجعة طلبات نقاط الفكرة{% endblock %}
+{% block content %}
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#ccc;}
+.tg td{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;}
+.tg th{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
+</style>
+
+<h2>مراجعة طلبات نقاط الفكرة</h2>
+
+<table class="tg">
+  <tr>
+    <th>#</th>
+    <th>النادي المنظم</th>
+    <th>اسم النشاط</th>
+    <th>عدد أكواد الفكرة المطلوبة</th>
+    <th><!-- التصرف : قبول أو رفض --></th>
+  </tr>
+{% for collec in unapproved_collec %}
+    <tr>
+    
+    <td>{{ forloop.counter }}</td>
+    <td>{{ collec.parent_order.activity.primary_club.name }}</td>
+    <td>{{ collec.parent_order.activity.name }}</td>
+    <td>{{ collec.code_count }}</td>
+    <td>
+        <form action="{% url 'niqati:approve' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="pk" value="{{ collec.pk }}"/>
+            <input type="hidden" name="action" value="approve"/>
+            <button type="submit" class="btn">قبول</button>
+        </form>
+        <form action="{% url 'niqati:approve' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="pk" value="{{ collec.pk }}"/>
+            <input type="hidden" name="action" value="reject"/>
+            <button type="submit" class="btn">رفض</button>
+        </form>    
+    </td>
+  </tr>
+{% endfor %}
+</table>
+{% endblock %}

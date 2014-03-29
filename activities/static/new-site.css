@@ -211,12 +211,12 @@ a.sb.rss:hover,
 }
 
 /* Forms */
-textarea{width:25em;
-height:10em;}
-
-input[type="text"], input[type="email"], input[type="number"], select{
-width:25em;
+textarea{width:30em;
+height:5em;
 }
+
+input[type="text"], input[type="password"], input[type="email"],input[type="number"], select{
+width:30em; }
 
 /* Global */
 body, div { margin: 0; padding: 0; }

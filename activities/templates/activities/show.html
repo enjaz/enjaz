@@ -13,7 +13,7 @@
 <table class="tg table-hover">
   <tr>
     <th>الوصف</th>
-    <td{% if can_view_review and review and not review.description_notes %} colspan="2"{% endif %}>{{ activity.description }}</td>{% if is_review or can_view_review and review %}
+    <td{% if can_view_review and review and not review.description_notes %} colspan="2"{% endif %}>{{ activity.description }}</td>{% if is_review or can_view_review and review and review.description_notes %}
     <td>{{ review.description_notes }}</td>{% endif %}
   </tr>
   <tr>

@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
 from activities.models import Activity, Review, Participation
-
+from clubs.models import Club
 
 class ActivityForm(ModelForm):
     class Meta:
@@ -145,12 +145,15 @@ def create(request):
         context = {'form': form}
         return render(request, 'activities/new.html', context)
 
+@login_required
 def edit(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id)
     user_coordination = request.user.coordination.all()
-    activity_primary_club = activity.primary_club
+    # We need a QuerySet to combine it with secondary clubs.
+    activity_primary_club = Club.objects.filter(
+        id=activity.primary_club.id)
     activity_secondary_clubs = activity.secondary_clubs.all()
-    activity_clubs = [activity_primary_club] + activity_secondary_clubs
+    activity_clubs = activity_primary_club | activity_secondary_clubs
 
     # If the user is neither the submitter, nor has the permission to
     # change activities (i.e. not part of the head of the Student
@@ -217,6 +220,7 @@ def participate(request, activity_id):
     else:
         return render(request, 'activities/participate.html', context)
 
+@login_required
 def view_participation(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id)
     if not activity.primary_club in request.user.coordination.all() and \

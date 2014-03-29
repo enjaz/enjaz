@@ -29,7 +29,7 @@ class SignupFormExtra(SignupForm):
         new_order = self.fields.keyOrder[:-3]
         new_order.insert(0, 'first_name')
         new_order.insert(1, 'last_name')
-        new_order.insert(1, 'student_id')
+        new_order.insert(2, 'student_id')
         self.fields.keyOrder = new_order
 
     def save(self):

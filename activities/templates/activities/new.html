@@ -27,7 +27,7 @@ $('#id_custom_datetime').change(function(){
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="{% if edit %}{% url 'activities:edit' activity_id %}{% else %}{% url 'activities:create' %}{% endif %}" method="post">
+<form action="{% if edit %}{% url 'activities:edit' activity_id %}{% else %}{% url 'activities:create' %}{% endif %}" method="post" class="form">
 {% csrf_token %}
     {% bootstrap_form form %}
     {% buttons %}

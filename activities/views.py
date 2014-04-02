@@ -141,7 +141,15 @@ def create(request):
             context = {'form': form}
             return render(request, 'activities/new.html', context)
     else:
-        form = ActivityForm()
+        try:
+            # It is theoretically true that the user can be a
+            # coordinator of more than one single club, but we are not
+            # taking that into consideration because it is just not
+            # common enough.
+            user_club = request.user.coordination.all()[0]
+        except IndexError:
+            user_club = None
+        form = ActivityForm(instance=Activity(primary_club=user_club))
         context = {'form': form}
         return render(request, 'activities/new.html', context)
 

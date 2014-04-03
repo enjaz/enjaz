@@ -1,14 +1,31 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load bootstrap3 %}
 {% block title %}إنشاء نقاط{% endblock %}
 {% block content %}
  
 <h2>إنشاء نقاط</h2>
 
-{% if msg %}<p><strong>{{ msg }}</strong></p>{% endif %}
+{% if msg %}
+<div class="alert alert-info alert-dismissable">
+  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+  {{ msg }}
+</div>
+{% endif %}
 
-<form action="{% url 'niqati:create' %}" method="post" class="form-horizontal">
+{% if error_message %}
+<div class="alert alert-danger alert-dismissable">
+  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+  {{ error_message }}
+</div>
+{% endif %}
+
+<form action="{% url 'niqati:create' %}" method="post">
 {% csrf_token %}
-{{ form.as_p }}
-<button type="submit" class="btn">أرسل</button>
+
+{% bootstrap_form form %}
+{% buttons %}
+    <button type="submit" class="btn btn-primary">
+        {% bootstrap_icon "star" %} أرسل
+    </button>
+{% endbuttons %}
 </form>
 {% endblock %}

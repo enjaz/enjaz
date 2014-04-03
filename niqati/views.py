@@ -27,6 +27,9 @@ def index(request):
 @login_required
 def submit(request, code=""): # (1) Shows submit code page & (2) Handles code submission requests
     if request.method == "POST":
+        # ###
+        # ! format code first i.e. make upper case & remove spaces or dashes
+        # ###
         try: # assume at first that code exists
             c = Code.objects.get(code_string=request.POST['code'])
             if not c.user: # code isn't associated with any user -- free to use
@@ -84,42 +87,39 @@ def student_report(request):
 def create_codes(request):
     if request.method == 'POST':
         form = Order_Form(request.POST)
-        if form.is_valid():
-            # if codes > 0:
-            
-            # create the Code_Order
-            
-            o = Code_Order(activity=form.cleaned_data['activity'])
-            o.save()            
-            
-            # create the Code_Collections
-            
+        if form.is_valid():            
             idea_c = form.cleaned_data['idea'] # idea count
             org_c = form.cleaned_data['organizer'] # org count
             par_c = form.cleaned_data['participant'] # participant count
             counts = [idea_c, org_c, par_c]
             d = form.cleaned_data['delivery_type']
             
-            for cat in Category.objects.all():
-                # if code count > 0:
-                x = Code_Collection(code_count=counts[cat.pk-1],
-                                    code_category=cat,
-                                    delivery_type=d,
-                                    parent_order=o)
-                if not cat.requires_approval: # set to approved=True if approval is not required for this category
-                    x.approved = True
-                x.save()
-            o.save()
+            # create the Code_Order
+            if idea_c > 0 or org_c > 0 or par_c > 0: # if code count > 0
+                o = Code_Order(activity=form.cleaned_data['activity'])
+                o.save()            
+                
+                # create the Code_Collections
+                for cat in Category.objects.all():
+                    if counts[cat.pk-1] > 0: # if ordered codes > 0
+                        x = Code_Collection(code_count=counts[cat.pk-1],
+                                            code_category=cat,
+                                            delivery_type=d,
+                                            parent_order=o)
+                        if not cat.requires_approval: # set to approved=True if approval is not required for this category
+                            x.approved = True
+                        x.save()
+                o.save()
+                # create the codes
+                host = request.build_absolute_uri(reverse('niqati:submit'))
+                print "host: " + host
+                o.process(host)
+                msg = "Codes created. Any idea codes will have to be approved first."
             
-            # create the Codes
-            for collec in o.code_collection_set.all():
-                collec.process()
+            else:
+                msg = "You didn't order any codes!"
                 
-                # generate pdf or short links
-                
-            # ---
             form = Order_Form()
-            msg = "Codes created. Any idea codes will have to be approved first."
         else: # i.e. form.is_valid() == False
             msg = "Please correct the issues below"
             
@@ -133,7 +133,26 @@ def create_codes(request):
         return render(request, 'niqati/create.html', context) 
 
 def view_orders(request):
-    return HttpResponse("You have ordered lots of codes.")
+    activities = Activity.objects.all()
+    
+    context = {'activities': activities}
+    return render(request, 'niqati/orders.html', context)
+
+def view_collection(request, pk):
+     
+    collec = get_object_or_404(Code_Collection, pk=pk)
+    
+    if collec.delivery_type == '0': # Coupon
+    
+        pdf = collec.asset.read()
+        response = HttpResponse(mimetype="application/pdf")
+        response.write(pdf)
+    else:
+        page = collec.asset.read()
+        response = HttpResponse(mimetype="text/html")
+        response.write(page)
+        
+    return response
 
 # Management Views
 
@@ -143,7 +162,9 @@ def approve_codes(request):
         if request.POST['action'] == "approve":
             collec = Code_Collection.objects.get(pk=pk)
             collec.approved = True
-            collec.process()
+            
+            host = request.build_absolute_uri(reverse('niqati:submit'))
+            collec.process(host)
             collec.save()
         else:
             collec = Code_Collection.objects.get(pk=pk)

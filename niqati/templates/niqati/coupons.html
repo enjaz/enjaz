@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>%title%</title>
+<title>{{ collec.parent_order.activity.name }} - {{ collec.code_category.ar_label }}</title>
 <style type="text/css">
 @font-face {font-family: "GE Dinar One"; font-weight: lighter; src: url('http://msarabi95.comyr.com/HelpMacNet-Fonts-563.otf');} 
 @font-face {font-family: "GE Dinar One"; font-weight: normal; src: url('http://msarabi95.comyr.com/HelpMacNet-Fonts-565.otf');}
@@ -87,19 +87,21 @@
 </head>
 
 <body>
-    {% for code in collec %}
+    {% for code in collec.code_set.all %}
 
         <div id="card">
           <div id="left">
             <div id="qr"><img src="{{ code.asset }}" width="180" height="180" alt=""/></div>
             <div dir="rtl" id="activity">
-              <div id="title">{{ code.activity.name }}</div>
-              <div id="role">{{ code.category.label }}</div>
+              <div id="title">{{ code.collection.parent_order.activity.name }}</div>
+              <div id="role">{{ code.category.ar_label }}<!-- change to ar_label --></div>
             </div>
           </div>
           <div id="right">
-            <div id="instructions"><img src="%instructions%"alt=""/></div>
-            <div id="code">{{ code.code_string }}</div>
+              
+            <div id="instructions"><img src="{{ code.category.instructions }}"alt=""/></div>
+              
+            <div id="code">{{ code.spaced_code }}</div>
         <div id="logos"><img src="http://msarabi95.comyr.com/niqatiformheader.png" alt=""/></div>
           </div>
         </div>

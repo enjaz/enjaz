@@ -15,6 +15,7 @@ $('#id_custom_datetime').change(function(){
     if($(this).val().length != 0){
         $('#id_date').attr('disabled', 'disabled');
         $('#id_time').attr('disabled', 'disabled');
+        $('#id_time').val('');
     }else{
         $('#id_date').removeAttr('disabled');
         $('#id_time').removeAttr('disabled');
@@ -30,13 +31,9 @@ $('#id_collect_participants').click(function() {
     if( $(this).is(':checked')) {
         $("#id_participant_colleges").siblings().show("slow");
         $("#id_participant_colleges").show("slow");
-        //$("form span:last-child").show();
     } else {
         $("#id_participant_colleges").siblings().hide("slow");
         $("#id_participant_colleges").hide("slow");
-        //$("form .form-group:last-child").hide();
-        //$("#id_participant_colleges").hide();
-        //$("form span:last-child").hide();
     }
 });
 

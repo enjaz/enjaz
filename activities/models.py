@@ -2,6 +2,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from clubs.models import College
+
 class Activity(models.Model):
     # For now, we will follow the current practice: only one club will
     # be considered the primary orginzier.  Others will be cosidered
@@ -28,11 +30,14 @@ class Activity(models.Model):
     time = models.CharField(max_length=200, verbose_name=u'الوقت',
                             blank=True)
     custom_datetime = models.TextField(verbose_name=u"تاريخ ووقت مخصّص",
-                                   blank=True)
+                                   blank=True, help_text=u"إذا كان النشاط الذي تنوي تنظيمه دوريا أو ممتدا لفصل كامل فعبء هذه الخانة.")
     edit_date = models.DateTimeField('date edited', auto_now=True)
     is_editable = models.BooleanField(default=True)
     collect_participants = models.BooleanField(default=False,
                                                verbose_name=u"اسمح بالتسجيل؟")
+    participant_colleges = models.ManyToManyField(College,
+                                                  verbose_name=u"الكليات المستهدفة",
+                                                  null=True, blank=True)
     inside_collaborators = models.TextField(blank=True,
                                             verbose_name=u"المتعاونون من داخل الجامعة")
     outside_collaborators = models.TextField(blank=True,
@@ -93,7 +98,7 @@ class Review(models.Model):
 
 
 class Participation(models.Model):
-    activity = models.OneToOneField(Activity, verbose_name=u" طاشنلا")
+    activity = models.ForeignKey(Activity, verbose_name=u"النشاط")
     user = models.ForeignKey(User, null=True,
                              on_delete=models.SET_NULL)
     submission_date = models.DateTimeField(auto_now_add=True)

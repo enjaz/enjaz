@@ -1,3 +1,5 @@
+import unicodecsv
+
 from django.contrib.auth.decorators import permission_required, login_required
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
@@ -16,7 +18,8 @@ class ActivityForm(ModelForm):
                   'name','description', 'date', 'time',
                   'custom_datetime', 'participants', 'organizers',
                   'requirements', 'inside_collaborators',
-                  'outside_collaborators', 'collect_participants']
+                  'outside_collaborators', 'collect_participants',
+                  'participant_colleges']
 
 class ReviewForm(ModelForm):
     class Meta:
@@ -42,16 +45,16 @@ def list(request):
         if request.user.is_authenticated():
             user_activities = request.user.activity_set.all()
             user_clubs = request.user.memberships.all() | request.user.coordination.all()
-            primary_club_activities = Activity.objects.filter(
+            primary_activities = Activity.objects.filter(
                 primary_club__in=user_clubs)
-            secondary_club_activities = Activity.objects.filter(
+            secondary_activities = Activity.objects.filter(
                 secondary_clubs__in=user_clubs)
         else:
             user_activities = Activity.objects.none()
             primary_activities = Activity.objects.none()
-            secondary_club_activities = Activity.objects.none()
+            secondary_activities = Activity.objects.none()
         activities = approved_activities | user_activities | \
-                     primary_activities | secondary_club_activities
+                     primary_activities | secondary_activities
 
     order = request.GET.get('order')
     if order == 'date':
@@ -179,7 +182,7 @@ def edit(request, activity_id):
     else:
         form = ActivityForm(instance=activity)
         context = {'form': form, 'activity_id': activity_id,
-                   'edit': True}
+                   'activity': activity, 'edit': True}
         return render(request, 'activities/new.html', context)
 
 @permission_required('activities.add_review', raise_exception=True)
@@ -208,6 +211,9 @@ def review(request, activity_id):
 @login_required
 def participate(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id)
+    colleges = activity.participant_colleges.all()
+    if colleges:
+        request.user
     existing_participation = Participation.objects.filter(activity=activity,
                                                        user=request.user)
     context = {'activity': activity}
@@ -220,7 +226,7 @@ def participate(request, activity_id):
         if request.POST['status'] == '1':
             Participation.objects.create(activity=activity,
                                          user=request.user)
-            return HttpResponseRedirect(reverse('activities:show',
+            return HttpResponseRedirect(reverse('activities:participate_done',
                                                 args=(activity_id,)))
         else:
             context['error_message'] = 'unknown'
@@ -238,3 +244,22 @@ def view_participation(request, activity_id):
     participations = Participation.objects.filter(activity=activity)
     context = {'participations': participations, 'activity': activity}
     return render(request, 'activities/view_participations.html', context)
+
+@login_required
+def download_participation(request, activity_id):
+    activity = get_object_or_404(Activity, pk=activity_id)
+    if not activity.primary_club in request.user.coordination.all() and \
+       not request.user.has_perm('activities.view_participation'):
+        raise PermissionDenied
+
+    participations = Participation.objects.filter(activity=activity)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="Participants in Activity %s.csv"' % activity_id
+
+    writer = unicodecsv.writer(response, encoding='utf-8')
+    writer.writerow(["Name", "Email"])
+    for participantion in participations:
+        name = u"%s %s" % (participantion.user.first_name, participantion.user.last_name)
+        email = participantion.user.email
+        writer.writerow([name, email])
+    return response

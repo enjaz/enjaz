@@ -49,7 +49,7 @@ class Activity(models.Model):
 
 
     def __unicode__(self):
-        return str(self.id)
+        return self.name
 
 class Review(models.Model):
     activity = models.OneToOneField(Activity, verbose_name=u" النشاط")

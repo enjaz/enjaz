@@ -20,6 +20,26 @@ $('#id_custom_datetime').change(function(){
         $('#id_time').removeAttr('disabled');
 }
 });
+
+{% if not activity.collect_participants %}
+$("#id_participant_colleges").siblings().hide();
+$("#id_participant_colleges").hide();
+{% endif %}
+
+$('#id_collect_participants').click(function() {
+    if( $(this).is(':checked')) {
+        $("#id_participant_colleges").siblings().show("slow");
+        $("#id_participant_colleges").show("slow");
+        //$("form span:last-child").show();
+    } else {
+        $("#id_participant_colleges").siblings().hide("slow");
+        $("#id_participant_colleges").hide("slow");
+        //$("form .form-group:last-child").hide();
+        //$("#id_participant_colleges").hide();
+        //$("form span:last-child").hide();
+    }
+});
+
 });
 </script>
 

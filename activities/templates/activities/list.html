@@ -36,7 +36,7 @@
     <th>الحالة</th>
   </tr>
     {% for activity in page_activities %}
-{% if activity.review %}
+{% if activity.review and user.is_authenticated %}
 {% if activity.review.is_approved == None %}
   <tr>
 {% elif activity.review.is_approved == True %}

@@ -2,6 +2,19 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+section_choices = (
+    ('M', u'طلاب'),
+    ('F', u'طالبات'),
+    ('K', u'مدينة الملك فهد'),
+)
+college_choices = (
+    ('M', u'كلية الطب'),
+    ('P', u'كلية الصيدلة'),
+    ('D', u'كلية الأسنان'),
+    ('B', u'كلية المهن الصحية'),
+    ('A', u'كلية العلوم التطبيقية'),
+)
+
 class Club(models.Model):
     name = models.CharField(max_length=200, verbose_name=u"الاسم")
     english_name = models.CharField(max_length=200, verbose_name=u"الاسم الإنجليزي")
@@ -44,3 +57,16 @@ class MembershipApplication(models.Model):
 
     def __unicode__(self):
         return self.user
+
+class Batch(models.Model):
+    college = models.ForeignKey('College')
+    batch_number = models.PositiveSmallIntegerField(verbose_name=u"رقم الدفعة")
+    def __unicode__(self):
+        return u"%s - الدفعة %d - %s" % (self.college.get_college_name_display(), self.batch_number, self.college.get_section_display())
+
+class College(models.Model):
+    section = models.CharField(max_length=1, choices=section_choices)
+    college_name = models.CharField(max_length=1, choices=college_choices)
+
+    def __unicode__(self):
+        return u"%s (%s)" % (self.get_college_name_display(), self.get_section_display())

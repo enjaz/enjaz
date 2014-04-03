@@ -1,11 +1,14 @@
 {% extends "base.html" %}
 {% block title %}مشاهدة طلبات الانضمام إلى {{ club.name }}{% endblock %}
+{% block sidebar %}
+<p><a href="{% url 'clubs:download_application' club.pk %}">نزّل الطلبات</a>.</p>
+{% endblock %}
 {% block content %}
 <h2>طلبات الانضمام إلى <a href="{% url 'clubs:show' club.pk %}">{{ club.name }}</a></h2>
 {% if applications %}
 <ul>
 {% for application in applications %}
-<li>{{ application.user.username }} - {{ application.note }} - {{ application.submission_date }}</li>
+<li>{{ application.user.first_name }} {{ application.user.last_name }} - {{ application.note }} - {{ application.submission_date }}</li>
 {% endfor %}
 </ul>
 {% else %}

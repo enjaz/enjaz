@@ -49,7 +49,7 @@
 <p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:edit' club.pk %}">عدّل</a></li></ul></p>
 {% endif %}
 {% if can_view_applications and club.open_membership %}
-<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:view_applications' club.pk %}">راجع طلبات الانضمام</a></li></ul></p>
+<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:view_application' club.pk %}">راجع طلبات الانضمام</a></li></ul></p>
 {% elif user.is_authenticated and club.open_membership %}
 <p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:join' club.pk %}">انضم للنادي!</a></li></ul></p>
 {% endif %}

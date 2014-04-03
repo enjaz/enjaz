@@ -1,3 +1,5 @@
+import unicodecsv
+
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.forms import ModelForm
@@ -32,8 +34,8 @@ def show(request, club_id):
     # see the approved ones.
     if request.user.is_authenticated() and \
        (request.user.has_perm('activities.view_activity') or \
-       club in request.user.memberships.all() or \
-       club in request.user.memberships.coordination):
+        club in request.user.memberships.all() or \
+        club in request.user.coordination.all()):
         activities = club.primary_activity.all() | club.secondary_activity.all()
     else:
         activities = club.primary_activity.filter(review__is_approved=True) |\
@@ -111,7 +113,8 @@ def join(request, club_id):
         form = MembershipForm(request.POST, instance=application)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse('clubs:show', args=(club_id,)))
+            return HttpResponseRedirect(reverse('clubs:join_done',
+                                                args=(club_id,)))
         else:
             context['form'] = form
             return render(request, 'clubs/join.html', context)
@@ -121,7 +124,7 @@ def join(request, club_id):
         return render(request, 'clubs/join.html', context)
 
 
-def view_applications(request, club_id):
+def view_application(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
     if not club in request.user.coordination.all() and \
        not request.user.has_perm('clubs.view_application'):
@@ -129,4 +132,24 @@ def view_applications(request, club_id):
 
     applications = MembershipApplication.objects.filter(club=club)
     context = {'applications': applications, 'club': club}
-    return render(request, 'clubs/view_applications.html', context)
+    return render(request, 'clubs/view_application.html', context)
+
+@login_required
+def download_application(request, club_id):
+    club = get_object_or_404(Club, pk=club_id)
+    if not club in request.user.coordination.all() and \
+       not request.user.has_perm('clubs.view_application'):
+        raise PermissionDenied
+
+    applications = MembershipApplication.objects.filter(club=club)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="Applications for Club %s.csv"' % club_id
+
+    writer = unicodecsv.writer(response, encoding='utf-8')
+    writer.writerow(["Name", "Email", "Note"])
+    for application in applications:
+        name = u"%s %s" % (application.user.first_name, application.user.last_name)
+        email = application.user.email
+        note = application.note
+        writer.writerow([name, email, note])
+    return response

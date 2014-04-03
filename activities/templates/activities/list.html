@@ -12,11 +12,13 @@
 {% if perms.activities.add_activity %}
 <p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:create' %}">أضف نشاطًا</a></li></ul></p>
 {% endif %}
+{% if page_activities %}
 <p style="font-size:1em;"><strong>رتّب النشاطات حسب:</strong>
 <ul class="list-unstyled">
 <li><a href="{% url 'activities:list' %}">تاريخ الإرسال</a></li>
 <li><a href="{% url 'activities:list' %}?order=date">تاريخ العقد</a></li>
 <li><a href="{% url 'activities:list' %}?order=club">النادي المنظم</a></li></ul></p>
+{% endif %}
 {% if perms.activities.add_review %}
 <p style="font-size:1em;">اعرض فقط:
 <ul class="list-unstyled"><li><a href="{% url 'activities:list' %}?pending=1">النشاطات المُعلّقة</a></li></ul></p>
@@ -34,7 +36,7 @@
     <th>الحالة</th>
   </tr>
     {% for activity in page_activities %}
-{% if activity.review %}
+{% if activity.review and user.is_authenticated %}
 {% if activity.review.is_approved == None %}
   <tr>
 {% elif activity.review.is_approved == True %}

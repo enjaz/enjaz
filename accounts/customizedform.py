@@ -3,6 +3,7 @@ from django import forms
 from django.utils.translation import ugettext as _
 
 from userena.forms import SignupForm
+from clubs.models import College, Batch, college_choices, section_choices
 
 class SignupFormExtra(SignupForm):
     """
@@ -11,11 +12,14 @@ class SignupFormExtra(SignupForm):
 
 
     """
+    first_name = forms.CharField(label=u'الاسم الأول',
+                                max_length=30)
+    last_name = forms.CharField(label=u'الاسم الأخير',
+                                max_length=30)
     student_id = forms.IntegerField(label=u'الرقم الجامعي')
-    first_name = forms.CharField(label=_(u'الاسم الأول'),
-                                max_length=30)
-    last_name = forms.CharField(label=_(u'الاسم الأخير'),
-                                max_length=30)
+    section = forms.CharField(label=u"القسم", max_length=1, widget=forms.Select(choices=section_choices))
+    college = forms.CharField(label=u"الكلية", max_length=1, widget=forms.Select(choices=college_choices))
+    batch = forms.IntegerField(label=u'الدفعة')
 
     def __init__(self, *args, **kw):
         """
@@ -26,10 +30,13 @@ class SignupFormExtra(SignupForm):
         """
         super(SignupFormExtra, self).__init__(*args, **kw)
         # Put the first and last name at the top
-        new_order = self.fields.keyOrder[:-3]
+        new_order = self.fields.keyOrder[:-6]
         new_order.insert(0, 'first_name')
         new_order.insert(1, 'last_name')
-        new_order.insert(1, 'student_id')
+        new_order.insert(2, 'student_id')
+        new_order.insert(3, 'section')
+        new_order.insert(4, 'college')
+        new_order.insert(5, 'batch')
         self.fields.keyOrder = new_order
 
     def save(self):
@@ -44,6 +51,12 @@ class SignupFormExtra(SignupForm):
         new_user.first_name = self.cleaned_data['first_name']
         new_user.last_name = self.cleaned_data['last_name']
         new_user.student_id = self.cleaned_data['student_id']
+        user_college = College.objects.get(
+            college_name=self.cleaned_data['college'],
+            section=self.cleaned_data['section'])
+        new_user.college = user_college
+        new_user.batch = Batch.objects.get(batch_number=self.cleaned_data['batch'],
+                                           college=user_college)
         new_user.save()
 
         # Userena expects to get the new user from this form, so return the new

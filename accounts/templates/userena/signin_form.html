@@ -1,0 +1,16 @@
+{% extends 'userena/base_userena.html' %}{% load bootstrap3 %}
+{% block title %}دخول{% endblock %}
+
+{% block content %}
+<form action="" method="post">
+  {% csrf_token %}
+    {% bootstrap_form form %}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "star" %} ادخل
+        </button>
+    {% endbuttons %}
+  <p class="forgot-password"><a href="{% url 'userena_password_reset' %}" title="أنسيت كلمة السر؟">أنسيت كلمة السر؟</a></p>
+  {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
+</form>
+{% endblock %}

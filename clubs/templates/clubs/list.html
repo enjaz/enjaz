@@ -2,7 +2,7 @@
 {% block title %}الأندية{% endblock %}
 {% block sidebar %}
 {% if perms.clubs.add_club %}
-<p style="font-size:1em;"><a href="{% url 'clubs:create' %}">أضف ناديًا</a></p>
+<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:create' %}">أضف ناديًا</a></li></ul></p>
 {% endif %}
 {% endblock %}
 {% block content %}
@@ -19,7 +19,7 @@
     <td><a href="{% url 'clubs:show' club.id %}">{{ club.name }}</a></td>
     <td>{% if club.members.all|length %}{{ club.members.all|length }}{% else %}لا يوجد{% endif %}</td>
     <td>{% if club.coordinator %} {{ club.coordinator }} {% else %} لا يوجد {% endif %}</td>
-    <td>{% if club.open_membership %} مفتوح {% else %} مغلق {% endif %}</td>
+    <td>{% if club.open_membership %} <a href="{% url 'clubs:join' club.id %}">مفتوح</a> {% else %} مغلق {% endif %}</td>
    </tr>
     {% endfor %}
 </table>

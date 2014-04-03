@@ -1,0 +1,15 @@
+{% extends 'userena/base_userena.html' %}{% load bootstrap3 %}
+
+{% block title %}سجّل{% endblock %}
+
+{% block content %}
+<form action="" method="post">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  {% buttons %}
+      <button type="submit" class="btn btn-primary">
+          {% bootstrap_icon "star" %} سجّل
+      </button>
+  {% endbuttons %}
+</form>
+{% endblock %}

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load bootstrap3 %}
 {% block title %}اشترك في {{ club.name }}{% endblock %}
 {% block content %}
 <h2>الاشتراك في {{ club.name }}</h2>
@@ -11,8 +11,12 @@
 أنت عضو في النادي!
 {% else %}
 <form action="{% url 'clubs:join' club.id %}" method="post">
-{% csrf_token %}
-{{ form.as_p }}
-<input type="submit" value="أرسل" />
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "star" %} أرسل
+        </button>
+    {% endbuttons %}
 {% endif %}
 {% endblock %}

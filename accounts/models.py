@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
 from userena.models import UserenaBaseProfile
-
+from clubs.models import College, Batch
 
 class MyProfile(UserenaBaseProfile):
     user = models.OneToOneField(User,
@@ -15,3 +15,5 @@ class MyProfile(UserenaBaseProfile):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     clubs = models.ManyToManyField('clubs.Club', null=True)
+    college = models.ForeignKey(College, null=True)
+    batch = models.ForeignKey(Batch, null=True)

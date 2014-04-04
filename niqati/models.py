@@ -67,6 +67,7 @@ class Code(models.Model):
                 else:
                     unique = False
     
+    # returns a "spaced code" i.e. XXXX XXXX XXXX XXXX instead of XXXXXXXXXXXXXXXX
     def spaced_code(self):
         spaced_code = ""
         for i in range(len(self.code_string)):
@@ -145,6 +146,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 html_file = render_to_string('niqati/coupons.html', context)
 
                 """
+                # never mind this commented-out bit; it's just for testing
                 output_file = open("codes.html", "wb")
                 output_file.write(html_file.encode('utf-8'))
                 output_file = open("codes.html", "r+")
@@ -154,7 +156,6 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 os.remove(output_file)
                 """
                 
-                # turned off temporarily just to test what really happens in the html file
                 try:
                     # create an API client instance
                     client = pdfcrowd.Client("msarabi95", "78a46547997be8ccadbe1ff05f84e967")
@@ -192,7 +193,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 self.asset.save(self.parent_order.activity.name + " - " + self.code_category.ar_label, File(output_file))
                 output_file.close()
                 
-                # os.remove(output_file)
+                os.remove(output_file)
                 
 
 class Code_Order(models.Model): # consists of one Code_Collection or more

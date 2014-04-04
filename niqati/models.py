@@ -1,3 +1,4 @@
+import string
 import random
 import requests
 import os
@@ -14,15 +15,12 @@ from activities.models import Activity
 from clubs.models import Club
 
 def generate_code(length):
-    chars = ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-           'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-           'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6',
-           '7', '8', '9', '0')
+    chars = string.ascii_uppercase + string.digits
     code = ''
     for i in range(length):
         # select a random char
-        j = random.randint(0, 35)
-        code += chars[j]
+        char = random.choice(chars)
+        code += char
     return code
 
 class Category(models.Model):

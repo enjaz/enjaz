@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}{% endblock %}
+{% block sidebar %}
+<p style="font-size:1em;"><ul class="list-unstyled">
+    <li><a href="{% url 'niqati:create' %}">أنشئ نقاطًا</a></li>
+    <li><a href="{% url 'niqati:orders' %}">النقاط المطلوبة</a></li>
+</ul></p>
+<br/>
+<p style="font-size:1em;"><ul class="list-unstyled">
+    <li><a href="{% url 'niqati:submit' %}">أدخل نقاطًا</a></li>
+    <li><a href="{% url 'niqati:student_report' %}">تقرير نقاطي</a></li>
+</ul></p>
+<br/>
+<p style="font-size:1em;"><ul class="list-unstyled">
+    <li><a href="{% url 'niqati:approve' %}">مراجعة طلبات نقاط الفكرة</a></li>
+    <li><a href="{% url 'niqati:general_report' %}">التقرير العام</a></li>
+</ul></p>
+{% endblock %}
+{% block content %}
+{% endblock %}

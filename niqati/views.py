@@ -150,10 +150,13 @@ def view_collection(request, pk):
             response = HttpResponse(mimetype="text/html")
         response.write(final_file)
     except ValueError: # If the (idea) codes weren't approved.
-        if collec.approved == False:
-            context = {'message': 'disapproved'}
+        if collec.code_category.label == 'Idea':
+            if collec.approved == False:
+                context = {'message': 'disapproved'}
+            else:
+                context = {'message': 'pending'}
         else:
-            context = {'message': 'pending'}
+            context = {'message': 'unknown'}
         response = render(request, 'niqati/order_not_approved.html', context)
 
     return response

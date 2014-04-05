@@ -1,3 +1,4 @@
+# -*- coding: utf-8  -*-
 import string
 import random
 import requests
@@ -95,8 +96,8 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
     COUPON = '0'
     SHORT_LINK = '1'
     DELIVERY_TYPE_CHOICES = (
-        (COUPON, "Coupon"),
-        (SHORT_LINK, "Short link"),
+        (COUPON, u"كوبونات"),
+        (SHORT_LINK, u"روابط قصيرة"),
     )
 
     # Basics
@@ -197,7 +198,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 
 
 class Code_Order(models.Model): # consists of one Code_Collection or more
-    activity = models.ForeignKey(Activity)
+    activity = models.ForeignKey(Activity, verbose_name=u"النشاط")
     date_ordered = models.DateTimeField(auto_now_add=True)
 
     def process(self, host):

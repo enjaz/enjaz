@@ -1,0 +1,9 @@
+{% extends "niqati_base.html" %}
+{% block title %}لم تعتمد!{% endblock %}
+{% block content %}
+{% if message = 'pending' %}
+<p class="btn-warning">لم تعتمد نقاط الأفكار حتى الآن.</p>
+{% else %}
+<p class="btn-danger">رُفضت نقاط الفكرة.</p>
+{% endif %}
+{% endblock %}

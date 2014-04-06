@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}{{ club.name }}{% endblock %}
 {% block content %}
 <h2>{{ club.name }}</h2>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
@@ -16,7 +17,7 @@
     <td>{{ club.description }}</td>
   </tr>
   <tr>
-    <th>البريد الإلكرتوني</th>
+    <th>البريد الإلكتروني</th>
     <td style="direction:ltr;">{{ club.email }}</td>
   </tr>
 {% if club.parent %}
@@ -24,24 +25,27 @@
     <th>النادي الأب</th>
     <td>{{ club.parent }}</td>
   </tr>
-{% endif %}{% if club.coordinator.name %}
+{% endif %}
+{% if club.coordinator.name %}
   <tr>
     <th>المنسق</th>
     <td>{{ club.coordinator.name }}</td>
-  </tr>{% endif %}
+  </tr>
+{% endif %}
   <tr>
     <th>تاريخ الإنشاء</th>
     <td>{{ club.creation_date|date:"j F Y" }}</td>
-  </tr>{% if activities %}
+  </tr>
+{% if activities %}
   <tr>
     <th>النشاطات</th>
     <td><ul>
-{% for activity in activities %}
-<li><a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a></li>
-{% endfor %}
-</ul>
-</td>
-  </tr>{% endif %}
+        {% for activity in activities %}
+        <li><a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a></li>
+        {% endfor %}
+    </ul></td>
+  </tr>
+{% endif %}
 </table>
 {% endblock %}
 {% block sidebar %}

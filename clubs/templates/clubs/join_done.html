@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}نجح التسجيل{% endblock %}
 {% block solecontent %}
-<p>سجّلت بنجاح! سيستلم منظمو النشاط اسمك وقد يتواصلون معك إن تطلب النشاط ذلك.</p>
+<p>تم تسجيلك في النادي بنجاح!</p>
 
-<p><a href="{% url 'activities:show' activity_id %}">عُد إلى صفحة النشاط</a></p>
+<p><a href="{% url 'clubs:list' %}">عُد إلى صفحة الأندية</a></p>
 
 {% endblock %}
 

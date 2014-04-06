@@ -9,10 +9,10 @@ section_choices = (
 )
 college_choices = (
     ('M', u'كلية الطب'),
+    ('A', u'كلية العلوم الطبية التطبيقية'),
     ('P', u'كلية الصيدلة'),
-    ('D', u'كلية الأسنان'),
-    ('B', u'كلية المهن الصحية'),
-    ('A', u'كلية العلوم التطبيقية'),
+    ('D', u'كلية طب الأسنان'),
+    ('B', u'كلية العلوم و المهن الصحية'),
 )
 
 class Club(models.Model):
@@ -58,6 +58,8 @@ class MembershipApplication(models.Model):
     def __unicode__(self):
         return self.user
 
+# vvv Why is this here (in this file)? (Saeed on Sun. Apr. 6) vvv
+    
 class Batch(models.Model):
     college = models.ForeignKey('College')
     batch_number = models.PositiveSmallIntegerField(verbose_name=u"رقم الدفعة")

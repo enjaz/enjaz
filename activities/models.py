@@ -17,11 +17,11 @@ class Activity(models.Model):
     secondary_clubs = models.ManyToManyField('clubs.Club', blank=True,
                                             null=True,
                                             related_name="secondary_activity",
-                                            verbose_name=u"النوادي المساندة")
-    name = models.CharField(max_length=200, verbose_name=u"الاسم")
-    description = models.TextField(verbose_name=u"الوصف")
+                                            verbose_name=u"الأندية المتعاونة")
+    name = models.CharField(max_length=200, verbose_name=u"اسم النشاط")
+    description = models.TextField(verbose_name=u"وصف النشاط")
     requirements = models.TextField(blank=True,
-                                    verbose_name=u"المتطلبات")
+                                    verbose_name=u"متطلبات النشاط")
     submitter = models.ForeignKey(User, null=True,
                                   on_delete=models.SET_NULL)
     submission_date = models.DateTimeField('date submitted',

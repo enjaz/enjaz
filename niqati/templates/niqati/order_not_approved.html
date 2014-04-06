@@ -1,0 +1,11 @@
+{% extends "niqati_base.html" %}
+{% block title %}خطأ{% endblock %}
+{% block content %}
+{% if message == 'pending' %}
+<p class="btn-warning">لم تعتمد نقاط الأفكار حتى الآن.</p>
+{% elif message == 'disapproved' %}
+<p class="btn-danger">رُفضت نقاط الفكرة.</p>
+{% else %}
+<p class="btn-danger">خطأ غير معروف.</p>
+{% endif %}
+{% endblock %}

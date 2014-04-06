@@ -9,6 +9,7 @@
 
 <h2>مراجعة طلبات نقاط الفكرة</h2>
 
+{% if unapproved_collec %}
 <table class="tg">
   <tr>
     <th>#</th>
@@ -25,22 +26,23 @@
     <td>{{ collec.parent_order.activity.name }}</td>
     <td>{{ collec.code_count }}</td>
     <td>
-        <div class="btn-group">
-            <form action="{% url 'niqati:approve' %}" method="post">
-                {% csrf_token %}
-                <input type="hidden" name="pk" value="{{ collec.pk }}"/>
-                <input type="hidden" name="action" value="approve"/>
-                <button type="submit" class="btn btn-primary">قبول</button>
-            </form>
-            <form action="{% url 'niqati:approve' %}" method="post">
-                {% csrf_token %}
-                <input type="hidden" name="pk" value="{{ collec.pk }}"/>
-                <input type="hidden" name="action" value="reject"/>
-                <button type="submit" class="btn btn-default">رفض</button>
-            </form>  
-        </div>
+        <form action="{% url 'niqati:approve' %}" method="post" class="form-group">
+            {% csrf_token %}
+            <input type="hidden" name="pk" value="{{ collec.pk }}"/>
+            <input type="hidden" name="action" value="approve"/>
+            <button type="submit" class="btn btn-success">قبول</button>
+        </form>
+        <form action="{% url 'niqati:approve' %}" method="post" class="form-group">
+            {% csrf_token %}
+            <input type="hidden" name="pk" value="{{ collec.pk }}"/>
+            <input type="hidden" name="action" value="reject"/>
+            <button type="submit" class="btn btn-danger">رفض</button>
+        </form>    
     </td>
   </tr>
 {% endfor %}
 </table>
+{% else %}
+<p>لا توجد نقاط عالقة.</p>
+{% endif %}
 {% endblock %}

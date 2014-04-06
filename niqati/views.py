@@ -1,3 +1,4 @@
+# -*- coding: utf-8  -*-
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
@@ -15,10 +16,11 @@ class Order_Form(ModelForm):
         model = Code_Order
         fields = ['activity']
     
-    idea = forms.IntegerField()
-    organizer = forms.IntegerField()
-    participant = forms.IntegerField()
-    delivery_type = forms.ChoiceField(choices=Code_Collection.DELIVERY_TYPE_CHOICES)
+    idea = forms.IntegerField(label=u"الفكرة", help_text=u"عدد نقاط الفكرة")
+    organizer = forms.IntegerField(label=u"المنظمون", help_text=u"عدد نقاط التنظيم")
+    participant = forms.IntegerField(label=u"المشاركون", help_text=u"عدد نقاط المشاركة")
+    delivery_type = forms.ChoiceField(label=u"طريقة التسليم",
+                      choices=Code_Collection.DELIVERY_TYPE_CHOICES)
 
 def index(request):
     return HttpResponseRedirect(reverse('niqati:submit')) 
@@ -96,8 +98,7 @@ def create_codes(request):
             
             # create the Code_Order
             if idea_c > 0 or org_c > 0 or par_c > 0: # if code count > 0
-                o = Code_Order(activity=form.cleaned_data['activity'])
-                o.save()            
+                o = Code_Order.objects.create(activity=form.cleaned_data['activity'])
                 
                 # create the Code_Collections
                 for cat in Category.objects.all():
@@ -109,19 +110,19 @@ def create_codes(request):
                         if not cat.requires_approval: # set to approved=True if approval is not required for this category
                             x.approved = True
                         x.save()
-                o.save()
+
                 # create the codes
                 host = request.build_absolute_uri(reverse('niqati:submit'))
                 print "host: " + host
                 o.process(host)
-                msg = "Codes created. Any idea codes will have to be approved first."
+                msg = "أنشئت النقاط، لكن سيتعين الموافقة على نقاط الأفكار أولا."
             
             else:
-                msg = "You didn't order any codes!"
+                msg = u"لم تطلب أية أكواد!"
                 
             form = Order_Form()
         else: # i.e. form.is_valid() == False
-            msg = "Please correct the issues below"
+            msg = u"الرجاء تصحيح الأخطاء أدناه"
             
         
         context = {'form': form, 'msg': msg}
@@ -139,19 +140,25 @@ def view_orders(request):
     return render(request, 'niqati/orders.html', context)
 
 def view_collection(request, pk):
-     
     collec = get_object_or_404(Code_Collection, pk=pk)
-    
-    if collec.delivery_type == '0': # Coupon
-    
-        pdf = collec.asset.read()
-        response = HttpResponse(mimetype="application/pdf")
-        response.write(pdf)
-    else:
-        page = collec.asset.read()
-        response = HttpResponse(mimetype="text/html")
-        response.write(page)
-        
+    try:
+        if collec.delivery_type == '0': # Coupon
+            final_file = collec.asset.read()
+            response = HttpResponse(mimetype="application/pdf")
+        else:
+            final_file = collec.asset.read()
+            response = HttpResponse(mimetype="text/html")
+        response.write(final_file)
+    except ValueError: # If the (idea) codes weren't approved.
+        if collec.code_category.label == 'Idea':
+            if collec.approved == False:
+                context = {'message': 'disapproved'}
+            else:
+                context = {'message': 'pending'}
+        else:
+            context = {'message': 'unknown'}
+        response = render(request, 'niqati/order_not_approved.html', context)
+
     return response
 
 # Management Views

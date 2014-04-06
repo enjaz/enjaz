@@ -1,3 +1,5 @@
+# -*- coding: utf-8  -*-
+import string
 import random
 import requests
 import os
@@ -14,15 +16,12 @@ from activities.models import Activity
 from clubs.models import Club
 
 def generate_code(length):
-    chars = ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-           'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-           'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6',
-           '7', '8', '9', '0')
+    chars = string.ascii_uppercase + string.digits
     code = ''
     for i in range(length):
         # select a random char
-        j = random.randint(0, 35)
-        code += chars[j]
+        char = random.choice(chars)
+        code += char
     return code
 
 class Category(models.Model):
@@ -69,6 +68,7 @@ class Code(models.Model):
                 else:
                     unique = False
     
+    # returns a "spaced code" i.e. XXXX XXXX XXXX XXXX instead of XXXXXXXXXXXXXXXX
     def spaced_code(self):
         spaced_code = ""
         for i in range(len(self.code_string)):
@@ -96,8 +96,8 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
     COUPON = '0'
     SHORT_LINK = '1'
     DELIVERY_TYPE_CHOICES = (
-        (COUPON, "Coupon"),
-        (SHORT_LINK, "Short link"),
+        (COUPON, u"كوبونات"),
+        (SHORT_LINK, u"روابط قصيرة"),
     )
 
     # Basics
@@ -147,6 +147,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 html_file = render_to_string('niqati/coupons.html', context)
 
                 """
+                # never mind this commented-out bit; it's just for testing
                 output_file = open("codes.html", "wb")
                 output_file.write(html_file.encode('utf-8'))
                 output_file = open("codes.html", "r+")
@@ -156,7 +157,6 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 os.remove(output_file)
                 """
                 
-                # turned off temporarily just to test what really happens in the html file
                 try:
                     # create an API client instance
                     client = pdfcrowd.Client("msarabi95", "78a46547997be8ccadbe1ff05f84e967")
@@ -194,11 +194,11 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 self.asset.save(self.parent_order.activity.name + " - " + self.code_category.ar_label, File(output_file))
                 output_file.close()
                 
-                # os.remove(output_file)
+                os.remove(output_file)
                 
 
 class Code_Order(models.Model): # consists of one Code_Collection or more
-    activity = models.ForeignKey(Activity)
+    activity = models.ForeignKey(Activity, verbose_name=u"النشاط")
     date_ordered = models.DateTimeField(auto_now_add=True)
 
     def process(self, host):

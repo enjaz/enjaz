@@ -40,7 +40,7 @@
     <th>التاريخ والوقت</th>
     <td{% if can_view_review and review and not review.datetime_notes %} colspan="2"{% endif %}>{% if activity.date %}{{ activity.date|date:"j F Y" }}<br/>{{ activity.time }}{% else %}{{ activity.custom_datetime }}{% endif %}</td>{% if is_review or can_view_review and review and review.datetime_notes %}
     <td>{{ review.datetime_notes }}</td>{% endif %}
-  </tr>
+  </tr>{% if can_edit or can_view_review %}
   <tr>
     <th>عدد المشتركين</th>
     <td{% if can_view_review and review and not review.participants_notes %} colspan="2"{% endif %}>{{ activity.participants }}</td>{% if is_review or can_view_review and review and review.participants_notes %}
@@ -73,20 +73,20 @@
   <tr>
     <th>المُرسل</th>
     <td {% if is_review or can_view_review and review %}colspan="2"{% endif %}>{{ activity.submitter.username }}</td>
-  </tr>{% if not is_review %}
+  </tr>{% endif %}{% if not is_review %}
   <tr>
     <th>الحالة</th>
     <td colspan="2">
 {% if activity.review %}
 {% if activity.review.is_approved == None %}
-هذا النشاط ينتظر التعديل!
+مُعلّق
 {% elif activity.review.is_approved == True %}
-هذا النشاط اعتمد!
+معتمد
 {% elif activity.review.is_approved == False %}
-هذا النشاط رُفض!
+مرفوض
 {% endif %}
 {% else %}
-هذا النشاط لم يراجع بعد.
+لم يراجع بعد.
 {% endif %}
 </td>
   </tr>{% endif %}

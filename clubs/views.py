@@ -14,6 +14,13 @@ class ClubForm(ModelForm):
         model = Club
         fields = ['name','english_name','description', 'email',
                   'parent', 'coordinator', 'open_membership']
+    def clean(self):
+        # Remove spaces at the start and end of all text fields.
+        cleaned_data = super(ClubForm, self).clean()
+        for field in cleaned_data:
+            if isinstance(cleaned_data[field], unicode):
+                cleaned_data[field] = cleaned_data[field].strip()
+        return cleaned_data
 
 class MembershipForm(ModelForm):
     class Meta:
@@ -21,7 +28,7 @@ class MembershipForm(ModelForm):
         fields = ['note']
 
 def list(request):
-    clubs = Club.objects.all()
+    clubs = Club.objects.exclude(english_name="Presidency")
     context = {'clubs':clubs}
     return render(request, 'clubs/list.html', context)
 

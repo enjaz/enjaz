@@ -14,12 +14,13 @@ from clubs.models import Club
 class ActivityForm(ModelForm):
     class Meta:
         model = Activity
-        fields = ['primary_club', 'secondary_clubs',
+        fields = ['primary_club', # primary club is already known (signed in):
+                                  # no need to include as field
                   'name','description', 'date', 'time',
-                  'custom_datetime', 'participants', 'organizers',
-                  'requirements', 'inside_collaborators',
-                  'outside_collaborators', 'collect_participants',
-                  'participant_colleges']
+                  'custom_datetime', 'organizers', 'participants',
+                  'secondary_clubs', 'inside_collaborators',
+                  'outside_collaborators', 'requirements',
+                  'collect_participants', 'participant_colleges']
 
 class ReviewForm(ModelForm):
     class Meta:
@@ -27,7 +28,7 @@ class ReviewForm(ModelForm):
         fields = ['clubs_notes', 'name_notes', 'description_notes',
                   'datetime_notes', 'requirement_notes',
                   'inside_notes', 'outside_notes',
-                  'participants_notes', 'organizers_notes', 'is_approved']
+                  'organizers_notes', 'participants_notes', 'is_approved']
 
 def list(request):
     # If the user is part of the head of the Student Club, or part of

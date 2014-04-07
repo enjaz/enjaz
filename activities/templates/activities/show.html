@@ -10,7 +10,11 @@
 <form action="{% url 'activities:review' activity.pk %}" method="post">
 {% csrf_token %}
 {% endif %}
-<table class="tg table-hover">
+<table class="tg table-hover table">
+  <colgroup>
+    <col class="col-xs-3">
+    <col class="col-xs-5">
+  </colgroup>
   <tr>
     <th>الوصف</th>
     <td{% if can_view_review and review and not review.description_notes %} colspan="2"{% endif %}>{{ activity.description }}</td>{% if is_review or can_view_review and review and review.description_notes %}

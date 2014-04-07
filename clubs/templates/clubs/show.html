@@ -3,11 +3,11 @@
 {% block content %}
 <h2>{{ club.name }}</h2>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-<table class="tg table-hover">
-  <tr>
-    <th>#</th>
-    <td>{{ club.id }}</td>
-  </tr>
+<table class="tg table-hover table">
+  <colgroup>
+    <col class="col-xs-2">
+    <col class="col-xs-6">
+  </colgroup>
   <tr>
     <th>الاسم الإنجليزي</th>
     <td style="direction:ltr;">{{ club.english_name }}</td>

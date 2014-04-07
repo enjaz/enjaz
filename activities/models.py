@@ -26,6 +26,8 @@ class Activity(models.Model):
                                   on_delete=models.SET_NULL)
     submission_date = models.DateTimeField('date submitted',
                                            auto_now_add=True)
+    location = models.CharField(max_length=200,
+                                verbose_name=u"المكان", blank=True)
     date = models.DateField(u'التاريخ', null=True, blank=True)
     time = models.CharField(max_length=200, verbose_name=u'الوقت',
                             blank=True)

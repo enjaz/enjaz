@@ -159,6 +159,7 @@ def show(request, activity_id):
 
 @permission_required('activities.add_activity', raise_exception=True)
 def create(request):
+    presidency = Club.objects.get(english_name="Presidency")
     if request.method == 'POST':
         activity = Activity(submitter=request.user)
         if request.user.has_perm('activities.directly_add_activity'):
@@ -169,7 +170,6 @@ def create(request):
             form_object = form.save()
             # If the chosen primary_club is the Presidency, make it
             # automatically approved.
-            presidency = Club.objects.get(english_name="Presidency")
             if form_object.primary_club == presidency:
                 review_object = Review.objects.create(
                     activity=form_object, reviewer=request.user,
@@ -179,6 +179,7 @@ def create(request):
             context = {'form': form}
             return render(request, 'activities/new.html', context)
     else:
+        can_directly_add = request.user.has_perm("activities.directly_add_activity")
         try:
             # It is theoretically true that the user can be a
             # coordinator of more than one single club, but we are not
@@ -186,7 +187,14 @@ def create(request):
             # common enough.
             user_club = request.user.coordination.all()[0]
         except IndexError:
-            user_club = None
+            # Make it more user-friendly: if the user is an admin,
+            # automatically choose presidency as the default
+            # primary_club.
+            if can_directly_add:
+                user_club = presidency
+            else:
+                user_club = None
+
         activity = Activity(primary_club=user_club)
         if request.user.has_perm("activities.directly_add_activity"):
             form = DirectActivityForm(instance=activity)

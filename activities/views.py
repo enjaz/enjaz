@@ -1,3 +1,4 @@
+# -*- coding: utf-8  -*-
 import unicodecsv
 
 from django.contrib.auth.decorators import permission_required, login_required
@@ -25,10 +26,10 @@ class ActivityForm(ModelForm):
         model = Activity
         fields = ['primary_club', 'secondary_clubs',
                   'name','description', 'date', 'time',
-                  'custom_datetime', 'participants', 'organizers',
-                  'requirements', 'inside_collaborators',
-                  'outside_collaborators', 'collect_participants',
-                  'participant_colleges']
+                  'custom_datetime', 'location', 'participants',
+                  'organizers', 'requirements',
+                  'inside_collaborators', 'outside_collaborators',
+                  'collect_participants', 'participant_colleges']
 
     def clean(self):
         # Remove spaces at the start and end of all text fields.
@@ -308,9 +309,12 @@ def download_participation(request, activity_id):
     response['Content-Disposition'] = 'attachment; filename="Participants in Activity %s.csv"' % activity_id
 
     writer = unicodecsv.writer(response, encoding='utf-8')
-    writer.writerow(["Name", "Email"])
+    writer.writerow([u"الاسم", u"البريد"])
     for participantion in participations:
-        name = u"%s %s" % (participantion.user.first_name, participantion.user.last_name)
+        if participantion.user.first_name:
+            name = u"%s %s" % (participantion.user.first_name, participantion.user.last_name)
+        else:
+            name = participantion.user.username
         email = participantion.user.email
         writer.writerow([name, email])
     return response

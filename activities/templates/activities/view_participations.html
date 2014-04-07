@@ -8,7 +8,7 @@
 {% if participations %}
 <ul>
 {% for participation in participations %}
-<li>{{ participation.user.first_name }} {{ participation.user.last_name }} - {{ participation.submission_date }}</li>
+<li>{% if participation.user.first_name %}{{ participation.user.first_name }} {{ participation.user.last_name }}{% else %}{{ participation.user.username }}{% endif %} - {{ participation.submission_date }}</li>
 {% endfor %}
 </ul>
 {% else %}

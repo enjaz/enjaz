@@ -8,7 +8,8 @@
 {% if applications %}
 <ul>
 {% for application in applications %}
-<li>{{ application.user.first_name }} {{ application.user.last_name }} - {{ application.note }} - {{ application.submission_date }}</li>
+<li>{% if application.user.first_name %}{{ application.user.first_name }} {{ application.user.last_name }}{% else %}{{ application.user.username }}{% endif %} - {{ application.note }} - {{ application.submission_date }}
+</li>
 {% endfor %}
 </ul>
 {% else %}

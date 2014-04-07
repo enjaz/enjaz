@@ -46,7 +46,8 @@ class Club(models.Model):
 class MembershipApplication(models.Model):
     club = models.ForeignKey(Club, related_name='club')
     user = models.ForeignKey(User, related_name='user')
-    note = models.TextField(verbose_name=u"لماذا تريد الانضمام؟")
+    note = models.TextField(verbose_name=u"لماذا تريد الانضمام؟",
+           help_text=u"هل لديك مهارات مخصوصة؟ هل لديك أفكار لنشاطات؟")
     submission_date = models.DateTimeField('date submitted',
                                            auto_now_add=True)
 

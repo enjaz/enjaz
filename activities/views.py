@@ -3,7 +3,7 @@ import unicodecsv
 from django.contrib.auth.decorators import permission_required, login_required
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
-from django.forms import ModelForm
+from django.forms import ModelForm, ModelChoiceField, ModelMultipleChoiceField
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
@@ -12,6 +12,15 @@ from activities.models import Activity, Review, Participation
 from clubs.models import Club
 
 class ActivityForm(ModelForm):
+    """A general form, which doesn't include 'Presidency'."""
+    queryset = Club.objects.exclude(english_name="Presidency")
+    primary_club = ModelChoiceField(queryset=queryset,
+                                    label=Activity.primary_club.field.verbose_name,
+                                    help_text=Activity.primary_club.field.help_text)
+    secondary_clubs = ModelMultipleChoiceField(queryset=queryset,
+                                    label=Activity.secondary_clubs.field.verbose_name,
+                                    help_text=Activity.secondary_clubs.field.help_text,
+                                    required=False)
     class Meta:
         model = Activity
         fields = ['primary_club', 'secondary_clubs',
@@ -21,6 +30,24 @@ class ActivityForm(ModelForm):
                   'outside_collaborators', 'collect_participants',
                   'participant_colleges']
 
+    def clean(self):
+        # Remove spaces at the start and end of all text fields.
+        cleaned_data = super(ActivityForm, self).clean()
+        for field in cleaned_data:
+            if isinstance(cleaned_data[field], unicode):
+                cleaned_data[field] = cleaned_data[field].strip()
+        return cleaned_data
+
+class DirectActivityForm(ActivityForm):
+    """A form which has 'Presidency' as an option."""
+    queryset = Club.objects.all()
+    primary_club = ModelChoiceField(queryset=queryset,
+                                    label=Activity.primary_club.field.verbose_name,
+                                    help_text=Activity.primary_club.field.help_text)
+    secondary_clubs = ModelMultipleChoiceField(queryset=queryset,
+                                    label=Activity.secondary_clubs.field.verbose_name,
+                                    help_text=Activity.secondary_clubs.field.help_text,
+                                    required=False)
 class ReviewForm(ModelForm):
     class Meta:
         model = Review
@@ -84,7 +111,6 @@ def show(request, activity_id):
     # If the activity is approved, everyone can see it.  If it is not,
     # only the head of the Student Club, the Media Team, the members
     # of the related clubs and the person who submitted it can see it.
-
     activity = get_object_or_404(Activity, pk=activity_id)
     context = {'activity': activity}
     if request.user.is_authenticated():
@@ -134,11 +160,20 @@ def show(request, activity_id):
 @permission_required('activities.add_activity', raise_exception=True)
 def create(request):
     if request.method == 'POST':
-        # Set the submission_date automatically.
         activity = Activity(submitter=request.user)
-        form = ActivityForm(request.POST, instance=activity)
+        if request.user.has_perm('activities.directly_add_activity'):
+            form = DirectActivityForm(request.POST, instance=activity)
+        else:
+            form = ActivityForm(request.POST, instance=activity)
         if form.is_valid():
-            form.save()
+            form_object = form.save()
+            # If the chosen primary_club is the Presidency, make it
+            # automatically approved.
+            presidency = Club.objects.get(english_name="Presidency")
+            if form_object.primary_club == presidency:
+                review_object = Review.objects.create(
+                    activity=form_object, reviewer=request.user,
+                    is_approved=True)
             return HttpResponseRedirect(reverse('activities:list'))
         else:
             context = {'form': form}
@@ -152,7 +187,11 @@ def create(request):
             user_club = request.user.coordination.all()[0]
         except IndexError:
             user_club = None
-        form = ActivityForm(instance=Activity(primary_club=user_club))
+        activity = Activity(primary_club=user_club)
+        if request.user.has_perm("activities.directly_add_activity"):
+            form = DirectActivityForm(instance=activity)
+        else:
+            form = ActivityForm(instance=activity)
         context = {'form': form}
         return render(request, 'activities/new.html', context)
 
@@ -189,7 +228,11 @@ def edit(request, activity_id):
 def review(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id)
     if request.method == 'POST':
-        review_object = Review(activity=activity, reviewer=request.user)
+        try: # If the review is already there, edit it.
+            review_object = Review.objects.get(activity=activity)
+        except ObjectDoesNotExist:
+            review_object = Review(activity=activity,
+                                   reviewer=request.user)
         review = ReviewForm(request.POST, instance=review_object)
         if review.is_valid():
             review.save()

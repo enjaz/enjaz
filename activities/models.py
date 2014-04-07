@@ -50,6 +50,7 @@ class Activity(models.Model):
     class Meta:
         permissions = (
             ("view_activity", "Can view all available activities."),
+            ("directly_add_activity", "Can add activities directly, without approval."),
         )
 
 

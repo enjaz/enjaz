@@ -26,7 +26,7 @@
 {% endblock %}
 {% block content %}
 {% if page_activities %}
-<table class="tg table">
+<table class="tg table table-hover">
   <tr>
     <th>#</th>
     <th>الاسم</th>
@@ -53,20 +53,32 @@
     <td>{{ activity.submission_date|date:"j F" }}</td>
     <td>{{ activity.date|date:"j F" }}</td>
     <td>
-{% if activity.review %}
-{% if activity.review.is_approved == None %}
+{% if not activity.review_set.all %}
+  {% if perms.activities.add_review %}<a href="{% url 'activities:review' activity.id %}">مُعلّق</a>{% else %}معلّق{% endif %}
+{% elif activity.review_set.all|length_is:"1" %}
+  {% if activity.review_set.all.0.review_type == 'P' %}
+    {% if activity.review_set.all.0.is_approved == None %}
     ينتظر تعديلا
-{% elif activity.review.is_approved == True %}
-    معتمد
-{% elif activity.review.is_approved == False %}
-    مرفوض
-{% endif %}
-{% else %}
-{% if perms.activities.add_review %}
-    <a href="{% url 'activities:review' activity.id %}">مُعلّق</a>
-{% else %}
-    مُعلّق
-{% endif %}
+    {% elif activity.review_set.all.0.is_approved == True %}
+    ينتظر مراجعة العمادة
+    {% elif activity.review_set.all.0.is_approved == False %}
+    رفضته الرئاسة
+    {% endif %}
+  {% elif activity.review_set.all.0.review_type == 'D' %}
+    {% if activity.review_set.all.0.is_approved == True %}
+    اعتمدته العمادة
+    {% endif %}
+  {% endif %}
+{% elif activity.review_set.all|length_is:"2" %}
+  {% if activity.review_set.all.1.review_type == 'D' %}
+    {% if activity.review_set.all.1.is_approved == None %}
+    ينتظر تعديلا
+    {% elif activity.review_set.all.1.is_approved == True %}
+    اعتمده العمادة
+    {% elif activity.review_set.all.1.is_approved == False %}
+    رفضته الرئاسة
+    {% endif %}
+  {% endif %}
 {% endif %}
     </td>
   </tr>
@@ -79,7 +91,7 @@
         {% endif %}
 
         <span class="current">
-            الصفحة {{ page_activities.number }} من {{ page_activities.paginator.num_pages }}.
+            الصفحة {{ page_activities.number }} من {{ page_activities.paginator.num_pages }}
         </span>
 
         {% if page_activities.has_next %}

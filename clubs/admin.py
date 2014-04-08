@@ -1,5 +1,5 @@
 from django.contrib import admin
-from clubs.models import College, Batch
+from clubs.models import College
 
 admin.site.register(College)
-admin.site.register(Batch)
+

@@ -33,7 +33,8 @@ class Activity(models.Model):
                             blank=True)
     custom_datetime = models.TextField(verbose_name=u"تاريخ ووقت مخصّص",
                                    blank=True, help_text=u"إذا كان النشاط الذي تنوي تنظيمه دوريا أو ممتدا لفصل كامل فعبء هذه الخانة.")
-    edit_date = models.DateTimeField('date edited', auto_now=True)
+    edit_date = models.DateTimeField('date edited', auto_now=True,
+                                     null=True)
     is_editable = models.BooleanField(default=True)
     collect_participants = models.BooleanField(default=False,
                                                verbose_name=u"اسمح بالتسجيل؟")
@@ -64,7 +65,8 @@ class Review(models.Model):
     reviewer = models.ForeignKey(User, null=True,
                                  on_delete=models.SET_NULL)
     review_date = models.DateTimeField(u'تاريخ المراجعة', auto_now_add=True)
-    edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
+    edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True,
+                                     null=True)
     clubs_notes = models.TextField(blank=True,
                                    verbose_name=u"ملاحظات على الأندية")
     name_notes = models.TextField(blank=True,

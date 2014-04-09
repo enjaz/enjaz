@@ -89,7 +89,7 @@ class Review(models.Model):
         ('P', u"رئاسة نادي الطلاب"),
         ('D', u"عمادة شؤون الطلاب"),
         )
-    review_type = models.CharField(max_length=1,
+    review_type = models.CharField(max_length=1, default='P',
                                    choices=review_type_choices,
                                    verbose_name=u"نوع المراجعة")
     approval_choices = (

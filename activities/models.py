@@ -33,8 +33,7 @@ class Activity(models.Model):
                             blank=True)
     custom_datetime = models.TextField(verbose_name=u"تاريخ ووقت مخصّص",
                                    blank=True, help_text=u"إذا كان النشاط الذي تنوي تنظيمه دوريا أو ممتدا لفصل كامل فعبء هذه الخانة.")
-    edit_date = models.DateTimeField('date edited', auto_now=True,
-                                     null=True)
+    edit_date = models.DateTimeField('date edited', auto_now=True)
     is_editable = models.BooleanField(default=True)
     collect_participants = models.BooleanField(default=False,
                                                verbose_name=u"اسمح بالتسجيل؟")

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}طلبات استعارة كتبي{% endblock %}
+
+{% block content %}
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#ccc;}
+.tg td{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;}
+.tg th{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
+</style>
+
+<h2>طلبات استعارة كتبي</h2>
+{% if books %}
+{% for book in books %}
+    <h3 id="book{{ book.pk }}"><a href="{% url 'books:show' book.pk %}">{{ book.title }}</a></h3>
+  {% if book.bookrequest_set.all %}
+<table class="table">
+  <tr>
+    <th>#</th>
+    <th>الاسم</th>
+    <th>وقت الطلب</th>
+    <th>الاستعارة من</th>
+    <th>الاستعارة حتى</th>
+    <th><!-- التصرف : قبول أو رفض --></th>
+  </tr>
+    {% for book_request in book.bookrequest_set.all %}
+      {% if book_request.status != 'W' %}
+  <tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ book_request.requester }}</td>
+    <td>{{ book_request.submission_date }}</td>
+    <td>{{ book_request.borrow_from }}</td>
+    <td>{{ book_request.borrow_until }}</td>
+
+        {% if book_request.status = 'P' %}
+    <td>
+        <form action="{% url 'books:review_requests' %}" method="post" class="form-group">
+            {% csrf_token %}
+            <input type="hidden" name="pk" value="{{ book_request.pk }}"/>
+            <input type="hidden" name="action" value="approve"/>
+            <button type="submit" class="btn btn-success">قبول</button>
+        </form>
+        <form action="{% url 'books:review_requests' %}" method="post" class="form-group">
+            {% csrf_token %}
+            <input type="hidden" name="pk" value="{{ book_request.pk }}"/>
+            <input type="hidden" name="action" value="reject"/>
+            <button type="submit" class="btn btn-danger">رفض</button>
+        </form> 
+        {% elif book_request.status == 'R' %}
+    <td class="btn-danger">
+         رفضتَ
+        {% elif book_request.status == 'A' %}
+
+          {% if book_request.book.status == 'H' %}
+    <td class="btn-warning">
+         قبلتَ الاستعارة. بانتظار أن يؤكد المستعير استلامه.
+          {% elif book_request.book.status == 'B' %}
+    <td class="btn-success">
+         قبلتَ الاستعارة، وأكد المستعير استلامه.
+          {% endif %}
+        {% endif %}
+    </td>
+  </tr>
+      {% endif %}
+    {% endfor %}
+</table>
+  {% else %}
+  <p>لم يطلب أحد هذا الكتاب.</p>
+  {% endif %}
+{% endfor %}
+
+{% else %}
+<p>لم تساهم بأي كتب. <a href="{% url 'books:contribute' %}">ساهم الآن!</a></p>
+{% endif %}
+{% endblock %}

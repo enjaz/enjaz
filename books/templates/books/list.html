@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}الكتب{% endblock %}
+{% block sidebar %}
+{% if perms.books.add_book %}
+<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'books:contribute' %}">ساهم بكتاب!</a></li>
+{% if user.is_authenticated %}<li><a href="{% url 'books:review_requests' %}">طلبات استعارة كتبي</a></li>
+<li><a href="{% url 'books:my_requests' %}">طلباتي</a></li>{% endif %}</ul></p>
+{% endif %}
+{% if page_books %}
+<p style="font-size:1em;"><strong>رتّب الكتب حسب:</strong>
+<ul class="list-unstyled">
+<li><a href="{% url 'books:list' %}">تاريخ المساهمة</a></li>
+<li><a href="{% url 'books:list' %}?order=status">الحالة</a></li></ul></p>
+<p style="font-size:1em;"><strong>رشّح الكتب:</strong>
+<ul class="list-unstyled">
+<li><a href="{% url 'books:list' %}">جميع الكتب</a></li>
+{% if user.is_authenticated %}<li><a href="{% url 'books:list' %}?filter=mine">كتبي فقط</a></li>{% endif %}
+<li><a href="{% url 'books:list' %}?filter=available">الكتب المتاحة</a></li></p>
+{% endif %}
+{% endblock %}
+{% block content %}
+{% if page_books %}
+<table class="tg table table-hover">
+  <tr>
+    <th>اسم الكتاب</th>
+    <th>متوفر من</th>
+    <th>متوفر حتى</th>
+    <th>الحالة</th>
+  </tr>
+    {% for book in page_books %}
+  <tr>
+    <td style="direction:ltr;"><a href="{% url 'books:show' book.pk %}">{{ book.title }}</a></td>
+    <td>{{ book.available_from }}</td>
+    <td>{% if book.available_until %}{{ book.available_until }}{% else %} - {% endif %}</td>
+    <td>{% if book.status == 'A' %}متاح
+{% elif book.status == 'H' %}محجوز
+{% elif book.status == 'B' %}معار
+{% elif book.status == 'W' %}مسحوب
+{% endif %}
+</td>
+  </tr>
+
+    {% endfor %}
+</table>
+<div style="text-align:center;">
+    <span class="step-links">
+        {% if page_books.has_previous %}
+            <a href="?page={{ page_books.previous_page_number }}">السابق</a>
+        {% endif %}
+
+        <span class="current">
+            الصفحة {{ page_books.number }} من {{ page_books.paginator.num_pages }}
+        </span>
+
+        {% if page_books.has_next %}
+            <a href="?page={{ page_books.next_page_number }}">التالي</a>
+        {% endif %}
+    </span>
+</div>
+{% else %}
+    <p>لا توجد أية كتب.</p>
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,35 @@
+{% extends "base.html" %}{% load bootstrap3 %}
+{% block title %}{% if edit %} تعديل {{ form.title.value }} {% else %} كتاب جديد {% endif %}{% endblock %}
+{% block content %}
+ <script>
+$(function() {
+$( "#id_available_from" ).datepicker({
+    dateFormat: "yy-mm-dd",{% if not edit %}
+    minDate: 0,{% endif %}
+    onSelect: function(dateText) {$( "#id_available_until" ).datepicker( "option", "minDate", dateText );}
+});
+$( "#id_available_until" ).datepicker({
+    dateFormat: "yy-mm-dd",{% if not edit %}
+    minDate: 0,{% endif %}
+    onSelect: function(dateText) {$( "#id_available_from" ).datepicker( "option", "maxDate", dateText );}
+});
+});
+</script>
+
+<h2>{% if edit %} تعديل {{ form.title.value }} {% else %} {% if form.title.value %} إضافة {{ form.title.value }} {% else %} كتاب جديد {% endif %}{% endif %}</h2>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% if edit %}{% url 'books:edit' book_id %}{% else %}{% url 'books:contribute' %}{% endif %}" method="post" class="form">
+{% csrf_token %}
+    <input type="hidden" name="is_submit" value="1"/>
+    {% bootstrap_form form %}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "star" %} أرسل
+        </button>
+    {% endbuttons %}
+</form>
+{% endblock %}
+
+

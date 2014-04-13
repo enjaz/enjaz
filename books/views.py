@@ -33,9 +33,9 @@ class BookForm(ModelForm):
     class Meta:
         model = Book
         fields = ['isbn', 'title', 'contact', 'available_from',
-                  'available_until', 'description', 'pages',
+                  'available_until', 'tags', 'description', 'pages',
                   'authors', 'publisher', 'year', 'edition',
-                  'condition', 'tags']
+                  'condition']
 
 class BookRequestForm(ModelForm):
     def clean(self):
@@ -186,7 +186,7 @@ def contribute(request):
                         else:
                             final_details[field] = book_field
                     else:
-                        if field == pageCount:
+                        if field == 'pageCount':
                             final_details[field] = None
                         else:
                             final_details[field] = ''

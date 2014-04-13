@@ -170,7 +170,7 @@ def contribute(request):
             final_details = {}
             fields = ['title', 'publisher', 'description', 'authors',
                       'pageCount', 'categories', 'publishedDate']
-            if book_details['totalItems'] == 1:
+            if book_details['totalItems'] >= 1:
                 for field in fields:
                     if field in book_details['items'][0]['volumeInfo']:
                         book_field = book_details['items'][0]['volumeInfo'][field]
@@ -192,9 +192,9 @@ def contribute(request):
                             final_details[field] = ''
             elif book_details['totalItems'] == 0:
                 errors.append('no_data')
-            else: # If the results were more than one.
-                print "Fix this!", isbn
-                errors.append('too_many')
+            #else: # If the results were more than one.
+            #    print "Fix this!", isbn
+            #    errors.append('too_many')
             if not errors:
                 form = BookForm(instance=Book(isbn=isbn,
                                               title=final_details['title'],

@@ -14,5 +14,4 @@ class MyProfile(UserenaBaseProfile):
     student_id = models.IntegerField(null=True, blank=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    clubs = models.ManyToManyField('clubs.Club', null=True)
     college = models.ForeignKey(College, null=True)

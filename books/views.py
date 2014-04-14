@@ -292,19 +292,28 @@ def review_requests(request):
     if request.method == 'POST':
         pk = request.POST['pk']
         book_request = BookRequest.objects.get(pk=pk)
+        book = book_request.book
         if not book_request.book.submitter == request.user:
             raise PermissionDenied
+
         if request.POST['action'] == "approve":
             # TODO: Make sure that the book isn't already borrowed or
             # held!
             book_request.status = 'A'
-            book = book_request.book
             book.status = 'H'
             book.save()
             book_request.save()
         elif request.POST['action'] == "reject":
             book_request.status = 'R'
             book_request.save()
+        elif request.POST['action'] == "return":
+            book.status = 'A'
+            book_request.status = 'S'
+            book.save()
+            book_request.save()
+            # TODO: Ask the submitter whether they want to keep the
+            # book in the library or not.  For now, we will just keep
+            # it.
         return HttpResponseRedirect(reverse('books:review_requests'))
     else:
         user_books = Book.objects.filter(submitter=request.user)
@@ -316,16 +325,25 @@ def my_requests(request):
     if request.method == 'POST':
         pk = request.POST['pk']
         book_request = BookRequest.objects.get(pk=pk)
+        book = book_request.book
         if not book_request.requester == request.user:
             raise PermissionDenied
-        if request.POST['action'] == "withdraw" and book_request.status == 'P':
-            book_request.status = 'W'
-            book_request.save()
-        elif request.POST['action'] == "confirm" and book_request.status == 'A':
-            book = book_request.book
-            book.status = 'B'
-            book.save()
-            # TODO: Send niqati
+        if 'action' in request.POST:
+            if request.POST['action'] == "withdraw" and \
+               book_request.status == 'P':
+                book_request.status = 'W'
+                book_request.save()
+            elif request.POST['action'] == "confirm" and \
+                 book_request.status == 'A':
+                book.status = 'B'
+                book.save()
+                # TODO: Send niqati
+            elif request.POST['action'] == "return" and \
+                 book_request.status == 'A':
+                book.status = 'R'
+                book.save()
+                # TODO: Email the submitter and ask them to confirm
+                # whether they have actually received the book back.
         else:
             context = {'error': True}
             return render(request, 'books/my_requests.html', context)

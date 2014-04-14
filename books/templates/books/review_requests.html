@@ -37,13 +37,13 @@
             {% csrf_token %}
             <input type="hidden" name="pk" value="{{ book_request.pk }}"/>
             <input type="hidden" name="action" value="approve"/>
-            <button type="submit" class="btn btn-success">قبول</button>
+            <button type="submit" class="btn btn-success">اقبل</button>
         </form>
         <form action="{% url 'books:review_requests' %}" method="post" class="form-group">
             {% csrf_token %}
             <input type="hidden" name="pk" value="{{ book_request.pk }}"/>
             <input type="hidden" name="action" value="reject"/>
-            <button type="submit" class="btn btn-danger">رفض</button>
+            <button type="submit" class="btn btn-danger">ارفض</button>
         </form> 
         {% elif book_request.status == 'R' %}
     <td class="btn-danger">
@@ -56,7 +56,19 @@
           {% elif book_request.book.status == 'B' %}
     <td class="btn-success">
          قبلتَ الاستعارة، وأكد المستعير استلامه.
+          {% elif book_request.book.status == 'R' %}
+    <td class="btn-warning">
+         هل أرجع المستعير الكتاب؟
+        <form action="{% url 'books:review_requests' %}" method="post" class="form-group">
+            {% csrf_token %}
+            <input type="hidden" name="pk" value="{{ book_request.pk }}"/>
+            <input type="hidden" name="action" value="return"/>
+            <button type="submit" class="btn btn-success">أرجعه</button>
+        </form>
           {% endif %}
+        {% elif book_request.status == 'S' %}
+    <td class="btn-success">
+         أعيد الكتاب
         {% endif %}
     </td>
   </tr>

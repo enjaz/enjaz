@@ -21,6 +21,7 @@ class Book(models.Model):
         ('H', u'محجوز'),
         ('B', u'معار'),
         ('W', u'مسحوب'),
+        ('R', u'معاد'),
         )
     status = models.CharField(max_length=1, default='A',
                               verbose_name=u"الحالة",
@@ -64,6 +65,7 @@ class BookRequest(models.Model):
         ('W', u'ملغاة'),
         ('A', u'مقبولة'),
         ('R', u'مرفوضة'),
+        ('S', u'أعيد الكتاب'),
         )
     status = models.CharField(max_length=1, default='P',
                               choices=status_choices,

@@ -29,6 +29,7 @@
 
         {% if book_request.status == 'P' %}
     <td>
+         بانتظار موافقة المعير.
         <form action="{% url 'books:my_requests' %}" method="post" class="form-group">
             {% csrf_token %}
             <input type="hidden" name="pk" value="{{ book_request.pk }}"/>
@@ -50,13 +51,24 @@
             <button type="submit" class="btn btn-success">استُلم</button>
         </form>
           {% elif book_request.book.status == 'B' %}
-    <td class="btn-success">
-          الكتاب معك
+    <td>
+          الكتاب معك. نأمل أن تعيده في الوقت المحدد.
+        <form action="{% url 'books:my_requests' %}" method="post" class="form-group">
+            {% csrf_token %}
+            <input type="hidden" name="pk" value="{{ book_request.pk }}"/>
+            <input type="hidden" name="action" value="return"/>
+            <button type="submit" class="btn btn-info">أرجعتُ الكتاب</button>
+        </form>
+          {% elif book_request.book.status == 'R' %}
+    <td class="btn-warning">
+          أعدت الكتاب. بانتظار تأكيد المعير.
           {% endif %}
         {% elif book_request.status == 'W' %}
     <td class="btn-warning">
           ألغيتَ طلبك
-
+        {% elif book_request.status == 'S' %}
+    <td class="btn-success">
+          أعدتَ الكتاب
         {% endif %}
     </td>
   </tr>

@@ -3,6 +3,7 @@ import datetime
 import urllib2
 import json
 import string
+import re
 
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required, login_required
@@ -12,6 +13,7 @@ from django.forms import ModelForm, ValidationError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from taggit.models import Tag
 
 from books.models import Book, BookRequest
 
@@ -29,6 +31,17 @@ class BookForm(ModelForm):
                 del cleaned_data["available_from"]
                 del cleaned_data["available_until"]
         return cleaned_data
+
+    def clean_tags(self):
+        """Make sure that only English tags are used."""
+        # TODO: Do it on the client side as well by preventing Arabic
+        # input to ths field.
+        english_regex = re.compile(ur'\b[A-Za-z\']+\b', re.U)
+        tags = self.cleaned_data['tags']
+        for tag in tags:
+            if not re.match(english_regex, tag):
+                raise ValidationError(u'يجب أن تكون كل الوسوم إنجليزية')
+        return tags
 
     class Meta:
         model = Book
@@ -205,7 +218,7 @@ def contribute(request):
                                               year=final_details['publishedDate'],
                                               available_from=datetime.date.today(),
                                               contact=request.user.email,))
-                context = {'form': form}
+                context = {'form': form, 'tags': Tag.objects.all()}
                 return render(request, 'books/edit.html', context)
         else:
             errors.append('no_isbn')
@@ -216,6 +229,7 @@ def contribute(request):
         avaliable_to = get_gender(request.user)            
         book = Book(submitter=request.user, avaliable_to=avaliable_to)
         form = BookForm(request.POST, instance=book)
+
         if form.is_valid():
             form_object = form.save()
             return HttpResponseRedirect(reverse('books:show', args=(form_object.pk,)))

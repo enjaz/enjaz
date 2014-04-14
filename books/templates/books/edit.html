@@ -63,7 +63,7 @@ return false;
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="{% if edit %}{% url 'books:edit' book_id %}{% else %}{% url 'books:contribute' %}{% endif %}" method="post" class="form">
+<form action="{% if edit %}{% url 'books:edit' book.pk %}{% else %}{% url 'books:contribute' %}{% endif %}" method="post" class="form">
 {% csrf_token %}
     <input type="hidden" name="is_submit" value="1"/>
     {% bootstrap_form form %}

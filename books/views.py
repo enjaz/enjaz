@@ -371,8 +371,8 @@ def edit(request, book_id):
         return HttpResponseRedirect(reverse('books:show', args=(book_id,)))
     else:
         form = BookForm(instance=book)
-        context = {'form': form, 'book_id': book_id, 'book': book,
-                   'edit': True}
+        context = {'form': form, 'book': book, 'edit': True, 'tags':
+                   Tag.objects.all()}
         return render(request, 'books/edit.html', context)
 
 @login_required

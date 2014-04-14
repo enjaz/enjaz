@@ -43,8 +43,8 @@ class Book(models.Model):
                                            auto_now=True)
     available_from = models.DateField(u'متوفر ابتداءً من', help_text=u"ترغب في إعارة هذا الكتاب ابتداءً من هذا التاريخ (مطلوب)")
     available_until = models.DateField(u'متوفر حتى', help_text=u"ترغب في إعارة هذا الكتاب حتى هذا التاريخ (اختياري)", null=True, blank=True)
-    tags = TaggableManager(verbose_name=u"وسوم",
-                           help_text=u"قائمة بوسوم إنجليزية مفصولة بفاصلة")
+    tags = TaggableManager(verbose_name=u"التصنيفات",
+                           help_text=u"ما التصانيف الإنجليزية التي تراها ملائمة؟ (مطلوبة ومفصولة بفواصل، مثلا: \"Respiratory, Physiology\")")
 
     class Meta:
         permissions = (

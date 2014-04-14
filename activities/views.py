@@ -1,3 +1,4 @@
+# -*- coding: utf-8  -*-
 import unicodecsv
 
 from django.contrib.auth.decorators import permission_required, login_required
@@ -124,12 +125,16 @@ def show(request, activity_id):
         if request.user.has_perm('activities.view_participation') or \
            is_coordinator:
             context['can_view_participation'] = True
-        if request.user.has_perm('activities.view_review') or \
+        if request.user.has_perm('activities.can_view_deanship_review') or \
            is_coordinator:
-            context['can_view_review'] = True
+            context['can_view_deanship_review'] = True
+        if request.user.has_perm('activities.can_view_presidency_review') or \
+           is_coordinator:
+            context['can_view_presidency_review'] = True
             try:
-                review = Review.objects.get(activity=activity)
-                context['review'] = review
+                review_p = Review.objects.get(activity=activity,
+                                              review_type='P')
+                context['review_p'] = review_p
             except ObjectDoesNotExist:
                 pass
     else:
@@ -138,8 +143,21 @@ def show(request, activity_id):
     activity_primary_club = activity.primary_club
     activity_secondary_clubs = activity.secondary_clubs.all()
     activity_clubs = [activity_primary_club] + [club for club in activity_secondary_clubs]
+
+    # We obtain the deanship review specifically because, really,
+    # that's what matters in determining whether a user can see the
+    # activity.
     try:
-        activity_status = activity.review.is_approved
+        review_d = Review.objects.get(activity=activity,
+                                      review_type='D')
+        context['review_d'] = review_d
+    except ObjectDoesNotExist:
+        review_d = False
+
+    try:
+        # The important review here is the deanship's, beacuse that
+        # what would determine whether the activity is accessible.
+        activity_status = review_d
     except ObjectDoesNotExist:
         activity_status = False
 
@@ -149,7 +167,6 @@ def show(request, activity_id):
     #  orginizing the activity that the user is trying to see.  If
     #  will be True if any club is one of the organizers and it will
     #  be False if none is.
-
     if not activity_status and \
        not request.user.has_perm('activities.view_activity') and \
        not any([club in activity_clubs for club in user_clubs]) and \
@@ -160,6 +177,7 @@ def show(request, activity_id):
 
 @permission_required('activities.add_activity', raise_exception=True)
 def create(request):
+    presidency = Club.objects.get(english_name="Presidency")
     if request.method == 'POST':
         activity = Activity(submitter=request.user)
         if request.user.has_perm('activities.directly_add_activity'):
@@ -169,17 +187,17 @@ def create(request):
         if form.is_valid():
             form_object = form.save()
             # If the chosen primary_club is the Presidency, make it
-            # automatically approved.
-            presidency = Club.objects.get(english_name="Presidency")
+            # automatically approved by the deanship.
             if form_object.primary_club == presidency:
                 review_object = Review.objects.create(
                     activity=form_object, reviewer=request.user,
-                    is_approved=True)
+                    is_approved=True, review_type='D')
             return HttpResponseRedirect(reverse('activities:list'))
         else:
             context = {'form': form}
             return render(request, 'activities/new.html', context)
     else:
+        can_directly_add = request.user.has_perm("activities.directly_add_activity")
         try:
             # It is theoretically true that the user can be a
             # coordinator of more than one single club, but we are not
@@ -187,7 +205,14 @@ def create(request):
             # common enough.
             user_club = request.user.coordination.all()[0]
         except IndexError:
-            user_club = None
+            # Make it more user-friendly: if the user is an admin,
+            # automatically choose presidency as the default
+            # primary_club.
+            if can_directly_add:
+                user_club = presidency
+            else:
+                user_club = None
+
         activity = Activity(primary_club=user_club)
         if request.user.has_perm("activities.directly_add_activity"):
             form = DirectActivityForm(instance=activity)
@@ -225,15 +250,26 @@ def edit(request, activity_id):
                    'activity': activity, 'edit': True}
         return render(request, 'activities/new.html', context)
 
-@permission_required('activities.add_review', raise_exception=True)
 def review(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id)
+
+    # We have two types of reviews: the one that is submitted by the
+    # presidency (first), and the one that is done by the deanship.
+    if request.user.has_perm('activities.add_presidency_review'):
+        review_type = 'P'
+    elif request.user.has_perm('activities.add_deanship_review'):
+        review_type = 'D'
+    else:
+        raise PermissionDenied
+
     if request.method == 'POST':
         try: # If the review is already there, edit it.
-            review_object = Review.objects.get(activity=activity)
+            review_object = Review.objects.get(activity=activity,
+                                               review_type=review_type)
         except ObjectDoesNotExist:
             review_object = Review(activity=activity,
-                                   reviewer=request.user)
+                                   reviewer=request.user,
+                                   review_type=review_type)
         review = ReviewForm(request.POST, instance=review_object)
         if review.is_valid():
             review.save()
@@ -244,13 +280,14 @@ def review(request, activity_id):
                                                 args=(activity_id,)))
     else:
         try: # If the review is already there, edit it.
-            review_object = Review.objects.get(activity=activity)
+            review_object = Review.objects.get(activity=activity,
+                                               review_type=review_type)
             review = ReviewForm(instance=review_object)
         except ObjectDoesNotExist:
             review = ReviewForm()
-    context = {'activity': activity, 'is_review': True,
-               'review': review}
-    return render(request, 'activities/show.html', context)
+    context = {'activity': activity,'review': review, 'review_type':
+               review_type}
+    return render(request, 'activities/review.html', context)
 
 @login_required
 def participate(request, activity_id):
@@ -301,9 +338,12 @@ def download_participation(request, activity_id):
     response['Content-Disposition'] = 'attachment; filename="Participants in Activity %s.csv"' % activity_id
 
     writer = unicodecsv.writer(response, encoding='utf-8')
-    writer.writerow(["Name", "Email"])
+    writer.writerow([u"الاسم", u"البريد"])
     for participantion in participations:
-        name = u"%s %s" % (participantion.user.first_name, participantion.user.last_name)
+        if participantion.user.first_name:
+            name = u"%s %s" % (participantion.user.first_name, participantion.user.last_name)
+        else:
+            name = participantion.user.username
         email = participantion.user.email
         writer.writerow([name, email])
     return response

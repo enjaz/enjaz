@@ -3,23 +3,57 @@
 {% block content %}
 <h2>{{ activity.name }}</h2>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-{% if not is_review or can_view_review and review %}
-<br/>
+<table class="tg table-hover table">
+{% if can_view_presidency_review and review_p and not can_view_deanship_review or can_view_deanship_review and review_d and not can_view_presidency_review %}
+  <colgroup>
+    <col class="col-xs-2">
+    <col class="col-xs-3">
+    <col class="col-xs-3">
+  </colgroup>
+{% elif review_p and review_d %}
+  <colgroup>
+    <col class="col-xs-1">
+    <col class="col-xs-3">
+    <col class="col-xs-2">
+    <col class="col-xs-2">
+  </colgroup>
+{% else %}
+  <colgroup>
+    <col class="col-xs-2">
+    <col class="col-xs-6">
+  </colgroup>
 {% endif %}
-{% if is_review %}
-<form action="{% url 'activities:review' activity.pk %}" method="post">
-{% csrf_token %}
+{% if can_view_deanship_review and review_d or can_view_presidency_review and review_p %}
+  <tr>
+    <th></th>
+    <th>الطلب</th>
+    {% if can_view_presidency_review and review_p %}
+    <th>ملاحظات رئاسة نادي الطلاب</th>
+    {% endif %}
+    {% if can_view_deanship_review and review_d %}
+    <th>ملاحظات عمادة شؤون الطلاب</th>
+    {% endif %}
+  </tr>
 {% endif %}
-<table class="tg table-hover">
   <tr>
     <th>الوصف</th>
-    <td{% if can_view_review and review and not review.description_notes %} colspan="2"{% endif %}>{{ activity.description }}</td>{% if is_review or can_view_review and review and review.description_notes %}
-    <td>{{ review.description_notes }}</td>{% endif %}
+    <td>{{ activity.description }}</td>
+    {% if can_view_presidency_review and review_p %}
+    <td>{%if review_p.description_notes %}{{ review_p.description_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
+    {% if can_view_deanship_review and review_d %}
+    <td>{%if review_d.description_notes %}{{ review_d.description_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
   </tr>
   <tr>
     <th>النادي المنظم</th>
-    <td{% if can_view_review and review and not review.clubs_notes %} colspan="2"{% endif %}><a href="{% url 'clubs:show' activity.primary_club.pk %}">{{ activity.primary_club }}</a></td>{% if is_review or can_view_review and review and review.clubs_notes %}
-    <td>{{ review.clubs_notes }}</td>{% endif %}
+    <td><a href="{% url 'clubs:show' activity.primary_club.pk %}">{{ activity.primary_club }}</a></td>
+    {% if can_view_presidency_review and review_p %}
+    <td{% if activity.secondary_club.all %} rowspan="2"{% endif %}>{%if review_p.clubs_notes %}{{ review_p.clubs_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
+    {% if can_view_deanship_review and review_d %}
+    <td{% if activity.secondary_club.all %} rowspan="2"{% endif %}>{%if review_d.clubs_notes %}{{ review_d.clubs_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
   </tr>{% if activity.secondary_club.all %}
   <tr>
     <th>النوادي المساندة</th>
@@ -32,74 +66,136 @@
     </td>{% if is_review or can_view_review and review %}
     <td></td>{% endif %}
   </tr>{% endif %}
+
   <tr>
     <th>التاريخ والوقت</th>
-    <td{% if can_view_review and review and not review.datetime_notes %} colspan="2"{% endif %}>{% if activity.date %}{{ activity.date|date:"j F Y" }}<br/>{{ activity.time }}{% else %}{{ activity.custom_datetime }}{% endif %}</td>{% if is_review or can_view_review and review and review.datetime_notes %}
-    <td>{{ review.datetime_notes }}</td>{% endif %}
-  </tr>
+    <td>{% if activity.date %}{{ activity.date|date:"j F Y" }}<br/>{{ activity.time }}{% else %}{{ activity.custom_datetime }}{% endif %}</td>
+    {% if can_view_presidency_review and review_p %}
+    <td>{%if review_p.datetime_notes %}{{ review_p.datetime_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
+    {% if can_view_deanship_review and review_d %}
+    <td>{%if review_d.datetime_notes %}{{ review_d.datetime_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
+  </tr>{% if activity.location %}
+  <tr>
+    <th>المكان</th>
+    <td>{{ activity.location }}</td>
+    {% if can_view_presidency_review and review_p %}
+    <td>{%if review_p.location_notes %}{{ review_p.location_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
+    {% if can_view_deanship_review and review_d %}
+    <td>{%if review_d.location_notes %}{{ review_d.location_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
+  </tr>{% endif %}
   <tr>
     <th>عدد المشتركين</th>
-    <td{% if can_view_review and review and not review.participants_notes %} colspan="2"{% endif %}>{{ activity.participants }}</td>{% if is_review or can_view_review and review and review.participants_notes %}
-    <td>{{ review.participants_notes }}</td>{% endif %}
+    <td>{{ activity.participants }}</td>
+    {% if can_view_presidency_review and review_p %}
+    <td>{%if review_p.participants_notes %}{{ review_p.participants_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
+    {% if can_view_deanship_review and review_d %}
+    <td>{%if review_d.participants_notes %}{{ review_d.participants_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
   </tr>
   <tr>
     <th>عدد المنظمين</th>
-    <td{% if can_view_review and review and not review.organizers_notes %} colspan="2"{% endif %}>{{ activity.organizers }}</td>{% if is_review or can_view_review and review and review.organizers_notes %}
-    <td>{{ review.organizers_notes }}</td>{% endif %}
+    <td>{{ activity.organizers }}</td>
+    {% if can_view_presidency_review and review_p %}
+    <td>{%if review_p.organizers_notes %}{{ review_p.organizers_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
+    {% if can_view_deanship_review and review_d %}
+    <td>{%if review_d.organizers_notes %}{{ review_d.organizers_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
   </tr>{% if activity.requirements %}
   <tr>
     <th>المتطلبات</th>
-    <td{% if can_view_review and review and not review.requirement_notes %} colspan="2"{% endif %}>{{ activity.requirements }}</td>{% if is_review or can_view_review and review and review.requirement_notes %}
-    <td>{{ review.requirement_notes }}</td>{% endif %}
+    <td>{{ activity.requirements }}</td>
+    {% if can_view_presidency_review and review_p %}
+    <td>{%if review_p.requirement_notes %}{{ review_p.requirement_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
+    {% if can_view_deanship_review and review_d %}
+    <td>{%if review_d.requirement_notes %}{{ review_d.requirement_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
   </tr>{% endif %}{% if activity.inside_collaborators %}
   <tr>
     <th>المتعاونون من داخل الجامعة</th>
-    <td{% if can_view_review and review and not review.inside_notes %} colspan="2"{% endif %}>{{ activity.inside_collaborators }}</td>{% if is_review or can_view_review and review and review.inside_notes %}
-    <td>{{ review.inside_notes }}</td>{% endif %}
+    <td>{{ activity.inside_collaborators }}</td>
+    {% if can_view_presidency_review and review_p %}
+    <td>{%if review_p.inside_notes %}{{ review_p.inside_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
+    {% if can_view_deanship_review and review_d %}
+    <td>{%if review_d.inside_notes %}{{ review_d.inside_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
   </tr>{% endif %}{% if activity.outside_collaborators %}
   <tr>
     <th>المتعاونون من خارج الجامعة</th>
-    <td{% if can_view_review and review and not review.outside_notes %} colspan="2"{% endif %}>{{ activity.outside_collaborators }}</td>{% if is_review or can_view_review and review and review.outside_notes%}
-    <td>{{ review.outside_notes }}</td>{% endif %}
+    <td>{{ activity.outside_collaborators }}</td>
+    {% if can_view_presidency_review and review_p %}
+    <td>{%if review_p.outside_notes %}{{ review_p.outside_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
+    {% if can_view_deanship_review and review_d %}
+    <td>{%if review_d.outside_notes %}{{ review_d.outside_notes }}{% else %}-{% endif %}</td>
+    {% endif %}
   </tr>{% endif %}
   <tr>
     <th>تاريخ الإرسال</th>
-    <td {% if is_review or can_view_review and review %}colspan="2"{% endif %}>{{ activity.submission_date|date:"j F Y" }}</td>
+    <td>{{ activity.submission_date }}</td>
+    {% if can_view_presidency_review and review_p %}
+    <td>{{ review_p.edit_date }}</td>
+    {% endif %}
+    {% if can_view_deanship_review and review_d %}
+    <td>{{ review_d.edit_date }}</td>
+    {% endif %}
+  </tr>
+  <tr>	
+    <th>المُرسل</th>
+    <td >{{ activity.submitter.username }}</td>
+    {% if can_view_presidency_review and review_p %}
+    <td>{{ review_p.reviewer }}</td>
+    {% endif %}
+    {% if can_view_deanship_review and review_d %}
+    <td>{{ review_d.reviewer }}</td>
+    {% endif %}
   </tr>
   <tr>
-    <th>المُرسل</th>
-    <td {% if is_review or can_view_review and review %}colspan="2"{% endif %}>{{ activity.submitter.username }}</td>
-  </tr>{% if not is_review %}
-  <tr>
     <th>الحالة</th>
-    <td colspan="2">
-{% if activity.review %}
-{% if activity.review.is_approved == None %}
-هذا النشاط ينتظر التعديل!
-{% elif activity.review.is_approved == True %}
-هذا النشاط اعتمد!
-{% elif activity.review.is_approved == False %}
-هذا النشاط رُفض!
+    <td{% if can_view_deanship_review and review_d and can_view_presidency_review and review_p %} colspan="3"{% elif can_view_deanship_review and review_d and not can_view_presidency_review or can_view_deanship_review and review_d and not review_p or can_view_presidency_review and review_p and not can_view_deanship_review or can_view_presidency_review and review_p and not review_d %} colspan="2"{% endif %}>
+{% if not activity.review_set.all %}
+  {% if perms.activities.add_review %}<a href="{% url 'activities:review' activity.id %}">مُعلّق</a>{% else %}معلّق{% endif %}
+{% elif activity.review_set.all|length_is:"1" %}
+  {% if activity.review_set.all.0.review_type == 'P' %}
+    {% if activity.review_set.all.0.is_approved == None %}
+    ينتظر تعديلا
+    {% elif activity.review_set.all.0.is_approved == True %}
+    ينتظر مراجعة العمادة
+    {% elif activity.review_set.all.0.is_approved == False %}
+    رفضته الرئاسة
+    {% endif %}
+  {% elif activity.review_set.all.0.review_type == 'D' %}
+    {% if activity.review_set.all.0.is_approved == True %}
+    اعتمدته العمادة
+    {% endif %}
+  {% endif %}
+{% elif activity.review_set.all|length_is:"2" %}
+  {% if activity.review_set.all.1.review_type == 'D' %}
+    {% if activity.review_set.all.1.is_approved == None %}
+    ينتظر تعديلا
+    {% elif activity.review_set.all.1.is_approved == True %}
+    اعتمده العمادة
+    {% elif activity.review_set.all.1.is_approved == False %}
+    رفضته الرئاسة
+    {% endif %}
+  {% endif %}
 {% endif %}
-{% else %}
-هذا النشاط لم يراجع بعد.
-{% endif %}
-</td>
-  </tr>{% endif %}
+    </td>
+  </tr>
 </table>
-{% if is_review %}
-{{ review.is_approved.label_tag }} {{ review.is_approved }}
-
-<input type="submit" value="أرسل" />
-</form>
-{% endif %}
 {% endblock %}
-
 {% block sidebar %}
-{% if not is_review and activity.is_editable and can_edit %}
+{% if activity.is_editable and can_edit %}
 <p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:edit' activity.pk %}">عدّل</a></li></ul></p>
 {% endif %}
-{% if not review.is_approved and perms.activities.add_review %}
+{% if can_review and not review_p.is_approved or can_review and not review_d.is_approved %}
 <p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:review' activity.pk %}">راجع واعتمد</a></li></ul></p>
 {% endif %}
 {% if can_view_participation and activity.collect_participants %}

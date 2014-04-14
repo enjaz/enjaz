@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}طلبات استعارة كتبي{% endblock %}
+
+{% block content %}
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#ccc;}
+.tg td{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;}
+.tg th{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
+</style>
+
+<h2>طلباتي</h2>
+{% if book_requests %}
+<table class="table">
+  <tr>
+    <th>#</th>
+    <th>الكتاب</th>
+    <th>وقت الطلب</th>
+    <th>الاستعارة من</th>
+    <th>الاستعارة حتى</th>
+    <th><!-- التصرف : قبول أو رفض --></th>
+  </tr>
+{% for book_request in book_requests %}
+  <tr>
+    <td>{{ forloop.counter }}</td>
+    <td style="direction:ltr;"><a href="{% url 'books:show' book_request.book.pk %}">{{ book_request.book.title }}</a></td>
+    <td>{{ book_request.submission_date }}</td>
+    <td>{{ book_request.borrow_from }}</td>
+    <td>{{ book_request.borrow_until }}</td>
+
+        {% if book_request.status == 'P' %}
+    <td>
+         بانتظار موافقة المعير.
+        <form action="{% url 'books:my_requests' %}" method="post" class="form-group">
+            {% csrf_token %}
+            <input type="hidden" name="pk" value="{{ book_request.pk }}"/>
+            <input type="hidden" name="action" value="withdraw"/>
+            <button type="submit" class="btn btn-warning">ألغِ</button>
+        </form>
+        {% elif book_request.status == 'R' %}
+    <td class="btn-danger">
+         رُفِض
+        {% elif book_request.status == 'A' %}
+          {% if book_request.book.status == 'H' %}
+    <td>
+ 
+        قُبل طلبك.<br/>أستلمت الكتاب؟
+        <form action="{% url 'books:my_requests' %}" method="post" class="form-group">
+            {% csrf_token %}
+            <input type="hidden" name="pk" value="{{ book_request.pk }}"/>
+            <input type="hidden" name="action" value="confirm"/>
+            <button type="submit" class="btn btn-success">استُلم</button>
+        </form>
+          {% elif book_request.book.status == 'B' %}
+    <td>
+          الكتاب معك. نأمل أن تعيده في الوقت المحدد.
+        <form action="{% url 'books:my_requests' %}" method="post" class="form-group">
+            {% csrf_token %}
+            <input type="hidden" name="pk" value="{{ book_request.pk }}"/>
+            <input type="hidden" name="action" value="return"/>
+            <button type="submit" class="btn btn-info">أرجعتُ الكتاب</button>
+        </form>
+          {% elif book_request.book.status == 'R' %}
+    <td class="btn-warning">
+          أعدت الكتاب. بانتظار تأكيد المعير.
+          {% endif %}
+        {% elif book_request.status == 'W' %}
+    <td class="btn-warning">
+          ألغيتَ طلبك
+        {% elif book_request.status == 'S' %}
+    <td class="btn-success">
+          أعدتَ الكتاب
+        {% endif %}
+    </td>
+  </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>لم تطلب أي كتب.</p>
+{% endif %}
+{% endblock %}

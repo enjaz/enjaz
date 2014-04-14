@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}مراجعة {{ activity.name }}{% endblock %}
+{% block content %}
+<h2>مراجعة {{ activity.name }} ({% if review_type == 'P' %}رئاسة نادي الطلاب{% else %}عمادة شؤون الطلاب{% endif %})</h2>
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+<form action="{% url 'activities:review' activity.pk %}" method="post">
+{% csrf_token %}
+<table class="tg table-hover table">
+  <colgroup>
+    <col class="col-xs-2">
+    <col class="col-xs-6">
+  </colgroup>
+  <tr>
+    <th>الوصف</th>
+    <td>{{ activity.description }}</td>
+    <td>{{ review.description_notes }}</td>
+  </tr>
+  <tr>
+    <th>النادي المنظم</th>
+    <td><a href="{% url 'clubs:show' activity.primary_club.pk %}">{{ activity.primary_club }}</a></td>
+    <td{% if activity.secondary_clubs.all %} rowspan="2"{% endif %}>{{ review.clubs_notes }}</td>
+  </tr>{% if activity.secondary_clubs.all %}
+  <tr>
+    <th>النوادي المساندة</th>
+    <td>
+    <ul>
+    {% for club in activity.secondary_clubs.all %}
+    <li><a href="{% url 'clubs:show' club.pk %}">{{ club.name }}</a></li>
+    {% endfor %}
+    </ul>
+    </td>
+  </tr>{% endif %}
+  <tr>
+    <th>التاريخ والوقت</th>
+    <td>{% if activity.date %}{{ activity.date|date:"j F Y" }}<br/>{{ activity.time }}{% else %}{{ activity.custom_datetime }}{% endif %}</td>
+    <td>{{ review.datetime_notes }}</td>
+  </tr>
+  <tr>
+    <th>عدد المشتركين</th>
+    <td>{{ activity.participants }}</td>
+    <td>{{ review.participants_notes }}</td>
+  </tr>
+  <tr>
+    <th>عدد المنظمين</th>
+    <td>{{ activity.organizers }}</td>
+    <td>{{ review.organizers_notes }}</td>
+  </tr>{% if activity.requirements %}
+  <tr>
+    <th>المتطلبات</th>
+    <td>{{ activity.requirements }}</td>
+    <td>{{ review.requirement_notes }}</td>
+  </tr>{% endif %}{% if activity.inside_collaborators %}
+  <tr>
+    <th>المتعاونون من داخل الجامعة</th>
+    <td>{{ activity.inside_collaborators }}</td>
+    <td>{{ review.inside_notes }}</td>
+  </tr>{% endif %}{% if activity.outside_collaborators %}
+  <tr>
+    <th>المتعاونون من خارج الجامعة</th>
+    <td>{{ activity.outside_collaborators }}</td>
+    <td>{{ review.outside_notes }}</td>
+  </tr>{% endif %}
+  <tr>
+    <th>تاريخ الإرسال</th>
+    <td colspan="2">{{ activity.submission_date|date:"j F Y" }}</td>
+  </tr>
+  <tr>
+    <th>المُرسل</th>
+    <td colspan="2">{{ activity.submitter.username }}</td>
+  </tr>
+</table>
+{{ review.is_approved.label_tag }} {{ review.is_approved }}
+
+<input type="submit" value="أرسل" />
+</form>
+{% endblock %}
+
+{% block sidebar %}
+{% if can_view_participation and activity.collect_participants %}
+<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:view_participation' activity.pk %}">شاهد طلبات المشاركة</a></li></ul></p>
+{% endif %}
+
+{% endblock %}
+

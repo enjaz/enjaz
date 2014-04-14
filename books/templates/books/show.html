@@ -1,0 +1,64 @@
+{% extends "base.html" %}{% load bootstrap3 %}
+{% block title %}{{ book.title }}{% endblock %}
+{% block content %}
+<h2>{{ book.title }}</h2>
+
+<table class="tg table-hover table">
+  <colgroup>
+    <col class="col-xs-4">
+    <col class="col-xs-4">
+  </colgroup>{% if book.description %}
+  <tr>
+    <th>الوصف</th>
+    <td style="direction:ltr;">{{ book.description }}</td>
+  </tr>{% endif %}{% if book.authors %}
+  <tr>
+    <th>المؤلف</th>
+    <td style="direction:ltr;">{{ book.authors }}</td>
+  </tr>{% endif %}{% if book.year %}
+  <tr>
+    <th>السنة</th>
+    <td>{{ book.year }}</td>
+  </tr>{% endif %}{% if book.edition %}
+  <tr>
+    <th>الطبعة</th>
+    <td>{{ book.edition }}</td>
+  </tr>{% endif %}{% if book.available_from %}
+  <tr>
+    <th>متوفر من</th>
+    <td>{{ book.available_from|date:"j F Y" }}</td>
+  </tr>{% endif %}{% if book.available_until %}
+  <tr>
+    <th>متوفر حتى</th>
+    <td>{{ book.available_until|date:"j F Y" }}</td>
+  </tr>{% endif %}{% if book.condition %}
+  <tr>
+    <th>الحالة</th>
+    <td>{{ book.condition }}</td>
+  </tr>{% endif %}
+  <tr>
+    <th>الكتاب متوفر لـ</th>
+    <td>{% if submitter_gender == 'M' %}الطلاب{% elif submitter_gender == 'F' %}الطالبات{% endif %}</td>
+  </tr>{% if extra %}
+  <tr>
+    <th>المساهم</th>
+    <td>{{ book.submitter }}</td>
+  </tr>{% if book.holder %}
+  <tr>
+    <th>المستعير</th>
+    <td>{{ book.holder }}</td>
+  </tr>
+{% endif %}{% endif %}</table>
+{% endblock %}
+
+{% block sidebar %}
+{% if book.status == 'A' and not user == book.submitter %}{% if user_gender == submitter_gender or not user.is_authenticated  %}
+<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'books:borrow' book.pk %}">استعر</a></li></ul></p>
+{% endif %}{% elif user == book.submitter %}
+<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'books:review_requests' %}#book{{ book.pk }}">راجع طلبات الاستعارة</a></li>
+{% if book.status == 'A' or book.status == 'H' %}
+<li><a href="{% url 'books:edit' book.pk %}">عدّل</a></li>
+<li><a href="{% url 'books:withdraw' book.pk %}" class="btn btn-danger btn-sm">اسحب</a></li>
+{% endif %}</ul></p>
+{% endif %}
+{% endblock %}

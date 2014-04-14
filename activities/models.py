@@ -26,6 +26,8 @@ class Activity(models.Model):
                                   on_delete=models.SET_NULL)
     submission_date = models.DateTimeField('date submitted',
                                            auto_now_add=True)
+    location = models.CharField(max_length=200,
+                                verbose_name=u"المكان", blank=True)
     date = models.DateField(u'التاريخ', null=True, blank=True)
     time = models.CharField(max_length=200, verbose_name=u'الوقت',
                             blank=True)
@@ -58,10 +60,12 @@ class Activity(models.Model):
         return self.name
 
 class Review(models.Model):
-    activity = models.OneToOneField(Activity, verbose_name=u" النشاط")
+    activity = models.ForeignKey(Activity, verbose_name=u" النشاط")
     reviewer = models.ForeignKey(User, null=True,
                                  on_delete=models.SET_NULL)
-    review_date = models.DateTimeField('date reviewed', auto_now_add=True)
+    review_date = models.DateTimeField(u'تاريخ المراجعة', auto_now_add=True)
+    edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True,
+                                     null=True)
     clubs_notes = models.TextField(blank=True,
                                    verbose_name=u"ملاحظات على الأندية")
     name_notes = models.TextField(blank=True,
@@ -77,10 +81,16 @@ class Review(models.Model):
     outside_notes = models.TextField(blank=True,
                                              verbose_name=u"ملاحظات المتعاونون من خارج الجامعة")
     participants_notes = models.TextField(blank=True,
-                                          verbose_name=u"ملاحظات على عدد المشاركين")
+                                            verbose_name=u"ملاحظات على عدد المشاركين")
     organizers_notes = models.TextField(blank=True,
                                         verbose_name=u"ملاحظات على عدد المنظمين")
-
+    review_type_choices = (
+        ('P', u"رئاسة نادي الطلاب"),
+        ('D', u"عمادة شؤون الطلاب"),
+        )
+    review_type = models.CharField(max_length=1, default='P',
+                                   choices=review_type_choices,
+                                   verbose_name=u"نوع المراجعة")
     approval_choices = (
         (None, u"أبقِ معلقًا"),
         (True, u"اقبل"),
@@ -91,7 +101,11 @@ class Review(models.Model):
 
     class Meta:
         permissions = (
-            ("view_review", "Can view all available activities."),
+            ("view_review", "Can view all available reviews."),
+            ("add_deanship_review", "Can add a review in the name of the deanship."),
+            ("add_presidency_review", "Can add a review in the name of the presidency."),
+            ("view_deanship_review", "Can view a review in the name of the deanship."),
+            ("view_presidency_review", "Can view a review in the name of the presidency."),
         )
 
     def __unicode__(self):

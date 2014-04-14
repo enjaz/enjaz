@@ -5,7 +5,8 @@ from django.contrib.auth.models import User
 section_choices = (
     ('M', u'طلاب'),
     ('F', u'طالبات'),
-    ('K', u'مدينة الملك فهد'),
+    ('KM', u'طلاب مدينة الملك فهد'),
+    ('KF', u'طالبات مدينة الملك فهد'),
 )
 college_choices = (
     ('M', u'كلية الطب'),
@@ -13,6 +14,7 @@ college_choices = (
     ('P', u'كلية الصيدلة'),
     ('D', u'كلية طب الأسنان'),
     ('B', u'كلية العلوم و المهن الصحية'),
+    ('N', u'كلية التمريض'),
 )
 
 class Club(models.Model):
@@ -46,7 +48,8 @@ class Club(models.Model):
 class MembershipApplication(models.Model):
     club = models.ForeignKey(Club, related_name='club')
     user = models.ForeignKey(User, related_name='user')
-    note = models.TextField(verbose_name=u"لماذا تريد الانضمام؟")
+    note = models.TextField(verbose_name=u"لماذا تريد الانضمام؟",
+           help_text=u"هل لديك مهارات مخصوصة؟ هل لديك أفكار لنشاطات؟")
     submission_date = models.DateTimeField('date submitted',
                                            auto_now_add=True)
 
@@ -58,16 +61,8 @@ class MembershipApplication(models.Model):
     def __unicode__(self):
         return self.user
 
-# vvv Why is this here (in this file)? (Saeed on Sun. Apr. 6) vvv
-    
-class Batch(models.Model):
-    college = models.ForeignKey('College')
-    batch_number = models.PositiveSmallIntegerField(verbose_name=u"رقم الدفعة")
-    def __unicode__(self):
-        return u"%s - الدفعة %d - %s" % (self.college.get_college_name_display(), self.batch_number, self.college.get_section_display())
-
 class College(models.Model):
-    section = models.CharField(max_length=1, choices=section_choices)
+    section = models.CharField(max_length=2, choices=section_choices)
     college_name = models.CharField(max_length=1, choices=college_choices)
 
     def __unicode__(self):

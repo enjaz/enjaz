@@ -1,3 +1,4 @@
+# -*- coding: utf-8  -*-
 import unicodecsv
 
 from django.shortcuts import render, get_object_or_404
@@ -153,9 +154,12 @@ def download_application(request, club_id):
     response['Content-Disposition'] = 'attachment; filename="Applications for Club %s.csv"' % club_id
 
     writer = unicodecsv.writer(response, encoding='utf-8')
-    writer.writerow(["Name", "Email", "Note"])
+    writer.writerow([u"الاسم", u"البريد", u"ملاحظة"])
     for application in applications:
-        name = u"%s %s" % (application.user.first_name, application.user.last_name)
+        if application.user.first_name:
+            name = u"%s %s" % (application.user.first_name, application.user.last_name)
+        else:
+            name = application.user.username
         email = application.user.email
         note = application.note
         writer.writerow([name, email, note])

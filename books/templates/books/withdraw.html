@@ -1,0 +1,22 @@
+{% extends "base.html" %}{% load bootstrap3 %}
+{% block title %}سحب {{ book.title }}{% endblock %}
+{% block content %}
+<h2>سحب {{ book.title }}</h2>
+<p>
+{% if done %}
+سُحِب <a href="{% url 'books:show' book.pk %}">{{ book.title }}</a> بنجاح.
+{% elif book.status == 'B' %}
+هذا الكتاب معار ولم يسترجع بعد. لا يمكنك سحب كتاب معار.
+{% elif book.status == 'W' %}
+سُحِب هذا الكتاب من قبل.
+{% else %}
+هل أنت متأكد أنك ترغب في سحب <a href="{% url 'books:show' book.pk %}">{{ book.title }}</a>؟
+        <form action="{% url 'books:withdraw' book.pk %}" method="post" class="form-group">
+            {% csrf_token %}
+            <input type="hidden" name="confirm" value="confirm"/>
+            <button type="submit" class="btn btn-danger">اسحب</button>
+            <a href="{% url 'books:show' book.pk %}" class="btn btn-success">ارجع</a>
+        </form>
+{% endif %}
+</p>
+{% endblock %}

@@ -1,0 +1,298 @@
+[
+{
+    "pk": 1, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Anatomy", 
+        "slug": "anatomy"
+    }
+},
+{
+    "pk": 2, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Anatomy atlas", 
+        "slug": "anatomy-atlas"
+    }
+},
+{
+    "pk": 3, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Biochemistry", 
+        "slug": "biochemistry"
+    }
+},
+{
+    "pk": 4, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Biostatistics", 
+        "slug": "biostatistics"
+    }
+},
+{
+    "pk": 5, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Clinical anatomy", 
+        "slug": "clinical-anatomy"
+    }
+},
+{
+    "pk": 6, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Embryology", 
+        "slug": "embryology"
+    }
+},
+{
+    "pk": 7, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Epidemiology", 
+        "slug": "epidemiology"
+    }
+},
+{
+    "pk": 8, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Genetics", 
+        "slug": "genetics"
+    }
+},
+{
+    "pk": 9, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Histology", 
+        "slug": "histology"
+    }
+},
+{
+    "pk": 10, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Immunology", 
+        "slug": "immunology"
+    }
+},
+{
+    "pk": 11, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Microbiology", 
+        "slug": "microbiology"
+    }
+},
+{
+    "pk": 12, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Pathology", 
+        "slug": "pathology"
+    }
+},
+{
+    "pk": 13, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Pharmacology", 
+        "slug": "pharmacology"
+    }
+},
+{
+    "pk": 14, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Physiology", 
+        "slug": "physiology"
+    }
+},
+{
+    "pk": 15, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Virology", 
+        "slug": "virology"
+    }
+},
+{
+    "pk": 16, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Anesthesiology", 
+        "slug": "anesthesiology"
+    }
+},
+{
+    "pk": 17, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Cardiology", 
+        "slug": "cardiology"
+    }
+},
+{
+    "pk": 18, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Chemotherapy", 
+        "slug": "chemotherapy"
+    }
+},
+{
+    "pk": 19, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Critical Care", 
+        "slug": "critical-care"
+    }
+},
+{
+    "pk": 20, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Dermatology", 
+        "slug": "dermatology"
+    }
+},
+{
+    "pk": 21, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Emergency Medicine", 
+        "slug": "emergency-medicine"
+    }
+},
+{
+    "pk": 22, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Endocrinology", 
+        "slug": "endocrinology"
+    }
+},
+{
+    "pk": 23, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Gastroenterology", 
+        "slug": "gastroenterology"
+    }
+},
+{
+    "pk": 24, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Gynecology", 
+        "slug": "gynecology"
+    }
+},
+{
+    "pk": 25, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Hematology", 
+        "slug": "hematology"
+    }
+},
+{
+    "pk": 26, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Musculoskeletal", 
+        "slug": "musculoskeletal"
+    }
+},
+{
+    "pk": 27, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Nephrology", 
+        "slug": "nephrology"
+    }
+},
+{
+    "pk": 28, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Neurology", 
+        "slug": "neurology"
+    }
+},
+{
+    "pk": 29, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Oncology", 
+        "slug": "oncology"
+    }
+},
+{
+    "pk": 30, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Ophthalmology", 
+        "slug": "ophthalmology"
+    }
+},
+{
+    "pk": 31, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Orthopedics", 
+        "slug": "orthopedics"
+    }
+},
+{
+    "pk": 32, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Pediatrics", 
+        "slug": "pediatrics"
+    }
+},
+{
+    "pk": 33, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Psychiatry", 
+        "slug": "psychiatry"
+    }
+},
+{
+    "pk": 34, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Psychology", 
+        "slug": "psychology"
+    }
+},
+{
+    "pk": 35, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Respiratory", 
+        "slug": "respiratory"
+    }
+},
+{
+    "pk": 36, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Rheumatology", 
+        "slug": "rheumatology"
+    }
+},
+{
+    "pk": 37, 
+    "model": "taggit.tag", 
+    "fields": {
+        "name": "Surgery", 
+        "slug": "surgery"
+    }
+}
+]

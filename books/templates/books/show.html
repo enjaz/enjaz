@@ -57,6 +57,7 @@
 {% endif %}{% elif user == book.submitter %}
 <p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'books:review_requests' %}#book{{ book.pk }}">راجع طلبات الاستعارة</a></li>
 {% if book.status == 'A' or book.status == 'H' %}
+<li><a href="{% url 'books:edit' book.pk %}">عدّل</a></li>
 <li><a href="{% url 'books:withdraw' book.pk %}" class="btn btn-danger btn-sm">اسحب</a></li>
 {% endif %}</ul></p>
 {% endif %}

@@ -154,8 +154,11 @@ def show(request, book_id):
 
     return render(request, 'books/show.html', context)
 
-@permission_required('books.add_book', raise_exception=True)
+@login_required
 def contribute(request):
+    if not request.user.has_perm('books.add_book'):
+        raise PermissionDenied
+
     if request.method == 'POST' and 'is_isbn' in request.POST:
         errors = []
         if 'isbn' in request.POST:
@@ -239,8 +242,10 @@ def contribute(request):
     elif request.method == 'GET':
         return render(request, 'books/submit_isbn.html')
 
-@permission_required('books.add_bookrequest', raise_exception=True)
+@login_required
 def borrow(request, book_id):
+    if not request.user.has_perm('books.add_bookrequest'):
+        raise PermissionDenied
     book = get_object_or_404(Book, pk=book_id)
     today = datetime.date.today()
     context = {'book': book}
@@ -355,7 +360,20 @@ def my_requests(request):
 
 @login_required
 def edit(request, book_id):
-    pass
+    book = get_object_or_404(Book, pk=book_id)
+    if not request.user == book.submitter and \
+       not request.user.has_perm('books.change_book'):
+        raise PermissionDenied
+
+    if request.method == 'POST':
+        modified_book = BookForm(request.POST, instance=book)
+        modified_book.save()
+        return HttpResponseRedirect(reverse('books:show', args=(book_id,)))
+    else:
+        form = BookForm(instance=book)
+        context = {'form': form, 'book_id': book_id, 'book': book,
+                   'edit': True}
+        return render(request, 'books/edit.html', context)
 
 @login_required
 def withdraw(request, book_id):

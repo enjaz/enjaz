@@ -24,7 +24,7 @@ class ActivityForm(ModelForm):
                                     required=False)
     class Meta:
         model = Activity
-        fields = ['primary_club', # primary club is already known (signed in):
+        fields = ['primary_club', # TODO: primary club is already known (signed in):
                                   # no need to include as field
                   'name','description', 'date', 'time',
                   'custom_datetime', 'organizers', 'participants',

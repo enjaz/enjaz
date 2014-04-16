@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
@@ -24,7 +24,15 @@ class Order_Form(ModelForm):
                       choices=Code_Collection.DELIVERY_TYPE_CHOICES)
 
 def index(request):
-    return HttpResponseRedirect(reverse('niqati:submit')) 
+    user = request.user
+    if user.has_perms('niqati.view_general_report'):
+        return HttpResponseRedirect(reverse('niqati:general_report')) 
+    elif user.has_perms('niqati.approve_order'):
+        return HttpResponseRedirect(reverse('niqati:approve')) 
+    elif user.has_perms('niqati.view_order'):
+        return HttpResponseRedirect(reverse('niqati:orders')) 
+    else:
+        return HttpResponseRedirect(reverse('niqati:submit')) 
 
 # Student Views
 @login_required
@@ -85,6 +93,7 @@ def submit(request, code=""): # (1) Shows submit code page & (2) Handles code su
     else: # request method is not POST
         return render(request, 'niqati/submit.html', {'code_to_redeem': code})
 
+@login_required
 def student_report(request):
     # calculate total points
     point_sum = sum(code.category.points for code in request.user.code_set.all())
@@ -93,6 +102,8 @@ def student_report(request):
 
 # Club Views
 
+@login_required
+@permission_required('niqati.request_order', raise_exception=True)
 def create_codes(request):
     if request.method == 'POST':
         form = Order_Form(request.POST)
@@ -131,21 +142,27 @@ def create_codes(request):
         else: # i.e. form.is_valid() == False
             msg = u"الرجاء تصحيح الأخطاء أدناه"
             
-        
-        context = {'form': form, 'msg': msg}
-        return render(request, 'niqati/create.html', context) 
+        context = {}
+        context['msg'] = msg
+        # return render(request, 'niqati/create.html', context) 
     else:
-        
         form = Order_Form()
-        context = {'form': form}
-        return render(request, 'niqati/create.html', context) 
+        context = {}
+    
+    form.fields['activity'].queryset = Activity.objects.filter(primary_club__coordinator=request.user)
+    context['form'] = form
+    return render(request, 'niqati/create.html', context) 
 
+@login_required
+@permission_required('niqati.view_order', raise_exception=True)
 def view_orders(request):
     activities = Activity.objects.all()
     
     context = {'activities': activities}
     return render(request, 'niqati/orders.html', context)
 
+@login_required
+@permission_required('niqati.view_order', raise_exception=True)
 def view_collection(request, pk):
     collec = get_object_or_404(Code_Collection, pk=pk)
     try:
@@ -170,6 +187,8 @@ def view_collection(request, pk):
 
 # Management Views
 
+@login_required
+@permission_required('niqati.approve_order', raise_exception=True)
 def approve_codes(request):
     if request.method == 'POST':
         pk = request.POST['pk']
@@ -189,6 +208,8 @@ def approve_codes(request):
     context = {'unapproved_collec': unapproved_collec}
     return render(request, 'niqati/approve.html', context)
 
+@login_required
+@permission_required('niqati.view_general_report', raise_exception=True)
 def general_report(request):
     users = Niqati_User.objects.all()
     

@@ -84,6 +84,13 @@ class Code(models.Model):
             spaced_code += self.code_string[i]
         return spaced_code
     
+    class Meta:
+        permissions = (
+            ("submit_code", "Can submit a code."),
+            ("view_student_report", "Can view a report of own's codes."),
+            ("view_general_report", "Can view a report of all students."),
+        )
+    
 
 """
 When a club requests codes for a certain activity, a Code_Order is created. This Code_Order contains several
@@ -212,3 +219,11 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
         for collec in self.code_collection_set.all():
             collec.process(host)
         self.save()
+    
+    class Meta:
+        permissions = (
+            ("request_order", "Can place a request for a code order."),
+            ("view_order", "Can view existing code orders."),
+            ("approve_order", "Can approve order requests."),
+        )
+

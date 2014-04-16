@@ -36,7 +36,7 @@ $(document).ready(function(){$('.header_menu li').hover(function(){$('#moresubme
 <li class="page_item page-item-16"><a href="{% url 'activities:list' %}">نشاطات</a></li>
 <li class="page_item page-item-18"><a href="{% url 'clubs:list' %}">نوادي</a></li>
 <li class="page_item page-item-18"><a href="{% url 'books:list' %}">كتب</a></li>
-<li class="more"><a href="#more"> نقاطي </a> <div class="menu"><ul id="moresubmenu"><li class="page_item page-item-838"><a href="{% url 'niqati:submit' %}">أضف نقاطا</a></li><li class="page_item page-item-19"><a href="{% url 'niqati:student_report' %}">اعرض نقاطك</a></li></ul></div></li>
+<li class="page_item page-item-18"><a href="{% url 'niqati:index' %}">نقاطي</a></li>
 {% if user.is_authenticated %}
 <li class="page_item page-item-16"><a href="{% url 'userena_signout' %}">اخرج</a></li>
 {% else %}

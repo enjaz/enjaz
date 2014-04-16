@@ -1,20 +1,17 @@
 {% extends 'base.html' %}
 {% block title %}{% endblock %}
 {% block sidebar %}
-<p style="font-size:1em;"><ul class="list-unstyled">
-    <li><a href="{% url 'niqati:create' %}"><span class="glyphicon glyphicon-pencil"></span> أنشئ نقاطًا</a></li>
-    <li><a href="{% url 'niqati:orders' %}"><span class="glyphicon glyphicon-cloud-download"></span> النقاط المطلوبة</a></li>
-</ul></p>
-<br/>
-<p style="font-size:1em;"><ul class="list-unstyled">
+
+<ul class="list-unstyled">
+    {% if perms.niqati.request_order %}<li><a href="{% url 'niqati:create' %}"><span class="glyphicon glyphicon-pencil"></span> أنشئ نقاطًا</a></li>{% endif %}
+    {% if perms.niqati.view_order %}<li><a href="{% url 'niqati:orders' %}"><span class="glyphicon glyphicon-cloud-download"></span> النقاط المطلوبة</a></li>{% endif %}
+
     <li><a href="{% url 'niqati:submit' %}"><span class="glyphicon glyphicon-plus"></span> أدخل نقاطًا</a></li>
     <li><a href="{% url 'niqati:student_report' %}"><span class="glyphicon glyphicon-file"></span> تقرير نقاطي</a></li>
-</ul></p>
-<br/>
-<p style="font-size:1em;"><ul class="list-unstyled">
-    <li><a href="{% url 'niqati:approve' %}"><span class="glyphicon glyphicon-ok-circle"></span> مراجعة طلبات نقاط الفكرة</a></li>
-    <li><a href="{% url 'niqati:general_report' %}"><span class="glyphicon glyphicon-stats"></span> التقرير العام</a></li>
-</ul></p>
+
+    {% if perms.niqati.approve_order %}<li><a href="{% url 'niqati:approve' %}"><span class="glyphicon glyphicon-ok-circle"></span> مراجعة طلبات نقاط الفكرة</a></li>{% endif %}
+    {% if perms.niqati.view_general_report %}<li><a href="{% url 'niqati:general_report' %}"><span class="glyphicon glyphicon-stats"></span> التقرير العام</a></li>{% endif %}
+</ul>
 {% endblock %}
 {% block content %}
 {% endblock %}  

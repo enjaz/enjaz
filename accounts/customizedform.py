@@ -81,7 +81,9 @@ class SignupFormExtra(SignupForm):
         # Add default permissions
         add_book = Permission.objects.get(codename='add_book')
         add_bookrequest = Permission.objects.get(codename='add_bookrequest')
-        new_user.user_permissions.add(add_book, add_bookrequest)
+        submit_niqati_code = Permission.objects.get(codename='submit_code')
+        view_niqati_report = Permission.objects.get(codename='view_student_report')
+        new_user.user_permissions.add(add_book, add_bookrequest, submit_niqati_code, view_niqati_report)
         new_user.save()
 
         # Append the extra fields

@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render
@@ -9,7 +10,7 @@ from django.forms import ModelForm
 from django.utils import timezone
 
 from activities.models import Activity
-from niqati.models import Category, Code, Code_Order, Code_Collection
+from niqati.models import Niqati_User, Category, Code, Code_Order, Code_Collection
 
 class Order_Form(ModelForm):
     class Meta:
@@ -29,19 +30,21 @@ def index(request):
 @login_required
 def submit(request, code=""): # (1) Shows submit code page & (2) Handles code submission requests
     if request.method == "POST":
-        # ###
-        # ! format code first i.e. make upper case & remove spaces or dashes
-        # ###
+        # format code first i.e. make upper case & remove spaces or dashes
+        code = request.POST['code'].upper().replace(" ","").replace("-","")
+
         try: # assume at first that code exists
-            c = Code.objects.get(code_string=request.POST['code'])
+            c = Code.objects.get(code_string=code)
             if not c.user: # code isn't associated with any user -- free to use
                 try: # assume user already has a code in the same activity
                     a = request.user.code_set.get(activity=c.activity)
-                    if c.points() > a.points(): # new code has more points than existing one 
+                    if c.category.points > a.category.points: # new code has more points than existing one 
                         # replace old code & show message that it has been replaced
                         a.user = None
+                        a.date_redeemed = None
                         a.save()
                         c.user = request.user
+                        c.date_redeemed = timezone.now()
                         c.save()
                         return render(request, 'niqati/submit.html', {
                             'message_type': "-info",
@@ -57,6 +60,7 @@ def submit(request, code=""): # (1) Shows submit code page & (2) Handles code su
                 except (KeyError, Code.DoesNotExist): # no codes in the same activity
                     # redeem & show success message --- default behavior
                     c.user = request.user
+                    c.date_redeemed = timezone.now()
                     c.save()
                     return render(request, 'niqati/submit.html', {
                         'message_type': "-success",
@@ -82,7 +86,10 @@ def submit(request, code=""): # (1) Shows submit code page & (2) Handles code su
         return render(request, 'niqati/submit.html', {'code_to_redeem': code})
 
 def student_report(request):
-    return HttpResponse("This is your report: ...")
+    # calculate total points
+    point_sum = sum(code.category.points for code in request.user.code_set.all())
+    # TODO: sort codes
+    return render(request, 'niqati/student_report.html', {'user': request.user, 'total_points': point_sum})
 
 # Club Views
 
@@ -183,4 +190,6 @@ def approve_codes(request):
     return render(request, 'niqati/approve.html', context)
 
 def general_report(request):
-    return HttpResponse("Here is a report of all students")
+    users = Niqati_User.objects.all()
+    
+    return render(request, 'niqati/general_report.html', {'users': users})

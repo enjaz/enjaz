@@ -1,0 +1,33 @@
+{% extends "niqati_base.html" %}
+{% block title %}تقريري{% endblock %}
+
+{% block content %}
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#ccc;}
+.tg td{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;}
+.tg th{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
+</style>
+
+<h3>تقرير نقاطي</h3>
+<div class="page-header">
+  <h3>مجموع نقاطي: <small>{{ total_points }} نقطة</small></h3>
+</div>
+<table class="table">
+  <tr>
+    <th>#</th>
+    <th>النشاط</th>
+    <th>دورك في النشاط</th>
+    <th>عدد النقاط</th>
+    <th>تاريخ الإدخال</th>
+  </tr>
+    {% for code in user.code_set.all %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ code.activity.name }}</td>
+            <td>{{ code.category.ar_label }}</td>
+            <td>{{ code.category.points }}</td>
+            <td>{{ code.redeem_date }}</td>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}

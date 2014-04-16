@@ -24,6 +24,13 @@ def generate_code(length):
         code += char
     return code
 
+class Niqati_User(User):
+    def total_points(self):
+        return sum(code.category.points for code in self.code_set.all())
+    class Meta:
+        proxy=True # nice trick to add custom methods to the User class; proxy=True means this model will use
+                   # the User table and will not have a table of its own in the db
+
 class Category(models.Model):
     label = models.CharField(max_length=20)
     ar_label = models.CharField(max_length=20)

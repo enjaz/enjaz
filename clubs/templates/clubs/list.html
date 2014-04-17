@@ -2,7 +2,7 @@
 {% block title %}الأندية{% endblock %}
 {% block sidebar %}
 {% if perms.clubs.add_club %}
-<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:create' %}">أضف ناديًا</a></li></ul></p>
+<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:create' %}"><span class="glyphicon glyphicon-plus"></span>  أضف ناديًا</a></li></ul></p>
 {% endif %}
 {% endblock %}
 {% block content %}

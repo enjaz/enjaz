@@ -55,10 +55,10 @@
 {% if book.status == 'A' and not user == book.submitter %}{% if user_gender == submitter_gender or not user.is_authenticated  %}
 <p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'books:borrow' book.pk %}">استعر</a></li></ul></p>
 {% endif %}{% elif user == book.submitter %}
-<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'books:review_requests' %}#book{{ book.pk }}">راجع طلبات الاستعارة</a></li>
+<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'books:review_requests' %}#book{{ book.pk }}"><span class="glyphicon glyphicon-list-alt"></span> راجع طلبات الاستعارة</a></li>
 {% if book.status == 'A' or book.status == 'H' %}
-<li><a href="{% url 'books:edit' book.pk %}">عدّل</a></li>
-<li><a href="{% url 'books:withdraw' book.pk %}" class="btn btn-danger btn-sm">اسحب</a></li>
+<li><a href="{% url 'books:edit' book.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
+<li><a href="{% url 'books:withdraw' book.pk %}"><span class="glyphicon glyphicon-remove"></span> اسحب</a></li>
 {% endif %}</ul></p>
 {% endif %}
 {% endblock %}

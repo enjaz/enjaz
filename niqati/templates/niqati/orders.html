@@ -11,7 +11,7 @@
 <h2>النقاط المطلوبة</h2>
 
 {% for activity in activities %}
-
+{% if activity.code_order_set.all %}
 <h3>{{ activity.name }}</h3>
 <table class="table">
   <tr>
@@ -28,8 +28,8 @@
         <ul class="list-group">
         <!-- collections -->
         {% for collec in order.code_collection_set.all %}
-            <li class="list-group-item">
-                <span class="badge">{{ collec.code_count }} أكواد</span>
+            <li class="list-group-item{% if collec.approved == True %} list-group-item-success{% elif collec.approved == None %} list-group-item-warning{% else %} list-group-item-danger{% endif %}">
+ 				<span class="badge">{{ collec.code_count }} أكواد</span>
                 <a href="{% url 'niqati:view_collec' collec.pk %}">{{ collec.code_category.ar_label }}</a>
             </li>
         {% endfor %}   
@@ -38,5 +38,6 @@
     </tr>
     {% endfor %}
 </table>
+{% endif %}
 {% endfor %}
 {% endblock %}

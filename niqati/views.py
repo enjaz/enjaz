@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, render
 from django import forms
 from django.forms import ModelForm
 from django.utils import timezone
+from django.db.models import Q
 
 from activities.models import Activity
 from niqati.models import Niqati_User, Category, Code, Code_Order, Code_Collection
@@ -23,6 +24,7 @@ class Order_Form(ModelForm):
     delivery_type = forms.ChoiceField(label=u"طريقة التسليم",
                       choices=Code_Collection.DELIVERY_TYPE_CHOICES)
 
+@login_required
 def index(request):
     user = request.user
     if user.has_perms('niqati.view_general_report'):
@@ -133,7 +135,7 @@ def create_codes(request):
                 host = request.build_absolute_uri(reverse('niqati:submit'))
                 print "host: " + host
                 o.process(host)
-                msg = "أنشئت النقاط، لكن سيتعين الموافقة على نقاط الأفكار أولا."
+                msg = "تم إرسال الطلب؛ و سيتم إنشاء النقاط فور الموافقة عليه."
             
             else:
                 msg = u"لم تطلب أية أكواد!"
@@ -149,7 +151,10 @@ def create_codes(request):
         form = Order_Form()
         context = {}
     
-    form.fields['activity'].queryset = Activity.objects.filter(primary_club__coordinator=request.user)
+    form.fields['activity'].queryset = Activity.objects.filter(
+                        Q(primary_club__coordinator=request.user), # | Q(primary_club__members__contains=request.user),
+                        
+                        )
     context['form'] = form
     return render(request, 'niqati/create.html', context) 
 
@@ -169,16 +174,15 @@ def view_collection(request, pk):
         if collec.delivery_type == '0': # Coupon
             final_file = collec.asset.read()
             response = HttpResponse(mimetype="application/pdf")
-        else:
+        else: # short link
             final_file = collec.asset.read()
             response = HttpResponse(mimetype="text/html")
         response.write(final_file)
-    except ValueError: # If the (idea) codes weren't approved.
-        if collec.code_category.label == 'Idea':
-            if collec.approved == False:
-                context = {'message': 'disapproved'}
-            else:
-                context = {'message': 'pending'}
+    except ValueError: # If file doesn't exist, i.e. collection wasn't approved.
+        if collec.approved == False:
+            context = {'message': 'disapproved'}
+        elif collec.approved == None:
+            context = {'message': 'pending'}
         else:
             context = {'message': 'unknown'}
         response = render(request, 'niqati/order_not_approved.html', context)
@@ -192,20 +196,40 @@ def view_collection(request, pk):
 def approve_codes(request):
     if request.method == 'POST':
         pk = request.POST['pk']
-        if request.POST['action'] == "approve":
+        if request.POST['action'] == "approve_order":
+            order = Code_Order.objects.get(pk=pk)
+            for collec in order.code_collection_set.filter(approved=None):
+                collec.approved = True
+                collec.save()
+            
+            host = request.build_absolute_uri(reverse('niqati:submit'))
+            order.process(host)
+            
+        elif request.POST['action'] == "reject_order":
+            order = Code_Order.objects.get(pk=pk)
+            for collec in order.code_collection_set.filter(approved=None):
+                collec.approved = False
+                collec.save()
+                
+        elif request.POST['action'] == "approve_collec":
             collec = Code_Collection.objects.get(pk=pk)
             collec.approved = True
             
             host = request.build_absolute_uri(reverse('niqati:submit'))
             collec.process(host)
             collec.save()
-        else:
+            
+        elif request.POST['action'] == "reject_collec":
             collec = Code_Collection.objects.get(pk=pk)
             collec.approved = False
             collec.save()
-
+    
     unapproved_collec = Code_Collection.objects.filter(approved=None)
-    context = {'unapproved_collec': unapproved_collec}
+    activities = []
+    for collec in unapproved_collec:
+        if not collec.parent_order.activity in activities:
+            activities.append(collec.parent_order.activity)
+    context = {'unapproved_collec': unapproved_collec, 'activities': activities}
     return render(request, 'niqati/approve.html', context)
 
 @login_required

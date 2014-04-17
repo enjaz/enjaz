@@ -7,16 +7,66 @@
 .tg th{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
 </style>
 
-<h2>مراجعة طلبات نقاط الفكرة</h2>
+<h2>مراجعة طلبات النقاط</h2>
 
+{% if activities %}
+{% for activity in activities %}
+<h3>{{ activity.name }} <small>{{ activity.primary_club.name }}</small></h3> 
+<table class="table">
+	<tr>
+		<th>تاريخ الطلب</th>
+		<th>محتوى الطلب</th>
+		<th><!-- التصرف: قبول أو رفض الطلب كاملاً --></th>
+	</tr>
+	{% for order in activity.code_order_set.all %}
+	{% if not order.is_reviewed %}
+		<tr>
+			<td>{{ order.date_ordered }}</td>
+			<td>
+				<ul class="list-group">
+				 	{% for collec in unapproved_collec %}
+				 	{% if collec in order.code_collection_set.all %}
+				 	<li class="list-group-item">
+					    <span class="badge">{{ collec.code_count }} أكواد</span>
+					    {{ collec.code_category.ar_label }}
+				  	</li>
+				  	{% endif %}
+				 	{% endfor %} 
+				</ul>
+			</td>
+			<td>
+				<form style="display:inline" action="{% url 'niqati:approve' %}" method="post" class="form-inline" role="form">
+		            {% csrf_token %}
+		            <input type="hidden" name="pk" value="{{ order.pk }}"/>
+		            <input type="hidden" name="action" value="approve_order"/>
+		            <button type="submit" class="btn btn-success">قبول</button>
+		        </form>
+		        <form style="display:inline" action="{% url 'niqati:approve' %}" method="post" class="form-inline" role="form">
+		            {% csrf_token %}
+		            <input type="hidden" name="pk" value="{{ order.pk }}"/>
+		            <input type="hidden" name="action" value="reject_order"/>
+		            <button type="submit" class="btn btn-danger">رفض</button>
+		        </form>    
+			</td>
+		</tr>
+	{% endif %}
+	{% endfor %}
+</table>
+{% endfor %}
+{% else %}
+<p>لا توجد طلبات نقاط حاليًا.</p>
+{% endif %}
+
+<!--
 {% if unapproved_collec %}
 <table class="tg">
   <tr>
     <th>#</th>
     <th>النادي المنظم</th>
     <th>اسم النشاط</th>
-    <th>عدد أكواد الفكرة المطلوبة</th>
-    <th><!-- التصرف : قبول أو رفض --></th>
+    <th>فئة النقاط</th>
+    <th>الكمية المطلوبة</th>
+    <th><!-- التصرف : قبول أو رفض --</th>
   </tr>
 {% for collec in unapproved_collec %}
     <tr>
@@ -24,6 +74,7 @@
     <td>{{ forloop.counter }}</td>
     <td>{{ collec.parent_order.activity.primary_club.name }}</td>
     <td>{{ collec.parent_order.activity.name }}</td>
+    <td>{{ collec.code_category.ar_label }}</td>
     <td>{{ collec.code_count }}</td>
     <td>
         <form action="{% url 'niqati:approve' %}" method="post" class="form-group">
@@ -45,4 +96,5 @@
 {% else %}
 <p>لا توجد نقاط عالقة.</p>
 {% endif %}
+-->
 {% endblock %}

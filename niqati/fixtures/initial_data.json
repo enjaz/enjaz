@@ -16,7 +16,7 @@
       "label": "Organizer",
       "ar_label": "تنظيم",
       "points": "2",
-      "requires_approval": "False"
+      "requires_approval": "True"
     }
   },
   {
@@ -26,7 +26,7 @@
       "label": "Participation",
       "ar_label": "مشاركة",
       "points": "1",
-      "requires_approval": "False"
+      "requires_approval": "True"
     }
   }
 ]

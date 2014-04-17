@@ -2,9 +2,9 @@
 {% block title %}خطأ{% endblock %}
 {% block content %}
 {% if message == 'pending' %}
-<p class="btn-warning">لم تعتمد نقاط الأفكار حتى الآن.</p>
+<p class="btn-warning">لم تتم مراجعة الطلب حتى الآن.</p>
 {% elif message == 'disapproved' %}
-<p class="btn-danger">رُفضت نقاط الفكرة.</p>
+<p class="btn-danger">تم رفض الطلب.</p>
 {% else %}
 <p class="btn-danger">خطأ غير معروف.</p>
 {% endif %}

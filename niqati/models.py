@@ -208,7 +208,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 self.asset.save(self.parent_order.activity.name + " - " + self.code_category.ar_label, File(output_file))
                 output_file.close()
                 
-                os.remove(output_file)
+                os.remove('links.html')
                 
 
 class Code_Order(models.Model): # consists of one Code_Collection or more
@@ -219,6 +219,12 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
         for collec in self.code_collection_set.all():
             collec.process(host)
         self.save()
+    
+    def is_reviewed(self):
+        if len(self.code_collection_set.filter(approved=None)) == 0:
+            return True
+        else:
+            return False
     
     class Meta:
         permissions = (

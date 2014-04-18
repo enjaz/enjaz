@@ -161,7 +161,10 @@ def create_codes(request):
 @login_required
 @permission_required('niqati.view_order', raise_exception=True)
 def view_orders(request):
-    activities = Activity.objects.all()
+    activities = Activity.objects.filter(
+                        Q(primary_club__coordinator=request.user), # | Q(primary_club__members__contains=request.user),
+                        
+                        )
     
     context = {'activities': activities}
     return render(request, 'niqati/orders.html', context)

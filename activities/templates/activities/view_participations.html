@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}مشاهدة طلبات المشاركة في {{ activity.name }}{% endblock %}
 {% block sidebar %}
-<p><a href="{% url 'activities:download_participation' activity.pk %}">نزّل الطلبات</a>.</p>
+<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:download_participation' activity.pk %}"><span class="glyphicon glyphicon-download"></span> نزّل الطلبات</a>.</il></ul></p>
 {% endblock %}
 {% block content %}
 <h2>طلبات المشاركة في {{ activity.name }}</h2>

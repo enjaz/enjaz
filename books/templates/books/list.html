@@ -2,20 +2,20 @@
 {% block title %}الكتب{% endblock %}
 {% block sidebar %}
 {% if perms.books.add_book %}
-<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'books:contribute' %}">ساهم بكتاب!</a></li>
-{% if user.is_authenticated %}<li><a href="{% url 'books:review_requests' %}">طلبات استعارة كتبي</a></li>
-<li><a href="{% url 'books:my_requests' %}">طلباتي</a></li>{% endif %}</ul></p>
+<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'books:contribute' %}"><span class="glyphicon glyphicon-plus"></span> ساهم بكتاب!</a></li>
+{% if user.is_authenticated %}<li><a href="{% url 'books:review_requests' %}"><span class="glyphicon glyphicon-list-alt"></span>  طلبات استعارة كتبي</a></li>
+<li><a href="{% url 'books:my_requests' %}"><span class="glyphicon glyphicon-star"></span> طلباتي</a></li>{% endif %}</ul></p>
 {% endif %}
 {% if page_books %}
 <p style="font-size:1em;"><strong>رتّب الكتب حسب:</strong>
 <ul class="list-unstyled">
-<li><a href="{% url 'books:list' %}">تاريخ المساهمة</a></li>
-<li><a href="{% url 'books:list' %}?order=status">الحالة</a></li></ul></p>
+<li><a href="{% url 'books:list' %}"><span class="glyphicon glyphicon-time"></span> تاريخ المساهمة</a></li>
+<li><a href="{% url 'books:list' %}?order=status"><span class="glyphicon glyphicon-signal"></span> الحالة</a></li></ul></p>
 <p style="font-size:1em;"><strong>رشّح الكتب:</strong>
 <ul class="list-unstyled">
-<li><a href="{% url 'books:list' %}">جميع الكتب</a></li>
-{% if user.is_authenticated %}<li><a href="{% url 'books:list' %}?filter=mine">كتبي فقط</a></li>{% endif %}
-<li><a href="{% url 'books:list' %}?filter=available">الكتب المتاحة</a></li></p>
+<li><a href="{% url 'books:list' %}"><span class="glyphicon glyphicon-book"></span> جميع الكتب</a></li>
+{% if user.is_authenticated %}<li><a href="{% url 'books:list' %}?filter=mine"><span class="glyphicon glyphicon-user"></span> كتبي فقط</a></li>{% endif %}
+<li><a href="{% url 'books:list' %}?filter=available"><span class="glyphicon glyphicon-thumbs-up"></span> الكتب المتاحة</a></li></p>
 {% endif %}
 {% endblock %}
 {% block content %}

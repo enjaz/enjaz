@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}مشاهدة طلبات الانضمام إلى {{ club.name }}{% endblock %}
 {% block sidebar %}
-<p><a href="{% url 'clubs:download_application' club.pk %}">نزّل الطلبات</a>.</p>
+<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:download_application' club.pk %}"><span class="glyphicon glyphicon-download"></span> نزّل الطلبات</a>.</il></ul></p>
 {% endblock %}
 {% block content %}
 <h2>طلبات الانضمام إلى <a href="{% url 'clubs:show' club.pk %}">{{ club.name }}</a></h2>

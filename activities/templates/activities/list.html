@@ -10,18 +10,18 @@
 
 {% block sidebar %}
 {% if perms.activities.add_activity %}
-<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:create' %}">أضف نشاطًا</a></li></ul></p>
+<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:create' %}"><span class="glyphicon glyphicon-plus"></span> أضف نشاطًا</a></li></ul></p>
 {% endif %}
 {% if page_activities %}
 <p style="font-size:1em;"><strong>رتّب النشاطات حسب:</strong>
 <ul class="list-unstyled">
-<li><a href="{% url 'activities:list' %}">تاريخ الإرسال</a></li>
-<li><a href="{% url 'activities:list' %}?order=date">تاريخ العقد</a></li>
-<li><a href="{% url 'activities:list' %}?order=club">النادي المنظم</a></li></ul></p>
+<li><a href="{% url 'activities:list' %}"><span class="glyphicon glyphicon-time"></span> تاريخ الإرسال</a></li>
+<li><a href="{% url 'activities:list' %}?order=date"><span class="glyphicon glyphicon-calendar"></span> تاريخ الانعقاد</a></li>
+<li><a href="{% url 'activities:list' %}?order=club"><span class="glyphicon glyphicon-user"></span> النادي المنظم</a></li></ul></p>
 {% endif %}
 {% if perms.activities.add_review %}
 <p style="font-size:1em;">اعرض فقط:
-<ul class="list-unstyled"><li><a href="{% url 'activities:list' %}?pending=1">النشاطات المُعلّقة</a></li></ul></p>
+<ul class="list-unstyled"><li><a href="{% url 'activities:list' %}?pending=1"><span class="glyphicon glyphicon-list-alt"></span> النشاطات المُعلّقة</a></li></ul></p>
 {% endif %}
 {% endblock %}
 {% block content %}

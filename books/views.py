@@ -255,7 +255,7 @@ def contribute(request):
                     cover_object = ContentFile(cover_image.read())
                     print "object =", cover_object
                     #str(form_object.pk), 
-                    form_object.cover.save("test.jpg", cover_object)
+                    form_object.cover.save(str(form_object.pk), cover_object)
                     form_object.save()
             return HttpResponseRedirect(reverse('books:show', args=(form_object.pk,)))
         else:
@@ -423,11 +423,11 @@ def withdraw(request, book_id):
 
 def search(request):
     if request.method == 'GET':
-        context = {'results': None}
+        context = {'page_books': None}
         # Make sure that a query was submitted and that it isn't
         # empty.
         if 'q' in request.GET and request.GET['q']:
-            context['q'] = True
+            context['q'] = request.GET['q']
             term = request.GET['q']
             additional_books = Book.objects.none()
             if request.user.has_perm('books.view_books'):
@@ -444,6 +444,25 @@ def search(request):
 
             title_search = Book.objects.filter(title__contains=term, status__in=statuses) | additional_books.filter(title__contains=term)
             isbn_search = Book.objects.filter(isbn__contains=term, status__in=statuses) | additional_books.filter(isbn__contains=term)
-            context['results'] = title_search | isbn_search
+
+            resulted_books = title_search | isbn_search
+            resulted_books = resulted_books.order_by('submission_date')
+
+            context['total_results'] = len(resulted_books)
+
+            # Each page of results should have a maximum of 25
+            # activities.
+            paginator = Paginator(resulted_books, 2)
+            page = request.GET.get('page')
+
+            try:
+                page_books = paginator.page(page)
+            except PageNotAnInteger:
+                # If page is not an integer, deliver first page.
+                page_books = paginator.page(1)
+            except EmptyPage:
+                # If page is out of range (e.g. 9999), deliver last page of results.
+                page_books = paginator.page(paginator.num_pages)
+            context['page_books'] = page_books
 
         return render(request, 'books/search.html', context)

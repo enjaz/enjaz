@@ -1,17 +1,24 @@
 {% extends "base.html" %}{% load bootstrap3 %}
 {% block title %}{{ book.title }}{% endblock %}
 {% block content %}
-<h2>{{ book.title }}</h2>
-
+<h2 style="direction: ltr;">{{ book.title }}</h2>
+{% if book.description or book.cover %}
+<div class="row" style="direction: ltr;">
+{% if book.cover %}
+    <img src="{{ book.cover.url }}" style="float: left; padding: 0 15px 15px 15px;"/>
+{% endif %}
+{% if book.description %}
+<blockquote>
+    <p>{{ book.description }}</p>
+</blockquote>
+{% endif %}
+</div>
+{% endif %}
 <table class="tg table-hover table">
   <colgroup>
     <col class="col-xs-4">
     <col class="col-xs-4">
-  </colgroup>{% if book.description %}
-  <tr>
-    <th>الوصف</th>
-    <td style="direction:ltr;">{{ book.description }}</td>
-  </tr>{% endif %}{% if book.authors %}
+  </colgroup>{% if book.authors %}
   <tr>
     <th>المؤلف</th>
     <td style="direction:ltr;">{{ book.authors }}</td>

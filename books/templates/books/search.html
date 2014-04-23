@@ -2,21 +2,56 @@
 {% block title %}بحث{% endblock %}
 {% block content %}
 <h2>بحث</h2>
-{% if results %}
-<p>عثرنا على {{ results|length }} كتاب.</p>
-<ul>
-{% for result in results %}
-<li><a href="{% url 'books:show' result.pk %}">{{ result.title }}</a></li>
-{% endfor %}
-</ul>
-{% elif q %}
-<p>لا توجد نتائج</p>
-{% else %}
 <form name="search" action="{% url 'books:search' %}" method="get" class="form">
-        <input type="text" name="q"/>
+        <input value="{{ q }}" type="text" name="q"/>
         <button type="submit" class="btn btn-primary">
             {% bootstrap_icon "search" %} ابحث
         </button>
 </form>
+
+{% if page_books %}
+<p>عثرنا على {{ total_results }} كتاب.</p>
+
+<table class="tg table table-hover">
+  <tr>
+    <th>اسم الكتاب</th>
+    <th>متوفر من</th>
+    <th>متوفر حتى</th>
+    <th>الحالة</th>
+  </tr>
+    {% for book in page_books %}
+  <tr>
+    <td style="direction:ltr;"><a href="{% url 'books:show' book.pk %}">{{ book.title }}</a></td>
+    <td>{{ book.available_from }}</td>
+    <td>{% if book.available_until %}{{ book.available_until }}{% else %} - {% endif %}</td>
+    <td>{% if book.status == 'A' %}متاح
+{% elif book.status == 'H' %}محجوز
+{% elif book.status == 'B' %}معار
+{% elif book.status == 'W' %}مسحوب
+{% endif %}
+</td>
+  </tr>
+
+    {% endfor %}
+</table>
+
+<div style="text-align:center;">
+    <span class="step-links">
+        {% if page_books.has_previous %}
+            <a href="?q={{ q }}&page={{ page_books.previous_page_number }}">السابق</a>
+        {% endif %}
+
+        <span class="current">
+            الصفحة {{ page_books.number }} من {{ page_books.paginator.num_pages }}
+        </span>
+
+        {% if page_books.has_next %}
+            <a href="?q={{ q }}&page={{ page_books.next_page_number }}">التالي</a>
+        {% endif %}
+    </span>
+</div>
+
+{% elif q %}
+<p>لا توجد نتائج</p>
 {% endif %}
 {% endblock %}

@@ -39,7 +39,7 @@ class Book(models.Model):
                                on_delete=models.SET_NULL,
                                related_name='holdings')
     cover_url = models.CharField(max_length=200, blank=True, verbose_name=u"صورة الغلاف", help_text=u"صورة لغلاف الكتاب (مستحسن)")
-    cover = models.FileField(upload_to='covers', blank=True)
+    cover = models.FileField(upload_to='covers', blank=True, null=True)
     submission_date = models.DateTimeField(u"تاريخ الإرسال",
                                            auto_now_add=True)
     modifiation_date = models.DateTimeField(u"تاريخ التعديل",

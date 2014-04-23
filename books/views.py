@@ -13,6 +13,7 @@ from django.forms import ModelForm, ValidationError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.files.base import ContentFile
 from taggit.models import Tag
 
 from books.models import Book, BookRequest
@@ -46,9 +47,9 @@ class BookForm(ModelForm):
     class Meta:
         model = Book
         fields = ['isbn', 'title', 'contact', 'available_from',
-                  'available_until', 'tags', 'description', 'pages',
-                  'authors', 'publisher', 'year', 'edition',
-                  'condition']
+                  'available_until', 'tags', 'description',
+                  'cover_url', 'pages', 'authors', 'publisher',
+                  'year', 'edition', 'condition']
 
 class BookRequestForm(ModelForm):
     def clean(self):
@@ -185,13 +186,15 @@ def contribute(request):
             book_details = json.loads(book_query)
             final_details = {}
             fields = ['title', 'publisher', 'description', 'authors',
-                      'pageCount', 'categories', 'publishedDate']
+                      'pageCount', 'categories', 'publishedDate',
+                      'imageLinks']
             if book_details['totalItems'] >= 1:
                 for field in fields:
                     if field in book_details['items'][0]['volumeInfo']:
                         book_field = book_details['items'][0]['volumeInfo'][field]
                         if isinstance(book_field, list):
-                            # For authors and categories
+                            # For authors and categories, we need a
+                            # string.
                             final_details[field] = ", ".join(book_field)
                         elif field == 'publishedDate':
                             try:
@@ -199,10 +202,14 @@ def contribute(request):
                             except ValueError:
                                 #Sometimes, only the year is provided.
                                 final_details[field] = datetime.datetime.strptime(book_field, '%Y').year
+                        elif field == 'imageLinks':
+                            final_details[field] = book_field['thumbnail']
                         else:
                             final_details[field] = book_field
                     else:
                         if field == 'pageCount':
+                            # Since the number of pages field does not
+                            # accept strings, set it to NULL.
                             final_details[field] = None
                         else:
                             final_details[field] = ''
@@ -219,6 +226,7 @@ def contribute(request):
                                               authors=final_details['authors'],
                                               pages=final_details['pageCount'],
                                               year=final_details['publishedDate'],
+                                              cover_url = final_details['imageLinks'],
                                               available_from=datetime.date.today(),
                                               contact=request.user.email,))
                 context = {'form': form, 'tags': Tag.objects.all()}
@@ -235,6 +243,20 @@ def contribute(request):
 
         if form.is_valid():
             form_object = form.save()
+            if form_object.cover_url:
+                # TODO: If the cover was previously uploaded (i.e. a
+                # previous book with the same ISBN), do not do it
+                # again, but this would require more redesign
+                opener = urllib2.build_opener()
+                opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+                cover_image = opener.open(form_object.cover_url)
+                # Make sure we are actually fetching an image.
+                if cover_image.headers.type.startswith('image'):
+                    cover_object = ContentFile(cover_image.read())
+                    print "object =", cover_object
+                    #str(form_object.pk), 
+                    form_object.cover.save("test.jpg", cover_object)
+                    form_object.save()
             return HttpResponseRedirect(reverse('books:show', args=(form_object.pk,)))
         else:
             context = {'form': form}
@@ -398,3 +420,30 @@ def withdraw(request, book_id):
             context['done'] = True
 
     return render(request, 'books/withdraw.html', context)
+
+def search(request):
+    if request.method == 'GET':
+        context = {'results': None}
+        # Make sure that a query was submitted and that it isn't
+        # empty.
+        if 'q' in request.GET and request.GET['q']:
+            context['q'] = True
+            term = request.GET['q']
+            additional_books = Book.objects.none()
+            if request.user.has_perm('books.view_books'):
+                # If the user has the right permissions, they should
+                # be able to search all books.
+                statuses = ['A', 'H', 'W', 'B', 'R']
+            else:
+                statuses = ['A']
+                if request.user.is_authenticated():
+                    # Allow the user to search all the books that he
+                    # submitted or borrowed.
+                    additional_books = Book.objects.filter(submitter=request.user) | \
+                                       Book.objects.filter(holder=request.user)
+
+            title_search = Book.objects.filter(title__contains=term, status__in=statuses) | additional_books.filter(title__contains=term)
+            isbn_search = Book.objects.filter(isbn__contains=term, status__in=statuses) | additional_books.filter(isbn__contains=term)
+            context['results'] = title_search | isbn_search
+
+        return render(request, 'books/search.html', context)

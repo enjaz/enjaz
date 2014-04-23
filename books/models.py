@@ -38,6 +38,8 @@ class Book(models.Model):
     holder = models.ForeignKey(User, null=True,
                                on_delete=models.SET_NULL,
                                related_name='holdings')
+    cover_url = models.CharField(max_length=200, blank=True, verbose_name=u"صورة الغلاف", help_text=u"صورة لغلاف الكتاب (مستحسن)")
+    cover = models.FileField(upload_to='covers', blank=True)
     submission_date = models.DateTimeField(u"تاريخ الإرسال",
                                            auto_now_add=True)
     modifiation_date = models.DateTimeField(u"تاريخ التعديل",
@@ -53,7 +55,7 @@ class Book(models.Model):
             )
 
     def __unicode__(self):
-        return self.name    
+        return self.title
     
 class BookRequest(models.Model):
     book = models.ForeignKey(Book, null=True,

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load bootstrap3 %}
 {% block title %}الكتب{% endblock %}
 {% block sidebar %}
 {% if perms.books.add_book %}
@@ -19,6 +19,12 @@
 {% endif %}
 {% endblock %}
 {% block content %}
+<form name="search" action="{% url 'books:search' %}" method="get" class="form">
+        <input type="text" name="q"/>
+        <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "search" %} ابحث
+        </button>
+</form>
 {% if page_books %}
 <table class="tg table table-hover">
   <tr>

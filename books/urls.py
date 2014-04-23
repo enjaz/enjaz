@@ -12,4 +12,5 @@ urlpatterns = patterns('',
     url(r'^(?P<book_id>\d+)/withdraw/$', views.withdraw, name='withdraw'),
     url(r'^review_requests/$', views.review_requests, name='review_requests'),
     url(r'^my_requests/$', views.my_requests, name='my_requests'),
+    url(r'^search/$', views.search, name='search'),
 )

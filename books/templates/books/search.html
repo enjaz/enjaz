@@ -1,0 +1,22 @@
+{% extends "base.html" %}{% load bootstrap3 %}
+{% block title %}بحث{% endblock %}
+{% block content %}
+<h2>بحث</h2>
+{% if results %}
+<p>عثرنا على {{ results|length }} كتاب.</p>
+<ul>
+{% for result in results %}
+<li><a href="{% url 'books:show' result.pk %}">{{ result.title }}</a></li>
+{% endfor %}
+</ul>
+{% elif q %}
+<p>لا توجد نتائج</p>
+{% else %}
+<form name="search" action="{% url 'books:search' %}" method="get" class="form">
+        <input type="text" name="q"/>
+        <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "search" %} ابحث
+        </button>
+</form>
+{% endif %}
+{% endblock %}

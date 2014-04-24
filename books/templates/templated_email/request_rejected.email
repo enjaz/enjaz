@@ -1,0 +1,7 @@
+{% block subject %}رفض طلب استعارتك لكتاب {{ book.title }}{% endblock %}
+{% block plain %}اعتذر {% if book.submitter.first_name %}{{ book.submitter.first_name }} {{ book.submitter.last_name }}{% else %}{{ book.submitter.username }}{% endif %} عن إعارتك كتاب {{ book.title }} من {{ book_request.borrow_from|date:"j F" }} إلى {{ book_request.borrow_until|date:"j F" }}.
+
+يمكنك البحث عن ذات الكتاب عند أشخاص آخرين:
+{{ search_url }}
+
+{% endblock %}

@@ -28,11 +28,13 @@ class MembershipForm(ModelForm):
         model = MembershipApplication
         fields = ['note']
 
+@login_required
 def list(request):
     clubs = Club.objects.exclude(english_name="Presidency")
     context = {'clubs':clubs}
     return render(request, 'clubs/list.html', context)
 
+@login_required
 def show(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
 
@@ -58,6 +60,7 @@ def show(request, club_id):
                'activities': activities}
     return render(request, 'clubs/show.html', context)
 
+@login_required
 @permission_required('clubs.add_club', raise_exception=True)
 def create(request):
     if request.method == 'POST':
@@ -75,6 +78,7 @@ def create(request):
         context = {'form': form}
         return render(request, 'clubs/new.html', context)
 
+@login_required
 def edit(request, club_id):
     exisiting_club = get_object_or_404(Club, pk=club_id)
 
@@ -131,7 +135,7 @@ def join(request, club_id):
         context['form'] = form
         return render(request, 'clubs/join.html', context)
 
-
+@login_required
 def view_application(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
     if not club in request.user.coordination.all() and \

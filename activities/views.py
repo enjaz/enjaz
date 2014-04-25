@@ -58,6 +58,7 @@ class ReviewForm(ModelForm):
                   'inside_notes', 'outside_notes',
                   'organizers_notes', 'participants_notes', 'is_approved']
 
+@login_required
 def list(request):
     # If the user is part of the head of the Student Club, or part of
     # the Media Team, they should be able to view all activities
@@ -109,6 +110,7 @@ def list(request):
     context = {'page_activities': page_activities}
     return render(request, 'activities/list.html', context)
 
+@login_required
 def show(request, activity_id):
     # If the activity is approved, everyone can see it.  If it is not,
     # only the head of the Student Club, the Media Team, the members
@@ -175,6 +177,7 @@ def show(request, activity_id):
 
     return render(request, 'activities/show.html', context)
 
+@login_required
 @permission_required('activities.add_activity', raise_exception=True)
 def create(request):
     presidency = Club.objects.get(english_name="Presidency")
@@ -250,6 +253,7 @@ def edit(request, activity_id):
                    'activity': activity, 'edit': True}
         return render(request, 'activities/new.html', context)
 
+@login_required
 def review(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id)
 

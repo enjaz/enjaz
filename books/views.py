@@ -79,6 +79,7 @@ def get_gender(user):
     elif section in [u'F', u'KF']:
         return 'F'
 
+@login_required
 def list_books(request):
     if request.user.has_perm('books.view_books'):
         books = Book.objects.all()
@@ -128,6 +129,7 @@ def list_books(request):
     context = {'page_books': page_books}
     return render(request, 'books/list.html', context)
 
+@login_required
 def show(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
     today = datetime.date.today()
@@ -462,6 +464,7 @@ def withdraw(request, book_id):
 
     return render(request, 'books/withdraw.html', context)
 
+@login_required
 def search(request):
     if request.method == 'GET':
         context = {'page_books': None}

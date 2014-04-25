@@ -1,16 +1,29 @@
-{% extends "base.html" %}
+{% extends "activities_base.html" %}
 {% block title %}مشاهدة طلبات المشاركة في {{ activity.name }}{% endblock %}
-{% block sidebar %}
-<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:download_participation' activity.pk %}"><span class="glyphicon glyphicon-download"></span> نزّل الطلبات</a>.</il></ul></p>
-{% endblock %}
+
 {% block content %}
 <h2>طلبات المشاركة في {{ activity.name }}</h2>
 {% if participations %}
-<ul>
-{% for participation in participations %}
-<li>{% if participation.user.first_name %}{{ participation.user.first_name }} {{ participation.user.last_name }}{% else %}{{ participation.user.username }}{% endif %} - {{ participation.submission_date }}</li>
-{% endfor %}
-</ul>
+<div class="col-md-3">
+	<div class="panel panel-primary" data-collapsed="0">
+		<!-- panel head -->
+		<div class="panel-heading">
+			<div class="panel-title">خيارات</div>
+		</div>
+		
+		<!-- panel body -->
+		<div class="panel-body">
+			<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:download_participation' activity.pk %}"><span class="glyphicon glyphicon-download"></span> نزّل الطلبات</a>.</il></ul></p>
+		</div>
+	</div>
+</div>
+<div class="col-md-9">
+	<ul>
+		{% for participation in participations %}
+		<li>{% if participation.user.first_name %}{{ participation.user.first_name }} {{ participation.user.last_name }}{% else %}{{ participation.user.username }}{% endif %} - {{ participation.submission_date }}</li>
+		{% endfor %}
+	</ul>
+</div>
 {% else %}
 <p>لا توجد طلبات مشاركة.</p>
 {% endif %}

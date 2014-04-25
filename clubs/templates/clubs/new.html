@@ -1,5 +1,6 @@
-{% extends "base.html" %}{% load bootstrap3 %}
+{% extends "clubs_base.html" %}{% load bootstrap3 %}
 {% block title %}{% if form.has_changed %} تعديل {{ form.name.value }}{% else %} نادٍ جديد {% endif %}{% endblock %}
+
 {% block content %}
 <h2>{% if form.has_changed %} تعديل {{ form.name.value }} {% else %} نادٍ جديد {% endif %}</h2>
 

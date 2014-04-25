@@ -1,5 +1,6 @@
-{% extends "base.html" %}{% load bootstrap3 %}
+{% extends "activities_base.html" %}{% load bootstrap3 %}
 {% block title %}{% if edit %} تعديل {{ form.name.value }} {% else %} نشاط جديد {% endif %}{% endblock %}
+
 {% block content %}
  <script>
 $(function() {

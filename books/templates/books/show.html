@@ -1,7 +1,31 @@
-{% extends "base.html" %}{% load bootstrap3 %}
+{% extends "books_base.html" %}{% load bootstrap3 %}
 {% block title %}{{ book.title }}{% endblock %}
+
 {% block content %}
 <h2 style="direction: ltr;">{{ book.title }}</h2>
+<div class="col-md-3">
+	<div class="panel panel-primary" data-collapsed="0">
+		<!-- panel head -->
+		<div class="panel-heading">
+			<div class="panel-title">خيارات</div>
+		</div>
+		
+		<!-- panel body -->
+		<div class="panel-body">
+			{% if book.status == 'A' and not user == book.submitter %}{% if user_gender == submitter_gender or not user.is_authenticated  %}
+				<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'books:borrow' book.pk %}">استعر</a></li></ul></p>
+			{% endif %}{% elif user == book.submitter %}
+				<p style="font-size:1em;"><ul class="list-unstyled">
+				<li><a href="{% url 'books:review_requests' %}#book{{ book.pk }}"><span class="glyphicon glyphicon-list-alt"></span> راجع طلبات الاستعارة</a></li>
+				<li><a href="{% url 'books:edit' book.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
+			{% if book.status == 'A' or book.status == 'H' %}
+				<li><a href="{% url 'books:withdraw' book.pk %}"><span class="glyphicon glyphicon-remove"></span> اسحب</a></li>
+			{% endif %}</ul></p>
+			{% endif %}
+		</div>
+	</div>
+</div>
+<div class="col-md-9">
 {% if book.description or book.cover %}
 <div class="row" style="direction: ltr;">
 {% if book.cover %}
@@ -56,17 +80,5 @@
     <td>{{ book.holder }}</td>
   </tr>
 {% endif %}{% endif %}</table>
-{% endblock %}
-
-{% block sidebar %}
-{% if book.status == 'A' and not user == book.submitter %}{% if user_gender == submitter_gender or not user.is_authenticated  %}
-<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'books:borrow' book.pk %}">استعر</a></li></ul></p>
-{% endif %}{% elif user == book.submitter %}
-<p style="font-size:1em;"><ul class="list-unstyled">
-<li><a href="{% url 'books:review_requests' %}#book{{ book.pk }}"><span class="glyphicon glyphicon-list-alt"></span> راجع طلبات الاستعارة</a></li>
-<li><a href="{% url 'books:edit' book.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
-{% if book.status == 'A' or book.status == 'H' %}
-<li><a href="{% url 'books:withdraw' book.pk %}"><span class="glyphicon glyphicon-remove"></span> اسحب</a></li>
-{% endif %}</ul></p>
-{% endif %}
+</div>
 {% endblock %}

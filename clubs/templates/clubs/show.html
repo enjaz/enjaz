@@ -1,8 +1,30 @@
-{% extends "base.html" %}
+{% extends "clubs_base.html" %}
 {% block title %}{{ club.name }}{% endblock %}
+
 {% block content %}
 <h2>{{ club.name }}</h2>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+<div class="col-md-3">
+	<div class="panel panel-primary" data-collapsed="0">
+		<!-- panel head -->
+		<div class="panel-heading">
+			<div class="panel-title">خيارات</div>
+		</div>
+		
+		<!-- panel body -->
+		<div class="panel-body">
+			{% if can_edit %}
+			<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:edit' club.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
+			{% if can_view_applications and club.open_membership %}
+			<li><a href="{% url 'clubs:view_application' club.pk %}"><span class="glyphicon glyphicon-list-alt"></span> راجع طلبات الانضمام</a></li>
+			{% endif %}{% endif %}{% if can_edit %}</ul></p>{% endif %}
+			{% if user.is_authenticated and club.open_membership %}
+			<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:join' club.pk %}"><span class="glyphicon glyphicon-star"></span> انضم للنادي</a></li></ul></p>
+			{% endif %}
+		</div>
+	</div>
+</div>
+<div class="col-md-9">
 <table class="tg table-hover table">
   <colgroup>
     <col class="col-xs-2">
@@ -47,15 +69,6 @@
   </tr>
 {% endif %}
 </table>
+</div>
+</div>
 {% endblock %}
-{% block sidebar %}
-{% if can_edit %}
-<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:edit' club.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
-{% if can_view_applications and club.open_membership %}
-<li><a href="{% url 'clubs:view_application' club.pk %}"><span class="glyphicon glyphicon-list-alt"></span> راجع طلبات الانضمام</a></li>
-{% endif %}{% endif %}{% if can_edit %}</ul></p>{% endif %}
-{% if user.is_authenticated and club.open_membership %}
-<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:join' club.pk %}"><span class="glyphicon glyphicon-star"></span> انضم للنادي</a></li></ul></p>
-{% endif %}
-{% endblock %}
-

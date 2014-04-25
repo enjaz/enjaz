@@ -1,8 +1,38 @@
-{% extends "base.html" %}
+{% extends "activities_base.html" %}
 {% block title %}{{ activity.name }}{% endblock %}
+
 {% block content %}
 <h2>{{ activity.name }}</h2>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+<div class="row">
+	<div class="col-md-3">
+	<div class="panel panel-primary" data-collapsed="0">
+				
+		<!-- panel head -->
+		<div class="panel-heading">
+			<div class="panel-title">خيارات</div>
+		</div>
+		
+		<!-- panel body -->
+		<div class="panel-body">
+		<ul class="list-unstyled">
+		{% if activity.is_editable and can_edit %}
+			<li><a href="{% url 'activities:edit' activity.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
+		{% endif %}
+		{% if can_review and not review_p.is_approved or can_review and not review_d.is_approved %}
+			<li><a href="{% url 'activities:review' activity.pk %}"><span class="glyphicon glyphicon-ok"></span> راجع واعتمد</a></li>
+		{% endif %}
+		{% if can_view_participation and activity.collect_participants %}
+			<li><a href="{% url 'activities:view_participation' activity.pk %}"><span class="glyphicon glyphicon-list-alt"></span> شاهد طلبات المشاركة</a></li>
+		{% elif not is_review and user.is_authenticated and activity.collect_participants %}
+			<li><a href="{% url 'activities:participate' activity.pk %}"><span class="glyphicon glyphicon-star"></span> شارك!</a></li>
+		{% endif %}
+		</ul>
+		</div>
+	
+	</div>
+	</div>
+	<div class="col-md-9">
 <table class="tg table-hover table">
 {% if can_view_presidency_review and review_p and not can_view_deanship_review or can_view_deanship_review and review_d and not can_view_presidency_review %}
   <colgroup>
@@ -190,20 +220,7 @@
     </td>
   </tr>
 </table>
-{% endblock %}
-{% block sidebar %}
-{% if activity.is_editable and can_edit %}
-<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:edit' activity.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li></ul></p>
-{% endif %}
-{% if can_review and not review_p.is_approved or can_review and not review_d.is_approved %}
-<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:review' activity.pk %}"><span class="glyphicon glyphicon-ok"></span> راجع واعتمد</a></li></ul></p>
-{% endif %}
-{% if can_view_participation and activity.collect_participants %}
-<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:view_participation' activity.pk %}"><span class="glyphicon glyphicon-list-alt"></span> شاهد طلبات المشاركة</a></li></ul></p>
-{% elif not is_review and user.is_authenticated and activity.collect_participants %}
-<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:participate' activity.pk %}"><span class="glyphicon glyphicon-star"></span> شارك!</a></li></ul></p>
-{% endif %}
-
+</div>
 {% endblock %}
 
 

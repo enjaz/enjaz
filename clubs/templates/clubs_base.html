@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}{% endblock %}
+{% block pageheader %}الأندية{% endblock %}
+
+{% block navbar %}
+
+    {% if perms.clubs.add_club %}
+		<li><a href="{% url 'clubs:create' %}"><span class="glyphicon glyphicon-plus"></span> أضف ناديًا</a></li>
+	{% endif %}
+    
+{% endblock %}
+{% block content %}
+{% endblock %}  

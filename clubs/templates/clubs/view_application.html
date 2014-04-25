@@ -1,17 +1,32 @@
-{% extends "base.html" %}
+{% extends "clubs_base.html" %}
 {% block title %}مشاهدة طلبات الانضمام إلى {{ club.name }}{% endblock %}
-{% block sidebar %}
-<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:download_application' club.pk %}"><span class="glyphicon glyphicon-download"></span> نزّل الطلبات</a>.</il></ul></p>
-{% endblock %}
+
 {% block content %}
 <h2>طلبات الانضمام إلى <a href="{% url 'clubs:show' club.pk %}">{{ club.name }}</a></h2>
+
 {% if applications %}
+
+<div class="col-md-3">
+	<div class="panel panel-primary" data-collapsed="0">
+		<!-- panel head -->
+		<div class="panel-heading">
+			<div class="panel-title">خيارات</div>
+		</div>
+		
+		<!-- panel body -->
+		<div class="panel-body">
+			<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:download_application' club.pk %}"><span class="glyphicon glyphicon-download"></span> نزّل الطلبات</a>.</il></ul></p>
+		</div>
+	</div>
+</div>
+<div class="col-md-9">
 <ul>
 {% for application in applications %}
 <li>{% if application.user.first_name %}{{ application.user.first_name }} {{ application.user.last_name }}{% else %}{{ application.user.username }}{% endif %} - {{ application.note }} - {{ application.submission_date }}
 </li>
 {% endfor %}
 </ul>
+</div>
 {% else %}
 <p>لا توجد أية طلبات.</p>
 {% endif %}

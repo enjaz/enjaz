@@ -44,13 +44,13 @@
 		body {
 			font-family: "GE Dinar One", Arial;
 			font-weight: lighter;
-			font-size: large !important;
+			/*font-size: large !important;*/
 		}
 		
 		.dinar-medium {
 			font-family: "GE Dinar One", Arial;
 			font-weight: normal;
-			font-size: large !important;
+			/*font-size: large !important;*/
 		}
 		
 	</style>
@@ -138,40 +138,42 @@
 				
 	</div>	
 	<div class="main-content">
-		<!-- Profile Info and Notifications -->
-	<div class="col-md-12 col-sm-8 clearfix">
-		
-		<ul class="user-info pull-right pull-none-xsm">
-		
-						<!-- Profile Info -->
-			<li class="profile-info dropdown pull-right"><!-- add class "pull-right" if you want to place this from right -->
-				
-				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-					سعيد عرابي
-				</a>
-				
+	
+	<nav class="navbar navbar-default" role="navigation">
+	<!-- Brand and toggle get grouped for better mobile display -->
+	<div class="navbar-header">
+		<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+			<span class="sr-only">Toggle navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		</button>
+		<a class="navbar-brand dinar-medium" href="#">{% block pageheader %}{% endblock %}</a>
+	</div>
+
+	<!-- Collect the nav links, forms, and other content for toggling -->
+	<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+		<ul class="nav navbar-nav">
+			{% block navbar %}{% endblock %}
+		</ul>
+		<ul class="nav navbar-nav navbar-left">
+			<li>
+				<a href="#">تسجيل الخروج</a>
 				
 			</li>
-		
 		</ul>
-				
-	
 	</div>
+	<!-- /.navbar-collapse -->
+</nav>
+	
+	<div class="col-md-12 col-sm-8 clearfix">
 {% block content %}
 
 {% endblock %}
-<br />
 
-<!-- lets do some work here... --><!-- Footer -->
-<footer class="main">
-	
-		
-	&copy; 2014 نادي الطلاب
-	
-</footer>	</div>
-	
-		
 	</div>
+</div>
+</div>
 
 
 

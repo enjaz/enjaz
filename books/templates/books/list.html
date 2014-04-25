@@ -1,23 +1,6 @@
-{% extends "base.html" %}{% load bootstrap3 %}
+{% extends "books_base.html" %}{% load bootstrap3 %}
 {% block title %}الكتب{% endblock %}
-{% block sidebar %}
-{% if perms.books.add_book %}
-<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'books:contribute' %}"><span class="glyphicon glyphicon-plus"></span> ساهم بكتاب!</a></li>
-{% if user.is_authenticated %}<li><a href="{% url 'books:review_requests' %}"><span class="glyphicon glyphicon-list-alt"></span>  طلبات استعارة كتبي</a></li>
-<li><a href="{% url 'books:my_requests' %}"><span class="glyphicon glyphicon-star"></span> طلباتي</a></li>{% endif %}</ul></p>
-{% endif %}
-{% if page_books %}
-<p style="font-size:1em;"><strong>رتّب الكتب حسب:</strong>
-<ul class="list-unstyled">
-<li><a href="{% url 'books:list' %}"><span class="glyphicon glyphicon-time"></span> تاريخ المساهمة</a></li>
-<li><a href="{% url 'books:list' %}?order=status"><span class="glyphicon glyphicon-signal"></span> الحالة</a></li></ul></p>
-<p style="font-size:1em;"><strong>رشّح الكتب:</strong>
-<ul class="list-unstyled">
-<li><a href="{% url 'books:list' %}"><span class="glyphicon glyphicon-book"></span> جميع الكتب</a></li>
-{% if user.is_authenticated %}<li><a href="{% url 'books:list' %}?filter=mine"><span class="glyphicon glyphicon-user"></span> كتبي فقط</a></li>{% endif %}
-<li><a href="{% url 'books:list' %}?filter=available"><span class="glyphicon glyphicon-thumbs-up"></span> الكتب المتاحة</a></li></p>
-{% endif %}
-{% endblock %}
+
 {% block content %}
 <form name="search" action="{% url 'books:search' %}" method="get" class="form">
         <input type="text" name="q"/>
@@ -26,6 +9,29 @@
         </button>
 </form>
 {% if page_books %}
+<div class="row">
+	<div class="col-md-3">
+	<div class="panel panel-primary" data-collapsed="0">
+		<!-- panel head -->
+		<div class="panel-heading">
+			<div class="panel-title">خيارات</div>
+		</div>
+		
+		<!-- panel body -->
+		<div class="panel-body">
+			<p style="font-size:1em;"><strong>رتّب الكتب حسب:</strong>
+			<ul class="list-unstyled">
+				<li><a href="{% url 'books:list' %}"><span class="glyphicon glyphicon-time"></span> تاريخ المساهمة</a></li>
+				<li><a href="{% url 'books:list' %}?order=status"><span class="glyphicon glyphicon-signal"></span> الحالة</a></li></ul></p>
+			<p style="font-size:1em;"><strong>رشّح الكتب:</strong>
+			<ul class="list-unstyled">
+				<li><a href="{% url 'books:list' %}"><span class="glyphicon glyphicon-book"></span> جميع الكتب</a></li>
+			{% if user.is_authenticated %}<li><a href="{% url 'books:list' %}?filter=mine"><span class="glyphicon glyphicon-user"></span> كتبي فقط</a></li>{% endif %}
+			<li><a href="{% url 'books:list' %}?filter=available"><span class="glyphicon glyphicon-thumbs-up"></span> الكتب المتاحة</a></li></p>
+		</div>
+	</div>
+	</div>
+	<div class="col-md-9">
 <table class="tg table table-hover">
   <tr>
     <th>اسم الكتاب</th>
@@ -62,6 +68,7 @@
             <a href="?page={{ page_books.next_page_number }}">التالي</a>
         {% endif %}
     </span>
+</div>
 </div>
 {% else %}
     <p>لا توجد أية كتب.</p>

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}{% endblock %}
+{% block pageheader %}الأنشطة{% endblock %}
+
+{% block navbar %}
+
+    {% if perms.activities.add_activity %}
+		<li><a href="{% url 'activities:create' %}"><span class="glyphicon glyphicon-plus"></span> أضف نشاطًا</a></li>
+	{% endif %}
+    
+{% endblock %}
+{% block content %}
+{% endblock %}  

@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% block title %}{% endblock %}
-{% block sidebar %}
+{% block pageheader %}نقاطي{% endblock %}
 
-<ul class="list-unstyled">
+{% block navbar %}
+
     {% if perms.niqati.request_order %}<li><a href="{% url 'niqati:create' %}"><span class="glyphicon glyphicon-pencil"></span> أنشئ نقاطًا</a></li>{% endif %}
     {% if perms.niqati.view_order %}<li><a href="{% url 'niqati:orders' %}"><span class="glyphicon glyphicon-cloud-download"></span> النقاط المطلوبة</a></li>{% endif %}
 
@@ -11,7 +12,7 @@
 
     {% if perms.niqati.approve_order %}<li><a href="{% url 'niqati:approve' %}"><span class="glyphicon glyphicon-ok-circle"></span> مراجعة طلبات النقاط</a></li>{% endif %}
     {% if perms.niqati.view_general_report %}<li><a href="{% url 'niqati:general_report' %}"><span class="glyphicon glyphicon-stats"></span> التقرير العام</a></li>{% endif %}
-</ul>
+    
 {% endblock %}
 {% block content %}
 {% endblock %}  

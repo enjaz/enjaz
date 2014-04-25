@@ -11,7 +11,21 @@
 	
 	<title>إنجاز | {% block title %}{% endblock %}</title>
 	
-
+	<style>
+		@font-face {
+		  font-family: 'GE Dinar One';
+		  font-weight: lighter;
+		  font-size: xx-large;
+		  src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
+		}
+		
+		@font-face {
+		  font-family: 'GE Dinar One';
+		  font-weight: normal;
+		  src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
+		}
+	</style>
+	
 	<link rel="stylesheet" href="{% static 'neon/assets/js/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/entypo/css/entypo.css' %}">
 	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noto+Sans:400,700,400italic">
@@ -21,6 +35,24 @@
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-forms.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
+	
+	<style>
+	
+		.sidebar-menu #main-menu li,
+		.main-content .user-info li a,
+		body {
+			font-family: "GE Dinar One", Arial;
+			font-weight: lighter;
+			font-size: large !important;
+		}
+		
+		.dinar-medium {
+			font-family: "GE Dinar One", Arial;
+			font-weight: normal;
+			font-size: large !important;
+		}
+		
+	</style>
 
 	<script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
 
@@ -36,90 +68,94 @@
 </head>
 <body class="page-body" data-url="http://neon.dev">
 
-<div class="page-container horizontal-menu with-sidebar right-sidebar"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->	
+<div class="page-container right-sidebar"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->	
 	
-<header class="navbar navbar-fixed-top"><!-- set fixed position by adding class "navbar-fixed-top" -->
+		<div class="sidebar-menu">
 		
-		<div class="navbar-inner">
-		
+			
+		<header class="logo-env">
+			
 			<!-- logo -->
-			<div class="navbar-brand">
-				<a href="index.html">
-					<img src="{% static 'neon/assets/images/logo@2x.png' %}" width="88" alt="" />
+			<div class="logo">
+				<a href="{% url 'home' %}">
+					<img src="{% static 'neon/assets/images/logo@2x.png' %}" width="120" alt="" />
 				</a>
 			</div>
 			
-			
-			<!-- main menu -->
+						<!-- logo collapse icon -->
 						
-			<ul class="navbar-nav">
-				<li>
-					<a href="{% url 'clubs:list' %}">
-						<i class="entypo-gauge"></i>
-						<span>نوادي</span>
-					</a>
-				</li>
-				<li>
-					<a href="{% url 'activities:list' %}">
-						<i class="entypo-layout"></i>
-						<span>نشاطات</span>
-					</a>
-				</li>
-				<li>
-					<a href="{% url 'books:list' %}">
-						<i class="entypo-newspaper"></i>
-						<span>كتب</span>
-					</a>
-				</li>
-				<li>
-					<a href="{% url 'niqati:index' %}">
-						<i class="entypo-doc-text"></i>
-						<span>نقاطي</span>
-					</a>
-			</ul>
-						
+			<div class="sidebar-collapse">
+				<a href="#" class="sidebar-collapse-icon with-animation"><!-- add class "with-animation" if you want sidebar to have animation during expanding/collapsing transition -->
+					<i class="entypo-menu"></i>
+				</a>
+			</div>
 			
-			<!-- notifications and other links -->
-			<ul class="nav navbar-right pull-right">
-				<!-- raw links -->
-				<li class="dropdown">
-										<li>
-						<a href="http://www.ksau-hs.com">الملتقى</a>
-					</li>
-									</li>
+									
+			
+			<!-- open/close menu icon (do not remove if you want to enable menu on mobile devices) -->
+			<div class="sidebar-mobile-menu visible-xs">
+				<a href="#" class="with-animation"><!-- add class "with-animation" to support animation -->
+					<i class="entypo-menu"></i>
+				</a>
+			</div>
+			
+		</header>
 				
-				<li class="sep"></li>
-				
-				<li>
-					<a href="#">
-						Log Out <i class="entypo-logout right"></i>
-					</a>
-				</li>
-				
-				
-				<!-- mobile only -->
-				<li class="visible-xs">	
-				
-					<!-- open/close menu icon (do not remove if you want to enable menu on mobile devices) -->
-					<div class="horizontal-mobile-menu visible-xs">
-						<a href="#" class="with-animation"><!-- add class "with-animation" to support animation -->
-							<i class="entypo-menu"></i>
-						</a>
-					</div>
-					
-				</li>
-				
-			</ul>
-	
-		</div>
 		
-	</header>
-	
-	<div class="sidebar-menu">
-	{% block sidebar %}
-	{% endblock %}
+		
+				
+		
+				
+		<ul id="main-menu" class="">
+			<!-- add class "multiple-expanded" to allow multiple submenus to open -->
+			<!-- class "auto-inherit-active-class" will automatically add "active" class for parent elements who are marked already with class "active" -->
+			<li>
+				<a href="{% url 'clubs:list' %}">
+					<i class="entypo-gauge"></i>
+					<span>نوادي</span>
+				</a>
+			</li>
+			<li>
+				<a href="{% url 'activities:list' %}">
+					<i class="entypo-layout"></i>
+					<span>أنشطة</span>
+				</a>
+			</li>
+			<li>
+				<a href="{% url 'niqati:index' %}">
+					<i class="entypo-monitor"></i>
+					<span>نقاطي</span>
+				</a>
+			</li>
+			<li>
+				<a href="{% url 'books:list' %}">
+					<i class="entypo-newspaper"></i>
+					<span>كتب</span>
+				</a>
+			</li>
+		</ul>
+				
 	</div>	
 	<div class="main-content">
+		<!-- Profile Info and Notifications -->
+	<div class="col-md-12 col-sm-8 clearfix">
+		
+		<ul class="user-info pull-right pull-none-xsm">
+		
+						<!-- Profile Info -->
+			<li class="profile-info dropdown pull-right"><!-- add class "pull-right" if you want to place this from right -->
+				
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+					سعيد عرابي
+				</a>
+				
+				
+			</li>
+		
+		</ul>
+				
+	
+	</div>
 {% block content %}
 
 {% endblock %}
@@ -129,7 +165,7 @@
 <footer class="main">
 	
 		
-	&copy; 2014 <strong>نادي الطلاب</strong>
+	&copy; 2014 <span class="dinar-medium">نادي الطلاب</span>
 	
 </footer>	</div>
 	

@@ -14,9 +14,11 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.files.base import ContentFile
-from taggit.models import Tag
 
+from taggit.models import Tag
 from books.models import Book, BookRequest
+from templated_email import send_templated_mail
+
 
 class BookForm(ModelForm):
     def clean(self):
@@ -253,8 +255,6 @@ def contribute(request):
                 # Make sure we are actually fetching an image.
                 if cover_image.headers.type.startswith('image'):
                     cover_object = ContentFile(cover_image.read())
-                    print "object =", cover_object
-                    #str(form_object.pk), 
                     form_object.cover.save(str(form_object.pk), cover_object)
                     form_object.save()
             return HttpResponseRedirect(reverse('books:show', args=(form_object.pk,)))
@@ -275,7 +275,17 @@ def borrow(request, book_id):
         book_request = BookRequest(book=book, requester=request.user)
         form = BookRequestForm(request.POST, instance=book_request)
         if form.is_valid():
-            form.save()
+            request_object = form.save()
+            review_url = request.build_absolute_uri(reverse('books:review_requests'))
+            send_templated_mail(
+                    template_name='book_requested',
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[book.submitter.email],
+                    context={
+                        'book': book,
+                        'book_request': book_request,
+                        'review_url': review_url,
+                        })
             return HttpResponseRedirect(reverse('books:show', args=(book.pk,)))
         else:
             context['form'] = form
@@ -294,8 +304,8 @@ def borrow(request, book_id):
             # TODO: Make it  possible to borrow a book  in the future,
             # after the book is returned.
             context['error'] = 'not_available'
-        elif request.user == book.submitter:
-            context['error'] = 'is_submitter'
+            #elif request.user == book.submitter:
+            #    context['error'] = 'is_submitter'
         elif request.user == book.holder:
             context['error'] = 'is_holder'
         elif not is_still_available:
@@ -326,13 +336,32 @@ def review_requests(request):
         if request.POST['action'] == "approve":
             # TODO: Make sure that the book isn't already borrowed or
             # held!
+            request_url = request.build_absolute_uri(reverse('books:my_requests'))
+            send_templated_mail(
+                    template_name='request_approved',
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[book_request.requester.email],
+                    context={
+                        'book': book,
+                        'book_request': book_request,
+                        'request_url': request_url,
+                        })
             book_request.status = 'A'
             book.status = 'H'
             book.save()
             book_request.save()
+
         elif request.POST['action'] == "reject":
             book_request.status = 'R'
             book_request.save()
+            search_url = request.build_absolute_uri(reverse('books:search')) + '?q=' + book.isbn
+            send_templated_mail(
+                    template_name='request_rejected',
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[book_request.requester.email],
+                    context={'book': book, 'book_request': book_request,
+                             'search_url': search_url}
+            )
         elif request.POST['action'] == "return":
             book.status = 'A'
             book_request.status = 'S'
@@ -369,8 +398,16 @@ def my_requests(request):
                  book_request.status == 'A':
                 book.status = 'R'
                 book.save()
-                # TODO: Email the submitter and ask them to confirm
-                # whether they have actually received the book back.
+                review_url = request.build_absolute_uri(reverse('books:review_requests'))
+                send_templated_mail(
+                        template_name='book_returned',
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[book.submitter.email],
+                        context={
+                            'book': book,
+                            'book_request': book_request,
+                            'review_url': review_url,
+                            })
         else:
             context = {'error': True}
             return render(request, 'books/my_requests.html', context)
@@ -383,19 +420,23 @@ def my_requests(request):
 @login_required
 def edit(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
+    context = {'book': book, 'edit': True, 'tags': Tag.objects.all()}
+
     if not request.user == book.submitter and \
        not request.user.has_perm('books.change_book'):
         raise PermissionDenied
 
     if request.method == 'POST':
         modified_book = BookForm(request.POST, instance=book)
-        modified_book.save()
-        return HttpResponseRedirect(reverse('books:show', args=(book_id,)))
+        if modified_book.is_valid():
+            modified_book.save()
+            return HttpResponseRedirect(reverse('books:show', args=(book_id,)))
+        else:
+            context['form'] = modified_book
     else:
         form = BookForm(instance=book)
-        context = {'form': form, 'book': book, 'edit': True, 'tags':
-                   Tag.objects.all()}
-        return render(request, 'books/edit.html', context)
+        context['form'] = form
+    return render(request, 'books/edit.html', context)
 
 @login_required
 def withdraw(request, book_id):
@@ -452,7 +493,7 @@ def search(request):
 
             # Each page of results should have a maximum of 25
             # activities.
-            paginator = Paginator(resulted_books, 2)
+            paginator = Paginator(resulted_books, 25)
             page = request.GET.get('page')
 
             try:

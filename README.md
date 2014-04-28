@@ -9,11 +9,12 @@ books.
 It is licensed under the AGPLv3+.
 
 Current dependencies:
-* django-userena
 * django-taggit
 * django-templated-email
+* django-userena
 * pdfcrowd
 * requests
+* unicodecsv
 
 Current required settings:
 * DEFAULT_FROM_EMAIL

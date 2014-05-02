@@ -79,8 +79,13 @@ def get_gender(user):
     elif section in [u'F', u'KF']:
         return 'F'
 
-@login_required
+# @login_required
 def list_books(request):
+    if not request.user.is_authenticated():
+        template = 'front/front_base.html'
+    else:
+        template = 'books_base.html'
+         
     if request.user.has_perm('books.view_books'):
         books = Book.objects.all()
     else:
@@ -126,7 +131,7 @@ def list_books(request):
         # If page is out of range (e.g. 9999), deliver last page of results.
         page_books = paginator.page(paginator.num_pages)
 
-    context = {'page_books': page_books}
+    context = {'template': template, 'page_books': page_books}
     return render(request, 'books/list.html', context)
 
 @login_required
@@ -464,8 +469,13 @@ def withdraw(request, book_id):
 
     return render(request, 'books/withdraw.html', context)
 
-@login_required
+#@login_required
 def search(request):
+    if request.user.is_authenticated():
+        template = 'books_base.html'
+    else:
+        template = 'front/front_base.html'
+        
     if request.method == 'GET':
         context = {'page_books': None}
         # Make sure that a query was submitted and that it isn't
@@ -508,5 +518,6 @@ def search(request):
                 # If page is out of range (e.g. 9999), deliver last page of results.
                 page_books = paginator.page(paginator.num_pages)
             context['page_books'] = page_books
-
+        
+        context['template'] = template
         return render(request, 'books/search.html', context)

@@ -1,0 +1,239 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="description" content="Neon Admin Panel" />
+	<meta name="author" content="" />
+	
+	<title>إنجاز | {% block title %}{% endblock %}</title>
+	
+	<style>
+		@font-face {
+		  font-family: 'GE Dinar One';
+		  font-weight: lighter;
+		  font-size: xx-large;
+		  src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
+		}
+		
+		@font-face {
+		  font-family: 'GE Dinar One';
+		  font-weight: normal;
+		  src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
+		}
+	</style>
+	
+	<!-- admin theme stylesheets  -->
+	<link rel="stylesheet" href="{% static 'neon/assets/js/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css' %}">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/entypo/css/entypo.css' %}">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:400,700,400italic">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/bootstrap.css' %}">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-core.css' %}">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-theme.css' %}">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-forms.css' %}">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.css' %}">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
+	
+	<!-- front stylesheets -->
+	<link rel="stylesheet" href="{% static 'neon-front/assets/css/bootstrap.css' %}">
+	<link rel="stylesheet" href="{% static 'neon-front/assets/css/font-icons/entypo/css/entypo.css' %}">
+	<link rel="stylesheet" href="{% static 'neon-front/assets/css/neon.css' %}">
+
+	<style>
+		.site-header .site-nav .main-menu li a,
+		.dinar-light
+		{
+			font-family: "GE Dinar One", Arial;
+			font-weight: lighter;	
+		}
+		
+		.site-header .site-nav .main-menu > li.active > a,
+		.dinar-medium
+		{
+			font-family: "GE Dinar One", Arial;
+			font-weight: normal;
+		}
+	</style>
+	
+	<script src="{% static 'neon-front/assets/js/jquery-1.11.0.min.js' %}"></script>
+
+	<!--[if lt IE 9]><script src="{% static 'neon-front/assets/js/ie8-responsive-file-warning.js' %}"></script><![endif]-->
+
+	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	
+	
+</head>
+<body class="page-body">
+
+<div class="wrap">
+	
+	<!-- Logo and Navigation --><div class="site-header-container container">
+
+	<div class="row">
+	
+		<div class="col-md-12">
+			
+			<header class="site-header">
+			<!--
+				<section class="site-logo">
+				
+					<a href="index.html">
+						<img src="{% static 'logo/enjaz_logo_w_sclogo_shadow' %}" width="120" />
+					</a>
+					
+				</section>
+			-->
+				<nav class="site-nav">
+					
+					<ul class="main-menu hidden-xs" id="main-menu">
+						<li class="active">
+							<a href="{% url 'home' %}">
+								<span>الرئيسية</span>
+							</a>
+						</li>
+						<li>
+							<a href="{% url 'clubs:list' %}">
+								<span>الأندية</span>
+							</a>
+							
+						</li>
+						<li>
+							<a href="{% url 'activities:list' %}">
+								<span>الأنشطة</span>
+							</a>
+							
+						</li>
+						<li>
+							<a href="{% url 'niqati:index' %}">
+								<span>نقاطي</span>
+							</a>
+							
+						</li>
+						<li>
+							<a href="{% url 'books:list' %}">
+								<span>الكتب</span>
+							</a>
+						</li>
+						<li>
+							<a href="{% url 'userena_signin' %}">
+								<span>تسجيل الدخول</span>
+							</a>
+						</li>
+						<li>
+							<a href="{% url 'userena_signup' %}">
+								<span>التسجيل</span>
+							</a>
+						</li>
+					</ul>
+					
+				
+					<div class="visible-xs">
+						
+						<a href="#" class="menu-trigger">
+							<i class="entypo-menu"></i>
+						</a>
+						
+					</div>
+				</nav>
+				
+				
+				
+			</header>
+			
+		</div>
+		
+	</div>
+	
+</div>
+<!--  end of navigation -->
+<!-- main content -->
+<!-- <section class="breadcrumb">
+	
+	<div class="container">
+		
+		<div class="row">
+			
+			<div class="col-sm-12">
+				
+				<h1 class="dinar-medium"></h1>
+							
+			</div>
+			
+		</div>
+		
+	</div>
+	
+</section>-->
+
+<!-- <div class="container">
+	<div class="row">
+		<div class="col-md-12">-->
+			{% block content %}{% endblock %}
+		<!--</div>
+	</div>
+</div> -->
+<!-- Site Footer --><footer class="site-footer">
+
+	<div class="container">
+	
+		<div class="row">
+			
+			<div class="col-sm-6">
+				
+				<ul class="social-networks text-right">
+					<li>
+						<a href="#">
+							<i class="entypo-instagram"></i>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<i class="entypo-twitter"></i>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<i class="entypo-facebook"></i>
+						</a>
+					</li>
+				</ul>
+				
+			</div>
+			
+			<div class="col-sm-6">
+				 تطوير نادي الطلاب بجامعة الملك سعود بن عبد العزيز للعلوم الصحية
+			</div>
+						
+		</div>
+		
+	</div>
+	
+</footer>	
+</div>
+	<!-- Admin Scripts -->
+	<script src="{% static 'neon/assets/js/gsap/main-gsap.js' %}"></script>
+	<script src="{% static 'neon/assets/js/jquery-ui/js/jquery-ui-1.10.3.minimal.min.js' %}"></script>
+	<script src="{% static 'neon/assets/js/bootstrap.js' %}"></script>
+	<script src="{% static 'neon/assets/js/joinable.js' %}"></script>
+	<script src="{% static 'neon/assets/js/resizeable.js' %}"></script>
+	<script src="{% static 'neon/assets/js/neon-api.js' %}"></script>
+	<script src="{% static 'neon/assets/js/neon-custom.js' %}"></script>
+	<script src="{% static 'neon/assets/js/neon-demo.js' %}"></script>
+
+	<!-- Front Scripts -->
+	<script src="{% static 'neon-front/assets/js/gsap/main-gsap.js' %}"></script>
+	<script src="{% static 'neon-front/assets/js/bootstrap.js' %}"></script>
+	<script src="{% static 'neon-front/assets/js/joinable.js' %}"></script>
+	<script src="{% static 'neon-front/assets/js/resizeable.js' %}"></script>
+	<script src="{% static 'neon-front/assets/js/neon-slider.js' %}"></script>
+	<script src="{% static 'neon-front/assets/js/neon-custom.js' %}"></script>
+
+</body>
+</html>

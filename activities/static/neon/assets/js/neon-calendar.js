@@ -72,7 +72,9 @@ var neonCalendar = neonCalendar || {};
 						calendar.fullCalendar('renderEvent', eventObject, true);
 						
 						$this.remove();
-					}
+					},
+					// isRTL: true,
+					events: activities
 				});
 				
 				$("#draggable_events li a").draggable({

@@ -1,4 +1,4 @@
-{% extends "activities_base.html" %}
+{% extends template %}{% load staticfiles %}
 {% block title %}الأنشطة{% endblock %}
 
 <div class="row">
@@ -9,7 +9,51 @@
 
 {% block content %}
 
+{% if not user.is_authenticated %}
+<section class="breadcrumb">
+	
+	<div class="container">
+		
+		<div class="row">
+			
+			<div class="col-sm-12">
+				
+				<h1 class="dinar-medium">الأنشطة</h1>
+							
+			</div>
+			
+		</div>
+		
+	</div>
+	
+</section>
+<div class="container">
+{% endif %}
+
 {% if page_activities %}
+
+{% if user.is_authenticated %}
+<div class="col-md-12">
+	<div class="row">
+		
+	<ul class="nav nav-tabs bordered"><!-- available classes "bordered", "right-aligned" -->
+		<li class="">
+			<a href="#list" data-toggle="tab">
+				<span class="visible-xs"><i class="entypo-home"></i></span>
+				<span class="hidden-xs">القائمة</span>
+			</a>
+		</li>
+		<li class="active">
+			<a href="#cal" data-toggle="tab">
+				<span class="visible-xs"><i class="entypo-user"></i></span>
+				<span class="hidden-xs">التقويم</span>
+			</a>
+		</li>
+	</ul>
+	
+	<div class="tab-content">
+		<div class="tab-pane" id="list">
+
 <div class="row">
 <div class="col-md-3">
 <div class="panel panel-primary" data-collapsed="0">
@@ -114,8 +158,71 @@
     </span>
 </div>
 </div>
+
+	</div>
+	</div>
+	<div class="tab-pane active" id="cal">	
+{% endif %}
+{% if not user.is_authenticated %}
+
+{% endif %}
+
+<style>
+	.calendar-env .calendar-body {
+		width: 100%;
+	}
+</style>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="calendar-env">
+			<!-- Calendar Body -->
+			<div class="calendar-body">
+				<div id="calendar"></div>
+			</div>
+				
+		</div>
+	</div>
+</div>
+
+<script>
+	var activities = [
+		{% for activity in page_activities %}
+		{
+			title : '{{ activity.name }}',
+			start : '2014-05-0{{ forloop.counter }}',
+			url   : '{{ activity.id }}/'
+		}{% if page_activities|length > forloop.counter %},{% endif %}
+		{% endfor %}
+	];
+</script>
+
+{% if user.is_authenticated %}
+</div>
+</div>
+</div>
+</div>
+{% endif %}
+
+<script src="{% static 'neon/assets/js/fullcalendar/fullcalendar.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/neon-calendar.js' %}"></script>
+<script>
+/*	$(document).ready(function () {
+		$('#calendar').fullCalendar({
+        	events: [
+				{
+					title : 'أروع نشاط في العالم',
+					start : '2014-05-05',
+					url   : '/activities/1/'
+				}
+			]
+    	});
+}); */
+	$(".calendar-env .calendar-sidebar").remove();
+</script>
 {% else %}
     <p>لا توجد أية نشاطات.</p>
 {% endif %}
+{% if not user.is_authenticated %}</div>{% endif %}
 {% endblock %}
 

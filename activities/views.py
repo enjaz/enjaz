@@ -66,13 +66,18 @@ def portal_home(request):
     else:
         return render(request, 'front/home_front.html')
 
-@login_required
+#@login_required
 def list(request):
     # If the user is part of the head of the Student Club, or part of
     # the Media Team, they should be able to view all activities
     # (i.e. approved, rejected and pending).  Otherwise, a user should
     # only see approved activities and the activities of the clubs
     # they have memberships in (regardless of their status).
+    if request.user.is_authenticated():
+        template = 'activities_base.html'
+    else:
+        template = 'front/front_base.html'
+    
     if request.user.has_perm('activities.view_activity'):
         if request.GET.get('pending') == "1":
             activities = Activity.objects.filter(review__is_approved=None)
@@ -115,8 +120,7 @@ def list(request):
         # If page is out of range (e.g. 9999), deliver last page of results.
         page_activities = paginator.page(paginator.num_pages)
 
-    context = {'page_activities': page_activities}
-    # if request.user.is_authenticated():
+    context = {'template': template, 'page_activities': page_activities}
     return render(request, 'activities/list.html', context)
 
 @login_required

@@ -1,15 +1,56 @@
-{% extends "books_base.html" %}{% load bootstrap3 %}
+{% extends template %}{% load bootstrap3 %}
 {% block title %}الكتب{% endblock %}
 
 {% block content %}
-<form name="search" action="{% url 'books:search' %}" method="get" class="form">
-        <input type="text" name="q"/>
-        <button type="submit" class="btn btn-primary">
-            {% bootstrap_icon "search" %} ابحث
-        </button>
+{% if not user.is_authenticated %}
+<section class="breadcrumb">
+	
+	<div class="container">
+		
+		<div class="row">
+			
+			<div class="col-sm-12">
+				
+				<h1 class="dinar-medium">الكتب</h1>
+							
+			</div>
+			
+		</div>
+		
+	</div>
+	
+</section>
+
+{% endif %}
+{% if not user.is_authenticated %}<div class="container">{% endif %}
+<div class="row">
+<form name="search" action="{% url 'books:search' %}" method="get" class="form-inline">
+	{% if not user.is_authenticated %}
+	<input type="text" class="form-control" name="q"/>
+	<button type="submit" class="btn btn-primary">
+        {% bootstrap_icon "search" %} ابحث
+    </button>
+    {% else %}
+  	<div class="col-md-6">
+    <div class="input-group">
+		<input type="text" class="form-control" name="q">
+		
+		<span class="input-group-btn">
+			<button type="submit" class="btn btn-primary">
+			    <span class="glyphicon glyphicon-search"></span> ابحث
+			</button>
+		</span>
+	</div>
+	</div>
+	{% endif %}
+    
 </form>
+</div>
+{% if not user.is_authenticated %}</div><!-- end .container -->{% endif %}
+<br>
 {% if page_books %}
 <div class="row">
+{% if user.is_authenticated %}
 	<div class="col-md-3">
 	<div class="panel panel-primary" data-collapsed="0">
 		<!-- panel head -->
@@ -32,12 +73,16 @@
 	</div>
 	</div>
 	<div class="col-md-9">
+{% else %}
+	<div class="container dinar-light">
+	<div class="col-md-12">
+{% endif %}
 <table class="tg table table-hover">
   <tr>
-    <th>اسم الكتاب</th>
-    <th>متوفر من</th>
-    <th>متوفر حتى</th>
-    <th>الحالة</th>
+    <th style="text-align: right;">اسم الكتاب</th>
+    <th style="text-align: right;">متوفر من</th>
+    <th style="text-align: right;">متوفر حتى</th>
+    <th style="text-align: right;">الحالة</th>
   </tr>
     {% for book in page_books %}
   <tr>
@@ -70,8 +115,14 @@
     </span>
 </div>
 </div>
+</div>
 {% else %}
     <p>لا توجد أية كتب.</p>
+{% endif %}
+{% if not user.is_authenticated %}
+</div>
+</div>
+
 {% endif %}
 {% endblock %}
 

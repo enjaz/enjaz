@@ -33,4 +33,3 @@ Current required settings:
 * `AUTH_PROFILE_MODULE = 'accounts.MyProfile'`
 * `USERENA_WITHOUT_USERNAMES = True`
 * Add `"django.core.context_processors.request"` to the [default TEMPLATE_CONTEXT_PROCESSORS](https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATE_CONTEXT_PROCESSORS)
-```

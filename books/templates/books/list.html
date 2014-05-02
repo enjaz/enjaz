@@ -46,7 +46,10 @@
     
 </form>
 </div>
-{% if not user.is_authenticated %}</div><!-- end .container -->{% endif %}
+{% if not user.is_authenticated %}
+	</div><!-- end .container -->
+	<div class="container dinar-light">
+{% endif %}
 <br>
 {% if page_books %}
 <div class="row">
@@ -74,7 +77,6 @@
 	</div>
 	<div class="col-md-9">
 {% else %}
-	<div class="container dinar-light">
 	<div class="col-md-12">
 {% endif %}
 <table class="tg table table-hover">

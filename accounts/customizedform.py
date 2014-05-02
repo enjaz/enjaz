@@ -2,6 +2,7 @@
 from django import forms
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import Permission
+from django.contrib.auth import authenticate
 from django.core.exceptions import ObjectDoesNotExist
 from userena.forms import SignupForm
 from clubs.models import College, college_choices, section_choices
@@ -29,7 +30,10 @@ class SignupFormExtra(SignupForm):
 
         """
         super(SignupFormExtra, self).__init__(*args, **kw)
-        # Put the first and last name at the top
+        # We don't want usernames (We could have inherited userena's
+        # SignupFormOnlyEmail, but it's more tricky to modify.)
+        del self.fields['username']
+        # Put the first and last name at the top 
         new_order = self.fields.keyOrder[:-6]
         new_order.insert(0, 'first_name')
         new_order.insert(1, 'last_name')
@@ -37,6 +41,7 @@ class SignupFormExtra(SignupForm):
         new_order.insert(3, 'section')
         new_order.insert(4, 'college')
         self.fields.keyOrder = new_order
+        self.fields['password1'].label = u'كلمة السر' # It isn't not translated in userena.
 
     def clean(self):
         # Call the parent class's clean function.
@@ -76,6 +81,7 @@ class SignupFormExtra(SignupForm):
 
         """
         # First save the parent form and get the user.
+        self.cleaned_data['username'] = self.cleaned_data['email'].split('@')[0]
         new_user = super(SignupFormExtra, self).save()
 
         # Add default permissions
@@ -101,3 +107,31 @@ class SignupFormExtra(SignupForm):
         # Userena expects to get the new user from this form, so return the new
         # user.
         return new_user
+
+
+class ModifiedAuthenticationForm(forms.Form):
+    identification = forms.CharField(label=u"البريد",
+                                        widget=forms.TextInput(attrs={'class': 'required'}),
+                                        max_length=75,
+                                        error_messages={'required': u"رجاءً أدخل بريدك الجامعي."})
+    password = forms.CharField(label=_("Password"),
+                               widget=forms.PasswordInput(attrs={'class': 'required'}, render_value=False))
+    remember_me = forms.BooleanField(widget=forms.CheckboxInput(),
+                                     required=False,
+                                     label=u'تذكرني شهرا')
+    def clean(self):
+        """
+        Checks for the identification and password.
+
+        If the combination can't be found will raise an invalid sign in error.
+
+        """
+        identification = self.cleaned_data.get('identification')
+        password = self.cleaned_data.get('password')
+
+        if identification and '@' in identification and password:
+            username = identification.split('@')[0]
+            user = authenticate(username=username, password=password)
+            if not user is None:
+                return self.cleaned_data
+        raise forms.ValidationError(_(u"الرجاء إدخال عنوان بريد وكلمة سر صحيحين."))

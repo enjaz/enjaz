@@ -1,0 +1,447 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="description" content="Neon Admin Panel" />
+	<meta name="author" content="" />
+	
+	<title>إنجاز | الصفحة الرئيسية</title>
+	
+	<style>
+		@font-face {
+		  font-family: 'GE Dinar One';
+		  font-weight: lighter;
+		  font-size: xx-large;
+		  src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
+		}
+		
+		@font-face {
+		  font-family: 'GE Dinar One';
+		  font-weight: normal;
+		  src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
+		}
+	</style>
+
+	<link rel="stylesheet" href="{% static 'neon-front/assets/css/bootstrap.css' %}">
+	<link rel="stylesheet" href="{% static 'neon-front/assets/css/font-icons/entypo/css/entypo.css' %}">
+	<link rel="stylesheet" href="{% static 'neon-front/assets/css/neon.css' %}">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-theme-min.css' %}" id="style-resource-6">
+
+	<style>
+		.site-header .site-nav .main-menu li a,
+		.dinar-light
+		{
+			font-family: "GE Dinar One", Arial;
+			font-weight: lighter;	
+		}
+		
+		.site-header .site-nav .main-menu > li.active > a,
+		.dinar-medium
+		{
+			font-family: "GE Dinar One", Arial;
+			font-weight: normal;
+		}
+	</style>
+	
+	<script src="{% static 'neon-front/assets/js/jquery-1.11.0.min.js' %}"></script>
+
+	<!--[if lt IE 9]><script src="{% static 'neon-front/assets/js/ie8-responsive-file-warning.js' %}"></script><![endif]-->
+
+	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	
+	
+</head>
+<body>
+
+<div class="wrap">
+	
+	<!-- Logo and Navigation --><div class="site-header-container container">
+
+	<div class="row">
+	
+		<div class="col-md-12">
+			
+			<header class="site-header">
+			<!--
+				<section class="site-logo">
+				
+					<a href="index.html">
+						<img src="{% static 'logo/enjaz_logo_w_sclogo_shadow' %}" width="120" />
+					</a>
+					
+				</section>
+			-->
+				<nav class="site-nav">
+					
+					<ul class="main-menu hidden-xs" id="main-menu">
+						<li class="active">
+							<a href="{% url 'home' %}">
+								<span>الرئيسية</span>
+							</a>
+						</li>
+						<li>
+							<a href="{% url 'activities:list' %}">
+								<span>الأنشطة</span>
+							</a>
+							
+						</li>
+						<li>
+							<a href="{% url 'books:list' %}">
+								<span>الكتب</span>
+							</a>
+						</li>
+						<li>
+							<a href="{% url 'userena_signup' %}">
+								<span>تسجيل الدخول</span>
+							</a>
+						</li>
+						<li>
+							<a href="{% url 'userena_signin' %}">
+								<span>التسجيل</span>
+							</a>
+						</li>
+					</ul>
+					
+				
+					<div class="visible-xs">
+						
+						<a href="#" class="menu-trigger">
+							<i class="entypo-menu"></i>
+						</a>
+						
+					</div>
+				</nav>
+				
+				
+				
+			</header>
+			
+		</div>
+		
+	</div>
+	
+</div>	
+	<!-- Main Slider --><section class="slider-container" style="background-image: url({% static 'img/bg.jpg' %});">
+	
+	<div class="container">
+		
+		<div class="row">
+			
+			<div class="col-md-12">
+				
+				<img width="100%" src="{% static 'logo/enjaz_logo_w_sc_logo_shadow.png' %}">
+				
+			</div>
+			
+		</div>
+		
+	</div>
+	
+</section>
+
+<!-- Call for Action Button --><div class="container">
+	<div class="row vspace">
+		<div class="col-md-12">
+			
+			<div class="callout-action">
+				<h2 class="dinar-medium">بوابة إنجاز هي ...!</h2>
+				
+				<div class="callout-button">
+					<a href="{% url 'userena_signup' %}" class="btn btn-secondary dinar-light">سجل الآن!</a>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+</div>
+<!-- Testimonails --><section class="testimonials-container">
+	
+	<div class="container">
+		
+		<div class="col-md-12">
+			
+			<div class="testimonials carousel slide" data-interval="8000">
+			
+				<div class="carousel-inner">
+					
+					<div class="item active">
+					
+						<blockquote>
+							<p>
+								Vivamus imperdiet felis consectetur onec eget orci adipiscing nunc. <br />
+								Pellentesque fermentum, ante ac interdum ullamcorper.
+							</p>
+							<small>
+								<cite>Art Ramadani</cite> - co-founder at Laborator
+							</small>
+						</blockquote>
+						
+					</div>
+					
+					<div class="item">
+					
+						<blockquote>
+							<p>
+								Entered of cordial do on no hearted. Yet agreed whence and unable limits. <br />
+								Use off him gay abilities concluded immediate allowance.
+							</p>
+							<small>
+								<cite>Larry Page</cite> - co-founder at Google
+							</small>
+						</blockquote>
+						
+					</div>
+					
+					<div class="item">
+					
+						<blockquote>
+							<p>
+								Of regard warmth by unable sudden garden ladies. No kept hung am size spot no. <br />
+								Likewise led and dissuade rejoiced welcomed husbands boy. 
+							</p>
+							<small>
+								<cite>Bill Gates</cite> - ceo at Microsoft
+							</small>
+						</blockquote>
+						
+					</div>
+				
+				</div>
+			
+			</div>
+			
+		</div>
+		
+	</div>
+	
+</section>
+
+
+<!-- Client Logos --><section class="clients-logos-container">
+	
+	<div class="container">
+		
+		<div class="row">
+			
+			<div class="client-logos carousel slide" data-ride="carousel" data-interval="5000">
+			
+				<div class="carousel-inner">
+				
+					<div class="item active">
+						
+						<a href="#">
+							<img src="{% static 'neon-front/assets/images/client-logo.png' %}" />
+						</a>
+						
+						<a href="#">
+							<img src="{% static 'neon-front/assets/images/client-logo.png' %}" />
+						</a>
+						
+						<a href="#">
+							<img src="{% static 'neon-front/assets/images/client-logo.png' %}" />
+						</a>
+						
+						<a href="#">
+							<img src="{% static 'neon-front/assets/images/client-logo.png' %}" />
+						</a>
+						
+					</div>
+					
+					<div class="item">
+						
+						<a href="#">
+							<img src="{% static 'neon-front/assets/images/client-logo.png' %}" />
+						</a>
+						
+						<a href="#">
+							<img src="{% static 'neon-front/assets/images/client-logo.png' %}" />
+						</a>
+						
+						<a href="#">
+							<img src="{% static 'neon-front/assets/images/client-logo.png' %}" />
+						</a>
+						
+						<a href="#">
+							<img src="{% static 'neon-front/assets/images/client-logo.png' %}" />
+						</a>
+						
+					</div>
+					
+				</div>
+				
+			</div>
+			
+		</div>
+		
+	</div>
+	
+</section>	
+	<!-- Footer Widgets --><section class="footer-widgets">
+	
+	<div class="container">
+		
+		<div class="row">
+			
+			<div class="col-sm-6">
+				
+				<a href="#">
+					<img src="{% static 'neon-front/assets/images/logo@2x.png' %}" width="100" />
+				</a>
+				
+				<p>
+					Vivamus imperdiet felis consectetur onec eget orci adipiscing nunc. <br />
+					Pellentesque fermentum, ante ac interdum ullamcorper.
+				</p>
+				
+			</div>
+			
+			<div class="col-sm-3">
+				
+				<h5>Address</h5>
+				
+				<p>
+					Loop, Inc. <br />
+					795 Park Ave, Suite 120 <br />
+					San Francisco, CA 94107
+				</p>
+				
+			</div>
+			
+			<div class="col-sm-3">
+				
+				<h5>Contact</h5>
+				
+				<p>
+					Phone: +1 (52) 2215-251 <br />
+					Fax: +1 (22) 5138-219 <br />
+					info@laborator.al
+				</p>
+				
+			</div>
+			
+		</div>
+		
+	</div>
+	
+</section>
+
+<div class="row">
+	<div class="calendar-env">
+	
+	<!-- Calendar Body -->
+	<div class="calendar-body">
+		
+		<div id="calendar" class="fc fc-ltr"><table class="fc-header" style="width:100%"><tbody><tr><td class="fc-header-left"><span class="fc-header-title"><h2>May 2014</h2></span></td><td class="fc-header-center"></td><td class="fc-header-right"><span class="fc-button fc-button-month fc-state-default fc-corner-left fc-state-active" unselectable="on">month</span><span class="fc-button fc-button-agendaWeek fc-state-default" unselectable="on">week</span><span class="fc-button fc-button-agendaDay fc-state-default fc-corner-right" unselectable="on">day</span><span class="fc-header-space"></span><span class="fc-button fc-button-today fc-state-default fc-corner-left fc-corner-right fc-state-disabled" unselectable="on">today</span><span class="fc-header-space"></span><span class="fc-button fc-button-prev fc-state-default fc-corner-left" unselectable="on"><span class="fc-text-arrow">‹</span></span><span class="fc-button fc-button-next fc-state-default fc-corner-right" unselectable="on"><span class="fc-text-arrow">›</span></span></td></tr></tbody></table><div class="fc-content" style="position: relative;"><div class="fc-view fc-view-month fc-grid" style="position:relative" unselectable="on"><div class="fc-event-container" style="position:absolute;z-index:8;top:0;left:0"></div><table class="fc-border-separate" style="width:100%" cellspacing="0"><thead><tr class="fc-first fc-last"><th class="fc-day-header fc-mon fc-widget-header fc-first" style="width: 80px;">Mon</th><th class="fc-day-header fc-tue fc-widget-header" style="width: 80px;">Tue</th><th class="fc-day-header fc-wed fc-widget-header" style="width: 80px;">Wed</th><th class="fc-day-header fc-thu fc-widget-header" style="width: 80px;">Thu</th><th class="fc-day-header fc-fri fc-widget-header" style="width: 80px;">Fri</th><th class="fc-day-header fc-sat fc-widget-header" style="width: 80px;">Sat</th><th class="fc-day-header fc-sun fc-widget-header fc-last">Sun</th></tr></thead><tbody><tr class="fc-week fc-first"><td class="fc-day fc-mon fc-widget-content fc-other-month fc-past fc-first" data-date="2014-04-28"><div style="min-height: 82px;"><div class="fc-day-number">28</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-tue fc-widget-content fc-other-month fc-past" data-date="2014-04-29"><div><div class="fc-day-number">29</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-wed fc-widget-content fc-other-month fc-past" data-date="2014-04-30"><div><div class="fc-day-number">30</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-thu fc-widget-content fc-today fc-state-highlight" data-date="2014-05-01"><div><div class="fc-day-number">1</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-fri fc-widget-content fc-future" data-date="2014-05-02"><div><div class="fc-day-number">2</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-sat fc-widget-content fc-future" data-date="2014-05-03"><div><div class="fc-day-number">3</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-sun fc-widget-content fc-future fc-last" data-date="2014-05-04"><div><div class="fc-day-number">4</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td></tr><tr class="fc-week"><td class="fc-day fc-mon fc-widget-content fc-future fc-first" data-date="2014-05-05"><div style="min-height: 82px;"><div class="fc-day-number">5</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-tue fc-widget-content fc-future" data-date="2014-05-06"><div><div class="fc-day-number">6</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-wed fc-widget-content fc-future" data-date="2014-05-07"><div><div class="fc-day-number">7</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-thu fc-widget-content fc-future" data-date="2014-05-08"><div><div class="fc-day-number">8</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-fri fc-widget-content fc-future" data-date="2014-05-09"><div><div class="fc-day-number">9</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-sat fc-widget-content fc-future" data-date="2014-05-10"><div><div class="fc-day-number">10</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-sun fc-widget-content fc-future fc-last" data-date="2014-05-11"><div><div class="fc-day-number">11</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td></tr><tr class="fc-week"><td class="fc-day fc-mon fc-widget-content fc-future fc-first" data-date="2014-05-12"><div style="min-height: 82px;"><div class="fc-day-number">12</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-tue fc-widget-content fc-future" data-date="2014-05-13"><div><div class="fc-day-number">13</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-wed fc-widget-content fc-future" data-date="2014-05-14"><div><div class="fc-day-number">14</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-thu fc-widget-content fc-future" data-date="2014-05-15"><div><div class="fc-day-number">15</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-fri fc-widget-content fc-future" data-date="2014-05-16"><div><div class="fc-day-number">16</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-sat fc-widget-content fc-future" data-date="2014-05-17"><div><div class="fc-day-number">17</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-sun fc-widget-content fc-future fc-last" data-date="2014-05-18"><div><div class="fc-day-number">18</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td></tr><tr class="fc-week"><td class="fc-day fc-mon fc-widget-content fc-future fc-first" data-date="2014-05-19"><div style="min-height: 82px;"><div class="fc-day-number">19</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-tue fc-widget-content fc-future" data-date="2014-05-20"><div><div class="fc-day-number">20</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-wed fc-widget-content fc-future" data-date="2014-05-21"><div><div class="fc-day-number">21</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-thu fc-widget-content fc-future" data-date="2014-05-22"><div><div class="fc-day-number">22</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-fri fc-widget-content fc-future" data-date="2014-05-23"><div><div class="fc-day-number">23</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-sat fc-widget-content fc-future" data-date="2014-05-24"><div><div class="fc-day-number">24</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-sun fc-widget-content fc-future fc-last" data-date="2014-05-25"><div><div class="fc-day-number">25</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td></tr><tr class="fc-week"><td class="fc-day fc-mon fc-widget-content fc-future fc-first" data-date="2014-05-26"><div style="min-height: 82px;"><div class="fc-day-number">26</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-tue fc-widget-content fc-future" data-date="2014-05-27"><div><div class="fc-day-number">27</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-wed fc-widget-content fc-future" data-date="2014-05-28"><div><div class="fc-day-number">28</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-thu fc-widget-content fc-future" data-date="2014-05-29"><div><div class="fc-day-number">29</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-fri fc-widget-content fc-future" data-date="2014-05-30"><div><div class="fc-day-number">30</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-sat fc-widget-content fc-future" data-date="2014-05-31"><div><div class="fc-day-number">31</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-sun fc-widget-content fc-other-month fc-future fc-last" data-date="2014-06-01"><div><div class="fc-day-number">1</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td></tr><tr class="fc-week fc-last"><td class="fc-day fc-mon fc-widget-content fc-other-month fc-future fc-first" data-date="2014-06-02"><div style="min-height: 86px;"><div class="fc-day-number">2</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-tue fc-widget-content fc-other-month fc-future" data-date="2014-06-03"><div><div class="fc-day-number">3</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-wed fc-widget-content fc-other-month fc-future" data-date="2014-06-04"><div><div class="fc-day-number">4</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-thu fc-widget-content fc-other-month fc-future" data-date="2014-06-05"><div><div class="fc-day-number">5</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-fri fc-widget-content fc-other-month fc-future" data-date="2014-06-06"><div><div class="fc-day-number">6</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-sat fc-widget-content fc-other-month fc-future" data-date="2014-06-07"><div><div class="fc-day-number">7</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td><td class="fc-day fc-sun fc-widget-content fc-other-month fc-future fc-last" data-date="2014-06-08"><div><div class="fc-day-number">8</div><div class="fc-day-content"><div style="position: relative; height: 0px;">&nbsp;</div></div></div></td></tr></tbody></table></div></div></div>
+		
+		
+	</div>
+	
+	<!-- Sidebar -->
+	<div class="calendar-sidebar" style="height: 637px;">
+		
+		<!-- new task form -->
+		<div class="calendar-sidebar-row">
+				
+			<form role="form" id="add_event_form">
+			
+				<div class="input-group minimal">
+					<input type="text" class="form-control" placeholder="Add event...">
+					
+					<div class="input-group-addon">
+						<i class="entypo-pencil"></i>
+					</div>
+				</div>
+				
+			</form>
+			
+		</div>
+	
+	
+		<!-- Events List -->
+		<ul class="events-list" id="draggable_events">
+			<li>
+				<p>Drag Events to Calendar Dates</p>
+			</li>
+			<li>
+				<a href="#" class="ui-draggable" style="position: relative;">Sport Match</a>
+			</li>
+			<li>
+				<a href="#" class="color-blue ui-draggable" data-event-class="color-blue" style="position: relative;">Meeting</a>
+			</li>
+			<li>
+				<a href="#" class="color-orange ui-draggable" data-event-class="color-orange" style="position: relative;">Relax</a>
+			</li>
+			<li>
+				<a href="#" class="color-primary ui-draggable" data-event-class="color-primary" style="position: relative;">Study</a>
+			</li>
+			<li>
+				<a href="#" class="color-green ui-draggable" data-event-class="color-green" style="position: relative;">Family Time</a>
+			</li>
+		</ul>
+		
+	</div>
+	
+</div>
+</div>
+
+<script src="http://demo.neontheme.com/assets/js/fullcalendar/fullcalendar.min.js" id="script-resource-8"></script>
+<script src="http://demo.neontheme.com/assets/js/neon-calendar.js" id="script-resource-9"></script>
+
+<!-- Site Footer --><footer class="site-footer">
+
+	<div class="container">
+	
+		<div class="row">
+			
+			<div class="col-sm-6">
+				Copyright &copy; Neon - All Rights Reserved. 
+			</div>
+			
+			<div class="col-sm-6">
+				
+				<ul class="social-networks text-right">
+					<li>
+						<a href="#">
+							<i class="entypo-instagram"></i>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<i class="entypo-twitter"></i>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<i class="entypo-facebook"></i>
+						</a>
+					</li>
+				</ul>
+				
+			</div>
+			
+		</div>
+		
+	</div>
+	
+</footer>	
+</div>
+
+
+	<!-- Bottom Scripts -->
+	<script src="{% static 'neon-front/assets/js/gsap/main-gsap.js' %}"></script>
+	<script src="{% static 'neon-front/assets/js/bootstrap.js' %}"></script>
+	<script src="{% static 'neon-front/assets/js/joinable.js' %}"></script>
+	<script src="{% static 'neon-front/assets/js/resizeable.js' %}"></script>
+	<script src="{% static 'neon-front/assets/js/neon-slider.js' %}"></script>
+	<script src="{% static 'neon-front/assets/js/neon-custom.js' %}"></script>
+
+</body>
+</html>

@@ -58,6 +58,14 @@ class ReviewForm(ModelForm):
                   'inside_notes', 'outside_notes',
                   'organizers_notes', 'participants_notes', 'is_approved']
 
+def portal_home(request):
+    # If the user is logged in, return the admin dashboard;
+    # If not, return the front-end homepage
+    if request.user.is_authenticated():
+        return render(request, 'home.html') # the dashboard
+    else:
+        return render(request, 'front/home_front.html')
+
 @login_required
 def list(request):
     # If the user is part of the head of the Student Club, or part of
@@ -108,6 +116,7 @@ def list(request):
         page_activities = paginator.page(paginator.num_pages)
 
     context = {'page_activities': page_activities}
+    # if request.user.is_authenticated():
     return render(request, 'activities/list.html', context)
 
 @login_required

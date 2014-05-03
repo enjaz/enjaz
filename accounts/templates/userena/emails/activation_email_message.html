@@ -1,0 +1,15 @@
+{% autoescape off %}
+<html>
+<body>
+    <p>نرحب بكم في بوابة إنجاز.</p>
+    <p>
+        لتنشيط حسابكم نرجو زيارة الرابط التالي:<br />
+        https://{{ site.domain }}{% url 'userena_activate' activation_key %}
+    </p>
+    <p>
+        آملين أن تجد البوابة مفيدة وأن تحوز على رضاك.<br />
+        مع تحيات إدارة بوابة إنجاز.
+    </p>
+</body>
+</html>
+{% endautoescape %}

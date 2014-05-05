@@ -15,7 +15,7 @@ var neonLogin = neonLogin || {};
 		neonLogin.$container = $("#form_login");
 		
 		
-		// Login Form & Validation
+		/* // Login Form & Validation
 		neonLogin.$container.validate({
 			rules: {
 				username: {
@@ -43,7 +43,7 @@ var neonLogin = neonLogin || {};
 				/* 
 					Updated on v1.1.4
 					Login form now processes the login data, here is the file: data/sample-login-form.php
-				*/
+				*
 				
 				$(".login-page").addClass('logging-in'); // This will hide the login form and init the progress bar
 					
@@ -58,7 +58,8 @@ var neonLogin = neonLogin || {};
 					
 					// The form data are subbmitted, we can forward the progress to 70%
 					neonLogin.setPercentage(40 + random_pct);
-											
+					
+					/*					
 					// Send data to the server
 					$.ajax({
 						url: baseurl + 'data/sample-login-form.php',
@@ -110,6 +111,7 @@ var neonLogin = neonLogin || {};
 							}, 1000);
 						}
 					});
+					*
 						
 					
 				}, 650);
@@ -152,7 +154,7 @@ var neonLogin = neonLogin || {};
 						Demo Purpose Only 
 						
 						Here you can handle the page login, currently it does not process anything, just fills the loader.
-					*/
+					*
 					
 					$(".login-page").addClass('logging-in-lockscreen'); // This will hide the login form and init the progress bar
 	
@@ -184,7 +186,7 @@ var neonLogin = neonLogin || {};
 					}, 650);
 				}
 			});
-		}
+		}*/
 		
 		
 		

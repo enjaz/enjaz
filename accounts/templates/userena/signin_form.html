@@ -32,7 +32,7 @@
 	<link rel="stylesheet" href="{% static 'neon/assets/css/bootstrap.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-core.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-theme.css' %}">
-	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-forms.css' %}">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-forms.css' %}?v=0001">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/skins/green.css' %}">
@@ -102,19 +102,12 @@ var baseurl = '';
 		<div class="login-content">
 			
 			{% if form.non_field_errors %}
-			<div class="form-login-error">
-				<h3>Invalid login</h3>
-				<p>{{ form.non_field_errors }}</p>
+			<div class="form-login-error visible dinar-light">
+				<h3 class="dinar-medium">عفوًا</h3>
+				{% for err in form.non_field_errors %}
+				<p>{{ err }}</p>
+				{% endfor %}
 			</div>
-			<script>
-				var $errors_container = $(".form-login-error");
-						
-				$errors_container.show();
-				
-				$errors_container.css({
-					height: 100px
-				});
-			</script>
 			{% endif %}
 			
 			<form method="post" role="form" id="form_login" action="">
@@ -126,7 +119,7 @@ var baseurl = '';
 							<i class="entypo-user"></i>
 						</div>
 						
-						<input type="text" class="form-control" name="identification" id="username" placeholder="Username" autocomplete="off" />
+						<input type="text" class="form-control dinar-light" name="identification" id="username" placeholder="اسم المستخدم" autocomplete="off" />
 					</div>
 					
 				</div>
@@ -138,7 +131,7 @@ var baseurl = '';
 							<i class="entypo-key"></i>
 						</div>
 						
-						<input type="password" class="form-control" name="password" id="password" placeholder="Password" autocomplete="off" />
+						<input type="password" class="form-control dinar-light" name="password" id="password" placeholder="كلمة السر" autocomplete="off" />
 					</div>
 				
 				</div>

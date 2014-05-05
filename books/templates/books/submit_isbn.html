@@ -1,4 +1,4 @@
-{% extends "books_base.html" %}{% load bootstrap3 %}
+{% extends "books_base.html" %}{% load bootstrap3 %}{% load staticfiles %}
 {% block title %}أدخل ردمك{% endblock %}
 {% block content %}
 <script src="https://raw.githubusercontent.com/SamWM/jQuery-Plugins/master/numeric/jquery.numeric.js"></script>
@@ -9,6 +9,7 @@ $("#isbn").numeric("-");
 </script>
 <h2>{% if edit %} تعديل {{ form.title.value }} {% else %} كتاب جديد {% endif %}</h2>
 
+<div class="col-md-6 col-sm-8">
 {% if errors %}
 {% for error in errors %}
 <p class="danger"><strong>{% if error == 'short_length' %}يبدو أنك أدخلت رقما ناقصا.
@@ -24,6 +25,7 @@ $("#isbn").numeric("-");
 <form action="{% url 'books:contribute' %}" method="post" class="form">
 {% csrf_token %}
     <input type="hidden" name="is_isbn" value="1">
+
     <div class="form-group">
     <label for="isbn">ردمك:</label><input type="text" class="form-control" id="isbn" name="isbn" placeholder="أدخل ردمك" value="{{ previous_isbn }}">
     </div>
@@ -33,4 +35,8 @@ $("#isbn").numeric("-");
         </button>
     {% endbuttons %}
 </form>
+</div>
+<div class="col-md-6 col-sm-8">
+<img src="{% static 'img/isbn.png' %}"/>
+</div>
 {% endblock %}

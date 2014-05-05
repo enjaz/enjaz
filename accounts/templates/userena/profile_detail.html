@@ -1,0 +1,43 @@
+{% extends 'userena/base_userena.html' %}
+
+{% block title %}صفحة {{ username }}{% endblock %}
+
+{% block content %}
+  <div class="white-box">
+    {% block profile_navigation %}
+      {% comment %}Dirty hack. Will use django-guardian in the future.{% endcomment %}
+      {% if user.username == profile.user.username %}
+        <ul id="box-nav">
+          {% block profile_navigation_items %}
+            <li><a href="{% url 'userena_profile_detail' user.username %}">شاهد الصفحة.</a></li>
+            <li><a href="{% url 'userena_profile_edit' user.username %}">عدل التفاصيل.</a></li>
+            <li><a href="{% url 'userena_password_change' user.username %}">غيّر كلمة السر.</a></li>
+            <li><a href="{% url 'userena_email_change' user.username %}">غيّر البريد الإلكتروني.</a></li>
+          {% endblock %}
+        </ul>
+      {% endif %}
+    {% endblock %}
+
+    <div id="details">
+      {% block profile_details %}
+        <img class="mugshot" src="{{ profile.get_mugshot_url }}" alt="صورتك" />
+        <dl>
+          {% block profile_definition_list %}
+            {% if profile.user.get_full_name %}
+              <dt>الاسم</dt>
+              <dd>{{ profile.user.get_full_name }}</dd>
+            {% endif %}
+            {% if profile.user.email and not hide_email %}
+              <dt>البريد</dt>
+              <dd>{{ profile.user.email }}</dd>
+            {% endif %}
+            {% if profile.college %}
+              <dt>الكلية</dt>
+              <dd>{{ profile.college }}</dd>
+            {% endif %}
+          {% endblock %}
+        </dl>
+      {% endblock %}
+    </div>
+  </div>
+{% endblock %}

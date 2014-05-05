@@ -1,0 +1,10 @@
+{% autoescape off %}
+نرحب بكم في بوابة إنجاز.
+
+لتنشيط حسابكم نرجو زيارة الرابط التالي:
+https://{{ site.domain }}{% url 'userena_activate' activation_key %}
+
+آملين أن تجد البوابة مفيدة وأن تحوز على رضاك.
+
+مع تحيات إدارة بوابة إنجاز.
+{% endautoescape %}

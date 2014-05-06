@@ -1,0 +1,58 @@
+{% extends 'userena/base_userena.html' %}{% load staticfiles %}
+{% block title %}تسجيل الدخول{% endblock %}
+{% block description %}أهلاً و سهلًا بك؛ أدخل اسم المستخدم و كلمة المرور الخاصة بك.{% endblock %}
+			
+{% block content %}
+	{% if form.non_field_errors %}
+	<div class="form-login-error visible dinar-light">
+		<h3 class="dinar-medium">عفوًا</h3>
+		{% for err in form.non_field_errors %}
+		<p>{{ err }}</p>
+		{% endfor %}
+	</div>
+	{% endif %}
+	
+	<form method="post" role="form" id="form_login" action="">
+		{% csrf_token %}
+		<div class="form-group">
+			
+			<div class="input-group{% if form.non_field_errors %} validate-has-error{% endif %}">
+				<div class="input-group-addon">
+					<i class="entypo-user"></i>
+				</div>
+				
+				<input type="text" class="form-control dinar-light" name="identification" id="username" placeholder="اسم المستخدم" autocomplete="off" />
+			</div>
+			
+		</div>
+		
+		<div class="form-group">
+			
+			<div class="input-group{% if form.non_field_errors %} validate-has-error{% endif %}">
+				<div class="input-group-addon">
+					<i class="entypo-key"></i>
+				</div>
+				
+				<input type="password" class="form-control dinar-light" name="password" id="password" placeholder="كلمة السر" autocomplete="off" />
+			</div>
+		
+		</div>
+		
+		{% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
+		
+		<div class="form-group">
+			<button type="submit" class="btn btn-primary btn-block btn-login dinar-medium">
+				<i class="entypo-login"></i>
+				تسجيل الدخول
+			</button>
+		</div>			
+	</form>
+	
+	
+	<div class="login-bottom-links">
+		
+		<a href="{% url 'userena_password_reset' %}" class="link dinar-light">هل نسيت كلمة السر؟</a>
+		
+	</div>
+{% endblock %}
+{% block customscript %}<script src="{% static 'neon/assets/js/neon-login.js' %}?v=0001"></script>{% endblock %}

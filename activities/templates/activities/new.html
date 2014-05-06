@@ -4,7 +4,7 @@
 {% block content %}
  <script>
 $(function() {
-$('#id_date').datepicker();
+$('#id_date').datepicker({isRTL: true});
 $('#id_date').change(function(){
     if($(this).val().length != 0){
         $('#id_custom_datetime').attr('disabled', 'disabled');

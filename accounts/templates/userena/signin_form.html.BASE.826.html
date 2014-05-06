@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-{% extends 'userena/base_userena.html' %}{% load staticfiles %}
-{% block title %}تسجيل الدخول{% endblock %}
-{% block description %}أهلاً و سهلًا بك؛ أدخل اسم المستخدم و كلمة المرور الخاصة بك.{% endblock %}
-			
-{% block content %}
-	{% if form.non_field_errors %}
-	<div class="form-login-error visible dinar-light">
-		<h3 class="dinar-medium">عفوًا</h3>
-		{% for err in form.non_field_errors %}
-		<p>{{ err }}</p>
-		{% endfor %}
-=======
 {% load staticfiles %}
 <!DOCTYPE html>
 <html lang="en">
@@ -92,10 +79,10 @@ var baseurl = '';
 		<div class="login-content">
 			
 			<a href="{% url 'home' %}" class="logo">
-				<img src="{% static 'logo/enjaz_logo_shadow.png' %}" width="250" alt="" />
+				<img src="{% static 'logo/enjaz_logo_w_sc_logo_shadow.png' %}" width="250" alt="" />
 			</a>
 			
-			<p class="description dinar-light">أهلاً و سهلًا بك؛ أدخل اسم المستخدم و كلمة المرور.</p>
+			<p class="description dinar-light">أهلاً و سهلًا بك؛ أدخل اسم المستخدم و كلمة المرور الخاصة بك.</p>
 			
 			<!-- progress bar indicator -->
 			<div class="login-progressbar-indicator">
@@ -104,68 +91,72 @@ var baseurl = '';
 			</div>
 		</div>
 		
->>>>>>> ef6ec33ae2803605aab571753d656f25c770a6f0
 	</div>
-	{% endif %}
 	
-	<form method="post" role="form" id="form_login" action="">
-		{% csrf_token %}
-		<div class="form-group">
+	<div class="login-progressbar">
+		<div></div>
+	</div>
+	
+	<div class="login-form">
+		
+		<div class="login-content">
 			
-			<div class="input-group{% if form.non_field_errors %} validate-has-error{% endif %}">
-				<div class="input-group-addon">
-					<i class="entypo-user"></i>
+			{% if form.non_field_errors %}
+			<div class="form-login-error visible dinar-light">
+				<h3 class="dinar-medium">عفوًا</h3>
+				{% for err in form.non_field_errors %}
+				<p>{{ err }}</p>
+				{% endfor %}
+			</div>
+			{% endif %}
+			
+			<form method="post" role="form" id="form_login" action="">
+				{% csrf_token %}
+				<div class="form-group">
+					
+					<div class="input-group{% if form.non_field_errors %} validate-has-error{% endif %}">
+						<div class="input-group-addon">
+							<i class="entypo-user"></i>
+						</div>
+						
+						<input type="text" class="form-control dinar-light" name="identification" id="username" placeholder="اسم المستخدم" autocomplete="off" />
+					</div>
+					
 				</div>
 				
-<<<<<<< HEAD
-				<input type="text" class="form-control dinar-light" name="identification" id="username" placeholder="اسم المستخدم" autocomplete="off" />
-			</div>
-=======
+				<div class="form-group">
+					
+					<div class="input-group{% if form.non_field_errors %} validate-has-error{% endif %}">
+						<div class="input-group-addon">
+							<i class="entypo-key"></i>
+						</div>
+						
+						<input type="password" class="form-control dinar-light" name="password" id="password" placeholder="كلمة السر" autocomplete="off" />
+					</div>
+				
+				</div>
+				
 				{% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
 				
 				<div class="form-group">
 					<button type="submit" class="btn btn-primary btn-block btn-login dinar-medium">
 						<i class="entypo-login"></i>
-						سجّل الدخول
+						تسجيل الدخول
 					</button>
 				</div>			
 			</form>
->>>>>>> ef6ec33ae2803605aab571753d656f25c770a6f0
 			
-		</div>
-		
-		<div class="form-group">
 			
-			<div class="input-group{% if form.non_field_errors %} validate-has-error{% endif %}">
-				<div class="input-group-addon">
-					<i class="entypo-key"></i>
-				</div>
+			<div class="login-bottom-links">
 				
-				<input type="password" class="form-control dinar-light" name="password" id="password" placeholder="كلمة السر" autocomplete="off" />
+				<a href="{% url 'userena_password_reset' %}" class="link dinar-light">هل نسيت كلمة السر؟</a>
+				
 			</div>
-		
+			
 		</div>
-		
-		{% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
-		
-		<div class="form-group">
-			<button type="submit" class="btn btn-primary btn-block btn-login dinar-medium">
-				<i class="entypo-login"></i>
-				تسجيل الدخول
-			</button>
-		</div>			
-	</form>
-	
-<<<<<<< HEAD
-	
-	<div class="login-bottom-links">
-		
-		<a href="{% url 'userena_password_reset' %}" class="link dinar-light">هل نسيت كلمة السر؟</a>
 		
 	</div>
-{% endblock %}
-{% block customscript %}<script src="{% static 'neon/assets/js/neon-login.js' %}?v=0001"></script>{% endblock %}
-=======
+	
 </div>
 
 
@@ -183,4 +174,3 @@ var baseurl = '';
 
 </body>
 </html>
->>>>>>> ef6ec33ae2803605aab571753d656f25c770a6f0

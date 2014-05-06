@@ -4,11 +4,13 @@
  <script>
 $(function() {
 $( "#id_available_from" ).datepicker({
+    isRTL: true,
     dateFormat: "yy-mm-dd",{% if not edit %}
     minDate: 0,{% endif %}
     onSelect: function(dateText) {$( "#id_available_until" ).datepicker( "option", "minDate", dateText );}
 });
 $( "#id_available_until" ).datepicker({
+    isRTL: true,
     dateFormat: "yy-mm-dd",{% if not edit %}
     minDate: 0,{% endif %}
     onSelect: function(dateText) {$( "#id_available_from" ).datepicker( "option", "maxDate", dateText );}

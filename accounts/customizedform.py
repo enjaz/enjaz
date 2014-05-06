@@ -129,9 +129,14 @@ class ModifiedAuthenticationForm(forms.Form):
         identification = self.cleaned_data.get('identification')
         password = self.cleaned_data.get('password')
 
-        if identification and '@' in identification and password:
-            username = identification.split('@')[0]
+        if identification and password:
+            if '@' in identification:
+                username = identification.split('@')[0]
+            else:
+                username = identification
+
             user = authenticate(username=username, password=password)
             if not user is None:
                 return self.cleaned_data
+
         raise forms.ValidationError(_(u"الرجاء إدخال عنوان بريد وكلمة سر صحيحين."))

@@ -1,15 +1,127 @@
-{% extends 'userena/base_userena.html' %}{% load bootstrap3 %}
+{% extends 'userena/base_userena.html' %}{% load staticfiles %}
 
-{% block title %}سجّل{% endblock %}
+{% block title %}التسجيل{% endblock %}
 
 {% block content %}
-<form action="" method="post">
-  {% csrf_token %}
-  {% bootstrap_form form %}
-  {% buttons %}
-      <button type="submit" class="btn btn-primary">
-          {% bootstrap_icon "star" %} سجّل
-      </button>
-  {% endbuttons %}
+<form method="post" role="form" id="form_register">	
+	<div class="form-register-success">
+		<i class="entypo-check"></i>
+		<h3>You have been successfully registered.</h3>
+		<p>We have emailed you the confirmation link for your account.</p>
+	</div>
+	
+	<div class="form-steps dinar-light">
+		
+		<div class="step current" id="step-1">
+		
+			<div class="form-group">
+				<div class="input-group">
+					<div class="input-group-addon">
+						<i class="entypo-user"></i>
+					</div>
+					
+					<input type="text" class="form-control" name="first_name" id="first_name" placeholder="الاسم الأول" autocomplete="off" />
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<div class="input-group">
+					<div class="input-group-addon">
+						<i class="entypo-user"></i>
+					</div>
+					
+					<input type="text" class="form-control" name="last_name" id="last_name" placeholder="الاسم الأخير" autocomplete="off" />
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<div class="input-group">
+					<div class="input-group-addon">
+						<i class="entypo-mail"></i>
+					</div>
+					
+					<input type="text" class="form-control" name="email" id="email" placeholder="البريد الإلكتروني" data-mask="email" autocomplete="off" />
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<button type="button" data-step="step-2" class="btn btn-primary btn-block btn-login">
+					<i class="entypo-left-open-mini"></i>
+					التالي
+				</button>
+			</div>
+			
+			<div class="form-group">
+				١ من ٣
+			</div>
+		
+		</div>
+		
+		<div class="step" id="step-2">
+		
+			<div class="form-group">
+				<div class="input-group">
+					<div class="input-group-addon">
+						<i class="entypo-graduation-cap"></i>
+					</div>
+					
+					<input type="text" class="form-control" name="student_id" id="student_id" placeholder="الرقم الجامعي" data-mask="[0-9\.]+" data-is-regex="true" autocomplete="off" />
+				</div>
+			</div>
+		
+			<div class="form-group">
+				<div class="input-group">
+					<div class="input-group-addon">
+						<i class="entypo-mail"></i>
+					</div>
+					
+					<select class="form-control" id="id_section" name="section" placeholder="Section" required="required" title="">
+						<option value="M">طلاب</option>
+						<option value="F">طالبات</option>
+						<option value="KM">طلاب مدينة الملك فهد</option>
+						<option value="KF">طالبات مدينة الملك فهد</option>
+					</select>
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<div class="input-group">
+					<div class="input-group-addon">
+						<i class="entypo-lock"></i>
+					</div>
+					
+					<input type="password" class="form-control" name="password" id="password" placeholder="Choose Password" autocomplete="off" />
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<button type="submit" class="btn btn-success btn-block btn-login">
+					<i class="entypo-right-open-mini"></i>
+					Complete Registration
+				</button>
+			</div>
+			
+			<div class="form-group">
+				Step 2 of 2
+			</div>
+			
+		</div>
+		
+	</div>
+	
 </form>
+
+
+<div class="login-bottom-links">
+	
+	<a href="extra-login.html" class="link">
+		<i class="entypo-lock"></i>
+		Return to Login Page
+	</a>
+	
+</div>
+{% endblock %}
+{% block customscript %}
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+<script src="{% static 'neon/assets/js/jquery.inputmask.bundle.min.js' %}"></script>
 {% endblock %}

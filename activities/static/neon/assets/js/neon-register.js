@@ -20,7 +20,11 @@ var neonRegister = neonRegister || {};
 		
 		neonRegister.$container.validate({
 			rules: {
-				name: {
+				first_name: {
+					required: true
+				},
+				
+				last_name: {
 					required: true
 				},
 				
@@ -29,7 +33,15 @@ var neonRegister = neonRegister || {};
 					email: true
 				},
 				
-				username: {
+				student_id: {
+					required: true	
+				},
+				
+				section: {
+					required: true	
+				},
+				
+				college: {
 					required: true	
 				},
 				
@@ -42,7 +54,7 @@ var neonRegister = neonRegister || {};
 			messages: {
 				
 				email: {
-					email: 'Invalid E-mail.'
+					email: 'هذا البريد الإلكتروني غير صحيح.'
 				}	
 			},
 			
@@ -54,9 +66,9 @@ var neonRegister = neonRegister || {};
 			unhighlight: function(element)
 			{
 				$(element).closest('.input-group').removeClass('validate-has-error');
-			},
+			}/*,
 			
-			submitHandler: function(ev)
+			* submitHandler: function(ev)
 			{
 				$(".login-page").addClass('logging-in');
 				
@@ -121,7 +133,7 @@ var neonRegister = neonRegister || {};
 						});
 					});
 				});
-			}
+			} */
 		});
 	
 		// Steps Handler

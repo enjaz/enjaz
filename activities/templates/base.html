@@ -160,7 +160,7 @@
 		<ul class="nav navbar-nav navbar-left">
 			<li>
                                 {% if user.is_authenticated %}
-				<a href="{% url 'userena_signout' %}">تسجيل الخروج</a>
+				<a href="{% url 'userena_signout' %}">اخرج</a>
                                 {% else %}
                                 <a style="display: table-cell;" href="{% url 'userena_signin' %}">ادخل</a>
                                 <a style="display: table-cell;" href="{% url 'userena_signup' %}">سجّل</a>

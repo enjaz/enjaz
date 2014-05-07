@@ -1,6 +1,60 @@
 {% extends 'front/front_base.html' %}{% load staticfiles %}
 {% block title %}الصفحة الرئيسية{% endblock %}
 {% block content %}
+{% if launch %}
+<style>
+#overlay {
+    opacity: 0.9;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: black;
+    width: 100%;
+    z-index: 5000;
+}
+#overlay p, #overlay button {
+    font-family: 'GE Dinar One',Arial;
+    font-size: 70px;
+    text-align: center;
+    vertical-align: middle;
+    opacity: 1;
+}
+
+#intro {
+    padding-top:100px;
+    font-size: 40px !important;
+}
+
+#overlay p {
+    color: white;
+}
+
+#overlay button {
+    color: #3C2424;
+}
+
+.tocenter {
+    text-align: center;
+}
+
+</style>
+<script>
+$(function() {
+
+   var docHeight = $(document).height();
+
+   $("body").append("<div id='overlay'><p id='intro'>يفتتح أ. د. يوسف العيسى</p><p><span class='dinar-light'>بـــوابــة</span> <span class='dinar-medium'>إنجاز</span></p><div class='tocenter'><button id='launch' class='btn btn-default text-center'>على بركة الله</button></div></div>");
+
+   $("#overlay").height(docHeight);
+
+   $( '#launch' ).click(function() {
+       $( "#overlay" ).fadeOut( 3000 );
+   });  
+});
+</script>
+
+</script>
+{% endif %}
 	<!-- Main Slider --><section class="slider-container" style="background-image: url({% static 'img/bg.jpg' %});">
 	
 	<div class="container">
@@ -30,10 +84,11 @@
 					<h2 class="dinar-medium">
 						بوابة إنجاز
 					</h2>
-					
-					<p style="font-size: 1.5em" class="dinar-light">
-						بوابة إنجاز الإلكترونية هي بوابة المستقبل بالنسبة للأنشطة الطلابية في نادي الطلاب. من خلال تطوير و تعزيز الاستفادة من الجانب الإلكتروني و التقني، يدخل نادي الطلاب مرحلة جديدة من عمره بقوة أكبر و أدوات أكثر تطورًا من أي وقت مضى!
+					<span class="description">
+					<p class="dinar-light">
+						بوابة إنجاز الإلكترونية هي بوابة المستقبل للأنشطة الطلابية في نادي الطلاب. من خلال تعزيز الاستفادة من الجانب الإلكتروني و التقني، يدخل نادي الطلاب مرحلة جديدة من عمره بقوة أكبر و أدوات أكثر تطورًا من أي وقت مضى!
 					</p>
+					</span>
 				</div>
 				
 			</div>
@@ -66,65 +121,4 @@
 	</div>
 </div>
 
-<!-- Testimonails <section class="testimonials-container">
-	
-	<div class="container">
-		
-		<div class="col-md-12">
-			
-			<div class="testimonials carousel slide" data-interval="8000">
-			
-				<div class="carousel-inner">
-					
-					<div class="item active">
-					
-						<blockquote>
-							<p>
-								Vivamus imperdiet felis consectetur onec eget orci adipiscing nunc. <br />
-								Pellentesque fermentum, ante ac interdum ullamcorper.
-							</p>
-							<small>
-								<cite>Art Ramadani</cite> - co-founder at Laborator
-							</small>
-						</blockquote>
-						
-					</div>
-					
-					<div class="item">
-					
-						<blockquote>
-							<p>
-								Entered of cordial do on no hearted. Yet agreed whence and unable limits. <br />
-								Use off him gay abilities concluded immediate allowance.
-							</p>
-							<small>
-								<cite>Larry Page</cite> - co-founder at Google
-							</small>
-						</blockquote>
-						
-					</div>
-					
-					<div class="item">
-					
-						<blockquote>
-							<p>
-								Of regard warmth by unable sudden garden ladies. No kept hung am size spot no. <br />
-								Likewise led and dissuade rejoiced welcomed husbands boy. 
-							</p>
-							<small>
-								<cite>Bill Gates</cite> - ceo at Microsoft
-							</small>
-						</blockquote>
-						
-					</div>
-				
-				</div>
-			
-			</div>
-			
-		</div>
-		
-	</div>
-	
-</section> -->
 {% endblock %}

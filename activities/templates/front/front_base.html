@@ -24,6 +24,20 @@
 		  font-weight: normal;
 		  src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
 		}
+                .description p {
+                  font-size: 1.5em;
+                  text-align:justify;
+		}
+                .login-menu  {
+                  display: inline-block;
+                  list-style: none outside none;
+                  float: left;
+                }
+                .login-menu  > li {
+                  display: inline-block;
+                  margin: 0px 5px;
+                  transition: all 350ms ease 0s;
+                }
 	</style>
 	
 	<!-- admin theme stylesheets  -->
@@ -124,15 +138,22 @@
 							</a>
 						</li>
 						<li>
+							<a href="{% url 'about' %}">
+								<span>عن البوابة</span>
+							</a>
+						</li>
+                                                <span class="visible-xs">
+						<li>
 							<a href="{% url 'userena_signin' %}">
-								<span>تسجيل الدخول</span>
+								<span>ادخل</span>
 							</a>
 						</li>
 						<li>
 							<a href="{% url 'userena_signup' %}">
-								<span>التسجيل</span>
+								<span>سجّل</span>
 							</a>
 						</li>
+						</span>
 					</ul>
 					
 				
@@ -143,6 +164,18 @@
 						</a>
 						
 					</div>
+					<ul class="login-menu hidden-xs dinar-light">
+						<li>
+							<a href="{% url 'userena_signin' %}">
+								<span>ادخل</span>
+							</a>
+						</li>
+						<li>
+							<a href="{% url 'userena_signup' %}">
+								<span>سجّل</span>
+							</a>
+						</li>
+					</ul>
 				</nav>
 				
 				

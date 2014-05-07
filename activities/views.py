@@ -64,7 +64,10 @@ def portal_home(request):
     if request.user.is_authenticated():
         return render(request, 'home.html') # the dashboard
     else:
-        return render(request, 'front/home_front.html')
+        context = {}
+        if request.method == 'GET' and 'launch' in request.GET:
+            context = {'launch': True}
+        return render(request, 'front/home_front.html', context)
 
 #@login_required
 def list(request):

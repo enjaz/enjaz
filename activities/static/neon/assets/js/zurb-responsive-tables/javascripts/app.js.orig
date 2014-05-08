@@ -13,13 +13,8 @@ $(document).ready(function () {
 		$activeTab.removeClass('active');
 		$tab.addClass('active');
 
-<<<<<<< HEAD
-    	//Show Tab Content
-		$(contentLocation).closest('.tabs-content').children('li').hide();
-=======
 		//Show Tab Content
 		$(contentLocation).closest('ul.tabs-content').find('> li').hide();
->>>>>>> bd561f03d730cf888789bb44e12c4e56c5f445ae
 		$(contentLocation).show();
 	}
 
@@ -79,8 +74,4 @@ $(document).ready(function () {
 	/* DISABLED BUTTONS ------------- */
 	/* Gives elements with a class of 'disabled' a return: false; */
 
-<<<<<<< HEAD
 });
-=======
-});
->>>>>>> bd561f03d730cf888789bb44e12c4e56c5f445ae

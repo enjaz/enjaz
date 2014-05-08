@@ -1,6 +1,7 @@
 {% extends 'userena/base_userena.html' %}{% load staticfiles %}
 
 {% block title %}التسجيل{% endblock %}
+{% block description %}فضلًا املأ النموذج التالي لإتمام عملية التسجيل.{% endblock %}
 
 {% block content %}
 <form method="post" role="form" id="form_register">	
@@ -10,9 +11,7 @@
 		<p>We have emailed you the confirmation link for your account.</p>
 	</div>
 	
-	<div class="form-steps dinar-light">
-		
-		<div class="step current" id="step-1">
+	<div class="dinar-light">
 		
 			<div class="form-group">
 				<div class="input-group">
@@ -40,24 +39,9 @@
 						<i class="entypo-mail"></i>
 					</div>
 					
-					<input type="text" class="form-control" name="email" id="email" placeholder="البريد الإلكتروني" data-mask="email" autocomplete="off" />
+					<input type="text" class="form-control" name="email" id="email" placeholder="البريد الإلكتروني الجامعي" data-mask="email" autocomplete="off" />
 				</div>
 			</div>
-			
-			<div class="form-group">
-				<button type="button" data-step="step-2" class="btn btn-primary btn-block btn-login">
-					<i class="entypo-left-open-mini"></i>
-					التالي
-				</button>
-			</div>
-			
-			<div class="form-group">
-				١ من ٣
-			</div>
-		
-		</div>
-		
-		<div class="step" id="step-2">
 		
 			<div class="form-group">
 				<div class="input-group">
@@ -75,11 +59,41 @@
 						<i class="entypo-mail"></i>
 					</div>
 					
-					<select class="form-control" id="id_section" name="section" placeholder="Section" required="required" title="">
+					<select class="form-control" id="id_section" name="section" placeholder="القسم" required="required" title="">
 						<option value="M">طلاب</option>
 						<option value="F">طالبات</option>
-						<option value="KM">طلاب مدينة الملك فهد</option>
-						<option value="KF">طالبات مدينة الملك فهد</option>
+						<option value="KM">طلاب مدينة الملك فهد الطبية</option>
+						<!-- <option value="KF">طالبات مدينة الملك فهد الطبية</option> -->
+					</select>
+				</div>
+			</div>
+			
+			<!-- <div class="form-group">
+							
+				<select name="test" class="selectboxit visible" data-first-option="false" style="display: none;">
+					<option disabled="disabled">Select city</option>
+					<option value="1">Alabama</option>
+					<option value="2">Boston</option>
+					<option value="3">Ohaio</option>
+					<option value="4">New York</option>
+					<option value="5">Washington</option>
+				</select>
+							
+			</div> -->
+			
+			<div class="form-group">
+				<div class="input-group">
+					<div class="input-group-addon">
+						<i class="entypo-mail"></i>
+					</div>
+					
+					<select class="form-control" id="id_college" name="college" required="required" title="">
+						<option value="M">كلية الطب</option>
+						<option value="A">كلية العلوم الطبية التطبيقية</option>
+						<option value="P">كلية الصيدلة</option>
+						<option value="D">كلية طب الأسنان</option>
+						<option value="B">كلية العلوم و المهن الصحية</option>
+						<option value="N">كلية التمريض</option>
 					</select>
 				</div>
 			</div>
@@ -90,19 +104,15 @@
 						<i class="entypo-lock"></i>
 					</div>
 					
-					<input type="password" class="form-control" name="password" id="password" placeholder="Choose Password" autocomplete="off" />
+					<input type="password" class="form-control" name="password" id="password" placeholder="اختر كلمة سر" autocomplete="off" />
 				</div>
 			</div>
 			
 			<div class="form-group">
 				<button type="submit" class="btn btn-success btn-block btn-login">
-					<i class="entypo-right-open-mini"></i>
-					Complete Registration
+					<i class="entypo-left-open-mini"></i>
+					تسجيل
 				</button>
-			</div>
-			
-			<div class="form-group">
-				Step 2 of 2
 			</div>
 			
 		</div>
@@ -110,18 +120,10 @@
 	</div>
 	
 </form>
-
-
-<div class="login-bottom-links">
-	
-	<a href="extra-login.html" class="link">
-		<i class="entypo-lock"></i>
-		Return to Login Page
-	</a>
-	
-</div>
 {% endblock %}
 {% block customscript %}
+<link rel="stylesheet" href="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.css' %}" id="style-resource-3">
+<script src="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.min.js' %}" id="script-resource-11"></script>
 <script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
 <script src="{% static 'neon/assets/js/jquery.inputmask.bundle.min.js' %}"></script>
 {% endblock %}

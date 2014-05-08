@@ -11,6 +11,8 @@ from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
 from activities.models import Activity, Review, Participation
 from clubs.models import Club
+from books.models import Book
+from niqati.models import Niqati_User
 
 class ActivityForm(ModelForm):
     """A general form, which doesn't include 'Presidency'."""
@@ -62,7 +64,13 @@ def portal_home(request):
     # If the user is logged in, return the admin dashboard;
     # If not, return the front-end homepage
     if request.user.is_authenticated():
-        return render(request, 'home.html') # the dashboard
+        context = {}
+        context['activity_count'] = len(Activity.objects.all())
+        context['niqati_sum'] = sum(code.category.points for code in request.user.code_set.all())
+        context['niqati_count'] = len(request.user.code_set.all())
+        context['books_count'] = len(Book.objects.all())
+        context['my_books_count'] = len(request.user.submissions.all())
+        return render(request, 'home.html', context) # the dashboard
     else:
         context = {}
         if request.method == 'GET' and 'launch' in request.GET:

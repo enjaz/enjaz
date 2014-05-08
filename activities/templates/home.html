@@ -1,15 +1,189 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load staticfiles %}
 
 {% block title %}الصفحة الرئيسية{% endblock %}
 {% block pageheader %}الصفحة الرئيسية{% endblock %}
-{% block solecontent %}
-<div class="mnote">
-<b>بوابة الطلاب الإلكترونية</b> مكان لأداء كل ما له علاقة بالنشاطات في جامعة الملك سعود بن عبد العزيز للعلوم الصحية!  هل تبحث عن النشاطات القادمة؟ هل ترغب في التسجيل في نشاط؟  هل تبحث عن نادٍ لتكون عضوا فيه؟ هذا هو المكان الملائم!
+{% block content %}
+<div class="row">
+	<div class="col-md-9">
+		<div class="panel panel-success panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+			
+			<!-- panel head -->
+			<div class="panel-heading">
+				<div class="panel-title">أنشطة الأسبوع القادم</div>
+			</div>
+			
+			<!-- panel body -->
+			<div class="panel-body">
+				
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Name</th>
+							<th>Address</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						<tr>
+							<td>1</td>
+							<td>Arlind</td>
+							<td>Nushi</td>
+						</tr>
+						
+						<tr>
+							<td>2</td>
+							<td>Art</td>
+							<td>Ramadani</td>
+						</tr>
+						
+						<tr>
+							<td>3</td>
+							<td>Filan</td>
+							<td>Fisteku</td>
+						</tr>
+					</tbody>
+				</table>
+				
+			</div>
+			
+		</div>
+	</div>
+	<div class="col-md-3">
+		<div class="tile-stats tile-green">
+			<div class="icon"><i class="entypo-chart-bar"></i></div>
+			<div class="num" data-start="0" data-end="{{ activity_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>عدد الأنشطة</h3>
+			<p>مجموع عدد أنشطة النادي لهذا العام</p>
+		</div>
+	</div>
 </div>
-
-<ul>
-<li><a href="{% url 'activities:list' %}">النشاطات</a></li>
-<li><a href="{% url 'clubs:list' %}">الأندية</a></li>
-</ul>
+<div class="row">
+	<div class="col-md-3">
+		<div class="tile-stats tile-aqua">
+			<div class="icon"><i class="entypo-gauge"></i></div>
+			<div class="num" data-start="0" data-end="{{ niqati_sum }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>عدد نقاطي</h3>
+			<p>مجموع النقاط المسجلة لك في برنامج نقاطي</p>
+		</div>
+		<div class="tile-stats tile-white-aqua">
+			<div class="icon"><i class="entypo-gauge"></i></div>
+			<div class="num" data-start="0" data-end="{{ niqati_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>عدد نقاطي</h3>
+			<p>مجموع النقاط المسجلة لك في برنامج نقاطي</p>
+		</div>
+	</div>
+	<div class="col-md-9">
+		<div class="panel panel-info panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+			
+			<!-- panel head -->
+			<div class="panel-heading">
+				<div class="panel-title">آخر إدخالاتي في نقاطي</div>
+			</div>
+			
+			<!-- panel body -->
+			<div class="panel-body">
+				
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Name</th>
+							<th>Address</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						<tr>
+							<td>1</td>
+							<td>Arlind</td>
+							<td>Nushi</td>
+						</tr>
+						
+						<tr>
+							<td>2</td>
+							<td>Art</td>
+							<td>Ramadani</td>
+						</tr>
+						
+						<tr>
+							<td>3</td>
+							<td>Filan</td>
+							<td>Fisteku</td>
+						</tr>
+					</tbody>
+				</table>
+				
+			</div>
+			
+		</div>
+	</div>
+</div><!-- end row -->
+<div class="row">
+	<div class="col-md-9">
+		<div class="panel panel-warning panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+			
+			<!-- panel head -->
+			<div class="panel-heading">
+				<div class="panel-title">آخر الكتب المضافة</div>
+			</div>
+			
+			<!-- panel body -->
+			<div class="panel-body">
+				
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Name</th>
+							<th>Address</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						<tr>
+							<td>1</td>
+							<td>Arlind</td>
+							<td>Nushi</td>
+						</tr>
+						
+						<tr>
+							<td>2</td>
+							<td>Art</td>
+							<td>Ramadani</td>
+						</tr>
+						
+						<tr>
+							<td>3</td>
+							<td>Filan</td>
+							<td>Fisteku</td>
+						</tr>
+					</tbody>
+				</table>
+				
+			</div>
+			
+		</div>
+	</div>
+	<div class="col-md-3">
+		<div class="tile-stats tile-orange">
+			<div class="icon"><i class="entypo-book"></i></div>
+			<div class="num" data-start="0" data-end="{{ books_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>عدد الكتب</h3>
+			<p>مجموع الكتب المعروضة في بوابة إنجاز</p>
+		</div>
+		<div class="tile-stats tile-white-orange">
+			<div class="icon"><i class="entypo-book"></i></div>
+			<div class="num" data-start="0" data-end="{{ my_books_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>عدد كتبي</h3>
+			<p>عدد كتبي المعروضة في بوابة إنجاز</p>
+		</div>
+	</div>
+</div>
 {% endblock %}
 

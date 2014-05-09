@@ -1,6 +1,8 @@
 # -*- coding: utf-8  -*-
 import unicodecsv
 
+from datetime import datetime, timedelta, date
+
 from django.contrib.auth.decorators import permission_required, login_required
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
@@ -65,11 +67,33 @@ def portal_home(request):
     # If not, return the front-end homepage
     if request.user.is_authenticated():
         context = {}
-        context['activity_count'] = len(Activity.objects.all())
+        # --- activities ---
+        current_year_activities = Activity.objects.all()
+        # count only approved activites
+        approved_activities = []
+        for a in current_year_activities:
+            if a.is_approved(): approved_activities.append(a)
+        context['activity_count'] = len(approved_activities)
+        
+        today = date.today()
+        next_week = today + timedelta(weeks=1)
+        next_week_activities = Activity.objects.filter(date__gte=today , date__lte=next_week)
+        # show only approved activities
+        upcoming_activities = []
+        for a in next_week_activities:
+            if a.is_approved(): upcoming_activities.append(a)
+        context['upcoming_activities'] = upcoming_activities
+        
+        # --- niqati -------
         context['niqati_sum'] = sum(code.category.points for code in request.user.code_set.all())
         context['niqati_count'] = len(request.user.code_set.all())
+        context['latest_entries'] = request.user.code_set.all()[::-1][:5]
+        
+        # --- books --------
         context['books_count'] = len(Book.objects.all())
         context['my_books_count'] = len(request.user.submissions.all())
+        context['latest_books'] = Book.objects.all()[::-1][:5]
+        
         return render(request, 'home.html', context) # the dashboard
     else:
         context = {}

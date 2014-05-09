@@ -82,7 +82,7 @@ def portal_home(request):
         upcoming_activities = []
         for a in next_week_activities:
             if a.is_approved(): upcoming_activities.append(a)
-        context['upcoming_activities'] = upcoming_activities
+        context['upcoming_activities'] = upcoming_activities[::-1]
         
         # --- niqati -------
         context['niqati_sum'] = sum(code.category.points for code in request.user.code_set.all())

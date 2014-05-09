@@ -39,13 +39,13 @@
 	<ul class="nav nav-tabs bordered"><!-- available classes "bordered", "right-aligned" -->
 		<li class="">
 			<a href="#list" data-toggle="tab">
-				<span class="visible-xs"><i class="entypo-home"></i></span>
+				<span class="visible-xs"><i class="entypo-list"></i></span>
 				<span class="hidden-xs">القائمة</span>
 			</a>
 		</li>
 		<li class="active">
 			<a href="#cal" data-toggle="tab">
-				<span class="visible-xs"><i class="entypo-user"></i></span>
+				<span class="visible-xs"><i class="entypo-calendar"></i></span>
 				<span class="hidden-xs">التقويم</span>
 			</a>
 		</li>
@@ -190,7 +190,7 @@
 		{% for activity in page_activities %}
 		{
 			title : '{{ activity.name }}',
-			start : '2014-05-0{{ forloop.counter }}',
+			start : '{{ activity.date }}',
 			url   : '{{ activity.id }}/'
 		}{% if page_activities|length > forloop.counter %},{% endif %}
 		{% endfor %}

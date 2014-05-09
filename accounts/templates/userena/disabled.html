@@ -1,0 +1,18 @@
+{% extends 'userena/base_userena.html' %}{% load staticfiles %}
+{% block title %}هذا الحساب غير مفعل{% endblock %}
+
+{% block description %}هذا الحساب غير مفعل{% endblock %}
+
+{% block content %}
+<div class="form-register-success visible dinar-light">
+	<i class="entypo-lock"></i>
+	<h3 class="dinar-medium">هذا الحساب غير مفعل.</h3>
+	<p>تأكد أنك قد فعلت الحساب من خلال الرابط الذي أرسل لك بالبريد الإلكتروني.</p>
+	<p>إذا كنت تظن أن هناك مشكلة لا تتردد في <a href="mailto:hello@enjazportal.com">التواصل معنا</a>.</p>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+{% endblock %}
+

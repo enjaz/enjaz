@@ -1,10 +1,18 @@
-{% extends 'userena/base_userena.html' %}
+{% extends 'userena/base_userena.html' %}{% load staticfiles %}
 
-{% block title %}يكاد التسجيل أن يكتمل!{% endblock %}
+{% block title %}لم يبق إلا القليل...{% endblock %}
+
+{% block description %}لم يبق إلا القليل...{% endblock %}
 
 {% block content %}
-<p>نرحب بك في بوابة إنجاز!</p>
+<div class="form-register-success visible dinar-light">
+	<i class="entypo-check"></i>
+	<h3 class="dinar-medium">أنت على وشك أن تدخل عالم إنجاز!</h3>
+	<p>كل ما تحتاجه هو تفعيل حسابك من خلال الرسالة التي أرسلناها لك بالبريد الإلكتروني.</p>
+	<p>سوف تتمكن من الاستفادة منها مدة 7 أيام.</p>
+</div>
+{% endblock %}
 
-<p>لقد أرسلنا رسالة إلى عنوان البريد الذي أدخلت فيها رابط تفعيل.</p>
-<p>سوف تتمكن من الاستفادة منها مدة 7 أيام.</p>
+{% block customscript %}
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
 {% endblock %}

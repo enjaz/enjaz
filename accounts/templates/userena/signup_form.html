@@ -4,83 +4,109 @@
 {% block description %}فضلًا املأ النموذج التالي لإتمام عملية التسجيل.{% endblock %}
 
 {% block content %}
+
+{% if form.errors %}
+<div class="form-login-error visible dinar-light">
+	<h3 class="dinar-medium">عفوًا، نرجو التأكد من الحقول التالية</h3>
+	{% for err in form.errors %}
+	<p>{{ err }}</p>
+	{% endfor %}
+</div>
+{% endif %}
+
+
 <form method="post" role="form" id="form_register">	
         {% csrf_token %}
-	<div class="form-register-success">
-		<i class="entypo-check"></i>
-		<h3>سجّلت بنجاح.</h3>
-		<p>أرسلنا لك رابط التفعيل.</p>
-	</div>
-	
 	<div class="dinar-light">
 		
 			<div class="form-group">
-				<div class="input-group">
+				<div class="input-group{% if form.first_name.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-user"></i>
 					</div>
 					
-					<input {% if form.first_name.value %}value="{{ form.first_name.value }}" {% endif %}type="text" class="form-control" name="first_name" id="first_name" placeholder="الاسم الأول"  />
+					<input {% if form.first_name.value and not form.first_name.errors %}value="{{ form.first_name.value }}" {% endif %}type="text" class="form-control" name="first_name" id="first_name" placeholder="الاسم الأول"  />
 					{% if form.first_name.errors %}
 					    {% for error in form.first_name.errors %}
-					        <label class='error' for='first_name'>{{ error|escape }}</label>
+					        <label class='error' for='first_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 				</div>
 			</div>
 			
 			<div class="form-group">
-				<div class="input-group">
+				<div class="input-group{% if form.last_name.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-user"></i>
 					</div>
 					
-					<input {% if form.last_name.value %}value="{{ form.last_name.value }}" {% endif %}type="text" class="form-control" name="last_name" id="last_name" placeholder="الاسم الأخير" />
+					<input {% if form.last_name.value and not form.last_name.errors %}value="{{ form.last_name.value }}" {% endif %}type="text" class="form-control" name="last_name" id="last_name" placeholder="الاسم الأخير" />
 					{% if form.last_name.errors %}
 					    {% for error in form.last_name.errors %}
-					        <label class='error' for='last_name'>{{ error|escape }}</label>
+					        <label class='error' for='last_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 				</div>
 			</div>
 			
 			<div class="form-group">
-				<div class="input-group">
+				<div class="input-group{% if form.email.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-mail"></i>
 					</div>
 					
-					<input {% if form.email.value %}value="{{ form.email.value }}" {% endif %}type="text" class="form-control" name="email" id="email" placeholder="البريد الإلكتروني الجامعي" data-mask="[a-zA-Z0-9]+@ksau-hs\.edu\.sa" data-is-regex="true" />
+					<input {% if form.email.value and not form.email.errors %}value="{{ form.email.value }}" {% endif %}type="text" class="form-control" name="email" id="email" {% if not form.email.errors %}placeholder="البريد الإلكتروني الجامعي"{% endif %} data-mask="[a-zA-Z0-9]+@ksau-hs\.edu\.sa" data-is-regex="true" />
 					{% if form.email.errors %}
 					    {% for error in form.email.errors %}
-					        <label class='error' for='email'>{{ error|escape }}</label>
+					        <label class='error' for='email' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 				</div>
 			</div>
 		
 			<div class="form-group">
-				<div class="input-group">
+				<div class="input-group{% if form.student_id.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-graduation-cap"></i>
 					</div>
 					
-					<input {% if form.student_id.value %}value="{{ form.student_id.value }}" {% endif %}type="text" class="form-control" name="student_id" id="student_id" placeholder="الرقم الجامعي" data-mask="\d+" data-is-regex="true" />
+					<input {% if form.student_id.value and not form.student_id.errors %}value="{{ form.student_id.value }}" {% endif %}type="text" class="form-control" name="student_id" id="student_id" placeholder="الرقم الجامعي" data-mask="\d+" data-is-regex="true" />
 					{% if form.student_id.errors %}
 					    {% for error in form.student_id.errors %}
-					        <label class='error' for='student_id'>{{ error|escape }}</label>
+					        <label class='error' for='student_id' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+					
+			<div class="form-group">
+				<div class="input-group{% if form.college.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-dot"></i>
+					</div>
+					<select {% if form.college.value and not form.college.errors %}value="{{ form.college.value }}" {% endif %}class="form-control" id="college" name="college" required="required" title="">
+						<option value="M">كلية الطب</option>
+						<option value="A">كلية العلوم الطبية التطبيقية</option>
+						<option value="P">كلية الصيدلة</option>
+						<option value="D">كلية طب الأسنان</option>
+						<option value="B">كلية العلوم و المهن الصحية</option>
+						<option value="N">كلية التمريض</option>
+					</select>
+					{% if form.college.errors %}
+					    {% for error in form.college.errors %}
+					        <label class='error' for='college' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 				</div>
 			</div>
 		
 			<div class="form-group">
-				<div class="input-group">
+				<div class="input-group{% if form.section.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
-						<i class="entypo-mail"></i>
+						<i class="entypo-dot"></i>
 					</div>
 					
-					<select {% if form.section.value %}value="{{ form.section.value }}" {% endif %}class="form-control" id="section" name="section" placeholder="القسم" required="required" title="">
+					<select {% if form.section.value and not form.section.errors %}value="{{ form.section.value }}" {% endif %}class="form-control" id="section" name="section" placeholder="القسم" required="required" title="">
 						<option value="M">طلاب</option>
 						<option value="F">طالبات</option>
 						<option value="KM">طلاب مدينة الملك فهد الطبية</option>
@@ -88,7 +114,7 @@
 					</select>
 					{% if form.section.errors %}
 					    {% for error in form.section.errors %}
-					        <label class='error' for='section'>{{ error|escape }}</label>
+					        <label class='error' for='section' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 				</div>
@@ -108,33 +134,12 @@
 			</div> -->
 			
 			<div class="form-group">
-				<div class="input-group">
+				<div class="input-group{% if form.password.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
-						<i class="entypo-mail"></i>
-					</div>
-					<select {% if form.college.value %}value="{{ form.college.value }}" {% endif %}class="form-control" id="college" name="college" required="required" title="">
-						<option value="M">كلية الطب</option>
-						<option value="A">كلية العلوم الطبية التطبيقية</option>
-						<option value="P">كلية الصيدلة</option>
-						<option value="D">كلية طب الأسنان</option>
-						<option value="B">كلية العلوم و المهن الصحية</option>
-						<option value="N">كلية التمريض</option>
-					</select>
-					{% if form.college.errors %}
-					    {% for error in form.college.errors %}
-					        <label class='error' for='college'>{{ error|escape }}</label>
-					    {% endfor %}
-					{% endif %}
-				</div>
-			</div>
-			
-			<div class="form-group">
-				<div class="input-group">
-					<div class="input-group-addon">
-						<i class="entypo-lock"></i>
+						<i class="entypo-key"></i>
 					</div>
 					
-					<input type="password" class="form-control" name="password" id="password" placeholder="اختر كلمة سر" autocomplete="off" />
+					<input type="password" class="form-control" name="password1" id="password" placeholder="اختر كلمة سر" autocomplete="off" />
 				</div>
 			</div>
 			

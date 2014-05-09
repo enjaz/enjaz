@@ -48,7 +48,17 @@ class Activity(models.Model):
                                        help_text=u"العدد المتوقع للمستفيدين من النشاط")
     organizers = models.IntegerField(verbose_name=u"عدد المنظمين",
                                        help_text=u"عدد الطلاب الذين سينظمون النشاط")
-
+    
+    def is_approved(self):
+        try:
+            d_review = self.review_set.get(review_type='D')
+            if d_review.is_approved:
+                return True
+            else:
+                return False
+        except (KeyError, Review.DoesNotExist): # deanship review does not exist
+            return False 
+    
     class Meta:
         permissions = (
             ("view_activity", "Can view all available activities."),

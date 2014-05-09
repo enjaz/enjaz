@@ -1,7 +1,17 @@
 {% extends 'userena/base_userena.html' %}
-{% block title %}تعذّر تفعيل حسابك.{% endblock %}
+{% block title %}تعذّر تفعيل حسابك{% endblock %}
+
+{% block description %}.تعذّر تفعيل حسابك{% endblock %}
 
 {% block content %}
-<p>تعذّر تأكيد حسابك. قد يكون ذلك لأن الوصلة قدمت.</p>
-<p>الرجاء محاولة التسجيل مجددا أو الاتصال بنا في حال ظننت أن إشكالا وقع.</p>
+<div class="form-register-success visible dinar-light">
+	<i class="entypo-lock"></i>
+	<h3 class="dinar-medium">تعذّر تأكيد حسابك.</h3>
+	<p>قد يكون ذلك لأن الرابط أصبح قديمًا.</p>
+	<p>الرجاء محاولة التسجيل مجددا أو الاتصال بنا في حال ظننت أن إشكالا وقع.</p>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
 {% endblock %}

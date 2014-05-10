@@ -80,8 +80,11 @@ class SignupFormExtra(SignupForm):
         field.
 
         """
-        # First save the parent form and get the user.
+
         self.cleaned_data['username'] = self.cleaned_data['email'].split('@')[0]
+        # All username names should be lower-case.
+        self.cleaned_data['username'] = self.cleaned_data['username'].lower()
+        # Save the parent form and get the user
         new_user = super(SignupFormExtra, self).save()
 
         # Add default permissions
@@ -134,6 +137,15 @@ class ModifiedAuthenticationForm(forms.Form):
                 username = identification.split('@')[0]
             else:
                 username = identification
+
+            # All usernames should alwyas be lower-case and with no
+            # spaces. This will make life easier.
+            username = username.lower().strip()
+
+
+            # The final username should be returned to userena to
+            # process.
+            self.cleaned_data['identification'] = username
 
             user = authenticate(username=username, password=password)
             if not user is None:

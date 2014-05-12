@@ -55,24 +55,24 @@ var neonCalendar = neonCalendar || {};
 					
 					//defaultView: 'basicWeek',
 					
-					editable: true,
-					firstDay: 1,
+					// editable: true,
+					firstDay: 7,
 					height: 600,
-					droppable: true,
-					drop: function(date, allDay) {
-						
-						var $this = $(this),
-							eventObject = {
-								title: $this.text(),
-								start: date,
-								allDay: allDay,
-								className: $this.data('event-class')
-							};
-							
-						calendar.fullCalendar('renderEvent', eventObject, true);
-						
-						$this.remove();
-					},
+					// droppable: true,
+					// drop: function(date, allDay) {
+// 						
+						// var $this = $(this),
+							// eventObject = {
+								// title: $this.text(),
+								// start: date,
+								// allDay: allDay,
+								// className: $this.data('event-class')
+							// };
+// 							
+						// calendar.fullCalendar('renderEvent', eventObject, true);
+// 						
+						// $this.remove();
+					// },
 					// isRTL: true,
 					events: activities
 				});

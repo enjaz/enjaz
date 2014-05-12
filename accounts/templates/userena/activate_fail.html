@@ -1,4 +1,4 @@
-{% extends 'userena/base_userena.html' %}
+{% extends 'userena/base_userena.html' %}{% load staticfiles %}
 {% block title %}تعذّر تفعيل حسابك{% endblock %}
 
 {% block description %}.تعذّر تفعيل حسابك{% endblock %}
@@ -8,7 +8,7 @@
 	<i class="entypo-lock"></i>
 	<h3 class="dinar-medium">تعذّر تأكيد حسابك.</h3>
 	<p>قد يكون ذلك لأن الرابط أصبح قديمًا.</p>
-	<p>الرجاء محاولة التسجيل مجددا أو الاتصال بنا في حال ظننت أن إشكالا وقع.</p>
+	<p>الرجاء محاولة التسجيل مجددا أو <a href="{% url 'about' %}">الاتصال بنا</a> في حال ظننت أن إشكالا وقع.</p>
 </div>
 {% endblock %}
 

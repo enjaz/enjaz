@@ -288,6 +288,7 @@
 	<script src="{% static 'neon-front/assets/js/resizeable.js' %}"></script>
 	<script src="{% static 'neon-front/assets/js/neon-slider.js' %}"></script>
 	<script src="{% static 'neon-front/assets/js/neon-custom.js' %}"></script>
+{% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
 	<!-- Piwik -->
 	<script type="text/javascript">
 	  var _paq = _paq || [];
@@ -303,5 +304,6 @@
 	</script>
 	<noscript><p><img src="//enjazportal.com/stats/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
         <!-- End Piwik Code -->
+{% endif %}
 </body>
 </html>

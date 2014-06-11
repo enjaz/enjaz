@@ -109,7 +109,7 @@
     <td><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}</a></td>
     <td><a href="{% url 'clubs:show' activity.primary_club.id %}">{{ activity.primary_club.name }}</a></td>
     <td>{{ activity.submission_date|date:"j F" }}</td>
-    <td>{{ activity.date|date:"j F" }}</td>
+    <td>{{ activity.get_first_date|date:"j F" }}</td>
     <td>
 {% if not activity.review_set.all %}
   {% if perms.activities.add_review %}<a href="{% url 'activities:review' activity.id %}">مُعلّق</a>{% else %}معلّق{% endif %}
@@ -190,7 +190,7 @@
 		{% for activity in page_activities %}
 		{
 			title : '{{ activity.name }}',
-			start : '{{ activity.date }}',
+			start : '{{ activity.get_first_date }}',
 			url   : '{{ activity.id }}/'
 		}{% if page_activities|length > forloop.counter %},{% endif %}
 		{% endfor %}

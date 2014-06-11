@@ -99,17 +99,17 @@
 
   <tr>
     <th>التاريخ والوقت</th>
-    <td>{% if activity.date %}{{ activity.date|date:"j F Y" }}<br/>{{ activity.time }}{% else %}{{ activity.custom_datetime }}{% endif %}</td>
+    <td>{{ activity.get_first_date|date:"j F Y" }}<br/>{{ activity.get_first_time }}</td>
     {% if can_view_presidency_review and review_p %}
     <td>{%if review_p.datetime_notes %}{{ review_p.datetime_notes }}{% else %}-{% endif %}</td>
     {% endif %}
     {% if can_view_deanship_review and review_d %}
     <td>{%if review_d.datetime_notes %}{{ review_d.datetime_notes }}{% else %}-{% endif %}</td>
     {% endif %}
-  </tr>{% if activity.location %}
+  </tr>{% if activity.get_first_location %}
   <tr>
     <th>المكان</th>
-    <td>{{ activity.location }}</td>
+    <td>{{ activity.get_first_location }}</td>
     {% if can_view_presidency_review and review_p %}
     <td>{%if review_p.location_notes %}{{ review_p.location_notes }}{% else %}-{% endif %}</td>
     {% endif %}

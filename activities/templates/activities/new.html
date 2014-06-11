@@ -3,6 +3,7 @@
 
 {% block content %}
  <script>
+ {% comment %}
 $(function() {
 $('#id_date').datepicker({isRTL: true});
 $('#id_date').change(function(){
@@ -22,6 +23,7 @@ $('#id_custom_datetime').change(function(){
         $('#id_time').removeAttr('disabled');
 }
 });
+{% endcomment %}
 
 {% if not activity.collect_participants %}
 $("#id_participant_colleges").siblings().hide();
@@ -47,7 +49,17 @@ $('#id_collect_participants').click(function() {
 
 <form action="{% if edit %}{% url 'activities:edit' activity_id %}{% else %}{% url 'activities:create' %}{% endif %}" method="post" class="form">
 {% csrf_token %}
-    {% bootstrap_form form %}
+	{% regroup form.fields by group as field_groups %}
+	{% for group in field_groups %}
+	<div class="group_{{ group.grouper }}">
+	  {% for field in group.list %}
+	    {% bootstrap_field field %}
+	  {% endfor %}
+	</div>
+	{% endfor %}
+	
+    
+	
     {% buttons %}
         <button type="submit" class="btn btn-primary">
             {% bootstrap_icon "ok-sign" %} أرسل

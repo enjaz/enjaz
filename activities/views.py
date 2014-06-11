@@ -7,11 +7,12 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.forms import ModelForm, ModelChoiceField, ModelMultipleChoiceField
+from django import forms
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
-from activities.models import Activity, Review, Participation
+from activities.models import Activity, Review, Participation, Episode
 from clubs.models import Club
 from books.models import Book
 from niqati.models import Niqati_User
@@ -26,15 +27,72 @@ class ActivityForm(ModelForm):
                                     label=Activity.secondary_clubs.field.verbose_name,
                                     help_text=Activity.secondary_clubs.field.help_text,
                                     required=False)
+    episode_count = forms.CharField(widget=forms.HiddenInput())
+    
     class Meta:
         model = Activity
         fields = ['primary_club', # TODO: primary club is already known (signed in):
                                   # no need to include as field
-                  'name','description', 'date', 'time',
-                  'custom_datetime', 'organizers', 'participants',
+                  'name','description',
+                  'organizers', 'participants',
                   'secondary_clubs', 'inside_collaborators',
                   'outside_collaborators', 'requirements',
                   'collect_participants', 'participant_colleges']
+
+    def __init__(self, *args, **kwargs):
+        """
+        Dynamically add date, time and location fields based on how many
+        Episodes are added in the original form. The number of episodes is
+        included as a hidden field with the name episode_count.
+        Based on this StackOverflow thread:
+        http://stackoverflow.com/questions/6142025/dynamically-add-field-to-a-form
+        """
+        # Get the episode count from the submitted data; if there is no data (unbound form), consider it 1
+        episode_count = kwargs.pop('episode_count', 1)
+        
+        # Initialize the form and set the value of the hidden field to the episode count
+        super(ActivityForm, self).__init__(*args, **kwargs)
+        self.fields['episode_count'].initial = episode_count
+        
+        # Experimental!
+        # Add a group attribute for normal fields as to separate them from
+        # episode fields in terms of displaying the form in the template
+        # At the same time seperate the fields into group 0 (before episodes)
+        # and group 2 (after episodes) so that episode fields fall
+        # in between (group 1)
+        
+        # Based on: http://stackoverflow.com/questions/10366745/django-form-field-grouping
+        
+        for key in self.fields:
+            self.fields[key].group = 2
+            
+        self.fields['primary_club'].group = 0
+        self.fields['name'].group = 0
+        self.fields['description'].group = 0
+            
+        field_names = []
+        
+        # Now add the custom date, time and location fields
+        for i in range(int(episode_count)):
+            self.fields['start_date{i}'.format(i=i)] = forms.DateField()
+            self.fields['end_date{i}'.format(i=i)] = forms.DateField()
+            self.fields['start_time{i}'.format(i=i)] = forms.TimeField()
+            self.fields['end_time{i}'.format(i=i)] = forms.TimeField()
+            self.fields['location{i}'.format(i=i)] = forms.CharField(max_length=128)
+            
+            field_names.extend(('start_date{i}'.format(i=i),
+                                'end_date{i}'.format(i=i),
+                                'start_time{i}'.format(i=i),
+                                'end_time{i}'.format(i=i),
+                                'location{i}'.format(i=i),
+                                ))
+        
+        # Add group attribute to episode fields to seperate them from normal fields
+        # as well as determine the order by which they will be displayed
+        # Note: This implementation should be changed as it depends on
+        # field_names, which itself is an experimental entity
+        for key in field_names:
+            self.fields[key].group = 1 
 
     def clean(self):
         # Remove spaces at the start and end of all text fields.
@@ -42,8 +100,44 @@ class ActivityForm(ModelForm):
         for field in cleaned_data:
             if isinstance(cleaned_data[field], unicode):
                 cleaned_data[field] = cleaned_data[field].strip()
+        
+        # Check if end_date is after start_date
+        
         return cleaned_data
-
+    
+    def save(self, *args, **kwargs):
+        # Extract and save the episodes, perform a normal save,
+        # and link the episodes to the activity
+        
+        # First, check how many episodes we have
+        episode_count = self.cleaned_data['episode_count']
+        episodes = []
+        
+        for i in range(int(episode_count)):
+            # Get the details of each episode and store them in an Episode object
+            start_date = self.cleaned_data.pop('start_date{i}'.format(i=i))
+            end_date = self.cleaned_data.pop('end_date{i}'.format(i=i))
+            start_time = self.cleaned_data.pop('start_time{i}'.format(i=i))
+            end_time = self.cleaned_data.pop('end_time{i}'.format(i=i))
+            location = self.cleaned_data.pop('location{i}'.format(i=i))
+            episode = Episode(start_date=start_date,
+                              end_date=end_date,
+                              start_time=start_time,
+                              end_time=end_time,
+                              location=location)
+            episodes.append(episode)
+                    
+        activity = super(ActivityForm, self).save(*args, **kwargs)
+        for episode in episodes:
+            episode.activity = activity
+            episode.save()
+            
+        return activity
+    
+    def groups(self):
+        return [filter(lambda x: x.group == i, self.fields) for i in range(3)]
+            
+    
 class DirectActivityForm(ActivityForm):
     """A form which has 'Presidency' as an option."""
     queryset = Club.objects.all()
@@ -232,9 +326,9 @@ def create(request):
     if request.method == 'POST':
         activity = Activity(submitter=request.user)
         if request.user.has_perm('activities.directly_add_activity'):
-            form = DirectActivityForm(request.POST, instance=activity)
+            form = DirectActivityForm(request.POST, instance=activity, episode_count=request.POST['episode_count'])
         else:
-            form = ActivityForm(request.POST, instance=activity)
+            form = ActivityForm(request.POST, instance=activity, episode_count=request.POST['episode_count'])
         if form.is_valid():
             form_object = form.save()
             # If the chosen primary_club is the Presidency, make it
@@ -293,8 +387,15 @@ def edit(request, activity_id):
 
     if request.method == 'POST':        
         modified_activity = ActivityForm(request.POST, instance=activity)
-        modified_activity.save()
-        return HttpResponseRedirect(reverse('activities:list'))
+        # Should check that edits are valid before saving
+        # TODO: actually edits should be approved first by presidency and deanship
+        if modified_activity.is_valid():
+            modified_activity.save()
+            return HttpResponseRedirect(reverse('activities:list'))
+        else:
+            context = {'form': modified_activity, 'activity_id': activity_id,
+                       'edit': True}
+            return render(request, 'activities/new.html', context)
     else:
         form = ActivityForm(instance=activity)
         context = {'form': form, 'activity_id': activity_id,

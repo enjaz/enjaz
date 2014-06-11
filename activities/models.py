@@ -26,13 +26,17 @@ class Activity(models.Model):
                                   on_delete=models.SET_NULL)
     submission_date = models.DateTimeField('date submitted',
                                            auto_now_add=True)
-    location = models.CharField(max_length=200,
-                                verbose_name=u"المكان", blank=True)
-    date = models.DateField(u'التاريخ', null=True, blank=True)
-    time = models.CharField(max_length=200, verbose_name=u'الوقت',
-                            blank=True)
-    custom_datetime = models.TextField(verbose_name=u"تاريخ ووقت مخصّص",
-                                   blank=True, help_text=u"إذا كان النشاط الذي تنوي تنظيمه دوريا أو ممتدا لفصل كامل فعبء هذه الخانة.")
+       
+#    Date,time and location are now handled by Episodes
+
+#     location = models.CharField(max_length=200,
+#                                 verbose_name=u"المكان", blank=True)
+#     date = models.DateField(u'التاريخ', null=True, blank=True)
+#     time = models.CharField(max_length=200, verbose_name=u'الوقت',
+#                             blank=True)
+#     custom_datetime = models.TextField(verbose_name=u"تاريخ ووقت مخصّص",
+#                                    blank=True, help_text=u"إذا كان النشاط الذي تنوي تنظيمه دوريا أو ممتدا لفصل كامل فعبء هذه الخانة.")
+
     edit_date = models.DateTimeField('date edited', auto_now=True)
     is_editable = models.BooleanField(default=True)
     collect_participants = models.BooleanField(default=False,
@@ -58,6 +62,15 @@ class Activity(models.Model):
                 return False
         except (KeyError, Review.DoesNotExist): # deanship review does not exist
             return False 
+        
+    def get_first_date(self):
+        return self.episode_set.all()[0].start_date
+        
+    def get_first_time(self):
+        return self.episode_set.all()[0].start_time
+    
+    def get_first_location(self):
+        return self.episode_set.all()[0].location
     
     class Meta:
         permissions = (
@@ -132,3 +145,25 @@ class Participation(models.Model):
         permissions = (
             ("view_participation", "Can view all available participations."),
         )
+
+class Episode(models.Model):
+    """
+    Enjaz activities are usually simple a date + a start and end time. Yet this is not always the case;
+    some activities have several dates and times yet all under the same activity and same request.
+    Enabling the coordinators to manually enter their custom dates has a big drawback in that these custom
+    dates can't be translated into something the computer can understand.
+    
+    Therefore, we define the "episode" model, which would be a representation of a single "unit" of
+    an activity. The Activity model is related to the Episode model via a foreign key relationship. Most
+    activities, however, will only require one episode, as they only consist of a single date and time.
+    The more complex activites are what really take advantage of this system.
+    """
+    activity = models.ForeignKey(Activity)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    location = models.CharField(max_length=128)
+    
+    def is_one_day(self):
+        return self.start_date == self.end_date

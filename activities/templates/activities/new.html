@@ -93,6 +93,10 @@ $('#id_collect_participants').click(function() {
 <script>
 $(document).ready(function () {
 	
+// Move the episode panel to the 4th position in the form
+// (after the description field)
+$('#episode_panel').insertAfter('form .form-group:nth-child(4)');
+	
 // Wrap all the fields related to episodes in a single div.
 // This makes it much easier for styling.
 
@@ -169,11 +173,29 @@ for (i=0; i<episode_count; i++) {
 	
 	// Upon clicking this button, a new episode will be added to the form, with all
 	// the associeated fields
-	$('#btn_add_episode').click(function () {
-		// function goes here
+	$('#btn_add_episode').click(function () {		
+		// Add a new episode and move this (button) to buttom
+		var episode = '<div id="episode_{i}_container" class="episode_container"><div class="col-md-1"><h4>الموعد {i+1}</h4></div><div class="col-md-11"><div id="episode_{i}_dates" class="col-md-5"><div class="form-group episode_field episode_{i} date_field col-md-6"><label>تاريخ البداية</label><input class="form-control" id="id_start_date{i}" name="start_date{i}" placeholder="تاريخ البداية" required="required" type="text" data-start-view="1"></div><div class="form-group episode_field episode_{i} date_field col-md-6"><label>تاريخ النهاية</label><input class="form-control" id="id_end_date{i}" name="end_date{i}" placeholder="تاريخ النهاية" required="required" type="text" data-start-view="1"></div></div><div id="episode_{i}_times" class="col-md-4"><div class="form-group episode_field episode_{i} time_field col-md-6"><label>وقت البداية</label><input class="form-control" id="id_start_time{i}" name="start_time{i}" placeholder="وقت البداية" required="required" type="text"></div><div class="form-group episode_field episode_{i} time_field col-md-6"><label>وقت النهاية</label><input class="form-control" id="id_end_time{i}" name="end_time{i}" placeholder="وقت النهاية" required="required" type="text"></div></div><div id="episode_{i}_loc" class="col-md-3"><div class="form-group episode_field episode_{i} loc_field col-md-12"><label>المكان</label><input class="form-control" id="id_location{i}" maxlength="128" name="location{i}" placeholder="المكان" required="required" type="text"></div></div></div></div>'.replace(/{i}/g, episode_count).replace('{i+1}', parseInt(episode_count)+1);
+		$(episode).insertBefore('#btn_add_episode');
+		// Initialize date and time pickers
+		
+		// Configure date pickers
+		// add attributes and init datepickers
+		$('#episode_' + episode_count + '_dates .date_field input').attr('data-start-view', '1').datepicker({isRTL: true});
+		
+		console.log($('#episode_' + episode_count + '_dates .date_field input'));
+		
+		// Configure time pickers
+		$('#episode_' + episode_count + '_times .time_field input').timepicker({showMeridian: false})
+			.on('show.timepicker', function(e) {
+		    $('.bootstrap-timepicker-widget').attr('dir', 'ltr'); // It appears reversed in rtl
+		  });
+		
+		// Update episode_count
+		episode_count++;
+		$('input[name="episode_count"]').val(episode_count);
 	});
 }
-
 });
 </script>
 
@@ -183,3 +205,4 @@ for (i=0; i<episode_count; i++) {
 <!-- <script src="{% static 'neon/assets/js/bootstrap-datepicker.js' %}"></script> -->
 <script src="{% static 'neon/assets/js/bootstrap-timepicker.min.js' %}"></script>
 {% endblock %}
+

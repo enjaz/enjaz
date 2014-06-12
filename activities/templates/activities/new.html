@@ -133,7 +133,7 @@ $('#episodes').appendTo('#episode_panel');
 $('.date_field input').attr('data-start-view', '1').datepicker({isRTL: true});
 
 // Configure time pickers
-$('.time_field input').timepicker()
+$('.time_field input').timepicker({showMeridian: false})
 	.on('show.timepicker', function(e) {
     $('.bootstrap-timepicker-widget').attr('dir', 'ltr'); // It appears reversed in rtl
   });

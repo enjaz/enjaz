@@ -48,11 +48,14 @@ class ActivityForm(ModelForm):
         http://stackoverflow.com/questions/6142025/dynamically-add-field-to-a-form
         """
         # Get the episode count from the submitted data; if there is no data (unbound form), consider it 1
+        # TODO: should be adapted so no extra argument is needed (get the value from self.fields[...]
         episode_count = kwargs.pop('episode_count', 1)
         
         # Initialize the form and set the value of the hidden field to the episode count
         super(ActivityForm, self).__init__(*args, **kwargs)
         self.fields['episode_count'].initial = episode_count
+        
+        # ------start_experimental------
         
         # Experimental!
         # Add a group attribute for normal fields as to separate them from
@@ -72,13 +75,17 @@ class ActivityForm(ModelForm):
             
         field_names = []
         
+        # ------end_experimental------
+        
         # Now add the custom date, time and location fields
         for i in range(int(episode_count)):
-            self.fields['start_date{i}'.format(i=i)] = forms.DateField()
-            self.fields['end_date{i}'.format(i=i)] = forms.DateField()
-            self.fields['start_time{i}'.format(i=i)] = forms.TimeField()
-            self.fields['end_time{i}'.format(i=i)] = forms.TimeField()
-            self.fields['location{i}'.format(i=i)] = forms.CharField(max_length=128)
+            self.fields['start_date{i}'.format(i=i)] = forms.DateField(label='تاريخ البداية')
+            self.fields['end_date{i}'.format(i=i)] = forms.DateField(label='تاريخ النهاية')
+            self.fields['start_time{i}'.format(i=i)] = forms.TimeField(label='وقت البداية')
+            self.fields['end_time{i}'.format(i=i)] = forms.TimeField(label='وقت النهاية')
+            self.fields['location{i}'.format(i=i)] = forms.CharField(max_length=128, label='المكان')
+            
+        # ------start_experimental------
             
             field_names.extend(('start_date{i}'.format(i=i),
                                 'end_date{i}'.format(i=i),
@@ -93,6 +100,8 @@ class ActivityForm(ModelForm):
         # field_names, which itself is an experimental entity
         for key in field_names:
             self.fields[key].group = 1 
+            
+        # ------end_experimental------
 
     def clean(self):
         # Remove spaces at the start and end of all text fields.

@@ -1,4 +1,4 @@
-{% extends "activities_base.html" %}{% load bootstrap3 %}
+{% extends "activities_base.html" %}{% load bootstrap3 %}{% load staticfiles %}
 {% block title %}{% if edit %} تعديل {{ form.name.value }} {% else %} نشاط جديد {% endif %}{% endblock %}
 
 {% block content %}
@@ -39,7 +39,6 @@ $('#id_collect_participants').click(function() {
         $("#id_participant_colleges").hide("slow");
     }
 });
-
 });
 </script>
 
@@ -49,6 +48,11 @@ $('#id_collect_participants').click(function() {
 
 <form action="{% if edit %}{% url 'activities:edit' activity_id %}{% else %}{% url 'activities:create' %}{% endif %}" method="post" class="form">
 {% csrf_token %}
+
+	{% comment %}------start_experimental------{% endcomment %}
+	
+	{% comment %}
+	
 	{% regroup form.fields by group as field_groups %}
 	{% for group in field_groups %}
 	<div class="group_{{ group.grouper }}">
@@ -58,12 +62,124 @@ $('#id_collect_participants').click(function() {
 	</div>
 	{% endfor %}
 	
-    
+	{% endcomment %}
+	
+	{% comment %}------end_experimental------{% endcomment %}
+	
+	{% bootstrap_form form %}
+	
+	<div id="episode_panel" class="panel panel-primary" data-collapsed="0">
+			
+			<!-- panel head -->
+			<div class="panel-heading">
+				<div class="panel-title">المواعيد</div>
+				
+				<div class="panel-options">
+					<a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
+				</div>
+			</div>
+			
+			<!-- panel body -->
+		</div>
 	
     {% buttons %}
         <button type="submit" class="btn btn-primary">
             {% bootstrap_icon "ok-sign" %} أرسل
         </button>
     {% endbuttons %}
+    
 </form>
+
+<script>
+$(document).ready(function () {
+	
+// Wrap all the fields related to episodes in a single div.
+// This makes it much easier for styling.
+
+// How many episodes are there?
+var episode_count = $('input[name="episode_count"]').val();
+
+// Based on this, mark all the episode fields with class 'episode_field'
+for (i=0; i<episode_count; i++) {
+	$('input[name="start_date' + i + '"]').parent()
+		.addClass('episode_field').addClass('episode_' + i).addClass('date_field');
+	$('input[name="end_date' + i + '"]').parent()
+		.addClass('episode_field').addClass('episode_' + i).addClass('date_field');
+	$('input[name="start_time' + i + '"]').parent()
+		.addClass('episode_field').addClass('episode_' + i).addClass('time_field');
+	$('input[name="end_time' + i + '"]').parent()
+		.addClass('episode_field').addClass('episode_' + i).addClass('time_field');
+	$('input[name="location' + i + '"]').parent()
+		.addClass('episode_field').addClass('episode_' + i).addClass('loc_field');;
+	
+	// Wrap each episode in a div
+	$('.episode_' + i).wrapAll("<div id='episode_" + i + "_container' class='episode_container' />");
+}
+
+// Now wrap all the episode_fields in a single div
+$('.episode_container').wrapAll("<div id='episodes' class='panel-body' />");
+
+// The counter is also logically relevant so add it also
+// 'prepend' adds it to the beginning rather than the end
+$('#episodes').prepend( $('input[name="episode_count"]') );
+
+// -----------------
+
+// Now give some style to the place
+$('#episodes').appendTo('#episode_panel');
+
+// Configure date pickers
+// add attributes and init datepickers
+$('.date_field input').attr('data-start-view', '1').datepicker({isRTL: true});
+
+// Configure time pickers
+$('.time_field input').timepicker()
+	.on('show.timepicker', function(e) {
+    $('.bootstrap-timepicker-widget').attr('dir', 'ltr'); // It appears reversed in rtl
+  });
+
+for (i=0; i<episode_count; i++) {
+	
+	// Wrap all fields together, as to separate them from the label
+	$('.episode_field.episode_' + i)
+		.wrapAll("<div class='col-md-11' />");
+	
+	// Add episode label
+	$('#episode_' + i + '_container')
+		.prepend("<div class='col-md-1'><h4>الموعد " + (i+1) + "</h4></div>");
+	
+	// Arrange episode fields into columns
+	$('.episode_field.episode_' + i + '.date_field')
+		.wrapAll("<div id='episode_" + i + "_dates' class='col-md-5' />");
+	$('.episode_field.episode_' + i + '.time_field')
+		.wrapAll("<div id='episode_" + i + "_times' class='col-md-4' />");
+	$('.episode_field.episode_' + i + '.loc_field')
+		.wrapAll("<div id='episode_" + i + "_loc' class='col-md-3' />");
+		
+	$('.episode_field.episode_' + i + '.date_field')
+		.addClass('col-md-6');	
+	$('.episode_field.episode_' + i + '.time_field')
+		.addClass('col-md-6');
+	$('.episode_field.episode_' + i + '.loc_field')
+		.addClass('col-md-12');
+	
+	// Append the 'add episode' button
+	$('#episodes')
+	.append('<button id="btn_add_episode" type="button" class="btn btn-default btn-icon btn-xs">أضف موعدًا<i class="entypo-plus"></i></button>');
+	
+	// Upon clicking this button, a new episode will be added to the form, with all
+	// the associeated fields
+	$('#btn_add_episode').click(function () {
+		// function goes here
+	});
+}
+
+});
+</script>
+
+{% endblock %}
+
+{% block customscript %}
+<!-- <script src="{% static 'neon/assets/js/bootstrap-datepicker.js' %}"></script> -->
+<script src="{% static 'neon/assets/js/bootstrap-timepicker.min.js' %}"></script>
 {% endblock %}

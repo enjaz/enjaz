@@ -48,8 +48,8 @@
 						<tr>
 							<td><a href="{% url 'activities:show' a.pk %}">{{ a.name }}</a></td>
 							<td>{{ a.primary_club }}</td>
-							<td>{{ a.date }}</td>
-							<td>{{ a.location }}</td>
+							<td>{{ a.get_first_date }}</td>
+							<td>{{ a.get_first_location }}</td>
 						</tr>
 						{% endfor %}
 					</tbody>

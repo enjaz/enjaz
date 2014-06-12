@@ -180,7 +180,7 @@ def portal_home(request):
         
         today = date.today()
         next_week = today + timedelta(weeks=1)
-        next_week_activities = Activity.objects.filter(date__gte=today , date__lte=next_week)
+        next_week_activities = filter(lambda a: a.get_first_date() >= today and a.get_first_date() <= next_week, Activity.objects.all()) # filter(date__gte=today , date__lte=next_week)
         # show only approved activities
         upcoming_activities = []
         for a in next_week_activities:

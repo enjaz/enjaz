@@ -83,9 +83,9 @@ $('#id_collect_participants').click(function() {
 		</div>
 	
     {% buttons %}
-        <button type="submit" class="btn btn-primary">
-            {% bootstrap_icon "ok-sign" %} أرسل
-        </button>
+    	<button type="submit" class="btn btn-primary btn-block">
+    		{% bootstrap_icon "ok-sign" %} أرسل
+    	</button>
     {% endbuttons %}
     
 </form>
@@ -105,6 +105,8 @@ var episode_count = $('input[name="episode_count"]').val();
 
 // Based on this, mark all the episode fields with class 'episode_field'
 for (i=0; i<episode_count; i++) {
+	$('input[name="episode_pk' + i + '"]')
+		.addClass('episode_field').addClass('episode_' + i);
 	$('input[name="start_date' + i + '"]').parent()
 		.addClass('episode_field').addClass('episode_' + i).addClass('date_field');
 	$('input[name="end_date' + i + '"]').parent()
@@ -167,7 +169,9 @@ for (i=0; i<episode_count; i++) {
 	$('.episode_field.episode_' + i + '.loc_field')
 		.addClass('col-md-12');
 	
-	// Append the 'add episode' button
+} // end loop
+
+// Append the 'add episode' button
 	$('#episodes')
 	.append('<button id="btn_add_episode" type="button" class="btn btn-default btn-icon btn-xs">أضف موعدًا<i class="entypo-plus"></i></button>');
 	
@@ -195,7 +199,7 @@ for (i=0; i<episode_count; i++) {
 		episode_count++;
 		$('input[name="episode_count"]').val(episode_count);
 	});
-}
+
 });
 </script>
 

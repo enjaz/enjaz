@@ -159,11 +159,32 @@ class Episode(models.Model):
     The more complex activites are what really take advantage of this system.
     """
     activity = models.ForeignKey(Activity)
+    
     start_date = models.DateField()
     end_date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
+    
+    # Note: Dates and times should be interpreted as follows:
+    # start_date and end_date indicate the dates on which the episode starts and ends, respectively
+    # start_time and end_time indicate the start and finish times ON EACH OF THE DATES, rather
+    # than for the whole episode
+    # 
+    # For example:
+    # start_date = yesterday, end_date = tomorrow,
+    # start_time = 4:00P.M., end_time = 10:00P.M.
+    # doesn't mean the episode started yesterday 4:00P.M. and ends tomorrow 10:00P.M.
+    # Rather, the episode started yesterday 4:00P.M. and ended 10:00P.M., then starts today
+    # 4:00P.M. and ends 10:00P.M., and the same thing for tomorrow.
+    # 
+    # Of course there is nothing by design to enforce this interpretation, but that's how
+    # it's meant to be
+    
     location = models.CharField(max_length=128)
+    
+    # In the future, as we add Google Calendar features, the calendar events will
+    # be linked here
+    # google_event = models.URLField()
     
     def is_one_day(self):
         return self.start_date == self.end_date

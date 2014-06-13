@@ -47,62 +47,59 @@ class ActivityForm(ModelForm):
         Based on this StackOverflow thread:
         http://stackoverflow.com/questions/6142025/dynamically-add-field-to-a-form
         """
-        # Get the episode count from the submitted data; if there is no data (unbound form), consider it 1
-        # TODO: should be adapted so no extra argument is needed (get the value from self.fields[...]
-        episode_count = kwargs.pop('episode_count', 1)
-        
+        # If an instance is passed, then store it in the instance variable.
+        # This will be used in populating the episode fields when an instance
+        # is passed.
+        instance = kwargs.get('instance', None)
+                
         # Initialize the form and set the value of the hidden field to the episode count
         super(ActivityForm, self).__init__(*args, **kwargs)
+        
+        # Determine how many episodes there are:
+        episode_count = 1 # default value
+        # First check if an instance is passed. If true, then get the episode count of that instance
+        if instance: episode_count = instance.episode_set.count()
+        
+        # If data is passed (whether it's for a new activity or editing),
+        # set episode_count to the episode count within the data.
+        # This may override the value obtained from the instance if there is an update in the episodes
+        if self['episode_count'].value(): episode_count = self['episode_count'].value()
+        
+        # In any case, the episode count should be at least 1
+        if episode_count < 1: episode_count = 1
+        
         self.fields['episode_count'].initial = episode_count
         
-        # ------start_experimental------
-        
-        # Experimental!
-        # Add a group attribute for normal fields as to separate them from
-        # episode fields in terms of displaying the form in the template
-        # At the same time seperate the fields into group 0 (before episodes)
-        # and group 2 (after episodes) so that episode fields fall
-        # in between (group 1)
-        
-        # Based on: http://stackoverflow.com/questions/10366745/django-form-field-grouping
-        
-        for key in self.fields:
-            self.fields[key].group = 2
-            
-        self.fields['primary_club'].group = 0
-        self.fields['name'].group = 0
-        self.fields['description'].group = 0
-            
-        field_names = []
-        
-        # ------end_experimental------
+        # If an instance is passed and is saved (has a pk), load its episodes
+        if instance:
+            if instance.pk:
+                instance_episodes = instance.episode_set.all()
         
         # Now add the custom date, time and location fields
         for i in range(int(episode_count)):
+            self.fields['episode_pk{i}'.format(i=i)] = forms.CharField(widget=forms.HiddenInput(), required=False)
             self.fields['start_date{i}'.format(i=i)] = forms.DateField(label='تاريخ البداية')
             self.fields['end_date{i}'.format(i=i)] = forms.DateField(label='تاريخ النهاية')
             self.fields['start_time{i}'.format(i=i)] = forms.TimeField(label='وقت البداية')
             self.fields['end_time{i}'.format(i=i)] = forms.TimeField(label='وقت النهاية')
             self.fields['location{i}'.format(i=i)] = forms.CharField(max_length=128, label='المكان')
             
-        # ------start_experimental------
-            
-            field_names.extend(('start_date{i}'.format(i=i),
-                                'end_date{i}'.format(i=i),
-                                'start_time{i}'.format(i=i),
-                                'end_time{i}'.format(i=i),
-                                'location{i}'.format(i=i),
-                                ))
-        
-        # Add group attribute to episode fields to seperate them from normal fields
-        # as well as determine the order by which they will be displayed
-        # Note: This implementation should be changed as it depends on
-        # field_names, which itself is an experimental entity
-        for key in field_names:
-            self.fields[key].group = 1 
-            
-        # ------end_experimental------
-
+            # If an instance exists (has a pk), then load the fields with the instance episode values.
+            # An IndexError arises when submitting an edit form in which new episodes have been added,
+            # since episode_count will increase beyond the lenght of instance_episodes.
+            # In this case just leave the new fields empty as they will be filled by the submitted data.
+            if instance:
+                if instance.pk:
+                    try:
+                        self.fields['episode_pk{i}'.format(i=i)].initial = instance_episodes[i].pk
+                        self.fields['start_date{i}'.format(i=i)].initial = instance_episodes[i].start_date
+                        self.fields['end_date{i}'.format(i=i)].initial = instance_episodes[i].end_date
+                        self.fields['start_time{i}'.format(i=i)].initial = instance_episodes[i].start_time
+                        self.fields['end_time{i}'.format(i=i)].initial = instance_episodes[i].end_time
+                        self.fields['location{i}'.format(i=i)].initial = instance_episodes[i].location
+                    except IndexError:
+                        pass
+                    
     def clean(self):
         # Remove spaces at the start and end of all text fields.
         cleaned_data = super(ActivityForm, self).clean()
@@ -120,32 +117,43 @@ class ActivityForm(ModelForm):
         
         # First, check how many episodes we have
         episode_count = self.cleaned_data['episode_count']
-        episodes = []
+        new_episodes = []
         
         for i in range(int(episode_count)):
             # Get the details of each episode and store them in an Episode object
+            pk = self.cleaned_data.pop('episode_pk{i}'.format(i=i), None)
             start_date = self.cleaned_data.pop('start_date{i}'.format(i=i))
             end_date = self.cleaned_data.pop('end_date{i}'.format(i=i))
             start_time = self.cleaned_data.pop('start_time{i}'.format(i=i))
             end_time = self.cleaned_data.pop('end_time{i}'.format(i=i))
             location = self.cleaned_data.pop('location{i}'.format(i=i))
-            episode = Episode(start_date=start_date,
-                              end_date=end_date,
-                              start_time=start_time,
-                              end_time=end_time,
-                              location=location)
-            episodes.append(episode)
+            
+            # If there is a pk, i.e. the episode already exists in the database, just update it
+            # Otherwise create a new one
+            if pk:
+                episode = Episode.objects.get(pk=pk)
+                
+                episode.start_date = start_date
+                episode.end_date = end_date
+                episode.start_time = start_time
+                episode.end_time = end_time
+                episode.location = location
+                
+                episode.save()
+            else:
+                episode = Episode(start_date=start_date,
+                                  end_date=end_date,
+                                  start_time=start_time,
+                                  end_time=end_time,
+                                  location=location)
+                new_episodes.append(episode)
                     
         activity = super(ActivityForm, self).save(*args, **kwargs)
-        for episode in episodes:
+        for episode in new_episodes:
             episode.activity = activity
             episode.save()
             
-        return activity
-    
-    def groups(self):
-        return [filter(lambda x: x.group == i, self.fields) for i in range(3)]
-            
+        return activity            
     
 class DirectActivityForm(ActivityForm):
     """A form which has 'Presidency' as an option."""
@@ -335,9 +343,9 @@ def create(request):
     if request.method == 'POST':
         activity = Activity(submitter=request.user)
         if request.user.has_perm('activities.directly_add_activity'):
-            form = DirectActivityForm(request.POST, instance=activity, episode_count=request.POST['episode_count'])
+            form = DirectActivityForm(request.POST, instance=activity) #, episode_count=request.POST['episode_count'])
         else:
-            form = ActivityForm(request.POST, instance=activity, episode_count=request.POST['episode_count'])
+            form = ActivityForm(request.POST, instance=activity) #, episode_count=request.POST['episode_count'])
         if form.is_valid():
             form_object = form.save()
             # If the chosen primary_club is the Presidency, make it

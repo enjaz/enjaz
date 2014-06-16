@@ -175,7 +175,7 @@
 
 <div class="row">
 	<div class="col-md-12">
-		<div class="calendar-env">
+		<div class="calendar-env" dir="ltr"> <!-- It's problematic in rtl -->
 			<!-- Calendar Body -->
 			<div class="calendar-body">
 				<div id="calendar"></div>
@@ -185,18 +185,6 @@
 	</div>
 </div>
 
-<script>
-	var activities = [
-		{% for activity in page_activities %}
-		{
-			title : '{{ activity.name }}',
-			start : '{{ activity.get_first_date }}',
-			url   : '{{ activity.id }}/'
-		}{% if page_activities|length > forloop.counter %},{% endif %}
-		{% endfor %}
-	];
-</script>
-
 {% if user.is_authenticated %}
 </div>
 </div>
@@ -204,25 +192,54 @@
 </div>
 {% endif %}
 
-<script src="{% static 'neon/assets/js/fullcalendar/fullcalendar.min.js' %}"></script>
-<script src="{% static 'neon/assets/js/neon-calendar.js' %}"></script>
 <script>
-/*	$(document).ready(function () {
-		$('#calendar').fullCalendar({
-        	events: [
+	var activities = [
+		{% for activity in page_activities %}
+			{% for episode in activity.episode_set.all %}
 				{
-					title : 'أروع نشاط في العالم',
-					start : '2014-05-05',
-					url   : '/activities/1/'
-				}
-			]
-    	});
-}); */
+					title : '{{ activity.name }}',
+					start : '{{ episode.start_datetime.isoformat }}',
+					end   : '{{ episode.end_datetime.isoformat }}',
+					{% if not episode.is_single_day %}
+					allDay: true,
+					{% else %}
+					allDay: false,
+					{% endif %}
+					url   : '{{ activity.id }}/'
+				}{% if page_activities|length > forloop.counter %},{% endif %}
+			{% endfor %}
+		{% endfor %}
+	];
+</script>
+
+<script>
 	$(".calendar-env .calendar-sidebar").remove();
 </script>
 {% else %}
     <p>لا توجد أية نشاطات.</p>
 {% endif %}
 {% if not user.is_authenticated %}</div>{% endif %}
+{% endblock %}
+{% block customscript %}
+	<script src="{% static 'neon/assets/js/fullcalendar/fullcalendar.min.js' %}"></script>
+	<script>
+	var calendar = $('#calendar');
+				
+				calendar.fullCalendar({
+					header: {
+						left: 'title',
+						right: 'month,agendaWeek,agendaDay today prev,next'
+					},
+					
+					//defaultView: 'basicWeek',
+					
+					editable: false,
+					firstDay: 7,
+					height: 600,
+					droppable: false,
+					allDayDefault: false,
+					events: activities
+				});
+	</script>
 {% endblock %}
 

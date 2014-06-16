@@ -14,4 +14,3 @@ class ActivityAdmin(admin.ModelAdmin):
     inlines = [EpisodeInline]
     
 admin.site.register(Activity, ActivityAdmin)
-admin.site.register(Episode)

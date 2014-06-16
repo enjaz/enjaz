@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import datetime
 
 from clubs.models import College
 
@@ -62,7 +63,10 @@ class Activity(models.Model):
                 return False
         except (KeyError, Review.DoesNotExist): # deanship review does not exist
             return False 
-        
+    
+    def is_single_episode(self):
+        return self.episode_set.count() == 1
+    
     def get_first_date(self):
         return self.episode_set.all()[0].start_date
         
@@ -165,7 +169,7 @@ class Episode(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     
-    # Note: Dates and times should be interpreted as follows:
+    # Note #1: Dates and times should be interpreted as follows:
     # start_date and end_date indicate the dates on which the episode starts and ends, respectively
     # start_time and end_time indicate the start and finish times ON EACH OF THE DATES, rather
     # than for the whole episode
@@ -180,11 +184,25 @@ class Episode(models.Model):
     # Of course there is nothing by design to enforce this interpretation, but that's how
     # it's meant to be
     
+    # Note #2: When reading the dates as strings, especially for use with the neon calendar,
+    # make sure you format them in the ISO 8601 format. This done easily by calling
+    # [date_object].isoformat() (e.g. self.start_date.isoformat())
+    
     location = models.CharField(max_length=128)
     
     # In the future, as we add Google Calendar features, the calendar events will
     # be linked here
     # google_event = models.URLField()
     
-    def is_one_day(self):
+    def is_single_day(self):
         return self.start_date == self.end_date
+    
+    def day_count(self):
+        "Return the length of the episode in terms of days"
+        return (self.end_date - self.start_date).days
+    
+    def start_datetime(self):
+        return datetime.combine(self.start_date, self.start_time)
+    
+    def end_datetime(self):
+        return datetime.combine(self.end_date, self.end_time)

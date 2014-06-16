@@ -288,6 +288,10 @@
 	<script src="{% static 'neon-front/assets/js/resizeable.js' %}"></script>
 	<script src="{% static 'neon-front/assets/js/neon-slider.js' %}"></script>
 	<script src="{% static 'neon-front/assets/js/neon-custom.js' %}"></script>
+
+	{% block customscript %}
+	{% endblock %}	
+
 {% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
 	<!-- Piwik -->
 	<script type="text/javascript">

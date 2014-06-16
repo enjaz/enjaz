@@ -1113,7 +1113,7 @@ th {
   margin-right: 0;
   margin-left: 5px;
 }
-.calendar-env .calendar-body .fc-header .fc-header-right {
+/*.calendar-env .calendar-body .fc-header .fc-header-right {
   text-align: left;
 }
 .calendar-env .calendar-sidebar {
@@ -1154,7 +1154,7 @@ th {
 }
 .calendar-env .calendar-sidebar #add_event_form .input-group .form-control {
   border-right: 1px solid #ebebeb;
-}
+}*/
 .notes-env .notes-header > .right {
   text-align: left;
 }
@@ -1671,7 +1671,7 @@ body .cke_toolbar_break {
   .mail-env .mail-body .mail-info .mail-date.mail-date {
     text-align: right;
   }
-  .calendar-env .calendar-body {
+  /*.calendar-env .calendar-body {
     float: none;
-  }
+  }*/
 }

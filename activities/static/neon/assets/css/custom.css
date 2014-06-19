@@ -38,3 +38,9 @@ h1, h2, h3, h4, h5, h6, h7, .dinar-medium {
     font-family: "GE Dinar One",Arial;
     font-weight: lighter;
 }
+
+
+.login-page .login-form .form-group .english-field.input-group.validate-has-error .error {
+    right: 10px;
+    left: auto;
+}

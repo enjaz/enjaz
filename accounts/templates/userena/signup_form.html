@@ -5,23 +5,15 @@
 
 {% block content %}
 {% comment %}
-<div class="form-register-success visible dinar-light">
-	<i class="entypo-dot-3"></i>
-	<h3 class="dinar-medium">قريبًا</h3>
-	<p>بوابة إنجاز: مستقبل نادي الطلاب.</p>
-	<!-- <p>سوف تتمكن من الاستفادة منها مدة 7 أيام.</p> -->
-</div>
-{% endcomment %}
-
 {% if form.errors %}
 <div class="form-login-error visible dinar-light">
-	<h3 class="dinar-medium">عفوًا، نرجو التأكد من الحقول التالية</h3>
-	{% for err in form.errors %}
-	<p>{{ err }}</p>
-	{% endfor %}
+       <h3 class="dinar-medium">عفوًا، نرجو التأكد من الحقول التالية</h3>
+       {% for err in form.errors %}
+       <p>{{ err }}</p>
+       {% endfor %}
 </div>
 {% endif %}
-
+{% endcomment %}
 <form method="post" role="form" id="form_register">	
         {% csrf_token %}
 	<div class="dinar-light">
@@ -63,19 +55,19 @@
 					<input {% if form.en_first_name.value and not form.en_first_name.errors %}value="{{ form.en_first_name.value }}" {% endif %}type="text" class="form-control" name="en_first_name" id="en_first_name" placeholder="{{ form.en_first_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" />
 					{% if form.en_first_name.errors %}
 					    {% for error in form.en_first_name.errors %}
-					        <label class='error' for='en_first_name' style='display: inline-block'>{{ error|escape }}</label>
+					        <label class='dinar-light error' for='en_first_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 					<input {% if form.en_middle_name.value and not form.en_middle_name.errors %}value="{{ form.en_middle_name.value }}" {% endif %}type="text" class="form-control" name="en_middle_name" id="en_middle_name" placeholder="{{ form.en_middle_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" />
 					{% if form.en_middle_name.errors %}
 					    {% for error in form.en_middle_name.errors %}
-					        <label class='error' for='en_middle_name' style='display: inline-block'>{{ error|escape }}</label>
+					        <label class='dinar-light error' for='en_middle_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 					<input {% if form.en_last_name.value and not form.en_last_name.errors %}value="{{ form.en_last_name.value }}" {% endif %}type="text" class="form-control" name="en_last_name" id="en_last_name" placeholder="{{ form.en_last_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" />
 					{% if form.en_last_name.errors %}
 					    {% for error in form.en_last_name.errors %}
-					        <label class='error' for='en_last_name' style='display: inline-block'>{{ error|escape }}</label>
+					        <label class='dinar-light error' for='en_last_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 				</div>
@@ -90,7 +82,7 @@
 					<input {% if form.email.value and not form.email.errors %}value="{{ form.email.value }}" {% endif %}type="text" class="form-control" name="email" id="email" {% if not form.email.errors %}placeholder="البريد الإلكتروني الجامعي"{% endif %} data-mask="[a-zA-Z0-9]+@ksau-hs\.edu\.sa" data-is-regex="true" />
 					{% if form.email.errors %}
 					    {% for error in form.email.errors %}
-					        <label class='error' for='email' style='display: inline-block'>{{ error|escape }}</label>
+					        <label class='dinar-light error' for='email' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 				</div>

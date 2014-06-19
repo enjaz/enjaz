@@ -62,7 +62,7 @@ class Activity(models.Model):
             else:
                 return False
         except (KeyError, Review.DoesNotExist): # deanship review does not exist
-            return False 
+            return None 
     
     def is_single_episode(self):
         return self.episode_set.count() == 1
@@ -185,7 +185,7 @@ class Episode(models.Model):
     # it's meant to be
     
     # Note #2: When reading the dates as strings, especially for use with the neon calendar,
-    # make sure you format them in the ISO 8601 format. This done easily by calling
+    # make sure you format them in the ISO 8601 format. This is done easily by calling
     # [date_object].isoformat() (e.g. self.start_date.isoformat())
     
     location = models.CharField(max_length=128)

@@ -33,7 +33,7 @@
   </tr>{% endif %}
   <tr>
     <th>التاريخ والوقت</th>
-    <td>{% if activity.date %}{{ activity.date|date:"j F Y" }}<br/>{{ activity.time }}{% else %}{{ activity.custom_datetime }}{% endif %}</td>
+    <td>{{ activity.get_first_date|date:"j F Y" }}<br/>{{ activity.get_first_time }}</td>
     <td>{{ review.datetime_notes }}</td>
   </tr>
   <tr>

@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, date
 
 from django.contrib.auth.decorators import permission_required, login_required
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.forms import ModelForm, ModelChoiceField, ModelMultipleChoiceField
 from django import forms
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -52,7 +52,7 @@ class ActivityForm(ModelForm):
         # is passed.
         instance = kwargs.get('instance', None)
                 
-        # Initialize the form and set the value of the hidden field to the episode count
+        # Initialize the form
         super(ActivityForm, self).__init__(*args, **kwargs)
         
         # Determine how many episodes there are:
@@ -68,6 +68,7 @@ class ActivityForm(ModelForm):
         # In any case, the episode count should be at least 1
         if episode_count < 1: episode_count = 1
         
+        #  Set the value of the hidden field to the episode count
         self.fields['episode_count'].initial = episode_count
         
         # If an instance is passed and is saved (has a pk), load its episodes
@@ -212,10 +213,9 @@ def portal_home(request):
             context = {'launch': True}
         return render(request, 'front/home_front.html', context)
 
-#@login_required
 def list(request):
     # If the user is part of the head of the Student Club, or part of
-    # the Media Team, they should be able to view all activities
+    # the Media Center, they should be able to view all activities
     # (i.e. approved, rejected and pending).  Otherwise, a user should
     # only see approved activities and the activities of the clubs
     # they have memberships in (regardless of their status).
@@ -275,52 +275,69 @@ def show(request, activity_id):
     # only the head of the Student Club, the Media Team, the members
     # of the related clubs and the person who submitted it can see it.
     activity = get_object_or_404(Activity, pk=activity_id)
+    
     context = {'activity': activity}
+    # The activity object is the only thing that should be in the context  [Saeed, 17 Jun 2014]
+    
     if request.user.is_authenticated():
         user_clubs = request.user.memberships.all() | request.user.coordination.all()
         is_coordinator = activity.primary_club in request.user.coordination.all()
 
-        if request.user.has_perm('activities.change_activity') or \
-           is_coordinator:
-            context['can_edit'] = True
-        if request.user.has_perm('activities.view_participation') or \
-           is_coordinator:
-            context['can_view_participation'] = True
-        if request.user.has_perm('activities.can_view_deanship_review') or \
-           is_coordinator:
-            context['can_view_deanship_review'] = True
-        if request.user.has_perm('activities.can_view_presidency_review') or \
-           is_coordinator:
-            context['can_view_presidency_review'] = True
-            try:
-                review_p = Review.objects.get(activity=activity,
-                                              review_type='P')
-                context['review_p'] = review_p
-            except ObjectDoesNotExist:
-                pass
+#        By definition, the coordinator should have all the below-mentioned
+#        permissions; all we need is use {{ perms }} from within the template
+#        [Saeed, 17 Jun 2014]
+#
+#         if request.user.has_perm('activities.change_activity') or \
+#            is_coordinator:
+#             context['can_edit'] = True
+#         if request.user.has_perm('activities.view_participation') or \
+#            is_coordinator:
+#             context['can_view_participation'] = True
+#         if request.user.has_perm('activities.can_view_deanship_review') or \
+#            is_coordinator:
+#             context['can_view_deanship_review'] = True
+#         if request.user.has_perm('activities.can_view_presidency_review') or \
+#            is_coordinator:
+#             context['can_view_presidency_review'] = True
+#
+#            Everything related to viewing or adding reviews is now moved to the review
+#            view, which is more logical and neat [Saeed, 17 Jun 2014]
+#
+#             try:
+#                 review_p = Review.objects.get(activity=activity,
+#                                               review_type='P')
+#                 context['review_p'] = review_p
+#             except ObjectDoesNotExist:
+#                 pass
     else:
-        user_clubs = Activity.objects.none()
+        user_clubs = Club.objects.none()
 
     activity_primary_club = activity.primary_club
     activity_secondary_clubs = activity.secondary_clubs.all()
     activity_clubs = [activity_primary_club] + [club for club in activity_secondary_clubs]
 
-    # We obtain the deanship review specifically because, really,
-    # that's what matters in determining whether a user can see the
-    # activity.
-    try:
-        review_d = Review.objects.get(activity=activity,
-                                      review_type='D')
-        context['review_d'] = review_d
-    except ObjectDoesNotExist:
-        review_d = False
+#    Again, everything related to reviews is moved to the review view
+#    [Saeed, 17 Jun 2014]
+#     
+#     # We obtain the deanship review specifically because, really,
+#     # that's what matters in determining whether a user can see the
+#     # activity.
+#     try:
+#         review_d = Review.objects.get(activity=activity,
+#                                       review_type='D')
+#         context['review_d'] = review_d
+#     except ObjectDoesNotExist:
+#         review_d = False
+#     
+#    This is redundant, since the Activity model has an is_approved()
+#    funtion which can be called directly from the template [Saeed, 17 Jun 2014]
+#     try:
+#         # The important review here is the deanship's, beacuse that
+#         # what would determine whether the activity is accessible.
+#         activity_status = review_d
+#     except ObjectDoesNotExist:
+#         activity_status = False
 
-    try:
-        # The important review here is the deanship's, beacuse that
-        # what would determine whether the activity is accessible.
-        activity_status = review_d
-    except ObjectDoesNotExist:
-        activity_status = False
 
     # The third test condition, that is:
     #   any([club in activity_clubs for club in user_clubs])
@@ -328,13 +345,18 @@ def show(request, activity_id):
     #  orginizing the activity that the user is trying to see.  If
     #  will be True if any club is one of the organizers and it will
     #  be False if none is.
-    if not activity_status and \
+    if not activity.is_approved() and \
        not request.user.has_perm('activities.view_activity') and \
        not any([club in activity_clubs for club in user_clubs]) and \
        not request.user == activity.submitter:
         raise PermissionDenied
 
-    return render(request, 'activities/show.html', context)
+#    We can check for the permissions from within the template [Saeed, 17 Jun 2014]
+#     if request.user.has_perm('activities.add_presidency_review') or \
+#        request.user.has_perm('activities.add_deanship_review'):
+#         context['can_review'] = True
+
+    return render(request, 'activities/show_new.html', context)
 
 @login_required
 @permission_required('activities.add_activity', raise_exception=True)
@@ -343,9 +365,9 @@ def create(request):
     if request.method == 'POST':
         activity = Activity(submitter=request.user)
         if request.user.has_perm('activities.directly_add_activity'):
-            form = DirectActivityForm(request.POST, instance=activity) #, episode_count=request.POST['episode_count'])
+            form = DirectActivityForm(request.POST, instance=activity)
         else:
-            form = ActivityForm(request.POST, instance=activity) #, episode_count=request.POST['episode_count'])
+            form = ActivityForm(request.POST, instance=activity)
         if form.is_valid():
             form_object = form.save()
             # If the chosen primary_club is the Presidency, make it
@@ -408,7 +430,9 @@ def edit(request, activity_id):
         # TODO: actually edits should be approved first by presidency and deanship
         if modified_activity.is_valid():
             modified_activity.save()
-            return HttpResponseRedirect(reverse('activities:list'))
+            return HttpResponseRedirect(reverse('activities:show',
+                                                args=(activity.pk, ))
+                                        )
         else:
             context = {'form': modified_activity, 'activity_id': activity_id,
                        'edit': True}
@@ -420,18 +444,47 @@ def edit(request, activity_id):
         return render(request, 'activities/new.html', context)
 
 @login_required
-def review(request, activity_id):
+def review(request, activity_id, type=None):
     activity = get_object_or_404(Activity, pk=activity_id)
 
     # We have two types of reviews: the one that is submitted by the
     # presidency (first), and the one that is done by the deanship.
-    if request.user.has_perm('activities.add_presidency_review'):
-        review_type = 'P'
-    elif request.user.has_perm('activities.add_deanship_review'):
-        review_type = 'D'
-    else:
-        raise PermissionDenied
+#     if request.user.has_perm('activities.add_presidency_review'):
+#         review_type = 'P'
+#     elif request.user.has_perm('activities.add_deanship_review'):
+#         review_type = 'D'
+#     else:
+#         raise PermissionDenied
 
+    if type == None:
+        # If the user has any permission (read or write) related to the deanship review,
+        # redirect to review/d/. Otherwise, if the user has any permission (read or write)
+        # related to the presidency review, redirect to review/p/
+        # Otherwise, raise PermissionDenied
+        if request.user.has_perm('activities.add_deanship_review') or \
+           request.user.has_perm('activities.view_deanship_review'):
+            return HttpResponseRedirect(reverse('activities:review_with_type',
+                                                args=(activity_id, 'd')))
+            
+        elif request.user.has_perm('activities.add_presidency_review') or \
+             request.user.has_perm('activities.view_presidency_review'):
+            return HttpResponseRedirect(reverse('activities:review_with_type',
+                                                args=(activity_id, 'p')))
+        else:
+            raise PermissionDenied
+        
+    elif type == 'p' or type == 'd':
+        review_type = type.upper()
+    else:
+        raise Http404
+    
+    # Review Type Full
+    rt_full = {'P': 'presidency', 'D': 'deanship'}[review_type]
+    
+    # Permission checks moved down (GET requests).
+    # As for POST, it's not necessary because the permission check will already have
+    # been done before serving the form page; in addition, CSRF token will prevent any
+    # spam. [Saeed 18 Jun 2014]
     if request.method == 'POST':
         try: # If the review is already there, edit it.
             review_object = Review.objects.get(activity=activity,
@@ -448,16 +501,34 @@ def review(request, activity_id):
                 activity.save()
             return HttpResponseRedirect(reverse('activities:show',
                                                 args=(activity_id,)))
-    else:
-        try: # If the review is already there, edit it.
-            review_object = Review.objects.get(activity=activity,
-                                               review_type=review_type)
-            review = ReviewForm(instance=review_object)
-        except ObjectDoesNotExist:
-            review = ReviewForm()
-    context = {'activity': activity,'review': review, 'review_type':
-               review_type}
-    return render(request, 'activities/review.html', context)
+    else: # if not POST
+        # If the user has the permission to add a review of the corresponding type
+        # then return the review form page to add or edit the review
+        # Else, if if they have the permission to read, then return the review read page
+        # Otherwise, raise PermissionDenied
+        if request.user.has_perm('activities.add_' + rt_full + '_review'):
+            template = 'activities/review_write.html'
+            try: # If the review is already there, edit it.
+                review_object = Review.objects.get(activity=activity,
+                                                   review_type=review_type)
+                review = ReviewForm(instance=review_object)
+            except ObjectDoesNotExist:
+                review = ReviewForm()
+                # Note 1: Here, review is a ReviewForm object, because we want to write
+        
+        elif request.user.has_perm('activities.view_' + rt_full + '_review'):
+            template = 'activities/review_read.html'
+            try:
+                review = Review.objects.get(activity=activity,
+                                            review_type=review_type)
+                # Note 2: Here, review is a Review object, because we just want to read
+            except ObjectDoesNotExist:
+                review = None
+        else:
+            raise PermissionDenied
+        
+    context = {'activity': activity, 'active_tab': rt_full, 'review': review}
+    return render(request, template, context)
 
 @login_required
 def participate(request, activity_id):

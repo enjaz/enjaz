@@ -14,9 +14,17 @@ class SignupFormExtra(SignupForm):
 
 
     """
-    first_name = forms.CharField(label=u'الاسم الأول',
+    ar_first_name = forms.CharField(label=u'الاسم الأول',
                                 max_length=30)
-    last_name = forms.CharField(label=u'الاسم الأخير',
+    ar_middle_name = forms.CharField(label=u'الاسم الأوسط',
+                                max_length=30)
+    ar_last_name = forms.CharField(label=u'الاسم الأخير',
+                                max_length=30)
+    en_first_name = forms.CharField(label=u'الاسم الأول',
+                                max_length=30)
+    en_middle_name = forms.CharField(label=u'الاسم الأوسط',
+                                max_length=30)
+    en_last_name = forms.CharField(label=u'الاسم الأخير',
                                 max_length=30)
     student_id = forms.IntegerField(label=u'الرقم الجامعي')
     section = forms.CharField(label=u"القسم", max_length=2, widget=forms.Select(choices=section_choices))
@@ -33,15 +41,6 @@ class SignupFormExtra(SignupForm):
         # We don't want usernames (We could have inherited userena's
         # SignupFormOnlyEmail, but it's more tricky to modify.)
         del self.fields['username']
-        # Put the first and last name at the top 
-        new_order = self.fields.keyOrder[:-6]
-        new_order.insert(0, 'first_name')
-        new_order.insert(1, 'last_name')
-        new_order.insert(2, 'student_id')
-        new_order.insert(3, 'section')
-        new_order.insert(4, 'college')
-        self.fields.keyOrder = new_order
-        self.fields['password1'].label = u'كلمة السر' # It isn't not translated in userena.
 
     def clean(self):
         # Call the parent class's clean function.
@@ -97,8 +96,12 @@ class SignupFormExtra(SignupForm):
 
         # Append the extra fields
         user_profile = new_user.get_profile()
-        user_profile.first_name = self.cleaned_data['first_name']
-        user_profile.last_name = self.cleaned_data['last_name']
+        user_profile.ar_first_name = self.cleaned_data['ar_first_name']
+        user_profile.ar_middle_name = self.cleaned_data['ar_middle_name']
+        user_profile.ar_last_name = self.cleaned_data['ar_last_name']
+        user_profile.en_first_name = self.cleaned_data['en_first_name']
+        user_profile.en_middle_name = self.cleaned_data['en_middle_name']
+        user_profile.en_last_name = self.cleaned_data['en_last_name']
         user_profile.student_id = self.cleaned_data['student_id']
         user_college = College.objects.get(
             college_name=self.cleaned_data['college'],

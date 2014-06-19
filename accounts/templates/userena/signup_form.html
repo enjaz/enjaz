@@ -25,32 +25,57 @@
 <form method="post" role="form" id="form_register">	
         {% csrf_token %}
 	<div class="dinar-light">
-		
 			<div class="form-group">
-				<div class="input-group{% if form.first_name.errors %} validate-has-error{% endif %}">
+                                <label class="control-label">الاسم بالعربية</label>
+				<div class="input-group{% if form.ar_first_name.errors or form.ar_middle_name.errors or form.ar_last_name.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-user"></i>
 					</div>
 					
-					<input {% if form.first_name.value and not form.first_name.errors %}value="{{ form.first_name.value }}" {% endif %}type="text" class="form-control" name="first_name" id="first_name" placeholder="الاسم الأول"  />
-					{% if form.first_name.errors %}
-					    {% for error in form.first_name.errors %}
-					        <label class='error' for='first_name' style='display: inline-block'>{{ error|escape }}</label>
+					<input {% if form.ar_first_name.value and not form.ar_first_name.errors %}value="{{ form.ar_first_name.value }}" {% endif %}type="text" class="form-control" name="ar_first_name" id="ar_first_name" placeholder="{{ form.ar_first_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" />
+					{% if form.ar_first_name.errors %}
+					    {% for error in form.ar_first_name.errors %}
+					        <label class='error' for='ar_first_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if form.ar_middle_name.value and not form.ar_middle_name.errors %}value="{{ form.ar_middle_name.value }}" {% endif %}type="text" class="form-control" name="ar_middle_name" id="ar_middle_name" placeholder="{{ form.ar_middle_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" />
+					{% if form.ar_middle_name.errors %}
+					    {% for error in form.ar_middle_name.errors %}
+					        <label class='error' for='ar_middle_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if form.ar_last_name.value and not form.ar_last_name.errors %}value="{{ form.ar_last_name.value }}" {% endif %}type="text" class="form-control" name="ar_last_name" id="ar_last_name" placeholder="{{ form.ar_last_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" />
+					{% if form.ar_last_name.errors %}
+					    {% for error in form.ar_last_name.errors %}
+					        <label class='error' for='ar_last_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 				</div>
 			</div>
-			
+
 			<div class="form-group">
-				<div class="input-group{% if form.last_name.errors %} validate-has-error{% endif %}">
+                                <label class="control-label">الاسم بالإنجليزية</label>
+				<div class="input-group{% if form.en_first_name.errors or form.en_middle_name.errors or form.en_last_name.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-user"></i>
 					</div>
 					
-					<input {% if form.last_name.value and not form.last_name.errors %}value="{{ form.last_name.value }}" {% endif %}type="text" class="form-control" name="last_name" id="last_name" placeholder="الاسم الأخير" />
-					{% if form.last_name.errors %}
-					    {% for error in form.last_name.errors %}
-					        <label class='error' for='last_name' style='display: inline-block'>{{ error|escape }}</label>
+					<input {% if form.en_first_name.value and not form.en_first_name.errors %}value="{{ form.en_first_name.value }}" {% endif %}type="text" class="form-control" name="en_first_name" id="en_first_name" placeholder="{{ form.en_first_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" />
+					{% if form.en_first_name.errors %}
+					    {% for error in form.en_first_name.errors %}
+					        <label class='error' for='en_first_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if form.en_middle_name.value and not form.en_middle_name.errors %}value="{{ form.en_middle_name.value }}" {% endif %}type="text" class="form-control" name="en_middle_name" id="en_middle_name" placeholder="{{ form.en_middle_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" />
+					{% if form.en_middle_name.errors %}
+					    {% for error in form.en_middle_name.errors %}
+					        <label class='error' for='en_middle_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if form.en_last_name.value and not form.en_last_name.errors %}value="{{ form.en_last_name.value }}" {% endif %}type="text" class="form-control" name="en_last_name" id="en_last_name" placeholder="{{ form.en_last_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" />
+					{% if form.en_last_name.errors %}
+					    {% for error in form.en_last_name.errors %}
+					        <label class='error' for='en_last_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 				</div>
@@ -77,7 +102,7 @@
 						<i class="entypo-graduation-cap"></i>
 					</div>
 					
-					<input {% if form.student_id.value and not form.student_id.errors %}value="{{ form.student_id.value }}" {% endif %}type="text" class="form-control" name="student_id" id="student_id" placeholder="الرقم الجامعي" data-mask="\d+" data-is-regex="true" />
+					<input {% if form.student_id.value and not form.student_id.errors %}value="{{ form.student_id.value }}" {% endif %}type="text" class="form-control" name="student_id" id="student_id" placeholder="{{ form.student_id.label }}" data-mask="\d+" data-is-regex="true" />
 					{% if form.student_id.errors %}
 					    {% for error in form.student_id.errors %}
 					        <label class='error' for='student_id' style='display: inline-block'>{{ error|escape }}</label>
@@ -141,12 +166,13 @@
 			</div> -->
 			
 			<div class="form-group">
-				<div class="input-group{% if form.password.errors %} validate-has-error{% endif %}">
+				<div class="input-group{% if form.password1.errors or form.password2.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-key"></i>
 					</div>
 					
-					<input type="password" class="form-control" name="password1" id="password" placeholder="اختر كلمة سر" autocomplete="off" />
+					<input type="password" class="form-control" name="password1" id="password1" placeholder="اختر كلمة سر" autocomplete="off" />
+					<input type="password" class="form-control" name="password2" id="password2" placeholder="أكّد كلمة السر" autocomplete="off" />
 				</div>
 			</div>
 			

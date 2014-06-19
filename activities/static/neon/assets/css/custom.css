@@ -4,6 +4,37 @@
  *
 */
 
-body {
-	
+@import url(https://fonts.googleapis.com/css?family=Roboto);
+
+@font-face {
+    font-family: 'GE Dinar One';
+    font-weight: lighter;
+    font-size: xx-large;
+    src: url("../../../fonts/ge-dinar-one-light.woff");
+}
+@font-face {
+    font-family: 'GE Dinar One';
+    font-weight: normal;
+    src: url("../../../fonts/ge-dinar-one-med.woff");
+}
+
+.sidebar-menu #main-menu li, .main-content .user-info li a, body {
+	font-family: "GE Dinar One", Arial;
+	font-weight: lighter;
+}
+
+h1, h2, h3, h4, h5, h6, h7, .dinar-medium {
+    font-family: "GE Dinar One", Arial;
+    font-weight: normal;
+}
+
+.english-field {
+    direction: ltr;
+    text-algin: left;
+    font-family: 'Roboto', sans-serif;
+}
+
+.dinnar-light {
+    font-family: "GE Dinar One",Arial;
+    font-weight: lighter;
 }

@@ -30,12 +30,18 @@ class Club(models.Model):
                                     blank=True,
                                     verbose_name=u"المنسق",
                                     related_name="coordination",
+                                    on_delete=models.SET_NULL,
                                     # To exclude AnonymousUser
                                     limit_choices_to={'pk__gt': -1})
     members = models.ManyToManyField(User, null=True,
                                      verbose_name=u"الأعضاء",
                                      blank=True,
                                      related_name="memberships")
+    employee = models.ForeignKey(User, null=True, blank=True,
+                                 related_name="employee",
+                                 on_delete=models.SET_NULL,
+                                 default=None,
+                                 verbose_name=u"الموظف المسؤول")
     open_membership = models.BooleanField(default=False,
                                                verbose_name=u"اسمح بالتسجيل؟")
     creation_date = models.DateTimeField('date created',

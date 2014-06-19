@@ -69,7 +69,7 @@ class BookRequestForm(ModelForm):
 
 def get_gender(user):
     try:
-        section = user.my_profile.college.section
+        section = user.enjaz_profile.college.section
     except (ObjectDoesNotExist, AttributeError):
         # If the user was auto-generated, it will raise this
         # error.  Let's assume the user is male.

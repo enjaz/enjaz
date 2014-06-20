@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from django.contrib.admin.sites import AdminSite
 from userena.admin import UserenaAdmin
 
-from clubs.models import Club
+from clubs.models import Club, college_choices, section_choices
 
 
 class DeanshipAuthenticationForm(admin.forms.AdminAuthenticationForm):
@@ -29,6 +29,16 @@ original Django code."""
             elif not self.user_cache.has_perm('deanship_employee'):
                 raise forms.ValidationError(message, code='invalid', params=params)
         return self.cleaned_data
+
+class DeanshipAdmin(AdminSite):
+    """This admin website is for the Studnet Affairs Deanship employees
+to modify user permissions (e.g. who is the coordinator of which
+club)."""
+
+    login_form = DeanshipAuthenticationForm
+
+    def has_permission(self, request):
+        return request.user.has_perm('deanship_employee')
 
 def remove_add_code_perm(modeladmin, request, queryset):
     add_code = Permission.objects.get(codename='add_code')
@@ -51,25 +61,61 @@ def remove_add_bookrequest_perm(modeladmin, request, queryset):
         user.save()
 remove_add_bookrequest_perm.short_description = u"امنع من طلب استعارة الكتب"
 
-class DeanshipAdmin(AdminSite):
-    """This admin website is for the Studnet Affairs Deanship employees
-to modify user permissions (e.g. who is the coordinator of which
-club)."""
+class EmployeeFilter(admin.SimpleListFilter):
+    title = u"عمادة شؤون الطلاب"
+    parameter_name = 'is_employee'
+    def lookups(self, request, model_admin):
+        return (
+            ('1', u'موظف'),
+            ('0', u'ليس موظف'),
+        )
 
-    login_form = DeanshipAuthenticationForm
+    def queryset(self, request, queryset):
+        if self.value() == '1':
+            return queryset.filter(user_permissions__codename='deanship_employee')
+        if self.value() == '0':
+            return queryset.exclude(user_permissions__codename='deanship_employee')
 
-    def has_permission(self, request):
-        """
-        Removed check for is_staff.
-        """
-        return request.user.has_perm('')
+class CoordinatorFilter(admin.SimpleListFilter):
+    title = u"تنسيق الأندية"
+    parameter_name = 'is_coordinator'
+    def lookups(self, request, model_admin):
+        return (
+            ('1', u'منسق'),
+            ('0', u'ليس منسق'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == '1':
+            return queryset.exclude(coordination__isnull=True)
+        if self.value() == '0':
+            return queryset.filter(coordination__isnull=True)
+
+class CollegeFilter(admin.SimpleListFilter):
+    title = u"كلية الطالب"
+    parameter_name = 'college'
+    def lookups(self, request, model_admin):
+        return college_choices
+
+    def queryset(self, request, queryset):
+        return queryset.filter(enjaz_profile__college__college_name=self.value())
+
+class SectionFilter(admin.SimpleListFilter):
+    title = u"قسم الطالب"
+    parameter_name = 'section'
+    def lookups(self, request, model_admin):
+        return section_choices
+
+    def queryset(self, request, queryset):
+        return queryset.filter(enjaz_profile__college__section=self.value())
 
 class ModifiedUserAdmin(UserenaAdmin):
     """This changes the way the admin websites (both the main and deanship
 ones) deal with the User model."""
     actions = [remove_add_code_perm, remove_add_bookrequest_perm,
                remove_add_book_perm]
-    list_display = ('username', 'full_en_name', 'email', 'is_coordinator')
+    list_display = ('username', 'full_en_name', 'email', 'is_coordinator', 'is_employee')
+    list_filter = (EmployeeFilter, CoordinatorFilter,CollegeFilter, SectionFilter)
 
     def is_coordinator(self, obj):
         if obj.coordination.all():
@@ -78,6 +124,14 @@ ones) deal with the User model."""
             return False
     is_coordinator.boolean = True
     is_coordinator.short_description = u"منسق؟"
+
+    def is_employee(self, obj):
+        if obj.user_permissions.filter(codename='deanship_employee'):
+            return True
+        else:
+            return False
+    is_employee.boolean = True
+    is_employee.short_description = u"موظف؟"
 
     def full_en_name(self, obj):
         fullname = ""

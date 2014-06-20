@@ -41,7 +41,8 @@ class Club(models.Model):
                                  related_name="employee",
                                  on_delete=models.SET_NULL,
                                  default=None,
-                                 verbose_name=u"الموظف المسؤول")
+                                 verbose_name=u"الموظف المسؤول",
+                                 limit_choices_to={'user_permissions__codename': 'deanship_employee'})
     open_membership = models.BooleanField(default=False,
                                                verbose_name=u"اسمح بالتسجيل؟")
     creation_date = models.DateTimeField('date created',

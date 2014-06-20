@@ -43,6 +43,13 @@ class Club(models.Model):
                                  default=None,
                                  verbose_name=u"الموظف المسؤول",
                                  limit_choices_to={'user_permissions__codename': 'deanship_employee'})
+    # To make it easy to make it specific to a certain college
+    # (e.g. for membership), let's add this field.  That's also one
+    # way to filter sub-clubs and college clubs.
+    college = models.ForeignKey('College', null=True, blank=True,
+                                 on_delete=models.SET_NULL,
+                                 default=None,
+                                 verbose_name=u"الكلية",)
     open_membership = models.BooleanField(default=False,
                                                verbose_name=u"اسمح بالتسجيل؟")
     creation_date = models.DateTimeField('date created',

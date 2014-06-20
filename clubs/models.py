@@ -5,8 +5,8 @@ from django.contrib.auth.models import User
 section_choices = (
     ('M', u'طلاب'),
     ('F', u'طالبات'),
-    ('KM', u'طلاب مدينة الملك فهد'),
-    ('KF', u'طالبات مدينة الملك فهد'),
+    ('KM', u'طلاب مدينة الملك فهد الطبية'),
+    ('KF', u'طالبات مدينة الملك فهد الطبية'),
 )
 college_choices = (
     ('M', u'كلية الطب'),

@@ -3,7 +3,7 @@ from django import forms
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import User, Permission, Group
 from django.contrib.auth import authenticate
 from django.contrib.admin.sites import AdminSite
 from userena.admin import UserenaAdmin
@@ -19,14 +19,17 @@ original Django code."""
         password = self.cleaned_data.get('password')
         message = admin.forms.ERROR_MESSAGE
         params = {'username': self.username_field.verbose_name}
+        deanship_group = Group.objects.get(name='deanship')
 
         if username and password:
             self.user_cache = authenticate(username=username, password=password)
             if self.user_cache is None:
                 raise forms.ValidationError(message, code='invalid', params=params)
-            # If the user isn't a deanship employee, they must not be
-            # able to use the deanship admin interface.
-            elif not self.user_cache.has_perm('deanship_employee'):
+            # If the user isn't a deanship employee and isn't a system
+            # administrator, they must not be able to use the deanship
+            # admin interface.
+            elif not deanship_group in self.user_cache.groups.all() and\
+                 not self.user_cache.is_superuser:
                 raise forms.ValidationError(message, code='invalid', params=params)
         return self.cleaned_data
 

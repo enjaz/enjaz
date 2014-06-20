@@ -26,7 +26,10 @@ class SignupFormExtra(SignupForm):
                                 max_length=30)
     en_last_name = forms.CharField(label=u'الاسم الأخير',
                                 max_length=30)
+    badge_number = forms.IntegerField(label=u'رقم البطاقة')
     student_id = forms.IntegerField(label=u'الرقم الجامعي')
+    # Since it starts with a zero, store it as a string.
+    mobile_number = forms.CharField(label=u'رقم الجوال')
     section = forms.CharField(label=u"القسم", max_length=2, widget=forms.Select(choices=section_choices))
     college = forms.CharField(label=u"الكلية", max_length=1, widget=forms.Select(choices=college_choices))
 
@@ -56,6 +59,20 @@ class SignupFormExtra(SignupForm):
             email_msg = u"أدخل عنوانا جامعيا"
             self._errors['email'] = self.error_class([email_msg])
             del cleaned_data['email']
+
+        # Make sure that the mobile numbers contain only digits and
+        # pluses:
+        if 'mobile_number' in cleaned_data:
+            mobile_number_msg = ""
+            if len(cleaned_data['mobile_number']) < 10:
+                mobile_number_msg = u"الرقم الذي أدخلت ناقص"
+            for char in cleaned_data['mobile_number']:
+                if not char in '1234567890+':
+                    mobile_number_msg = u"أدخل أرقاما فقط"
+                    break
+            if mobile_number_msg:
+                self._errors['mobile_number'] = self.error_class([mobile_number_msg])
+                del cleaned_data['mobile_number']
 
         # Make sure that the college/section choice is actually valid.
         try:
@@ -102,7 +119,9 @@ class SignupFormExtra(SignupForm):
         user_profile.en_first_name = self.cleaned_data['en_first_name']
         user_profile.en_middle_name = self.cleaned_data['en_middle_name']
         user_profile.en_last_name = self.cleaned_data['en_last_name']
+        user_profile.badge_number = self.cleaned_data['badge_number']
         user_profile.student_id = self.cleaned_data['student_id']
+        user_profile.mobile_number = self.cleaned_data['mobile_number']
         user_college = College.objects.get(
             college_name=self.cleaned_data['college'],
             section=self.cleaned_data['section'])

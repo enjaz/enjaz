@@ -3,18 +3,18 @@ $(function() {
     // set the font accordingly.
     $('.english-field input').each(function(){
 	if($(this).val().length == 0){
-	    $(this).addClass('dinnar-light');
+	    $(this).addClass('dinar-light');
 	}else{
-	    $(this).removeClass('dinnar-light');
+	    $(this).removeClass('dinar-light');
 	}
     });
     // Watch the input fields for any changes and set the font
     // accordingly.
     $('.english-field input').on('keypress keyup',function(){
         if($(this).val().length == 0){
-            $(this).addClass('dinnar-light');
+            $(this).addClass('dinar-light');
         }else{
-            $(this).removeClass('dinnar-light');
+            $(this).removeClass('dinar-light');
         }
     });
 });

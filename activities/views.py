@@ -172,7 +172,8 @@ class ReviewForm(ModelForm):
         fields = ['clubs_notes', 'name_notes', 'description_notes',
                   'datetime_notes', 'requirement_notes',
                   'inside_notes', 'outside_notes',
-                  'organizers_notes', 'participants_notes', 'is_approved']
+                  'organizers_notes', 'participants_notes',
+                  'is_approved', 'submission_date_notes']
 
 def portal_home(request):
     # If the user is logged in, return the admin dashboard;
@@ -527,7 +528,8 @@ def review(request, activity_id, type=None):
         else:
             raise PermissionDenied
         
-    context = {'activity': activity, 'active_tab': rt_full, 'review': review}
+    context = {'activity': activity, 'active_tab': rt_full,
+               'review': review, 'review_type': review_type}
     return render(request, template, context)
 
 @login_required

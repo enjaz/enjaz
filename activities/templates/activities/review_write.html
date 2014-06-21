@@ -1,14 +1,174 @@
 {% extends 'activities/show_new.html' %}
 {% block review_content %}
-<div class="panel panel-primary panel-shadow" data-collapsed="0">		
+<div class="panel panel-default panel-shadow" data-collapsed="0">		
 	<!-- panel body -->
-	<div class="panel-body">
+	<div class="panel-body with-table">
 		
-		<p>Difficulty on insensible reasonable in. From as went he they. Preference themselves me as thoroughly partiality considered on in estimating. Middletons acceptance discovered projecting so is so or. In or attachment inquietude remarkably comparison at an. Is surrounded prosperous stimulated am me discretion expression. But truth being state can she china widow. Occasional preference fat remarkably now projecting uncommonly dissimilar. Sentiments projection particular companions interested do at my delightful. Listening newspaper in advantage frankness to concluded unwilling.</p>
-
-		<p>It if sometimes furnished unwilling as additions so. Blessing resolved peculiar fat graceful ham. Sussex on at really ladies in as elinor. Sir sex opinions age properly extended. Advice branch vanity or do thirty living. Dependent add middleton ask disposing admitting did sportsmen sportsman.</p>
+		<table class="table table-bordered table-responsive">
+		<form action="{% url 'activities:review_with_type' activity.pk review_type|lower %}" method="post">
+		{% csrf_token %}
+		<colgroup>
+			<col class="col-md-2">
+			<col class="col-md-4">
+			<col class="col-md-6">
+		</colgroup>
+		<thead>
+			<tr>
+				<th colspan="2"></th>
+				<th>الملاحظات</th>
+			</tr>
+		</thead>
 		
+		<tbody>
+			<tr>
+				<th>اسم النشاط</th>
+				<td>{{ activity.name }}</td>
+				<td>{{ review.name_notes }}</td>
+			</tr>
+			
+			<tr>
+				<th>وصف النشاط</th>
+				<td>{{ activity.description }}</td>
+				<td>{{ review.description_notes }}</td>
+			</tr>
+			
+			<tr>
+				<th>النادي المنظم</th>
+				<td>
+					<a href="{% url 'clubs:show' activity.primary_club.pk %}">
+						{{ activity.primary_club }}
+					</a>
+				</td>
+				<td rowspan="2">{{ review.clubs_notes }}</td>
+			</tr>
+			<tr>
+				<th>الأندية المتعاونة</th>
+				<td>
+					{% if activity.secondary_clubs.all %}
+					    <ul>
+					    {% for club in activity.secondary_clubs.all %}
+					    <li><a href="{% url 'clubs:show' club.pk %}">{{ club.name }}</a></li>
+					    {% endfor %}
+					    </ul>
+					{% else %}
+						لا يوجد.
+					{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>المواعيد</th>
+				<td>
+					<ul class="list-unstyled">
+					{% for episode in activity.episode_set.all %}
+					<li>
+						<div class="row">
+						<a href="#">
+							<div>
+								<i class="entypo-calendar"></i>
+								{{ episode.start_date }}
+								-
+								{{ episode.end_date }}
+							</div>
+							<div>
+								<i class="entypo-clock"></i>
+								{{ episode.start_time }}
+								-
+								{{ episode.end_time }}
+							</div>
+							<div>
+								<i class="entypo-location"></i>
+								{{ episode.location }}
+							</div>
+						</a>
+						</div>
+					</li>
+					{% endfor %}
+					</ul>
+				</td>
+				<td>
+					{{ review.datetime_notes }}
+				</td>
+			</tr>
+			<tr>
+				<th>الجهات المشاركة من داخل الجامعة</th>
+				<td>
+					{% if activity.inside_collaborators %}
+						{{ activity.inside_collaborators }}
+					{% else %}
+						لا يوجد.
+					{% endif %}
+				</td>
+				<td>{{ review.inside_notes }}</td>
+			</tr>
+			<tr>
+				<th>الجهات المشاركة من خارج الجامعة</th>
+				<td>
+					{% if activity.outside_collaborators %}
+						{{ activity.outside_collaborators }}
+					{% else %}
+						لا يوجد.
+					{% endif %}
+				</td>
+				<td>{{ review.outside_notes }}</td>
+			</tr>
+			<tr>
+				<th>عدد المنظمين</th>
+				<td>{{ activity.organizers }}</td>
+				<td>{{ review.organizers_notes }}</td>
+			</tr>
+			<tr>
+				<th>عدد المشاركين</th>
+				<td>{{ activity.participants }}</td>
+				<td>{{ review.participants_notes }}</td>
+			</tr>
+			<tr>
+				<th>موعد تقديم الطلب</th>
+				<td>{{ activity.submission_date }}</td>
+				<td>{{ review.submission_date_notes }}</td>
+			</tr>
+			<tr><td colspan="3">
+				<div class="col-md-offset-3 col-md-6">
+					<div class="col-md-4" align="center">
+					<div class="radio">
+						<label>
+							<input type="radio" name="is_approved" value="True"
+							{% if review.is_approved.value == True %}checked=""{% endif %}>اقبل
+						</label>
+					</div>
+					</div>
+					<div class="col-md-4" align="center">
+					<div class="radio">
+						<label>
+							<input type="radio" name="is_approved" value="None" 
+							{% if review.is_approved.value == None %}checked=""{% endif %}>أبق معلقًا
+						</label>
+					</div>
+					</div>
+					<div class="col-md-4" align="center">
+					<div class="radio">
+						<label>
+							<input type="radio" name="is_approved" value="False"
+							{% if review.is_approved.value == False %}checked=""{% endif %}>ارفض
+						</label>
+					</div>
+					</div>
+				</div>
+		    	<button type="submit" class="btn btn-primary btn-block">
+		    		<span class="glyphicon glyphicon-ok-sign"></span> أرسل
+		    	</button>
+			</td></tr>
+		</tbody>
+	</form>
+	</table>
 		
 	</div>
 </div>
+<script>
+	$("textarea").removeAttr("cols")
+		.removeAttr("rows")
+		.css("height", "100%")
+		.css("width", "100%")
+		.addClass("form-control")
+		.addClass("autogrow")
+</script>
 {% endblock %}

@@ -100,28 +100,24 @@
 					{% for episode in activity.episode_set.all %}
 					<li>
 						<div class="row">
+						<a href="#">
 							<div class="col-sm-4">
-								<a href="#">
-									<i class="entypo-calendar"></i>
-									{{ episode.start_date }}
-									-
-									{{ episode.end_date }}
-								</a>
+								<i class="entypo-calendar"></i>
+								{{ episode.start_date }}
+								-
+								{{ episode.end_date }}
 							</div>
 							<div class="col-sm-4">
-								<a href="#">
-									<i class="entypo-clock"></i>
-									{{ episode.start_time }}
-									-
-									{{ episode.end_time }}
-								</a>
+								<i class="entypo-clock"></i>
+								{{ episode.start_time }}
+								-
+								{{ episode.end_time }}
 							</div>
 							<div class="col-sm-4">
-								<a href="#">
-									<i class="entypo-location"></i>
-									{{ episode.location }}
-								</a>
+								<i class="entypo-location"></i>
+								{{ episode.location }}
 							</div>
+						</a>
 						</div>
 					</li>
 					{% endfor %}
@@ -130,12 +126,12 @@
 				
 				<!-- tabs for the profile links -->
 				<ul class="nav nav-tabs">
-					{% if perms.activities.view_presidency_review %}
+					{% if perms.activities.view_presidency_review or perms.activities.add_presidency_review %}
 					<li{% if active_tab == 'presidency' %} class="active" {% endif %}>
 						<a href="{% url 'activities:review_with_type' activity.pk 'p' %}">مراجعة رئاسة نادي الطلاب</a>
 					</li>
 					{% endif %}
-					{% if perms.activities.view_deanship_review %}
+					{% if perms.activities.view_deanship_review or perms.activities.add_deanship_review %}
 					<li{% if active_tab == 'deanship' %} class="active" {% endif %}>
 						<a href="{% url 'activities:review_with_type' activity.pk 'd' %}">مراجعة عمادة شؤون الطلاب</a>
 					</li>

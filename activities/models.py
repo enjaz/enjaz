@@ -111,6 +111,8 @@ class Review(models.Model):
                                             verbose_name=u"ملاحظات على عدد المشاركين")
     organizers_notes = models.TextField(blank=True,
                                         verbose_name=u"ملاحظات على عدد المنظمين")
+    submission_date_notes = models.TextField(blank=True,
+                                             verbose_name=u"ملاحظات على تاريخ تقديم الطلب")
     review_type_choices = (
         ('P', u"رئاسة نادي الطلاب"),
         ('D', u"عمادة شؤون الطلاب"),

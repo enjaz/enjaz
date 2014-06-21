@@ -136,9 +136,9 @@
 						<i class="entypo-docs"></i>
 					</div>
 					<select {% if form.college.value and not form.college.errors %}value="{{ form.college.value }}" {% endif %}class="form-control" id="college" name="college" required="required" title="{{ form.college.label }}">
+                                                <option value="">{{ form.college.label }}</option>
                                                 {% for value, label in form.fields.college.widget.choices %}
-                                                <option {% if form.college.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>
-                                                {% endfor %}
+                                                <option {% if form.college.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
 					</select>
 					{% if form.college.errors %}
 					    {% for error in form.college.errors %}
@@ -154,9 +154,9 @@
 						<i class="entypo-docs"></i>
 					</div>
 					<select {% if form.section.value and not form.section.errors %}value="{{ form.section.value }}" {% endif %}class="form-control" id="section" name="section" required="required" title="{{ form.section.label }}">
+                                                <option value="">{{ form.section.label }}</option>
                                                 {% for value, label in form.fields.section.widget.choices %}
-                                                <option {% if form.section.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>
-                                                {% endfor %}
+                                                <option {% if form.section.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
 					</select>
 					{% if form.section.errors %}
 					    {% for error in form.section.errors %}
@@ -182,11 +182,7 @@
 					سجّل
 				</button>
 			</div>
-			
-		</div>
-		
 	</div>
-	
 </form>
 
 {% endblock %}

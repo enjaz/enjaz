@@ -4,6 +4,56 @@
  *
 */
 
-body {
-	
+@import url(https://fonts.googleapis.com/css?family=Roboto);
+
+@font-face {
+    font-family: 'GE Dinar One';
+    font-weight: lighter;
+    font-size: xx-large;
+    src: url("../../../fonts/ge-dinar-one-light.woff");
 }
+@font-face {
+    font-family: 'GE Dinar One';
+    font-weight: normal;
+    src: url("../../../fonts/ge-dinar-one-med.woff");
+}
+
+.frontend .description p {
+    font-size: 1.5em;
+    text-align: justify;
+}
+.frontend .login-menu  {
+    display: inline-block;
+    list-style: none outside none;
+    float: left;
+}
+.frontend .login-menu  > li {
+    display: inline-block;
+    margin: 0px 5px;
+    transition: all 350ms ease 0s;
+    position: relative;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+.sidebar-menu #main-menu li, .main-content .user-info li a, .frontend .site-header .site-nav .main-menu li a, body, .dinar-light {
+	font-family: "GE Dinar One", Arial;
+	font-weight: lighter;
+}
+
+h1, h2, h3, h4, h5, h6, h7, .site-header .site-nav .main-menu > li.active > a, .dinar-medium {
+    font-family: "GE Dinar One", Arial;
+    font-weight: normal;
+}
+
+.english-field {
+    direction: ltr;
+    text-algin: left;
+    font-family: 'Roboto', sans-serif;
+}
+
+.login-page .login-form .form-group .english-field.input-group.validate-has-error .error {
+    right: 10px;
+    left: auto;
+}
+

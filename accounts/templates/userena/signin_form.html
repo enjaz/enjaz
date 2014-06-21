@@ -15,7 +15,7 @@
 	
 	<form method="post" role="form" id="form_login" action="">
 		{% csrf_token %}
-		<div class="form-group">
+		<div class="english-field form-group">
 			
 			<div class="input-group{% if form.non_field_errors %} validate-has-error{% endif %}">
 				<div class="input-group-addon">
@@ -51,9 +51,10 @@
 	
 	
 	<div class="login-bottom-links">
-		
-		<a href="{% url 'userena_password_reset' %}" class="link dinar-light">هل نسيت كلمة السر؟</a>
-		
+		<p>
+		<a href="{% url 'userena_password_reset' %}" class="link dinar-light">هل نسيت كلمة السر؟</a><br/>
+		ليس عندك حساب؟ <a href="{% url 'userena_signup' %}" class="link dinar-light">سجّل الآن!</a>
+		<p>
 	</div>
 {% endblock %}
 {% block customscript %}<script src="{% static 'neon/assets/js/neon-login.js' %}?v=0001"></script>{% endblock %}

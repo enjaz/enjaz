@@ -10,22 +10,6 @@
 	<meta name="author" content="" />
 	
 	<title>إنجاز | {% block title %}{% endblock %}</title>
-	
-	<style>
-		@font-face {
-		  font-family: 'GE Dinar One';
-		  font-weight: lighter;
-		  font-size: xx-large;
-		  src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
-		}
-		
-		@font-face {
-		  font-family: 'GE Dinar One';
-		  font-weight: normal;
-		  src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
-		}
-	</style>	
-
 	<link rel="stylesheet" href="{% static 'neon/assets/js/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/entypo/css/entypo.css' %}">
 	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noto+Sans:400,700,400italic">
@@ -36,25 +20,8 @@
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/skins/green.css' %}">
-	
-	<style>
-		.site-header .site-nav .main-menu li a,
-		.dinar-light
-		{
-			font-family: "GE Dinar One", Arial;
-			font-weight: lighter;	
-		}
-		
-		.site-header .site-nav .main-menu > li.active > a,
-		.dinar-medium
-		{
-			font-family: "GE Dinar One", Arial;
-			font-weight: normal;
-		}
-	</style>
-	
 	<script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
-
+	<script src="{% static 'neon/assets/js/custom.js' %}"></script>
 	<!--[if lt IE 9]><script src="{% static 'neon/assets/js/ie8-responsive-file-warning.js' %}"></script><![endif]-->
 
 	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->

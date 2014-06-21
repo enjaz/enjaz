@@ -1,60 +1,6 @@
 {% extends 'front/front_base.html' %}{% load staticfiles %}
 {% block title %}الصفحة الرئيسية{% endblock %}
 {% block content %}
-{% if launch %}
-<style>
-#overlay {
-    opacity: 0.9;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: black;
-    width: 100%;
-    z-index: 5000;
-}
-#overlay p, #overlay button {
-    font-family: 'GE Dinar One',Arial;
-    font-size: 70px;
-    text-align: center;
-    vertical-align: middle;
-    opacity: 1;
-}
-
-#intro {
-    padding-top:100px;
-    font-size: 40px !important;
-}
-
-#overlay p {
-    color: white;
-}
-
-#overlay button {
-    color: #3C2424;
-}
-
-.tocenter {
-    text-align: center;
-}
-
-</style>
-<script>
-$(function() {
-
-   var docHeight = $(document).height();
-
-   $("body").append("<div id='overlay'><br><br><br><br><br><br><br><p id='intro'>يفتتح أ. د. يوسف العيسى</p><p><span class='dinar-light'>بـــوابــة</span> <span class='dinar-medium'>إنجاز</span></p><div class='tocenter'><button id='launch' class='btn btn-default text-center'>على بركة الله</button></div></div>");
-
-   $("#overlay").height(docHeight);
-
-   $( '#launch' ).click(function() {
-       $( "#overlay" ).fadeOut( 3000 );
-   });  
-});
-</script>
-
-</script>
-{% endif %}
 	<!-- Main Slider --><section class="slider-container" style="background-image: url({% static 'img/bg.jpg' %});">
 	
 	<div class="container">

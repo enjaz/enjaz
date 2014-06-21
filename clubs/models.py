@@ -5,8 +5,8 @@ from django.contrib.auth.models import User
 section_choices = (
     ('M', u'طلاب'),
     ('F', u'طالبات'),
-    ('KM', u'طلاب مدينة الملك فهد'),
-    ('KF', u'طالبات مدينة الملك فهد'),
+    ('KM', u'طلاب مدينة الملك فهد الطبية'),
+    ('KF', u'طالبات مدينة الملك فهد الطبية'),
 )
 college_choices = (
     ('M', u'كلية الطب'),
@@ -30,12 +30,26 @@ class Club(models.Model):
                                     blank=True,
                                     verbose_name=u"المنسق",
                                     related_name="coordination",
+                                    on_delete=models.SET_NULL,
                                     # To exclude AnonymousUser
                                     limit_choices_to={'pk__gt': -1})
     members = models.ManyToManyField(User, null=True,
                                      verbose_name=u"الأعضاء",
                                      blank=True,
                                      related_name="memberships")
+    employee = models.ForeignKey(User, null=True, blank=True,
+                                 related_name="employee",
+                                 on_delete=models.SET_NULL,
+                                 default=None,
+                                 verbose_name=u"الموظف المسؤول",
+                                 limit_choices_to={'user_permissions__codename': 'deanship_employee'})
+    # To make it easy to make it specific to a certain college
+    # (e.g. for membership), let's add this field.  That's also one
+    # way to filter sub-clubs and college clubs.
+    college = models.ForeignKey('College', null=True, blank=True,
+                                 on_delete=models.SET_NULL,
+                                 default=None,
+                                 verbose_name=u"الكلية",)
     open_membership = models.BooleanField(default=False,
                                                verbose_name=u"اسمح بالتسجيل؟")
     creation_date = models.DateTimeField('date created',

@@ -54,7 +54,7 @@ class ShowActivityViewTests(TestCase):
         # Setup the database
         normal_user = create_user('normal_user')
         club = create_club()
-        activity = create_activity(submitter=normal_user)
+        activity = create_activity(submitter=normal_user, club=club)
         
         # Login
         logged_in = self.client.login(username=normal_user.username, password='12345678')
@@ -149,3 +149,107 @@ class ReviewViewTests(TestCase):
         response = self.client.get(reverse('activities:review',
                                            args=(activity.pk, )))
         self.assertEqual(response.status_code, 403) # Forbidden
+        
+        response = self.client.get(reverse('activities:review_with_type',
+                                           args=(activity.pk, 'p')))
+        self.assertEqual(response.status_code, 403) # Forbidden
+        
+        response = self.client.get(reverse('activities:review_with_type',
+                                           args=(activity.pk, 'd')))
+        self.assertEqual(response.status_code, 403) # Forbidden
+
+    def test_review_view_with_view_presidency_permission_and_no_review(self):
+        """
+        Test how the review view appears with a user who has a view presidency
+        permission and when the activity hasn't been reviewed by presidency yet.
+        """
+        # Setup the database
+        user = create_user('user')
+        club = create_club()
+        activity = create_activity(submitter=user)
+        
+        view_presidency_review = Permission.objects.get(codename='view_presidency_review') 
+        user.user_permissions.add(view_presidency_review)
+        
+        # Login
+        logged_in = self.client.login(username=user.username, password='12345678')
+        self.assertEqual(logged_in, True)
+        
+        # Go to the view
+        # The follow argument keeps track of the redirects
+        # https://docs.djangoproject.com/en/dev/topics/testing/tools/#django.test.Client.get
+        response = self.client.get(reverse('activities:review',
+                                           args=(activity.pk, )),
+                                   follow=True)
+        self.assertEqual(response.redirect_chain[0][1], 302) # make sure we're redirected
+        # make sure we're redirected to /review/p/
+        self.assertEqual(response.request['PATH_INFO'], reverse('activities:review_with_type',
+                                                                args=(activity.pk, 'p')))
+        self.assertEqual(response.status_code, 200)
+        
+        # some more housekeeping tests
+        self.assertContains(response, activity.name)
+        self.assertContains(response, activity.primary_club.name)
+        self.assertContains(response, activity.description)
+        
+        # user should see presidency but not deanship review buttons
+        self.assertContains(response, u'مراجعة رئاسة نادي الطلاب')
+        self.assertNotContains(response, u'مراجعة عمادة شؤون الطلاب')
+        
+        # Should see error message
+        self.assertContains(response, '<i class="entypo-hourglass"></i>') # hourglass
+        self.assertContains(response, '<p>هذا النشاط لم تتم مراجعته بعد.</p>') # message
+        
+        # Try visiting deanship review page
+        response = self.client.get(reverse('activities:review_with_type',
+                                           args=(activity.pk, 'd')))
+        self.assertEqual(response.status_code, 403) # Forbidden
+        
+    def test_review_view_with_view_presidency_permission_and_review(self):
+        """
+        Test how the review view appears with a user who has a view presidency
+        permission and when the activity has been reviewed by presidency.
+        """
+        pass
+    
+    def test_review_view_with_view_deanship_permission_and_no_review(self):
+        """
+        Test how the review view appears with a user who has a view deanship
+        permission and when the activity hasn't been reviewed by deanship yet.
+        """
+        pass
+    
+    def test_review_view_with_view_deanship_permission_and_review(self):
+        """
+        Test how the review view appears with a user who has a view deanship
+        permission and when the activity has been reviewed by deanship.
+        """
+        pass
+    
+    def test_review_view_with_add_presidency_permission_and_no_review(self):
+        """
+        Test how the review view appears with a user who has an add presidency
+        permission and when the activity hasn't yet been reviewed by presidency.
+        """
+        pass
+    
+    def test_review_view_with_add_presidency_permission_and_review(self):
+        """
+        Test how the review view appears with a user who has an add presidency
+        permission and when the activity has been reviewed by presidency.
+        """
+        pass
+    
+    def test_review_view_with_add_deanship_permission_and_no_review(self):
+        """
+        Test how the review view appears with a user who has an add deanship
+        permission and when the activity hasn't yet been reviewed by deanship.
+        """
+        pass
+    
+    def test_review_view_with_add_deanship_permission_and_review(self):
+        """
+        Test how the review view appears with a user who has an add deanship
+        permission and when the activity has been reviewed by deanship.
+        """
+        pass

@@ -13,7 +13,18 @@
 		</colgroup>
 		<thead>
 			<tr>
-				<th colspan="2"></th>
+				<th colspan="2">
+				<div>
+					حالة الطلب: 
+					{% if review.is_approved == True %}
+						<div class="label label-success">تمت الموافقة عليه</div>
+					{% elif review.is_approved == None %}
+						<div class="label label-warning">معلَّق</div>
+					{% else %}
+						<div class="label label-danger">تم رفضه</div>
+					{% endif %}
+				</div>
+				</th>
 				<th>الملاحظات</th>
 			</tr>
 		</thead>

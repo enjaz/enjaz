@@ -11,7 +11,7 @@ from django.contrib.auth.models import User, Permission
 from django.core.urlresolvers import reverse
 
 from clubs.models import Club
-from activities.models import Activity, Episode
+from activities.models import Activity, Review, Episode
 
 def create_club():
     return Club.objects.create(name="Test Club Arabic Name",
@@ -166,7 +166,7 @@ class ReviewViewTests(TestCase):
         # Setup the database
         user = create_user('user')
         club = create_club()
-        activity = create_activity(submitter=user)
+        activity = create_activity(submitter=user, club=club)
         
         view_presidency_review = Permission.objects.get(codename='view_presidency_review') 
         user.user_permissions.add(view_presidency_review)
@@ -210,46 +210,282 @@ class ReviewViewTests(TestCase):
         Test how the review view appears with a user who has a view presidency
         permission and when the activity has been reviewed by presidency.
         """
-        pass
+        # Setup the database
+        user = create_user('user')
+        club = create_club()
+        activity = create_activity(submitter=user, club=club)
+        review = Review.objects.create(activity=activity,
+                                       name_notes="Test Name Notes",
+                                       review_type="P")
+        
+        view_presidency_review = Permission.objects.get(codename='view_presidency_review') 
+        user.user_permissions.add(view_presidency_review)
+        
+        # Login
+        logged_in = self.client.login(username=user.username, password='12345678')
+        self.assertEqual(logged_in, True)
+        
+        # Go to the view
+        # The follow argument keeps track of the redirects
+        # https://docs.djangoproject.com/en/dev/topics/testing/tools/#django.test.Client.get
+        response = self.client.get(reverse('activities:review_with_type',
+                                           args=(activity.pk, 'p')))
+        self.assertEqual(response.status_code, 200)
+        
+        # some more housekeeping tests
+        self.assertContains(response, activity.name)
+        self.assertContains(response, activity.primary_club.name)
+        self.assertContains(response, activity.description)
+        
+        # user should see presidency but not deanship review buttons
+        self.assertContains(response, u'مراجعة رئاسة نادي الطلاب')
+        self.assertNotContains(response, u'مراجعة عمادة شؤون الطلاب')
+        
+        # Should see review
+        self.assertContains(response, 'panel-body with-table') # panel
+        self.assertContains(response, review.name_notes)
+        self.assertContains(response, '<div class="label label-warning">معلَّق</div>')
+        
+        # should not see submit button
+        self.assertNotContains(response, '<button type="submit"')
+        self.assertNotContains(response, 'أرسل')
     
     def test_review_view_with_view_deanship_permission_and_no_review(self):
         """
         Test how the review view appears with a user who has a view deanship
         permission and when the activity hasn't been reviewed by deanship yet.
         """
-        pass
+        # Setup the database
+        user = create_user('user')
+        club = create_club()
+        activity = create_activity(submitter=user, club=club)
+        
+        view_deanship_review = Permission.objects.get(codename='view_deanship_review') 
+        user.user_permissions.add(view_deanship_review)
+        
+        # Login
+        logged_in = self.client.login(username=user.username, password='12345678')
+        self.assertEqual(logged_in, True)
+        
+        # Go to the view
+        # The follow argument keeps track of the redirects
+        # https://docs.djangoproject.com/en/dev/topics/testing/tools/#django.test.Client.get
+        response = self.client.get(reverse('activities:review',
+                                           args=(activity.pk, )),
+                                   follow=True)
+        self.assertEqual(response.redirect_chain[0][1], 302) # make sure we're redirected
+        # make sure we're redirected to /review/p/
+        self.assertEqual(response.request['PATH_INFO'], reverse('activities:review_with_type',
+                                                                args=(activity.pk, 'd')))
+        self.assertEqual(response.status_code, 200)
+        
+        # some more housekeeping tests
+        self.assertContains(response, activity.name)
+        self.assertContains(response, activity.primary_club.name)
+        self.assertContains(response, activity.description)
+        
+        # user should see deanship but not presidency review buttons
+        self.assertNotContains(response, u'مراجعة رئاسة نادي الطلاب')
+        self.assertContains(response, u'مراجعة عمادة شؤون الطلاب')
+        
+        # Should see error message
+        self.assertContains(response, '<i class="entypo-hourglass"></i>') # hourglass
+        self.assertContains(response, '<p>هذا النشاط لم تتم مراجعته بعد.</p>') # message
+        
+        # Try visiting deanship review page
+        response = self.client.get(reverse('activities:review_with_type',
+                                           args=(activity.pk, 'p')))
+        self.assertEqual(response.status_code, 403) # Forbidden
     
     def test_review_view_with_view_deanship_permission_and_review(self):
         """
         Test how the review view appears with a user who has a view deanship
         permission and when the activity has been reviewed by deanship.
         """
-        pass
+         # Setup the database
+        user = create_user('user')
+        club = create_club()
+        activity = create_activity(submitter=user, club=club)
+        review = Review.objects.create(activity=activity,
+                                       name_notes="Test Name Notes",
+                                       review_type="D")
+        
+        view_deanship_review = Permission.objects.get(codename='view_deanship_review') 
+        user.user_permissions.add(view_deanship_review)
+        
+        # Login
+        logged_in = self.client.login(username=user.username, password='12345678')
+        self.assertEqual(logged_in, True)
+        
+        # Go to the view
+        # The follow argument keeps track of the redirects
+        # https://docs.djangoproject.com/en/dev/topics/testing/tools/#django.test.Client.get
+        response = self.client.get(reverse('activities:review_with_type',
+                                           args=(activity.pk, 'd')))
+        self.assertEqual(response.status_code, 200)
+        
+        # some more housekeeping tests
+        self.assertContains(response, activity.name)
+        self.assertContains(response, activity.primary_club.name)
+        self.assertContains(response, activity.description)
+        
+        # user should see deanship but not presidency review buttons
+        self.assertNotContains(response, u'مراجعة رئاسة نادي الطلاب')
+        self.assertContains(response, u'مراجعة عمادة شؤون الطلاب')
+        
+        # Should see review
+        self.assertContains(response, "panel-body with-table") # panel
+        self.assertContains(response, review.name_notes)
+        self.assertContains(response, '<div class="label label-warning">معلَّق</div>')
+        
+        # should not see submit button
+        self.assertNotContains(response, '<button type="submit"')
+        self.assertNotContains(response, 'أرسل')
     
     def test_review_view_with_add_presidency_permission_and_no_review(self):
         """
         Test how the review view appears with a user who has an add presidency
         permission and when the activity hasn't yet been reviewed by presidency.
         """
-        pass
+        # Setup the database
+        user = create_user('user')
+        club = create_club()
+        activity = create_activity(submitter=user, club=club)
+        
+        add_presidency_review = Permission.objects.get(codename='add_presidency_review') 
+        user.user_permissions.add(add_presidency_review)
+        
+        # Login
+        logged_in = self.client.login(username=user.username, password='12345678')
+        self.assertEqual(logged_in, True)
+        
+        # Go to the view
+        # The follow argument keeps track of the redirects
+        # https://docs.djangoproject.com/en/dev/topics/testing/tools/#django.test.Client.get
+        response = self.client.get(reverse('activities:review_with_type',
+                                           args=(activity.pk, 'p')))
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertContains(response, "panel-body with-table") # panel
+        
+        # Should not see status label (only in read mode)
+        self.assertNotContains(response, '<div class="label label-warning">معلَّق</div>')
+        
+        # should see form and submit button
+        self.assertContains(response, '<form action="' + reverse('activities:review_with_type',
+                                                                 args=(activity.pk, 'p')))
+        self.assertContains(response, '<button type="submit"')
+        self.assertContains(response, 'أرسل')
     
     def test_review_view_with_add_presidency_permission_and_review(self):
         """
         Test how the review view appears with a user who has an add presidency
         permission and when the activity has been reviewed by presidency.
         """
-        pass
+        # Setup the database
+        user = create_user('user')
+        club = create_club()
+        activity = create_activity(submitter=user, club=club)
+        review = Review.objects.create(activity=activity,
+                                       name_notes="Test Name Notes",
+                                       review_type="P")
+        
+        add_presidency_review = Permission.objects.get(codename='add_presidency_review') 
+        user.user_permissions.add(add_presidency_review)
+        
+        # Login
+        logged_in = self.client.login(username=user.username, password='12345678')
+        self.assertEqual(logged_in, True)
+        
+        # Go to the view
+        # The follow argument keeps track of the redirects
+        # https://docs.djangoproject.com/en/dev/topics/testing/tools/#django.test.Client.get
+        response = self.client.get(reverse('activities:review_with_type',
+                                           args=(activity.pk, 'p')))
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertContains(response, "panel-body with-table") # panel
+        
+        # Should not see status label (only in read mode)
+        self.assertNotContains(response, '<div class="label label-warning">معلَّق</div>')
+        
+        # should see form and submit button
+        self.assertContains(response, '<form action="' + reverse('activities:review_with_type',
+                                                                 args=(activity.pk, 'p')))
+        self.assertContains(response, '<button type="submit"')
+        self.assertContains(response, 'أرسل')
+        self.assertContains(response, review.name_notes)
     
     def test_review_view_with_add_deanship_permission_and_no_review(self):
         """
         Test how the review view appears with a user who has an add deanship
         permission and when the activity hasn't yet been reviewed by deanship.
         """
-        pass
+        # Setup the database
+        user = create_user('user')
+        club = create_club()
+        activity = create_activity(submitter=user, club=club)
+        
+        add_deanship_review = Permission.objects.get(codename='add_deanship_review') 
+        user.user_permissions.add(add_deanship_review)
+        
+        # Login
+        logged_in = self.client.login(username=user.username, password='12345678')
+        self.assertEqual(logged_in, True)
+        
+        # Go to the view
+        # The follow argument keeps track of the redirects
+        # https://docs.djangoproject.com/en/dev/topics/testing/tools/#django.test.Client.get
+        response = self.client.get(reverse('activities:review_with_type',
+                                           args=(activity.pk, 'd')))
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertContains(response, "panel-body with-table") # panel
+        
+        # Should not see status label (only in read mode)
+        self.assertNotContains(response, '<div class="label label-warning">معلَّق</div>')
+        
+        # should see form and submit button
+        self.assertContains(response, '<form action="' + reverse('activities:review_with_type',
+                                                                 args=(activity.pk, 'd')))
+        self.assertContains(response, '<button type="submit"')
+        self.assertContains(response, 'أرسل')
     
     def test_review_view_with_add_deanship_permission_and_review(self):
         """
         Test how the review view appears with a user who has an add deanship
         permission and when the activity has been reviewed by deanship.
         """
-        pass
+        # Setup the database
+        user = create_user('user')
+        club = create_club()
+        activity = create_activity(submitter=user, club=club)
+        review = Review.objects.create(activity=activity,
+                                       name_notes="Test Name Notes",
+                                       review_type="D")
+        
+        add_deanship_review = Permission.objects.get(codename='add_deanship_review') 
+        user.user_permissions.add(add_deanship_review)
+        
+        # Login
+        logged_in = self.client.login(username=user.username, password='12345678')
+        self.assertEqual(logged_in, True)
+        
+        # Go to the view
+        # The follow argument keeps track of the redirects
+        # https://docs.djangoproject.com/en/dev/topics/testing/tools/#django.test.Client.get
+        response = self.client.get(reverse('activities:review_with_type',
+                                           args=(activity.pk, 'd')))
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertContains(response, "panel-body with-table") # panel
+        
+        # Should not see status label (only in read mode)
+        self.assertNotContains(response, '<div class="label label-warning">معلَّق</div>')
+        
+        # should see form and submit button
+        self.assertContains(response, '<form action="' + reverse('activities:review_with_type',
+                                                                 args=(activity.pk, 'd')))
+        self.assertContains(response, '<button type="submit"')
+        self.assertContains(response, 'أرسل')
+        self.assertContains(response, review.name_notes)

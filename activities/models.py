@@ -21,23 +21,14 @@ class Activity(models.Model):
                                             verbose_name=u"الأندية المتعاونة")
     name = models.CharField(max_length=200, verbose_name=u"اسم النشاط")
     description = models.TextField(verbose_name=u"وصف النشاط")
+    public_description = models.TextField(verbose_name=u"الوصف الإعلامي",
+                                          help_text=u"هذا هو الوصل الذي سيهرض للطلاب")
     requirements = models.TextField(blank=True,
                                     verbose_name=u"متطلبات النشاط")
     submitter = models.ForeignKey(User, null=True,
                                   on_delete=models.SET_NULL)
     submission_date = models.DateTimeField('date submitted',
                                            auto_now_add=True)
-       
-#    Date,time and location are now handled by Episodes
-
-#     location = models.CharField(max_length=200,
-#                                 verbose_name=u"المكان", blank=True)
-#     date = models.DateField(u'التاريخ', null=True, blank=True)
-#     time = models.CharField(max_length=200, verbose_name=u'الوقت',
-#                             blank=True)
-#     custom_datetime = models.TextField(verbose_name=u"تاريخ ووقت مخصّص",
-#                                    blank=True, help_text=u"إذا كان النشاط الذي تنوي تنظيمه دوريا أو ممتدا لفصل كامل فعبء هذه الخانة.")
-
     edit_date = models.DateTimeField('date edited', auto_now=True)
     is_editable = models.BooleanField(default=True)
     collect_participants = models.BooleanField(default=False,
@@ -51,6 +42,11 @@ class Activity(models.Model):
                                              verbose_name=u"المتعاونون من خارج الجامعة")
     participants = models.IntegerField(verbose_name=u"عدد المشاركين",
                                        help_text=u"العدد المتوقع للمستفيدين من النشاط")
+    category = models.ForeignKey('Category', null=True,
+                                 on_delete=models.SET_NULL,
+                                 verbose_name=u"التصنيف",
+                                 # If they category has sub-categories, don't show it.
+                                 limit_choices_to={'category__isnull': True})
     organizers = models.IntegerField(verbose_name=u"عدد المنظمين",
                                        help_text=u"عدد الطلاب الذين سينظمون النشاط")
     
@@ -208,3 +204,16 @@ class Episode(models.Model):
     
     def end_datetime(self):
         return datetime.combine(self.end_date, self.end_time)
+
+class Category(models.Model):
+    ar_name = models.CharField(max_length=50,
+                               verbose_name=u"اسم التصنيف")
+    en_name = models.CharField(max_length=50,
+                               verbose_name=u"اسم الإنجليزي")
+    description = models.TextField(blank=True, verbose_name=u"وصف التصنيف")
+    parent = models.ForeignKey('self', verbose_name=u"التصنيف الأب",
+                               null=True, blank=True,
+                               on_delete=models.SET_NULL)
+
+    def __unicode__(self):
+        return self.ar_name

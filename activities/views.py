@@ -260,15 +260,18 @@ def edit(request, activity_id):
 
     # If the user is neither the submitter, nor has the permission to
     # change activities (i.e. not part of the head of the Student
-    # Club, or the Media Team), not a coordinator of any of the
+    # Club, or the Media Team), nor a coordinator of any of the
     # organizing clubs, raise a PermissionDenied error.
     if not request.user == activity.submitter and \
        not request.user.has_perm('activities.change_activity') and \
        not any([club in activity_clubs for club in user_coordination]):
         raise PermissionDenied
 
-    if request.method == 'POST':        
-        modified_activity = ActivityForm(request.POST, instance=activity)
+    if request.method == 'POST':
+        if request.user.has_perm('activities.directly_add_activity'):
+            modified_activity = DirectActivityForm(request.POST, instance=activity)
+        else:
+            modified_activity = ActivityForm(request.POST, instance=activity)
         # Should check that edits are valid before saving
         # TODO: actually edits should be approved first by presidency and deanship
         if modified_activity.is_valid():
@@ -281,7 +284,10 @@ def edit(request, activity_id):
                        'edit': True}
             return render(request, 'activities/new.html', context)
     else:
-        form = ActivityForm(instance=activity)
+        if request.user.has_perm('activities.directly_add_activity'):
+            form = DirectActivityForm(instance=activity)
+        else:
+            form = ActivityForm(instance=activity)
         context = {'form': form, 'activity_id': activity_id,
                    'activity': activity, 'edit': True}
         return render(request, 'activities/new.html', context)
@@ -300,10 +306,11 @@ def review(request, activity_id, type=None):
 #         raise PermissionDenied
 
     if type == None:
-        # If the user has any permission (read or write) related to the deanship review,
-        # redirect to review/d/. Otherwise, if the user has any permission (read or write)
-        # related to the presidency review, redirect to review/p/
-        # Otherwise, raise PermissionDenied
+        # If the user has any permission (read or write) related to
+        # the deanship review, redirect to review/d/. Otherwise, if
+        # the user has any permission (read or write) related to the
+        # presidency review, redirect to review/p/.  Otherwise, raise
+        # PermissionDenied
         if request.user.has_perm('activities.add_deanship_review') or \
            request.user.has_perm('activities.view_deanship_review'):
             return HttpResponseRedirect(reverse('activities:review_with_type',

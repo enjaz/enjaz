@@ -21,7 +21,7 @@ class ActivityForm(ModelForm):
         model = Activity
         fields = ['primary_club', # TODO: primary club is already known (signed in):
                                   # no need to include as field
-                  'name','description',
+                  'name', 'category', 'description', 'public_description',
                   'organizers', 'participants',
                   'secondary_clubs', 'inside_collaborators',
                   'outside_collaborators', 'requirements',
@@ -42,7 +42,7 @@ class ActivityForm(ModelForm):
                 
         # Initialize the form
         super(ActivityForm, self).__init__(*args, **kwargs)
-        
+
         # Determine how many episodes there are:
         episode_count = 1 # default value
         # First check if an instance is passed. If true, then get the episode count of that instance
@@ -60,12 +60,12 @@ class ActivityForm(ModelForm):
         self.fields['episode_count'].initial = episode_count
         
         # If an instance is passed and is saved (has a pk), load its episodes
-        if instance:
-            if instance.pk:
-                instance_episodes = instance.episode_set.all()
+        if instance and instance.pk:
+            instance_episodes = instance.episode_set.all()
         
         # Now add the custom date, time and location fields
         for i in range(int(episode_count)):
+            # The disability status is the opposite of is_editable
             self.fields['episode_pk{i}'.format(i=i)] = forms.CharField(widget=forms.HiddenInput(), required=False)
             self.fields['start_date{i}'.format(i=i)] = forms.DateField(label='تاريخ البداية')
             self.fields['end_date{i}'.format(i=i)] = forms.DateField(label='تاريخ النهاية')
@@ -73,31 +73,44 @@ class ActivityForm(ModelForm):
             self.fields['end_time{i}'.format(i=i)] = forms.TimeField(label='وقت النهاية')
             self.fields['location{i}'.format(i=i)] = forms.CharField(max_length=128, label='المكان')
             
-            # If an instance exists (has a pk), then load the fields with the instance episode values.
-            # An IndexError arises when submitting an edit form in which new episodes have been added,
-            # since episode_count will increase beyond the lenght of instance_episodes.
-            # In this case just leave the new fields empty as they will be filled by the submitted data.
-            if instance:
-                if instance.pk:
-                    try:
-                        self.fields['episode_pk{i}'.format(i=i)].initial = instance_episodes[i].pk
-                        self.fields['start_date{i}'.format(i=i)].initial = instance_episodes[i].start_date
-                        self.fields['end_date{i}'.format(i=i)].initial = instance_episodes[i].end_date
-                        self.fields['start_time{i}'.format(i=i)].initial = instance_episodes[i].start_time
-                        self.fields['end_time{i}'.format(i=i)].initial = instance_episodes[i].end_time
-                        self.fields['location{i}'.format(i=i)].initial = instance_episodes[i].location
-                    except IndexError:
-                        pass
+            # If an instance exists (has a pk), then load the fields
+            # with the instance episode values.  An IndexError arises
+            # when submitting an edit form in which new episodes have
+            # been added, since episode_count will increase beyond the
+            # lenght of instance_episodes.  In this case just leave
+            # the new fields empty as they will be filled by the
+            # submitted data.
+            if instance and instance.pk:
+                try:
+                    self.fields['episode_pk{i}'.format(i=i)].initial = instance_episodes[i].pk
+                    self.fields['start_date{i}'.format(i=i)].initial = instance_episodes[i].start_date
+                    self.fields['end_date{i}'.format(i=i)].initial = instance_episodes[i].end_date
+                    self.fields['start_time{i}'.format(i=i)].initial = instance_episodes[i].start_time
+                    self.fields['end_time{i}'.format(i=i)].initial = instance_episodes[i].end_time
+                    self.fields['location{i}'.format(i=i)].initial = instance_episodes[i].location
+                except IndexError:
+                    pass
                     
+        # If an instance is passed (i.e. it's being edited) and
+        # is_editable is False, disable most fields.
+        if instance and not instance.is_editable:
+            # Fields to keep enabled.
+            enabled_fields = ['public_description']
+            for field in self.fields:
+                if not field in enabled_fields:
+                    self.fields[field].widget.attrs['readonly'] = 'readonly'
+
+
     def clean(self):
-        # Remove spaces at the start and end of all text fields.
         cleaned_data = super(ActivityForm, self).clean()
+        # Remove spaces at the start and end of all text fields.
         for field in cleaned_data:
             if isinstance(cleaned_data[field], unicode):
-                cleaned_data[field] = cleaned_data[field].strip()
-        
-        # Check if end_date is after start_date
-        
+                cleaned_data[field] = cleaned_data[field].strip()                
+        # TODO: If is_editable is False, the server-side should also
+        # make sure that nothing is changed.
+        # TODO: Check if end_date is after start_date
+
         return cleaned_data
     
     def save(self, *args, **kwargs):
@@ -136,11 +149,12 @@ class ActivityForm(ModelForm):
                                   end_time=end_time,
                                   location=location)
                 new_episodes.append(episode)
-                    
+
         activity = super(ActivityForm, self).save(*args, **kwargs)
         for episode in new_episodes:
             episode.activity = activity
             episode.save()
+
             
         return activity            
     
@@ -154,6 +168,7 @@ class DirectActivityForm(ActivityForm):
                                     label=Activity.secondary_clubs.field.verbose_name,
                                     help_text=Activity.secondary_clubs.field.help_text,
                                     required=False)
+
 class ReviewForm(ModelForm):
     class Meta:
         model = Review

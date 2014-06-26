@@ -1,0 +1,192 @@
+[
+{
+  "pk": 1, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u0645\u062d\u0627\u0636\u0631\u0627\u062a", 
+    "en_name": "Lectures", 
+    "parent": null, 
+    "description": ""
+  }
+},
+{
+  "pk": 2, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u0645\u062d\u0627\u0636\u0631\u0627\u062a \u0639\u0644\u0645\u064a\u0629", 
+    "en_name": "Scientific lectures", 
+    "parent": 1, 
+    "description": ""
+  }
+},
+{
+  "pk": 3, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u0645\u062d\u0627\u0636\u0631\u0627\u062a \u062b\u0642\u0627\u0641\u064a\u0629", 
+    "en_name": "Cultural lectures", 
+    "parent": 1, 
+    "description": ""
+  }
+},
+{
+  "pk": 4, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u0645\u062d\u0627\u0636\u0631\u0627\u062a \u062f\u064a\u0646\u064a\u0629", 
+    "en_name": "Religious lectures", 
+    "parent": 1, 
+    "description": ""
+  }
+},
+{
+  "pk": 5, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u0644\u0642\u0627\u0621\u0627\u062a", 
+    "en_name": "Meet-ups", 
+    "parent": null, 
+    "description": ""
+  }
+},
+{
+  "pk": 6, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u0648\u0631\u0634\u0627\u062a \u0639\u0645\u0644", 
+    "en_name": "Workshops", 
+    "parent": null, 
+    "description": ""
+  }
+},
+{
+  "pk": 7, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u062f\u0648\u0631\u0627\u062a \u062a\u062f\u0631\u064a\u0628\u064a\u0629", 
+    "en_name": "Training courses", 
+    "parent": null, 
+    "description": ""
+  }
+},
+{
+  "pk": 8, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u0628\u0631\u0627\u0645\u062c \u062a\u0631\u0641\u064a\u0647\u064a\u0629", 
+    "en_name": "Recreation programs", 
+    "parent": null, 
+    "description": ""
+  }
+},
+{
+  "pk": 9, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u0628\u0631\u0627\u0645\u062c \u0631\u064a\u0627\u0636\u064a\u0629", 
+    "en_name": "Sport programs", 
+    "parent": null, 
+    "description": ""
+  }
+},
+{
+  "pk": 10, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u062d\u0645\u0644\u0627\u062a", 
+    "en_name": "Campaigns", 
+    "parent": null, 
+    "description": ""
+  }
+},
+{
+  "pk": 11, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u0632\u064a\u0627\u0631\u0627\u062a", 
+    "en_name": "Visits", 
+    "parent": null, 
+    "description": ""
+  }
+},
+{
+  "pk": 12, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u0632\u064a\u0627\u0631\u0627\u062a \u062a\u0637\u0648\u0639\u064a\u0629", 
+    "en_name": "Voluntary visits", 
+    "parent": 11, 
+    "description": ""
+  }
+},
+{
+  "pk": 13, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u0632\u064a\u0627\u0631\u0627\u062a \u062a\u0631\u0641\u064a\u0647\u064a\u0629", 
+    "en_name": "Recreational visits", 
+    "parent": 11, 
+    "description": ""
+  }
+},
+{
+  "pk": 14, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u0632\u064a\u0627\u0631\u0627\u062a \u0639\u0644\u0645\u064a\u0629", 
+    "en_name": "Scientific visits", 
+    "parent": 11, 
+    "description": ""
+  }
+},
+{
+  "pk": 15, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u062c\u0644\u0633\u0627\u062a \u0646\u0642\u0627\u0634 \u0648\u062d\u0648\u0627\u0631", 
+    "en_name": "Discussion sessions", 
+    "parent": null, 
+    "description": ""
+  }
+},
+{
+  "pk": 16, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u0645\u0633\u0627\u0628\u0642\u0627\u062a", 
+    "en_name": "Contests", 
+    "parent": null, 
+    "description": ""
+  }
+},
+{
+  "pk": 17, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u0628\u0631\u0627\u0645\u062c/\u062d\u0645\u0644\u0627\u062a \u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a\u0629", 
+    "en_name": "E-programs/campaigns", 
+    "parent": null, 
+    "description": ""
+  }
+},
+{
+  "pk": 18, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u0645\u0639\u0627\u0631\u0636", 
+    "en_name": "Exhibitions", 
+    "parent": null, 
+    "description": ""
+  }
+},
+{
+  "pk": 19, 
+  "model": "activities.category", 
+  "fields": {
+    "ar_name": "\u0623\u062e\u0631\u0649", 
+    "en_name": "Others", 
+    "parent": null, 
+    "description": ""
+  }
+}
+]

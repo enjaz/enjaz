@@ -58,3 +58,13 @@ Current required settings:
 * `AUTH_PROFILE_MODULE = 'accounts.MyProfile'`
 * `USERENA_WITHOUT_USERNAMES = True`
 * Add `"django.core.context_processors.request"` to the [default TEMPLATE_CONTEXT_PROCESSORS](https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATE_CONTEXT_PROCESSORS)
+
+# First run
+
+* The platform has many KSAU-HS-dependent conentns and they are load
+  automatically as part of `*/fixtures/initial_data.json`.  Make sure
+  you too need them.
+* Usernea requires certain permissions to function.  Those are
+  provided with the `manage.py check_permissions` command.  Make sure
+  that you run it because otherwise, the sign-up page may just stop
+  raise exceptions.

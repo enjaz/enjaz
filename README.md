@@ -35,7 +35,7 @@ In the project `urls.py`, add the following:
 # [...]
 from django.views.generic import TemplateView
 from accounts.admin import deanship_admin
-from accounts.customizedform import SignupFormExtra, ModifiedAuthenticationForm
+from accounts.forms import SignupFormExtra, ModifiedAuthenticationForm
 # [...]
     (r'^$', 'activities.views.portal_home', name='home'),
     (r'^about/$', TemplateView.as_view(template_name='about.html'), name='about'),

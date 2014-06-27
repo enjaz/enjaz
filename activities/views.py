@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
 from activities.models import Activity, Review, Participation, Episode
-from activities.forms import ActivityForm, DirectActivityForm, ReviewForm
+from activities.forms import ActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm
 from clubs.models import Club
 from books.models import Book
 from niqati.models import Niqati_User
@@ -259,8 +259,17 @@ def edit(request, activity_id):
                        'edit': True}
             return render(request, 'activities/new.html', context)
     else:
+        # There are different activity forms depending on what
+        # permission the user has.  Presidency group members
+        # (i.e. with directly_add_activity) can add activities
+        # directly without waiting for the approval of the deanship.
+        # They can also (with change_activity) edit activities
+        # regardless of their is_editable value.
         if request.user.has_perm('activities.directly_add_activity'):
             form = DirectActivityForm(instance=activity)
+        elif not activity.is_editable and \
+             not request.user.has_perm('activities.change_activity'):
+            form = DisabledActivityForm(instance=activity)
         else:
             form = ActivityForm(instance=activity)
         context = {'form': form, 'activity_id': activity_id,

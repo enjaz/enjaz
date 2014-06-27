@@ -90,16 +90,6 @@ class ActivityForm(ModelForm):
                     self.fields['location{i}'.format(i=i)].initial = instance_episodes[i].location
                 except IndexError:
                     pass
-                    
-        # If an instance is passed (i.e. it's being edited) and
-        # is_editable is False, disable most fields.
-        if instance and not instance.is_editable:
-            # Fields to keep enabled.
-            enabled_fields = ['public_description']
-            for field in self.fields:
-                if not field in enabled_fields:
-                    self.fields[field].widget.attrs['readonly'] = 'readonly'
-
 
     def clean(self):
         cleaned_data = super(ActivityForm, self).clean()
@@ -107,8 +97,6 @@ class ActivityForm(ModelForm):
         for field in cleaned_data:
             if isinstance(cleaned_data[field], unicode):
                 cleaned_data[field] = cleaned_data[field].strip()                
-        # TODO: If is_editable is False, the server-side should also
-        # make sure that nothing is changed.
         # TODO: Check if end_date is after start_date
 
         return cleaned_data
@@ -168,6 +156,28 @@ class DirectActivityForm(ActivityForm):
                                     label=Activity.secondary_clubs.field.verbose_name,
                                     help_text=Activity.secondary_clubs.field.help_text,
                                     required=False)
+
+class DisabledActivityForm(ActivityForm):
+    def __init__(self, *args, **kwargs):
+        # If an instance is passed, then store it in the instance variable.
+        # This will be used to disable the fields.
+        instance = kwargs.get('instance', None)
+
+        # Initialize the form
+        super(DisabledActivityForm, self).__init__(*args, **kwargs)
+
+        # Make sure that an instance is passed (i.e. the form is being
+        # edited) and is_editable is False, so you can disable most
+        # fields.
+        if instance and not instance.is_editable:
+            # Fields to keep enabled.
+            enabled_fields = ['public_description']
+            for field in self.fields:
+                if not field in enabled_fields:
+                    self.fields[field].widget.attrs['readonly'] = 'readonly'
+
+    # TODO: If is_editable is False, the server-side should also make
+    #       sure that nothing is changed.
 
 class ReviewForm(ModelForm):
     class Meta:

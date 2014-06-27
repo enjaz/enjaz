@@ -73,7 +73,7 @@
 				</a>
 				{% endif %}
 				
-				{% if can_edit and activity.is_editable %}
+				{% if can_edit %}
 				<a href="{% url 'activities:edit' activity.pk %}" class="btn btn-default">
 					<i class="entypo-pencil"></i>
 					عدّل

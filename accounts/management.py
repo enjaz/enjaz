@@ -15,10 +15,14 @@ def create_groups(sender, **kwargs):
     # his deputies.
     presidency_group = Group.objects.create(name='presidency')
     add_activity = Permission.objects.get(codename='add_activity')
+    # The 'change_activity' permission indicates that the user can
+    # changes activities regardless of the value of is_editable.
+    change_activity = Permission.objects.get(codename='change_activity')
+    add_club = Permission.objects.get(codename='add_club')
     view_presidency_review = Permission.objects.get(codename='view_presidency_review')
     add_presidency_review = Permission.objects.get(codename='add_presidency_review')
     directly_add_activity = Permission.objects.get(codename='directly_add_activity')
-    presidency_group.permissions.add(add_activity,
+    presidency_group.permissions.add(add_activity, add_club,
                                      view_presidency_review,
                                      add_presidency_review,
                                      directly_add_activity)

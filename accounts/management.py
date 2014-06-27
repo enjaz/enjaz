@@ -23,6 +23,7 @@ def create_groups(sender, **kwargs):
     add_presidency_review = Permission.objects.get(codename='add_presidency_review')
     directly_add_activity = Permission.objects.get(codename='directly_add_activity')
     presidency_group.permissions.add(add_activity, add_club,
+                                     change_activity,
                                      view_presidency_review,
                                      add_presidency_review,
                                      directly_add_activity)

@@ -1,10 +1,8 @@
-/**
- *
- * Apply Here your Custom CSS
- *
-*/
-
 @import url(https://fonts.googleapis.com/css?family=Roboto);
+
+body, p, .form-control, .page-container .sidebar-menu #main-menu li, .login-page .login-header .description {
+   font-size:14px;
+}
 
 @font-face {
     font-family: 'GE Dinar One';
@@ -57,3 +55,6 @@ h1, h2, h3, h4, h5, h6, h7, .site-header .site-nav .main-menu > li.active > a, .
     left: auto;
 }
 
+p.bg-warning {
+   padding: 15px;
+}

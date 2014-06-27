@@ -14,10 +14,12 @@ def create_groups(sender, **kwargs):
     # This group is meant for the President of the Studnet Club and
     # his deputies.
     presidency_group = Group.objects.create(name='presidency')
+    add_activity = Permission.objects.get(codename='add_activity')
     view_presidency_review = Permission.objects.get(codename='view_presidency_review')
     add_presidency_review = Permission.objects.get(codename='add_presidency_review')
     directly_add_activity = Permission.objects.get(codename='directly_add_activity')
-    presidency_group.permissions.add(view_presidency_review,
+    presidency_group.permissions.add(add_activity,
+                                     view_presidency_review,
                                      add_presidency_review,
                                      directly_add_activity)
 

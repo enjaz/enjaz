@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}{% endblock %}
+{% block pageheaderurl %}{% url 'activities:list' %}{% endblock %}
 {% block pageheader %}الأنشطة{% endblock %}
-
 {% block navbar %}
     {# if the user is a coordinator of any club, or if they have the add_activity permission #}
     {% if perms.activities.add_activity or user.coordination.all %}

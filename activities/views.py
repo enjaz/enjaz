@@ -57,16 +57,16 @@ def portal_home(request):
         return render(request, 'front/home_front.html', context)
 
 def list(request):
-    # If the user is part of the head of the Student Club, or part of
-    # the Media Center, they should be able to view all activities
-    # (i.e. approved, rejected and pending).  Otherwise, a user should
-    # only see approved activities and the activities of the clubs
-    # they have memberships in (regardless of their status).
     if request.user.is_authenticated():
         template = 'activities_base.html'
     else:
         template = 'front/front_base.html'
-    
+
+    # If the user is part of the presidency of the Student Club, or
+    # part of the Media Center, they should be able to view all
+    # activities (i.e. approved, rejected and pending).  Otherwise, a
+    # user should only see approved activities and the activities of
+    # the clubs they have memberships in (regardless of their status).    
     if request.user.has_perm('activities.view_activity'):
         if request.GET.get('pending') == "1":
             activities = Activity.objects.filter(review__is_approved=None)

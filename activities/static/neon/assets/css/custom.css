@@ -1,7 +1,11 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto);
 
-body, p, .form-control, .page-container .sidebar-menu #main-menu li, .login-page .login-header .description {
-   font-size:14px;
+body, p, .form-control, .page-container .sidebar-menu #main-menu li, .login-page .login-header .description, .login-page .form-register-success p {
+   font-size: 14px;
+}
+
+.login-page .form-register-success h3 {
+    font-size: 18px;
 }
 
 @font-face {

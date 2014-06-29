@@ -1,7 +1,7 @@
 {% extends 'userena/base_userena.html' %}{% load staticfiles %}
 
 {% block title %}التسجيل{% endblock %}
-{% comment %}{% block description %}فضلًا املأ النموذج التالي لإتمام عملية التسجيل.{% endblock %}{% endcomment %}
+{% block description %}فضلًا املأ النموذج التالي لإتمام عملية التسجيل. ستكون هذه آخر مرة نطلب منك كل هذه التفاصيل!<br/>إذا لم تكن طالبا <a href="{% url 'nonstudent_signup' %}">سجّل هنا</a>.{% endblock %}
 
 {% block content %}
 {% comment %}
@@ -24,19 +24,19 @@
 						<i class="entypo-user"></i>
 					</div>
 					
-					<input {% if form.ar_first_name.value and not form.ar_first_name.errors %}value="{{ form.ar_first_name.value }}" {% endif %}type="text" class="form-control" name="ar_first_name" id="ar_first_name" placeholder="{{ form.ar_first_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" />
+					<input {% if form.ar_first_name.value and not form.ar_first_name.errors %}value="{{ form.ar_first_name.value }}" {% endif %}type="text" class="form-control" name="ar_first_name" id="ar_first_name" placeholder="{{ form.ar_first_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" required="required"/>
 					{% if form.ar_first_name.errors %}
 					    {% for error in form.ar_first_name.errors %}
 					        <label class='error' for='ar_first_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
-					<input {% if form.ar_middle_name.value and not form.ar_middle_name.errors %}value="{{ form.ar_middle_name.value }}" {% endif %}type="text" class="form-control" name="ar_middle_name" id="ar_middle_name" placeholder="{{ form.ar_middle_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" />
+					<input {% if form.ar_middle_name.value and not form.ar_middle_name.errors %}value="{{ form.ar_middle_name.value }}" {% endif %}type="text" class="form-control" name="ar_middle_name" id="ar_middle_name" placeholder="{{ form.ar_middle_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" required="required"/>
 					{% if form.ar_middle_name.errors %}
 					    {% for error in form.ar_middle_name.errors %}
 					        <label class='error' for='ar_middle_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
-					<input {% if form.ar_last_name.value and not form.ar_last_name.errors %}value="{{ form.ar_last_name.value }}" {% endif %}type="text" class="form-control" name="ar_last_name" id="ar_last_name" placeholder="{{ form.ar_last_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" />
+					<input {% if form.ar_last_name.value and not form.ar_last_name.errors %}value="{{ form.ar_last_name.value }}" {% endif %}type="text" class="form-control" name="ar_last_name" id="ar_last_name" placeholder="{{ form.ar_last_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" required="required"/>
 					{% if form.ar_last_name.errors %}
 					    {% for error in form.ar_last_name.errors %}
 					        <label class='error' for='ar_last_name' style='display: inline-block'>{{ error|escape }}</label>
@@ -52,19 +52,19 @@
 						<i class="entypo-user"></i>
 					</div>
 					
-					<input {% if form.en_first_name.value and not form.en_first_name.errors %}value="{{ form.en_first_name.value }}" {% endif %}type="text" class="form-control" name="en_first_name" id="en_first_name" placeholder="{{ form.en_first_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" />
+					<input {% if form.en_first_name.value and not form.en_first_name.errors %}value="{{ form.en_first_name.value }}" {% endif %}type="text" class="form-control" name="en_first_name" id="en_first_name" placeholder="{{ form.en_first_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" required="required"/>
 					{% if form.en_first_name.errors %}
 					    {% for error in form.en_first_name.errors %}
 					        <label class='dinar-light error' for='en_first_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
-					<input {% if form.en_middle_name.value and not form.en_middle_name.errors %}value="{{ form.en_middle_name.value }}" {% endif %}type="text" class="form-control" name="en_middle_name" id="en_middle_name" placeholder="{{ form.en_middle_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" />
+					<input {% if form.en_middle_name.value and not form.en_middle_name.errors %}value="{{ form.en_middle_name.value }}" {% endif %}type="text" class="form-control" name="en_middle_name" id="en_middle_name" placeholder="{{ form.en_middle_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" required="required"/>
 					{% if form.en_middle_name.errors %}
 					    {% for error in form.en_middle_name.errors %}
 					        <label class='dinar-light error' for='en_middle_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
-					<input {% if form.en_last_name.value and not form.en_last_name.errors %}value="{{ form.en_last_name.value }}" {% endif %}type="text" class="form-control" name="en_last_name" id="en_last_name" placeholder="{{ form.en_last_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" />
+					<input {% if form.en_last_name.value and not form.en_last_name.errors %}value="{{ form.en_last_name.value }}" {% endif %}type="text" class="form-control" name="en_last_name" id="en_last_name" placeholder="{{ form.en_last_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" required="required"/>
 					{% if form.en_last_name.errors %}
 					    {% for error in form.en_last_name.errors %}
 					        <label class='dinar-light error' for='en_last_name' style='display: inline-block'>{{ error|escape }}</label>
@@ -79,7 +79,7 @@
 						<i class="entypo-mail"></i>
 					</div>
 					
-					<input {% if form.email.value and not form.email.errors %}value="{{ form.email.value }}" {% endif %}type="text" class="form-control" name="email" id="email" {% if not form.email.errors %}placeholder="البريد الإلكتروني الجامعي"{% endif %} data-mask="[a-zA-Z0-9]+@ksau-hs\.edu\.sa" data-is-regex="true" />
+					<input {% if form.email.value and not form.email.errors %}value="{{ form.email.value }}" {% endif %}type="text" class="form-control" name="email" id="email" {% if not form.email.errors %}placeholder="البريد الإلكتروني الجامعي"{% endif %} data-mask="[a-zA-Z0-9]+@ksau-hs\.edu\.sa" data-is-regex="true" required="required"/>
 					{% if form.email.errors %}
 					    {% for error in form.email.errors %}
 					        <label class='dinar-light error' for='email' style='display: inline-block'>{{ error|escape }}</label>
@@ -93,7 +93,7 @@
 						<i class="entypo-mobile"></i>
 					</div>
 					
-					<input {% if form.mobile_number.value and not form.badge_number.errors %}value="{{ form.mobile_number.value }}" {% endif %}type="text" class="form-control" name="mobile_number" id="mobile_number" placeholder="{{ form.mobile_number.label }}" data-mask="[\d\+]+" data-is-regex="true" />
+					<input {% if form.mobile_number.value and not form.badge_number.errors %}value="{{ form.mobile_number.value }}" {% endif %}type="text" class="form-control" name="mobile_number" id="mobile_number" placeholder="{{ form.mobile_number.label }}" data-mask="[\d\+]+" data-is-regex="true" required="required"/>
 					{% if form.mobile_number.errors %}
 					    {% for error in form.mobile_number.errors %}
 					        <label class='error' for='mobile_number' style='display: inline-block'>{{ error|escape }}</label>
@@ -107,7 +107,7 @@
 						<i class="entypo-vcard"></i>
 					</div>
 					
-					<input {% if form.badge_number.value and not form.badge_number.errors %}value="{{ form.badge_number.value }}" {% endif %}type="text" class="form-control" name="badge_number" id="badge_number" placeholder="{{ form.badge_number.label }}" data-mask="\d+" data-is-regex="true" />
+					<input {% if form.badge_number.value and not form.badge_number.errors %}value="{{ form.badge_number.value }}" {% endif %}type="text" class="form-control" name="badge_number" id="badge_number" placeholder="{{ form.badge_number.label }}" data-mask="\d+" data-is-regex="true" required="required"/>
 					{% if form.badge_number.errors %}
 					    {% for error in form.badge_number.errors %}
 					        <label class='error' for='badge_number' style='display: inline-block'>{{ error|escape }}</label>
@@ -121,7 +121,7 @@
 						<i class="entypo-graduation-cap"></i>
 					</div>
 					
-					<input {% if form.student_id.value and not form.student_id.errors %}value="{{ form.student_id.value }}" {% endif %}type="text" class="form-control" name="student_id" id="student_id" placeholder="{{ form.student_id.label }}" data-mask="\d+" data-is-regex="true" />
+					<input {% if form.student_id.value and not form.student_id.errors %}value="{{ form.student_id.value }}" {% endif %}type="text" class="form-control" name="student_id" id="student_id" placeholder="{{ form.student_id.label }}" data-mask="\d+" data-is-regex="true" required="required"/>
 					{% if form.student_id.errors %}
 					    {% for error in form.student_id.errors %}
 					        <label class='error' for='student_id' style='display: inline-block'>{{ error|escape }}</label>
@@ -135,7 +135,7 @@
 					<div class="input-group-addon">
 						<i class="entypo-docs"></i>
 					</div>
-					<select {% if form.college.value and not form.college.errors %}value="{{ form.college.value }}" {% endif %}class="form-control" id="college" name="college" required="required" title="{{ form.college.label }}">
+					<select {% if form.college.value and not form.college.errors %}value="{{ form.college.value }}" {% endif %}class="form-control" id="college" name="college" title="{{ form.college.label }}" required="required">
                                                 <option value="">{{ form.college.label }}</option>
                                                 {% for value, label in form.fields.college.widget.choices %}
                                                 <option {% if form.college.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
@@ -153,7 +153,7 @@
 					<div class="input-group-addon">
 						<i class="entypo-docs"></i>
 					</div>
-					<select {% if form.section.value and not form.section.errors %}value="{{ form.section.value }}" {% endif %}class="form-control" id="section" name="section" required="required" title="{{ form.section.label }}">
+					<select {% if form.section.value and not form.section.errors %}value="{{ form.section.value }}" {% endif %}class="form-control" id="section" name="section"  title="{{ form.section.label }}" required="required">
                                                 <option value="">{{ form.section.label }}</option>
                                                 {% for value, label in form.fields.section.widget.choices %}
                                                 <option {% if form.section.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
@@ -171,8 +171,8 @@
 						<i class="entypo-key"></i>
 					</div>
 					
-					<input type="password" class="form-control" name="password1" id="password1" placeholder="اختر كلمة سر" autocomplete="off" />
-					<input type="password" class="form-control" name="password2" id="password2" placeholder="أكّد كلمة السر" autocomplete="off" />
+					<input type="password" class="form-control" name="password1" id="password1" placeholder="اختر كلمة سر" autocomplete="off" required="required"/>
+					<input type="password" class="form-control" name="password2" id="password2" placeholder="أكّد كلمة السر" autocomplete="off" required="required"/>
 				</div>
 			</div>
 			

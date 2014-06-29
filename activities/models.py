@@ -30,7 +30,7 @@ class Activity(models.Model):
     submission_date = models.DateTimeField('date submitted',
                                            auto_now_add=True)
     edit_date = models.DateTimeField('date edited', auto_now=True)
-    is_editable = models.BooleanField(default=True)
+    is_editable = models.BooleanField(default=True, verbose_name=u"هل يمكن تعديله؟")
     collect_participants = models.BooleanField(default=False,
                                                verbose_name=u"اسمح بالتسجيل؟")
     participant_colleges = models.ManyToManyField(College,
@@ -77,7 +77,9 @@ class Activity(models.Model):
             ("view_activity", "Can view all available activities."),
             ("directly_add_activity", "Can add activities directly, without approval."),
         )
-
+        # For the admin interface.
+        verbose_name = u"نشاط"
+        verbose_name_plural = u"النشاطات"
 
     def __unicode__(self):
         return self.name
@@ -132,6 +134,9 @@ class Review(models.Model):
             ("view_deanship_review", "Can view a review in the name of the deanship."),
             ("view_presidency_review", "Can view a review in the name of the presidency."),
         )
+        # For the admin interface.
+        verbose_name = u"مراجعة"
+        verbose_name_plural = u"المراجعات"
 
     def __unicode__(self):
         return str(self.id)
@@ -147,6 +152,9 @@ class Participation(models.Model):
         permissions = (
             ("view_participation", "Can view all available participations."),
         )
+        # For the admin interface.
+        verbose_name = u"مشاركة"
+        verbose_name_plural = u"المشاركات"
 
 class Episode(models.Model):
     """
@@ -217,3 +225,9 @@ class Category(models.Model):
 
     def __unicode__(self):
         return self.ar_name
+
+
+    class Meta:
+        # For the admin interface.
+        verbose_name = u"تصنيف"
+        verbose_name_plural = u"التصنيفات"

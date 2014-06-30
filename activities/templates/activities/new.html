@@ -119,7 +119,7 @@ for (i=0; i<episode_count; i++) {
 		.addClass('episode_field').addClass('episode_' + i).addClass('loc_field');;
 	
 	// Wrap each episode in a div
-	$('.episode_' + i).wrapAll("<div id='episode_" + i + "_container' class='episode_container' />");
+	$('.episode_' + i).wrapAll("<div id='episode_" + i + "_container' class='episode_container row' />");
 }
 
 // Now wrap all the episode_fields in a single div
@@ -177,9 +177,10 @@ for (i=0; i<episode_count; i++) {
 	
 	// Upon clicking this button, a new episode will be added to the form, with all
 	// the associeated fields
-	$('#btn_add_episode').click(function () {		
+	$('#btn_add_episode').click(function () {
+		var episode_count = $('input[name="episode_count"]').val();
 		// Add a new episode and move this (button) to buttom
-		var episode = '<div id="episode_{i}_container" class="episode_container"><div class="col-md-1"><h4>الموعد {i+1}</h4></div><div class="col-md-11"><div id="episode_{i}_dates" class="col-md-5"><div class="form-group episode_field episode_{i} date_field col-md-6"><label>تاريخ البداية</label><input class="form-control" id="id_start_date{i}" name="start_date{i}" placeholder="تاريخ البداية" required="required" type="text" data-start-view="1"></div><div class="form-group episode_field episode_{i} date_field col-md-6"><label>تاريخ النهاية</label><input class="form-control" id="id_end_date{i}" name="end_date{i}" placeholder="تاريخ النهاية" required="required" type="text" data-start-view="1"></div></div><div id="episode_{i}_times" class="col-md-4"><div class="form-group episode_field episode_{i} time_field col-md-6"><label>وقت البداية</label><input class="form-control" id="id_start_time{i}" name="start_time{i}" placeholder="وقت البداية" required="required" type="text"></div><div class="form-group episode_field episode_{i} time_field col-md-6"><label>وقت النهاية</label><input class="form-control" id="id_end_time{i}" name="end_time{i}" placeholder="وقت النهاية" required="required" type="text"></div></div><div id="episode_{i}_loc" class="col-md-3"><div class="form-group episode_field episode_{i} loc_field col-md-12"><label>المكان</label><input class="form-control" id="id_location{i}" maxlength="128" name="location{i}" placeholder="المكان" required="required" type="text"></div></div></div></div>'.replace(/{i}/g, episode_count).replace('{i+1}', parseInt(episode_count)+1);
+		var episode = '<div id="episode_{i}_container" class="episode_container row"><div class="col-md-1"><h4>الموعد {i+1}</h4></div><div class="col-md-11"><div id="episode_{i}_dates" class="col-md-5"><div class="form-group episode_field episode_{i} date_field col-md-6"><label>تاريخ البداية</label><input class="form-control" id="id_start_date{i}" name="start_date{i}" placeholder="تاريخ البداية" required="required" type="text" data-start-view="1"></div><div class="form-group episode_field episode_{i} date_field col-md-6"><label>تاريخ النهاية</label><input class="form-control" id="id_end_date{i}" name="end_date{i}" placeholder="تاريخ النهاية" required="required" type="text" data-start-view="1"></div></div><div id="episode_{i}_times" class="col-md-4"><div class="form-group episode_field episode_{i} time_field col-md-6"><label>وقت البداية</label><input class="form-control" id="id_start_time{i}" name="start_time{i}" placeholder="وقت البداية" required="required" type="text"></div><div class="form-group episode_field episode_{i} time_field col-md-6"><label>وقت النهاية</label><input class="form-control" id="id_end_time{i}" name="end_time{i}" placeholder="وقت النهاية" required="required" type="text"></div></div><div id="episode_{i}_loc" class="col-md-3"><div class="form-group episode_field episode_{i} loc_field col-md-12"><label>المكان</label><input class="form-control" id="id_location{i}" maxlength="128" name="location{i}" placeholder="المكان" required="required" type="text"></div></div></div></div>'.replace(/{i}/g, episode_count).replace('{i+1}', parseInt(episode_count)+1);
 		$(episode).insertBefore('#btn_add_episode');
 		// Initialize date and time pickers
 		
@@ -187,7 +188,7 @@ for (i=0; i<episode_count; i++) {
 		// add attributes and init datepickers
 		$('#episode_' + episode_count + '_dates .date_field input').attr('data-start-view', '1').datepicker({isRTL: true});
 		
-		console.log($('#episode_' + episode_count + '_dates .date_field input'));
+		// console.log($('#episode_' + episode_count + '_dates .date_field input'));
 		
 		// Configure time pickers
 		$('#episode_' + episode_count + '_times .time_field input').timepicker({showMeridian: false})
@@ -198,11 +199,155 @@ for (i=0; i<episode_count; i++) {
 		// Update episode_count
 		episode_count++;
 		$('input[name="episode_count"]').val(episode_count);
+		addOrRemoveEpisodeDeleteButtons()
 	});
+	
+	// Add the delete buttons if necessary
+	addOrRemoveEpisodeDeleteButtons()
 
 });
+
+function addOrRemoveEpisodeDeleteButtons() {
+	var episode_count = $('input[name="episode_count"]').val();
+	
+	if (episode_count > 1) {
+		// delete buttons should be visible
+		$(".episode_container").each(function (index) {
+			// if the episode container doesn't contain a delete button, add one
+			// console.log("index: " + index)
+			// console.log($(this).has(".episode_delete_btn").length)
+			if ($(this).find(".episode_delete_btn").length == 0) {
+				console.log($(this));
+				console.log($(this).find(".col-md-11"));
+				$(this).find(".col-md-11").removeClass("col-md-11").addClass("col-md-10");
+				var deleteButton = '<div class="col-md-1"><button class="btn btn-xs btn-red episode_delete_btn"><i class="fa fa-trash-o"></i></button></div>';
+				// Add the delete button to every episode container
+				$(this).append(deleteButton);
+	
+				// Attach a delete function to the button
+				$(this).find(".episode_delete_btn").click(function () {
+					var episode_count = $('input[name="episode_count"]').val();
+					// Remove episode
+					$(this).parent().parent().remove()
+					// Update episode count
+					// console.log(episode_count)
+					episode_count -= 1
+					// console.log(episode_count)
+					$('input[name="episode_count"]').val(episode_count)
+					// Call addOrRemoveEpisodeDeleteButtons function to show or hide delete buttons as
+					// appropriate
+					addOrRemoveEpisodeDeleteButtons()
+					updateEpisodes()
+				});
+			};
+		});
+		
+	} else if (episode_count == 1) {
+		$(".episode_delete_btn").remove()
+		$(".episode_container .col-md-10").removeClass("col-md-10").addClass("col-md-11");	
+	}
+}
+
+/*
+ * This function ensures that episode numbers -in terms of id's, classes and titles-
+ * are in order starting from 0 and increasing in steps of 1.
+ * This is necessary when a deletion occurs in the middle of the episode sequence.
+ */
+function updateEpisodes() {
+	// Iterate over the existing episodes, assigning them indices starting from 0
+	// regardless of what their previous indices are.
+	$(".episode_container").each(function (index) {
+		var old_index = $(this).attr("id").split("_")[1];
+		
+		$(this).attr("id", "episode_" + index + "_container");
+		
+		// Update the text of the title
+		$(this).find("div h4").text("الموعد " + (parseInt(index) + 1));
+		
+		// Update fields
+		// pk field
+		$(this).find("div #id_episode_pk" + old_index)
+			.attr("id", "id_episode_pk" + index)
+			.attr("name", "episode_pk" + index)
+			.removeClass("episode_" + old_index)
+			.addClass("episode_" + index)
+		
+		// Date, time, and location containers
+		$(this).find("div #episode_" + old_index + "_dates")
+			.attr("id", "episode_" + index + "_dates");
+			
+		$(this).find("div #episode_" + old_index + "_times")
+			.attr("id", "episode_" + index + "_times");
+			
+		$(this).find("div #episode_" + old_index + "_loc")
+			.attr("id", "episode_" + index + "_loc");
+		
+		// .episode_X class
+		$(this).find(".episode_" + old_index)
+			.removeClass("episode_" + old_index)
+			.addClass("episode_" + index);
+		
+		$(this).find("#id_start_date" + old_index)
+			.attr("id", "id_start_date" + index)
+			.attr("name", "start_date" + index)
+		
+		$(this).find("#id_end_date" + old_index)
+			.attr("id", "id_end_date" + index)
+			.attr("name", "end_date" + index)
+			
+		$(this).find("#id_start_time" + old_index)
+			.attr("id", "id_start_time" + index)
+			.attr("name", "start_time" + index)
+			
+		$(this).find("#id_end_time" + old_index)
+			.attr("id", "id_end_time" + index)
+			.attr("name", "end_time" + index)
+			
+		$(this).find("#id_location" + old_index)
+			.attr("id", "id_location" + index)
+			.attr("name", "location" + index)
+	});
+}
+
+/*
+ * TODO: when deleting an episode from the middle or beginning, episode numbers and delete buttons
+ *  get messed up; fix that. 
+ */
+
+/*
+ * For reference, this is how episodes are organized
+ * 
+ * |--div #episodes .panel-body
+ *    |--input #id_episode_count
+ *    |--div #episode_X_container .episode_container .row
+ *       |--div .col-md-1
+ *          |--h4
+ *       |--div .col-md-11 (or .col-md-10 when delete button is present)
+ *          |--input #id_episode_pk0 [name=episode_pk0] .episode_field .episode_X
+ *          |--div #episode_X_dates .col-md-5
+ *             |--div .form-group .episode_field .episode_X .date_field .col-md-6
+ *                |--label
+ *                |--input .form-control #id_start_date_X [name=start_date_X]
+ *             |--div .form-group .episode_field .episode_X .date_field .col-md-6
+ *                |--label
+ *                |--input .form-control #id_end_date_X [name=end_date_X]
+ *          |--div #episode_X_times .col-md-4
+ *             |--div .form-group .episode_field .episode_X .time_field .col-md-6
+ *                |--label
+ *                |--input .form-control #id_start_time_X [name=start_time_X]
+ *             |--div .form-group .episode_field .episode_X .time_field .col-md-6
+ *                |--label
+ *                |--input .form-control #id_end_time_X [name=end_time_X]
+ *          |--div #episode_X_loc .col-md-3
+ *             |--div .form-group .episode_field .episode_X .loc_field .col-md-12
+ *                |--label
+ *                |--input .form-control #id_location_X [name=location_X]
+ *       |--div .col-md-1
+ *          |--button .episode_delete-btn
+ */
 </script>
 
+<link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/font-awesome/css/font-awesome.min.css' %}">
 {% endblock %}
 
 {% block customscript %}

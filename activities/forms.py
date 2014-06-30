@@ -1,4 +1,7 @@
 # -*- coding: utf-8  -*-
+"""
+This module contains the forms used in the activities app.
+"""
 from django import forms
 from django.forms import ModelForm, ModelChoiceField, ModelMultipleChoiceField
 
@@ -107,6 +110,10 @@ class ActivityForm(ModelForm):
         # First, check how many episodes we have
         episode_count = self.cleaned_data['episode_count']
         new_episodes = []
+        pk_list = [] # A list for storing any pk's submitted through the form
+                     # Comparing this list to the list of episode pk's from the
+                     # the database will tell us which episodes, if any, have
+                     # been deleted 
         
         for i in range(int(episode_count)):
             # Get the details of each episode and store them in an Episode object
@@ -120,6 +127,7 @@ class ActivityForm(ModelForm):
             # If there is a pk, i.e. the episode already exists in the database, just update it
             # Otherwise create a new one
             if pk:
+                pk_list.append(int(pk))
                 episode = Episode.objects.get(pk=pk)
                 
                 episode.start_date = start_date
@@ -136,8 +144,20 @@ class ActivityForm(ModelForm):
                                   end_time=end_time,
                                   location=location)
                 new_episodes.append(episode)
-                    
+        
+        print "PK list: ", pk_list
+        
         activity = super(ActivityForm, self).save(*args, **kwargs)
+        
+        # Check if any episodes have been deleted and delete them
+        for episode in activity.episode_set.all():
+            print "PK: ", episode.pk, " is in list: " if episode.pk in pk_list else " is not in list: ", pk_list
+            if episode.pk not in pk_list:
+                # If the pk is not in the submitted pk's, then it has been deleted
+                # by the user, so delete it from the database
+                episode.delete()
+        
+        # Save the new episodes
         for episode in new_episodes:
             episode.activity = activity
             episode.save()

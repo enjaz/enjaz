@@ -489,3 +489,5 @@ class ReviewViewTests(TestCase):
         self.assertContains(response, '<button type="submit"')
         self.assertContains(response, 'أرسل')
         self.assertContains(response, review.name_notes)
+        
+from activities.more_tests.activity_form_tests import EpisodeTests

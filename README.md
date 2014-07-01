@@ -35,18 +35,17 @@ In the project `urls.py`, add the following:
 # [...]
 from django.views.generic import TemplateView
 from accounts.admin import deanship_admin
-from accounts.forms import SignupFormExtra, ModifiedAuthenticationForm
+from accounts.forms import StudentSignupForm, NonStudentSignupForm, ModifiedAuthenticationForm
 # [...]
-    (r'^$', 'activities.views.portal_home', name='home'),
-    (r'^about/$', TemplateView.as_view(template_name='about.html'), name='about'),
-    (r'^copy/$', TemplateView.as_view(template_name='copy.html'), name='copy'),
-    (r'^clubs/', include('clubs.urls', namespace="clubs")),
-    (r'^books/', include('books.urls', namespace="books")),
-    (r'^niqati/', include('niqati.urls', namespace="niqati")),
-    (r'^accounts/signup/$', 'userena.views.signup', {'signup_form': SignupFormExtra}),
-    (r'^accounts/signin/$', 'userena.views.signin', {'auth_form': ModifiedAuthenticationForm}),
-    (r'^accounts/', include('userena.urls'),
-    (r'^deanship_admin/', include(deanship_admin.urls)),
+    url(r'^$', 'activities.views.portal_home', name='home'),
+    url(r'^about/$', TemplateView.as_view(template_name='about.html'), name='about'),
+    url(r'^clubs/', include('clubs.urls', namespace="clubs")),
+    url(r'^books/', include('books.urls', namespace="books")),
+    url(r'^niqati/', include('niqati.urls', namespace="niqati")),
+    url(r'^accounts/signup/$', 'userena.views.signup', {'signup_form': StudentSignupForm, 'template_name': 'userena/student_signup_form.html'}),
+    url(r'^accounts/signup/nonstudents/$', 'userena.views.signup', {'signup_form': NonStudentSignupForm, 'template_name': 'userena/nonstudent_signup_form.html'}, name="nonstudent_signup"),
+    url(r'^accounts/signin/$', 'userena.views.signin', {'auth_form': ModifiedAuthenticationForm}),
+    url(r'^accounts/', include('userena.urls'), (r'^deanship_admin/', include(deanship_admin.urls)),
 # [...]
 ```
 
@@ -55,7 +54,7 @@ Current required settings:
 * GOOGLE_BOOKS_KEY: to be generated from https://code.google.com/apis/console/
 * MEDIA_ROOT: Where do you want to save the covers on the server?
 * MEDIA_URL: Where do you want users to access the covers?
-* `AUTH_PROFILE_MODULE = 'accounts.MyProfile'`
+* `AUTH_PROFILE_MODULE = 'accounts.EnjazProfile'`
 * `USERENA_WITHOUT_USERNAMES = True`
 * Add `"django.core.context_processors.request"` to the [default TEMPLATE_CONTEXT_PROCESSORS](https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATE_CONTEXT_PROCESSORS)
 

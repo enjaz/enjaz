@@ -55,7 +55,10 @@ class Club(models.Model):
     creation_date = models.DateTimeField('date created',
                                          auto_now_add=True)
     edit_date = models.DateTimeField('date edited', auto_now=True)
-
+    class Meta:
+        # For the admin interface.
+        verbose_name = u"نادي"
+        verbose_name_plural = u"النوادي"
     def __unicode__(self):
         return self.name
 
@@ -76,8 +79,13 @@ class MembershipApplication(models.Model):
         return self.user
 
 class College(models.Model):
-    section = models.CharField(max_length=2, choices=section_choices)
-    college_name = models.CharField(max_length=1, choices=college_choices)
+    section = models.CharField(max_length=2, choices=section_choices, verbose_name=u"القسم")
+    name = models.CharField(max_length=1, choices=college_choices, verbose_name=u"الاسم")
 
     def __unicode__(self):
-        return u"%s (%s)" % (self.get_college_name_display(), self.get_section_display())
+        return u"%s (%s)" % (self.get_name_display(), self.get_section_display())
+
+    class Meta:
+        # For the admin interface.
+        verbose_name = u"كلية"
+        verbose_name_plural = u"الكليات"

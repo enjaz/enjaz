@@ -11,11 +11,11 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
 from activities.models import Activity, Review, Participation, Episode
+from activities.forms import ActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm
 from clubs.models import Club
 from books.models import Book
 from niqati.models import Niqati_User
 
-from activities.forms import ActivityForm, DirectActivityForm, ReviewForm
 
 def portal_home(request):
     # If the user is logged in, return the admin dashboard;
@@ -57,16 +57,16 @@ def portal_home(request):
         return render(request, 'front/home_front.html', context)
 
 def list(request):
-    # If the user is part of the head of the Student Club, or part of
-    # the Media Center, they should be able to view all activities
-    # (i.e. approved, rejected and pending).  Otherwise, a user should
-    # only see approved activities and the activities of the clubs
-    # they have memberships in (regardless of their status).
     if request.user.is_authenticated():
         template = 'activities_base.html'
     else:
         template = 'front/front_base.html'
-    
+
+    # If the user is part of the presidency of the Student Club, or
+    # part of the Media Center, they should be able to view all
+    # activities (i.e. approved, rejected and pending).  Otherwise, a
+    # user should only see approved activities and the activities of
+    # the clubs they have memberships in (regardless of their status).    
     if request.user.has_perm('activities.view_activity'):
         if request.GET.get('pending') == "1":
             activities = Activity.objects.filter(review__is_approved=None)
@@ -129,58 +129,30 @@ def show(request, activity_id):
 #        By definition, the coordinator should have all the below-mentioned
 #        permissions; all we need is use {{ perms }} from within the template
 #        [Saeed, 17 Jun 2014]
-#
-#         if request.user.has_perm('activities.change_activity') or \
-#            is_coordinator:
-#             context['can_edit'] = True
-#         if request.user.has_perm('activities.view_participation') or \
-#            is_coordinator:
-#             context['can_view_participation'] = True
-#         if request.user.has_perm('activities.can_view_deanship_review') or \
-#            is_coordinator:
-#             context['can_view_deanship_review'] = True
-#         if request.user.has_perm('activities.can_view_presidency_review') or \
-#            is_coordinator:
-#             context['can_view_presidency_review'] = True
-#
-#            Everything related to viewing or adding reviews is now moved to the review
-#            view, which is more logical and neat [Saeed, 17 Jun 2014]
-#
-#             try:
-#                 review_p = Review.objects.get(activity=activity,
-#                                               review_type='P')
-#                 context['review_p'] = review_p
-#             except ObjectDoesNotExist:
-#                 pass
+
+#        {{ perms }} cannot figure out whether or not someone is a
+#        coordinator of this specific club.  In addition, Django
+#        templates are limited when dealing with combined and/or
+#        conditions. [Osama, 27 Jun 2014]
+
+        if request.user.has_perm('activities.change_activity') or \
+            is_coordinator:
+            context['can_edit'] = True
+        if request.user.has_perm('activities.view_participation') or \
+            is_coordinator:
+            context['can_view_participation'] = True
+        if request.user.has_perm('activities.view_deanship_review') or \
+            is_coordinator:
+            context['can_view_deanship_review'] = True
+        if request.user.has_perm('activities.view_presidency_review') or \
+            is_coordinator:
+            context['can_view_presidency_review'] = True
     else:
         user_clubs = Club.objects.none()
 
     activity_primary_club = activity.primary_club
     activity_secondary_clubs = activity.secondary_clubs.all()
     activity_clubs = [activity_primary_club] + [club for club in activity_secondary_clubs]
-
-#    Again, everything related to reviews is moved to the review view
-#    [Saeed, 17 Jun 2014]
-#     
-#     # We obtain the deanship review specifically because, really,
-#     # that's what matters in determining whether a user can see the
-#     # activity.
-#     try:
-#         review_d = Review.objects.get(activity=activity,
-#                                       review_type='D')
-#         context['review_d'] = review_d
-#     except ObjectDoesNotExist:
-#         review_d = False
-#     
-#    This is redundant, since the Activity model has an is_approved()
-#    funtion which can be called directly from the template [Saeed, 17 Jun 2014]
-#     try:
-#         # The important review here is the deanship's, beacuse that
-#         # what would determine whether the activity is accessible.
-#         activity_status = review_d
-#     except ObjectDoesNotExist:
-#         activity_status = False
-
 
     # The third test condition, that is:
     #   any([club in activity_clubs for club in user_clubs])
@@ -194,15 +166,9 @@ def show(request, activity_id):
        not request.user == activity.submitter:
         raise PermissionDenied
 
-#    We can check for the permissions from within the template [Saeed, 17 Jun 2014]
-#     if request.user.has_perm('activities.add_presidency_review') or \
-#        request.user.has_perm('activities.add_deanship_review'):
-#         context['can_review'] = True
-
     return render(request, 'activities/show_new.html', context)
 
 @login_required
-@permission_required('activities.add_activity', raise_exception=True)
 def create(request):
     presidency = Club.objects.get(english_name="Presidency")
     if request.method == 'POST':
@@ -224,13 +190,22 @@ def create(request):
             context = {'form': form}
             return render(request, 'activities/new.html', context)
     else:
+        # To check permissions, rather than using the
+        # @permission_required('activities.add_activity') decorator,
+        # it is more dynamic to check whether the user is a
+        # coordinator of any club, or has the permission to add
+        # activities (i.e. part of the presidency group)
+        user_coordination = request.user.coordination.all()
+        if not request.user.has_perm("activities.add_activity") and not user_coordination:
+            raise PermissionDenied
+
         can_directly_add = request.user.has_perm("activities.directly_add_activity")
         try:
             # It is theoretically true that the user can be a
             # coordinator of more than one single club, but we are not
             # taking that into consideration because it is just not
             # common enough.
-            user_club = request.user.coordination.all()[0]
+            user_club = user_coordination[0]
         except IndexError:
             # Make it more user-friendly: if the user is an admin,
             # automatically choose presidency as the default
@@ -260,15 +235,18 @@ def edit(request, activity_id):
 
     # If the user is neither the submitter, nor has the permission to
     # change activities (i.e. not part of the head of the Student
-    # Club, or the Media Team), not a coordinator of any of the
+    # Club, or the Media Team), nor a coordinator of any of the
     # organizing clubs, raise a PermissionDenied error.
     if not request.user == activity.submitter and \
        not request.user.has_perm('activities.change_activity') and \
        not any([club in activity_clubs for club in user_coordination]):
         raise PermissionDenied
 
-    if request.method == 'POST':        
-        modified_activity = ActivityForm(request.POST, instance=activity)
+    if request.method == 'POST':
+        if request.user.has_perm('activities.directly_add_activity'):
+            modified_activity = DirectActivityForm(request.POST, instance=activity)
+        else:
+            modified_activity = ActivityForm(request.POST, instance=activity)
         # Should check that edits are valid before saving
         # TODO: actually edits should be approved first by presidency and deanship
         if modified_activity.is_valid():
@@ -281,7 +259,19 @@ def edit(request, activity_id):
                        'edit': True}
             return render(request, 'activities/new.html', context)
     else:
-        form = ActivityForm(instance=activity)
+        # There are different activity forms depending on what
+        # permission the user has.  Presidency group members
+        # (i.e. with directly_add_activity) can add activities
+        # directly without waiting for the approval of the deanship.
+        # They can also (with change_activity) edit activities
+        # regardless of their is_editable value.
+        if request.user.has_perm('activities.directly_add_activity'):
+            form = DirectActivityForm(instance=activity)
+        elif not activity.is_editable and \
+             not request.user.has_perm('activities.change_activity'):
+            form = DisabledActivityForm(instance=activity)
+        else:
+            form = ActivityForm(instance=activity)
         context = {'form': form, 'activity_id': activity_id,
                    'activity': activity, 'edit': True}
         return render(request, 'activities/new.html', context)
@@ -289,21 +279,14 @@ def edit(request, activity_id):
 @login_required
 def review(request, activity_id, type=None):
     activity = get_object_or_404(Activity, pk=activity_id)
-
-    # We have two types of reviews: the one that is submitted by the
-    # presidency (first), and the one that is done by the deanship.
-#     if request.user.has_perm('activities.add_presidency_review'):
-#         review_type = 'P'
-#     elif request.user.has_perm('activities.add_deanship_review'):
-#         review_type = 'D'
-#     else:
-#         raise PermissionDenied
+    is_coordinator = activity.primary_club in request.user.coordination.all()
 
     if type == None:
-        # If the user has any permission (read or write) related to the deanship review,
-        # redirect to review/d/. Otherwise, if the user has any permission (read or write)
-        # related to the presidency review, redirect to review/p/
-        # Otherwise, raise PermissionDenied
+        # If the user has any permission (read or write) related to
+        # the deanship review, redirect to review/d/. Otherwise, if
+        # the user has any permission (read or write) related to the
+        # presidency review, redirect to review/p/.  Otherwise, raise
+        # PermissionDenied
         if request.user.has_perm('activities.add_deanship_review') or \
            request.user.has_perm('activities.view_deanship_review'):
             return HttpResponseRedirect(reverse('activities:review_with_type',
@@ -344,11 +327,13 @@ def review(request, activity_id, type=None):
                 activity.save()
             return HttpResponseRedirect(reverse('activities:show',
                                                 args=(activity_id,)))
+        # TODO: if not valid, show the error messages.
     else: # if not POST
-        # If the user has the permission to add a review of the corresponding type
-        # then return the review form page to add or edit the review
-        # Else, if if they have the permission to read, then return the review read page
-        # Otherwise, raise PermissionDenied
+        # If the user has the permission to add a review of the
+        # corresponding type then return the review form page to add
+        # or edit the review.
+        # Else, if if they have the permission to read, then return
+        # the review read page Otherwise, raise PermissionDenied
         if request.user.has_perm('activities.add_' + rt_full + '_review'):
             template = 'activities/review_write.html'
             try: # If the review is already there, edit it.
@@ -358,8 +343,9 @@ def review(request, activity_id, type=None):
             except ObjectDoesNotExist:
                 review = ReviewForm()
                 # Note 1: Here, review is a ReviewForm object, because we want to write
-        
-        elif request.user.has_perm('activities.view_' + rt_full + '_review'):
+        # Deanship employees, presidency students and the specific
+        # club coordinator should be able to see the reviews.
+        elif request.user.has_perm('activities.view_' + rt_full + '_review') or is_coordinator:
             template = 'activities/review_read.html'
             try:
                 review = Review.objects.get(activity=activity,
@@ -372,6 +358,20 @@ def review(request, activity_id, type=None):
         
     context = {'activity': activity, 'active_tab': rt_full,
                'review': review, 'review_type': review_type}
+
+    if request.user.has_perm('activities.change_activity') or \
+        is_coordinator:
+        context['can_edit'] = True
+    if request.user.has_perm('activities.view_participation') or \
+        is_coordinator:
+        context['can_view_participation'] = True
+    if request.user.has_perm('activities.view_deanship_review') or \
+        is_coordinator:
+        context['can_view_deanship_review'] = True
+    if request.user.has_perm('activities.view_presidency_review') or \
+        is_coordinator:
+        context['can_view_presidency_review'] = True
+
     return render(request, template, context)
 
 @login_required

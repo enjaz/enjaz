@@ -1,5 +1,5 @@
 from django.contrib import admin
-from activities.models import Activity, Episode
+from activities.models import Activity, Episode, Category
 
 class EpisodeInline(admin.StackedInline):
     model = Episode
@@ -14,3 +14,4 @@ class ActivityAdmin(admin.ModelAdmin):
     inlines = [EpisodeInline]
     
 admin.site.register(Activity, ActivityAdmin)
+admin.site.register(Category)

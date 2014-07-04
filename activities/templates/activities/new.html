@@ -2,50 +2,10 @@
 {% block title %}{% if edit %} تعديل {{ form.name.value }} {% else %} نشاط جديد {% endif %}{% endblock %}
 
 {% block content %}
- <script>
- {% comment %}
-$(function() {
-$('#id_date').datepicker({isRTL: true});
-$('#id_date').change(function(){
-    if($(this).val().length != 0){
-        $('#id_custom_datetime').attr('disabled', 'disabled');
-    }else{
-        $('#id_custom_datetime').removeAttr('disabled');
-}
-});
-$('#id_custom_datetime').change(function(){
-    if($(this).val().length != 0){
-        $('#id_date').attr('disabled', 'disabled');
-        $('#id_time').attr('disabled', 'disabled');
-        $('#id_time').val('');
-    }else{
-        $('#id_date').removeAttr('disabled');
-        $('#id_time').removeAttr('disabled');
-}
-});
-{% endcomment %}
-
-{% if not activity.collect_participants %}
-$("#id_participant_colleges").siblings().hide();
-$("#id_participant_colleges").hide();
-{% endif %}
-
-$('#id_collect_participants').click(function() {
-    if( $(this).is(':checked')) {
-        $("#id_participant_colleges").siblings().show("slow");
-        $("#id_participant_colleges").show("slow");
-    } else {
-        $("#id_participant_colleges").siblings().hide("slow");
-        $("#id_participant_colleges").hide("slow");
-    }
-});
-});
-</script>
-
 <h2>{% if edit %} تعديل {{ form.name.value }} {% else %} نشاط جديد {% endif %}</h2>
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
+{% if edit and not activity.is_editable and not perms.activities.change_activity %}<p class="bg-warning">اعتمد هذا النشاط، ولم يعد ممكنا تعديله.  ستتمكن من تعديل {{ form.fields.public_description.label }} فقط.</p>{% endif %}
 <form action="{% if edit %}{% url 'activities:edit' activity_id %}{% else %}{% url 'activities:create' %}{% endif %}" method="post" class="form">
 {% csrf_token %}
 
@@ -92,10 +52,29 @@ $('#id_collect_participants').click(function() {
 
 <script>
 $(document).ready(function () {
-	
-// Move the episode panel to the 4th position in the form
+
+// Hide the list of colleges if the participation checkbox is not
+// chosen.
+{% if not activity.collect_participants %}
+$("#id_participant_colleges").siblings().hide();
+$("#id_participant_colleges").hide();
+{% endif %}{% comment %}
+// FIXME: the collect_participants checkbox is not 'readonly', it can be modified.
+{% endcomment %}
+// Check if it's readonly, if not, hide list when unchecked.
+$('#id_collect_participants').click(function() {
+    if( $(this).is(':checked') && !($(this).is('[readonly]'))) {
+        $("#id_participant_colleges").siblings().show("slow");
+        $("#id_participant_colleges").show("slow");
+    } else if  (!($(this).is(':checked')) && !($(this).is('[readonly]'))) {
+        $("#id_participant_colleges").siblings().hide("slow");
+        $("#id_participant_colleges").hide("slow");
+    }
+});
+
+// Move the episode panel to the 6th position in the form
 // (after the description field)
-$('#episode_panel').insertAfter('form .form-group:nth-child(4)');
+$('#episode_panel').insertAfter('form .form-group:nth-child(6)');
 	
 // Wrap all the fields related to episodes in a single div.
 // This makes it much easier for styling.
@@ -173,8 +152,7 @@ for (i=0; i<episode_count; i++) {
 
 // Append the 'add episode' button
 	$('#episodes')
-	.append('<button id="btn_add_episode" type="button" class="btn btn-default btn-icon btn-xs">أضف موعدًا<i class="entypo-plus"></i></button>');
-	
+	.append('<button {% if edit and not activity.is_editable %}disabled=disabled {% endif %}id="btn_add_episode" type="button" class="btn btn-default btn-icon btn-xs">أضف موعدًا<i class="entypo-plus"></i></button>');
 	// Upon clicking this button, a new episode will be added to the form, with all
 	// the associeated fields
 	$('#btn_add_episode').click(function () {
@@ -204,7 +182,6 @@ for (i=0; i<episode_count; i++) {
 	
 	// Add the delete buttons if necessary
 	addOrRemoveEpisodeDeleteButtons()
-
 });
 
 function addOrRemoveEpisodeDeleteButtons() {

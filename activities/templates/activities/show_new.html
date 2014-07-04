@@ -73,7 +73,7 @@
 				</a>
 				{% endif %}
 				
-				{% if perms.activities.change_activity and activity.is_editable %}
+				{% if can_edit %}
 				<a href="{% url 'activities:edit' activity.pk %}" class="btn btn-default">
 					<i class="entypo-pencil"></i>
 					عدّل
@@ -90,11 +90,17 @@
 			
 			<div class="col-sm-offset-2 col-sm-10">
 				
-				<ul class="user-details">
+				<ul class="user-details">{# if the user is privileged, show them the internal description #}{% if can_view_deanship_review or perms.activities.add_deanship_review or can_view_presidency_review or perms.activities.add_presidency_review %}
 					<li>
 						<a href="#">
 							<i class="entypo-info-circled"></i>
 							{{ activity.description }}
+						</a>
+					</li>{% endif %}
+					<li>
+						<a href="#">
+							<i class="entypo-megaphone"></i>
+							{{ activity.public_description }}
 						</a>
 					</li>
 					{% for episode in activity.episode_set.all %}
@@ -122,26 +128,22 @@
 					</li>
 					{% endfor %}
 				</ul>
-				
-				
+
 				<!-- tabs for the profile links -->
 				<ul class="nav nav-tabs">
-					{% if perms.activities.view_presidency_review or perms.activities.add_presidency_review %}
-					<li{% if active_tab == 'presidency' %} class="active" {% endif %}>
+					{% if can_view_presidency_review or perms.activities.add_presidency_review %}
+					<li{% if active_tab == 'presidency' %} class="active"{% endif %}>
 						<a href="{% url 'activities:review_with_type' activity.pk 'p' %}">مراجعة رئاسة نادي الطلاب</a>
 					</li>
 					{% endif %}
-					{% if perms.activities.view_deanship_review or perms.activities.add_deanship_review %}
-					<li{% if active_tab == 'deanship' %} class="active" {% endif %}>
+					{% if can_view_deanship_review or perms.activities.add_deanship_review %}
+					<li{% if active_tab == 'deanship' %} class="active"{% endif %}>
 						<a href="{% url 'activities:review_with_type' activity.pk 'd' %}">مراجعة عمادة شؤون الطلاب</a>
 					</li>
 					{% endif %}
 				</ul>
-				
 			</div>
-			
 		</div>
-		
 	</section>
 	
 	<section class="profile-feed">

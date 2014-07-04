@@ -1,0 +1,158 @@
+{% extends 'userena/base_userena.html' %}{% load staticfiles %}
+
+{% block title %}التسجيل{% endblock %}
+{% comment %}{% block description %}فضلًا املأ النموذج التالي لإتمام عملية التسجيل.{% endblock %}{% endcomment %}
+
+{% block content %}
+{% comment %}
+{% if form.errors %}
+<div class="form-login-error visible dinar-light">
+       <h3 class="dinar-medium">عفوًا، نرجو التأكد من الحقول التالية</h3>
+       {% for err in form.errors %}
+       <p>{{ err }}</p>
+       {% endfor %}
+</div>
+{% endif %}
+{% endcomment %}
+<form method="post" role="form" id="form_register">	
+        {% csrf_token %}
+	<div class="dinar-light">
+			<div class="form-group">
+                                <label class="control-label">الاسم بالعربية</label>
+				<div class="input-group{% if form.ar_first_name.errors or form.ar_middle_name.errors or form.ar_last_name.errors %} validate-has-error{% endif %}" required="required">
+					<div class="input-group-addon">
+						<i class="entypo-user"></i>
+					</div>
+					
+					<input {% if form.ar_first_name.value and not form.ar_first_name.errors %}value="{{ form.ar_first_name.value }}" {% endif %}type="text" class="form-control" name="ar_first_name" id="ar_first_name" placeholder="{{ form.ar_first_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" required="required"/>
+					{% if form.ar_first_name.errors %}
+					    {% for error in form.ar_first_name.errors %}
+					        <label class='error' for='ar_first_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if form.ar_middle_name.value and not form.ar_middle_name.errors %}value="{{ form.ar_middle_name.value }}" {% endif %}type="text" class="form-control" name="ar_middle_name" id="ar_middle_name" placeholder="{{ form.ar_middle_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" required="required"/>
+					{% if form.ar_middle_name.errors %}
+					    {% for error in form.ar_middle_name.errors %}
+					        <label class='error' for='ar_middle_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if form.ar_last_name.value and not form.ar_last_name.errors %}value="{{ form.ar_last_name.value }}" {% endif %}type="text" class="form-control" name="ar_last_name" id="ar_last_name" placeholder="{{ form.ar_last_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" required="required"/>
+					{% if form.ar_last_name.errors %}
+					    {% for error in form.ar_last_name.errors %}
+					        <label class='error' for='ar_last_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+
+			<div class="form-group">
+                                <label class="control-label">الاسم بالإنجليزية</label>
+				<div class="english-field input-group{% if form.en_first_name.errors or form.en_middle_name.errors or form.en_last_name.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-user"></i>
+					</div>
+					
+					<input {% if form.en_first_name.value and not form.en_first_name.errors %}value="{{ form.en_first_name.value }}" {% endif %}type="text" class="form-control" name="en_first_name" id="en_first_name" placeholder="{{ form.en_first_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" required="required"/>
+					{% if form.en_first_name.errors %}
+					    {% for error in form.en_first_name.errors %}
+					        <label class='dinar-light error' for='en_first_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if form.en_middle_name.value and not form.en_middle_name.errors %}value="{{ form.en_middle_name.value }}" {% endif %}type="text" class="form-control" name="en_middle_name" id="en_middle_name" placeholder="{{ form.en_middle_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" required="required"/>
+					{% if form.en_middle_name.errors %}
+					    {% for error in form.en_middle_name.errors %}
+					        <label class='dinar-light error' for='en_middle_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if form.en_last_name.value and not form.en_last_name.errors %}value="{{ form.en_last_name.value }}" {% endif %}type="text" class="form-control" name="en_last_name" id="en_last_name" placeholder="{{ form.en_last_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" required="required"/>
+					{% if form.en_last_name.errors %}
+					    {% for error in form.en_last_name.errors %}
+					        <label class='dinar-light error' for='en_last_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<div class="english-field input-group{% if form.email.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-mail"></i>
+					</div>
+					
+					<input {% if form.email.value and not form.email.errors %}value="{{ form.email.value }}" {% endif %}type="text" class="form-control" name="email" id="email" {% if not form.email.errors %}placeholder="البريد الإلكتروني الجامعي"{% endif %} data-mask="[a-zA-Z0-9]+@(ksau-hs\.edu|ngha\.med)\.sa" data-is-regex="true" required="required"/>
+					{% if form.email.errors %}
+					    {% for error in form.email.errors %}
+					        <label class='dinar-light error' for='email' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="input-group{% if form.mobile_number.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-mobile"></i>
+					</div>
+					<input {% if form.mobile_number.value and not form.badge_number.errors %}value="{{ form.mobile_number.value }}" {% endif %}type="text" class="form-control" name="mobile_number" id="mobile_number" placeholder="{{ form.mobile_number.label }}" data-mask="[\d\+]+" data-is-regex="true"/>
+					{% if form.mobile_number.errors %}
+					    {% for error in form.mobile_number.errors %}
+					        <label class='error' for='mobile_number' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+
+			<div class="form-group">
+				<div class="input-group{% if form.badge_number.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-vcard"></i>
+					</div>
+					
+					<input {% if form.badge_number.value and not form.badge_number.errors %}value="{{ form.badge_number.value }}" {% endif %}type="text" class="form-control" name="badge_number" id="badge_number" placeholder="{{ form.badge_number.label }}" data-mask="\d+" data-is-regex="true" required="required"/>
+					{% if form.badge_number.errors %}
+					    {% for error in form.badge_number.errors %}
+					        <label class='error' for='badge_number' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="input-group{% if form.job_description.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-vcard"></i>
+					</div>
+					
+					<input {% if form.job_description.value and not form.job_description.errors %}value="{{ form.job_description.value }}" {% endif %}type="text" class="form-control" name="job_description" id="job_description" placeholder="{{ form.job_description.label }}" required="required"/>
+					{% if form.job_description.errors %}
+					    {% for error in form.job_description.errors %}
+					        <label class='error' for='job_description' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="input-group{% if form.password1.errors or form.password2.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-key"></i>
+					</div>
+					
+					<input type="password" class="form-control" name="password1" id="password1" placeholder="اختر كلمة سر" autocomplete="off" required="required"/>
+					<input type="password" class="form-control" name="password2" id="password2" placeholder="أكّد كلمة السر" autocomplete="off" required="required"/>
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<button type="submit" class="btn btn-success btn-block btn-login">
+					<i class="entypo-left-open-mini"></i>
+					سجّل
+				</button>
+			</div>
+	</div>
+</form>
+
+{% endblock %}
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.css' %}" id="style-resource-3">
+<script src="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.min.js' %}" id="script-resource-11"></script>
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+<script src="{% static 'neon/assets/js/jquery.inputmask.bundle.min.js' %}"></script>
+{% endblock %}

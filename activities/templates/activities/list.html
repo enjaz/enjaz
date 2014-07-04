@@ -112,7 +112,7 @@
     <td>{{ activity.get_first_date|date:"j F" }}</td>
     <td>
 {% if not activity.review_set.all %}
-  {% if perms.activities.add_review %}<a href="{% url 'activities:review' activity.id %}">مُعلّق</a>{% else %}معلّق{% endif %}
+  {% if perms.activities.add_deanship_review or perms.activities.add_presidency_review  %}<a href="{% url 'activities:review' activity.id %}">مُعلّق</a>{% else %}معلّق{% endif %}
 {% elif activity.review_set.all|length_is:"1" %}
   {% if activity.review_set.all.0.review_type == 'P' %}
     {% if activity.review_set.all.0.is_approved == None %}

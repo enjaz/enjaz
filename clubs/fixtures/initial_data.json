@@ -4,7 +4,7 @@
     "model": "clubs.college", 
     "fields": {
         "section": "M", 
-        "college_name": "M"
+        "name": "M"
     }
 },
 {
@@ -12,7 +12,7 @@
     "model": "clubs.college", 
     "fields": {
         "section": "M", 
-        "college_name": "P"
+        "name": "P"
     }
 },
 {
@@ -20,7 +20,7 @@
     "model": "clubs.college", 
     "fields": {
         "section": "M", 
-        "college_name": "D"
+        "name": "D"
     }
 },
 {
@@ -28,7 +28,7 @@
     "model": "clubs.college", 
     "fields": {
         "section": "M", 
-        "college_name": "B"
+        "name": "B"
     }
 },
 {
@@ -36,7 +36,7 @@
     "model": "clubs.college", 
     "fields": {
         "section": "M", 
-        "college_name": "A"
+        "name": "A"
     }
 },
 {
@@ -44,7 +44,7 @@
     "model": "clubs.college", 
     "fields": {
         "section": "F", 
-        "college_name": "M"
+        "name": "M"
     }
 },
 {
@@ -52,7 +52,7 @@
     "model": "clubs.college", 
     "fields": {
         "section": "F", 
-        "college_name": "N"
+        "name": "N"
     }
 },
 {
@@ -60,7 +60,7 @@
     "model": "clubs.college", 
     "fields": {
         "section": "KM", 
-        "college_name": "M"
+        "name": "M"
     }
 },
 {
@@ -68,7 +68,7 @@
     "model": "clubs.college", 
     "fields": {
         "section": "F", 
-        "college_name": "B"
+        "name": "B"
     }
 },
 {
@@ -76,7 +76,7 @@
     "model": "clubs.college", 
     "fields": {
         "section": "F", 
-        "college_name": "D"
+        "name": "D"
     }
 },
 {

@@ -27,6 +27,7 @@ class ClubAdmin(admin.ModelAdmin):
 
     def number_of_members(self, obj):
         return obj.members.count()
+    number_of_members.short_description = u"عدد الأعضاء"
 
 admin.site.register(College)
 admin.site.register(Club, ClubAdmin)

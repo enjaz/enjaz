@@ -6,10 +6,11 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User, Permission, Group
 from django.contrib.auth import authenticate
 from django.contrib.admin.sites import AdminSite
+from django.core.exceptions import ObjectDoesNotExist
 from userena.admin import UserenaAdmin
 
 from clubs.models import Club, college_choices, section_choices
-
+from accounts.models import StudentProfile, NonStudentProfile
 
 class DeanshipAuthenticationForm(admin.forms.AdminAuthenticationForm):
     """A custom authentication form used in the admin app.  Based on the
@@ -64,6 +65,16 @@ def remove_add_bookrequest_perm(modeladmin, request, queryset):
         user.save()
 remove_add_bookrequest_perm.short_description = u"امنع من طلب استعارة الكتب"
 
+class StudentProfileInline(admin.StackedInline):
+    model = StudentProfile
+    max_num = 1
+    extra = 0
+
+class NonStudentProfileInline(admin.StackedInline):
+    model = NonStudentProfile
+    max_num = 1
+    extra = 0
+
 class EmployeeFilter(admin.SimpleListFilter):
     title = u"عمادة شؤون الطلاب"
     parameter_name = 'is_employee'
@@ -101,7 +112,7 @@ class CollegeFilter(admin.SimpleListFilter):
         return college_choices
 
     def queryset(self, request, queryset):
-        return queryset.filter(enjaz_profile__college__college_name=self.value())
+        return queryset.filter(student_profile__college__name=self.value())
 
 class SectionFilter(admin.SimpleListFilter):
     title = u"قسم الطالب"
@@ -110,7 +121,7 @@ class SectionFilter(admin.SimpleListFilter):
         return section_choices
 
     def queryset(self, request, queryset):
-        return queryset.filter(enjaz_profile__college__section=self.value())
+        return queryset.filter(student_profile__college__section=self.value())
 
 class ModifiedUserAdmin(UserenaAdmin):
     """This changes the way the admin websites (both the main and deanship
@@ -119,6 +130,7 @@ ones) deal with the User model."""
                remove_add_book_perm]
     list_display = ('username', 'full_en_name', 'email', 'is_coordinator', 'is_employee')
     list_filter = (EmployeeFilter, CoordinatorFilter,CollegeFilter, SectionFilter)
+    inlines = [StudentProfileInline, NonStudentProfileInline]
 
     def is_coordinator(self, obj):
         if obj.coordination.all():
@@ -137,22 +149,16 @@ ones) deal with the User model."""
     is_employee.short_description = u"موظف؟"
 
     def full_en_name(self, obj):
-        fullname = ""
         try:
-            # If the English first name is missing, let's assume the
-            # rest is also missing.
-            if obj.enjaz_profile.en_first_name:
-                fullname = " ".join([obj.enjaz_profile.en_first_name,
-                                     obj.enjaz_profile.en_middle_name,
-                                     obj.enjaz_profile.en_last_name])
-        except AttributeError: # If the user has their details missing
-            pass
+            return obj.student_profile.get_en_full_name()
+        except ObjectDoesNotExist:
+            # If the user has no student_profile
+            try:
+                return obj.nonstudent_profile.get_en_full_name()
+            except ObjectDoesNotExist:
+                # If the user has no nonstudent_profile
+                return
 
-        # If no full name is provided, fallback to the username.
-        if not fullname:
-            fullname = obj.username
-
-        return fullname
     full_en_name.short_description = u"الاسم الإنجليزي الكامل"
 
 deanship_admin = DeanshipAdmin("Deanship Admin")

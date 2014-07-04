@@ -1,7 +1,7 @@
 {% extends 'userena/base_userena.html' %}{% load staticfiles %}
 {% block title %}تسجيل الدخول{% endblock %}
 
-{% block description %}أهلاً و سهلًا بك؛ أدخل البريد الجامعي و كلمة المرور الخاصة بك.{% endblock %}
+{% block description %}أهلاً و سهلًا بك؛ أدخل البريد الجامعي و كلمة المرور.{% endblock %}
 			
 {% block content %}
 	{% if form.non_field_errors %}
@@ -13,7 +13,7 @@
 	</div>
 	{% endif %}
 	
-	<form method="post" role="form" id="form_login" action="">
+	<form method="post" role="form" id="form_login" action="{% url 'userena_signin' %}">
 		{% csrf_token %}
 		<div class="english-field form-group">
 			

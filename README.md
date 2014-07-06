@@ -39,13 +39,15 @@ from accounts.forms import StudentSignupForm, NonStudentSignupForm, ModifiedAuth
 # [...]
     url(r'^$', 'activities.views.portal_home', name='home'),
     url(r'^about/$', TemplateView.as_view(template_name='about.html'), name='about'),
+    url(r'^activities/', include('activities.urls', namespace="activities")),
     url(r'^clubs/', include('clubs.urls', namespace="clubs")),
     url(r'^books/', include('books.urls', namespace="books")),
     url(r'^niqati/', include('niqati.urls', namespace="niqati")),
     url(r'^accounts/signup/$', 'userena.views.signup', {'signup_form': StudentSignupForm, 'template_name': 'userena/student_signup_form.html'}),
     url(r'^accounts/signup/nonstudents/$', 'userena.views.signup', {'signup_form': NonStudentSignupForm, 'template_name': 'userena/nonstudent_signup_form.html'}, name="nonstudent_signup"),
     url(r'^accounts/signin/$', 'userena.views.signin', {'auth_form': ModifiedAuthenticationForm}),
-    url(r'^accounts/', include('userena.urls'), (r'^deanship_admin/', include(deanship_admin.urls)),
+    url(r'^accounts/', include('userena.urls')),
+    url(r'^da/', include(deanship_admin.urls)),
 # [...]
 ```
 

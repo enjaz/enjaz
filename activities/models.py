@@ -22,7 +22,7 @@ class Activity(models.Model):
     name = models.CharField(max_length=200, verbose_name=u"اسم النشاط")
     description = models.TextField(verbose_name=u"وصف النشاط")
     public_description = models.TextField(verbose_name=u"الوصف الإعلامي",
-                                          help_text=u"هذا هو الوصل الذي سيهرض للطلاب")
+                                          help_text=u"هذا هو الوصف الذي سيعرض للطلاب")
     requirements = models.TextField(blank=True,
                                     verbose_name=u"متطلبات النشاط")
     submitter = models.ForeignKey(User, null=True,
@@ -64,13 +64,30 @@ class Activity(models.Model):
         return self.episode_set.count() == 1
     
     def get_first_date(self):
-        return self.episode_set.all()[0].start_date
+        return self.episode_set.all()[0].start_date # NOTE: This is not accurate as the
+                                                    # first episode in the queryset may
+                                                    # or may not be the first in terms
+                                                    # of date and time.
+                                                    # [Saeed, 4 Jul 2014]
         
     def get_first_time(self):
         return self.episode_set.all()[0].start_time
     
     def get_first_location(self):
         return self.episode_set.all()[0].location
+    
+    def get_first_episode(self):
+        """
+        Return the first scheduled episode for this activity.
+        *** This should replace the three above-mentioned methods. ***
+        """
+        pass
+    
+    def get_next_episode(self):
+        """
+        Return the next scheduled episode for this activity.
+        """
+        pass
     
     class Meta:
         permissions = (

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 from django.db import models
 from django.contrib.auth.models import User
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from clubs.models import College
 
@@ -229,6 +229,26 @@ class Episode(models.Model):
     
     def end_datetime(self):
         return datetime.combine(self.end_date, self.end_time)
+    
+    # Media-related methods
+    REPORT_DUE_AFTER = 7 # in days
+    
+    def report_due_date(self):
+        """
+        Return the due date of the report, which is within 7
+        days of the end of the corresponding episode.
+        """
+        return self.end_datetime() + timedelta(days=self.REPORT_DUE_AFTER)
+    
+    def report_is_due(self):
+        """
+        Return whether the report is due, i.e. the episode has ended and the due date hasn't passed
+        """
+        return self.end_datetime() < datetime.now() < self.report_due_date()
+    
+    def report_is_overdue(self):
+        "Return whether the report is overdue"
+        return datetime.now() > self.report_due_date()
 
 class Category(models.Model):
     ar_name = models.CharField(max_length=50,

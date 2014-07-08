@@ -55,6 +55,9 @@ class Club(models.Model):
     creation_date = models.DateTimeField('date created',
                                          auto_now_add=True)
     edit_date = models.DateTimeField('date edited', auto_now=True)
+    special = models.BooleanField(default=False,
+                                  verbose_name=u"نادي مميز؟") # To allow more flexible exceptions with
+                                                         # presidency, media club and arshidny
     class Meta:
         # For the admin interface.
         verbose_name = u"نادي"

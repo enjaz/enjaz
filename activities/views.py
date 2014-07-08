@@ -66,14 +66,20 @@ def list(request):
     # part of the Media Center, they should be able to view all
     # activities (i.e. approved, rejected and pending).  Otherwise, a
     # user should only see approved activities and the activities of
-    # the clubs they have memberships in (regardless of their status).    
+    # the clubs they have memberships in (regardless of their status).  
+    
+    # TODO: if the user is part of the deanship_master group (responsible for
+    # approvals), they should only see activities approved by the presidency)
+    # if the user is part of the deanship group, they should see approved
+    # activities only.
+    
     if request.user.has_perm('activities.view_activity'):
         if request.GET.get('pending') == "1":
             activities = Activity.objects.filter(review__is_approved=None)
         else:
             activities = Activity.objects.all()
     else:
-        approved_activities = Activity.objects.filter(review__is_approved=True)
+        approved_activities = filter(lambda x: x.is_approved() == True, Activity.objects.all())
         if request.user.is_authenticated():
             user_activities = request.user.activity_set.all()
             user_clubs = request.user.memberships.all() | request.user.coordination.all()

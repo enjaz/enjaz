@@ -1,7 +1,79 @@
-{% extends 'media_base.html' %}
+{% extends 'media_base.html' %}{% load staticfiles %}
 
 {% block content %}
+<h3>الأنشطة المعتمدة</h3>
+<table id="activity_list">
+	<thead>
+        <tr>
+            <th>اسم النشاط</th>
+            <th>الجهة المنظمة</th>
+            <th>الموعد</th>
+            <th>تاريخ الاعتماد</th>
+            <th>الخيارات</th>
+        </tr>
+    </thead>
+    <tbody>
+    	{% for activity in activities %}
+    	{% for episode in activity.episode_set.all %}
+        <tr>
+            <td><a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a></td>
+            <td><a href="{% url 'clubs:show' activity.primary_club.pk %}">{{ activity.primary_club.name }}</a></td>
+            <td>
+            	<div class="row">
+						<div>
+							{# }<i class="entypo-calendar"></i> #}
+							{{ episode.start_date|date:"j F" }}
+							-
+							{{ episode.end_date|date:"j F" }}
+						</div>
+						{% comment %}
+						<div>
+							<i class="entypo-clock"></i>
+							{{ episode.start_time }}
+							-
+							{{ episode.end_time }}
+						</div>
+						<div>
+							<i class="entypo-location"></i>
+							{{ episode.location }}
+						</div>
+						{% endcomment %}
+				</div>
+            </td>
+            <td>{{ activity.submission_date|date:"j F" }}</td>{# FIXME: replace with approval date #}
+            <td>{# options #}
+            	{# first, the follow-up report #}
+            	<div class="col-md-6">
+	            	{% if episode.followupreport %}
+	            		<a class="btn btn-gold btn-xs">استعراض التقرير</a>
+	            	{% elif episode.report_is_due %}
+	            		<a class="btn btn-gold btn-xs disabled">بانتظار رفع التقرير</a>
+	            	{% elif episode.report_is_overdue %}
+	            		<a class="btn btn-red btn-xs disabled">بانتظار رفع التقرير</a>
+	            	{% else %}
+	            		<a class="btn btn-default btn-xs disabled">بانتظار انتهاء النشاط</a>
+	            	{% endif %}
+            	</div>
+            	
+            	{# second, the story #}
+            	<div class="col-md-6">
+            		
+            	</div>
+            </td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+    </tbody>
+</table>
+<link rel="stylesheet" href="{% static 'neon/assets/js/datatables/responsive/css/datatables.responsive.css' %}">
 {% endblock %}
 
 {% block customscript %}
+<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+<script>
+$(document).ready(function () {
+	$('#activity_list').DataTable();
+});
+</script>
 {% endblock %}

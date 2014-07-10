@@ -1,9 +1,9 @@
-from django.shortcuts import render
-
+# -*- coding: utf-8  -*-
 from django.contrib.auth.decorators import permission_required, login_required
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.shortcuts import render, get_object_or_404
 
 from clubs.models import Club
 from activities.models import Activity, Episode
@@ -54,10 +54,7 @@ def submit_report(request, episode_pk):
     """
     Submit a FollowUpReport.
     """
-    try:
-        episode = Episode.objects.get(pk=episode_pk)
-    except ObjectDoesNotExist:
-        raise Http404
+    episode = get_object_or_404(Episode, pk=episode_pk)
     
     # Permission checks
     # (1) The passed episode should be owned by the user's club
@@ -78,12 +75,17 @@ def submit_report(request, episode_pk):
                                                           submitter=request.user)
                                   )
         if form.is_valid():
-            # FIXME: missing model fields
             form.save()
-            return HttpResponseRedirect(reverse('media:index'))
+            return HttpResponseRedirect(reverse('activities:show',
+                                                args=(episode.activity.pk, )
+                                                ))
     else:
         # Initialize the form with initial data from the episode
-        form = FollowUpReportForm(initial={'start_date' : episode.start_date,
+        form = FollowUpReportForm(initial={# no initial data for the description, because
+                                           # the report should contain a description of what
+                                           # actually happened, whereas the description
+                                           # of the activity isn't necessarily that.
+                                           'start_date' : episode.start_date,
                                            'end_date'   : episode.end_date,
                                            'start_time' : episode.start_time,
                                            'end_time'   : episode.end_time,
@@ -95,11 +97,13 @@ def submit_report(request, episode_pk):
                                                        'episode': episode})
 
 @login_required
-def show_report(request, pk):
+def show_report(request, episode_pk):
     """
     Show a FollowUpReport.
     """
-    pass
+    episode = get_object_or_404(Episode, pk=episode_pk)
+    report = get_object_or_404(FollowUpReport, episode=episode)
+    return render(request, 'media/report_read.html', {'report': report})
 
 @login_required
 def submit_story(request, episode_pk):

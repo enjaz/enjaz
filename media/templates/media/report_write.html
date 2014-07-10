@@ -1,7 +1,7 @@
-{% extends 'media_base.html' %}{% load bootstrap3 %}
+{% extends 'media_base.html' %}{% load bootstrap3 %}{% load staticfiles %}
 {% block title %}رفع تقرير {{ episode.activity.name }}{% endblock %}
 {% block content %}
-<h3>تقرير {{ episode.activity.name }}</h3>
+<h2>تقرير {{ episode.activity.name }}</h2>
 <p>التقرير التالي يحتوي معلومات النشاط الافتراضية كما تم رفعها في طلب النشاط؛ نرجو تحديث البيانات أو تعديلها حسب المعلومات و الإحصائيات الحقيقية.</p>
 <hr>
 <form action="{% url 'media:submit_report' episode.pk %}" method="post">
@@ -12,4 +12,23 @@
 	أرسل
 </button>
 </form>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/bootstrap-timepicker.min.js' %}"></script>
+<script>
+	// Initialize date and time pickers
+	$("input[name=start_date]").datepicker({isRTL: true});
+	$("input[name=end_date]").datepicker({isRTL: true});
+	
+	$("input[name=start_time]").timepicker({showMeridian: false})
+		.on('show.timepicker', function(e) {
+	    $('.bootstrap-timepicker-widget').attr('dir', 'ltr'); // It appears reversed in rtl
+	});
+	
+	$("input[name=end_time]").timepicker({showMeridian: false})
+		.on('show.timepicker', function(e) {
+	    $('.bootstrap-timepicker-widget').attr('dir', 'ltr'); // It appears reversed in rtl
+	});
+</script>
 {% endblock %}

@@ -153,6 +153,10 @@ def show(request, activity_id):
         if request.user.has_perm('activities.view_presidency_review') or \
             is_coordinator:
             context['can_view_presidency_review'] = True
+        if request.user.has_perm('media.add_followupreport') or \
+            is_coordinator:
+            context['can_add_followupreport'] = True
+            
     else:
         user_clubs = Club.objects.none()
 

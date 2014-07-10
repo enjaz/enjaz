@@ -62,3 +62,7 @@ h1, h2, h3, h4, h5, h6, h7, .site-header .site-nav .main-menu > li.active > a, .
 p.bg-warning {
    padding: 15px;
 }
+
+.followupreport_zone a.btn {
+	color: #FFFFFF !important;
+}

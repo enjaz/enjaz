@@ -106,6 +106,11 @@
 					{% for episode in activity.episode_set.all %}
 					<li>
 						<div class="row">
+						{% if can_add_followupreport %}
+						{# group the activity info in a div to make #}
+						{# space for the report button #}
+						<div class="col-md-10">
+						{% endif %}
 						<a href="#">
 							<div class="col-sm-4">
 								<i class="entypo-calendar"></i>
@@ -124,6 +129,25 @@
 								{{ episode.location }}
 							</div>
 						</a>
+						{% if can_add_followupreport %}
+						</div>
+						<div class="followupreport_zone col-md-2">
+			            	{% if episode.followupreport %}
+			            		<a class="btn btn-block btn-green btn-xs">استعرض التقرير</a>
+			            		
+			            	{% elif episode.report_is_due %}
+			            		<a href="{% url 'media:submit_report' episode.pk %}"
+			            		class="btn btn-block btn-gold btn-xs">ارفع التقرير</a>
+			            		
+			            	{% elif episode.report_is_overdue %}
+			            		<a href="{% url 'media:submit_report' episode.pk %}"
+			            		class="btn btn-block btn-red btn-xs">ارفع التقرير</a>
+			            		
+			            	{% else %}
+			            		<a class="btn btn-block btn-primary btn-xs disabled">بانتظار انتهاء النشاط</a>
+			            	{% endif %}
+						</div>
+						{% endif %}
 						</div>
 					</li>
 					{% endfor %}

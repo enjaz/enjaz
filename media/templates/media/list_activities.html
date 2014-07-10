@@ -1,6 +1,11 @@
 {% extends 'media_base.html' %}{% load staticfiles %}
 
 {% block content %}
+<style>
+	tr {
+		height: 30px;
+	}
+</style>
 <h3>الأنشطة المعتمدة</h3>
 <table id="activity_list">
 	<thead>
@@ -42,22 +47,24 @@
             </td>
             <td>{{ activity.submission_date|date:"j F" }}</td>{# FIXME: replace with approval date #}
             <td>{# options #}
+            	<div class="row">
             	{# first, the follow-up report #}
             	<div class="col-md-6">
 	            	{% if episode.followupreport %}
-	            		<a class="btn btn-gold btn-xs">استعراض التقرير</a>
+	            		<a class="btn btn-block btn-green btn-xs">استعرض التقرير</a>
 	            	{% elif episode.report_is_due %}
-	            		<a class="btn btn-gold btn-xs disabled">بانتظار رفع التقرير</a>
+	            		<a class="btn btn-block btn-gold btn-xs disabled">بانتظار رفع التقرير</a>
 	            	{% elif episode.report_is_overdue %}
-	            		<a class="btn btn-red btn-xs disabled">بانتظار رفع التقرير</a>
+	            		<a class="btn btn-block btn-red btn-xs disabled">بانتظار رفع التقرير</a>
 	            	{% else %}
-	            		<a class="btn btn-default btn-xs disabled">بانتظار انتهاء النشاط</a>
+	            		<a class="btn btn-block btn-default btn-xs disabled">بانتظار انتهاء النشاط</a>
 	            	{% endif %}
             	</div>
             	
             	{# second, the story #}
             	<div class="col-md-6">
-            		
+            		<a class="btn btn-block btn-info btn-xs disabled">التغطية</a>
+            	</div>
             	</div>
             </td>
         </tr>

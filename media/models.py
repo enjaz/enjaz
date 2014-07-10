@@ -7,9 +7,8 @@ from activities.models import Activity, Episode
 
 class FollowUpReport(models.Model):
     """
-    A follow-up report, submitted after 7 days of an activity.
+    A follow-up report, submitted after 7 days of an activity episode.
     """
-    activity = models.ForeignKey(Activity, verbose_name=u"النشاط")
     episode = models.OneToOneField(Episode, verbose_name=u"الموعد")
     
     submitter = models.ForeignKey(User)
@@ -17,7 +16,8 @@ class FollowUpReport(models.Model):
                                       verbose_name=u"تاريخ رفع التقرير")
     
     # Content
-    description = models.TextField(verbose_name=u"وصف النشاط")
+    description = models.TextField(verbose_name=u"الوصف",
+                                   help_text=u"")
     start_date = models.DateField(verbose_name=u"تاريخ البداية")
     end_date = models.DateField(verbose_name=u"تاريخ النهاية")
     start_time = models.TimeField(verbose_name=u"وقت البداية")
@@ -29,15 +29,14 @@ class FollowUpReport(models.Model):
     
     class Meta:
         permissions = (
-            ("view_follow_up_report", "Can view all available follow-up reports."),
+            ("view_followupreport", "Can view a follow-up report."),
+            ("view_all_followupreports", "Can view all available follow-up reports."),
         )
 
 class Story(models.Model):
     """
     A media coverage of a certain episode of an activity.
     """
-    activity = models.ForeignKey(Activity,
-                                 verbose_name=u"النشاط")
     episode = models.OneToOneField(Episode,
                                    verbose_name=u"الموعد")
     

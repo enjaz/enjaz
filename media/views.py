@@ -1,11 +1,14 @@
 from django.shortcuts import render
 
 from django.contrib.auth.decorators import permission_required, login_required
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
-from activities.models import Activity
+from clubs.models import Club
+from activities.models import Activity, Episode
 from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview
+from media.forms import FollowUpReportForm
 
 @login_required
 def index(request):
@@ -24,7 +27,9 @@ def list_activities(request):
     """
     # Get all approved activities
     activities = filter(lambda x: x.is_approved() == True, Activity.objects.all())
-    return render(request, 'media/list_activities.html', {'activities': activities})
+    media_center = Club.objects.get(english_name="Media Center")
+    return render(request, 'media/list_activities.html', {'activities': activities,
+                                                          'media_center': media_center})
 
 @login_required
 def list_reports(request):
@@ -43,12 +48,51 @@ def list_articles(request):
     """
     pass
 
+#@permission_required('add_followupreport')
 @login_required
 def submit_report(request, episode_pk):
     """
     Submit a FollowUpReport.
     """
-    pass
+    try:
+        episode = Episode.objects.get(pk=episode_pk)
+    except ObjectDoesNotExist:
+        raise Http404
+    
+    # Permission checks
+    # (1) The passed episode should be owned by the user's club
+    user_clubs = request.user.coordination.all() | request.user.memberships.all()
+    if episode.activity.primary_club not in user_clubs and not request.user.is_superuser:
+        raise PermissionDenied
+    # (2) The passed episode shouldn't already have an episode.
+    #     Overriding a previous submission shouldn't be allowed
+    try:
+        report = episode.followupreport
+        raise PermissionDenied
+    except ObjectDoesNotExist:
+        pass
+    
+    if request.method == 'POST':
+        form = FollowUpReportForm(request.POST,
+                                  instance=FollowUpReport(episode=episode,
+                                                          submitter=request.user)
+                                  )
+        if form.is_valid():
+            # FIXME: missing model fields
+            form.save()
+            return HttpResponseRedirect(reverse('media:index'))
+    else:
+        # Initialize the form with initial data from the episode
+        form = FollowUpReportForm(initial={'start_date' : episode.start_date,
+                                           'end_date'   : episode.end_date,
+                                           'start_time' : episode.start_time,
+                                           'end_time'   : episode.end_time,
+                                           'location'   : episode.location,
+                                           'organizer_count': episode.activity.organizers,
+                                           'participant_count': episode.activity.participants,
+                                           })
+    return render(request, 'media/report_write.html', {'form': form,
+                                                       'episode': episode})
 
 @login_required
 def show_report(request, pk):

@@ -1,1 +1,62 @@
-{% extends 'media_base.html' %}
+{% extends 'media_base.html' %}{% load staticfiles %}
+
+{% block title %}تقارير الأنشطة{% endblock %}
+
+{% block content %}
+<h3>تقارير الأنشطة</h3>
+<table id="report_list">
+	<thead>
+		<th>#</th>
+		<th>اسم النشاط</th>
+		<th>الجهة المنظمة</th>
+		<th>الموعد</th>
+		<th>الوصف</th>
+		<th>تاريخ البداية</th>
+		<th>تاريخ النهاية</th>
+		<th>وقت البداية</th>
+		<th>وقت النهاية</th>
+		<th>المكان</th>
+		<th>عدد المنظمين</th>
+		<th>عدد المشاركين</th>
+		<th>التقرير الكامل</th>
+	</thead>
+	<tbody>
+		{% for report in reports %}
+		<tr>
+			<td>{{ report.pk }}</td>
+			<td>{{ report.episode.activity.name }}</td>
+			<td>{{ report.episode.activity.primary_club.name }}</td>
+			<td>#</td>
+			<td>{{ report.description }}</td>
+			<td>{{ report.start_date }}</td>
+			<td>{{ report.end_date }}</td>
+			<td>{{ report.start_time }}</td>
+			<td>{{ report.end_time }}</td>
+			<td>{{ report.location }}</td>
+			<td>{{ report.organizer_count }}</td>
+			<td>{{ report.participant_count }}</td>
+			<td><a href="{% url 'media:show_report' report.pk %}"
+				class="btn btn-xs btn-green">
+					<i class="entypo-left-bold"></i>
+				</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+<script src="{% static 'neon/assets/js/datatables/TableTools.min.js' %}"></script>
+<script>
+$(document).ready(function () {
+	$('#report_list').DataTable({
+		"sDom": "<'row'<'col-xs-6 col-left'l><'col-xs-6 col-right'<'export-data'T>f>r>t<'row'<'col-xs-6 col-left'i><'col-xs-6 col-right'p>>",
+		"oTableTools": {
+		}
+	});
+});
+</script>
+{% endblock %}

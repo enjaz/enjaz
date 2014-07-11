@@ -2,6 +2,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from activities.models import Episode
+
 section_choices = (
     ('M', u'طلاب'),
     ('F', u'طالبات'),
@@ -58,6 +60,20 @@ class Club(models.Model):
     special = models.BooleanField(default=False,
                                   verbose_name=u"نادي مميز؟") # To allow more flexible exceptions with
                                                          # presidency, media club and arshidny
+    def get_due_report_count(self):
+        "Get the number of due follow-up reports."
+        # Get all club's episodes whose report is due
+        due_episodes = filter(lambda x: x.report_is_due(),
+                              Episode.objects.filter(activity__primary_club=self))
+        return len(due_episodes)
+    
+    def get_overdue_report_count(self):
+        "Get the number of overdue follow-up reports."
+        # Get all club's episodes whose report is overdue
+        overdue_episodes = filter(lambda x: x.report_is_overdue(),
+                                  Episode.objects.filter(activity__primary_club=self))
+        return len(overdue_episodes)
+        
     class Meta:
         # For the admin interface.
         verbose_name = u"نادي"

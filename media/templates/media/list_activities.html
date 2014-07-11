@@ -51,7 +51,8 @@
             	{# first, the follow-up report #}
             	<div class="col-md-6">
 	            	{% if episode.followupreport %}
-	            		<a class="btn btn-block btn-green btn-xs">استعرض التقرير</a>
+	            		<a href="{% url 'media:show_report' episode.pk %}"
+	            		class="btn btn-block btn-green btn-xs">استعرض التقرير</a>
 	            	{% elif episode.report_is_due %}
 	            		<a class="btn btn-block btn-gold btn-xs disabled">بانتظار رفع التقرير</a>
 	            	{% elif episode.report_is_overdue %}

@@ -5,7 +5,13 @@
 {% block content %}
 <div class="row">
 	<div class="col-md-12">
-		<h2>مرحبًا {{ user.first_name }}!</h2>
+		<h2>مرحبًا 
+		{% if user.student_profile %}
+			{{ user.student_profile.ar_first_name }}!
+		{% else %}
+			{{ user.non_student_profile.ar_first_name }}!
+		{% endif %}
+		</h2>
 		<p>فيما يلي ملخص لما يهمك في بوابة إنجاز.</p>
 	</div>
 </div>

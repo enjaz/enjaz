@@ -2,8 +2,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from activities.models import Episode
-
 section_choices = (
     ('M', u'طلاب'),
     ('F', u'طالبات'),
@@ -62,16 +60,24 @@ class Club(models.Model):
                                                          # presidency, media club and arshidny
     def get_due_report_count(self):
         "Get the number of due follow-up reports."
+        # Get all club's episodes
+        episodes = []
+        for activity in self.primary_activity.all():
+            episodes.extend(activity.episode_set.all())
         # Get all club's episodes whose report is due
         due_episodes = filter(lambda x: x.report_is_due(),
-                              Episode.objects.filter(activity__primary_club=self))
+                              episodes)
         return len(due_episodes)
     
     def get_overdue_report_count(self):
         "Get the number of overdue follow-up reports."
+        # Get all club's episodes
+        episodes = []
+        for activity in self.primary_activity.all():
+            episodes.extend(activity.episode_set.all())
         # Get all club's episodes whose report is overdue
         overdue_episodes = filter(lambda x: x.report_is_overdue(),
-                                  Episode.objects.filter(activity__primary_club=self))
+                                  episodes)
         return len(overdue_episodes)
         
     class Meta:

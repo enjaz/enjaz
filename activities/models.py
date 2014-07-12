@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime, timedelta
 
 from clubs.models import College
@@ -242,13 +243,29 @@ class Episode(models.Model):
     
     def report_is_due(self):
         """
-        Return whether the report is due, i.e. the episode has ended and the due date hasn't passed
+        Return whether the report is due.
+        The report is due when the episode has ended, the due date hasn't passed,
+        and the report hasn't been submitted.
         """
-        return self.end_datetime() < datetime.now() < self.report_due_date()
+        try:
+            report = self.followupreport
+            report_not_submitted = False
+        except ObjectDoesNotExist:
+            report_not_submitted = True
+        return self.end_datetime() < datetime.now() < self.report_due_date() and report_not_submitted
     
     def report_is_overdue(self):
-        "Return whether the report is overdue"
-        return datetime.now() > self.report_due_date()
+        """
+        Return whether the report is overdue.
+        The report is overdue when the episode has ended, the due date has passed,
+        and the report hasn't been submitted.
+        """
+        try:
+            report = self.followupreport
+            report_not_submitted = False
+        except ObjectDoesNotExist:
+            report_not_submitted = True
+        return datetime.now() > self.report_due_date() and report_not_submitted
 
 class Category(models.Model):
     ar_name = models.CharField(max_length=50,

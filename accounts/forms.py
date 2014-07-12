@@ -112,7 +112,7 @@ class StudentSignupForm(SignupForm):
         submit_niqati_code = Permission.objects.get(codename='submit_code')
         view_niqati_report = Permission.objects.get(codename='view_student_report')
         new_user.user_permissions.add(add_book, add_bookrequest,
-                                      add_vote, add_vocie,
+                                      add_vote, add_voice,
                                       submit_niqati_code,
                                       view_niqati_report)
         new_user.save()

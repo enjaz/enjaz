@@ -1,0 +1,19 @@
+{% extends 'studentvoice_base.html' %}{% load bootstrap3 %}
+{% block title %}{% if edit %} تعديل {% if is_comment %}تعليق على {% endif %}{{ voice.title }} {% else %} صوت جديد {% endif %}{% endblock %}
+{% block content %}
+<h2>{% if edit %} تعديل {% if is_comment %}تعليق على {% endif %}<a href="{% url 'studentvoice:show' voice.pk %}">{{ voice.title }}</a> {% else %} {% if form.title.value %} إضافة {{ form.title.value }} {% else %} صوت جديد {% endif %}{% endif %}</h2>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% if edit %}{% url 'studentvoice:edit' voice.pk %}{% else %}{% url 'studentvoice:create' %}{% endif %}" method="post" class="form">
+{% csrf_token %}
+    {% bootstrap_form form %}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "ok-sign" %} {% if edit %} عدّل {% else %} أضف {% endif %}
+        </button>
+    {% endbuttons %}
+</form>
+{% endblock %}
+
+

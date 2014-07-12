@@ -1,0 +1,141 @@
+{% extends template %}{% load bootstrap3 %}
+{% block title %}بحث{% endblock %}
+
+{% block content %}
+{% if not user.is_authenticated %}
+<section class="breadcrumb">
+	
+	<div class="container">
+		
+		<div class="row">
+			
+			<div class="col-sm-12">
+				
+				<h1 class="dinar-medium">صوتك مسموع</h1>
+							
+			</div>
+			
+		</div>
+		
+	</div>
+	
+</section>
+{% endif %}
+{% if not user.is_authenticated %}<div class="container">{% endif %}
+<!--<div class="row">-->
+<form name="search" action="{% url 'studentvoice:search' %}" method="get" class="form-inline">
+	{% if not user.is_authenticated %}
+	<input type="text" class="form-control" name="q" value="{{ q }}"/>
+	<button type="submit" class="btn btn-primary">
+        {% bootstrap_icon "search" %} ابحث
+    </button>
+    {% else %}
+  	<div class="col-md-6">
+    <div class="input-group">
+		<input type="text" class="form-control" name="q" value="{{ q }}">
+		
+		<span class="input-group-btn">
+			<button type="submit" class="btn btn-primary">
+			    <span class="glyphicon glyphicon-search"></span> ابحث
+			</button>
+		</span>
+	</div>
+	</div>
+	{% endif %}
+    
+</form>
+</div>
+{% if not user.is_authenticated %}</div><!-- end .container -->{% endif %}
+<br>
+{% if not user.is_authenticated %}<div class="container dinar-light">{% endif %}
+<!--<div class="col-md-12">-->
+{% if page_voices %}
+<div class="voice-search">
+<p>تم العثور على {{ total_results }} صوت.</p>
+{% if page_voices %}
+    {% for voice in page_voices %}
+
+<div class="short-summary{% if extra_class %} {{extra_class}}{% endif %}{% if not voice.is_published %} unpublished{% endif %}" id="voice-{{voice.pk}}">
+    <div class="counts">
+        <div class="views
+{% if voice.number_of_views == 0 %}
+no-views
+{% else %}
+some-views
+{% endif %}">
+             <span class="item-count">{{ voice.number_of_views }}</span>
+            <div>
+            مشاهدة
+            </div>
+        </div>
+        <div class="comments
+{% if voice.number_of_comments == 0 %}
+no-comments
+{% else %}
+{% if voice.response %} {# INFO: Use _id to not fetch the whole answer post #}
+accepted
+{% else %}
+some-comments
+{% endif %}
+{% endif %}">
+            <span
+                class="item-count"
+            >{{ voice.number_of_comments }}</span>
+            <div>
+            تعليق
+            </div>
+        </div>
+        <div class="votes
+{% if voice.score == 0 %}
+no-votes
+{% else %}
+some-votes
+{% endif %}">
+            <span class="item-count">{{voice.score}}</span>
+            <div>
+            تأييد
+            </div>
+        </div>
+        <div style="clear:both"></div>
+        <div class="userinfo">
+            {% comment %}{% {{ timeago(thread.last_activity_at) }}%}{% endcomment %}
+            {% if not voice.submitter %}{# todo: here we need to look at the anonymity of the last edit instead #}
+                <span class="anonymous">مجهول</span>
+            {% else %}
+                <a href="https://ar.wikipedia.org">{{ voice.sumbitter.student_profile.get_full_ar_name }}</a>
+            {% endif %}
+        </div>
+    </div>
+    <h2>{% if not voice.is_published %}<span class="unpublished">[غير منشور]</span> {% endif %}<a href="{% url 'studentvoice:show' voice.pk %}">{{ voice.title|escape }}</a></h2>
+    {% comment %}{{ tag_list_widget(thread.get_tag_names(), search_state=search_state) }}{% endcomment %}
+</div>
+
+
+    {% endfor %}
+</div><!--voice-search-->
+{% elif q %}
+<p>لا توجد نتائج</p>
+{% endif %}
+
+<div style="text-align:center;">
+    <span class="step-links">
+        {% if page_voices.has_previous %}
+            <a href="?q={{ q }}&page={{ page_voices.previous_page_number }}">السابق</a>
+        {% endif %}
+
+        <span class="current">
+            الصفحة {{ page_voices.number }} من {{ page_voices.paginator.num_pages }}
+        </span>
+
+        {% if page_voices.has_next %}
+            <a href="?q={{ q }}&page={{ page_voices.next_page_number }}">التالي</a>
+        {% endif %}
+    </span>
+</div>
+
+{% elif q %}
+<p>لا توجد نتائج</p>
+{% endif %}
+<!--</div>-->
+{% if not user.is_authenticated %}</div><!-- end .container -->{% endif %}
+{% endblock %}

@@ -4,6 +4,7 @@ Tests of the follow-up reports part of the media app.
 from datetime import datetime, date, time, timedelta
 
 from django.test import TestCase
+from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 
 from django.contrib.auth.models import User
@@ -112,3 +113,125 @@ class ReportDueAndOverdueDateTests(TestCase):
         "Test the get_overdue_report_count method of the club model"
         # Overue reports should be 1
         self.assertEqual(self.club.get_overdue_report_count(), 1)
+        
+class ActivityViewsWithNoReportPenalty(TestCase):
+    """
+    Test how the activity views (create and list) behave with
+    integration with reports set up.
+    """
+    def setUp(self):
+        # Create a user, a club (and make the user its coordinator),
+        # and 4 activities with 1, 2, 3, 4 episodes respectively.
+        # Also create a report for the first episode in each activity
+        # Set the number of due reports to 3
+        # Also set overdue reports to 3
+        # Therefore no penalties are expected 
+        self.user = User.objects.create_user('enjazuser', 'test@enjazportal.com', '12345678')
+        self.client.login(username=self.user.username, password='12345678')
+        self.club = Club.objects.create(name="Test Arabic Club Name",
+                                        english_name="Presidency",
+                                        description="Test Club Description",
+                                        email="test@enjazportal.com",
+                                        coordinator=self.user)
+        for i in range(1, 5):
+            activity = Activity.objects.create(primary_club=self.club,
+                                               name='Test Activity Name ' + str(i),
+                                               description='Test Activity Description ' + str(i),
+                                               participants=1,
+                                               organizers=1,
+                                               submitter=self.user,
+                                               )
+            for j in range(i):
+                # Set the episode end date to be 6*j days back
+                episode = Episode.objects.create(activity=activity,
+                                                start_date=date.today() - timedelta(weeks=3),
+                                                end_date=date.today() - timedelta(days=j*6),
+                                                start_time=datetime.now(),
+                                                end_time=datetime.now(),
+                                                location='Test Location',
+                                                )
+                if j == 0:
+                    FollowUpReport.objects.create(episode=episode,
+                                                  description="Test Report Description",
+                                                  start_date=date.today(),
+                                                  end_date=date.today(),
+                                                  start_time=datetime.now(),
+                                                  end_time=datetime.now(),
+                                                  location="Test Report Location",
+                                                  organizer_count=10,
+                                                  participant_count=100,
+                                                  submitter=self.user,
+                                                  )
+#     # This is run after each test
+#     def tearDown(self):
+#         print User.objects.all()
+#         print Club.objects.all()
+#         print Activity.objects.all()
+#         print Episode.objects.all()
+#         print FollowUpReport.objects.all()
+        
+    def test_create_activity_view(self):
+        "Test how create activity view behaves with no report penalties"
+        response = self.client.get(reverse('activities:create'))
+        self.assertEqual(response.status_code, 200)
+        
+class ActivityViewsWithReportPenalty(TestCase):
+    """
+    Test how the activity views (create and list) behave with
+    integration with reports set up.
+    """
+    def setUp(self):
+        # Create a user, a club (and make the user its coordinator),
+        # and 4 activities with 1, 2, 3, 4, 5 episodes respectively.
+        # Also create a report for the first episode in each activity
+        # Set the number of due reports to 4
+        # Also set overdue reports to 6
+        # Therefore penalties are expected 
+        self.user = User.objects.create_user('enjazuser', 'test@enjazportal.com', '12345678')
+        self.client.login(username=self.user.username, password='12345678')
+        self.club = Club.objects.create(name="Test Arabic Club Name",
+                                        english_name="Presidency",
+                                        description="Test Club Description",
+                                        email="test@enjazportal.com",
+                                        coordinator=self.user)
+        for i in range(1, 6):
+            activity = Activity.objects.create(primary_club=self.club,
+                                               name='Test Activity Name ' + str(i),
+                                               description='Test Activity Description ' + str(i),
+                                               participants=1,
+                                               organizers=1,
+                                               submitter=self.user,
+                                               )
+            for j in range(i):
+                # Set the episode end date to be 6*j days back
+                episode = Episode.objects.create(activity=activity,
+                                                start_date=date.today() - timedelta(weeks=3),
+                                                end_date=date.today() - timedelta(days=j*6),
+                                                start_time=datetime.now(),
+                                                end_time=datetime.now(),
+                                                location='Test Location',
+                                                )
+                if j == 0:
+                    FollowUpReport.objects.create(episode=episode,
+                                                  description="Test Report Description",
+                                                  start_date=date.today(),
+                                                  end_date=date.today(),
+                                                  start_time=datetime.now(),
+                                                  end_time=datetime.now(),
+                                                  location="Test Report Location",
+                                                  organizer_count=10,
+                                                  participant_count=100,
+                                                  submitter=self.user,
+                                                  )
+#     # This is run after each test
+#     def tearDown(self):
+#         print User.objects.all()
+#         print Club.objects.all()
+#         print Activity.objects.all()
+#         print Episode.objects.all()
+#         print FollowUpReport.objects.all()
+        
+    def test_create_activity_view(self):
+        "Test how create activity view behaves with report penalties"
+        response = self.client.get(reverse('activities:create'))
+        self.assertEqual(response.status_code, 403)

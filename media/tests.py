@@ -10,4 +10,4 @@ Tests for the Media Center app.
 # Rather than creating all tests here, it's neater to create
 # them seperately and just import them here.
 
-from media.test_suites.followupreport_tests import ReportDueAndOverdueDateTests
+from media.test_suites.followupreport_tests import ReportDueAndOverdueDateTests, ActivityViewsWithNoReportPenalty, ActivityViewsWithReportPenalty

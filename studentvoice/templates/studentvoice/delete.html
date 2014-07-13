@@ -1,0 +1,33 @@
+{% extends 'studentvoice_base.html' %}{% load bootstrap3 %}
+{% block title %}
+{% if greatest_parent %}
+حذف تعليق من {{ greatest_parent.title }}
+{% else %}
+حذف {{ voice.title }}
+{% endif %}
+{% endblock %}
+{% block content %}
+<h2>حذف تعليق</a></h2>
+
+{% if error_message and error_message == 'not_conrifmed' %}<p class="alert alert-danger">لم تؤكد الحذف.</p>{% endif %}
+<p>
+{% if greatest_parent == voice %}
+هل أنت متأكد أنك تريد حذف <a href="{% url 'studentvoice:show' voice.pk %}">{{ voice.title }}</a>؟
+{% else %}
+هل أنت متأكد أنك تريد حذف التعليق من <a href="{% url 'studentvoice:show' greatest_parent.pk %}">{{ greatest_parent.title }}</a>؟
+{% endif %}
+
+</p>
+
+<form action="{% url 'studentvoice:delete' voice.pk %}" method="post" class="form">
+{% csrf_token %}
+    <input type="hidden" name="confirm" value="1"/>
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "remove" %} احذف
+        </button>
+    {% endbuttons %}
+</form>
+{% endblock %}
+
+

@@ -15,10 +15,20 @@ it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Affero General Public License for more details.
+
+
+Additionally, the `studentvoice` app includes parts from the Askbot
+project.
+
+Copyright (C) 2009 Chen Gang and Sailing Cai.
+Copyright (C) 2009-2011 Evgeny Fadeev and individual contributors of Askbot project
+
+Licensed under the General Public License version 3 of the License, or
+(at your option) any later version.
 
 # Installation 
 
@@ -43,6 +53,7 @@ from accounts.forms import StudentSignupForm, NonStudentSignupForm, ModifiedAuth
     url(r'^clubs/', include('clubs.urls', namespace="clubs")),
     url(r'^books/', include('books.urls', namespace="books")),
     url(r'^niqati/', include('niqati.urls', namespace="niqati")),
+    url(r'^voice/', include('studentvoice.urls', namespace="studentvoice")),
     url(r'^accounts/signup/$', 'userena.views.signup', {'signup_form': StudentSignupForm, 'template_name': 'userena/student_signup_form.html'}),
     url(r'^accounts/signup/nonstudents/$', 'userena.views.signup', {'signup_form': NonStudentSignupForm, 'template_name': 'userena/nonstudent_signup_form.html'}, name="nonstudent_signup"),
     url(r'^accounts/signin/$', 'userena.views.signin', {'auth_form': ModifiedAuthenticationForm}),

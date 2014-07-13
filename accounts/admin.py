@@ -112,7 +112,9 @@ class CollegeFilter(admin.SimpleListFilter):
         return college_choices
 
     def queryset(self, request, queryset):
-        return queryset.filter(student_profile__college__name=self.value())
+        # If the filter is actually selected, apply it
+        if self.value():
+            return queryset.filter(student_profile__college__name=self.value())
 
 class SectionFilter(admin.SimpleListFilter):
     title = u"قسم الطالب"
@@ -121,7 +123,9 @@ class SectionFilter(admin.SimpleListFilter):
         return section_choices
 
     def queryset(self, request, queryset):
-        return queryset.filter(student_profile__college__section=self.value())
+        # If the filter is actually selected, apply it
+        if self.value():
+            return queryset.filter(student_profile__college__section=self.value())
 
 class ModifiedUserAdmin(UserenaAdmin):
     """This changes the way the admin websites (both the main and deanship
@@ -129,7 +133,8 @@ ones) deal with the User model."""
     actions = [remove_add_code_perm, remove_add_bookrequest_perm,
                remove_add_book_perm]
     list_display = ('username', 'full_en_name', 'email', 'is_coordinator', 'is_employee')
-    list_filter = (EmployeeFilter, CoordinatorFilter,CollegeFilter, SectionFilter)
+    list_filter = (EmployeeFilter, CoordinatorFilter, CollegeFilter,
+                   SectionFilter)
     inlines = [StudentProfileInline, NonStudentProfileInline]
 
     def is_coordinator(self, obj):

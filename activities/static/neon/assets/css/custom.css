@@ -66,3 +66,270 @@ p.bg-warning {
 .followupreport_zone a.btn {
 	color: #FFFFFF !important;
 }
+
+/* Adapted from askbot's style.less.  Licensed under GPLv3+.*/
+
+.short-summary {
+  position: relative;
+  filter: inherit;
+  padding: 10px 0 3px 0;
+  border-bottom: 1px solid #DDDBCE;
+  margin-bottom: 1px;
+  overflow: hidden;
+  width: 733px;
+  float: right;
+  min-height: 80px;
+}
+.short-summary h2 {
+  font-size: 20px;
+  font-weight: normal;
+  line-height: 26px;
+  padding-left: 0;
+  margin-bottom: 7px;
+  display: block;
+}
+.short-summary a {
+  color: #464646;
+}
+.short-summary .userinfo {
+  text-align: right;
+  line-height: 16px;
+  padding-right: 4px;
+}
+.short-summary .userinfo .timeago,
+.short-summary span.anonymous {
+  font-size: 11px;
+  clear: both;
+  font-weight: normal;
+  color: #555;
+}
+.short-summary .userinfo a {
+  font-weight: bold;
+  font-size: 11px;
+}
+.short-summary .counts {
+  float: left;
+  margin: 4px 0 0 5px;
+}
+.short-summary .counts .item-count {
+  padding: 0px 5px 0px 5px;
+  font-size: 25px;
+}
+.short-summary .counts .votes div,
+.short-summary .counts .views div,
+.short-summary .counts .comments div,
+.short-summary .counts .favorites div {
+  margin-top: 3px;
+  font-size: 14px;
+  line-height: 14px;
+  color: #646464;
+}
+.short-summary .votes,
+.short-summary .comments,
+.short-summary .favorites,
+.short-summary .views {
+  text-align: center;
+  margin: 0 3px;
+  padding: 8px 2px 0px 2px;
+  width: 51px;
+  float: right;
+  height: 44px;
+  border: #dbdbd4 1px solid;
+}
+.short-summary .votes {
+  background: url(../../../img/vote-background.png) repeat-x;
+}
+.short-summary .comments {
+  background: url(../../../img/comments-background.png) repeat-x;
+}
+.short-summary .views {
+  background: url(../../../img/view-background.png) repeat-x;
+}
+.short-summary .no-votes .item-count {
+  color: #b1b5b6;
+}
+.short-summary .some-votes .item-count {
+  color: #4a757f;
+}
+.short-summary .no-comments .item-count {
+  color: #b1b5b6;
+}
+.short-summary .some-comments .item-count {
+  color: #eab243;
+}
+.short-summary .no-views .item-count {
+  color: #b1b5b6;
+}
+.short-summary .some-views .item-count {
+  color: #d33f00;
+}
+
+.short-summary .some-favorites .item-count {
+  background: #338333;
+  color: #d0f5a9;
+}
+.short-summary .no-favorites .item-count {
+  background: #eab243;
+  color: yellow;
+}
+
+/*Question page*/
+.question-page h1 {
+  padding-top: 0px;
+/*  font-family: 'Open Sans Condensed', Arial, sans-serif;*/
+}
+.question-page h1 a {
+  color: #464646;
+  font-size: 26px;
+  font-weight: normal;
+  line-height: 1;
+}
+.question-page p.rss a {
+/*  font-family: 'Open Sans Condensed', Arial, sans-serif;*/
+  vertical-align: top;
+}
+.question-page .post {
+  display: table;
+  padding: 3px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+.question-page .post .mceEditor td {
+  width: auto;
+}
+.question-page .post pre,
+.question-page .post code {
+  clear: both;
+}
+.question-page .post-content {
+  display: table-cell;
+  border-spacing: 0px;
+  padding-left: 14px;
+  vertical-align: top;
+  width: auto;
+}
+.question-page .question .post-content {
+  margin-bottom: 10px;
+}
+.question-page .answer .post-content {
+  border-bottom: 1px solid #D4D4D4;
+}
+.voice-update-info-container {
+  float: left;
+  width: 175px;
+}
+.voice-update-info {
+  background: #ffffff url(../images/background-user-info.png) repeat-x bottom;
+  float: left;
+  font-size: 9px;
+  line-height: 12px;
+  margin: 0px 0px 5px 5px;
+  padding: 4px;
+  width: 166px;
+  border-radius: 4px;
+  -ms-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  -webkit-box-shadow: 0px 2px 1px #bfbfbf;
+  -moz-box-shadow: 0px 2px 1px #bfbfbf;
+  box-shadow: 0px 2px 1px #bfbfbf;
+}
+.voice-update-info p {
+  line-height: 13px;
+  font-size: 11px;
+  margin: 0 0 2px 1px;
+  padding: 0;
+}
+.voice-update-info a {
+  color: #444;
+}
+.vote-buttons {
+  float: right;
+  display: table-cell;
+  text-align: center;
+  padding-top: 2px;
+  width: 25px;
+  margin-left: 13px;
+  /* small IE fixes */
+  *margin: 0;
+  *height: 210px;
+  *width: 30px;
+}
+.vote-buttons * {
+  margin: 0;
+}
+.box.vote-buttons {
+  display: block;
+  width: 100% !important;
+}
+.question-img-upvote, .question-img-downvote,
+.answer-img-upvote, .answer-img-downvote {
+    width: 25px;
+    height: 20px;
+    cursor: pointer;
+}
+.question-img-upvote, .answer-img-upvote {
+    background: url(../../../img/vote-arrow-up-new.png) no-repeat;
+}
+
+.question-img-downvote, .answer-img-downvote {
+    background: url(../../../img/vote-arrow-down-new.png) no-repeat;
+}
+
+.question-img-upvote:hover, .question-img-upvote.on,
+.answer-img-upvote:hover, .answer-img-upvote.on {
+    background: url(../../../img/vote-arrow-up-on-new.png) no-repeat;
+}
+
+.question-img-downvote:hover, .question-img-downvote.on,
+.answer-img-downvote:hover, .answer-img-downvote.on {
+    background: url(../../../img/vote-arrow-down-on-new.png) no-repeat;
+}
+.vote-number {
+    padding: 2px 0 5px 0;
+    font-size: 25px;
+    font-weight: bold;
+    color: #777;
+}
+
+/* end of askbot-adapted CSS */
+
+.voice-comments {
+   display: block;
+}
+.voice-comments h3 {
+   margin-top: 30px;
+}
+
+.voice-comments textarea {
+   height: 100px;
+}
+
+.single-comment {
+   min-height: 100px;
+   margin-bottom: 16px;
+   border-bottom: 1px solid #D4D4D4;
+   background-color: rgb(238, 255, 234);
+   padding-top: 5px;
+}
+
+.single-comment p{
+   padding-top: 10px;
+}
+
+.short-summary.unpublished, .single-comment.unpublished {
+   background-color: rgb(200, 197, 197);
+}
+
+span.unpublished {
+   color: rgb(210, 0, 0);
+}
+
+.clean {
+    clear: both;
+}
+
+.voice-search .short-summary {
+    float: none;
+}

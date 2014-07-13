@@ -54,6 +54,7 @@ from accounts.forms import StudentSignupForm, NonStudentSignupForm, ModifiedAuth
     url(r'^books/', include('books.urls', namespace="books")),
     url(r'^niqati/', include('niqati.urls', namespace="niqati")),
     url(r'^voice/', include('studentvoice.urls', namespace="studentvoice")),
+    url(r'^media/', include('media.urls', namespace="media")),
     url(r'^accounts/signup/$', 'userena.views.signup', {'signup_form': StudentSignupForm, 'template_name': 'userena/student_signup_form.html'}),
     url(r'^accounts/signup/nonstudents/$', 'userena.views.signup', {'signup_form': NonStudentSignupForm, 'template_name': 'userena/nonstudent_signup_form.html'}, name="nonstudent_signup"),
     url(r'^accounts/signin/$', 'userena.views.signin', {'auth_form': ModifiedAuthenticationForm}),

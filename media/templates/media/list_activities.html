@@ -6,7 +6,14 @@
 		height: 30px;
 	}
 </style>
-<h3>الأنشطة المعتمدة</h3>
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/3/dataTables.bootstrap.css">
+
+<h3>الأنشطة المعتمدة
+<a href="{% url 'media:list_reports' %}" class="btn btn-xs btn-default">
+	استعرض جميع التقارير 
+	<i class="entypo-left-bold"></i>
+</a>
+</h3>
 <table id="activity_list">
 	<thead>
         <tr>
@@ -77,8 +84,12 @@
 {% endblock %}
 
 {% block customscript %}
+<!-- <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script> -->
 <script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+<!-- <script src="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/3/dataTables.bootstrap.js"></script> -->
+<script src="{% static 'neon/assets/js/datatables/TableTools.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/datatables/responsive/js/datatables.responsive.js' %}"></script>
 <script>
 $(document).ready(function () {
 	$('#activity_list').DataTable();

@@ -180,6 +180,27 @@ def show(request, activity_id):
 
 @login_required
 def create(request):
+    
+    # --- Permission checks ---
+    
+    # (1) Check if the user is a coordinator
+    
+    # To check permissions, rather than using the
+    # @permission_required('activities.add_activity') decorator,
+    # it is more dynamic to check whether the user is a
+    # coordinator of any club, or has the permission to add
+    # activities (i.e. part of the presidency group)
+    user_coordination = request.user.coordination.all()
+    if not request.user.has_perm("activities.add_activity") and not user_coordination:
+        raise PermissionDenied
+    
+    # (2) Check if the user's club has no more than 3 overdue follow-up reports.
+    # If any club coordinated by the user exceeds the 3-report threshold,
+    # prevent new activity submission (again in reality the user will only coordinate
+    # one club)
+    if any(club.get_overdue_report_count() > 3 for club in user_coordination):
+        raise PermissionDenied
+    
     presidency = Club.objects.get(english_name="Presidency")
     if request.method == 'POST':
         activity = Activity(submitter=request.user)
@@ -200,14 +221,6 @@ def create(request):
             context = {'form': form}
             return render(request, 'activities/new.html', context)
     else:
-        # To check permissions, rather than using the
-        # @permission_required('activities.add_activity') decorator,
-        # it is more dynamic to check whether the user is a
-        # coordinator of any club, or has the permission to add
-        # activities (i.e. part of the presidency group)
-        user_coordination = request.user.coordination.all()
-        if not request.user.has_perm("activities.add_activity") and not user_coordination:
-            raise PermissionDenied
 
         can_directly_add = request.user.has_perm("activities.directly_add_activity")
         try:

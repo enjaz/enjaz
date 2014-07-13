@@ -8,7 +8,7 @@ from django.shortcuts import render, get_object_or_404
 from clubs.models import Club
 from activities.models import Activity, Episode
 from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview
-from media.forms import FollowUpReportForm
+from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm
 
 @login_required
 def index(request):
@@ -38,7 +38,7 @@ def list_reports(request):
     """
     # Get all reports
     reports = FollowUpReport.objects.all()
-    return render(request, 'media/list_reports.html', {'reports': reports})
+    return render(request, 'media/test_dt.html', {'reports': reports})
 
 @login_required
 def list_articles(request):
@@ -61,7 +61,7 @@ def submit_report(request, episode_pk):
     user_clubs = request.user.coordination.all() | request.user.memberships.all()
     if episode.activity.primary_club not in user_clubs and not request.user.is_superuser:
         raise PermissionDenied
-    # (2) The passed episode shouldn't already have an episode.
+    # (2) The passed episode shouldn't already have a report.
     #     Overriding a previous submission shouldn't be allowed
     try:
         report = episode.followupreport
@@ -71,7 +71,9 @@ def submit_report(request, episode_pk):
     
     if request.method == 'POST':
         form = FollowUpReportForm(request.POST,
-                                  instance=FollowUpReport(episode=episode,
+                                  instance=FollowUpReport(pk=episode.pk, # make pk equal to episode pk
+                                                                         # to keep things synchronized
+                                                          episode=episode,
                                                           submitter=request.user)
                                   )
         if form.is_valid():
@@ -106,11 +108,53 @@ def show_report(request, episode_pk):
     return render(request, 'media/report_read.html', {'report': report})
 
 @login_required
-def submit_story(request, episode_pk):
+def create_story(request, episode_pk):
     """
-    Submit a Story.
+    Create a story for an episode.
     """
-    pass
+    episode = get_object_or_404(Episode, pk=episode_pk)
+    
+    # --- Permission Checks ---
+    # (1) The user should be part of the Media Center (either head or member)
+    media_center = Club.objects.get(english_name="Media Center")
+    user_clubs = request.user.coordination.all() | request.user.memberships.all()
+    if media_center not in user_clubs and not request.user.is_superuser:
+        raise PermissionDenied
+    # (2) The passed episode shouldn't already have a story.
+    #     If so, redirect to the edit view
+    try:
+        story = episode.story
+        return HttpRedirectResponse(reverse('media:edit_story',
+                                            args=(episode.pk, )))
+    except ObjectDoesNotExist:
+        pass
+    # (3) The episode should have no task associated with it;
+    #     or it should have a task assigned to the user
+    
+    
+    if request.method == 'POST':
+        form = StoryForm(request.POST,
+                         instance=Story(pk=episode.pk, # make pk equal to episode pk
+                                                       # to keep things synchronized
+                                        episode=episode,
+                                        writer=request.user)
+                         )
+        if form.is_valid():
+            form.save()
+            return HttpRedirectResponse(reverse('media:show_story',
+                                                args=(episode.pk, )))
+    else:
+        form = StoryForm()
+    
+    context = {}
+    context['form'] = form
+    context['episode'] = episode
+    # Get the episode's report to include in the context
+    try:
+        context['report'] = episode.followupreport
+    except ObjectDoesNotExist:
+        pass
+    return render(request, 'media/story_write.html', context)
 
 @login_required
 def show_story(request, pk):
@@ -120,9 +164,16 @@ def show_story(request, pk):
     pass
 
 @login_required
-def review_story(request, pk):
+def edit_story(request, pk):
     """
     Review a Story by writing notes or editing it directly.
+    """
+    pass
+
+# AJAX
+def assign_story_task(request, pk):
+    """
+    Assign a task to write or edit a story.
     """
     pass
 

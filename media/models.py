@@ -84,8 +84,8 @@ class Review(models.Model):
                                  verbose_name=u"المُراجع")
     date_reviewed = models.DateTimeField(auto_now_add=True,
                                      verbose_name=u"تاريخ المراجعة")
-    
     notes = models.TextField(verbose_name=u"الملاحظات")
+    approve = models.BooleanField()
     
     class Meta:
         abstract = True # This means this model won't have a table in the db
@@ -104,3 +104,25 @@ class ArticleReview(Review):
     """
     article = models.ForeignKey(Article,
                                 verbose_name=u"المقال")
+    
+class Task(models.Model):
+    """
+    An abstract task class.
+    """
+    assigner = models.ForeignKey(User,
+                                 verbose_name="المعيِّن")
+    assignee = models.ForeignKey(User,
+                                 related_name="assigned_tasks",
+                                 verbose_name="المعيَّن")
+    date_assigned = models.DateTimeField(auto_now_add=True,
+                                         verbose_name="تاريخ التعيين")
+    completed = models.BooleanField(default=False)
+    
+    class Meta:
+        abstract = True
+        
+class StoryTask(Task):
+    """
+    A task to write a story.
+    """
+    episode = models.ForeignKey(Episode)

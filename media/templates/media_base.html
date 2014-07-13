@@ -1,8 +1,16 @@
 {% extends 'base.html' %}
 
-{# some more blocks still to be added #}
-
 {% block title %}المركز الإعلامي{% endblock %}
+
+{% block pageheaderurl %}{% url 'media:index' %}{% endblock %}
+{% block pageheader %}المركز الإعلامي{% endblock %}
+
+{% block navbar %}
+
+	<li><a href="{% url 'media:list_activities' %}"><i class="entypo-flag"></i> التقارير و التغطيات</a></li>
+	<li><a href="#"><i class="entypo-newspaper"></i> المقالات</a></li>
+    
+{% endblock %}
 
 {% block content %}{% endblock %}
 

@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse
 from django.views.decorators import csrf
 
 
-from studentvoice import decorators
+from core import decorators
 from studentvoice.models import Voice, Vote, View
 
 # As a general design decision, the user interface (which can also be

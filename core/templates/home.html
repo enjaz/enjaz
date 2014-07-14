@@ -1,0 +1,215 @@
+{% extends "base.html" %}{% load staticfiles %}
+
+{% block title %}الصفحة الرئيسية{% endblock %}
+{% block pageheader %}الصفحة الرئيسية{% endblock %}
+{% block content %}
+<div class="row">
+	<div class="col-md-12">
+		<h2>مرحبًا 
+		{% if user.student_profile %}
+			{{ user.student_profile.ar_first_name }}!
+		{% else %}
+			{{ user.non_student_profile.ar_first_name }}!
+		{% endif %}
+		</h2>
+		<p>فيما يلي ملخص لما يهمك في بوابة إنجاز.</p>
+	</div>
+</div>
+<br>
+<div class="panel minimal minimal-gray">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<h2>الأنشطة</h2>
+		</div>
+	</div>
+	<div class="panel-body">
+		<div class="col-md-9">
+		<div class="panel panel-success panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+			
+			<!-- panel head -->
+			<div class="panel-heading">
+				<div class="panel-title">أنشطة الأسبوع القادم</div>
+				<div class="panel-options">
+					<a href="{% url 'activities:list' %}" type="button" class="btn btn-default">
+						 المزيد في تقويم الأنشطة
+					</a>
+				</div>
+			</div>
+			
+			<!-- panel body -->
+			<div class="panel-body">
+				
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>النشاط</th>
+							<th>النادي المنظم</th>
+							<th>التاريخ و الوقت</th>
+							<th>المكان</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						{% for a in upcoming_activities %}
+						<tr>
+							<td><a href="{% url 'activities:show' a.pk %}">{{ a.name }}</a></td>
+							<td>{{ a.primary_club }}</td>
+							<td>{{ a.get_first_date }}</td>
+							<td>{{ a.get_first_location }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				
+			</div>
+			
+		</div>
+	</div>
+	<div class="col-md-3">
+		<div class="tile-stats tile-green">
+			<div class="icon"><i class="entypo-chart-bar"></i></div>
+			<div class="num" data-start="0" data-end="{{ activity_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>عدد الأنشطة</h3>
+			<p>مجموع عدد أنشطة النادي لهذا العام</p>
+		</div>
+	</div>
+	</div>
+</div>
+
+<div class="panel minimal minimal-gray">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<h2>نقاطي</h2>
+		</div>
+	</div>
+	<div class="panel-body">
+		<div class="col-md-3">
+		<div class="tile-stats tile-aqua">
+			<div class="icon"><i class="entypo-gauge"></i></div>
+			<div class="num" data-start="0" data-end="{{ niqati_sum }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>عدد نقاطي</h3>
+			<p>مجموع النقاط المسجلة لك في برنامج نقاطي</p>
+		</div>
+		<div class="tile-stats tile-white-aqua">
+			<div class="icon"><i class="entypo-gauge"></i></div>
+			<div class="num" data-start="0" data-end="{{ niqati_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>عدد أنشطتي</h3>
+			<p>عدد الأنشطة التي حصلت فيها على نقاط</p>
+		</div>
+	</div>
+	<div class="col-md-9">
+		<div class="panel panel-info panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+			
+			<!-- panel head -->
+			<div class="panel-heading">
+				<div class="panel-title">آخر إدخالاتي في نقاطي</div>
+				
+				<div class="panel-options">
+					<a href="{% url 'niqati:student_report' %}" type="button" class="btn btn-default">
+						 استعرض تقريري الكامل
+					</a>
+				</div>
+				
+			</div>
+			
+			<!-- panel body -->
+			<div class="panel-body">
+				
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>اسم النشاط</th>
+							<th>عدد النقاط</th>
+							<th>تاريخ الإدخال</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						{% for c in latest_entries %}
+						<tr>
+							<td>{{ c.activity.name }}</td>
+							<td>{{ c.category.points }}</td>
+							<td>{{ c.redeem_date }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				
+			</div>
+			
+		</div>
+	</div>
+	</div>
+</div><!-- end panel -->
+<div class="panel minimal minimal-gray">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<h2>الكتب</h2>
+		</div>
+	</div>
+	<div class="panel-body">
+		<div class="col-md-9">
+		<div class="panel panel-warning panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+			
+			<!-- panel head -->
+			<div class="panel-heading">
+				<div class="panel-title">آخر الكتب المضافة</div>
+				
+				<div class="panel-options">
+					<a href="{% url 'books:list' %}" type="button" class="btn btn-default">
+						 المزيد
+					</a>
+				</div>
+				
+			</div>
+			
+			<!-- panel body -->
+			<div class="panel-body">
+				
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>الكتاب</th>
+							<th>المساهم</th>
+							<th>تاريخ الإضافة</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						{% for b in latest_books %}
+						<tr>
+							<td><a href="{% url 'books:show' b.pk %}">{{ b.title }}</a></td>
+							<td>{{ b.submitter }}</td>
+							<td>{{ b.submission_date }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				
+			</div>
+			
+		</div>
+	</div>
+	<div class="col-md-3">
+		<div class="tile-stats tile-orange">
+			<div class="icon"><i class="entypo-book"></i></div>
+			<div class="num" data-start="0" data-end="{{ books_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>عدد الكتب</h3>
+			<p>مجموع الكتب المعروضة في بوابة إنجاز</p>
+		</div>
+		<div class="tile-stats tile-white-orange">
+			<div class="icon"><i class="entypo-book"></i></div>
+			<div class="num" data-start="0" data-end="{{ my_books_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>عدد كتبي</h3>
+			<p>عدد كتبي المعروضة في بوابة إنجاز</p>
+		</div>
+	</div>
+	</div>
+</div>
+{% endblock %}
+

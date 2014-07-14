@@ -17,6 +17,7 @@ class ReportDueAndOverdueDateTests(TestCase):
     Test the methods related to report due dates, which are
     associated with the club and episode models.
     """
+#     fixtures = ['initial_data.json']
     def setUp(self):
         # Create a user, a club (and make the user its coordinator),
         # and 3 activities with 1, 2, 3 episodes respectively
@@ -190,7 +191,9 @@ class ActivityViewsWithReportPenalty(TestCase):
         self.user = User.objects.create_user('enjazuser', 'test@enjazportal.com', '12345678')
         self.client.login(username=self.user.username, password='12345678')
         self.club = Club.objects.create(name="Test Arabic Club Name",
-                                        english_name="Presidency",
+                                        english_name="Presidency", # due to dependent nature of create view,
+                                                                   # there must be a club with the name
+                                                                   # Presidency :/
                                         description="Test Club Description",
                                         email="test@enjazportal.com",
                                         coordinator=self.user)

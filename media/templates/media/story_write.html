@@ -1,20 +1,73 @@
 {% extends 'media_base.html' %}{% load bootstrap3 %}
 
-{% block title %}تغطية {{ episode.activity.name }}{% endblock %}
+{% block title %}تغطية نشاط: {{ episode.activity.name }}{% endblock %}
 
 {% block content %}
-<form method="post" action="{% url 'media:create_story' episode.pk %}">
-	
+<h3>تغطية نشاط: {{ episode.activity.name }}</h3>
+{# display the follow-up report info at the top of the page #}
+<div class="panel panel-default" data-collapsed="1">
+	<div class="panel-heading">
+		<div class="panel-title">تقرير النشاط</div>
+		
+		<div class="panel-options">
+			<a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
+		</div>
+	</div>
+	<div class="panel-body with-table">
+	{% if report %}
+	<table class="table table-bordered table-responsive">		
+		<tbody>
+			<tr>
+				<th class="text-center">الوصف</th>
+				<td colspan="3">{{ report.description }}</td>
+			</tr>
+			
+			<tr>
+				<th class="text-center">تاريخ البداية</th>
+				<td>{{ report.start_date }}</td>
+				<th class="text-center">تاريخ النهاية</th>
+				<td>{{ report.end_date }}</td>
+			</tr>
+			
+			<tr>
+				<th class="text-center">وقت البداية</th>
+				<td>{{ report.start_time }}</td>
+				<th class="text-center">وقت النهاية</th>
+				<td>{{ report.end_time }}</td>
+			</tr>
+			
+			<tr>
+				<th class="text-center">عدد المنظمين</th>
+				<td>{{ report.organizer_count }}</td>
+				<th class="text-center">عدد المشاركين</th>
+				<td>{{ report.participant_count }}</td>
+			</tr>		
+		</tbody>
+	</table>
+	{% else %}
+	<br>
+	<div align="center">لم يتم رفع التقرير بعد.</div>
+	<br>
+	{% endif %}
+	</div>
+</div>
+
+<hr>
+<br>
+<form method="post" action="{% if not episode.story %}{% url 'media:create_story' episode.pk %}{% else %}{% url 'media:edit_story' episode.pk %}{% endif %}">
+	{% csrf_token %}
 	<!-- Title and Publish Buttons -->	<div class="row">
 		<div class="col-sm-2 post-save-changes">
-			<button type="button" class="btn btn-green btn-lg btn-block btn-icon">
-				Publish
+			<button type="submit" class="btn btn-green btn-lg btn-block btn-icon">
+				أرســـــل
 				<i class="entypo-check"></i>
 			</button>
 		</div>
 		
 		<div class="col-sm-10">
-			<input type="text" class="form-control input-lg" name="post_title" placeholder="Post title">
+			{{ form.title }}
+			{#{% bootstrap_field form.title %}#}
+			<!-- <input type="text" class="form-control input-lg" name="post_title" placeholder="Post title"> -->
 		</div>
 	</div>
 	
@@ -22,11 +75,65 @@
 	
 	<!-- WYSIWYG - Content Editor -->	<div class="row">
 		<div class="col-sm-12">
-			<textarea class="form-control"></textarea>
+			{{ form.text }}
+			{#{% bootstrap_field form.text %}#}
+			<!-- <textarea class="form-control" rows="18" name="post_content" id="post_content"></textarea> -->
+		</div>
+	
+	<br>
+	
+	<div class="row">
+		<div class="col-sm-12">
+			كتبه {{ user.student_profile.ar_first_name}} {{ user.student_profile.ar_last_name }}
+			{% if episode.story.date_submitted %}بتاريخ {{ episode.story.date_submitted|date:"j F Y" }}{% endif %}
 		</div>
 	</div>
 	
-	<br>
+	<hr>
+	
+	<div class="row">
+		<div class="col-md-12">
+		
+		{% if review_form %}
+			<div class="panel panel-warning panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+				
+				<!-- panel head -->
+				<div class="panel-heading">
+					<div class="panel-title">الملاحظات</div>
+					
+					<div class="panel-options">
+						<a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
+					</div>
+				</div>
+				
+				<!-- panel body -->
+				<div class="panel-body">
+					
+					{{ review_form.notes }}
+					{{ review_form.approve }} {{ review_form.approve.label }}
+					{#{% bootstrap_form review_form %}#}
+						
+				</div>
+				
+			</div>
+			
+		{% elif review %}
+		
+		<blockquote class="blockquote-{% if review.approved %}green{% else %}gold{% endif %}">
+			<p>
+				<strong>الملاحظات</strong>
+			</p>
+			<p>
+				{{ review.notes }}
+			</p>
+		</blockquote>
+		
+		{% endif %}
+		
+		</div>
+	</div>
+	
+
 	
 </form>
 {% endblock %}

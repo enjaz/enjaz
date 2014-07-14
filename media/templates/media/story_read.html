@@ -1,0 +1,24 @@
+{% extends 'media_base.html' %}
+
+{% block title %}{{ story.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+	<div class="col-md-12">
+		<h1>{{ story.title }} 
+			<small>{{ story.writer.student_profile.ar_first_name }} {{ story.writer.student_profile.ar_last_name }}</small>
+			<a href="{% url 'media:edit_story' episode.pk %}" class="btn btn-xs btn-gold btn-icon">
+				عدّل
+				<i class="entypo-pencil"></i>
+			</a>
+		</h1>
+	</div>
+</div>
+<hr>
+<br>
+<div class="row">
+	<div class="col-md-12">
+		<p>{{ story.text }}</p>
+	</div>
+</div>
+{% endblock %}

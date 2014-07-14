@@ -38,7 +38,7 @@ def list_reports(request):
     """
     # Get all reports
     reports = FollowUpReport.objects.all()
-    return render(request, 'media/test_dt.html', {'reports': reports})
+    return render(request, 'media/list_reports.html', {'reports': reports})
 
 @login_required
 def list_articles(request):
@@ -124,12 +124,13 @@ def create_story(request, episode_pk):
     #     If so, redirect to the edit view
     try:
         story = episode.story
-        return HttpRedirectResponse(reverse('media:edit_story',
+        return HttpResponseRedirect(reverse('media:edit_story',
                                             args=(episode.pk, )))
     except ObjectDoesNotExist:
         pass
     # (3) The episode should have no task associated with it;
     #     or it should have a task assigned to the user
+    #    #TODO
     
     
     if request.method == 'POST':
@@ -137,11 +138,16 @@ def create_story(request, episode_pk):
                          instance=Story(pk=episode.pk, # make pk equal to episode pk
                                                        # to keep things synchronized
                                         episode=episode,
-                                        writer=request.user)
+                                        writer=request.user) # This is the only place
+                                                             # we specify the writer.
+                                                             # The story will be attributed
+                                                             # to the author, no matter
+                                                             # who edits it later on.
                          )
         if form.is_valid():
             form.save()
-            return HttpRedirectResponse(reverse('media:show_story',
+            # TODO: resolve task
+            return HttpResponseRedirect(reverse('media:show_story',
                                                 args=(episode.pk, )))
     else:
         form = StoryForm()
@@ -157,18 +163,64 @@ def create_story(request, episode_pk):
     return render(request, 'media/story_write.html', context)
 
 @login_required
-def show_story(request, pk):
+def show_story(request, episode_pk):
     """
     Show a Story.
     """
-    pass
+    episode = get_object_or_404(Episode, pk=episode_pk)
+    story = get_object_or_404(Story, episode=episode)
+    return render(request, 'media/story_read.html', {'story': story,
+                                                     'episode': episode})
 
 @login_required
-def edit_story(request, pk):
+def edit_story(request, episode_pk):
     """
     Review a Story by writing notes or editing it directly.
     """
-    pass
+    episode = get_object_or_404(Episode, pk=episode_pk)
+    story = get_object_or_404(Story, episode=episode)
+    try:
+        review = StoryReview.objects.get(story=story)
+    except ObjectDoesNotExist:
+        review = StoryReview(story=story,
+                             reviewer=request.user)
+    
+    # --- Permission Checks ---
+    # The user should be part of the Media Center (either head or member)
+    media_center = Club.objects.get(english_name="Media Center")
+    user_clubs = request.user.coordination.all() | request.user.memberships.all()
+    if media_center not in user_clubs and not request.user.is_superuser:
+        raise PermissionDenied    
+    
+    if request.method == 'POST':
+        form = StoryForm(request.POST,
+                         instance=Story.objects.get(pk=episode.pk)
+                         )
+        review_form = StoryReviewForm(request.POST,
+                                      instance=review)
+        if form.is_valid() and review_form.is_valid():
+            form.save()
+            review_form.save()
+            # TODO: resolve task
+            return HttpResponseRedirect(reverse('media:show_story',
+                                                args=(episode.pk, )))
+    else:
+        form = StoryForm(instance=story)
+        review_form = StoryReviewForm(instance=review)
+    
+    context = {}
+    context['form'] = form
+    if request.user == media_center.coordinator or request.user.is_superuser:
+        context['review_form'] = review_form
+    else:
+        context['review'] = review
+    context['episode'] = episode
+    # Get the episode's report to include in the context
+    try:
+        context['report'] = episode.followupreport
+    except ObjectDoesNotExist:
+        pass
+    return render(request, 'media/story_write.html', context)
 
 # AJAX
 def assign_story_task(request, pk):

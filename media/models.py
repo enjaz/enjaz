@@ -27,6 +27,10 @@ class FollowUpReport(models.Model):
     organizer_count = models.IntegerField(verbose_name=u"عدد المنظمين")
     participant_count = models.IntegerField(verbose_name=u"عدد المشاركين")
     
+    def __unicode__(self):
+        "Return the name of the parent activity followed by the number of the episode"
+        return self.episode.activity.name + " #" + str(list(self.episode.activity.episode_set.all()).index(self.episode) + 1)
+    
     class Meta:
         permissions = (
             ("view_followupreport", "Can view a follow-up report."),
@@ -48,6 +52,9 @@ class Story(models.Model):
     title = models.CharField(max_length=256,
                              verbose_name=u"العنوان")
     text = models.TextField(verbose_name=u"النص")
+    
+    def __unicode__(self):
+        return self.episode.activity.name + ": " + self.title
     
     class Meta:
         permissions = (
@@ -126,3 +133,4 @@ class StoryTask(Task):
     A task to write a story.
     """
     episode = models.ForeignKey(Episode)
+    story = models.ForeignKey(Story, blank=True, null=True)

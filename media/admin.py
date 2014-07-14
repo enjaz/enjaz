@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from media.models import FollowUpReport, Story
+
+admin.site.register(FollowUpReport)
+admin.site.register(Story)

@@ -266,6 +266,10 @@ class Episode(models.Model):
         except ObjectDoesNotExist:
             report_not_submitted = True
         return datetime.now() > self.report_due_date() and report_not_submitted
+    
+    def has_incomplete_storytask(self):
+        "Return True if there is any incomplete StoryTask, otherwise return False"
+        return any(not task.complete for task in self.storytask_set.all())
 
 class Category(models.Model):
     ar_name = models.CharField(max_length=50,

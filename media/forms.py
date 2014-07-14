@@ -12,11 +12,15 @@ class FollowUpReportForm(ModelForm):
                   'organizer_count', 'participant_count']
         
 class StoryForm(ModelForm):
+    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control input-lg', 'placeholder': u'العنوان'}))
+    text = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': '18', 'placeholder': u'النص'}))
     class Meta:
         model = Story
         fields = ['title', 'text']
 
 class StoryReviewForm(ModelForm):
+    notes = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'rows': '5', 'placeholder': u'الملاحظات'}))
+    approve = forms.BooleanField(label=u"اعتمد التغطية.", required=False)
     class Meta:
         model = StoryReview
         fields = ['notes', 'approve']

@@ -132,5 +132,5 @@ class StoryTask(Task):
     """
     A task to write a story.
     """
-    episode = models.ForeignKey(Episode)
-    story = models.ForeignKey(Story, blank=True, null=True)
+    episode = models.OneToOneField(Episode)
+    story = models.OneToOneField(Story, blank=True, null=True)

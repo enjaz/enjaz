@@ -1,13 +1,18 @@
 # -*- coding: utf-8  -*-
+import random
+
 from django.contrib.auth.decorators import permission_required, login_required
+from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.shortcuts import render, get_object_or_404
+from django.views.decorators import csrf
 
+from core import decorators
 from clubs.models import Club
 from activities.models import Activity, Episode
-from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview
+from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask
 from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm
 
 @login_required
@@ -38,7 +43,7 @@ def list_reports(request):
     """
     # Get all reports
     reports = FollowUpReport.objects.all()
-    return render(request, 'media/list_reports.html', {'reports': reports})
+    return render(request, 'media/dt_test2.html', {'reports': reports})
 
 @login_required
 def list_articles(request):
@@ -169,7 +174,12 @@ def show_story(request, episode_pk):
     """
     episode = get_object_or_404(Episode, pk=episode_pk)
     story = get_object_or_404(Story, episode=episode)
+    try:
+        review = story.storyreview
+    except ObjectDoesNotExist:
+        review = None
     return render(request, 'media/story_read.html', {'story': story,
+                                                     'review': review,
                                                      'episode': episode})
 
 @login_required
@@ -222,12 +232,26 @@ def edit_story(request, episode_pk):
         pass
     return render(request, 'media/story_write.html', context)
 
-# AJAX
-def assign_story_task(request, pk):
+@csrf.csrf_exempt
+@decorators.ajax_only
+@decorators.post_only
+def assign_story_task(request):
     """
     Assign a task to write or edit a story.
     """
-    pass
+    episode = Episode.objects.get(pk=request.POST['episode_pk'])
+    if request.POST['assignee'] == 'random':
+        media_center = Club.objects.get(english_name="Media Center")
+        assignee = random.choice(media_center.members.all())
+    else:
+        assignee = User.objects.get(pk=int(request.POST['assignee']))
+    task = StoryTask.objects.create(pk=episode.pk,
+                                    assigner=request.user,
+                                    assignee=assignee,
+                                    episode=episode)
+    assignee_name = assignee.student_profile.ar_first_name + " " + assignee.student_profile.ar_last_name
+    return {"episode_pk": episode.pk,
+            "assignee_name": assignee_name}
 
 @login_required
 def submit_article(request):

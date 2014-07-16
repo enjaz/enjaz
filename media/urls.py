@@ -10,5 +10,5 @@ urlpatterns = patterns('',
     url(r'^activities/stories/(?P<episode_pk>\d+)/create/$', views.create_story, name="create_story"),
     url(r'^activities/stories/(?P<episode_pk>\d+)/$', views.show_story, name="show_story"),
     url(r'^activities/stories/(?P<episode_pk>\d+)/edit/$', views.edit_story, name="edit_story"),
-    url(r'^activities/stories/(?P<episode_pk>\d+)/assign/$', views.assign_story_task, name="assign_story_task"),
+    url(r'^activities/stories/assign/$', views.assign_story_task, name="assign_story_task"),
 )

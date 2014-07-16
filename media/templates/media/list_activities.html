@@ -6,15 +6,13 @@
 		height: 30px;
 	}
 </style>
-<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/3/dataTables.bootstrap.css">
-
 <h3>الأنشطة المعتمدة
 <a href="{% url 'media:list_reports' %}" class="btn btn-xs btn-default">
 	استعرض جميع التقارير 
 	<i class="entypo-left-bold"></i>
 </a>
 </h3>
-<table id="activity_list">
+<table id="activity_list" class="table table-bordered datatable">
 	<thead>
         <tr>
             <th>اسم النشاط</th>

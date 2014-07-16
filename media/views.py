@@ -43,7 +43,7 @@ def list_reports(request):
     """
     # Get all reports
     reports = FollowUpReport.objects.all()
-    return render(request, 'media/dt_test2.html', {'reports': reports})
+    return render(request, 'media/list_reports.html', {'reports': reports})
 
 @login_required
 def list_articles(request):

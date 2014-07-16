@@ -218,6 +218,13 @@ class Episode(models.Model):
     # be linked here
     # google_event = models.URLField()
     
+    def __unicode__(self):
+        return self.activity.name + " #" + str(self.get_index() + 1)
+    
+    def get_index(self):
+        "Return the index of the episode within the parent activity's episode set"
+        return list(self.activity.episode_set.all()).index(self)
+    
     def is_single_day(self):
         return self.start_date == self.end_date
     
@@ -266,10 +273,6 @@ class Episode(models.Model):
         except ObjectDoesNotExist:
             report_not_submitted = True
         return datetime.now() > self.report_due_date() and report_not_submitted
-    
-    def has_incomplete_storytask(self):
-        "Return True if there is any incomplete StoryTask, otherwise return False"
-        return any(not task.complete for task in self.storytask_set.all())
 
 class Category(models.Model):
     ar_name = models.CharField(max_length=50,

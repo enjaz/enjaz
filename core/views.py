@@ -30,12 +30,12 @@ def portal_home(request):
         
         # --- niqati -------
         context['niqati_sum'] = sum(code.category.points for code in request.user.code_set.all())
-        context['niqati_count'] = len(request.user.code_set.all())
+        context['niqati_count'] = request.user.code_set.count()
         context['latest_entries'] = request.user.code_set.all()[::-1][:5]
         
         # --- books --------
-        context['books_count'] = len(Book.objects.all())
-        context['my_books_count'] = len(request.user.submissions.all())
+        context['books_count'] = Book.objects.count()
+        context['my_books_count'] = request.user.submissions.count()
         context['latest_books'] = Book.objects.all()[::-1][:5]
         
         return render(request, 'home.html', context) # the dashboard

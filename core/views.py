@@ -1,10 +1,12 @@
 # -*- coding: utf-8  -*-
 from datetime import datetime, timedelta, date
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
 
 from activities.models import Activity
 from books.models import Book
+from .models import Announcement
 
 def portal_home(request):
     # If the user is logged in, return the admin dashboard;
@@ -41,3 +43,9 @@ def portal_home(request):
         return render(request, 'home.html', context) # the dashboard
     else:
         return render(request, 'front/home_front.html')
+    
+def visit_announcement(request, pk):
+    announce = get_object_or_404(Announcement, pk=pk)
+    announce.visits += 1
+    announce.save()
+    return HttpResponseRedirect(announce.url)

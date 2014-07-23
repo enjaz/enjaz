@@ -107,14 +107,35 @@ class StudentSignupForm(SignupForm):
         # Add default permissions
         add_book = Permission.objects.get(codename='add_book')
         add_bookrequest = Permission.objects.get(codename='add_bookrequest')
+
+        # Student Voice:
         add_vote = Permission.objects.get(codename='add_vote')
         add_voice = Permission.objects.get(codename='add_voice')
+
+        # Niqati:
         submit_niqati_code = Permission.objects.get(codename='submit_code')
         view_niqati_report = Permission.objects.get(codename='view_student_report')
+
+        # Arshidni:
+        add_studygroup = Permission.objects.get(codename='add_studygroup')
+        add_question = Permission.objects.get(codename='add_question')
+        add_answer = Permission.objects.get(codename='add_answer')
+        add_graduateprofile = Permission.objects.get(codename='add_graduateprofile')
+        add_learningobjective = Permission.objects.get(codename='add_learningobjective')
+        add_joinstudygrouprequest = Permission.objects.get(codename='add_joinstudygrouprequest')
+        add_colleagueprofile = Permission.objects.get(codename='add_colleagueprofile')
+        add_supervisionrequest = Permission.objects.get(codename='add_supervisionrequest')
+
         new_user.user_permissions.add(add_book, add_bookrequest,
                                       add_vote, add_voice,
                                       submit_niqati_code,
-                                      view_niqati_report)
+                                      view_niqati_report,
+                                      add_studygroup, add_question,
+                                      add_answer, add_graduateprofile,
+                                      add_learningobjective,
+                                      add_joinstudygrouprequest,
+                                      add_colleagueprofile,
+                                      add_supervisionrequest)
         new_user.save()
 
         # Append the extra fields to the Student Profile

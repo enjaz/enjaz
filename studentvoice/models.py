@@ -94,6 +94,15 @@ In case of comments and subcomments, this returns the original
     is_reported.boolean = True
     is_reported.short_description = u"هل بُلّغ عنه؟"
 
+    def is_edited(self):
+        """If the difference between submission_date and edit_date is
+        more than 10 minutes.  Consider it edited. """
+        delta_time = edit_date - submission_date
+        if delta_time.seconds >= 600:
+            return True
+        else:
+            return False
+
     class Meta:
         verbose_name = u"صوت"
         verbose_name_plural = u"الأصوات"

@@ -4,15 +4,9 @@
 {% block pageheader %}صوتك مسموع{% endblock %}
 
 {% block navbar %}
-
-	{% if perms.books.add_book %}
+	{% if perms.studentvoice.add_voice %}
 		<li><a href="{% url 'studentvoice:create' %}"><span class="glyphicon glyphicon-plus"></span> أسمعنا صوتك!</a></li>
-		{% comment %}{% if user.is_authenticated %}
-			<li><a href="{% url 'books:review_requests' %}"><span class="glyphicon glyphicon-list-alt"></span>  مشاركاتي</a></li>
-			<li><a href="{% url 'books:my_requests' %}"><span class="glyphicon glyphicon-star"></span> طلباتي</a></li>
-		{% endif %}{% endcomment %}
 	{% endif %}
-    
 {% endblock %}
 {% block content %}
 {% endblock %}  

@@ -172,7 +172,10 @@ def show(request, voice_id):
 @login_required
 @decorators.post_only
 def create_comment(request, voice_id):
-    parent_voice = get_object_or_404(Voice, pk=voice_id)
+    # Don't make it possible to comment on comments that are not
+    # published.
+    parent_voice = get_object_or_404(Voice, pk=voice_id,
+                                     is_published=True)
     greatest_parent = parent_voice.get_greatest_parent()
     comment_object = Voice(submitter=request.user,
                            parent=parent_voice)

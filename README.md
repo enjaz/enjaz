@@ -45,6 +45,7 @@ In the project `urls.py`, add the following:
 # [...]
 from django.views.generic import TemplateView
 from accounts.admin import deanship_admin
+from arshidni.admin import arshidni_admin
 from accounts.forms import StudentSignupForm, NonStudentSignupForm, ModifiedAuthenticationForm
 # [...]
     url(r'^$', 'core.views.portal_home', name='home'),
@@ -54,6 +55,8 @@ from accounts.forms import StudentSignupForm, NonStudentSignupForm, ModifiedAuth
     url(r'^books/', include('books.urls', namespace="books")),
     url(r'^niqati/', include('niqati.urls', namespace="niqati")),
     url(r'^voice/', include('studentvoice.urls', namespace="studentvoice")),
+    url(r'^arshidni/admin/', include(arshidni_admin.urls)),
+    url(r'^arshidni/', include('arshidni.urls', namespace="arshidni")),
     url(r'^media/', include('media.urls', namespace="media")),
     url(r'^accounts/signup/$', 'userena.views.signup', {'signup_form': StudentSignupForm, 'template_name': 'userena/student_signup_form.html'}),
     url(r'^accounts/signup/nonstudents/$', 'userena.views.signup', {'signup_form': NonStudentSignupForm, 'template_name': 'userena/nonstudent_signup_form.html'}, name="nonstudent_signup"),

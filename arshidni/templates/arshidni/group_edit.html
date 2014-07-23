@@ -1,0 +1,38 @@
+{% extends 'arshidni_base.html' %}{% load bootstrap3 %}
+{% block title %}{% if edit %} تعديل مجموعة {{ group.name }}{% else %} إنشاء مجموعة دراسية جديدة{% endif %}{% endblock %}
+
+{% block navbar %}
+	<li><a href="{% url 'arshidni:list_groups' %}"><span class="entypo-users"></span> المجموعات الدراسية</a></li>
+	{% if perms.add_studygroup %}
+		<li><a href="{% url 'arshidni:submit_group' %}"><span class="glyphicon glyphicon-plus"></span> أنشئ مجموعة</a></li>
+	{% endif %}
+{% endblock %}
+
+{% block content %}
+<h2>{% if edit %} تعديل مجموعة {{ group.name }} {% else %} إنشاء مجموعة دراسية جديدة {% endif %}</h2>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% if edit %}{% url 'arshidni:edit_group' group.pk %}{% else %}{% url 'arshidni:submit_group' %}{% endif %}" method="post" class="form">
+{% csrf_token %}
+    {% bootstrap_form form %}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "ok-sign" %} {% if edit %} عدّل {% else %} أنشئ {% endif %}
+        </button>
+    {% endbuttons %}
+</form>
+
+<script>
+$(function(){
+	$('#id_starting_date, #id_ending_date').datepicker({isRTL: true});
+		$("#id_max_members").attr({
+		"max" : 8,        // substitute your own
+	       "min" : 3          // values (or variables) here
+	});
+});
+</script>
+
+{% endblock %}
+
+

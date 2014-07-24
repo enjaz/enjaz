@@ -135,7 +135,7 @@ def show(request, activity_id):
        not request.user == activity.submitter:
         raise PermissionDenied
 
-    return render(request, 'activities/show_new.html', context)
+    return render(request, 'activities/show.html', context)
 
 @login_required
 def create(request):

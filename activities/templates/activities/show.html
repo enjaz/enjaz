@@ -1,227 +1,178 @@
-{% extends "activities_base.html" %}
+{% extends 'activities_base.html' %}{% load staticfiles %}
 {% block title %}{{ activity.name }}{% endblock %}
-
 {% block content %}
-<h2>{{ activity.name }}</h2>
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-<div class="row">
-	<div class="col-md-3">
-	<div class="panel panel-primary" data-collapsed="0">
-				
-		<!-- panel head -->
-		<div class="panel-heading">
-			<div class="panel-title">خيارات</div>
+{% if error_message %}
+<div class="alert alert-danger"><strong>{{ error_message }}</strong></div>
+{% endif %}
+<style>
+	.profile-env > header .profile-picture img {
+		background-color: #FFFFFF;
+	}
+
+	@media (max-width: 1080px) {
+		.profile-env > header {
+			margin-bottom: 20px;
+		}
+	}
+	
+	.profile-env > header .profile-info-sections > li:first-child {
+		padding-right: 0;
+  		padding-left: 0;
+	}
+	
+	.profile-env > header .profile-info-sections .profile-name {
+		margin-top: 17px;
+	}
+</style>
+<div class="profile-env">
+	
+	<header class="row">
+		
+		<div class="col-sm-2">
+			
+			<a href="{% url 'activities:show' activity.pk %}" class="profile-picture hidden-xs hidden-sm">
+				{# The picture is to be changed; for the moment, keep it #}
+				<img src="{% static 'logo/enjaz_logo_shadow_no_text.png' %}"
+				class="img-responsive img-circle">
+			</a>
+			
 		</div>
 		
-		<!-- panel body -->
-		<div class="panel-body">
-		<ul class="list-unstyled">
-		{% if activity.is_editable and can_edit %}
-			<li><a href="{% url 'activities:edit' activity.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
-		{% endif %}
-		{% if can_review and not review_p.is_approved or can_review and not review_d.is_approved %}
-			<li><a href="{% url 'activities:review' activity.pk %}"><span class="glyphicon glyphicon-ok"></span> راجع واعتمد</a></li>
-		{% endif %}
-		{% if can_view_participation and activity.collect_participants %}
-			<li><a href="{% url 'activities:view_participation' activity.pk %}"><span class="glyphicon glyphicon-list-alt"></span> شاهد طلبات المشاركة</a></li>
-		{% elif not is_review and user.is_authenticated and activity.collect_participants %}
-			<li><a href="{% url 'activities:participate' activity.pk %}"><span class="glyphicon glyphicon-star"></span> شارك!</a></li>
-		{% endif %}
-		</ul>
+		<div class="col-sm-7">
+			
+			<ul class="profile-info-sections">
+				<li>
+					<div class="profile-name">
+						<strong>
+							<a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a>
+							
+							{# if the user can view unapproved activity, show the activity status #}
+							{# is-online = approved, is-idle = pending, is-busy = rejected #}
+							
+							{% if perms.activities.view_activity %}
+							<a href="#" class="user-status {% if activity.is_approved %}is-online{% elif activity.is_approved == None %}is-idle{% else %}is-busy{% endif %} tooltip-primary"
+							data-toggle="tooltip" data-placement="top"
+							data-original-title="{% if activity.is_approved %}تمت الموافقة على النشاط{% elif activity.is_approved == None %}بانتظار مراجعة الطلب{% else %}لم تتم الموافقة على النشاط{% endif %}"></a>
+							<!-- User statuses available classes "is-online", "is-offline", "is-idle", "is-busy" -->	
+							{% endif %}
+						</strong>
+						<span><a href="{% url 'clubs:show' activity.primary_club.pk %}">{{ activity.primary_club.name }}</a></span>
+					</div>
+				</li>
+			</ul>
+			
 		</div>
+		
+		<div class="col-sm-3">
+			
+			<div class="profile-buttons">
+				{% if activity.collect_participants %}
+				<a href="{% url 'activities:participate' activity.pk %}" class="btn btn-default">
+					<i class="entypo-user-add"></i>
+					شارك
+				</a>
+				{% endif %}
+				
+				{% if can_edit %}
+				<a href="{% url 'activities:edit' activity.pk %}" class="btn btn-default">
+					<i class="entypo-pencil"></i>
+					عدّل
+				</a>
+				{% endif %}
+			</div>
+		</div>
+		
+	</header>
 	
-	</div>
-	</div>
-	<div class="col-md-9">
-<table class="tg table-hover table">
-{% if can_view_presidency_review and review_p and not can_view_deanship_review or can_view_deanship_review and review_d and not can_view_presidency_review %}
-  <colgroup>
-    <col class="col-xs-2">
-    <col class="col-xs-3">
-    <col class="col-xs-3">
-  </colgroup>
-{% elif review_p and review_d %}
-  <colgroup>
-    <col class="col-xs-1">
-    <col class="col-xs-3">
-    <col class="col-xs-2">
-    <col class="col-xs-2">
-  </colgroup>
-{% else %}
-  <colgroup>
-    <col class="col-xs-2">
-    <col class="col-xs-6">
-  </colgroup>
-{% endif %}
-{% if can_view_deanship_review and review_d or can_view_presidency_review and review_p %}
-  <tr>
-    <th></th>
-    <th>الطلب</th>
-    {% if can_view_presidency_review and review_p %}
-    <th>ملاحظات رئاسة نادي الطلاب</th>
-    {% endif %}
-    {% if can_view_deanship_review and review_d %}
-    <th>ملاحظات عمادة شؤون الطلاب</th>
-    {% endif %}
-  </tr>
-{% endif %}
-  <tr>
-    <th>الوصف</th>
-    <td>{{ activity.description }}</td>
-    {% if can_view_presidency_review and review_p %}
-    <td>{%if review_p.description_notes %}{{ review_p.description_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-    {% if can_view_deanship_review and review_d %}
-    <td>{%if review_d.description_notes %}{{ review_d.description_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-  </tr>
-  <tr>
-    <th>النادي المنظم</th>
-    <td><a href="{% url 'clubs:show' activity.primary_club.pk %}">{{ activity.primary_club }}</a></td>
-    {% if can_view_presidency_review and review_p %}
-    <td{% if activity.secondary_club.all %} rowspan="2"{% endif %}>{%if review_p.clubs_notes %}{{ review_p.clubs_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-    {% if can_view_deanship_review and review_d %}
-    <td{% if activity.secondary_club.all %} rowspan="2"{% endif %}>{%if review_d.clubs_notes %}{{ review_d.clubs_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-  </tr>{% if activity.secondary_club.all %}
-  <tr>
-    <th>الأندية المساندة</th>
-    <td>
-    <ul>
-    {% for club in activity.secondary_club.all %}
-    <li><a href="{% url 'clubs:show' club.pk %}">{{ club.name }}</a></li>
-    {% endfor %}
-    </ul>
-    </td>{% if is_review or can_view_review and review %}
-    <td></td>{% endif %}
-  </tr>{% endif %}
+	<section class="profile-info-tabs">
+		
+		<div class="row">
+			
+			<div class="col-sm-offset-2 col-sm-10">
+				
+				<ul class="user-details">{# if the user is privileged, show them the internal description #}{% if can_view_deanship_review or perms.activities.add_deanship_review or can_view_presidency_review or perms.activities.add_presidency_review %}
+					<li>
+						<a href="#">
+							<i class="entypo-info-circled"></i>
+							{{ activity.description }}
+						</a>
+					</li>{% endif %}
+					<li>
+						<a href="#">
+							<i class="entypo-info-circled"></i>
+							{{ activity.public_description }}
+						</a>
+					</li>
+					{% for episode in activity.episode_set.all %}
+					<li>
+						<div class="row">
+						{% if can_add_followupreport %}
+						{# group the activity info in a div to make #}
+						{# space for the report button #}
+						<div class="col-md-10">
+						{% endif %}
+						<a href="#">
+							<div class="col-sm-4">
+								<i class="entypo-calendar"></i>
+								{{ episode.start_date }}
+								-
+								{{ episode.end_date }}
+							</div>
+							<div class="col-sm-4">
+								<i class="entypo-clock"></i>
+								{{ episode.start_time }}
+								-
+								{{ episode.end_time }}
+							</div>
+							<div class="col-sm-4">
+								<i class="entypo-location"></i>
+								{{ episode.location }}
+							</div>
+						</a>
+						{% if can_add_followupreport %}
+						</div>
+						<div class="followupreport_zone col-md-2">
+			            	{% if episode.followupreport %}
+			            		<a href="{% url 'media:show_report' episode.pk %}"
+			            		class="btn btn-block btn-green btn-xs">استعرض التقرير</a>
+			            		
+			            	{% elif episode.report_is_due %}
+			            		<a href="{% url 'media:submit_report' episode.pk %}"
+			            		class="btn btn-block btn-gold btn-xs">ارفع التقرير</a>
+			            		
+			            	{% elif episode.report_is_overdue %}
+			            		<a href="{% url 'media:submit_report' episode.pk %}"
+			            		class="btn btn-block btn-red btn-xs">ارفع التقرير</a>
+			            		
+			            	{% else %}
+			            		<a class="btn btn-block btn-primary btn-xs disabled">بانتظار انتهاء النشاط</a>
+			            	{% endif %}
+						</div>
+						{% endif %}
+						</div>
+					</li>
+					{% endfor %}
+				</ul>
 
-  <tr>
-    <th>التاريخ والوقت</th>
-    <td>{{ activity.get_first_date|date:"j F Y" }}<br/>{{ activity.get_first_time }}</td>
-    {% if can_view_presidency_review and review_p %}
-    <td>{%if review_p.datetime_notes %}{{ review_p.datetime_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-    {% if can_view_deanship_review and review_d %}
-    <td>{%if review_d.datetime_notes %}{{ review_d.datetime_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-  </tr>{% if activity.get_first_location %}
-  <tr>
-    <th>المكان</th>
-    <td>{{ activity.get_first_location }}</td>
-    {% if can_view_presidency_review and review_p %}
-    <td>{%if review_p.location_notes %}{{ review_p.location_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-    {% if can_view_deanship_review and review_d %}
-    <td>{%if review_d.location_notes %}{{ review_d.location_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-  </tr>{% endif %}
-  <tr>
-    <th>عدد المشتركين</th>
-    <td>{{ activity.participants }}</td>
-    {% if can_view_presidency_review and review_p %}
-    <td>{%if review_p.participants_notes %}{{ review_p.participants_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-    {% if can_view_deanship_review and review_d %}
-    <td>{%if review_d.participants_notes %}{{ review_d.participants_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-  </tr>
-  <tr>
-    <th>عدد المنظمين</th>
-    <td>{{ activity.organizers }}</td>
-    {% if can_view_presidency_review and review_p %}
-    <td>{%if review_p.organizers_notes %}{{ review_p.organizers_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-    {% if can_view_deanship_review and review_d %}
-    <td>{%if review_d.organizers_notes %}{{ review_d.organizers_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-  </tr>{% if activity.requirements %}
-  <tr>
-    <th>المتطلبات</th>
-    <td>{{ activity.requirements }}</td>
-    {% if can_view_presidency_review and review_p %}
-    <td>{%if review_p.requirement_notes %}{{ review_p.requirement_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-    {% if can_view_deanship_review and review_d %}
-    <td>{%if review_d.requirement_notes %}{{ review_d.requirement_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-  </tr>{% endif %}{% if activity.inside_collaborators %}
-  <tr>
-    <th>المتعاونون من داخل الجامعة</th>
-    <td>{{ activity.inside_collaborators }}</td>
-    {% if can_view_presidency_review and review_p %}
-    <td>{%if review_p.inside_notes %}{{ review_p.inside_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-    {% if can_view_deanship_review and review_d %}
-    <td>{%if review_d.inside_notes %}{{ review_d.inside_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-  </tr>{% endif %}{% if activity.outside_collaborators %}
-  <tr>
-    <th>المتعاونون من خارج الجامعة</th>
-    <td>{{ activity.outside_collaborators }}</td>
-    {% if can_view_presidency_review and review_p %}
-    <td>{%if review_p.outside_notes %}{{ review_p.outside_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-    {% if can_view_deanship_review and review_d %}
-    <td>{%if review_d.outside_notes %}{{ review_d.outside_notes }}{% else %}-{% endif %}</td>
-    {% endif %}
-  </tr>{% endif %}
-  <tr>
-    <th>تاريخ الإرسال</th>
-    <td>{{ activity.submission_date }}</td>
-    {% if can_view_presidency_review and review_p %}
-    <td>{{ review_p.edit_date }}</td>
-    {% endif %}
-    {% if can_view_deanship_review and review_d %}
-    <td>{{ review_d.edit_date }}</td>
-    {% endif %}
-  </tr>
-  <tr>	
-    <th>المُرسل</th>
-    <td >{{ activity.submitter.username }}</td>
-    {% if can_view_presidency_review and review_p %}
-    <td>{{ review_p.reviewer }}</td>
-    {% endif %}
-    {% if can_view_deanship_review and review_d %}
-    <td>{{ review_d.reviewer }}</td>
-    {% endif %}
-  </tr>
-  <tr>
-    <th>الحالة</th>
-    <td{% if can_view_deanship_review and review_d and can_view_presidency_review and review_p %} colspan="3"{% elif can_view_deanship_review and review_d and not can_view_presidency_review or can_view_deanship_review and review_d and not review_p or can_view_presidency_review and review_p and not can_view_deanship_review or can_view_presidency_review and review_p and not review_d %} colspan="2"{% endif %}>
-{% if not activity.review_set.all %}
-  {% if perms.activities.add_review %}<a href="{% url 'activities:review' activity.id %}">مُعلّق</a>{% else %}معلّق{% endif %}
-{% elif activity.review_set.all|length_is:"1" %}
-  {% if activity.review_set.all.0.review_type == 'P' %}
-    {% if activity.review_set.all.0.is_approved == None %}
-    ينتظر تعديلا
-    {% elif activity.review_set.all.0.is_approved == True %}
-    ينتظر مراجعة العمادة
-    {% elif activity.review_set.all.0.is_approved == False %}
-    رفضته الرئاسة
-    {% endif %}
-  {% elif activity.review_set.all.0.review_type == 'D' %}
-    {% if activity.review_set.all.0.is_approved == True %}
-    اعتمدته العمادة
-    {% endif %}
-  {% endif %}
-{% elif activity.review_set.all|length_is:"2" %}
-  {% if activity.review_set.all.1.review_type == 'D' %}
-    {% if activity.review_set.all.1.is_approved == None %}
-    ينتظر تعديلا
-    {% elif activity.review_set.all.1.is_approved == True %}
-    اعتمده العمادة
-    {% elif activity.review_set.all.1.is_approved == False %}
-    رفضته الرئاسة
-    {% endif %}
-  {% endif %}
-{% endif %}
-    </td>
-  </tr>
-</table>
+				<!-- tabs for the profile links -->
+				<ul class="nav nav-tabs">
+					{% if can_view_presidency_review or perms.activities.add_presidency_review %}
+					<li{% if active_tab == 'presidency' %} class="active"{% endif %}>
+						<a href="{% url 'activities:review_with_type' activity.pk 'p' %}">مراجعة رئاسة نادي الطلاب</a>
+					</li>
+					{% endif %}
+					{% if can_view_deanship_review or perms.activities.add_deanship_review %}
+					<li{% if active_tab == 'deanship' %} class="active"{% endif %}>
+						<a href="{% url 'activities:review_with_type' activity.pk 'd' %}">مراجعة عمادة شؤون الطلاب</a>
+					</li>
+					{% endif %}
+				</ul>
+			</div>
+		</div>
+	</section>
+	
+	<section class="profile-feed">
+		{% block review_content %}{% endblock %}
+	</section>
 </div>
 {% endblock %}
-
-
-

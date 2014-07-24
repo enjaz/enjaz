@@ -128,9 +128,9 @@ class Vote(models.Model):
         )
     vote_type = models.CharField(max_length=1,
                                  choices=vote_type_choices)
-    submission_date = models.DateTimeField('تاريخ الإرسال',
+    submission_date = models.DateTimeField(u'تاريخ الإرسال',
                                            auto_now_add=True)
-    edit_date = models.DateTimeField('date edited', auto_now=True)
+    edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
 
     class Meta:
         verbose_name = u"اقتراع"
@@ -152,9 +152,9 @@ class Response(models.Model):
                                        default=True)
     is_editable = models.BooleanField(verbose_name=u"يمكن تعديله؟",
                                       default=True)
-    submission_date = models.DateTimeField('تاريخ الإرسال',
+    submission_date = models.DateTimeField(u'تاريخ الإرسال',
                                            auto_now_add=True)
-    edit_date = models.DateTimeField('date edited', auto_now=True)
+    edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
 
     class Meta:
         verbose_name = u"استجابة"

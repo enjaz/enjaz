@@ -28,9 +28,9 @@ class Activity(models.Model):
                                     verbose_name=u"متطلبات النشاط")
     submitter = models.ForeignKey(User, null=True,
                                   on_delete=models.SET_NULL)
-    submission_date = models.DateTimeField('تاريخ الإرسال',
+    submission_date = models.DateTimeField(u'تاريخ الإرسال',
                                            auto_now_add=True)
-    edit_date = models.DateTimeField('date edited', auto_now=True)
+    edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
     is_editable = models.BooleanField(default=True, verbose_name=u"هل يمكن تعديله؟")
     collect_participants = models.BooleanField(default=False,
                                                verbose_name=u"افتح التسجيل للمنظمين؟")

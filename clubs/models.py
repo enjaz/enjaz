@@ -58,9 +58,9 @@ class Club(models.Model):
                                  verbose_name=u"الكلية",)
     open_membership = models.BooleanField(default=False,
                                                verbose_name=u"اسمح بالتسجيل؟")
-    creation_date = models.DateTimeField('date created',
+    creation_date = models.DateTimeField(u'تاريخ الإنشاء',
                                          auto_now_add=True)
-    edit_date = models.DateTimeField('date edited', auto_now=True)
+    edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
     special = models.BooleanField(default=False,
                                   verbose_name=u"نادي مميز؟") # To allow more flexible exceptions with
                                                          # presidency, media club and arshidny
@@ -99,7 +99,7 @@ class MembershipApplication(models.Model):
     user = models.ForeignKey(User, related_name='user')
     note = models.TextField(verbose_name=u"لماذا تريد الانضمام؟",
            help_text=u"هل لديك مهارات مخصوصة؟ هل لديك أفكار لنشاطات؟")
-    submission_date = models.DateTimeField('تاريخ الإرسال',
+    submission_date = models.DateTimeField(u'تاريخ الإرسال',
                                            auto_now_add=True)
 
     class Meta:

@@ -90,7 +90,7 @@ class Club(models.Model):
     class Meta:
         # For the admin interface.
         verbose_name = u"نادي"
-        verbose_name_plural = u"النوادي"
+        verbose_name_plural = u"الأندية"
     def __unicode__(self):
         return self.name
 

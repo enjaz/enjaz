@@ -226,11 +226,16 @@ def edit(request, activity_id):
 
     if request.method == 'POST':
         if request.user.has_perm('activities.directly_add_activity'):
-            modified_activity = DirectActivityForm(request.POST, instance=activity)
+            modified_activity = DirectActivityForm(request.POST,
+                                                   instance=activity)
+        elif not activity.is_editable and \
+             not request.user.has_perm('activities.change_activity'):
+            modified_activity = DisabledActivityForm(request.POST,
+                                                     instance=activity)
         else:
-            modified_activity = ActivityForm(request.POST, instance=activity)
+            modified_activity = ActivityForm(request.POST,
+                                             instance=activity)
         # Should check that edits are valid before saving
-        # TODO: actually edits should be approved first by presidency and deanship
         if modified_activity.is_valid():
             modified_activity.save()
             return HttpResponseRedirect(reverse('activities:show',

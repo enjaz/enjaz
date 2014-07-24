@@ -25,6 +25,8 @@ class ClubForm(ModelForm):
 
 class DisabledClubForm(ClubForm):
     def __init__(self, *args, **kwargs):
+        # Fields to keep enabled.
+        self.enabled_fields = ['description', 'open_membership']
         # If an instance is passed, then store it in the instance variable.
         # This will be used to disable the fields.
         self.instance = kwargs.get('instance', None)
@@ -33,11 +35,8 @@ class DisabledClubForm(ClubForm):
         super(DisabledClubForm, self).__init__(*args, **kwargs)
 
         # Make sure that an instance is passed (i.e. the form is being
-        # edited) and is_editable is False, so you can disable most
-        # fields.
+        # edited).
         if self.instance:
-            # Fields to keep enabled.
-            self.enabled_fields = ['description', 'open_membership']
             for field in self.fields:
                 if not field in self.enabled_fields:
                     self.fields[field].widget.attrs['readonly'] = 'readonly'
@@ -50,10 +49,6 @@ class DisabledClubForm(ClubForm):
                     cleaned_data[field] = getattr(self.instance, field)
 
         return cleaned_data
-        
-
-    # TODO: The server-side should also make sure that nothing is
-    #       changed.
 
 class ModifyClubForm(ModelForm):
     class Meta:

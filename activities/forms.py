@@ -179,9 +179,11 @@ class DirectActivityForm(ActivityForm):
 
 class DisabledActivityForm(ActivityForm):
     def __init__(self, *args, **kwargs):
+        # Fields to keep enabled.
+        self.enabled_fields = ['public_description']
         # If an instance is passed, then store it in the instance variable.
         # This will be used to disable the fields.
-        instance = kwargs.get('instance', None)
+        self.instance = kwargs.get('instance', None)
 
         # Initialize the form
         super(DisabledActivityForm, self).__init__(*args, **kwargs)
@@ -189,15 +191,31 @@ class DisabledActivityForm(ActivityForm):
         # Make sure that an instance is passed (i.e. the form is being
         # edited) and is_editable is False, so you can disable most
         # fields.
-        if instance and not instance.is_editable:
-            # Fields to keep enabled.
-            enabled_fields = ['public_description']
+        if self.instance and not self.instance.is_editable:
             for field in self.fields:
-                if not field in enabled_fields:
+                if not field in self.enabled_fields:
                     self.fields[field].widget.attrs['readonly'] = 'readonly'
 
-    # TODO: If is_editable is False, the server-side should also make
-    #       sure that nothing is changed.
+    def clean(self):
+        # m2m need a special workaround.
+        m2m_fields = ['secondary_clubs', 'participant_colleges']
+
+        cleaned_data = super(DisabledActivityForm, self).clean()
+
+        if self.instance:
+            for field in cleaned_data:
+                if not field in self.enabled_fields:
+                    try:
+                        if field in m2m_fields:
+                            cleaned_data[field] = getattr(self.instance, field).all()
+                        else:
+                            cleaned_data[field] = getattr(self.instance, field)
+                    except AttributeError: # For episode fields
+                        pass
+        else:
+            print "No instance!"
+
+        return cleaned_data
 
 class ReviewForm(ModelForm):
     class Meta:

@@ -35,7 +35,7 @@ def portal_home(request):
         
         # --- books --------
         context['books_count'] = Book.objects.count()
-        context['my_books_count'] = request.user.submissions.count()
+        context['my_books_count'] = request.user.book_contributions.count()
         context['latest_books'] = Book.objects.all()[::-1][:5]
         
         return render(request, 'home.html', context) # the dashboard

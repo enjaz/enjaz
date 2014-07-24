@@ -363,4 +363,6 @@ span.unpublished {
     background-color: rgb(254, 215, 215);
 }
 
-
+.book-description {
+    text-align: justify;
+}

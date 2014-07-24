@@ -13,7 +13,16 @@ class Book(models.Model):
     publisher = models.CharField(max_length=200, verbose_name=u"الناشر", blank=True, help_text=u"اختياري")
     year = models.PositiveSmallIntegerField(u"سنة النشر", null=True, blank=True, help_text=u"اختياري")
     edition = models.CharField(max_length=200, verbose_name=u"الطبعة", blank=True, help_text=u"اختياري")
-    condition = models.CharField(max_length=200, verbose_name=u"حالة الكتاب", blank=True, help_text=u"هل من صفحات ناقصة أو ممزقة مثلا؟ (اختياري)")
+    condition_choices = (
+        ('Like new', u'كأنه جديد'),
+        ('Very good', u'جيدة جدا'),
+        ('Good', u'جيدة'),
+        ('Poor', u'دون الجيدة'),
+        )
+    condition = models.CharField(max_length=200, verbose_name=u"حالة الكتاب",
+                                 choices=condition_choices,
+                                 blank=True,
+                                 help_text=u"هل من صفحات ناقصة أو ممزقة مثلا؟ (اختياري)")
     description = models.TextField(verbose_name=u"وصف الكتاب", blank=True, help_text=u"اختياري")
     contact = models.CharField(max_length=200, verbose_name=u"طريقة التواصل", help_text=u"رقم جوال أو عنوان بريد (مطلوب)")
     status_choices = (
@@ -34,10 +43,10 @@ class Book(models.Model):
                               choices=availability_choices)
     submitter = models.ForeignKey(User, null=True,
                                   on_delete=models.SET_NULL,
-                                  related_name='submissions')
+                                  related_name='book_contributions')
     holder = models.ForeignKey(User, null=True,
                                on_delete=models.SET_NULL,
-                               related_name='holdings')
+                               related_name='book_holdings')
     cover_url = models.CharField(max_length=200, blank=True, verbose_name=u"صورة الغلاف", help_text=u"صورة لغلاف الكتاب (مستحسن)")
     cover = models.FileField(upload_to='covers', blank=True, null=True)
     submission_date = models.DateTimeField(u"تاريخ الإرسال",

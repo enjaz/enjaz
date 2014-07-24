@@ -3,6 +3,33 @@
 {% block title %}الصفحة الرئيسية{% endblock %}
 {% block pageheader %}الصفحة الرئيسية{% endblock %}
 {% block content %}
+{% if major_program_announcement %}
+<div class="jumbotron">
+	<div class="row">
+	<div class="col-md-3">
+	<div class="screenshot">
+		<a href="{% url 'visit_announcement' major_program_announcement.pk %}">
+			{% if major_program_announcement.image %}
+			<img src="{{ major_program_announcement.image.url }}" class="img-circle img-responsive" style="max-width: 100%;">
+			{% else %}
+			<img src="{% static 'logo/enjaz_logo_shadow_no_text.png' %}" class="img-circle img-responsive" style="max-width: 100%;">
+			{% endif %}
+		</a>
+	</div>
+	</div>
+	<div class="col-md-9">
+	<h1>{{ major_program_announcement.title }}</h1>
+	
+	<p>{{ major_program_announcement.description }}</p>
+	
+	<p>
+		<br>
+		</p><a href="{% url 'visit_announcement' major_program_announcement.pk %}" style="float: left;" class="btn btn-primary btn-lg">المزيد <i class="entypo-left"></i></a>
+	<p></p>
+	</div>
+	</div>
+</div>
+{% endif %}
 <div class="row">
 	<div class="col-md-12">
 		<h2>مرحبًا 
@@ -76,7 +103,7 @@
 	</div>
 	</div>
 </div>
-
+{% if user.student_profile %}
 <div class="panel minimal minimal-gray">
 	<div class="panel-heading">
 		<div class="panel-title">
@@ -144,6 +171,7 @@
 	</div>
 	</div>
 </div><!-- end panel -->
+{% endif %}
 <div class="panel minimal minimal-gray">
 	<div class="panel-heading">
 		<div class="panel-title">
@@ -210,6 +238,82 @@
 		</div>
 	</div>
 	</div>
+</div>
+<div class="row">
+<div class="col-md-6">
+<div class="panel minimal minimal-gray">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<h2>أبحاث طلابية</h2>
+		</div>
+	</div>
+	<div class="panel-body scrollable" data-height="250px" style="max-height: 250px;">
+		<div class="panel-group joined" id="accordion-student-researches">
+			
+			{% for research in student_researches %}
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#accordion-student-researches" href="#student-research-{{ forloop.counter }}" class="collapsed">
+							{{ research.title }}
+							{# a little hack to avoid using a link because it would mess up the styles #}
+							
+							<button type="button" style="float:left;" onclick="window.location.href = '{% url 'visit_announcement' research.pk %}'" class="btn btn-xs btn-default">
+								<i class="entypo-link"></i>
+							</button>
+						</a>
+					</h4>
+				</div>
+				<div id="student-research-{{ forloop.counter }}" class="panel-collapse collapse">
+					<div class="panel-body">
+						{{ research.description }}
+					</div>
+				</div>
+			</div>
+			{% empty %}
+			لا توجد أبحاث حاليًا.
+			{% endfor %}
+		</div>
+	</div>
+</div>
+</div>
+<div class="col-md-6">
+	<div class="panel minimal minimal-gray">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<h2>إعلانات خارجية</h2>
+		</div>
+	</div>
+	<div class="panel-body scrollable" data-height="250px" style="max-height: 250px;">
+		<div class="panel-group joined" id="accordion-external-anns">
+			
+			{% for ann in external_announcements %}
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#accordion-external-anns" href="#external-ann-{{ forloop.counter }}" class="collapsed">
+							{{ ann.title }}
+							{# a little hack to avoid using a link because it would mess up the styles #}
+							
+							<button type="button" style="float:left;" onclick="window.location.href = '{% url 'visit_announcement' ann.pk %}'" class="btn btn-xs btn-default">
+								<i class="entypo-link"></i>
+							</button>
+						</a>
+					</h4>
+				</div>
+				<div id="external-ann-{{ forloop.counter }}" class="panel-collapse collapse">
+					<div class="panel-body">
+						{{ ann.description }}
+					</div>
+				</div>
+			</div>
+			{% empty %}
+			لا توجد إعلانات خارجية حاليًا.
+			{% endfor %}
+		</div>
+	</div>
+</div>
+</div>
 </div>
 {% endblock %}
 

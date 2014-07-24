@@ -7,7 +7,8 @@ class Announcement(models.Model):
     """
     TYPE_CHOICES = (
     ('R', u'إعلان بحث'),
-    ('E', u'إعلان جهة خارجية'),              
+    ('E', u'إعلان جهة خارجية'),
+    ('M', u'إعلان برنامج عام لنادي الطلاب'),
     )
     type = models.CharField(max_length=1,
                             choices=TYPE_CHOICES,
@@ -15,6 +16,7 @@ class Announcement(models.Model):
     title = models.CharField(max_length=128,
                              verbose_name=u"العنوان")
     description = models.TextField(verbose_name=u"الوصف")
+    image = models.ImageField(upload_to='announcement_images', blank=True, null=True)
     url = models.URLField(verbose_name=u"الرابط")
     visits = models.PositiveIntegerField(default=0,
                                          verbose_name=u"عدد الزيارات")

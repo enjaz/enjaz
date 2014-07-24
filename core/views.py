@@ -40,6 +40,13 @@ def portal_home(request):
         context['my_books_count'] = request.user.submissions.count()
         context['latest_books'] = Book.objects.all()[::-1][:5]
         
+        # --- announcements 
+        context['student_researches'] = Announcement.objects.filter(type='R')[::-1] # show last first
+        context['external_announcements'] = Announcement.objects.filter(type='E')[::-1]
+        context['major_program_announcement'] = None
+        if Announcement.objects.filter(type='M').count() > 0:
+            context['major_program_announcement'] = Announcement.objects.filter(type='M')[0]
+        
         return render(request, 'home.html', context) # the dashboard
     else:
         return render(request, 'front/home_front.html')

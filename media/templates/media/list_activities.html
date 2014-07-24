@@ -150,7 +150,7 @@
 <script src="{% static 'neon/assets/js/datatables/responsive/js/datatables.responsive.js' %}"></script>
 <script>
 $(document).ready(function () {
-	$('#activity_list').on( 'draw.dt', attach_assign_task_to_click_event);
+	attach_assign_task_to_click_event();
 	$('#activity_list').DataTable();
 });
 function attach_assign_task_to_click_event() {

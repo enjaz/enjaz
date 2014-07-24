@@ -1,0 +1,80 @@
+{% extends 'media_base.html' %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+	<div class="col-md-12">
+		<h1>{{ article.title }} 
+			<small>{{ article.author.student_profile.get_ar_full_name }}</small>
+			{% if article.author == user and article.status == 'E' %}
+			<a href="{% url 'media:edit_article' article.pk %}" class="btn btn-xs btn-gold btn-icon">
+				عدّل
+				<i class="entypo-pencil"></i>
+			</a>
+			{% endif %}
+		</h1>
+	</div>
+</div>
+<hr>
+<br>
+<div class="row">
+	<div class="col-md-12">
+		<p>{{ article.text }}</p>
+	</div>
+</div>
+{% if review_form %}
+<hr>
+<br>
+<form action="{% url 'media:review_article' article.pk %}" method="post">
+	{% csrf_token %}
+	<div class="panel panel-warning panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+				
+		<!-- panel head -->
+		<div class="panel-heading">
+			<div class="panel-title">الملاحظات</div>
+			
+			<div class="panel-options">
+				<a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
+			</div>
+		</div>
+		
+		<!-- panel body -->
+		<div class="panel-body">
+			
+			{{ review_form.notes }}
+			
+			<br>
+			
+			<div class="row">
+			<div class="col-md-10">
+				{{ review_form.approve }} {{ review_form.approve.label }}
+			</div>
+			<div class="col-md-2">
+				<button type="submit" class="btn btn-sm btn-default btn-block btn-icon">
+					أرسل
+					<i class="entypo-check"></i>
+				</button>
+			</div>
+			</div>
+			{#{% bootstrap_form review_form %}#}
+				
+		</div>
+		
+	</div>
+</form>
+{% elif review %}
+
+<hr>
+<br>
+<blockquote class="blockquote-{% if review.approve %}green{% else %}gold{% endif %}">
+	<p>
+		<strong>الملاحظات</strong>
+	</p>
+	<p>
+		{{ review.notes }}
+	</p>
+</blockquote>
+
+{% endif %}
+{% endblock %}

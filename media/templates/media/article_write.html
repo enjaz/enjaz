@@ -1,0 +1,58 @@
+{% extends 'media_base_nonmember.html' %}
+
+{% block title %}مقال جديد{% endblock %}
+
+{% block content %}
+<h3>مقال جديد</h3>
+<hr>
+<br>
+<form method="post" action="{% if not article.pk %}{% url 'media:submit_article' %}{% else %}{% url 'media:edit_article' article.pk %}{% endif %}">
+	{% csrf_token %}
+	<!-- Title and Publish Buttons -->	<div class="row">
+		<div class="col-sm-2 post-save-changes">
+			<button type="submit" class="btn btn-green btn-lg btn-block btn-icon">
+				أرســـــل
+				<i class="entypo-check"></i>
+			</button>
+		</div>
+		
+		<div class="col-sm-10">
+			{{ form.title }}
+			{#{% bootstrap_field form.title %}#}
+			<!-- <input type="text" class="form-control input-lg" name="post_title" placeholder="Post title"> -->
+		</div>
+	</div>
+	
+	<br>
+	
+	<!-- WYSIWYG - Content Editor -->	<div class="row">
+		<div class="col-sm-12">
+			{{ form.text }}
+			{#{% bootstrap_field form.text %}#}
+			<!-- <textarea class="form-control" rows="18" name="post_content" id="post_content"></textarea> -->
+		</div>
+	
+	<br>
+	
+	<div class="row">
+		<div class="col-sm-12">
+			كتبه {{ user.student_profile.get_ar_full_name }}
+			{% if article.date_submitted %}بتاريخ {{ article.date_submitted|date:"j F Y" }}{% endif %}
+		</div>
+	</div>
+	
+</form>
+{% if review %}
+<hr>
+<br>
+<blockquote class="blockquote-{% if review.approve %}green{% else %}gold{% endif %}">
+	<p>
+		<strong>الملاحظات</strong>
+	</p>
+	<p>
+		{{ review.notes }}
+	</p>
+</blockquote>
+
+{% endif %}
+{% endblock %}

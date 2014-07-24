@@ -1,0 +1,52 @@
+{% extends 'media_base.html' %}{% load staticfiles %}
+
+{% block title %}المقالات{% endblock %}
+
+{% block content %}
+<h3>المقالات</h3>
+<table id="article_list" class="table table-bordered datatable">
+	<thead>
+		<!-- <th>#</th> -->
+		<th>عنوان المقال</th>
+		<th>الكاتب</th>
+		<th>تاريخ الإرسال</th>
+		<th>الحالة</th>
+		<th>الخيارات</th>
+	</thead>
+	<tbody>
+		{% for article in articles %}
+		<tr>
+			<!-- <td>{{ article.pk }}</td> -->
+			<td><a href="{% url 'media:show_article' article.pk %}">{{ article.title }}</a></td>
+			<td>{{ article.author.student_profile.get_ar_full_name }}</td>
+			<td>{{ article.date_submitted|date:"j F Y" }}</td>
+			<td>{{ article.get_status_display }}</td>
+			<td>
+				{# if the article is pending (and is assigned to the user), #}
+				{# show a review button; otherwise a read button #}
+				{# (they basically point to the same thing) #}
+				{% if article.status == 'P' and article.assignee == user %}
+					<a href="{% url 'media:show_article' article.pk %}"
+					class="btn btn-xs btn-block btn-orange btn-icon">
+					<i class="entypo-feather"></i>
+					راجع
+					</a>
+				{% else %}
+					<a href="{% url 'media:show_article' article.pk %}"
+					class="btn btn-xs btn-block btn-default btn-icon">
+					<i class="entypo-book-open"></i>
+					اقرأ
+					</a>
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+<!-- bottom scripts -->
+<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+<script>
+	$("#article_list").DataTable()
+</script>
+{% endblock %}

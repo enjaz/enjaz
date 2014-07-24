@@ -21,4 +21,17 @@
 		<p>{{ story.text }}</p>
 	</div>
 </div>
+{% if review %}
+<hr>
+<br>
+<blockquote class="blockquote-{% if review.approve %}green{% else %}gold{% endif %}">
+	<p>
+		<strong>الملاحظات</strong>
+	</p>
+	<p>
+		{{ review.notes }}
+	</p>
+</blockquote>
+
+{% endif %}
 {% endblock %}

@@ -36,6 +36,9 @@ class FollowUpReport(models.Model):
             ("view_followupreport", "Can view a follow-up report."),
             ("view_all_followupreports", "Can view all available follow-up reports."),
         )
+        verbose_name = u"تقرير"
+        verbose_name_plural = u"التقارير"
+#         app_label = u"المركز الإعلامي"
 
 class Story(models.Model):
     """
@@ -63,12 +66,16 @@ class Story(models.Model):
             ("review_story", "Can review any available story."),
             ("assign_review_story", "Can assign any Media Center member to review a story.")
         )
+        verbose_name = u"تغطية"
+        verbose_name_plural = u"التغطيات"
+#         app_label = u"المركز الإعلامي"
 
 class Article(models.Model):
     """
     An article that's submitted for publishing.
     """
-    writer = models.ForeignKey(User,
+    author = models.ForeignKey(User,
+                               related_name=u"authored_articles",
                                verbose_name=u"الكاتب")
     date_submitted = models.DateTimeField(auto_now_add=True,
                                       verbose_name=u"تاريخ الرفع")
@@ -77,11 +84,32 @@ class Article(models.Model):
                              verbose_name=u"العنوان")
     text = models.TextField(verbose_name=u"النص")
     
+    STATUS_CHOICES = (
+        ('A', u'تم قبوله'),
+        ('P', u'ينتظر المراجعة'),
+        ('E', u'ينتظر تعديلًا'),
+        ('R', u'مرفوض'),
+    )
+    
+    status = models.CharField(max_length=1,
+                              choices=STATUS_CHOICES,
+                              default='P',
+                              verbose_name=u"الحالة")
+    assignee = models.ForeignKey(User,
+                                 blank=True, null=True,
+                                 verbose_name=u"المكلف بالمراجعة")
+    
+    def __unicode__(self):
+        return self.title
+    
     class Meta:
         permissions = (
                 ("view_article", "Can view all available articles."),
                 ("review_article", "Can review any available article."),
             )
+        verbose_name = u"مقال"
+        verbose_name_plural = u"المقالات"
+#         app_label = u"المركز الإعلامي"
 
 class Review(models.Model):
     """
@@ -104,6 +132,10 @@ class StoryReview(Review):
     """
     story = models.OneToOneField(Story,
                                  verbose_name=u"التغطية")
+    class Meta:
+        verbose_name = u"مراجعة تغطية"
+        verbose_name_plural = u"مراجعات التغطيات"
+#         app_label = u"المركز الإعلامي"
     
 class ArticleReview(Review):
     """
@@ -111,6 +143,10 @@ class ArticleReview(Review):
     """
     article = models.ForeignKey(Article,
                                 verbose_name=u"المقال")
+    class Meta:
+        verbose_name = u"مراجعة مقال"
+        verbose_name_plural = u"مراجعات المقالات"
+#         app_label = u"المركز الإعلامي"
     
 class Task(models.Model):
     """
@@ -134,3 +170,20 @@ class StoryTask(Task):
     """
     episode = models.OneToOneField(Episode)
     story = models.OneToOneField(Story, blank=True, null=True)
+    
+    def __unicode__(self):
+        return self.episode.__unicode__()
+    
+    class Meta:
+        verbose_name = u"مهمة تغطية"
+        verbose_name_plural = u"مهمات التغطيات"
+#         app_label = u"المركز الإعلامي"
+    
+# class ArticleTask(Task):
+#     """
+#     A task to review or edit a task.
+#     """
+#     article = models.OneToOneField(Article)
+#     
+#     def __unicode__(self):
+#         return self.article.__unicode__()

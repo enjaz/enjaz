@@ -1,0 +1,46 @@
+{% extends 'media_base_nonmember.html' %}{% load staticfiles %}
+
+{% block title %}مقالاتي{% endblock %}
+
+{% block content %}
+<h3>المقالات</h3>
+<table id="article_list" class="table table-bordered datatable">
+	<thead>
+		<!-- <th>#</th> -->
+		<th>عنوان المقال</th>
+		<th>تاريخ الإرسال</th>
+		<th>الحالة</th>
+		<th>الخيارات</th>
+	</thead>
+	<tbody>
+		{% for article in articles %}
+		<tr>
+			<!-- <td>{{ article.pk }}</td> -->
+			<td>{{ article.title }}</td>
+			<td>{{ article.date_submitted|date:"j F Y" }}</td>
+			<td>{{ article.get_status_display }}</td>
+			<td>
+				{% if article.status == 'E' %}
+					<a href="{% url 'media:edit_article' article.pk %}" class="btn btn-gold btn-icon btn-xs">
+						عدّل
+						<i class="entypo-feather"></i>
+					</a>
+				{% else %}
+					<a href="{% url 'media:show_article' article.pk %}"
+					class="btn btn-xs btn-block btn-default btn-icon">
+						<i class="entypo-book-open"></i>
+						اقرأ
+					</a>
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+<!-- bottom scripts -->
+<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+<script>
+	$("#article_list").DataTable()
+</script>
+{% endblock %}

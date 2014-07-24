@@ -13,7 +13,17 @@ from core import decorators
 from clubs.models import Club
 from activities.models import Activity, Episode
 from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask
-from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm
+from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm
+
+# --- Helper functions
+
+def get_media_center():
+    return Club.objects.get(english_name="Media Center")
+
+def get_user_clubs(user):
+    return user.coordination.all() | user.memberships.all()
+
+# --- Views ---
 
 @login_required
 def index(request):
@@ -32,9 +42,11 @@ def list_activities(request):
     """
     # Get all approved activities
     activities = filter(lambda x: x.is_approved() == True, Activity.objects.all())
-    media_center = Club.objects.get(english_name="Media Center")
+    media_center = get_media_center()
     return render(request, 'media/list_activities.html', {'activities': activities,
                                                           'media_center': media_center})
+
+# --- Follow-up Reports ---
 
 @login_required
 def list_reports(request):
@@ -44,14 +56,6 @@ def list_reports(request):
     # Get all reports
     reports = FollowUpReport.objects.all()
     return render(request, 'media/list_reports.html', {'reports': reports})
-
-@login_required
-def list_articles(request):
-    """
-    Show a list of all articles with the different options (for Media Center members).
-    Show a list of the user's own submitted articles with their status (for others).
-    """
-    pass
 
 #@permission_required('add_followupreport')
 @login_required
@@ -63,7 +67,7 @@ def submit_report(request, episode_pk):
     
     # Permission checks
     # (1) The passed episode should be owned by the user's club
-    user_clubs = request.user.coordination.all() | request.user.memberships.all()
+    user_clubs = get_user_clubs(request.user)
     if episode.activity.primary_club not in user_clubs and not request.user.is_superuser:
         raise PermissionDenied
     # (2) The passed episode shouldn't already have a report.
@@ -112,6 +116,8 @@ def show_report(request, episode_pk):
     report = get_object_or_404(FollowUpReport, episode=episode)
     return render(request, 'media/report_read.html', {'report': report})
 
+# --- Stories ---
+
 @login_required
 def create_story(request, episode_pk):
     """
@@ -121,8 +127,8 @@ def create_story(request, episode_pk):
     
     # --- Permission Checks ---
     # (1) The user should be part of the Media Center (either head or member)
-    media_center = Club.objects.get(english_name="Media Center")
-    user_clubs = request.user.coordination.all() | request.user.memberships.all()
+    media_center = get_media_center()
+    user_clubs = get_user_clubs(request.user)
     if media_center not in user_clubs and not request.user.is_superuser:
         raise PermissionDenied
     # (2) The passed episode shouldn't already have a story.
@@ -172,6 +178,11 @@ def show_story(request, episode_pk):
     """
     Show a Story.
     """
+    # --- Permission Checks ---
+    # The user should be part of the Media Center (either head or member)
+    if get_media_center() not in get_user_clubs(request.user) and not request.user.is_superuser:
+        raise PermissionDenied 
+    
     episode = get_object_or_404(Episode, pk=episode_pk)
     story = get_object_or_404(Story, episode=episode)
     try:
@@ -197,8 +208,8 @@ def edit_story(request, episode_pk):
     
     # --- Permission Checks ---
     # The user should be part of the Media Center (either head or member)
-    media_center = Club.objects.get(english_name="Media Center")
-    user_clubs = request.user.coordination.all() | request.user.memberships.all()
+    media_center = get_media_center()
+    user_clubs = get_user_clubs(request.user)
     if media_center not in user_clubs and not request.user.is_superuser:
         raise PermissionDenied    
     
@@ -239,9 +250,14 @@ def assign_story_task(request):
     """
     Assign a task to write or edit a story.
     """
+    # --- Permission Checks ---
+    # The user should be the head of the Media Center
+    media_center = get_media_center()
+    if request.user != media_center.coordinator and not request.user.is_superuser:
+        raise PermissionDenied   
+    
     episode = Episode.objects.get(pk=request.POST['episode_pk'])
     if request.POST['assignee'] == 'random':
-        media_center = Club.objects.get(english_name="Media Center")
         assignee = random.choice(media_center.members.all())
     else:
         assignee = User.objects.get(pk=int(request.POST['assignee']))
@@ -253,30 +269,153 @@ def assign_story_task(request):
     return {"episode_pk": episode.pk,
             "assignee_name": assignee_name}
 
+# --- Articles ---
+
+@login_required
+def list_articles(request):
+    """
+    Show a list of all articles with the different options (for Media Center members).
+    Show a list of the user's own submitted articles with their status (for others).
+    """
+    # --- Permission Checks ---
+    # The user should be part of the Media Center (either head or member)
+    media_center = get_media_center()
+    user_clubs = get_user_clubs(request.user)
+    if media_center in user_clubs or request.user.is_superuser:
+        # show a list of all articles
+        articles = Article.objects.all()
+        return render(request, 'media/list_articles.html', {'articles': articles})
+    else:
+        # show a list of user's articles
+        articles = Article.objects.filter(author=request.user)
+        return render(request, 'media/list_user_articles.html', {'articles': articles})
+
 @login_required
 def submit_article(request):
     """
     Submit an Article.
     """
-    pass
+    if request.method == 'POST':
+        form = ArticleForm(request.POST,
+                           instance=Article(author=request.user),
+                           )
+        if form.is_valid():
+            article = form.save()
+            
+            # assign a task to a random MC member to review the article
+            article.assignee = random.choice(get_media_center().members.all())
+            article.save()
+            
+            return HttpResponseRedirect(reverse('media:list_articles'))
+    else:
+        form = ArticleForm()
+    return render(request, 'media/article_write.html', {'form': form})
   
 @login_required  
 def show_article(request, pk):
     """
     Show an article.
     """
-    pass
+    article = get_object_or_404(Article, pk=pk)
+    # --- Permission Checks ---
+    # Only media center members and the article's author can view
+    # the article before it's approved
+    if not article.status == 'A':
+        if not get_media_center() in get_user_clubs(request.user) \
+           and not article.author == request.user:
+            raise PermissionDenied
+        
+    try:
+        review = ArticleReview.objects.get(article=article)
+        review_form = ArticleReviewForm(instance=review)
+    except ObjectDoesNotExist:
+        review = None
+        review_form = ArticleReviewForm()
+    context = {}
+    context['article'] = article
+    # if the user is a member of the media club plus being the article's
+    # assignee, show the review form; otherwise only show the review
+    if (get_media_center() in get_user_clubs(request.user) and \
+       article.assignee == request.user) or \
+       get_media_center().coordinator == request.user:
+        context['review_form'] = review_form
+    else:
+        context['review'] = review
+    return render(request, 'media/article_read.html', context)
 
 @login_required
 def edit_article(request, pk):
     """
     Edit an article.
     """
-    pass
+    article = get_object_or_404(Article, pk=pk)
+    # --- Permission Checks ---
+    # Only the article's author should be able to edit it
+    # and only when the reviewer asks for an edit
+    if not article.author == request.user or not article.status == 'E':
+        raise PermissionDenied
+    
+    try:
+        review = ArticleReview.objects.get(article=Article.objects.get(pk=pk))
+    except ObjectDoesNotExist:
+        review = None
+    
+    if request.method == 'POST':
+        form = ArticleForm(request.POST,
+                           instance=article
+                           )
+        if form.is_valid():
+            form.save()
+            # update article status
+            article.status = 'P' # pending
+            article.save()
+            return HttpResponseRedirect(reverse('media:show_article',
+                                                args=(pk, )))
+    else:
+        form = ArticleForm(instance=article)
+    return render(request, 'media/article_write.html', {'form': form,
+                                                        'article': article,
+                                                        'review': review})
 
 @login_required
 def review_article(request, pk):
     """
     Review an article.
     """
-    pass
+    article = Article.objects.get(pk=pk)
+    
+    # --- Permission Checks ---
+    # Only the article's assignee in addition to the media center's
+    # head is allowed to review articles
+    if (get_media_center() not in get_user_clubs(request.user) or \
+       not article.assignee == request.user) and \
+       not get_media_center().coordinator == request.user:
+        raise PermissionDenied
+    
+    try:
+        review = ArticleReview.objects.get(article=article)
+    except ObjectDoesNotExist:
+        review = ArticleReview(reviewer=request.user,
+                               article=article)
+    if request.method == 'POST':
+        form = ArticleReviewForm(request.POST,
+                                 instance=review
+                                 )
+        if form.is_valid():
+            form.save()
+            
+            # update article status
+            if form.cleaned_data['approve'] == True:
+                article.status = 'A' # approved
+            else:
+                article.status = 'E' # needs editing
+            article.save()
+            
+            return HttpResponseRedirect(reverse('media:list_articles'))
+        else:
+            return render(request, 'media/article_read.html', {'article': article,
+                                                               'review_form': form})
+    else:
+        return HttpResponseRedirect(reverse('media:show_article',
+                                            args=(pk, ))
+                                    )

@@ -28,7 +28,7 @@ class Activity(models.Model):
                                     verbose_name=u"متطلبات النشاط")
     submitter = models.ForeignKey(User, null=True,
                                   on_delete=models.SET_NULL)
-    submission_date = models.DateTimeField('date submitted',
+    submission_date = models.DateTimeField('تاريخ الإرسال',
                                            auto_now_add=True)
     edit_date = models.DateTimeField('date edited', auto_now=True)
     is_editable = models.BooleanField(default=True, verbose_name=u"هل يمكن تعديله؟")
@@ -50,8 +50,8 @@ class Activity(models.Model):
                                  limit_choices_to={'category__isnull': True})
     organizers = models.IntegerField(verbose_name=u"عدد المنظمين",
                                        help_text=u"عدد الطلاب الذين سينظمون النشاط")
-    
-    def is_approved(self):
+
+    def is_approved_by_deanship(self):
         try:
             d_review = self.review_set.get(review_type='D')
             if d_review.is_approved:
@@ -59,7 +59,24 @@ class Activity(models.Model):
             else:
                 return False
         except (KeyError, Review.DoesNotExist): # deanship review does not exist
-            return None 
+            return None
+    is_approved_by_deanship.boolean = True
+    is_approved_by_deanship.short_description = u"اعتمدته العمادة؟"
+
+    def is_approved_by_presidency(self):
+        try:
+            p_review = self.review_set.get(review_type='P')
+            if p_review.is_approved:
+                return True
+            else:
+                return False
+        except (KeyError, Review.DoesNotExist): # deanship review does not exist
+            return None
+    is_approved_by_presidency.boolean = True
+    is_approved_by_presidency.short_description = u"اعتمدته الرئاسة؟"
+
+    def is_approved(self):
+        return self.is_approved_by_deanship()
     
     def is_single_episode(self):
         return self.episode_set.count() == 1

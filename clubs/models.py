@@ -99,7 +99,7 @@ class MembershipApplication(models.Model):
     user = models.ForeignKey(User, related_name='user')
     note = models.TextField(verbose_name=u"لماذا تريد الانضمام؟",
            help_text=u"هل لديك مهارات مخصوصة؟ هل لديك أفكار لنشاطات؟")
-    submission_date = models.DateTimeField('date submitted',
+    submission_date = models.DateTimeField('تاريخ الإرسال',
                                            auto_now_add=True)
 
     class Meta:

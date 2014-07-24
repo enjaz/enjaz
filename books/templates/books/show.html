@@ -75,11 +75,11 @@
   <tr>
     <th>الكتاب متوفر لـ</th>
     <td>{% if submitter_gender == 'M' %}الطلاب{% elif submitter_gender == 'F' %}الطالبات{% endif %}</td>
-  </tr>{% if extra %}
+  </tr>
   <tr>
     <th>المساهم</th>
-    <td>{{ book.submitter }}</td>
-  </tr>{% if book.holder %}
+    <td>{{ book.submitter.student_profile.get_ar_full_name|default:book.submitter.username }}</td>
+  </tr>{% if extra %}{% if book.holder %}
   <tr>
     <th>المستعير</th>
     <td>{{ book.holder }}</td>

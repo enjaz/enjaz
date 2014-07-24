@@ -182,7 +182,7 @@
 						{% for b in latest_books %}
 						<tr>
 							<td><a href="{% url 'books:show' b.pk %}">{{ b.title }}</a></td>
-							<td>{{ b.submitter }}</td>
+							<td>{{ b.submitter.student_profile.get_ar_full_name|default:b.submitter.username }}</td>
 							<td>{{ b.submission_date }}</td>
 						</tr>
 						{% endfor %}

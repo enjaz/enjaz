@@ -10,6 +10,7 @@ from django.core.exceptions import PermissionDenied
 
 from core.decorators import post_only
 from activities.models import Activity
+from activities.forms import EvaluationForm
 from niqati.models import Niqati_User, Category, Code, Code_Order, Code_Collection
 from niqati.forms import OrderForm
 
@@ -28,7 +29,7 @@ def index(request):
 
     # Student Views
 
-
+# TODO: implement activity evaluation!
 @login_required
 def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code submission requests
     if request.method == "POST":
@@ -48,42 +49,32 @@ def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code s
                         c.user = request.user
                         c.date_redeemed = timezone.now()
                         c.save()
-                        return render(request, 'niqati/submit.html', {
-                            'message_type': "-info",
-                            'message': "Success: You already have a code in this activity \
-                            it has been replaced, however, by the one you just submitted.",
-                        })
+                        message_type = "-info"
+                        message = u"تم إدخال الرمز بنجاح و استبدال الرمز السابق لك في هذا النشاط."
                     else:  # new code has equal or less points than existing one
                         # show message: you have codes in the same activity
-                        return render(request, 'niqati/submit.html', {
-                            'message': "Can't use code: You already have a code in this activity \
-                            which has equal or less value than the one you just submitted.",
-                        })
+                        message_type = None
+                        message = u"لا يمكن إدخال هذا الرمز؛ لديك رمز نقاطي آخر في نفس النشاط ذو قيمة مساوية أو أكبر."
                 except (KeyError, Code.DoesNotExist):  # no codes in the same activity
                     # redeem & show success message --- default behavior
                     c.user = request.user
                     c.date_redeemed = timezone.now()
                     c.save()
-                    return render(request, 'niqati/submit.html', {
-                        'message_type': "-success",
-                        'message': "Success: This code is now part of your record.",
-                    })
+                    message_type = "-success"
+                    message = u"تم تسجيل الرمز بنجاح."
             elif c.user == request.user:  # user has used the same code before
                 # show message: you have used this code before
-                return render(request, 'niqati/submit.html', {
-                    'message': "Can't use code again: You have already used this code before.",
-                })
+                message_type = None
+                message = u"لقد استخدمت هذا الرمز من قبل؛ لا يمكنك استخدامه مرة أخرى"
             else:  # code is used by another user
                 # show message: code not available (used by other)
-                return render(request, 'niqati/submit.html', {
-                    'message': "Can't use code: This code is already used by another person.",
-                })
+                message_type = None
+                message = u"هذا الرمز غير متوفر."
         except (KeyError, Code.DoesNotExist):  # code does not exist
             # show message: code doesn't exist
-            return render(request, 'niqati/submit.html', {
-                'message_type': "-error",
-                'message': "Wrong code: Please verify that you entered the code correctly.",
-            })
+            message_type = "-error"
+            message = u"هذا الرمز غير صحيح."
+        return render(request, 'niqati/submit.html', {'message_type': message_type, 'message': message})
     else:  # request method is not POST
         return render(request, 'niqati/submit.html', {'code_to_redeem': code})
 

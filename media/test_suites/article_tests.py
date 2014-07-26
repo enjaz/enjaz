@@ -4,49 +4,18 @@ Tests of the articles part of the media app.
 """
 from django.test import TestCase
 from django.core.urlresolvers import reverse
-from django.core.exceptions import ObjectDoesNotExist
 
-from django.contrib.auth.models import User
-from clubs.models import Club
 from media.models import Article
 
-# --- Helper functions
+from accounts.test_utils import create_user
+from media.test_utils import media_center_head, media_center_member, create_articles
+
 
 def classic_setup(instance):
     instance.coordinator = media_center_head(create_user())
     instance.member = media_center_member(create_user())
     instance.user1 = create_user()
     instance.user2 = create_user()
-
-def create_user(username=None, email="test@enjazportal.com", password="12345678"):
-    if username == None:
-        username = "username" + str(User.objects.count() + 1)
-    return User.objects.create_user(username, email, password)
-
-def get_media_center():
-    return Club.objects.get(english_name="Media Center")
-
-def media_center_head(user):
-    media_center = get_media_center()
-    media_center.coordinator = user
-    media_center.save()
-    return user
-    
-def media_center_member(user):
-    media_center = get_media_center()
-    media_center.members.add(user)
-    return user
-
-def create_article(author=create_user(),
-                   title=("Test Article Title " + str(Article.objects.count() + 1)),
-                   text="Test Article Text"):
-    return Article.objects.create(author=author,
-                                  title=title,
-                                  text=text)
-    
-def create_articles(count):
-    for i in range(count):
-        create_article()
 
 class ListArticlesViewTests(TestCase):
     fixtures = ['initial_data.json']

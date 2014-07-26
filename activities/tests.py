@@ -2,16 +2,15 @@
 """
 Tests for the activities app.
 """
-from datetime import datetime, date, time
-
 from django.test import TestCase
 
-from django.contrib.auth import login
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import Permission
 from django.core.urlresolvers import reverse
+from accounts.test_utils import create_user
+from activities.test_utils import create_activity
 
 from clubs.models import Club
-from activities.models import Activity, Review, Episode
+from activities.models import Review
 
 def create_club():
     return Club.objects.create(name="Test Club Arabic Name",
@@ -19,32 +18,6 @@ def create_club():
                                description="-",
                                email="test@enjazportal.com",
                                )
-
-def create_activity(club=Club.objects.get(pk=1),
-                    submitter=User.objects.get(pk=1),
-                    collect_participants=False,
-                    episode_count=1,
-                    ):
-    activity =  Activity.objects.create(primary_club=club,
-                                       name='Test Activity',
-                                       description='Test Description',
-                                       participants=1,
-                                       organizers=1,
-                                       submitter=submitter,
-                                       collect_participants=collect_participants,
-                                       )
-    for i in range(episode_count):
-        Episode.objects.create(activity=activity,
-                               start_date=date.today(),
-                               end_date=date.today(),
-                               start_time=datetime.now(),
-                               end_time=datetime.now(),
-                               location='Test Location',
-                               )
-    return activity
-
-def create_user(username):
-    return User.objects.create_user(username, 'test@enjazportal.com', '12345678')
 
 class ShowActivityViewTests(TestCase):
     def test_show_view_with_a_normal_user(self):
@@ -490,4 +463,4 @@ class ReviewViewTests(TestCase):
         self.assertContains(response, 'أرسل')
         self.assertContains(response, review.name_notes)
         
-from activities.more_tests.activity_form_tests import EpisodeTests
+from activities.test_suites.activity_form_tests import EpisodeTests

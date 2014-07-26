@@ -166,6 +166,11 @@
 						<a href="{% url 'activities:review_with_type' activity.pk 'd' %}">مراجعة عمادة شؤون الطلاب</a>
 					</li>
 					{% endif %}
+					{% if can_view_niqati_orders %}
+					<li{% if active_tab == 'niqati' %} class="active"{% endif %}>
+						<a href="{% url 'activities:niqati_orders' activity.pk %}">نقاطي</a>
+					</li>
+					{% endif %}
 				</ul>
 			</div>
 		</div>

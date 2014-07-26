@@ -1,0 +1,72 @@
+{% extends 'activities/show_new.html' %}
+
+{% block title %}{{ activity.name }} | طلبات النقاط{% endblock %}
+
+{% block review_content %}
+
+<div class="panel panel-primary panel-shadow" data-collapsed="0">		
+	<!-- panel body -->
+	<div class="panel-body with-table">
+		
+		<table class="table table-bordered table-responsive">
+		<colgroup>
+			<col class="col-md-3">
+			<col class="col-md-9">
+		</colgroup>
+		<thead>
+			<tr>
+				<th colspan="2">
+                    <h4>طلبات نقاطي</h4>
+				</th>
+			</tr>
+		</thead>
+		
+		<tbody>
+			{% for order in orders %}
+			<tr>
+				<th>{{ order.date_ordered|date:"j F Y" }}</th>
+			    <td>
+			        <ul class="list-group">
+			        {# collections #}
+			        {% for collec in order.code_collection_set.all %}
+			            <li class="list-group-item">
+			 				<span class="badge">{{ collec.code_count }} أكواد</span>
+                            {% if collec.approved == True %}
+                            <span class="badge badge-success">تمت الموافقة</span>
+                            {% elif collec.approved == False %}
+                            <span class="badge badge-danger">تم الرفض</span>
+                            {% else %}
+                            <span class="badge badge-warning">معلق</span>
+                            {% endif %}
+			                <a href="{% if collec.approved == True %}{% url 'niqati:view_collec' collec.pk %}{% else %}#{% endif %}">{{ collec.code_category.ar_label }}</a>
+			            </li>
+			        {% endfor %}   
+			        </ul>
+			    </td>
+			</tr>
+			{% empty %}
+			<th colspan="2">
+				لا توجد طلبات نقاط لهذا النشاط.
+			</th>
+			{% endfor %}
+		</tbody>
+	</table>
+		
+	</div>
+</div>
+
+<div class="panel panel-primary panel-shadow" data-collapsed="0">
+	<!-- panel body -->
+	<div class="panel-body with-table">
+          <table class="table table-bordered table-responsive">
+              <thead>
+			<tr>
+				<th colspan="2">
+					{% include 'niqati/create_form.html' %}
+				</th>
+			</tr>
+		</thead>
+          </table>
+    </div>
+</div>
+{% endblock %}

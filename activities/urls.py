@@ -2,6 +2,7 @@ from django.conf.urls import patterns, url
 from django.views.generic import TemplateView
 
 from activities import views
+from niqati import views as niqati_views
 
 urlpatterns = patterns('',
     url(r'^$', views.list, name='list'),
@@ -14,4 +15,7 @@ urlpatterns = patterns('',
     url(r'^(?P<activity_id>\d+)/participate/done/$', TemplateView.as_view(template_name='activities/participate_done.html'), name='participate_done'),
     url(r'^(?P<activity_id>\d+)/view_participation/$', views.view_participation, name='view_participation'),
     url(r'^(?P<activity_id>\d+)/view_participation/download$', views.download_participation, name='download_participation'),
+    url(r'^(?P<activity_id>\d+)/niqati/$', niqati_views.coordinator_view, name='niqati_orders'),
+    # url(r'^(?P<activity_id>\d+)/niqati/create/$', niqati_views.coordinator_view, name='niqati_create'),  # TODO: reduce to
+                                                                                                     # one url
 )

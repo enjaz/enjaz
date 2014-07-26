@@ -38,7 +38,7 @@ def list(request):
         else:
             activities = Activity.objects.all()
     else:
-        approved_activities = filter(lambda x: x.is_approved() == True, Activity.objects.all())
+        approved_activities = Activity.objects.filter(review__is_approved=True)
         if request.user.is_authenticated():
             user_activities = request.user.activity_set.all()
             user_clubs = request.user.memberships.all() | request.user.coordination.all()
@@ -115,6 +115,9 @@ def show(request, activity_id):
         if request.user.has_perm('media.add_followupreport') or \
             is_coordinator:
             context['can_add_followupreport'] = True
+        if request.user.has_perm('niqati.view_order') or \
+            is_coordinator:
+            context['can_view_niqati_orders'] = True
             
     else:
         user_clubs = Club.objects.none()

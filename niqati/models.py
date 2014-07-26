@@ -92,18 +92,18 @@ class Code(models.Model):
         )
     
 
-"""
-When a club requests codes for a certain activity, a Code_Order is created. This Code_Order contains several
-Code_Collections, each corresponding to a code category (idea, organizer, etc.). Each Code_Collection contains all information
-and methods for creation of codes of its specific category. The Code_Order just houses the different Code_Collections
-together.
----
-Code_Collection is the "functional unit" of the code generation process
-Code_Order is a container that contains all Code_Collections of a single order
----
-Management approves idea Code_Collections, not Code_Orders
-For each activity, Clubs see a list of Code_Orders, with each containing files (e.g. PDFs) representing the Code_Collections
-"""
+
+# When a club requests codes for a certain activity, a Code_Order is created. This Code_Order contains several
+# Code_Collections, each corresponding to a code category (idea, organizer, etc.). Each Code_Collection contains all information
+# and methods for creation of codes of its specific category. The Code_Order just houses the different Code_Collections
+# together.
+# ---
+# Code_Collection is the "functional unit" of the code generation process
+# Code_Order is a container that contains all Code_Collections of a single order
+# ---
+# Management approves idea Code_Collections, not Code_Orders
+# For each activity, Clubs see a list of Code_Orders, with each containing files (e.g. PDFs) representing the Code_Collections
+
 
 class Code_Collection(models.Model): # group of codes that are (1) of the same type & (2) of the same Code_Order
 
@@ -160,16 +160,16 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 context = {'collec': self}
                 html_file = render_to_string('niqati/coupons.html', context)
 
-                """
-                # never mind this commented-out bit; it's just for testing
-                output_file = open("codes.html", "wb")
-                output_file.write(html_file.encode('utf-8'))
-                output_file = open("codes.html", "r+")
-                self.asset.save(self.parent_order.activity.name + " - " + self.code_category.ar_label, File(output_file))
-                output_file.close()
                 
-                os.remove(output_file)
-                """
+                # never mind this commented-out bit; it's just for testing
+#                 output_file = open("codes.html", "wb")
+#                 output_file.write(html_file.encode('utf-8'))
+#                 output_file = open("codes.html", "r+")
+#                 self.asset.save(self.parent_order.activity.name + " - " + self.code_category.ar_label, File(output_file))
+#                 output_file.close()
+#                 
+#                 os.remove(output_file)
+                
                 
                 try:
                     # create an API client instance

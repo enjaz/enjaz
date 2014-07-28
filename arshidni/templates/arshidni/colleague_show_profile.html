@@ -1,0 +1,74 @@
+{% extends 'arshidni_base.html' %}
+{% block title %}الزملاء الطلابيون{% endblock %}
+{% block navbar %}
+	<li><a href="{% url 'arshidni:list_colleagues' %}"><span class="entypo-users"></span> الزملاء الطلابيون</a></li>
+ 	{% if user.student_profile and not user.colleague_profile and perms.arshidni.add_colleagueprofile %}
+		<li><a href="{% url 'arshidni:register_colleague_profile' %}"><span class="glyphicon glyphicon-plus"></span> سجّل نفسك زميلا طلابيا</a></li>
+	{% endif %}
+	{% if user.colleague_profile %}
+		<li><a href="{% url 'arshidni:supervision_requests_to_me' %}"><span class="glyphicon glyphicon-star"></span> طلبات موجهة إليّ</a></li>
+ 	{% else %}
+		<li><a href="{% url 'arshidni:my_supervision_requests' %}"><span class="glyphicon glyphicon-star"></span> طلبات وجهتَها</a></li>
+ 	{% endif %}
+	{% if colleague_profile == user.colleague_profile or perms.change_colleagueprofile %}
+		<li><a href="{% url 'arshidni:edit_colleague_profile' colleague_profile.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل الملف</a></li>
+	{% endif %}
+{% endblock %}
+{% block content %}
+
+{% if colleague_profile.is_published == None %}
+<p class="alert alert-warning">
+هذه الملف لا يزال ينتظر المراجعة.
+</p>
+{% elif not colleague_profile.is_available %}
+<p class="alert alert-warning">
+هذا الزميل غير متاح.
+</p>
+{% endif %}
+
+
+<div class="row">
+	{% if not colleague_profile == user.colleague_profile and perms.arshidni.add_supervisionrequest %}
+		<div class="col-md-3">
+			<a href="{% url 'arshidni:submit_supervision_request' colleague_profile.pk %}" class="btn btn-success"{% if previous_request %}disabled="disabled"{% endif %}><span class="glyphicon glyphicon-plus"></span> {% if previous_request %}أرسلتَ طلبا!{% else %}اختر{% endif %}</a>
+		</div>
+	{% endif %}
+	<div class="col-md-9">
+	<table class="table-hover table">
+		<colgroup>
+			<col class="col-xs-2">
+			<col class="col-xs-6">
+		</colgroup>
+		<tr>
+			<th>الاسم</th>
+			<td>{{ colleague_profile.user.student_profile.get_ar_full_name|default:colleague_profile.user.username }}</td>
+		</tr>
+		<tr>
+			<th>الدفعة</th>
+			<td>{{ colleague_profile.batch }}</td>
+		</tr>
+		<tr>
+			<th>الكلية</th>
+			<td>{{ colleague_profile.user.student_profile.college.get_college_full_name }}</td>
+		</tr>
+		<tr>
+			<th>المدينة</th>
+			<td>{{ colleague_profile.user.student_profile.college.get_city_full_name }}</td>
+		</tr>
+		<tr>
+			<th>نبذة</th>
+			<td>{{ colleague_profile.bio }}</td>
+		</tr>
+		<tr>
+			<th>الاهتمامات</th>
+			<td>{{ colleague_profile.interests }}</td>
+		</tr>
+		<tr>
+			<th>تاريخ الإضافة</th>
+			<td>{{ colleague_profile.submission_date|date:"j F Y" }}</td>
+		</tr>
+	</table>
+	</div>
+</div>
+{% endblock %}
+

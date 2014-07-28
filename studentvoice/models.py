@@ -94,6 +94,15 @@ In case of comments and subcomments, this returns the original
     is_reported.boolean = True
     is_reported.short_description = u"هل بُلّغ عنه؟"
 
+    def is_edited(self):
+        """If the difference between submission_date and edit_date is
+        more than 10 minutes.  Consider it edited. """
+        delta_time = edit_date - submission_date
+        if delta_time.seconds >= 600:
+            return True
+        else:
+            return False
+
     class Meta:
         verbose_name = u"صوت"
         verbose_name_plural = u"الأصوات"
@@ -119,9 +128,9 @@ class Vote(models.Model):
         )
     vote_type = models.CharField(max_length=1,
                                  choices=vote_type_choices)
-    submission_date = models.DateTimeField('date submitted',
+    submission_date = models.DateTimeField(u'تاريخ الإرسال',
                                            auto_now_add=True)
-    edit_date = models.DateTimeField('date edited', auto_now=True)
+    edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
 
     class Meta:
         verbose_name = u"اقتراع"
@@ -143,9 +152,9 @@ class Response(models.Model):
                                        default=True)
     is_editable = models.BooleanField(verbose_name=u"يمكن تعديله؟",
                                       default=True)
-    submission_date = models.DateTimeField('date submitted',
+    submission_date = models.DateTimeField(u'تاريخ الإرسال',
                                            auto_now_add=True)
-    edit_date = models.DateTimeField('date edited', auto_now=True)
+    edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
 
     class Meta:
         verbose_name = u"استجابة"

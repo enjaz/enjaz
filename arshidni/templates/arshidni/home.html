@@ -1,0 +1,244 @@
+{% extends 'arshidni_base.html' %}
+{% block title %}أرشدني{% endblock %}
+
+{% block navbar %}
+ 	{% if user.student_profile and not user.graduate_profile %}
+		<li><a href="{% url 'arshidni:register_graduate_profile' %}"><span class="glyphicon glyphicon-plus"></span> سجّل نفسك خريجا متعاونا</a></li>
+ 	{% endif %}
+ 	{% if user.student_profile and not user.graduate_profile %}
+		<li><a href="{% url 'arshidni:register_colleague_profile' %}"><span class="glyphicon glyphicon-plus"></span> سجّل نفسك زميلا طلابيا</a></li>
+ 	{% endif %}
+{% endblock %}
+{% block content %}
+
+
+
+<div class="row">
+	<div class="col-md-12">
+		<h1>مرحبا 
+		{% if user.student_profile %}
+			{{ user.student_profile.ar_first_name }}
+		{% else %}
+			{{ user.non_student_profile.ar_first_name }}
+		{% endif %} في برنامج أرشدني!
+		
+		</h1>
+		<p>[ملخص تحفيزي عن البرنامج].</p>
+	</div>
+</div>
+
+<div class="panel minimal minimal-gray">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<h2><a href="{% url 'arshidni:list_colleges' %}">استفسارات أكاديمية</a></h2>
+		</div>
+	</div>
+	<div class="panel-body">
+		<div class="col-md-9">
+		<div class="panel panel-warning panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+			
+			<!-- panel head -->
+			<div class="panel-heading">
+				<div class="panel-title">آخر الأسئلة المضافة</div>
+				
+				<div class="panel-options">
+					<a href="{% url 'arshidni:list_colleges' %}" type="button" class="btn btn-default">
+						 المزيد
+					</a>
+				</div>
+				
+			</div>
+			
+			<!-- panel body -->
+			<div class="panel-body">
+				{% if latest_questions %}
+				  <table class="table table-hover">
+					<thead>
+						<tr>
+							<th>السؤال</th>
+							<th>الكلية</th>
+							<th>الإجابات</th>
+							<th>تاريخ الإضافة</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for q in latest_questions %}
+						<tr>
+							<td><a href="{% url 'arshidni:show_question' q.pk %}">{{ q.get_title }}</a></td>
+							<td><a href="{% url 'arshidni:list_questions' q.college.lower %}">{{ q.get_college_name }}</a></td>
+							<td>{{ q.answer_set.count }}</td>
+							<td>{{ q.submission_date|date:"j F Y" }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				  </table>
+				{% else %}
+				  <p>لا توجد أسئلة منشورة.</p>
+				{% endif %}
+				
+			</div>
+			
+		</div>
+	</div>
+	<div class="col-md-3">
+		<div class="tile-stats tile-orange">
+			<div class="icon"><i class="entypo-graduation-cap"></i></div>
+			<div class="num" data-start="0" data-end="{{ question_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>عدد الأسئلة</h3>
+			<p>عدد الأسئلة في بوابة إنجاز</p>
+		</div>
+		<div class="tile-stats tile-white-orange">
+			<div class="icon"><i class="entypo-graduation-cap"></i></div>
+			<div class="num" data-start="0" data-end="{{ my_question_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>عدد أسئلتي</h3>
+			<p>عدد أسئلتي في بوابة إنجاز</p>
+		</div>
+	</div>
+	</div>
+</div>
+
+<div class="panel minimal minimal-gray">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<h2><a href="{% url 'arshidni:list_groups' %}">المجموعات الدراسية</a></h2>
+		</div>
+	</div>
+	<div class="panel-body">
+		<div class="col-md-3">
+		<div class="tile-stats tile-aqua">
+			<div class="icon"><i class="entypo-users"></i></div>
+			<div class="num" data-start="0" data-end="{{ group_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>عدد المجموعات</h3>
+			<p>عدد المجموعات الدراسية في بوابة إنجاز</p>
+		</div>
+		<div class="tile-stats tile-white-aqua">
+			<div class="icon"><i class="entypo-users"></i></div>
+			<div class="num" data-start="0" data-end="{{ my_group_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>عدد مجموعاتي</h3>
+			<p>عدد مجموعاتي في بوابة إنجاز</p>
+		</div>
+	</div>
+	<div class="col-md-9">
+		<div class="panel panel-info panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+			
+			<!-- panel head -->
+			<div class="panel-heading">
+				<div class="panel-title">آخر المجموعات المضافة للبوابة</div>
+				
+				<div class="panel-options">
+					<a href="{% url 'arshidni:list_groups' %}" type="button" class="btn btn-default">
+						 المزيد
+					</a>
+				</div>
+				
+			</div>
+			
+			<!-- panel body -->
+			<div class="panel-body">
+				{% if latest_groups %}
+				  <table class="table table-hover">
+					<thead>
+						<tr>
+							<th>الاسم</th>
+							<th>تاريخ البدء</th>
+							<th>المدة (بالأسابيع)</th>
+							<th>عدد المقاعد المتاحة</th>
+						</tr>
+					</thead>
+
+					 <tbody>
+						{% for g in latest_groups %}
+						<tr>
+							<td><a href="{% url 'arshidni:show_group' g.pk %}">{{ g.name }}</a></td>
+							<td>{{ g.starting_date|date:"j F Y" }}</td>
+							<td>{{ g.get_period_in_weeks }}</td>
+							<td>{{ g.get_remaining_members }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				  </table>
+				{% else %}
+				  <p>لا توجد مجموعات معتمدة.</p>
+				{% endif %}
+
+				
+			</div>
+			
+		</div>
+	</div>
+	</div>
+</div>
+
+
+<div class="panel minimal minimal-gray">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<h2><a href="{% url 'arshidni:list_colleagues' %}">الزملاء الطلابيون</a></h2>
+		</div>
+	</div>
+	<div class="panel-body">
+		<div class="col-md-9">
+		<div class="panel panel-success panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+			
+			<!-- panel head -->
+			<div class="panel-heading">
+				<div class="panel-title">زملاء متاحون</div>
+				
+				<div class="panel-options">
+					<a href="{% url 'arshidni:list_colleagues' %}" type="button" class="btn btn-default">
+						 المزيد
+					</a>
+				</div>
+				
+			</div>
+			
+			<!-- panel body -->
+			<div class="panel-body">
+				{% if latest_colleagues %}
+				  <table class="table table-hover">
+					<thead>
+						<tr>
+							<th>الزميل</th>
+							<th>الكلية</th>
+							<th>الدفعة</th>
+							<th>تاريخ الإضافة</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for c in latest_colleagues %}
+						<tr>
+							<td><a href="{% url 'arshidni:show_colleague_profile' c.pk %}">{{ c.user.student_profile.get_ar_full_name|default:c.user.username }}</a></td>
+							<td>{{ c.user.student_profile.college.get_college_full_name }}</a></td>
+							<td>{{ c.batch }}</td>
+							<td>{{ c.submission_date|date:"j F Y" }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				  </table>
+				{% else %}
+				  <p>لا يوجد زملاء طلابيون معتمدون.</p>
+				{% endif %}
+				
+			</div>
+			
+		</div>
+	</div>
+	<div class="col-md-3">
+		<div class="tile-stats tile-green">
+			<div class="icon"><i class="entypo-address"></i></div>
+			<div class="num" data-start="0" data-end="{{ colleague_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>عدد الزملاء الطلابيون</h3>
+			<p>عدد الزملاء الطلابيون في بوابة إنجاز</p>
+		</div>
+
+	</div>
+	</div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'arshidni_base.html' %}{% load bootstrap3 %}
+{% block title %}تقديم طلب زمالة ل{{ colleague_profile.user.student_profile.get_ar_full_name|default:colleague_profile.user.username }}{% endblock %}
+
+{% block navbar %}
+	<li><a href="{% url 'arshidni:list_colleagues' %}"><span class="entypo-users"></span> الزملاء الطلابيون</a></li>
+	{% if user.colleague_profile %}
+		<li><a href="{% url 'arshidni:supervision_requests_to_me' %}"><span class="glyphicon glyphicon-star"></span> طلبات موجهة إليّ</a></li>
+ 	{% else %}
+		<li><a href="{% url 'arshidni:my_supervision_requests' %}"><span class="glyphicon glyphicon-star"></span> طلباتي</a></li>
+ 	{% endif %}
+{% endblock %}
+
+{% block content %}
+	<h2>تقديم طلب زمالة ل{{ colleague_profile.user.student_profile.get_ar_full_name|default:colleague_profile.user.username }}</h2>
+	{% if user.colleague_profile.pk == colleague_profile.pk %}
+		<p class="alert alert-warning">
+			لا يمكن أن تقدم طلبًا لنفسك!
+		</p>
+	{% elif error %}
+		<p class="alert alert-danger">
+		{% if error == 'current_student_requests' %}
+			لديك طلبات معلقة أو زمالة مقبولة.  <a href="{% url 'arshidni:my_supervision_requests' %}">ألغِ تلك الطلبات والزمالات أولا</a>!
+		{% elif error == 'current_colleague_requests' %}
+			لدى الزميل الطلابي زمالات سابقة!
+		{% endif %}
+		</p>
+	{% else %}
+<form action="{% url 'arshidni:submit_supervision_request' colleague_profile.pk %}" method="post" class="form">
+{% csrf_token %}
+    {% bootstrap_form form %}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "ok-sign" %} {% if edit %} عدّل {% else %} أنشئ {% endif %}
+        </button>
+    {% endbuttons %}
+</form>
+<script>
+$(function(){
+	$('#id_starting_date, #id_ending_date').datepicker({isRTL: true});
+		$("#id_max_members").attr({
+		"max" : 8,        // substitute your own
+	       "min" : 3          // values (or variables) here
+	});
+});
+</script>
+	{% endif %}
+{% endblock %}
+
+

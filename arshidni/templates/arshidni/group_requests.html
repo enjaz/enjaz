@@ -1,0 +1,74 @@
+{% extends 'arshidni_base.html' %}
+{% block title %}المجموعات الدراسية{% endblock %}
+{% block navbar %}
+	<li><a href="{% url 'arshidni:list_groups' %}"><span class="entypo-users"></span> المجموعات الدراسية</a></li>
+{% endblock %}
+{% block content %}
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">طلبات الانضمام لمجموعة <a href="{% url 'arshidni:show_group' group.pk %}">{{ group.name }}</a></h3>
+	</div>
+	 <div class="panel-body">
+	{% if group.join_requests.all %}
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th>الاسم</th>
+					<th>تاريخ الطلب</th>
+					<th>البريد الإكتروني</th>
+					<th>الحالة</th>
+					<th>الإجراءات</th>
+				</tr>
+			</thead>
+			 <tbody>
+				{% for r in group.join_requests.all %}
+				<tr>
+					<td>{{ r.submitter.student_profile.get_ar_full_name|default:r.submitter.username }}</td>
+					<td>{{ r.submission_date|date:"j F Y" }}</td>
+					<td>{{ r.submitter.email }}</td>
+					<td id="status-{{ r.pk }}">{{ r.get_full_status }}</td>
+					<td id="actions-{{ r.pk }}">{% if r.is_accepted == None %}<i title="اقبل" data-id="{{ r.pk }}" data-action="accept" class="accept-request glyphicon glyphicon-ok"></i> <i title="ارفض" data-id="{{ r.pk }}" data-action="reject" class="delete-request glyphicon glyphicon-remove"></i>{% else %}-{% endif %}</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{% else %}
+		<p>لا توجد أي طلبات انضمام للمجموعة.</p>
+	{% endif %}
+</div>
+
+<script>
+$(function() {
+    $('.delete-request, .accept-request').click(function(){
+    var action = $(this).data('action');
+    if (action == 'reject'){
+	var confirm_msg = "هل أنت متأكد أنك تريد التخلي عن هذا الطلب؟";
+	} else if (action == 'accept') {
+	var confirm_msg = "هل أنت متأكد أنك تريد قبول هذا الطلب؟";
+	}
+    if (confirm(confirm_msg) == true) {
+        var request_id = $(this).data('id');
+
+        var data = {'request_id': request_id, 'action': action};
+        $.ajax({
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            url: '{% url 'arshidni:group_action' %}',
+            cache: false,
+            success: function(data){
+                if (data['success'] == true){
+                    //$('#request-' + request_id).addClass('deleted-request');
+                    $('#status-' + request_id).html(data['full_current_status']);
+                    //$('#actions-' + request_id).html('');
+                } else {
+                    alert(data['message']);
+                }
+            }
+        });
+    }
+    });
+});
+</script>
+
+{% endblock %}

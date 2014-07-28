@@ -1,0 +1,46 @@
+{% extends 'arshidni_base.html' %}{% load bootstrap3 %}
+{% block title %}{{ question.get_title }}{% endblock %}
+{% block navbar %}
+<li><a href="{% url 'arshidni:list_colleges' %}"><span class="glyphicon glyphicon-th"></span> استفسارات أكاديمية</a></li>
+<li><a href="{% url 'arshidni:list_questions' question.college.lower %}"><span class="glyphicon glyphicon-align-justify"></span> {{ question.get_college_name }}</a></li>
+	{% if user == question.submitter or perms.change_question %}
+		<li><a href="{% url 'arshidni:edit_question' question.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل السؤال</a></li>
+	{% endif %}
+{% endblock %}
+{% block content %}
+	<div class="single-question panel panel-default">
+		<div class="panel-body">
+			<p class="question-header">سأل {{ question.submitter.student_profile.get_ar_full_name|default:question.submitter.username }} في {{ question.submission_date|date:"j F" }} عند الساعة {{ question.submission_date|date:"h:i" }}:</p>
+			<p class="question-text">{{ question.text }}</p>
+			<hr/>
+			{% if published_answers %}
+				<ol>
+				{% for a in published_answers %}
+					<li id="answer-{{ a.pk }}">
+					
+						<p class="question-header">أجاب {{ a.submitter.student_profile.get_ar_full_name|default:a.submitter.username }} في {{ a.submission_date|date:"j F" }} عند الساعة {{ a.submission_date|date:"h:i" }}:</p>
+						<p class="question-text">{{ a.text }}</p>
+					</li>
+				{% endfor %}
+				</ol>
+			{% else %}
+				<p>لا توجد إجابات.</p>
+			{% endif %}
+		</div>
+	</div>
+	<div id="answer" class="row">
+		<h2>أجب</h2>
+		<form action="{% url 'arshidni:submit_answer' question.pk %}" method="post" class="form">
+			{% csrf_token %}
+
+                        <textarea title="" rows="10" required="required" placeholder="الجواب" name="text" id="id_text" cols="40" class="form-control"></textarea>
+   			<div class="col-md-4 col-md-offset-8">
+			{% buttons %}
+				<button type="submit" class="form-control btn btn-primary">
+					{% bootstrap_icon "ok-sign" %}  أجب
+				</button>
+ 			{% endbuttons %}
+			</div>
+		</form>
+	</div>
+{% endblock %}

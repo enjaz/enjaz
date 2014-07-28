@@ -17,6 +17,12 @@ college_choices = (
     ('N', u'كلية التمريض'),
 )
 
+city_choices = (
+    ('R', u'الرياض'),
+    ('J', u'جدة'),
+    ('A', u'الأحساء'),
+    )
+
 class Club(models.Model):
     name = models.CharField(max_length=200, verbose_name=u"الاسم")
     english_name = models.CharField(max_length=200, verbose_name=u"الاسم الإنجليزي")
@@ -52,12 +58,13 @@ class Club(models.Model):
                                  verbose_name=u"الكلية",)
     open_membership = models.BooleanField(default=False,
                                                verbose_name=u"اسمح بالتسجيل؟")
-    creation_date = models.DateTimeField('date created',
+    creation_date = models.DateTimeField(u'تاريخ الإنشاء',
                                          auto_now_add=True)
-    edit_date = models.DateTimeField('date edited', auto_now=True)
+    edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
     special = models.BooleanField(default=False,
                                   verbose_name=u"نادي مميز؟") # To allow more flexible exceptions with
                                                          # presidency, media club and arshidny
+    city = models.CharField(max_length=1, choices=city_choices, verbose_name=u"المدينة")
     def get_due_report_count(self):
         "Get the number of due follow-up reports."
         # Get all club's episodes
@@ -83,7 +90,7 @@ class Club(models.Model):
     class Meta:
         # For the admin interface.
         verbose_name = u"نادي"
-        verbose_name_plural = u"النوادي"
+        verbose_name_plural = u"الأندية"
     def __unicode__(self):
         return self.name
 
@@ -92,7 +99,7 @@ class MembershipApplication(models.Model):
     user = models.ForeignKey(User, related_name='user')
     note = models.TextField(verbose_name=u"لماذا تريد الانضمام؟",
            help_text=u"هل لديك مهارات مخصوصة؟ هل لديك أفكار لنشاطات؟")
-    submission_date = models.DateTimeField('date submitted',
+    submission_date = models.DateTimeField(u'تاريخ الإرسال',
                                            auto_now_add=True)
 
     class Meta:
@@ -106,6 +113,7 @@ class MembershipApplication(models.Model):
 class College(models.Model):
     section = models.CharField(max_length=2, choices=section_choices, verbose_name=u"القسم")
     name = models.CharField(max_length=1, choices=college_choices, verbose_name=u"الاسم")
+    city = models.CharField(max_length=1, choices=city_choices, verbose_name=u"المدينة")
 
     def __unicode__(self):
         return u"%s (%s)" % (self.get_name_display(), self.get_section_display())
@@ -114,3 +122,15 @@ class College(models.Model):
         # For the admin interface.
         verbose_name = u"كلية"
         verbose_name_plural = u"الكليات"
+
+    def get_college_full_name(self):
+        college_dict = dict(college_choices)
+        return college_dict[self.name]
+
+    def get_city_full_name(self):
+        city_dict = dict(city_choices)
+        try:
+            city_full_name = city_dict[self.city]
+        except KeyError: # Riyadh should be the default
+            city_full_name = u"الرياض"
+        return city_full_name

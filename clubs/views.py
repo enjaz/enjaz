@@ -23,6 +23,40 @@ class ClubForm(ModelForm):
                 cleaned_data[field] = cleaned_data[field].strip()
         return cleaned_data
 
+class DisabledClubForm(ClubForm):
+    def __init__(self, *args, **kwargs):
+        # Fields to keep enabled.
+        self.enabled_fields = ['description', 'open_membership']
+        # If an instance is passed, then store it in the instance variable.
+        # This will be used to disable the fields.
+        self.instance = kwargs.get('instance', None)
+
+        # Initialize the form
+        super(DisabledClubForm, self).__init__(*args, **kwargs)
+
+        # Make sure that an instance is passed (i.e. the form is being
+        # edited).
+        if self.instance:
+            for field in self.fields:
+                if not field in self.enabled_fields:
+                    self.fields[field].widget.attrs['readonly'] = 'readonly'
+
+    def clean(self):
+        cleaned_data = super(DisabledClubForm, self).clean()
+        if self.instance:
+            for field in cleaned_data:
+                if not field in self.enabled_fields:
+                    cleaned_data[field] = getattr(self.instance, field)
+
+        return cleaned_data
+
+class ModifyClubForm(ModelForm):
+    class Meta:
+        model = Club
+        fields = ['description', 'email',
+                  'parent', 'coordinator', 'open_membership']
+
+
 class MembershipForm(ModelForm):
     class Meta:
         model = MembershipApplication
@@ -90,12 +124,20 @@ def edit(request, club_id):
         raise PermissionDenied
 
     if request.method == 'POST':
-        modified_club = ClubForm(request.POST, instance=exisiting_club)
+        if request.user == exisiting_club.coordinator:
+            modified_club = DisabledClubForm(request.POST,
+                                             instance=exisiting_club)
+        else:
+            modified_club = ClubForm(request.POST, instance=exisiting_club)
         modified_club.save()
-        return HttpResponseRedirect(reverse('clubs:list'))
+        return HttpResponseRedirect(reverse('clubs:show',
+                                            args=(club_id,)))
     else:
         exisiting_club = get_object_or_404(Club, pk=club_id)
-        form = ClubForm(instance=exisiting_club)
+        if request.user == exisiting_club.coordinator:
+            form = DisabledClubForm(instance=exisiting_club)
+        else:
+            form = ClubForm(instance=exisiting_club)
         context = {'form': form, 'club_id': club_id}
         return render(request, 'clubs/new.html', context)
 

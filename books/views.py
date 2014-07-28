@@ -137,13 +137,15 @@ def list_books(request):
 @login_required
 def show(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
+    previous_requests = BookRequest.objects.filter(book=book,
+                                                  requester=request.user)
     today = datetime.date.today()
     # Since available_until can be None:
     if not book.available_until:
         is_still_available = True
     else:
         is_still_available = today <= book.available_until
-    context = {'book': book}
+    context = {'book': book, 'previous_requests': previous_requests}
     # Don't show the book unnless:
     # * The user is the original submitter,
     # * The user is the current holder,

@@ -1,0 +1,66 @@
+{% extends 'arshidni_base.html' %}
+{% block title %} اختر كلية {% endblock %}
+{% block navbar %}
+<li><a href="{% url 'arshidni:list_colleges' %}"><span class="glyphicon glyphicon-th"></span> استفسارات أكاديمية</a></li>
+{% endblock %}
+
+{% block content%}
+<div class="row">
+  <div class="col-md-4">
+   <a href="{% url 'arshidni:list_questions' 'm' %}" class="tile-stats tile-green">
+			<div class="icon"><i class="entypo-forward"></i></div>
+			<div class="num" data-start="0" data-end="{{ m_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>كلية الطب</h3>
+			<p>مجموع الأسئلة لكلية الطب</p>
+   </a>
+  </div>
+  <div class="col-md-4">
+   <a href="{% url 'arshidni:list_questions' 'p' %}" class="tile-stats tile-gray">
+			<div class="icon"><i class="entypo-forward"></i></div>
+			<div class="num" data-start="0" data-end="{{ p_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>كلية الصيدلة</h3>
+			<p>مجموع الأسئلة لكلية الصيدلة</p>
+   </a>
+  </div>
+  <div class="col-md-4">
+   <a href="{% url 'arshidni:list_questions' 'd' %}" class="tile-stats tile-green">
+			<div class="icon"><i class="entypo-forward"></i></div>
+			<div class="num" data-start="0" data-end="{{ d_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>كلية طب الأسنان</h3>
+			<p>مجموع الأسئلة لكلية طب الأسنان</p>
+   </a>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-4">
+   <a href="{% url 'arshidni:list_questions' 'b' %}" class="tile-stats tile-gray">
+			<div class="icon"><i class="entypo-forward"></i></div>
+			<div class="num" data-start="0" data-end="{{ b_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>كلية العلوم والمهن الصحية</h3>
+			<p>مجموع الأسئلة لكلية العلوم والمهن الصحية</p>
+   </a>
+  </div>
+  <div class="col-md-4">
+   <a href="{% url 'arshidni:list_questions' 'a' %}" class="tile-stats tile-green">
+			<div class="icon"><i class="entypo-forward"></i></div>
+			<div class="num" data-start="0" data-end="{{ a_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>كلية العلوم الطبية التطبيقية</h3>
+			<p>مجموع الأسئلة لكلية العلوم الطبية التطبيقية</p>
+   </a>
+  </div>
+  <div class="col-md-4">
+   <a href="{% url 'arshidni:list_questions' 'n' %}" class="tile-stats tile-gray">
+			<div class="icon"><i class="entypo-forward"></i></div>
+			<div class="num" data-start="0" data-end="{{ n_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+			
+			<h3>كلية التمريض</h3>
+			<p>مجموع الأسئلة لكلية التمريض</p>
+   </a>
+  </div>
+</div>
+{% endblock %}

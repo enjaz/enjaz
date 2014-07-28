@@ -1,0 +1,33 @@
+{% extends 'arshidni_base.html' %}{% load bootstrap3 %}
+{% block title %}{% if edit %} تعديل ملف {{ colleague_profile.user.student_profile.get_ar_full_name|default:colleague_profile.user.username }}{% else %} تسجيل زميل طلابي{% endif %}{% endblock %}
+
+{% block navbar %}
+	<li><a href="{% url 'arshidni:list_colleagues' %}"><span class="entypo-users"></span> الزملاء الطلابيون</a></li>
+ 	{% if user.student_profile and not user.colleague_profile %}
+		<li><a href="{% url 'arshidni:register_colleague_profile' %}"><span class="glyphicon glyphicon-plus"></span> سجّل نفسك زميلا طلابيا</a></li>
+ 	{% endif %}
+{% endblock %}
+
+{% block content %}
+<h2>{% if edit %} تعديل ملف {{ colleague_profile.user.student_profile.get_ar_full_name|default:colleague_profile.user.username }} {% else %} تسجيل زميل طلابي{% endif %}</h2>
+
+{% if error %}
+	<p class="alter alter-danger">
+	{% if error == 'notstudent' %}
+		يمكن للطلاب فقط تسجيل أنفسهم زملاء طلابيين.
+	{% endif %}
+	</p>
+{% else %}
+	<form action="{% if edit %}{% url 'arshidni:edit_colleague_profile' colleague_profile.pk %}{% else %}{% url 'arshidni:register_colleague_profile' %}{% endif %}" method="post" class="form">
+		{% csrf_token %}
+		{% bootstrap_form form %}
+		{% buttons %}
+        	<button type="submit" class="btn btn-primary">
+	        {% bootstrap_icon "ok-sign" %} {% if edit %} عدّل {% else %} أضف {% endif %}
+	        </button>
+		{% endbuttons %}
+	</form>
+{% endif %}
+{% endblock %}
+
+

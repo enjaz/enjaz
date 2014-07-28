@@ -1,0 +1,95 @@
+{% extends 'arshidni_base.html' %}
+{% block title %}مجموعة دراسية{% endblock %}
+{% block navbar %}
+	<li><a href="{% url 'arshidni:list_groups' %}"><span class="entypo-users"></span> المجموعات الدراسية</a></li>
+	{% if group.coordinator == user or perms.arshidni.change_studygroup %}
+		<li><a href="{% url 'arshidni:edit_group' group.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل مجموعة</a></li>
+		<li><a href="{% url 'arshidni:join_group_requests' group.pk %}"><span class="glyphicon glyphicon-list"></span> طلبات الانضمام</a></li>
+
+	{% elif perms.arshidni.add_studygroup %}
+		<li><a href="{% url 'arshidni:submit_group' %}"> أنشئ مجموعة</a></li>
+	{% endif %}
+{% endblock %}
+{% block content %}
+
+{% if group.is_published == False %}
+<p class="alert alert-danger">
+هذه المجموعة محذوفة.
+</p>
+{% elif group.status == 'P' %}
+<p class="alert alert-warning">
+هذه المجموعة لا تزال تنتظر المراجعة.
+</p>
+{% endif %}
+
+
+<div class="row">
+	{% if not group.coordinator == user and perms.arshidni.add_joinstudygrouprequest %}
+		<div class="col-md-3">
+			<button id="join-group" data-group-id="{{ group.pk }}" class="btn btn-success"{% if previous_request %}disabled="disabled"{% endif %}><span class="glyphicon glyphicon-plus"></span> {% if previous_request %}أرسلت طلبا!{% else %}انضم للمجموعة{% endif %}</button>
+		</div>
+	{% endif %}
+	<div class="col-md-9">
+	<table class="table-hover table">
+		<colgroup>
+			<col class="col-xs-2">
+			<col class="col-xs-6">
+		</colgroup>
+		<tr>
+			<th>الاسم</th>
+			<td>{{ group }}</td>
+		</tr>
+		<tr>
+			<th>المنسق</th>
+			<td>{{ group.coordinator.student_profile.get_ar_full_name|default:group.coordinator.username  }}</td>
+		</tr>
+		<tr>
+			<th>عدد الأعضاء حاليا</th>
+			<td>{{ group.members.count }}</td>
+		</tr>
+		<tr>
+			<th>عدد لأعضاء الأقصى</th>
+			<td>{{ group.max_members }}</td>
+		</tr>
+		<tr>
+			<th>تاريخ البدء</th>
+			<td>{{ group.starting_date|date:"j F Y" }}</td>
+		</tr>
+		<tr>
+			<th>تاريخ الانتهاء</th>
+			<td>{{ group.ending_date|date:"j F Y" }}</td>
+		</tr>
+		<tr>
+			<th>الأهداف التعليمية</th>
+			<td class="english-field"><ul>{% for learningobjective in group.learningobjective_set.all %}<li{% if learningobjective.is_done %} style="text-decoration:line-through;"{% endif %}>{% if learningobjective.is_done %}<span class="glyphicon glyphicon-ok-circle" style="color: #009549;"></span> {% endif %}{{ learningobjective.text }}</li>{% endfor %}</ul></td>
+		</tr>
+	</table>
+	</div>
+</div>
+
+<script>
+$(function() {
+    $('#join-group').click(function(){
+        var data = {'group_id': $('#join-group').data('group-id')};
+        $.ajax({
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            url: '{% url 'arshidni:join_group' %}',
+            cache: false,
+            success: function(data){
+                if (data['success'] == true){
+                    $('#join-group').html('أرسلت طلبا!');
+                    $('#join-group').attr('disabled', 'disabled');
+                } else {
+                    alert(data['message']);
+                }
+            }
+        });
+    });
+});
+
+</script>
+
+{% endblock %}
+

@@ -333,3 +333,36 @@ span.unpublished {
 .voice-search .short-summary {
     float: none;
 }
+
+
+#ask #id_text, #answer #id_text {
+    height: 100px;
+}
+
+.question-header {
+    font-size: 11px;
+}
+
+.question-text {
+    color: #545454;
+}
+
+.single-question a{
+    color: #949494;
+}
+
+.delete-request {
+    color: rgb(212, 19, 19);
+}
+
+.accept-request {
+    color: rgb(80, 162, 60);
+}
+
+.deleted-request {
+    background-color: rgb(254, 215, 215);
+}
+
+.book-description {
+    text-align: justify;
+}

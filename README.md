@@ -1,7 +1,7 @@
 student-portal
 ==============
 
-The Student Portal is a platform for university student activity.
+The Student Portal is a [Django-based](https://www.djangoproject.com) platform for university student activity.
 Through the platform, students can sumbit activities for approval,
 join clubs, enter their 'Activity Points' (Niqati) and contribute and
 borrow books.

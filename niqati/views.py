@@ -1,18 +1,19 @@
 # -*- coding: utf-8  -*-
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
-# from django.db.models import Q
+
 from django.core.exceptions import PermissionDenied
 
 from core.decorators import post_only
-from activities.models import Activity
+from activities.models import Activity, Evaluation
 from activities.forms import EvaluationForm
 from niqati.models import Niqati_User, Category, Code, Code_Order, Code_Collection
-from niqati.forms import OrderForm
+from niqati.forms import OrderForm  #, SubmissionForm
+
+# from django.db.models import Q
 
 
 @login_required
@@ -29,54 +30,104 @@ def index(request):
 
     # Student Views
 
-# TODO: implement activity evaluation!
+# TODO: fix redeem_date issue
 @login_required
 def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code submission requests
     if request.method == "POST":
+        # print request.POST
+        # form = SubmissionForm(instance=Code(code_string=request.POST['code_string'], user=request.user))
+        # form = SubmissionForm({'code_string':'XXX'})
+        # if form.is_valid():
+        #     pass
+        #     # form.save()
+        # else:
+        #     pass
+        # print form.error_class
+        # print type(form.error_class)
+        # for error in form.error_class:
+        #     print error
+        # # elif form.errors.code_string:
+        # #     pass
+        # # print form.errors
+        # # print form['code_string'].errors
+        # message = ""
+        # message_type = "-danger"
+        # eval_form = EvaluationForm()
+
+        # ----
+
         # format code first i.e. make upper case & remove spaces or dashes
         code = request.POST['code'].upper().replace(" ", "").replace("-", "")
 
         try:  # assume at first that code exists
             c = Code.objects.get(code_string=code)
+
+            # If the code exists, then initialize and check the evaluation form
+            # Only if the code is actually saved, the evaluation will be saved, too.
+            eval_form = EvaluationForm(request.POST,
+                                       instance=Evaluation(activity=c.activity,
+                                                           evaluator=request.user))
+            eval_form_valid = eval_form.is_valid()
+
             if not c.user:  # code isn't associated with any user -- free to use
                 try:  # assume user already has a code in the same activity
                     a = request.user.code_set.get(activity=c.activity)
                     if c.category.points > a.category.points:  # new code has more points than existing one
                         # replace old code & show message that it has been replaced
                         a.user = None
-                        a.date_redeemed = None
+                        a.redeem_date = None
                         a.save()
                         c.user = request.user
-                        c.date_redeemed = timezone.now()
+                        c.redeem_date = timezone.now()
                         c.save()
                         message_type = "-info"
                         message = u"تم إدخال الرمز بنجاح و استبدال الرمز السابق لك في هذا النشاط."
+
+                        # Since the user already has an evaluation (submitted a code previously),
+                        # we'll get that evaluation and update it rather than create a new one.
+                        evaluation = Evaluation.objects.get(evaluator=request.user, activity=c.activity)
+                        eval_form = EvaluationForm(request.POST, instance=evaluation)
+                        if eval_form.is_valid():
+                            eval_form.save()
+                            eval_form = EvaluationForm()
+
                     else:  # new code has equal or less points than existing one
                         # show message: you have codes in the same activity
-                        message_type = None
+                        message_type = "-danger"
                         message = u"لا يمكن إدخال هذا الرمز؛ لديك رمز نقاطي آخر في نفس النشاط ذو قيمة مساوية أو أكبر."
                 except (KeyError, Code.DoesNotExist):  # no codes in the same activity
                     # redeem & show success message --- default behavior
                     c.user = request.user
-                    c.date_redeemed = timezone.now()
+                    c.redeem_date = timezone.now()
                     c.save()
                     message_type = "-success"
                     message = u"تم تسجيل الرمز بنجاح."
+
+                    # Save the evaluation form
+                    if eval_form_valid:
+                        eval_form.save()
+                        eval_form = EvaluationForm()
+
             elif c.user == request.user:  # user has used the same code before
                 # show message: you have used this code before
-                message_type = None
+                message_type = "-danger"
                 message = u"لقد استخدمت هذا الرمز من قبل؛ لا يمكنك استخدامه مرة أخرى"
             else:  # code is used by another user
                 # show message: code not available (used by other)
-                message_type = None
+                message_type = "-danger"
                 message = u"هذا الرمز غير متوفر."
         except (KeyError, Code.DoesNotExist):  # code does not exist
             # show message: code doesn't exist
-            message_type = "-error"
+            message_type = "-danger"
             message = u"هذا الرمز غير صحيح."
-        return render(request, 'niqati/submit.html', {'message_type': message_type, 'message': message})
+            eval_form = EvaluationForm()
+        return render(request, 'niqati/submit.html', {'message_type': message_type,
+                                                      'message': message,
+                                                      # 'form': form,
+                                                      'eval_form': eval_form})
     else:  # request method is not POST
-        return render(request, 'niqati/submit.html', {'code_to_redeem': code})
+        return render(request, 'niqati/submit.html', {'code_to_redeem': code,
+                                                      'eval_form': EvaluationForm()})
 
 
 @login_required

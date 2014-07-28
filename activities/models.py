@@ -292,3 +292,20 @@ class Category(models.Model):
         # For the admin interface.
         verbose_name = u"تصنيف"
         verbose_name_plural = u"التصنيفات"
+
+
+class Evaluation(models.Model):
+    """ An activity evaluation filled by students upon Niqati code submission. """
+    activity = models.ForeignKey(Activity)  # TODO: change to episode (when niqati.models.Code has been changed)
+    evaluator = models.ForeignKey(User)
+
+    # Evaluation criteria, where evaluation is on a scale from 1 (lowest) to 5 (highest)
+    # (So far there isn't a way to enforce min and max for model fields, so this has
+    # to be done on the form level)
+    quality = models.PositiveIntegerField(verbose_name=u"جودة تنظيم النشاط",
+                                          help_text=u"كيف تقيم عمل النادي في تنظيم النشاط؟")
+    relevance = models.PositiveIntegerField(verbose_name=u"ملاءمة النشاط لاهتمام الطلاب",
+                                            help_text=u"ما مدى ملاءمة النشاط لاهتمام الطلاب؟")
+    class Meta:
+        verbose_name = u"تقييم"
+        verbose_name_plural = u"التقييمات"

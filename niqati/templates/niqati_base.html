@@ -15,5 +15,7 @@
     {% if perms.niqati.view_general_report %}<li><a href="{% url 'niqati:general_report' %}"><span class="glyphicon glyphicon-stats"></span> التقرير العام</a></li>{% endif %}
     
 {% endblock %}
-{% block content %}
-{% endblock %}  
+
+{% block content %}{% endblock %}
+
+{% block customscript %}{% endblock %}

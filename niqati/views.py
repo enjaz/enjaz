@@ -73,23 +73,28 @@ def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code s
                 try:  # assume user already has a code in the same activity
                     a = request.user.code_set.get(activity=c.activity)
                     if c.category.points > a.category.points:  # new code has more points than existing one
-                        # replace old code & show message that it has been replaced
-                        a.user = None
-                        a.redeem_date = None
-                        a.save()
-                        c.user = request.user
-                        c.redeem_date = timezone.now()
-                        c.save()
-                        message_type = "-info"
-                        message = u"تم إدخال الرمز بنجاح و استبدال الرمز السابق لك في هذا النشاط."
 
                         # Since the user already has an evaluation (submitted a code previously),
                         # we'll get that evaluation and update it rather than create a new one.
                         evaluation = Evaluation.objects.get(evaluator=request.user, activity=c.activity)
                         eval_form = EvaluationForm(request.POST, instance=evaluation)
                         if eval_form.is_valid():
+
+                            # replace old code & show message that it has been replaced
+                            a.user = None
+                            a.redeem_date = None
+                            a.save()
+                            c.user = request.user
+                            c.redeem_date = timezone.now()
+                            c.save()
+                            message_type = "-info"
+                            message = u"تم إدخال الرمز بنجاح و استبدال الرمز السابق لك في هذا النشاط."
+
                             eval_form.save()
                             eval_form = EvaluationForm()
+                        else:
+                            message_type = "-danger"
+                            message = u"يرجى التأكد من تعبئة تقييم النشاط بشكل صحيح."
 
                     else:  # new code has equal or less points than existing one
                         # show message: you have codes in the same activity
@@ -97,16 +102,19 @@ def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code s
                         message = u"لا يمكن إدخال هذا الرمز؛ لديك رمز نقاطي آخر في نفس النشاط ذو قيمة مساوية أو أكبر."
                 except (KeyError, Code.DoesNotExist):  # no codes in the same activity
                     # redeem & show success message --- default behavior
-                    c.user = request.user
-                    c.redeem_date = timezone.now()
-                    c.save()
-                    message_type = "-success"
-                    message = u"تم تسجيل الرمز بنجاح."
+                    if eval_form.is_valid():
+                        c.user = request.user
+                        c.redeem_date = timezone.now()
+                        c.save()
 
-                    # Save the evaluation form
-                    if eval_form_valid:
                         eval_form.save()
                         eval_form = EvaluationForm()
+
+                        message_type = "-success"
+                        message = u"تم تسجيل الرمز بنجاح."
+                    else:
+                        message_type = "-danger"
+                        message = u"يرجى التأكد من تعبئة تقييم النشاط بشكل صحيح."
 
             elif c.user == request.user:  # user has used the same code before
                 # show message: you have used this code before

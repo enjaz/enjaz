@@ -12,7 +12,7 @@ from clubs.models import Club, MembershipApplication
 
 @login_required
 def list(request):
-    clubs = Club.objects.exclude(english_name="Presidency")
+    clubs = Club.objects.exclude(english_name="Presidency").exclude(english_name="Media Center")
     context = {'clubs':clubs}
     return render(request, 'clubs/list.html', context)
 

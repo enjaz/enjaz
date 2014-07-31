@@ -1,25 +1,34 @@
-{% extends "clubs_base.html" %}
+{% extends "clubs_base.html" %}{% load staticfiles %}
 {% block title %}الأندية{% endblock %}
 
 {% block content %}
-{% if clubs %}
-<table class="tg table">
-  <tr>
+<table id="club_list" class="table table-bordered datatable">
+  <thead>
     <th>الاسم</th>
     <th># الأعضاء</th>
     <th>المنسق</th>
     <th>حالة التسجيل</th>
-  </tr>
+  </thead>
+  <tbody>
     {% for club in clubs %}
-  <tr>
-    <td><a href="{% url 'clubs:show' club.id %}">{{ club.name }}</a></td>
-    <td>{% if club.members.all|length %}{{ club.members.all|length }}{% else %}لا يوجد{% endif %}</td>
-    <td>{% if club.coordinator %} {{ club.coordinator.student_profile.get_ar_full_name|default:club.coordinator.username }} {% else %} لا يوجد {% endif %}</td>
-    <td>{% if club.open_membership %} <a href="{% url 'clubs:join' club.id %}">مفتوح</a> {% else %} مغلق {% endif %}</td>
-   </tr>
+    <tr>
+        <td><a href="{% url 'clubs:show' club.id %}">{{ club.name }}</a></td>
+        <td>{% if club.members.all|length %}{{ club.members.all|length }}{% else %}لا يوجد{% endif %}</td>
+        <td>{% if club.coordinator %} {{ club.coordinator.student_profile.get_ar_full_name|default:club.coordinator.username }} {% else %} لا يوجد {% endif %}</td>
+        <td>{% if club.open_membership %} <a href="{% url 'clubs:join' club.id %}">مفتوح</a> {% else %} مغلق {% endif %}</td>
+    </tr>
     {% endfor %}
+  </tbody>
 </table>
-{% else %}
-    <p>لا توجد أية أندية.</p>
-{% endif %}
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+<script>
+$(document).ready(function () {
+	$('#club_list').DataTable();
+	{# TODO: disable sorting and paging #}
+});
+</script>
 {% endblock %}

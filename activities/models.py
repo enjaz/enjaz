@@ -11,7 +11,7 @@ class Activity(models.Model):
     # be considered the primary orginzier.  Others will be cosidered
     # secondary.
     #clubs = models.ManyToManyField('clubs.Club',
-    #                               verbose_name=u"النوادي")
+    #                               verbose_name=u"الأندية")
     primary_club = models.ForeignKey('clubs.Club', null=True,
                                      on_delete=models.SET_NULL,
                                      related_name='primary_activity',

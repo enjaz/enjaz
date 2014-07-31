@@ -57,7 +57,8 @@ class SubmitCodeTests(TestCase):
         A user has no other codes in the same activity.
         """
         self.code = Code.objects.get(pk=1)
-
+        # before submission there shouldn't be any codes from this activity in the user's record
+        self.assertQuerysetEqual(self.user.code_set.filter(activity=self.code.activity), Code.objects.none())
         # before submission, the user should not have any evaluations for the activity
         self.assertQuerysetEqual(Evaluation.objects.filter(evaluator=self.user, activity=self.activity),
                                  Evaluation.objects.none())
@@ -69,6 +70,7 @@ class SubmitCodeTests(TestCase):
                                     )
 
         self.assertEqual(response.status_code, 200)
+
         # niqati tests
         self.assertIn(self.code, self.user.code_set.all())
         #self.assertEqual(self.code.user, self.user)
@@ -81,6 +83,34 @@ class SubmitCodeTests(TestCase):
         self.assertEqual(self.evaluation.relevance, 4)
         self.assertEqual(self.evaluation.quality, 3)
 
+    def test_submit_code_with_no_or_invalid_evaluation(self):
+        """
+        Test a scenario where a user submits a code but doesn't fill out the evaluation
+        or the evaluation has some issues. In this case the code (nor the evaluation)
+        should not be submitted.
+        """
+        self.code = Code.objects.get(pk=1)
+        # before submission there shouldn't be any codes from this activity in the user's record
+        self.assertQuerysetEqual(self.user.code_set.filter(activity=self.code.activity), Code.objects.none())
+        # before submission, the user should not have any evaluations for the activity
+        self.assertQuerysetEqual(Evaluation.objects.filter(evaluator=self.user, activity=self.activity),
+                                 Evaluation.objects.none())
+
+        # Post invalid values for the evaluation form. Here 0 is an invalid value that will make
+        # eval_form.is_valid() return False.
+        response = self.client.post(reverse("niqati:submit"),
+                                    {'code': self.code.code_string,
+                                     'relevance': '4',
+                                     'quality': '0'}
+                                    )
+
+        self.assertEqual(response.status_code, 200)
+
+        # niqati tests
+        self.assertNotIn(self.code, self.user.code_set.all())
+        self.assertContains(response, u"يرجى التأكد من تعبئة تقييم النشاط بشكل صحيح.")
+
+        self.assertFalse(Evaluation.objects.filter(activity=self.code.activity, evaluator=self.user).exists())
 
     def test_submit_code_with_other_code_of_less_value(self):
         """
@@ -120,6 +150,45 @@ class SubmitCodeTests(TestCase):
         self.evaluation = Evaluation.objects.get(activity=self.activity, evaluator=self.user)
         self.assertEqual(self.evaluation.relevance, 5)
         self.assertEqual(self.evaluation.quality, 1)
+
+    def test_submit_code_with_other_code_of_less_value_and_no_or_invalid_evaluation(self):
+        """
+        Test a scenario where a user already has a code in the same activity, but whose value is
+        less than the submitted code. The user submits the new code but with invalid evaluation
+        fields. In this case the code shouldn't be submitted nor the evaluation should be updated.
+        """
+        self.code_cheap = Code.objects.filter(category__points=1).first()
+        self.code = Code.objects.filter(category__points=2).first()
+
+        # Add the cheap code to the user first
+        self.code_cheap.user = self.user
+        self.code_cheap.save()
+
+        # Since the user already has a previous code, they must also have submitted an evaluation
+        self.evaluation = Evaluation.objects.create(activity=self.activity,
+                                                    evaluator=self.user,
+                                                    relevance=2,
+                                                    quality=4)
+
+        # Now submit the new code with an invalid evaluation argument (0 in this case)
+        response = self.client.post(reverse("niqati:submit"),
+                                    {'code': self.code.code_string,
+                                     'relevance': 5,
+                                     'quality': 0}
+                                    )
+
+        self.assertEqual(response.status_code, 200)
+
+        # niqati tests
+        self.assertNotIn(self.code, self.user.code_set.all())
+        self.assertIn(self.code_cheap, self.user.code_set.all())
+        self.assertContains(response, u"يرجى التأكد من تعبئة تقييم النشاط بشكل صحيح.")
+
+        # evaluation tests
+        # there shouldn't be any change
+        self.assertEqual(Evaluation.objects.get(activity=self.code.activity, evaluator=self.user), self.evaluation)
+        self.assertNotEqual(Evaluation.objects.get(activity=self.code.activity, evaluator=self.user).relevance,
+                            5)
 
     def utility_greater_or_equal(self):
         """

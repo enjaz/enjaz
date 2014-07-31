@@ -106,7 +106,25 @@ class Activity(models.Model):
         Return the next scheduled episode for this activity.
         """
         pass
-    
+
+    # Evaluation-related
+    def get_relevance_score_average(self):
+        """
+        Return the average evaluation score for relevance to student needs.
+        """
+        relevance_scores = [e.relevance for e in self.evaluation_set.all()]
+        return float(sum(relevance_scores))/len(relevance_scores) if len(relevance_scores) > 0 else 0
+        # NOTE: the conditional is to avoid division by zero
+    get_relevance_score_average.short_description = u"معدل تقييم ملاءمة النشاط"
+
+    def get_quality_score_average(self):
+        """
+        Return the average evaluation score for quality of the activity.
+        """
+        quality_scores = [e.quality for e in self.evaluation_set.all()]
+        return float(sum(quality_scores))/len(quality_scores) if len(quality_scores) > 0 else 0
+    get_quality_score_average.short_description = u"معدل تقييم جودة النشاط"
+
     class Meta:
         permissions = (
             ("view_activity", "Can view all available activities."),

@@ -35,9 +35,20 @@
             <div class="col-xs-5"><hr></div>
         </div>
         <div class="row">
+            <div class="col-xs-12">
+                <h6 class="dinar-light" align="center">قم بتقييم النشاط من ١ إلى ٥ حسب السؤالين التاليين. يمكنك تدوير المقبض إلى القيمة المرغوبة أو إدخالها مباشرة.</h6>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12"><hr></div>
+        </div>
+        <div class="row">
             <div class="col-md-4 col-md-offset-1">
                 <div class="row">
-                    <div class="col-xs-5"><h4>ما تقييمك لملاءمة النشاط لاهتمامات الطلاب؟</h4></div>
+                    <div class="col-xs-5">
+                        <h4>ما تقييمك لملاءمة النشاط لاهتماماتك كطالبـ/ـة؟</h4>
+                        <!--<h4><small class="dinar-light">(من ١ إلى ٥ حيث ٥ هو الأعلى)</small></h4>-->
+                    </div>
                     <div class="col-xs-7" dir="ltr">{{ eval_form.relevance }}</div>
                 </div>
             </div>
@@ -45,7 +56,7 @@
                 <div class="row">
                     <div class="col-xs-5">
                         <h4>ما تقييمك لجودة تنظيم النشاط؟</h4>
-                        <h4><small>ألوووو</small></h4>
+                        <!--<h4><small class="dinar-light">(من ١ إلى ٥ حيث ٥ هو الأعلى)</small></h4>-->
                     </div>
                     <div class="col-xs-7" dir="ltr">{{ eval_form.quality }}</div>
                 </div>

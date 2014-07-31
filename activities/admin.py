@@ -2,7 +2,7 @@
 import datetime
 
 from django.contrib import admin
-from activities.models import Activity, Episode, Category
+from activities.models import Activity, Episode, Category, Evaluation
 from clubs.models import section_choices
 
 class EpisodeInline(admin.StackedInline):
@@ -64,9 +64,15 @@ class StatusFilter(admin.SimpleListFilter):
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'primary_club', 'category',
                     'submission_date', 'is_approved_by_presidency',
-                    'is_approved_by_deanship')
+                    'is_approved_by_deanship', 'get_relevance_score_average',
+                    'get_quality_score_average')
     list_filter = [CategoryFilter, SubmissionFilter, StatusFilter]
     inlines = [EpisodeInline]
-    
+
+class EvaluationAdmin(admin.ModelAdmin):
+    readonly_fields = ('relevance', 'quality')
+    list_display = ('activity', 'evaluator', 'relevance', 'quality')
+
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(Category)
+admin.site.register(Evaluation, EvaluationAdmin)

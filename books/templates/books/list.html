@@ -91,12 +91,7 @@
     <td style="direction:ltr;"><a href="{% url 'books:show' book.pk %}">{{ book.title }}</a></td>
     <td>{{ book.available_from }}</td>
     <td>{% if book.available_until %}{{ book.available_until }}{% else %} - {% endif %}</td>
-    <td>{% if book.status == 'A' %}متاح
-{% elif book.status == 'H' %}محجوز
-{% elif book.status == 'B' %}معار
-{% elif book.status == 'W' %}مسحوب
-{% endif %}
-</td>
+    <td>{{ book.get_status_display }}</td>
   </tr>
 
     {% endfor %}

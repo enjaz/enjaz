@@ -54,10 +54,7 @@ class Activity(models.Model):
     def is_approved_by_deanship(self):
         try:
             d_review = self.review_set.get(review_type='D')
-            if d_review.is_approved:
-                return True
-            else:
-                return False
+            return d_review.is_approved
         except (KeyError, Review.DoesNotExist): # deanship review does not exist
             return None
     is_approved_by_deanship.boolean = True
@@ -66,11 +63,8 @@ class Activity(models.Model):
     def is_approved_by_presidency(self):
         try:
             p_review = self.review_set.get(review_type='P')
-            if p_review.is_approved:
-                return True
-            else:
-                return False
-        except (KeyError, Review.DoesNotExist): # deanship review does not exist
+            return p_review.is_approved
+        except (KeyError, Review.DoesNotExist): # presidency review does not exist
             return None
     is_approved_by_presidency.boolean = True
     is_approved_by_presidency.short_description = u"اعتمدته الرئاسة؟"
@@ -99,13 +93,13 @@ class Activity(models.Model):
         Return the first scheduled episode for this activity.
         *** This should replace the three above-mentioned methods. ***
         """
-        pass
+        pass # TODO: implement get_first_episode
     
     def get_next_episode(self):
         """
         Return the next scheduled episode for this activity.
         """
-        pass
+        pass # TODO: implement get_next_episode
 
     # Evaluation-related
     def get_relevance_score_average(self):

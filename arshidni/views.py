@@ -402,40 +402,7 @@ def list_groups(request):
         approved_groups = StudyGroup.objects.filter(status='A')
         groups = user_groups | approved_groups
 
-    group_filter = request.GET.get('filter')
-    if group_filter == 'mine':
-        filtered_groups = groups.filter(coordinator=request.user)
-    elif group_filter == 'day':
-        one_day_ago = datetime.datetime.now() - datetime.timedelta(days=1)
-        filtered_groups = groups.filter(submission_date__gte=one_day_ago)
-    elif group_filter == 'week':
-        one_week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
-        filtered_groups = groups.filter(submission_date__gte=one_week_ago)
-    elif group_filter == 'motnh':
-        one_month_ago = datetime.datetime.now() - datetime.timedelta(days=30)
-        filtered_groups = groups.filter(submission_date__gte=one_month_ago)
-    else:
-        filtered_groups = groups
-
-    group_order = request.GET.get('order')
-    #TODO: Find out more useful orders
-    if True:
-        ordered_groups = filtered_groups.order_by('-submission_date')
-
-    # Each page of results should have a maximum of 25 activities.
-    paginator = Paginator(ordered_groups, 25)
-    page = request.GET.get('page')
-
-    try:
-        page_groups = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        page_groups = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        page_groups = paginator.page(paginator.num_pages)
-
-    context = {'page_groups': page_groups}
+    context = {'page_groups': groups}
     return render(request, 'arshidni/group_list.html', context)
 
 @login_required
@@ -715,26 +682,16 @@ def supervision_requests_to_me(request):
         colleague_profile = ColleagueProfile.objects.get(user=request.user)
     except ObjectDoesNotExist:
         colleague_profile = None
-        context = {}
 
     if colleague_profile:
         # No need to show the requests that were removed for
         # acceptance.  They could be just a mistake.
         supervision_requests = SupervisionRequest.objects.filter(colleague=colleague_profile,
                                                                  status__in=['P', 'A', 'R', 'WC', 'WN'])
-        ordered_supervision_requests = supervision_requests.order_by('-submission_date')
 
-        paginator = Paginator(ordered_supervision_requests, 25)
-        page = request.GET.get('page')
-
-        try:
-            page_requests = paginator.page(page)
-        except PageNotAnInteger:
-            page_requests = paginator.page(1)
-        except EmptyPage:
-            page_requests = paginator.page(paginator.num_pages)
-
-        context = {'colleague_profile': colleague_profile, 'page_requests': page_requests}
+        context = {'colleague_profile': colleague_profile, 'page_requests': supervision_requests}
+    else:
+        context = {}
 
     return render(request, 'arshidni/supervision_requests_to_me.html', context)
 
@@ -742,23 +699,9 @@ def supervision_requests_to_me(request):
 def my_supervision_requests(request):
     # TODO: [Arshidni-wide] if you the user is colleague himself, they
     # shouldn't be able to submit any requests.
-    context = {}
-
     supervision_requests = SupervisionRequest.objects.filter(user=request.user)
-    ordered_supervision_requests = supervision_requests.order_by('-submission_date')
 
-    paginator = Paginator(ordered_supervision_requests, 25)
-    page = request.GET.get('page')
-
-    try:
-        page_requests = paginator.page(page)
-    except PageNotAnInteger:
-        page_requests = paginator.page(1)
-    except EmptyPage:
-        page_requests = paginator.page(paginator.num_pages)
-
-    context = {'page_requests': page_requests}
-
+    context = {'page_requests': supervision_requests}
     return render(request, 'arshidni/my_supervision_requests.html', context)
 
 

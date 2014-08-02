@@ -31,7 +31,6 @@
 		<div class="col-sm-2">
 			
 			<a href="{% url 'activities:show' activity.pk %}" class="profile-picture hidden-xs hidden-sm">
-				{# The picture is to be changed; for the moment, keep it #}
 				<img src="{% static 'logo/enjaz_logo_shadow_no_text.png' %}"
 				class="img-responsive img-circle">
 			</a>
@@ -171,6 +170,7 @@
 						<a href="{% url 'activities:niqati_orders' activity.pk %}">نقاطي</a>
 					</li>
 					{% endif %}
+                    <!--{# TODO: Add a tab to view participations #}-->
 				</ul>
 			</div>
 		</div>

@@ -2,9 +2,21 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
 from userena.models import UserenaBaseProfile
 from clubs.models import College
+
+def get_gender(user):
+    try:
+        student_profile = user.student_profile
+    except ObjectDoesNotExist:
+        student_profile = None
+    if student_profile:
+        return student_profile.college.gender
+    else:
+        return 'M'
+
 
 class EnjazProfile(UserenaBaseProfile):
     user = models.OneToOneField(User,

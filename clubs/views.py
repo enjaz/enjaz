@@ -136,6 +136,7 @@ def view_application(request, club_id):
     context = {'applications': applications, 'club': club}
     return render(request, 'clubs/view_application.html', context)
 
+# TODO: remove this view and the associated url since its function is now done by datatables
 @login_required
 def download_application(request, club_id):
     club = get_object_or_404(Club, pk=club_id)

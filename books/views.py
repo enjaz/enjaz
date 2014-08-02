@@ -445,6 +445,7 @@ def withdraw(request, book_id):
 
     return render(request, 'books/withdraw.html', context)
 
+# TODO: remove this view and the associated url since searching is now done by datatables
 #@login_required
 def search(request):
     if request.user.is_authenticated():

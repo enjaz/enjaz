@@ -33,7 +33,7 @@
 				{% for c in page_colleague_profiles %}
 				<tr>
 					<td><a href="{% url 'arshidni:show_colleague_profile' c.pk %}">{{ c.user.student_profile.get_ar_full_name|default:c.user.username }}</a></td>
-					<td>{{ c.user.student_profile.college.get_college_full_name }}</a></td>
+					<td>{{ c.user.student_profile.college }}</a></td>
 					<td>{{ c.batch }}</td>
                        			<td>{{ c.submission_date|date:"j F Y" }}</td>
                        			<td>{% if user.colleague_profile != c %}<a href="{% url 'arshidni:submit_supervision_request' c.pk %}">اختر</a>{% endif %}</td>

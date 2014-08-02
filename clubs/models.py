@@ -129,15 +129,3 @@ class College(models.Model):
         # For the admin interface.
         verbose_name = u"كلية"
         verbose_name_plural = u"الكليات"
-
-    def get_college_full_name(self):
-        college_dict = dict(college_choices)
-        return college_dict[self.name]
-
-    def get_city_full_name(self):
-        city_dict = dict(city_choices)
-        try:
-            city_full_name = city_dict[self.city]
-        except KeyError: # Riyadh should be the default
-            city_full_name = u"الرياض"
-        return city_full_name

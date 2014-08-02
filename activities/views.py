@@ -2,15 +2,11 @@
 # TODO: replace presidency with get_presidency utility function
 # TODO: revise permissions (attach to club coordination and membership rather than django
 # permissions - that's for normal users and club members and coordinators)
-from django.db.models import Count
 import unicodecsv
-
-from datetime import datetime, timedelta, date
 
 from django.contrib.auth.decorators import permission_required, login_required
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
@@ -29,6 +25,7 @@ def list(request):
     * For Deanship of Student Affairs employees and other users, only activities approved by SC-P and DSA should be
       visible.
     """
+    # TODO: Revisit this view in terms of what appears for different groups (permissions) (See specification above)
     if request.user.is_authenticated():
         template = 'activities/list_normal.html'
     else:
@@ -391,6 +388,7 @@ def view_participation(request, activity_id):
     context = {'participations': participations, 'activity': activity}
     return render(request, 'activities/view_participations.html', context)
 
+# TODO: remove this view and the associated url since its function is now done by datatables
 @login_required
 def download_participation(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id)

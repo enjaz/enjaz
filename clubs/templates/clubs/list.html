@@ -29,8 +29,10 @@
 <script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
 <script>
 $(document).ready(function () {
-	$('#club_list').DataTable();
-	{# TODO: disable sorting and paging #}
+	/* $('#club_list').DataTable({
+	    "bPaginate": false,
+	    "bSort": false
+	}); */
 });
 </script>
 {% endblock %}

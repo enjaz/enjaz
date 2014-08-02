@@ -1,4 +1,4 @@
-{% extends template %}{% load bootstrap3 %}
+{% extends template %}{% load bootstrap3 %}{% load staticfiles %}
 {% block title %}الكتب{% endblock %}
 
 {% block content %}
@@ -21,105 +21,103 @@
 	
 </section>
 
-{% endif %}
-{% if not user.is_authenticated %}<div class="container">{% endif %}
-<div class="row">
-<form name="search" action="{% url 'books:search' %}" method="get" class="form-inline">
-	{% if not user.is_authenticated %}
-	<input type="text" class="form-control" name="q"/>
-	<button type="submit" class="btn btn-primary">
-        {% bootstrap_icon "search" %} ابحث
-    </button>
-    {% else %}
-  	<div class="col-md-6">
-    <div class="input-group">
-		<input type="text" class="form-control" name="q">
-		
-		<span class="input-group-btn">
-			<button type="submit" class="btn btn-primary">
-			    <span class="glyphicon glyphicon-search"></span> ابحث
-			</button>
-		</span>
-	</div>
-	</div>
-	{% endif %}
-    
-</form>
-</div>
-{% if not user.is_authenticated %}
-	</div><!-- end .container -->
 	<div class="container dinar-light">
 {% endif %}
-<br>
-{% if page_books %}
+{% if page_books and user.is_authenticated %}
 <div class="row">
-{% if user.is_authenticated %}
-	<div class="col-md-3">
-	<div class="panel panel-primary" data-collapsed="0">
-		<!-- panel head -->
-		<div class="panel-heading">
-			<div class="panel-title">خيارات</div>
-		</div>
-		
-		<!-- panel body -->
-		<div class="panel-body">
-			<p style="font-size:1em;"><strong>رتّب الكتب حسب:</strong>
-			<ul class="list-unstyled">
-				<li><a href="{% url 'books:list' %}"><span class="glyphicon glyphicon-time"></span> تاريخ المساهمة</a></li>
-				<li><a href="{% url 'books:list' %}?order=status"><span class="glyphicon glyphicon-signal"></span> الحالة</a></li></ul></p>
-			<p style="font-size:1em;"><strong>رشّح الكتب:</strong>
-			<ul class="list-unstyled">
-				<li><a href="{% url 'books:list' %}"><span class="glyphicon glyphicon-book"></span> جميع الكتب</a></li>
-			{% if user.is_authenticated %}<li><a href="{% url 'books:list' %}?filter=mine"><span class="glyphicon glyphicon-user"></span> كتبي فقط</a></li>{% endif %}
-			<li><a href="{% url 'books:list' %}?filter=available"><span class="glyphicon glyphicon-thumbs-up"></span> الكتب المتاحة</a></li></p>
-		</div>
-	</div>
-	</div>
-	<div class="col-md-9">
-{% else %}
-	<div class="col-md-12">
+    <div class="col-md-12">
+        <div class="panel panel-primary" data-collapsed="0">
+
+        <!-- panel head -->
+        <div class="panel-heading">
+            <div class="panel-title">رشح الكتب: </div>
+
+            <div class="panel-options">
+                <a class="btn btn-default filter-btn" data-filter="all"><span class="glyphicon glyphicon-book"></span> جميع الكتب</a>
+                <a class="btn btn-default filter-btn" data-filter="mine"><span class="glyphicon glyphicon-user"></span> كتبي فقط</a>
+                <a class="btn btn-default filter-btn" data-filter="available"><span class="glyphicon glyphicon-thumbs-up"></span> الكتب المتاحة</a>
+            </div>
+        </div>
+
+        </div>
+    </div>
+</div>
 {% endif %}
-<table class="tg table table-hover">
-  <tr>
+<div class="row">
+	<div class="col-md-12">
+<table id="books" class="table table-bordered datatable dataTable">
+  <thead>
     <th style="text-align: right;">اسم الكتاب</th>
+    <th style="text-align: right;">المساهم</th>
+    <th style="text-align: right;">تاريخ المساهمة</th>
     <th style="text-align: right;">متوفر من</th>
     <th style="text-align: right;">متوفر حتى</th>
     <th style="text-align: right;">الحالة</th>
-  </tr>
+  </thead>
+  <tbody>
     {% for book in page_books %}
-  <tr>
-    <td style="direction:ltr;"><a href="{% url 'books:show' book.pk %}">{{ book.title }}</a></td>
-    <td>{{ book.available_from }}</td>
-    <td>{% if book.available_until %}{{ book.available_until }}{% else %} - {% endif %}</td>
-    <td>{{ book.get_status_display }}</td>
-  </tr>
+      <tr>
+        <td style="direction:ltr;"><a href="{% url 'books:show' book.pk %}">{{ book.title }}</a></td>
+        <td>{{ book.submitter.student_profile.get_ar_full_name }}</td>
+        <td>{{ book.submission_date|date }}</td>
+        <td>{{ book.available_from }}</td>
+        <td>{% if book.available_until %}{{ book.available_until }}{% else %} - {% endif %}</td>
+        <td>{{ book.get_status_display }}</td>
+      </tr>
 
     {% endfor %}
+  </tbody>
 </table>
-<div style="text-align:center;">
-    <span class="step-links">
-        {% if page_books.has_previous %}
-            <a href="?page={{ page_books.previous_page_number }}">السابق</a>
-        {% endif %}
-
-        <span class="current">
-            الصفحة {{ page_books.number }} من {{ page_books.paginator.num_pages }}
-        </span>
-
-        {% if page_books.has_next %}
-            <a href="?page={{ page_books.next_page_number }}">التالي</a>
-        {% endif %}
-    </span>
 </div>
 </div>
-</div>
-{% else %}
-    <p>لا توجد أية كتب.</p>
-{% endif %}
 {% if not user.is_authenticated %}
 </div>
 </div>
-
 {% endif %}
+
+{#<link rel="stylesheet" href="{% static 'neon/assets/js/datatables/responsive/css/datatables.responsive.css' %}">#}
+{% endblock %}
+
+{% block customscript %}
+    <script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+    {#<script src="{% static 'neon/assets/js/datatables/responsive/js/datatables.responsive.js' %}"></script>#}
+	<script>
+    var table = $('#books').DataTable();
+
+    {% if user.is_authenticated %}
+    var filterBy = "";
+
+    $.fn.dataTableExt.afnFiltering.push(
+        function( oSettings, aData, iDataIndex ) {
+            switch (filterBy) {
+                case "mine":
+                    var submitter = String( aData[1] ) || null; // use data for the submitter column
+                    if (submitter == "{{ user.student_profile.get_ar_full_name }}") {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                case "available":
+                    var available = String( aData[5] ) || null;
+                    if (available == "متاح") {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                default:
+                    return true;
+            }
+        }
+    );
+
+
+    $(".filter-btn").click(function () {
+        filterBy = $(this).attr("data-filter");
+        console.log(filterBy);
+        table.fnDraw()
+    });
+    {% endif %}
+	</script>
 {% endblock %}
 

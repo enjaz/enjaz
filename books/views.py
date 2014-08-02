@@ -17,14 +17,8 @@ from django.core.files.base import ContentFile
 
 from taggit.models import Tag
 from books.models import Book, BookRequest
+from accounts.models import get_gender
 from templated_email import send_templated_mail
-
-def get_gender(user):
-    student_profile = getattr(user, 'student_profile', None)
-    if student_profile:
-        return student_profile.college.gender
-    else:
-        return 'M'
 
 class BookForm(ModelForm):
     def clean(self):

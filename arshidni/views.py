@@ -10,8 +10,11 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import permission_required, login_required
 from django.views.decorators import csrf
 
+from post_office import mail
+
 from core import decorators
 from arshidni.models import GraduateProfile, Question, Answer, StudyGroup, LearningObjective, JoinStudyGroupRequest, ColleagueProfile, SupervisionRequest
+from arshidni.utilities import get_arshidni_coordinator
 from clubs.models import College
 from accounts.models import get_gender
 
@@ -19,11 +22,11 @@ from accounts.models import get_gender
 # should be done through the arshidni admin interface.
 
 # TODO:
-#  * Add college to college and graduate form pages.
-#  * Add view_* permissions
+#  * Add college to college and graduate form pages. [Osama, Aug 2]
+#  * Add view_* permissions [Osama, Aug 2]
 #  * End date pickers should start at present date. (Don't apply this
 #    rule to the start date because some groups may be register after
-#    they have already started
+#    they have already started. [Osama, Aug 2]
  
 class GraduateProfileForm(forms.ModelForm):
     class Meta:
@@ -126,8 +129,17 @@ def register_graduate_profile(request):
                                    instance=graduate_profile_object)
         if form.is_valid():
             new_graduate_profile = form.save()
-            return HttpResponseRedirect(reverse('arshidni:show_graduate_profile',
-                                                args=(new_graduate_profile.pk,)))
+            graduate_profile_url = reverse('arshidni:show_graduate_profile',
+                                           args=(new_graduate_profile.pk,))
+            full_url = request.build_absolute_uri(graduate_profile_url)
+            arshidni_coordinator = get_arshidni_coordinator()
+            email_context = {'arshidni_coordinator': arshidni_coordinator,
+                             'graduate_profile': new_graduate_profile,
+                             'full_url': full_url}
+            mail.send([arshidni_coordinator.email],
+                      template="graduate_profile_submitted",
+                      context=email_context)
+            return HttpResponseRedirect(graduate_profile_url)
         else:
             context = {'form': form}
     elif request.method == 'GET':
@@ -479,8 +491,20 @@ def submit_group(request):
         form = StudyGroupForm(request.POST, instance=group_object)
         if form.is_valid():
             new_group = form.save()
-            return HttpResponseRedirect(reverse('arshidni:show_group',
-                                                args=(new_group.pk,)))
+            group_url = reverse('arshidni:show_group',
+                                args=(new_group.pk,))
+            group_full_url = request.build_absolute_uri(group_url)
+            admin_url = reverse('arshidni_admin:index')
+            admin_full_url = request.build_absolute_uri(admin_url)
+            arshidni_coordinator = get_arshidni_coordinator()
+            email_context = {'arshidni_coordinator': arshidni_coordinator,
+                             'group': new_group,
+                             'full_url': group_full_url,
+                             'admin_full_url': admin_full_url}
+            mail.send([arshidni_coordinator.email],
+                      template="study_group_submitted",
+                      context=email_context)
+            return HttpResponseRedirect(group_url)
         else:
             context = {'form': form}
     elif request.method == 'GET':
@@ -649,6 +673,16 @@ def submit_supervision_request(request, colleague_profile_id):
         form = SupervisionRequestForm(request.POST, instance=request_object)
         if form.is_valid():
             new_request = form.save()
+            to_me_url = reverse('arshidni:supervision_requests_to_me')
+            full_url = request.build_absolute_uri(to_me_url)
+            arshidni_coordinator = get_arshidni_coordinator()
+            email_context = {'full_url': full_url,
+                             'supervision_request': new_request,
+                             'colleague_profile': colleague_profile}
+            mail.send([colleague_profile.user.email],
+                      cc=[arshidni_coordinator.email],
+                      template="supervision_request_submitted",
+                      context=email_context)
             after_url = reverse('arshidni:my_supervision_requests') + '#request-' + str(new_request.pk)
             return HttpResponseRedirect(after_url)
         else:
@@ -822,6 +856,15 @@ def student_action(request):
             now = datetime.datetime.now()
             supervision_request.status = 'WN'
             supervision_request.withdrawal_date = now
+            to_me_url = reverse('arshidni:supervision_requests_to_me')
+            full_url = request.build_absolute_uri(to_me_url)
+            arshidni_coordinator = get_arshidni_coordinator()
+            email_context = {'full_url': full_url,
+                             'supervision_request': supervision_request}
+            mail.send([supervision_request.colleague.user.email],
+                      cc=[arshidni_coordinator.email],
+                      template="supervision_request_withdrawn",
+                      context=email_context)
         elif supervision_request.status == 'P':
             supervision_request.status = 'D'
         else: # Just in case
@@ -857,6 +900,15 @@ def colleague_action(request):
             supervision_request.save()
             colleague_profile.is_available = False
             colleague_profile.save()
+            mine_url = reverse('arshidni:my_supervision_requests')
+            full_url = request.build_absolute_uri(mine_url)
+            arshidni_coordinator = get_arshidni_coordinator()
+            email_context = {'full_url': full_url,
+                             'supervision_request': supervision_request}
+            mail.send([supervision_request.user.email],
+                      cc=[arshidni_coordinator.email],
+                      template="supervision_request_accepted",
+                      context=email_context)
         else: # Just in case
             raise Exception(u'حدث خطأ غير معروف.')
 

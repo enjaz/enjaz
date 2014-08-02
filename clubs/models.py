@@ -3,11 +3,15 @@ from django.db import models
 from django.contrib.auth.models import User
 
 section_choices = (
-    ('M', u'طلاب'),
-    ('F', u'طالبات'),
-    ('KM', u'طلاب مدينة الملك فهد الطبية'),
-    ('KF', u'طالبات مدينة الملك فهد الطبية'),
+    ('NG', u'الحرس الوطني'),
+    ('KF', u'مدينة الملك فهد الطبية'),
 )
+
+gender_choices = (
+    ('F', u'طالبات'),
+    ('M', u'طلاب'),
+)
+
 college_choices = (
     ('M', u'كلية الطب'),
     ('A', u'كلية العلوم الطبية التطبيقية'),
@@ -21,7 +25,7 @@ city_choices = (
     ('R', u'الرياض'),
     ('J', u'جدة'),
     ('A', u'الأحساء'),
-    )
+)
 
 class Club(models.Model):
     name = models.CharField(max_length=200, verbose_name=u"الاسم")
@@ -114,9 +118,12 @@ class College(models.Model):
     section = models.CharField(max_length=2, choices=section_choices, verbose_name=u"القسم")
     name = models.CharField(max_length=1, choices=college_choices, verbose_name=u"الاسم")
     city = models.CharField(max_length=1, choices=city_choices, verbose_name=u"المدينة")
+    gender = models.CharField(max_length=1, choices=gender_choices, verbose_name=u"الجنس")
 
     def __unicode__(self):
-        return u"%s (%s)" % (self.get_name_display(), self.get_section_display())
+        return u"%s (%s - %s)" % (self.get_name_display(),
+                                  self.get_section_display(),
+                                  self.get_gender_display())
 
     class Meta:
         # For the admin interface.

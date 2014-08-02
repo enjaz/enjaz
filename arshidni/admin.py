@@ -8,7 +8,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.admin.sites import AdminSite
 from django.core.exceptions import ObjectDoesNotExist
 
-from arshidni.models import Question, Answer, StudyGroup, LearningObjective, group_status_choices, ColleagueProfile, SupervisionRequest, GraduateProfile, supervision_request_status_choices
+from arshidni.models import Question, Answer, StudyGroup, LearningObjective, JoinStudyGroupRequest, group_status_choices, ColleagueProfile, SupervisionRequest, GraduateProfile, supervision_request_status_choices
 
 class ArshidniAuthenticationForm(admin.forms.AdminAuthenticationForm):
     """A custom authentication form used in the admin app.  Based on the
@@ -132,7 +132,7 @@ class GraduateProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'answers_questions', 'gives_lectures')
 
 class SupervisionRequestAdmin(admin.ModelAdmin):
-    list_display = ('get_user_full_name', 'batch', 'get_colleague_full_name', 'get_full_status', 'submission_date')
+    list_display = ('get_user_full_name', 'batch', 'get_colleague_full_name', 'status', 'submission_date')
     list_filter = [SupervisionRequestStatusFilter]
 
     def get_user_full_name(self, obj):
@@ -143,10 +143,16 @@ class SupervisionRequestAdmin(admin.ModelAdmin):
         return obj.colleague.user.student_profile.get_ar_full_name()
     get_colleague_full_name.short_description = u"اسم الزميل الطلابي"
 
+class JoinStudyGroupRequestAdmin(admin.ModelAdmin):
+    list_display = ('submitter', 'group', 'is_accepted', 'submission_date')
+
 arshidni_admin = ArshidniAdmin("Arshidni Admin")
 
 admin.site.register(StudyGroup, StudyGroupAdmin)
 arshidni_admin.register(StudyGroup, StudyGroupAdmin)
+
+admin.site.register(JoinStudyGroupRequest, JoinStudyGroupRequestAdmin)
+arshidni_admin.register(JoinStudyGroupRequest, JoinStudyGroupRequestAdmin)
 
 admin.site.register(Question, QuestionAdmin)
 arshidni_admin.register(Question, QuestionAdmin)

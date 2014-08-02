@@ -214,10 +214,6 @@ class JoinStudyGroupRequest(models.Model):
     submission_date = models.DateTimeField(u'تاريخ الإرسال',
                                            auto_now_add=True)
 
-    def get_full_status(self):
-        is_accepted_dict = dict(is_accepted_choices)
-        return is_accepted_dict[self.is_accepted]
-
     class Meta:
         verbose_name = u"طلب انضمام لمجموعة دراسية"
         verbose_name_plural = u"طلبات الانضمام لمجموعة دراسية"
@@ -263,11 +259,6 @@ class SupervisionRequest(models.Model):
                                            null=True,
                                            default=None)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
-
-    def get_full_status(self):
-        status_dict = dict(supervision_request_status_choices)
-        return status_dict[self.status]
-    get_full_status.short_description = u"الحالة"
 
     def __unicode__(self):
         return self.user.student_profile.get_en_full_name()

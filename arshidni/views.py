@@ -570,7 +570,7 @@ def group_action(request):
             raise Exception(u'سبق أن استجبت لهذا الطلب.')
         else:
             join_request.is_accepted = True
-            group.members.add(join_request.user)
+            group.members.add(join_request.submitter)
             join_request.save()
             group.save()
     elif action == 'reject':
@@ -578,14 +578,14 @@ def group_action(request):
             raise Exception(u'سبق أن استجبت لهذا الطلب.')
         else:
             join_request.is_accepted = False
-            group.members.remove(join_request.user)
+            group.members.remove(join_request.submitter)
             join_request.save()
             group.save()
     else:
         raise Exception(u'حدث خطأ غير معروف.')
 
     return  {'current_status': join_request.is_accepted,
-             'full_current_status': join_request.get_full_status()}
+             'full_current_status': join_request.get_is_accepted_display()}
 
 def search_groups(request):
     pass
@@ -831,7 +831,7 @@ def student_action(request):
         raise Exception(u'حدث خطأ غير معروف.')
 
     return  {'current_status': supervision_request.status,
-             'full_current_status': supervision_request.get_full_status()}
+             'full_current_status': supervision_request.get_status_display()}
 
 @login_required
 @csrf.csrf_exempt
@@ -878,7 +878,7 @@ def colleague_action(request):
         raise Exception(u'حدث خطأ غير معروف.')
 
     return  {'current_status': supervision_request.status,
-             'full_current_status': supervision_request.get_full_status(),
+             'full_current_status': supervision_request.get_status_display(),
              'contacts': supervision_request.contacts}
 
 # Acadmic activities

@@ -592,38 +592,7 @@ def list_colleagues(request):
     else:
         colleague_profiles = ColleagueProfile.objects.filter(is_available=True, is_published=True)
 
-    profile_filter = request.GET.get('filter')
-    if profile_filter == 'day':
-        one_day_ago = datetime.datetime.now() - datetime.timedelta(days=1)
-        filtered_colleague_profiles = colleague_profiles.filter(submission_date__gte=one_day_ago)
-    elif profile_filter == 'week':
-        one_week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
-        filtered_colleague_profiles = colleague_profiles.filter(submission_date__gte=one_week_ago)
-    elif profile_filter == 'motnh':
-        one_month_ago = datetime.datetime.now() - datetime.timedelta(days=30)
-        filtered_colleague_profiles = colleague_profiles.filter(submission_date__gte=one_month_ago)
-    else:
-        filtered_colleague_profiles = colleague_profiles
-
-    profile_order = request.GET.get('order')
-    #TODO: Find out more useful orders
-    if True:
-        ordered_colleague_profiles = filtered_colleague_profiles.order_by('-submission_date')
-
-    # Each page of results should have a maximum of 25 activities.
-    paginator = Paginator(ordered_colleague_profiles, 25)
-    page = request.GET.get('page')
-
-    try:
-        page_colleague_profiles = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        page_colleague_profiles = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        page_colleague_profiles = paginator.page(paginator.num_pages)
-
-    context = {'page_colleague_profiles': page_colleague_profiles}
+    context = {'page_colleague_profiles': colleague_profiles}
     return render(request, 'arshidni/colleague_list.html', context)
 
 @login_required

@@ -12,10 +12,10 @@ from django.views.decorators import csrf
 
 from core import decorators
 from arshidni.models import GraduateProfile, Question, Answer, StudyGroup, LearningObjective, JoinStudyGroupRequest, ColleagueProfile, SupervisionRequest
-from clubs.models import College, college_choices
+from clubs.models import College
 
 # Anything that should solely be done by the Arshidni coordinator
-# should be done by the arshidni coordinator.
+# should be done through the arshidni admin interface.
 
 # TODO:
 #  * Add college to college and graduate form pages.
@@ -198,11 +198,10 @@ def list_questions(request, college_name):
     upper_college_name = college_name.upper()
     # Make sure that there are actually colleges with that name (this
     # query makes things as dynamic as possible.)
-    get_list_or_404(College, name=upper_college_name)
+    college = get_list_or_404(College, name=upper_college_name)[0]
+    college_full_name = college.get_name_display()
 
     form = QuestionForm()
-    college_dict = dict(college_choices)
-    college_full_name = college_dict[upper_college_name]
 
     # If the user has the view_questions permission, show questions
     # that are pending-revision.

@@ -26,15 +26,15 @@ def create_groups(sender, **kwargs):
     view_participation = Permission.objects.get(codename='view_participation')
     add_club = Permission.objects.get(codename='add_club')
     change_club = Permission.objects.get(codename='change_club')
-    change_book = Permission.objects.get(codename='change_book')
-    delete_book = Permission.objects.get(codename='delete_book')
+    # change_book = Permission.objects.get(codename='change_book')
+    # delete_book = Permission.objects.get(codename='delete_book')
     view_presidency_review = Permission.objects.get(codename='view_presidency_review')
     add_presidency_review = Permission.objects.get(codename='add_presidency_review')
     presidency_group.permissions.add(add_activity,
                                      directly_add_activity,
                                      change_activity, view_activity,
                                      view_participation, add_club,
-                                     change_club, change_book,
+                                     change_club, #change_book,
                                      view_presidency_review,
                                      view_deanship_review,
                                      add_presidency_review)

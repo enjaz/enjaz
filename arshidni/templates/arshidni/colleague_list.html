@@ -1,4 +1,4 @@
-{% extends 'arshidni_base.html' %}
+{% extends 'arshidni_base.html' %}{% load staticfiles %}
 {% block title %}الزملاء الطلابيون{% endblock %}
 {% block navbar %}
 	<li><a href="{% url 'arshidni:list_colleagues' %}"><span class="entypo-users"></span> الزملاء الطلابيون</a></li>
@@ -12,14 +12,12 @@
  	{% endif %}
 {% endblock %}
 {% block content %}
-<div class="panel panel-default">
+<div class="panel panel-primary">
 	<div class="panel-heading">
 		<h3 class="panel-title">الزملاء الطلابيون</h3>
 	</div>
 	 <div class="panel-body">
-		{% if page_colleague_profiles %}
-
-		<table class="table table-hover">
+		<table id="colleague-table" class="table table-hover table-bordered datatable">
 			<thead>
 				<tr>
 					<th>الزميل</th>
@@ -41,24 +39,16 @@
 				{% endfor %}
 			</tbody>
 		</table>
-		{% else %}
-			<p>لا يوجد زملاء طلابيون.</p>
-		{% endif %}
-		<div style="text-align:center;">
-		    <span class="step-links">
-		        {% if page_colleague_profiles.has_previous %}
-		            <a href="?page={{ page_colleague_profiles.previous_page_number }}">السابق</a>
-		        {% endif %}
-
-        		<span class="current">
-		            الصفحة {{ page_colleague_profiles.number }} من {{ page_colleague_profiles.paginator.num_pages }}
-		        </span>
-
-        		{% if page_colleague_profiles.has_next %}
-		            <a href="?page={{ page_colleague_profiles.next_page_number }}">التالي</a>
-		        {% endif %}
-		    </span>
-		</div>
 	</div>
 </div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+<script>
+$(document).ready(function () {
+	$('#colleague-table').DataTable();
+});
+</script>
 {% endblock %}

@@ -1,4 +1,4 @@
-{% extends 'arshidni_base.html' %}
+{% extends 'arshidni_base.html' %}{% load staticfiles %}
 {% block title %}الزملاء الطلابيون{% endblock %}
 {% block navbar %}
 	<li><a href="{% url 'arshidni:list_colleagues' %}"><span class="entypo-users"></span> الزملاء الطلابيون</a></li>
@@ -7,13 +7,13 @@
  	{% endif %}
 {% endblock %}
 {% block content %}
-<div class="panel panel-default">
+<div class="panel panel-primary">
 	<div class="panel-heading">
 		<h3 class="panel-title">طلبات الزمالة الطلابية</h3>
 	</div>
 	 <div class="panel-body">
 	{% if user.colleague_profile %}
-		<table class="table table-hover">
+		<table id="request-table" class="table table-bordered datatable">
 			<thead>
 				<tr>
 					<th>الاسم</th>
@@ -39,22 +39,6 @@
 				{% endfor %}
 			</tbody>
 		</table>
-
-		<div style="text-align:center;">
-		    <span class="step-links">
-		        {% if page_requests.has_previous %}
-		            <a href="?page={{ page_requests.previous_page_number }}">السابق</a>
-		        {% endif %}
-
-        		<span class="current">
-		            الصفحة {{ page_requests.number }} من {{ page_requests.paginator.num_pages }}
-		        </span>
-
-        		{% if page_requests.has_next %}
-		            <a href="?page={{ page_requests.next_page_number }}">التالي</a>
-		        {% endif %}
-		    </span>
-		</div>
 	{% else %}
 		<p>لا توجد أي طلبات لأنك لست زميلا طلابيا. <a href="{% url 'arshidni:register_colleague_profile' %}">كن زميلا طلابيا الآن</a>.</p>
 	{% endif %}
@@ -94,5 +78,14 @@ $(function() {
     });
 });
 </script>
+{% endblock %}
 
+{% block customscript %}
+<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+<script>
+$(document).ready(function () {
+	$('#request-table').DataTable();
+});
+</script>
 {% endblock %}

@@ -105,33 +105,7 @@ def list_books(request):
 
         books = available_books | user_books
 
-    filter_by = request.GET.get('filter')
-    if filter_by == 'mine':
-        if request.user.is_authenticated():
-            books = books.filter(submitter=request.user)
-    elif filter_by == "available":
-        books = books.filter(status='A')
-
-    order = request.GET.get('order')
-    if order == 'status':
-        sorted_books = books.order_by('-status')
-    else:
-        sorted_books = books.order_by('-submission_date')
-
-    #Each page of results should have a maximum of 25 activities.
-    paginator = Paginator(sorted_books, 25)
-    page = request.GET.get('page')
-
-    try:
-        page_books = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        page_books = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        page_books = paginator.page(paginator.num_pages)
-
-    context = {'template': template, 'page_books': page_books}
+    context = {'template': template, 'page_books': books}
     return render(request, 'books/list.html', context)
 
 @login_required
@@ -471,6 +445,7 @@ def withdraw(request, book_id):
 
     return render(request, 'books/withdraw.html', context)
 
+# TODO: remove this view and the associated url since searching is now done by datatables
 #@login_required
 def search(request):
     if request.user.is_authenticated():

@@ -37,6 +37,7 @@ Current dependencies:
 * django-templated-email
 * django-userena
 * pdfcrowd
+* post_office _(with the cronjob)_
 * requests
 * unicodecsv
 
@@ -57,7 +58,7 @@ from core.views import visit_announcement
     url(r'^books/', include('books.urls', namespace="books")),
     url(r'^niqati/', include('niqati.urls', namespace="niqati")),
     url(r'^voice/', include('studentvoice.urls', namespace="studentvoice")),
-    url(r'^arshidni/admin/', include(arshidni_admin.urls)),
+    url(r'^arshidni/admin/', include(arshidni_admin.urls, namespace="arshidni_admin")),
     url(r'^arshidni/', include('arshidni.urls', namespace="arshidni")),
     url(r'^media/', include('media.urls', namespace="media")),
     url(r'^accounts/signup/$', 'userena.views.signup', {'signup_form': StudentSignupForm, 'template_name': 'userena/student_signup_form.html'}),
@@ -70,9 +71,11 @@ from core.views import visit_announcement
 
 Current required settings:
 * DEFAULT_FROM_EMAIL: The default _noreply_ email.
-* GOOGLE_BOOKS_KEY: to be generated from https://code.google.com/apis/console/
 * MEDIA_ROOT: Where do you want to save the covers on the server?
 * MEDIA_URL: Where do you want users to access the covers?
+* GOOGLE_BOOKS_KEY: to be generated from https://code.google.com/apis/console/
+* `FVP_USERNAME = 'username'` for the female vice president.
+* `MVP_USERNAME = 'username'` for the male vice president.
 * `AUTH_PROFILE_MODULE = 'accounts.EnjazProfile'`
 * `USERENA_WITHOUT_USERNAMES = True`
 * Add `"django.core.context_processors.request"` to the [default TEMPLATE_CONTEXT_PROCESSORS](https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATE_CONTEXT_PROCESSORS)

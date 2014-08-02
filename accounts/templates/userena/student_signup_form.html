@@ -166,6 +166,23 @@
 				</div>
 			</div>
 			<div class="form-group">
+				<div class="input-group{% if form.gender.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-docs"></i>
+					</div>
+					<select {% if form.gender.value and not form.gender.errors %}value="{{ form.gender.value }}" {% endif %}class="form-control" id="gender" name="gender"  title="{{ form.gender.label }}" required="required">
+                                                <option value="">{{ form.gender.label }}</option>
+                                                {% for value, label in form.fields.gender.widget.choices %}
+                                                <option {% if form.gender.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
+					</select>
+					{% if form.gender.errors %}
+					    {% for error in form.gender.errors %}
+					        <label class='error' for='gender' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
 				<div class="input-group{% if form.password1.errors or form.password2.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-key"></i>

@@ -29,7 +29,7 @@
 					<td><a href="{% url 'arshidni:show_colleague_profile' r.colleague.pk %}">{{ r.colleague.user.student_profile.get_ar_full_name }}</a></td>
 					<td>{% if r.status == 'A' or r.status == 'WN' %}{{ colleague_profile.contacts }}{% else %}-{% endif %}</td>
 					<td>{{ r.submission_date|date:"j F Y" }}</td>
-					<td id="status-{{ r.pk }}">{{ r.get_full_status }}</td>
+					<td id="status-{{ r.pk }}">{{ r.get_status_display }}</td>
 					<td id="actions-{{ r.pk }}">{% if r.status == 'P' or r.status == 'A' %}<i title="اسحب" data-id="{{ r.pk }}" class="delete-request glyphicon glyphicon-remove"></i>{% else %}-{% endif %}</td>
 				</tr>
 				{% endfor %}

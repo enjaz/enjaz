@@ -5,7 +5,7 @@
 <h2 class="english-field">{{ book.title }}</h2>
 
 <div class="col-md-3">
-{% if user == book.submitter or not previous_requests and user_gender == submitter_gender and book.status == 'A' %}
+{% if user == book.submitter or not previous_requests and book.status == 'A' %}
 	<div class="panel panel-primary" data-collapsed="0">
 		<!-- panel head -->
 		<div class="panel-heading">
@@ -23,6 +23,8 @@
 				{% if book.status == 'A' or book.status == 'H' %}
 				<li><a href="{% url 'books:withdraw' book.pk %}"><span class="glyphicon glyphicon-remove"></span> اسحب</a></li>
 				{% endif %}
+			{% elif user_gender != submitter_gender %}
+				<p>هذا الكتاب متوفر {% if book.available_to == 'F' %} للطالبات{% else %} للطلاب{% endif %} فقط.</p>
 			{% endif %}
 			</ul></p>
 		</div>

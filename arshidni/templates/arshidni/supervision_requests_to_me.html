@@ -33,7 +33,7 @@
 					<td>{{ r.batch }}</td>
 					<td id="contacts-{{ r.pk }}">{% if r.status == 'A' or r.status == 'WC' %}{{ r.contacts }}{% else %}-{% endif %}</td>
 					<td>{{ r.submission_date|date:"j F Y" }}</td>
-					<td id="status-{{ r.pk }}">{{ r.get_full_status }}</td>
+					<td id="status-{{ r.pk }}">{{ r.get_status_display }}</td>
 					<td id="actions-{{ r.pk }}">{% if r.status == 'P' %}<i title="اقبل" data-id="{{ r.pk }}" data-action="accept" class="accept-request glyphicon glyphicon-ok"></i>{% endif %} {% if r.status == 'P' or r.status == 'A' %}<i title="ارفض" data-id="{{ r.pk }}" data-action="reject" class="delete-request glyphicon glyphicon-remove"></i>{% endif %}{% if r.status == 'WN' or r.status == 'WC' or r.status == 'R' %}-{% endif %}</td>
 				</tr>
 				{% endfor %}

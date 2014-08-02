@@ -17,8 +17,8 @@ from django.core.files.base import ContentFile
 
 from taggit.models import Tag
 from books.models import Book, BookRequest
+from accounts.models import get_gender
 from templated_email import send_templated_mail
-
 
 class BookForm(ModelForm):
     def clean(self):
@@ -66,18 +66,6 @@ class BookRequestForm(ModelForm):
     class Meta:
         model = BookRequest
         fields = ['borrow_from', 'borrow_until']
-
-def get_gender(user):
-    try:
-        section = user.enjaz_profile.college.section
-    except (ObjectDoesNotExist, AttributeError):
-        # If the user was auto-generated, it will raise this
-        # error.  Let's assume the user is male.
-        return 'M'
-    if section in [u'M', u'KM']:
-        return 'M'
-    elif section in [u'F', u'KF']:
-        return 'F'
 
 # @login_required
 def list_books(request):
@@ -135,7 +123,6 @@ def show(request, book_id):
 
     if request.user.is_authenticated():
         context['user_gender'] = get_gender(request.user)
-
     context['submitter_gender'] = get_gender(book.submitter)
 
     return render(request, 'books/show.html', context)
@@ -222,8 +209,8 @@ def contribute(request):
                               {'errors': errors})
 
     elif request.method == 'POST' and 'is_submit' in request.POST:
-        avaliable_to = get_gender(request.user)            
-        book = Book(submitter=request.user, avaliable_to=avaliable_to)
+        available_to = get_gender(request.user)            
+        book = Book(submitter=request.user, available_to=available_to)
         form = BookForm(request.POST, instance=book)
 
         if form.is_valid():
@@ -248,9 +235,8 @@ def contribute(request):
         return render(request, 'books/submit_isbn.html')
 
 @login_required
+@permission_required('books.add_bookrequest', raise_exception=True)
 def borrow(request, book_id):
-    if not request.user.has_perm('books.add_bookrequest'):
-        raise PermissionDenied
     book = get_object_or_404(Book, pk=book_id)
     today = datetime.date.today()
     context = {'book': book}
@@ -269,7 +255,7 @@ def borrow(request, book_id):
                         'book_request': book_request,
                         'review_url': review_url,
                         })
-            return HttpResponseRedirect(reverse('books:show', args=(book.pk,)))
+            return HttpResponseRedirect(reverse('books:my_requests'))
         else:
             context['form'] = form
             return render(request, 'books/borrow.html', context)
@@ -295,6 +281,8 @@ def borrow(request, book_id):
             context['error'] = 'expired'
         elif today < book.available_from:
             context['error'] = 'not_yet'
+        elif book.available_to != get_gender(request.user):
+            context['error'] = 'gender'
 
         # If the more serious errors arenot present, we can check for
         # warnings and prepare the form:

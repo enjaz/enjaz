@@ -12,10 +12,11 @@ from django.views.decorators import csrf
 
 from core import decorators
 from arshidni.models import GraduateProfile, Question, Answer, StudyGroup, LearningObjective, JoinStudyGroupRequest, ColleagueProfile, SupervisionRequest
-from clubs.models import College, college_choices
+from clubs.models import College
+from accounts.models import get_gender
 
 # Anything that should solely be done by the Arshidni coordinator
-# should be done by the arshidni coordinator.
+# should be done through the arshidni admin interface.
 
 # TODO:
 #  * Add college to college and graduate form pages.
@@ -198,11 +199,10 @@ def list_questions(request, college_name):
     upper_college_name = college_name.upper()
     # Make sure that there are actually colleges with that name (this
     # query makes things as dynamic as possible.)
-    get_list_or_404(College, name=upper_college_name)
+    college = get_list_or_404(College, name=upper_college_name)[0]
+    college_full_name = college.get_name_display()
 
     form = QuestionForm()
-    college_dict = dict(college_choices)
-    college_full_name = college_dict[upper_college_name]
 
     # If the user has the view_questions permission, show questions
     # that are pending-revision.
@@ -414,6 +414,15 @@ def join_group(request):
     group_id = request.POST.get('group_id')
     group = get_object_or_404(StudyGroup, pk=group_id)
 
+    user_gender = get_gender(request.user)
+    coordinator_gender = get_gender(group.coordinator)
+
+    if user_gender != coordinator_gender:
+        if coordinator_gender == 'F':
+            raise Exception(u'المجموعة متاحة للطالبات فقط')
+        elif coordinator_gender == 'M':
+            raise Exception(u'المجموعة متاحة للطلاب فقط')
+
     if not group.max_members > group.members.count():
         raise Exception(u'المجموعة تجاوزت العدد الأقصى')
 
@@ -528,7 +537,7 @@ def group_action(request):
             raise Exception(u'سبق أن استجبت لهذا الطلب.')
         else:
             join_request.is_accepted = True
-            group.members.add(join_request.user)
+            group.members.add(join_request.submitter)
             join_request.save()
             group.save()
     elif action == 'reject':
@@ -536,14 +545,14 @@ def group_action(request):
             raise Exception(u'سبق أن استجبت لهذا الطلب.')
         else:
             join_request.is_accepted = False
-            group.members.remove(join_request.user)
+            group.members.remove(join_request.submitter)
             join_request.save()
             group.save()
     else:
         raise Exception(u'حدث خطأ غير معروف.')
 
     return  {'current_status': join_request.is_accepted,
-             'full_current_status': join_request.get_full_status()}
+             'full_current_status': join_request.get_is_accepted_display()}
 
 def search_groups(request):
     pass
@@ -569,6 +578,7 @@ def submit_supervision_request(request, colleague_profile_id):
     colleague_profile = get_object_or_404(ColleagueProfile,
                                           pk=colleague_profile_id,
                                           is_published=True)
+    context = {'colleague_profile': colleague_profile}
     if request.method == 'POST':
         request_object = SupervisionRequest(user=request.user,
                                             colleague=colleague_profile)
@@ -578,7 +588,7 @@ def submit_supervision_request(request, colleague_profile_id):
             after_url = reverse('arshidni:my_supervision_requests') + '#request-' + str(new_request.pk)
             return HttpResponseRedirect(after_url)
         else:
-            context = {'form': form}
+            context['form'] = form
     elif request.method == 'GET':
         # Check if the user has any pending or accepted supervision
         # requests
@@ -590,12 +600,14 @@ def submit_supervision_request(request, colleague_profile_id):
             colleague=colleague_profile, status='A')
 
         if current_student_requests:
-            context = {'error': 'current_student_requests'}
+            context['error'] = 'current_student_requests'
         elif current_colleague_requests:
-            context = {'error': 'current_colleague_requests'}
+            context['error'] = 'current_colleague_requests'
+        elif get_gender(request.user) != get_gender(colleague_profile.user):
+            context['error'] = 'gender'
         else:
             form = SupervisionRequestForm()
-            context = {'form': form, 'colleague_profile': colleague_profile}
+            context['form'] = form
 
     return render(request, 'arshidni/colleague_choose.html', context)
 
@@ -731,7 +743,7 @@ def student_action(request):
         raise Exception(u'حدث خطأ غير معروف.')
 
     return  {'current_status': supervision_request.status,
-             'full_current_status': supervision_request.get_full_status()}
+             'full_current_status': supervision_request.get_status_display()}
 
 @login_required
 @csrf.csrf_exempt
@@ -778,7 +790,7 @@ def colleague_action(request):
         raise Exception(u'حدث خطأ غير معروف.')
 
     return  {'current_status': supervision_request.status,
-             'full_current_status': supervision_request.get_full_status(),
+             'full_current_status': supervision_request.get_status_display(),
              'contacts': supervision_request.contacts}
 
 # Acadmic activities

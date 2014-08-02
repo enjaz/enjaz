@@ -39,8 +39,8 @@ class Book(models.Model):
         ('M', u'الطلاب'),
         ('F', u'الطالبات'),
         )
-    avaliable_to = models.CharField(max_length=1, verbose_name=u"متاح لقسم",
-                              choices=availability_choices)
+    available_to = models.CharField(max_length=1, verbose_name=u"متاح لقسم",
+                                    choices=availability_choices)
     submitter = models.ForeignKey(User, null=True,
                                   on_delete=models.SET_NULL,
                                   related_name='book_contributions')

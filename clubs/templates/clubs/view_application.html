@@ -1,34 +1,68 @@
-{% extends "clubs_base.html" %}
+{% extends "clubs_base.html" %}{% load staticfiles %}
 {% block title %}مشاهدة طلبات الانضمام إلى {{ club.name }}{% endblock %}
 
 {% block content %}
 <h2>طلبات الانضمام إلى <a href="{% url 'clubs:show' club.pk %}">{{ club.name }}</a></h2>
 
-{% if applications %}
-
-<div class="col-md-3">
-	<div class="panel panel-primary" data-collapsed="0">
-		<!-- panel head -->
-		<div class="panel-heading">
-			<div class="panel-title">خيارات</div>
-		</div>
-		
-		<!-- panel body -->
-		<div class="panel-body">
-			<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:download_application' club.pk %}"><span class="glyphicon glyphicon-download"></span> نزّل الطلبات</a>.</il></ul></p>
-		</div>
-	</div>
-</div>
-<div class="col-md-9">
-<ul>
-{% for application in applications %}
-<li>{% if application.user.first_name %}{{ application.user.first_name }} {{ application.user.last_name }}{% else %}{{ application.user.username }}{% endif %} - {{ application.note }} - {{ application.submission_date }}
-</li>
-{% endfor %}
-</ul>
-</div>
-{% else %}
-<p>لا توجد أية طلبات.</p>
-{% endif %}
+<table id="application_table" class="table table-bordered datatable">
+    <thead>
+        <th>الاسم</th>
+        <th>الاسم الإنجليزي</th>
+        <th>الكلية</th>
+        <th>الرقم الجامعي</th>
+        <th>رقم البطاقة الجامعية</th>
+        <th>البريد الإلكتروني</th>
+        <th>رقم الجوال</th>
+        <th>تاريخ الطلب</th>
+        <th>الخيارات</th>
+    </thead>
+    <tbody>
+        {% for app in applications %}
+        <tr>
+            <td>{% if app.user.student_profile %}{{ app.user.student_profile.get_ar_full_name }}{% else %}{{ app.user.username }}{% endif %}</td>
+            <td>{% if app.user.student_profile %}{{ app.user.student_profile.get_en_full_name }}{% else %}{{ app.user.username }}{% endif %}</td>
+            <td>{{ app.user.student_profile.college }}</td>
+            <td>{{ app.user.student_profile.student_id }}</td>
+            <td>{{ app.user.student_profile.badge_number }}</td>
+            <td>{{ app.user.email }}</td>
+            <td>{{ app.user.student_profile.mobile_number }}</td>
+            <td>{{ app.submission_date|date:"j F Y" }}</td>
+            <!--TODO: Add registration note field (as drawer) -->
+            <td>
+                <div class="btn-group-vertical">
+                    <button class="btn btn-success btn-xs">اقبل</button>
+                    <button class="btn btn-default btn-xs">تجاهل</button>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
 
+{% block customscript %}
+<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+<script src="{% static 'neon/assets/js/datatables/TableTools.min.js' %}"></script>
+<script>
+$(document).ready(function () {
+	$('#application_table').DataTable({
+		"sDom": "<'row'<'col-xs-6 col-left'l><'col-xs-6 col-right'<'export-data btn-group'T>f>r>t<'row'<'col-xs-6 col-left'i><'col-xs-6 col-right'p>>",
+		"oTableTools": {
+		    "sSwfPath": "{% static 'neon/assets/js/datatables/copy_csv_xls_pdf.swf' %}",
+		    "aButtons": [
+                {
+                    "sExtends":     "print",
+                    "sButtonClass": "btn btn-default btn-xs"
+                },
+                {
+                    "sExtends":     "xls",
+                    "sButtonText":  "Download",
+                    "sButtonClass": "btn btn-white btn-xs"
+                }
+            ]
+		}
+	});
+});
+</script>
+{% endblock %}

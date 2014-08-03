@@ -1,0 +1,93 @@
+{% extends 'activities_base.html' %}{% load staticfiles %}
+{% block title %}الأنشطة{% endblock %}
+
+{% block content %}
+
+
+<div class="row">
+
+<table id="activities" class="table table-bordered datatable">
+    <thead>
+        <th>الاسم</th>
+        <th>النادي المنظم</th>
+        <th>تاريخ الانعقاد</th>
+    </thead>
+    <tbody>
+    {% for activity in page_activities %}
+    <tr>
+        <td><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}</a></td>
+        <td><a href="{% url 'clubs:show' activity.primary_club.id %}">{{ activity.primary_club.name }}</a></td>
+        <td>{{ activity.get_first_date|date:"j F" }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+
+<style>
+	.calendar-env .calendar-body {
+		width: 100%;
+	}
+</style>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="calendar-env" dir="ltr"> {# It's problematic in rtl #}
+			<!-- Calendar Body -->
+			<div class="calendar-body">
+				<div id="calendar"></div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+
+
+</div>
+
+{% endblock %}
+{% block customscript %}
+	<script src="{% static 'neon/assets/js/fullcalendar/fullcalendar.min.js' %}"></script>
+    <script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+	<script>
+    var activities = [
+		{% for activity in page_activities %}
+			{% for episode in activity.episode_set.all %}
+				{
+					title : '{{ activity.name }}',
+					start : '{{ episode.start_datetime.isoformat }}',
+					end   : '{{ episode.end_datetime.isoformat }}',
+					{% if not episode.is_single_day %}
+					allDay: true,
+					{% else %}
+					allDay: false,
+					{% endif %}
+					url   : '{{ activity.id }}/'
+				}{% if page_activities|length > forloop.counter %},{% endif %}
+			{% endfor %}
+		{% endfor %}
+	];
+	var calendar = $('#calendar');
+    calendar.fullCalendar({
+        header: {
+            left: 'title',
+            right: 'month,agendaWeek,agendaDay today prev,next'
+        },
+
+        //defaultView: 'basicWeek',
+
+        editable: false,
+        firstDay: 7,
+        height: 600,
+        droppable: false,
+        allDayDefault: false,
+        events: activities
+    });
+
+    var table = $('#activities');
+    table.DataTable();
+	</script>
+{% endblock %}
+

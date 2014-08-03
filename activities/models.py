@@ -11,7 +11,7 @@ class Activity(models.Model):
     # be considered the primary orginzier.  Others will be cosidered
     # secondary.
     #clubs = models.ManyToManyField('clubs.Club',
-    #                               verbose_name=u"النوادي")
+    #                               verbose_name=u"الأندية")
     primary_club = models.ForeignKey('clubs.Club', null=True,
                                      on_delete=models.SET_NULL,
                                      related_name='primary_activity',
@@ -54,10 +54,7 @@ class Activity(models.Model):
     def is_approved_by_deanship(self):
         try:
             d_review = self.review_set.get(review_type='D')
-            if d_review.is_approved:
-                return True
-            else:
-                return False
+            return d_review.is_approved
         except (KeyError, Review.DoesNotExist): # deanship review does not exist
             return None
     is_approved_by_deanship.boolean = True
@@ -66,11 +63,8 @@ class Activity(models.Model):
     def is_approved_by_presidency(self):
         try:
             p_review = self.review_set.get(review_type='P')
-            if p_review.is_approved:
-                return True
-            else:
-                return False
-        except (KeyError, Review.DoesNotExist): # deanship review does not exist
+            return p_review.is_approved
+        except (KeyError, Review.DoesNotExist): # presidency review does not exist
             return None
     is_approved_by_presidency.boolean = True
     is_approved_by_presidency.short_description = u"اعتمدته الرئاسة؟"
@@ -99,14 +93,32 @@ class Activity(models.Model):
         Return the first scheduled episode for this activity.
         *** This should replace the three above-mentioned methods. ***
         """
-        pass
+        pass # TODO: implement get_first_episode
     
     def get_next_episode(self):
         """
         Return the next scheduled episode for this activity.
         """
-        pass
-    
+        pass # TODO: implement get_next_episode
+
+    # Evaluation-related
+    def get_relevance_score_average(self):
+        """
+        Return the average evaluation score for relevance to student needs.
+        """
+        relevance_scores = [e.relevance for e in self.evaluation_set.all()]
+        return float(sum(relevance_scores))/len(relevance_scores) if len(relevance_scores) > 0 else 0
+        # NOTE: the conditional is to avoid division by zero
+    get_relevance_score_average.short_description = u"معدل تقييم ملاءمة النشاط"
+
+    def get_quality_score_average(self):
+        """
+        Return the average evaluation score for quality of the activity.
+        """
+        quality_scores = [e.quality for e in self.evaluation_set.all()]
+        return float(sum(quality_scores))/len(quality_scores) if len(quality_scores) > 0 else 0
+    get_quality_score_average.short_description = u"معدل تقييم جودة النشاط"
+
     class Meta:
         permissions = (
             ("view_activity", "Can view all available activities."),

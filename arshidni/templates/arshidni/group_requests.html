@@ -26,7 +26,7 @@
 					<td>{{ r.submitter.student_profile.get_ar_full_name|default:r.submitter.username }}</td>
 					<td>{{ r.submission_date|date:"j F Y" }}</td>
 					<td>{{ r.submitter.email }}</td>
-					<td id="status-{{ r.pk }}">{{ r.get_full_status }}</td>
+					<td id="status-{{ r.pk }}">{{ r.get_status_display }}</td>
 					<td id="actions-{{ r.pk }}">{% if r.is_accepted == None %}<i title="اقبل" data-id="{{ r.pk }}" data-action="accept" class="accept-request glyphicon glyphicon-ok"></i> <i title="ارفض" data-id="{{ r.pk }}" data-action="reject" class="delete-request glyphicon glyphicon-remove"></i>{% else %}-{% endif %}</td>
 				</tr>
 				{% endfor %}

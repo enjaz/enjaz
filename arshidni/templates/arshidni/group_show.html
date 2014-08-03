@@ -7,7 +7,7 @@
 		<li><a href="{% url 'arshidni:join_group_requests' group.pk %}"><span class="glyphicon glyphicon-list"></span> طلبات الانضمام</a></li>
 
 	{% elif perms.arshidni.add_studygroup %}
-		<li><a href="{% url 'arshidni:submit_group' %}"> أنشئ مجموعة</a></li>
+		<li><a href="{% url 'arshidni:submit_group' %}"><span class="glyphicon glyphicon-plus"></span> أنشئ مجموعة</a></li>
 	{% endif %}
 {% endblock %}
 {% block content %}

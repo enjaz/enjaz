@@ -20,7 +20,7 @@ $( "#id_borrow_until" ).datepicker({
 </script>
 
 <h2>استعارة {{ book.title }}</h2>
-{% if error %}<p><strong>
+{% if error %}<p class="alert alert-warning">
 {% if error == 'not_available' %}
 {% if book.status == 'H' %}
 الكتاب محجوز.
@@ -37,9 +37,10 @@ $( "#id_borrow_until" ).datepicker({
 لم يعد الكتاب متوفرا.
 {% elif error == 'not_yet' %}
 لم يتوفر الكتاب للإعارة بعد.
-{% elif error == '' %}
+{% elif error == 'gender' %}
+هذا الكتاب متوفر {% if book.available_to == 'F' %} للطالبات{% else %} للطلاب{% endif %} فقط.
 {% endif %}
-</strong></p>
+</p>
 {% else %}
 {% if warning %}
 <p><em>تحذير: ثمة طلبات معلقة.</em></p>

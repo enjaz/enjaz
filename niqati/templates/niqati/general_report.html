@@ -21,7 +21,7 @@
     {% for user in users %}
         <tr>
             <td>{{ forloop.counter }}</td>
-            <td>{{ user }} {{ user.get_profile.last_name }}</td>
+            <td>{{ user.student_profile.get_ar_full_name|default:user }}</td>
             <td>{{ user.total_points }}</td>
         </tr>
     {% endfor %}

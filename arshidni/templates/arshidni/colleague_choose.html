@@ -22,6 +22,8 @@
 			لديك طلبات معلقة أو زمالة مقبولة.  <a href="{% url 'arshidni:my_supervision_requests' %}">ألغِ تلك الطلبات والزمالات أولا</a>!
 		{% elif error == 'current_colleague_requests' %}
 			لدى الزميل الطلابي زمالات سابقة!
+		{% elif error == 'gender' %}
+			يمكن {% if colleague_profile.user.student_profile.college.gender == 'F' %}للطالبات{% else %}للطلاب{% endif %} فقط أن يطلبوا من {{ colleague_profile.user.student_profile.ar_first_name }} الزمالة.
 		{% endif %}
 		</p>
 	{% else %}

@@ -30,7 +30,7 @@ def list(request):
     """
     # TODO: Revisit this view in terms of what appears for different groups (permissions) (See specification above)
     if request.user.is_authenticated():
-        template = 'activities/list_normal.html'
+        template = 'activities/list_privileged.html'
     else:
         template = 'activities/front/list.html'
 

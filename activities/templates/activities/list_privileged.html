@@ -43,9 +43,13 @@
         {% elif activity.review_set.all|length_is:"1" %}
             {% if activity.review_set.all.0.review_type == 'P' %}
                 {% if activity.review_set.all.0.is_approved == None %}
+            <a href="{% url 'activities:review' activity.pk %}">
                 ينتظر تعديلا
+            </a>
                 {% elif activity.review_set.all.0.is_approved == True %}
+            <a href="{% url 'activities:review_with_type' activity.pk 'd' %}">
                 ينتظر مراجعة العمادة
+            </a>
                 {% elif activity.review_set.all.0.is_approved == False %}
                 رفضته الرئاسة
                 {% endif %}
@@ -57,7 +61,9 @@
         {% elif activity.review_set.all|length_is:"2" %}
             {% if activity.review_set.all.1.review_type == 'D' %}
                 {% if activity.review_set.all.1.is_approved == None %}
+            <a href="{% url 'activities:review' activity.pk %}">
                 ينتظر تعديلا
+            </a>
                 {% elif activity.review_set.all.1.is_approved == True %}
                 اعتمده العمادة
                 {% elif activity.review_set.all.1.is_approved == False %}

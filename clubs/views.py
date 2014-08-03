@@ -1,14 +1,20 @@
 # -*- coding: utf-8  -*-
-import unicodecsv
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core.exceptions import PermissionDenied
 
+from post_office import mail
+import unicodecsv
+
 from clubs.forms import MembershipForm, DisabledClubForm, ClubForm
 from clubs.models import Club, MembershipApplication
 
+# TODO:
+#   * After applying  the data  table with  the new  membership action
+#     buttons,  create a  message to  inform the  user about  whatever
+#     action was taken regarding their membership. [Osama, Aug 2]
 
 @login_required
 def list(request):
@@ -115,6 +121,13 @@ def join(request, club_id):
         form = MembershipForm(request.POST, instance=application)
         if form.is_valid():
             form.save()
+            view_application_url = reverse('clubs:view_application', args=(club_id,))
+            full_url = request.build_absolute_uri(view_application_url)
+            email_context = {'club': club, 'user': request.user,
+                             'full_url': full_url}
+            mail.send([club.coordinator.email],
+                      template="club_membership_applied",
+                      context=email_context)
             return HttpResponseRedirect(reverse('clubs:join_done',
                                                 args=(club_id,)))
         else:

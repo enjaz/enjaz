@@ -2,17 +2,20 @@
 # TODO: replace presidency with get_presidency utility function
 # TODO: revise permissions (attach to club coordination and membership rather than django
 # permissions - that's for normal users and club members and coordinators)
-import unicodecsv
-
 from django.contrib.auth.decorators import permission_required, login_required
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
+from post_office import mail
+import unicodecsv
+
 from activities.models import Activity, Review, Participation, Episode
 from activities.forms import ActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm
+from accounts.models import get_gender
 from clubs.models import Club
+from core.utilities import FVP_EMAIL, MVP_EMAIL, DHA_EMAIL
 
 def list(request):
     """
@@ -160,11 +163,26 @@ def create(request):
         if form.is_valid():
             form_object = form.save()
             # If the chosen primary_club is the Presidency, make it
-            # automatically approved by the deanship.
+            # automatically approved by the deanship.  Otherwise,
+            # email the vice president.
             if form_object.primary_club == presidency:
                 review_object = Review.objects.create(
                     activity=form_object, reviewer=request.user,
                     is_approved=True, review_type='D')
+            else:
+                show_activity_url = reverse('activities:show', args=(form_object.pk,))
+                full_url = request.build_absolute_uri(show_activity_url)
+                submitter_gender = get_gender(request.user)
+                email_context = {'activity': form_object, 'full_url':
+                           full_url}
+                if submitter_gender == 'M':
+                    mail.send([MVP_EMAIL],
+                              template="activity_submitted",
+                              context=email_context)
+                else:
+                    mail.send([FVP_EMAIL],
+                              template="activity_submitted",
+                              context=email_context)
             return HttpResponseRedirect(reverse('activities:list'))
         else:
             context = {'form': form}
@@ -254,11 +272,11 @@ def edit(request, activity_id):
         return render(request, 'activities/new.html', context)
 
 @login_required
-def review(request, activity_id, type=None):
+def review(request, activity_id, lower_reivew_type=None):
     activity = get_object_or_404(Activity, pk=activity_id)
     is_coordinator = activity.primary_club in request.user.coordination.all()
 
-    if type == None:
+    if lower_reivew_type == None:
         # If the user has any permission (read or write) related to
         # the deanship review, redirect to review/d/. Otherwise, if
         # the user has any permission (read or write) related to the
@@ -275,9 +293,8 @@ def review(request, activity_id, type=None):
                                                 args=(activity_id, 'p')))
         else:
             raise PermissionDenied
-        
-    elif type == 'p' or type == 'd':
-        review_type = type.upper()
+    elif lower_reivew_type in ['d', 'p']:
+        review_type = lower_reivew_type.upper()
     else:
         raise Http404
     
@@ -299,9 +316,46 @@ def review(request, activity_id, type=None):
         review = ReviewForm(request.POST, instance=review_object)
         if review.is_valid():
             review.save()
+            deanship_review_url = reverse('activities:review_with_type', args=(activity_id, 'd'))
+            deanship_full_url =  request.build_absolute_uri(deanship_review_url)
+            presidency_review_url = reverse('activities:review_with_type', args=(activity_id, 'p'))
+            presidency_full_url =  request.build_absolute_uri(presidency_review_url)
+            activity_url = reverse('activities:show', args=(activity_id,))
+            activity_full_url = request.build_absolute_uri(activity_url)
+            email_context = {'activity': activity}
             if review.cleaned_data['is_approved']:
                 activity.is_editable = False
                 activity.save()
+                if review_type == 'P':
+                    email_context['full_url'] = presidency_full_url
+                    mail.send([DHA_EMAIL],
+                              template="activity_presidency_approved",
+                              context=email_context)
+                elif review_type == 'D':
+                    email_context['full_url'] = activity_full_url
+                    mail.send([activity.primary_club.coordinator.email],
+                              template="activity_deanship_approved",
+                              context=email_context)
+                    # FIXME: When we launch the website, not all clubs
+                    # will have employees assigned.  This check is to
+                    # be remvoed later.
+                    if activity.primary_club.employee:
+                        email_context['full_url'] = deanship_full_url
+                        mail.send([activity.primary_club.employee.email],
+                                  template="activity_approved_employee",
+                                  context=email_context)
+            elif review.cleaned_data['is_approved'] == False:
+                # if the activity is rejected.
+                if review_type == 'P':
+                    email_context['full_url'] = presidency_full_url
+                    mail.send([activity.primary_club.coordinator.email],
+                              template="activity_presidency_rejected",
+                              context=email_context)
+                elif review_type == 'D':
+                    email_context['full_url'] = deanship_full_url
+                    mail.send([activity.primary_club.coordinator.email],
+                              template="activity_deanship_rejected",
+                              context=email_context)
             return HttpResponseRedirect(reverse('activities:show',
                                                 args=(activity_id,)))
         # TODO: if not valid, show the error messages.

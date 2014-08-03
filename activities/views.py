@@ -356,8 +356,7 @@ def review(request, activity_id, lower_reivew_type=None):
                     mail.send([activity.primary_club.coordinator.email],
                               template="activity_deanship_rejected",
                               context=email_context)
-            return HttpResponseRedirect(reverse('activities:show',
-                                                args=(activity_id,)))
+            return HttpResponseRedirect(reverse('activities:list'))
         # TODO: if not valid, show the error messages.
     else: # if not POST
         # If the user has the permission to add a review of the

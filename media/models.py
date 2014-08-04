@@ -52,7 +52,7 @@ class Story(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True,
                                       verbose_name=u"تاريخ رفع التغطية")
     
-    title = models.CharField(max_length=256,
+    title = models.CharField(max_length=256,  # TODO: reduce max length as it crashes MySQL
                              verbose_name=u"العنوان")
     text = models.TextField(verbose_name=u"النص")
     
@@ -80,7 +80,7 @@ class Article(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True,
                                       verbose_name=u"تاريخ الرفع")
     
-    title = models.CharField(max_length=256,
+    title = models.CharField(max_length=256,  # TODO: reduce max length as it crashes MySQL
                              verbose_name=u"العنوان")
     text = models.TextField(verbose_name=u"النص")
     

@@ -38,7 +38,7 @@ def portal_home(request):
         # --- books --------
         context['books_count'] = Book.objects.count()
         context['my_books_count'] = request.user.book_contributions.count()
-        context['latest_books'] = Book.objects.all()[::-1][:5]
+        context['latest_books'] = Book.objects.all()[::-1][:5] # TODO: update to be gender-segregated
         
         # --- announcements 
         context['student_researches'] = Announcement.objects.filter(type='R')[::-1] # show last first

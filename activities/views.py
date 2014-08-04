@@ -1,5 +1,4 @@
 # -*- coding: utf-8  -*-
-# TODO: replace presidency with get_presidency utility function
 # TODO: revise permissions (attach to club coordination and membership rather than django
 # permissions - that's for normal users and club members and coordinators)
 from django.contrib.auth.decorators import permission_required, login_required
@@ -15,6 +14,7 @@ from activities.models import Activity, Review, Participation, Episode
 from activities.forms import ActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm
 from accounts.models import get_gender
 from clubs.models import Club
+from clubs.utils import get_presidency
 from core.utilities import FVP_EMAIL, MVP_EMAIL, DHA_EMAIL
 
 def list(request):
@@ -58,7 +58,7 @@ def list(request):
             secondary_activities = Activity.objects.filter(
                 secondary_clubs__in=user_clubs)
         else:
-            user_activities = Activity.objects.none()
+            user_activities = Activity.objecrevts.none()
             primary_activities = Activity.objects.none()
             secondary_activities = Activity.objects.none()
         activities = approved_activities | user_activities | \
@@ -153,7 +153,7 @@ def create(request):
     if any(club.get_overdue_report_count() > 3 for club in user_coordination):
         raise PermissionDenied
     
-    presidency = Club.objects.get(english_name="Presidency")
+    presidency = get_presidency() # Club.objects.get(english_name="Presidency")
     if request.method == 'POST':
         activity = Activity(submitter=request.user)
         if request.user.has_perm('activities.directly_add_activity'):

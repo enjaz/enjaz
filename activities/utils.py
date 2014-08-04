@@ -9,5 +9,4 @@ def get_approved_activities():
     Return a query set of the current year's approved activities.
     """
     # Approved activities are those who have an approved deanship review
-    # TODO: Test (exhaustively)
     return Activity.objects.filter(review__review_type="D", review__is_approved=True)

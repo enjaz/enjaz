@@ -18,7 +18,7 @@ from clubs.models import Club
 from clubs.utils import get_presidency, is_coordinator_or_member, is_coordinator_of_any_club, get_media_center
 from core.utilities import FVP_EMAIL, MVP_EMAIL, DHA_EMAIL
 
-def list(request):
+def list_activities(request):
     """
     Return a list of the current year's activities displayed as a calendar as well as a table.
     (For the front-end, only the calendar is visible.)

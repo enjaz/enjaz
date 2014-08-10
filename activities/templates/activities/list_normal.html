@@ -13,7 +13,7 @@
         <th>تاريخ الانعقاد</th>
     </thead>
     <tbody>
-    {% for activity in page_activities %}
+    {% for activity in approved %}
     <tr>
         <td><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}</a></td>
         <td><a href="{% url 'clubs:show' activity.primary_club.id %}">{{ activity.primary_club.name }}</a></td>
@@ -53,7 +53,7 @@
     <script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
 	<script>
     var activities = [
-		{% for activity in page_activities %}
+		{% for activity in approved %}
 			{% for episode in activity.episode_set.all %}
 				{
 					title : '{{ activity.name }}',
@@ -65,7 +65,7 @@
 					allDay: false,
 					{% endif %}
 					url   : '{{ activity.id }}/'
-				}{% if page_activities|length > forloop.counter %},{% endif %}
+				}{% if approved|length > forloop.counter %},{% endif %}
 			{% endfor %}
 		{% endfor %}
 	];

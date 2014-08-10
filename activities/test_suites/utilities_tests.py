@@ -2,13 +2,13 @@ from django.test import TestCase
 from accounts.test_utils import create_user
 from activities.models import Activity, Review
 from activities.test_utils import create_activity
-from activities.utils import get_rejected_activities
+from activities.utils import get_rejected_activities, get_pending_activities
 
 from ..utils import get_approved_activities
 
 
 # TODO: modify documentation to include get_rejected and get_pending
-class GetApprovedActivitiesTests(TestCase):
+class ActivityGetterTests(TestCase):
     """
     Test suite for the get approved activities function.
     """
@@ -43,6 +43,8 @@ class GetApprovedActivitiesTests(TestCase):
     #
     # In any way, an activity should be considered approved only in ONE case out of the 16 (or the 7);
     # and that's when the activity has two approved reviews. (One from the presidency and one from the DSA)
+    # On the other hand, it should be considered rejected in 7 cases out of the 16 (2 out of the 7); and that's
+    # when either of the reviews gets rejected. Pending activities, finally, are those not approved nor rejected.
 
     def setUp(self):
         self.user = create_user()
@@ -51,16 +53,18 @@ class GetApprovedActivitiesTests(TestCase):
     # case 1.1 * case 2.1
     def test_activity_with_no_reviews(self):
         """
-        Test that an activity with no reviews doesn't appear in get_approved_activities()
+        Test that an activity with no reviews doesn't appear in get_approved_activities() nor get_rejected_activities()
+        but in get_pending_activities()
         """
         self.assertNotIn(self.activity, get_approved_activities())
         self.assertNotIn(self.activity, get_rejected_activities())
+        self.assertIn(self.activity, get_pending_activities())
 
     # case 1.2 * case 2.1
     def test_activity_with_pending_presidency_review(self):
         """
         Test that an activity with only a pending presidency review doesn't appear in
-        get_approved_activities()
+        get_approved_activities() nor get_rejected_activities() but in get_pending_activities()
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
                                                         review_type='P',
@@ -68,12 +72,13 @@ class GetApprovedActivitiesTests(TestCase):
         self.assertIn(self.p_review, self.activity.review_set.filter(review_type='P'))
         self.assertNotIn(self.activity, get_approved_activities())
         self.assertNotIn(self.activity, get_rejected_activities())
+        self.assertIn(self.activity, get_pending_activities())
 
     # case 1.3 * case 2.1
     def test_activity_with_rejected_presidency_review(self):
         """
         Test that an activity with only a rejected presidency review doesn't appear in
-        get_approved_activities()
+        get_approved_activities() nor get_pending_activities() but in get_rejected_activities()
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
                                                         review_type='P',
@@ -81,12 +86,13 @@ class GetApprovedActivitiesTests(TestCase):
         self.assertIn(self.p_review, self.activity.review_set.filter(review_type='P'))
         self.assertNotIn(self.activity, get_approved_activities())
         self.assertIn(self.activity, get_rejected_activities())
+        self.assertNotIn(self.activity, get_pending_activities())
 
     # case 1.4 * case 2.1
     def test_activity_with_approved_presidency_review_and_no_dsa_review(self):
         """
         Test that an activity with only an approved presidency review doesn't appear in
-        get_approved_activities()
+        get_approved_activities() nor rejected but in pending.
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
                                                         review_type='P',
@@ -96,12 +102,13 @@ class GetApprovedActivitiesTests(TestCase):
                                  Review.objects.none())
         self.assertNotIn(self.activity, get_approved_activities())
         self.assertNotIn(self.activity, get_rejected_activities())
+        self.assertIn(self.activity, get_pending_activities())
 
     # case 1.4 * case 2.2
     def test_activity_with_approved_presidency_review_and_pending_dsa_review(self):
         """
         Test that an activity with an approved presidency review and pending DSA review
-        doesn't appear in get_approved_activities()
+        doesn't appear in get_approved_activities() nor rejected but in pending.
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
                                                         review_type='P',
@@ -114,12 +121,13 @@ class GetApprovedActivitiesTests(TestCase):
         self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
         self.assertNotIn(self.activity, get_approved_activities())
         self.assertNotIn(self.activity, get_rejected_activities())
+        self.assertIn(self.activity, get_pending_activities())
 
     # case 1.4 * case 2.3
     def test_activity_with_approved_presidency_review_and_rejected_dsa_review(self):
         """
         Test that an activity with an approved presidency review and rejected DSA review
-        doesn't appear in get_approved_activities()
+        doesn't appear in get_approved_activities() nor pending but rejected.
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
                                                         review_type='P',
@@ -132,12 +140,13 @@ class GetApprovedActivitiesTests(TestCase):
         self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
         self.assertNotIn(self.activity, get_approved_activities())
         self.assertIn(self.activity, get_rejected_activities())
+        self.assertNotIn(self.activity, get_pending_activities())
 
     # case 1.4 * case 2.4
     def test_activity_with_approved_presidency_review_and_approved_dsa_review(self):
         """
         Test that an activity with an approved presidency review and an approved DSA review
-        DOES appear in get_approved_activities()
+        DOES appear in get_approved_activities() and DOES NOT appear in rejected or pending.
         This is the ONLY case in which the activity is considered to be approved.
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
@@ -151,6 +160,7 @@ class GetApprovedActivitiesTests(TestCase):
         self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
         self.assertIn(self.activity, get_approved_activities())
         self.assertNotIn(self.activity, get_rejected_activities())
+        self.assertNotIn(self.activity, get_pending_activities())
 
     ############################################################
     # The remaining cases are rather theoretical and shouldn't #
@@ -169,6 +179,7 @@ class GetApprovedActivitiesTests(TestCase):
         self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
         self.assertNotIn(self.activity, get_approved_activities())
         self.assertNotIn(self.activity, get_rejected_activities())
+        self.assertIn(self.activity, get_pending_activities())
 
     # case 1.1 * case 1.3
     def test_activity_with_no_presidency_review_and_rejected_dsa_review(self):
@@ -182,6 +193,7 @@ class GetApprovedActivitiesTests(TestCase):
         self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
         self.assertNotIn(self.activity, get_approved_activities())
         self.assertIn(self.activity, get_rejected_activities())
+        self.assertNotIn(self.activity, get_pending_activities())
 
     # case 1.1 * case 1.4
     def test_activity_with_no_presidency_review_and_approved_dsa_review(self):
@@ -195,6 +207,7 @@ class GetApprovedActivitiesTests(TestCase):
         self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
         self.assertNotIn(self.activity, get_approved_activities())
         self.assertNotIn(self.activity, get_rejected_activities())
+        self.assertIn(self.activity, get_pending_activities())
 
     # case 1.2 * case 1.2
     def test_activity_with_pending_presidency_review_and_pending_dsa_review(self):
@@ -213,6 +226,7 @@ class GetApprovedActivitiesTests(TestCase):
         self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
         self.assertNotIn(self.activity, get_approved_activities())
         self.assertNotIn(self.activity, get_rejected_activities())
+        self.assertIn(self.activity, get_pending_activities())
 
     # case 1.2 * case 1.3
     def test_activity_with_pending_presidency_review_and_rejected_dsa_review(self):
@@ -231,6 +245,7 @@ class GetApprovedActivitiesTests(TestCase):
         self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
         self.assertNotIn(self.activity, get_approved_activities())
         self.assertIn(self.activity, get_rejected_activities())
+        self.assertNotIn(self.activity, get_pending_activities())
 
     # case 1.2 * case 1.4
     def test_activity_with_pending_presidency_review_and_approved_dsa_review(self):
@@ -249,6 +264,7 @@ class GetApprovedActivitiesTests(TestCase):
         self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
         self.assertNotIn(self.activity, get_approved_activities())
         self.assertNotIn(self.activity, get_rejected_activities())
+        self.assertIn(self.activity, get_pending_activities())
 
     # case 1.3 * case 1.2
     def test_activity_with_rejected_presidency_review_and_pending_dsa_review(self):
@@ -267,6 +283,7 @@ class GetApprovedActivitiesTests(TestCase):
         self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
         self.assertNotIn(self.activity, get_approved_activities())
         self.assertIn(self.activity, get_rejected_activities())
+        self.assertNotIn(self.activity, get_pending_activities())
 
     # case 1.3 * case 1.3
     def test_activity_with_rejected_presidency_review_and_rejected_dsa_review(self):
@@ -285,6 +302,8 @@ class GetApprovedActivitiesTests(TestCase):
         self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
         self.assertNotIn(self.activity, get_approved_activities())
         self.assertIn(self.activity, get_rejected_activities())
+        self.assertNotIn(self.activity, get_pending_activities())
+
 
     # case 1.3 * case 1.4
     def test_activity_with_rejected_presidency_review_and_approved_dsa_review(self):
@@ -303,3 +322,4 @@ class GetApprovedActivitiesTests(TestCase):
         self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
         self.assertNotIn(self.activity, get_approved_activities())
         self.assertIn(self.activity, get_rejected_activities())
+        self.assertNotIn(self.activity, get_pending_activities())

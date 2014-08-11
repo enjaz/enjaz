@@ -5,7 +5,7 @@ from activities import views
 from niqati import views as niqati_views
 
 urlpatterns = patterns('',
-    url(r'^$', views.list, name='list_activities'),
+    url(r'^$', views.list_activities, name='list'),
     url(r'^create/$', views.create, name='create'),
     url(r'^(?P<activity_id>\d+)/$', views.show, name='show'),
     url(r'^(?P<activity_id>\d+)/edit/$', views.edit, name='edit'),

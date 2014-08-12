@@ -2,102 +2,95 @@
 {% block title %}الأنشطة{% endblock %}
 
 {% block content %}
+<div class="panel-group" id="activities-accordion">
+		
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseOne-2" class="collapsed">
+                    الأنشطة المعتمدة
+                </a>
+            </h4>
+        </div>
+        <div id="collapseOne-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <div class="row">
+                {% with activities=approved %}
+                    {% include 'activities/components/activities_table.html' %}
+                {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseTwo-2" class="notcollapsed">
+                    الأنشطة المعلّقة
+                </a>
+            </h4>
+        </div>
+        <div id="collapseTwo-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <div class="row">
+                {% with activities=pending %}
+                    {% include 'activities/components/activities_table.html' %}
+                {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="panel panel-danger">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseThree-2" class="collapsed">
+                    الأنشطة المرفوضة
+                </a>
+            </h4>
+        </div>
+        <div id="collapseThree-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <div class="row">
+                {% with activities=rejected %}
+                    {% include 'activities/components/activities_table.html' %}
+                {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseFour-2" class="collapsed">
+                    التقويم
+                </a>
+            </h4>
+        </div>
+        <div id="collapseFour-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+
+                <style>
+                    .calendar-env .calendar-body {
+                        width: 100%;
+                    }
+                </style>
+
+                {# <!-- FIXME: the calendar (when put in a panel isn't displayed correctly initially; it needs a kind of redraw --> #}
+                <div class="row"><div class="calendar-env" dir="ltr"> <!-- It's problematic in rtl -->
+                    <!-- Calendar Body -->
+                    <div class="calendar-body">
+                        <div id="calendar"></div>
+                    </div>
+
+                </div><!-- end .calendar-env --></div>
 
 
-<div class="row">
-
-<table id="activities" class="table table-bordered datatable">
-  <thead>
-    <th>#</th>
-    <th>الاسم</th>
-    <th>النادي المنظم</th>
-    <th>تاريخ الإرسال</th>
-    <th>تاريخ الانعقاد</th>
-    <th>الحالة</th>
-  </thead>
-    <tbody>
-    {% for activity in page_activities %}
-        {% if activity.review and user.is_authenticated %}
-            {% if activity.review.is_approved == None %}
-              <tr>
-            {% elif activity.review.is_approved == True %}
-              <tr style="background-color:#A9F5A9;">
-            {% elif activity.review.is_approved == False %}
-              <tr style="background-color:#F5BCA9;">
-            {% endif %}
-        {% else %}
-            <tr>
-        {% endif %}
-        <td>{{ activity.id }}</td>
-        <td><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}</a></td>
-        <td><a href="{% url 'clubs:show' activity.primary_club.id %}">{{ activity.primary_club.name }}</a></td>
-        <td>{{ activity.submission_date|date:"j F" }}</td>
-        <td>{{ activity.get_first_date|date:"j F" }}</td>
-        <td>
-        {% if not activity.review_set.all %}
-            {% if perms.activities.add_deanship_review or perms.activities.add_presidency_review  %}
-                <a href="{% url 'activities:review' activity.id %}">مُعلّق</a>
-            {% else %}
-            معلّق
-            {% endif %}
-        {% elif activity.review_set.all|length_is:"1" %}
-            {% if activity.review_set.all.0.review_type == 'P' %}
-                {% if activity.review_set.all.0.is_approved == None %}
-            <a href="{% url 'activities:review' activity.pk %}">
-                ينتظر تعديلا
-            </a>
-                {% elif activity.review_set.all.0.is_approved == True %}
-            <a href="{% url 'activities:review_with_type' activity.pk 'd' %}">
-                ينتظر مراجعة العمادة
-            </a>
-                {% elif activity.review_set.all.0.is_approved == False %}
-                رفضته الرئاسة
-                {% endif %}
-            {% elif activity.review_set.all.0.review_type == 'D' %}
-                {% if activity.review_set.all.0.is_approved == True %}
-                اعتمدته العمادة
-                {% endif %}
-            {% endif %}
-        {% elif activity.review_set.all|length_is:"2" %}
-            {% if activity.review_set.all.1.review_type == 'D' %}
-                {% if activity.review_set.all.1.is_approved == None %}
-            <a href="{% url 'activities:review' activity.pk %}">
-                ينتظر تعديلا
-            </a>
-                {% elif activity.review_set.all.1.is_approved == True %}
-                اعتمده العمادة
-                {% elif activity.review_set.all.1.is_approved == False %}
-                رفضته الرئاسة
-                {% endif %}
-            {% endif %}
-        {% endif %}
-    </td>
-  </tr>
-    {% endfor %}
-    </tbody>
-</table>
-
-
-<style>
-	.calendar-env .calendar-body {
-		width: 100%;
-	}
-</style>
-
-<div class="row">
-	<div class="col-md-12">
-		<div class="calendar-env" dir="ltr"> <!-- It's problematic in rtl -->
-			<!-- Calendar Body -->
-			<div class="calendar-body">
-				<div id="calendar"></div>
-			</div>
-				
-		</div>
-	</div>
-</div>
-
-
-
+            </div>
+        </div>
+    </div>
 </div>
 
 {% endblock %}
@@ -106,8 +99,8 @@
     <script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
 	<script>
-    var activities = [
-		{% for activity in page_activities %}
+    var approved = [
+		{% for activity in approved %}
 			{% for episode in activity.episode_set.all %}
 				{
 					title : '{{ activity.name }}',
@@ -119,10 +112,47 @@
 					allDay: false,
 					{% endif %}
 					url   : '{{ activity.id }}/'
-				}{% if page_activities|length > forloop.counter %},{% endif %}
+				}{% if approved|length > forloop.counter %},{% endif %}
 			{% endfor %}
 		{% endfor %}
 	];
+
+	var pending = [
+		{% for activity in pending %}
+			{% for episode in activity.episode_set.all %}
+				{
+					title : '{{ activity.name }}',
+					start : '{{ episode.start_datetime.isoformat }}',
+					end   : '{{ episode.end_datetime.isoformat }}',
+					{% if not episode.is_single_day %}
+					allDay: true,
+					{% else %}
+					allDay: false,
+					{% endif %}
+					url   : '{{ activity.id }}/'
+				}{% if approved|length > forloop.counter %},{% endif %}
+			{% endfor %}
+		{% endfor %}
+	];
+
+	var rejected = [
+		{% for activity in rejected %}
+			{% for episode in activity.episode_set.all %}
+				{
+					title : '{{ activity.name }}',
+					start : '{{ episode.start_datetime.isoformat }}',
+					end   : '{{ episode.end_datetime.isoformat }}',
+					{% if not episode.is_single_day %}
+					allDay: true,
+					{% else %}
+					allDay: false,
+					{% endif %}
+					url   : '{{ activity.id }}/'
+				}{% if approved|length > forloop.counter %},{% endif %}
+			{% endfor %}
+		{% endfor %}
+	];
+
 	var calendar = $('#calendar');
     calendar.fullCalendar({
         header: {
@@ -137,11 +167,19 @@
         height: 600,
         droppable: false,
         allDayDefault: false,
-        events: activities
+        eventSources: [
+            {events: approved,
+             color: 'rgb(0, 166, 81)'
+            },
+            {events: pending,
+             color: 'rgb(250, 216, 57)'
+            },
+            {events: rejected
+            }
+        ]
     });
 
-    var table = $('#activities');
-    table.DataTable();
+    $('.datatable').DataTable();
 	</script>
 {% endblock %}
 

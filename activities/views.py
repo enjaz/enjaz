@@ -1,6 +1,4 @@
 # -*- coding: utf-8  -*-
-# TODO: revise permissions (attach to club coordination and membership rather than django
-# permissions - that's for normal users and club members and coordinators)
 from django.contrib.auth.decorators import permission_required, login_required
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
@@ -31,12 +29,14 @@ def list_activities(request):
       visible.
     """
     context = {}
+    template = 'activities/list_privileged.html'
     if request.user.is_superuser or is_coordinator_or_member(get_presidency(), request.user):
-        # If the user is a super user or part of the presdency, then show all activities
+        # If the user is a super user or part of the presidency, then show all activities
         context['approved'] = get_approved_activities()
         context['pending'] = get_pending_activities()
         context['rejected'] = get_rejected_activities()
 
+    # elif request.user.groups.filter(name="deanship_master").exists():
     elif request.user.has_perm('activities.add_deanship_review'):
         # If the user is part of the deanship of student affairs, only show activities approved by presidency
         context['approved'] = get_approved_activities()
@@ -59,7 +59,12 @@ def list_activities(request):
         context['pending'] = Activity.objects.none()
         context['rejected'] = Activity.objects.none()
 
-    return render(request, 'activities/list_normal.html', context)
+        if request.user.is_authenticated():
+            template = 'activities/list_normal.html'
+        else:
+            template = 'activities/front/list.html'
+
+    return render(request, template, context)
 
 @login_required
 def show(request, activity_id):

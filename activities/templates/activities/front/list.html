@@ -44,8 +44,8 @@
 {% block customscript %}
 <script src="{% static 'neon/assets/js/fullcalendar/fullcalendar.min.js' %}"></script>
 <script>
-    var activities = [
-		{% for activity in page_activities %}
+    var approved = [
+		{% for activity in approved %}
 			{% for episode in activity.episode_set.all %}
 				{
 					title : '{{ activity.name }}',
@@ -76,7 +76,8 @@
         height: 600,
         droppable: false,
         allDayDefault: false,
-        events: activities
+        events: approved,
+        eventColor: 'rgb(0, 166, 81)'
     });
 </script>
 {% endblock %}

@@ -1,6 +1,4 @@
 # -*- coding: utf-8  -*-
-# TODO: revise permissions (attach to club coordination and membership rather than django
-# permissions - that's for normal users and club members and coordinators)
 from django.contrib.auth.decorators import permission_required, login_required
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
@@ -13,58 +11,59 @@ import unicodecsv
 from activities.models import Activity, Review, Participation, Episode
 from activities.forms import ActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm
 from accounts.models import get_gender
+from activities.utils import get_pending_activities, get_approved_activities, get_rejected_activities
 from clubs.models import Club
-from clubs.utils import get_presidency
+from clubs.utils import get_presidency, is_coordinator_or_member, is_coordinator_of_any_club, get_media_center, \
+    is_member_of_any_club
 from core.utilities import FVP_EMAIL, MVP_EMAIL, DHA_EMAIL
 
-def list(request):
+def list_activities(request):
     """
     Return a list of the current year's activities displayed as a calendar as well as a table.
     (For the front-end, only the calendar is visible.)
     * For superusers, SC Presidency members (Chairman, Deputies, and Assistants), all activities should be visible.
     * For Deanship of Student Affairs reviewers, only activities approved by SC Presidency should be visible.
-    * For club coordinators, only activities approved by SC-P and DSA in addition to pending activities of their
-      own club.
+    * For club coordinators, only activities approved by SC-P and DSA in addition to pending and rejected activities
+      of their own club.
     * For Deanship of Student Affairs employees and other users, only activities approved by SC-P and DSA should be
       visible.
     """
-    # TODO: Revisit this view in terms of what appears for different groups (permissions) (See specification above)
-    if request.user.is_authenticated():
-        template = 'activities/list_privileged.html'
-    else:
-        template = 'activities/front/list.html'
+    context = {}
+    template = 'activities/list_privileged.html'
+    if request.user.is_superuser or is_coordinator_or_member(get_presidency(), request.user):
+        # If the user is a super user or part of the presidency, then show all activities
+        context['approved'] = get_approved_activities()
+        context['pending'] = get_pending_activities()
+        context['rejected'] = get_rejected_activities()
 
-    # If the user is part of the presidency of the Student Club, or
-    # part of the Media Center, they should be able to view all
-    # activities (i.e. approved, rejected and pending).  Otherwise, a
-    # user should only see approved activities and the activities of
-    # the clubs they have memberships in (regardless of their status).  
+    # elif request.user.groups.filter(name="deanship_master").exists():
+    elif request.user.has_perm('activities.add_deanship_review'):
+        # If the user is part of the deanship of student affairs, only show activities approved by presidency
+        context['approved'] = get_approved_activities()
+        context['pending'] = get_pending_activities().filter(review__review_type="P", review__is_approved=True)
+        context['rejected'] = get_rejected_activities().filter(review__review_type="P", review__is_approved=True)
 
-    if request.user.has_perm('activities.view_activity'):
-        if request.GET.get('pending') == "1":
-            activities = Activity.objects.filter(review__is_approved=None)
-        else:
-            activities = Activity.objects.all()
+    elif (is_coordinator_of_any_club(request.user) or is_member_of_any_club(request.user)) and \
+         not is_coordinator_or_member(get_presidency(), request.user) and \
+         not is_coordinator_or_member(get_media_center(), request.user):
+        # For club coordinators (and members?), show approved activities as well as their own club's pending and
+        # rejected activities
+        context['approved'] = get_approved_activities()
+        context['pending'] = get_pending_activities().filter(primary_club__in=request.user.coordination.all()
+                                                                            | request.user.memberships.all())
+        context['rejected'] = get_rejected_activities().filter(primary_club__in=request.user.coordination.all()
+                                                                              | request.user.memberships.all())
+
     else:
-        approved_activities = Activity.objects.filter(review__is_approved=True) # This doesn't work
-                                                                                # (It returns activities that have
-                                                                                # either reviews (P or D) approved,
-                                                                                # whereas both have to be True
+        context['approved'] = get_approved_activities()
+        context['pending'] = Activity.objects.none()
+        context['rejected'] = Activity.objects.none()
+
         if request.user.is_authenticated():
-            user_activities = request.user.activity_set.all()
-            user_clubs = request.user.memberships.all() | request.user.coordination.all()
-            primary_activities = Activity.objects.filter(
-                primary_club__in=user_clubs)
-            secondary_activities = Activity.objects.filter(
-                secondary_clubs__in=user_clubs)
+            template = 'activities/list_normal.html'
         else:
-            user_activities = Activity.objecrevts.none()
-            primary_activities = Activity.objects.none()
-            secondary_activities = Activity.objects.none()
-        activities = approved_activities | user_activities | \
-                     primary_activities | secondary_activities
+            template = 'activities/front/list.html'
 
-    context = {'page_activities': activities}
     return render(request, template, context)
 
 @login_required

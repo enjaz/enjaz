@@ -40,7 +40,6 @@
                     }
                 </style>
 
-                {# <!-- FIXME: the calendar (when put in a panel isn't displayed correctly initially; it needs a kind of redraw --> #}
                 <div class="row"><div class="calendar-env" dir="ltr"> <!-- It's problematic in rtl -->
                     <!-- Calendar Body -->
                     <div class="calendar-body">
@@ -98,6 +97,10 @@
              color: 'rgb(0, 166, 81)'
             }
         ]
+    });
+
+    $('#collapseFour-2').on('shown.bs.collapse', function (e) {
+        calendar.fullCalendar('render');
     });
 
     $('.datatable').DataTable();

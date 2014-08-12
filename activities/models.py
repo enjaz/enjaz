@@ -70,8 +70,54 @@ class Activity(models.Model):
     is_approved_by_presidency.short_description = u"اعتمدته الرئاسة؟"
 
     def is_approved(self):
-        return self.is_approved_by_deanship()
-    
+        if self.get_approval_status() == 6:
+            return True
+        elif self.get_approval_status() == 2 or self.get_approval_status() == 5:
+            return False
+        else:
+            return None
+        # return self.is_approved_by_deanship()
+
+    def get_approval_status(self):
+        """
+        Returns the approval status of the activity as a number within the range 0 to 6, where 6 is approved.
+        """
+        reviews = self.review_set.all()
+        if not reviews.exists():
+            return 0
+        elif reviews.filter(review_type="P", is_approved=None).exists() and \
+            not reviews.filter(review_type="D").exists():
+            return 1
+        elif reviews.filter(review_type="P", is_approved=False).exists() and \
+            not reviews.filter(review_type="D").exists():
+            return 2
+        elif reviews.filter(review_type="P", is_approved=True).exists() and \
+            not reviews.filter(review_type="D").exists():
+            return 3
+        elif reviews.filter(review_type="P", is_approved=True).exists() and \
+            reviews.filter(review_type="D", is_approved=None).exists():
+            return 4
+        elif reviews.filter(review_type="P", is_approved=True).exists() and \
+            reviews.filter(review_type="D", is_approved=False).exists():
+            return 5
+        elif reviews.filter(review_type="P", is_approved=True).exists() and \
+            reviews.filter(review_type="D", is_approved=True).exists():
+            return 6
+
+    def get_approval_status_message(self):
+        """
+        Return a verbose version of the approval status.
+        """
+        return {0: u"لم تتم مراجعته بعد.",
+                1: u"ينتظر تعديلاً.",
+                2: u"رفضته رئاسة نادي الطلاب.",
+                3: u"ينتظر مراجعة عمادة شؤون الطلاب.",
+                4: u"ينتظر تعديلًا.",
+                5: u"رفضته عمادة شؤون الطلاب.",
+                6: u"تمت الموافقة على النشاط.",
+                None: u"غير معروف",
+                }[self.get_approval_status()]
+
     def is_single_episode(self):
         return self.episode_set.count() == 1
     

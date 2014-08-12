@@ -17,7 +17,7 @@
                 {% with status=activity.get_approval_status %}
                     {% if status == 0 and perms.activities.add_presidency_review %}
                         <a class="btn btn-xs btn-green" href="{% url 'activities:review' activity.pk %}">
-                            راجع
+                            راجع النشاط
                         </a>
                     {% elif status == 1 %}
                         <a class="btn btn-xs btn-green" href="{% url 'activities:review_with_type' activity.pk 'p' %}">
@@ -25,7 +25,7 @@
                         </a>
                     {% elif status == 3 and perms.activities.add_deanship_review %}
                         <a class="btn btn-xs btn-green" href="{% url 'activities:review_with_type' activity.pk 'd' %}">
-راجع
+راجع النشاط
                         </a>
                     {% elif status == 4 %}
                         <a class="btn btn-xs btn-green" href="{% url 'activities:review_with_type' activity.pk 'd' %}">

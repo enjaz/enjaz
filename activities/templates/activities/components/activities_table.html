@@ -1,0 +1,81 @@
+<table class="table table-bordered datatable">
+    <thead>
+        <th>الاسم</th>
+        <th>النادي المنظم</th>
+        <th>تاريخ الانعقاد</th>
+        <th>الحالة</th>
+        <th>الخيارات</th>
+    </thead>
+    <tbody>
+    {% for activity in activities %}
+        <tr>
+            <td><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}</a></td>
+            <td><a href="{% url 'clubs:show' activity.primary_club.id %}">{{ activity.primary_club.name }}</a></td>
+            <td>{{ activity.get_first_date|date:"j F" }}</td>
+            <td>{{ activity.get_approval_status_message }}</td>
+            <td>
+                {% with status=activity.get_approval_status %}
+                    {% if status == 0 and perms.activities.add_presidency_review %}
+                        <a class="btn btn-xs btn-green" href="{% url 'activities:review' activity.pk %}">
+                            راجع
+                        </a>
+                    {% elif status == 1 %}
+                        <a class="btn btn-xs btn-green" href="{% url 'activities:review_with_type' activity.pk 'p' %}">
+ اقرأ مراجعة رئاسة نادي الطلاب
+                        </a>
+                    {% elif status == 3 and perms.activities.add_deanship_review %}
+                        <a class="btn btn-xs btn-green" href="{% url 'activities:review_with_type' activity.pk 'd' %}">
+راجع
+                        </a>
+                    {% elif status == 4 %}
+                        <a class="btn btn-xs btn-green" href="{% url 'activities:review_with_type' activity.pk 'd' %}">
+اقرأ مراجعة عمادة شؤون الطلاب
+                        </a>
+                    {% endif %}
+                {% endwith %}
+            </td>
+            {% comment %}
+            <td>
+            {% if not activity.review_set.all %}
+                {% if perms.activities.add_deanship_review or perms.activities.add_presidency_review  %}
+                    <a href="{% url 'activities:review' activity.id %}">مُعلّق</a>
+                {% else %}
+                معلّق
+                {% endif %}
+            {% elif activity.review_set.all|length_is:"1" %}
+                {% if activity.review_set.all.0.review_type == 'P' %}
+                    {% if activity.review_set.all.0.is_approved == None %}
+                <a href="{% url 'activities:review' activity.pk %}">
+                    ينتظر تعديلا
+                </a>
+                    {% elif activity.review_set.all.0.is_approved == True %}
+                <a href="{% url 'activities:review_with_type' activity.pk 'd' %}">
+                    ينتظر مراجعة العمادة
+                </a>
+                    {% elif activity.review_set.all.0.is_approved == False %}
+                    رفضته الرئاسة
+                    {% endif %}
+                {% elif activity.review_set.all.0.review_type == 'D' %}
+                    {% if activity.review_set.all.0.is_approved == True %}
+                    اعتمدته العمادة
+                    {% endif %}
+                {% endif %}
+            {% elif activity.review_set.all|length_is:"2" %}
+                {% if activity.review_set.all.1.review_type == 'D' %}
+                    {% if activity.review_set.all.1.is_approved == None %}
+                <a href="{% url 'activities:review' activity.pk %}">
+                    ينتظر تعديلا
+                </a>
+                    {% elif activity.review_set.all.1.is_approved == True %}
+                    اعتمده العمادة
+                    {% elif activity.review_set.all.1.is_approved == False %}
+                    رفضته الرئاسة
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+            </td>
+            {% endcomment %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

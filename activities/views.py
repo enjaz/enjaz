@@ -15,7 +15,8 @@ from activities.forms import ActivityForm, DirectActivityForm, DisabledActivityF
 from accounts.models import get_gender
 from activities.utils import get_pending_activities, get_approved_activities, get_rejected_activities
 from clubs.models import Club
-from clubs.utils import get_presidency, is_coordinator_or_member, is_coordinator_of_any_club, get_media_center
+from clubs.utils import get_presidency, is_coordinator_or_member, is_coordinator_of_any_club, get_media_center, \
+    is_member_of_any_club
 from core.utilities import FVP_EMAIL, MVP_EMAIL, DHA_EMAIL
 
 def list_activities(request):
@@ -36,64 +37,29 @@ def list_activities(request):
         context['pending'] = get_pending_activities()
         context['rejected'] = get_rejected_activities()
 
-    elif request.user.groups.filter(name="deanship_master").exists():
-        # If the user is part of the deanship of student affairs group, only show activities approved by presidency
+    elif request.user.has_perm('activities.add_deanship_review'):
+        # If the user is part of the deanship of student affairs, only show activities approved by presidency
         context['approved'] = get_approved_activities()
         context['pending'] = get_pending_activities().filter(review__review_type="P", review__is_approved=True)
         context['rejected'] = get_rejected_activities().filter(review__review_type="P", review__is_approved=True)
 
-    elif is_coordinator_of_any_club(request.user) and \
+    elif (is_coordinator_of_any_club(request.user) or is_member_of_any_club(request.user)) and \
          not is_coordinator_or_member(get_presidency(), request.user) and \
          not is_coordinator_or_member(get_media_center(), request.user):
         # For club coordinators (and members?), show approved activities as well as their own club's pending and
         # rejected activities
         context['approved'] = get_approved_activities()
-        context['pending'] = get_pending_activities().filter(primary_club__in=request.user.coordination.all())
-        context['rejected'] = get_rejected_activities().filter(primary_club__in=request.user.coordination.all())
+        context['pending'] = get_pending_activities().filter(primary_club__in=request.user.coordination.all()
+                                                                            | request.user.memberships.all())
+        context['rejected'] = get_rejected_activities().filter(primary_club__in=request.user.coordination.all()
+                                                                              | request.user.memberships.all())
 
     else:
         context['approved'] = get_approved_activities()
+        context['pending'] = Activity.objects.none()
+        context['rejected'] = Activity.objects.none()
 
     return render(request, 'activities/list_normal.html', context)
-
-    # # TODO: Revisit this view in terms of what appears for different groups (permissions) (See specification above)
-    # if request.user.is_authenticated():
-    #     template = 'activities/list_privileged.html'
-    # else:
-    #     template = 'activities/front/list.html'
-    #
-    # # If the user is part of the presidency of the Student Club, or
-    # # part of the Media Center, they should be able to view all
-    # # activities (i.e. approved, rejected and pending).  Otherwise, a
-    # # user should only see approved activities and the activities of
-    # # the clubs they have memberships in (regardless of their status).
-    #
-    # if request.user.has_perm('activities.view_activity'):
-    #     if request.GET.get('pending') == "1":
-    #         activities = Activity.objects.filter(review__is_approved=None)
-    #     else:
-    #         activities = Activity.objects.all()
-    # else:
-    #     approved_activities = Activity.objects.filter(review__is_approved=True) # This doesn't work
-    #                                                                             # (It returns activities that have
-    #                                                                             # either reviews (P or D) approved,
-    #                                                                             # whereas both have to be True
-    #     if request.user.is_authenticated():
-    #         user_activities = request.user.activity_set.all()
-    #         user_clubs = request.user.memberships.all() | request.user.coordination.all()
-    #         primary_activities = Activity.objects.filter(
-    #             primary_club__in=user_clubs)
-    #         secondary_activities = Activity.objects.filter(
-    #             secondary_clubs__in=user_clubs)
-    #     else:
-    #         user_activities = Activity.objects.none()
-    #         primary_activities = Activity.objects.none()
-    #         secondary_activities = Activity.objects.none()
-    #     activities = approved_activities | user_activities | \
-    #                  primary_activities | secondary_activities
-    #
-    # context = {'page_activities': activities}
-    # return render(request, template, context)
 
 @login_required
 def show(request, activity_id):

@@ -1,13 +1,15 @@
 # -*- coding: utf-8  -*-
 import random
 
-from django.contrib.auth.decorators import permission_required, login_required
+from django.contrib.auth.decorators import permission_required, login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
+from activities.utils import get_approved_activities
+from clubs.utils import get_media_center, is_coordinator_or_member, is_coordinator_of_any_club, is_member_of_any_club
 
 from core import decorators
 from clubs.models import Club
@@ -17,12 +19,24 @@ from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleF
 
 # --- Helper functions
 
-def get_media_center():
-    return Club.objects.get(english_name="Media Center")
-
 def get_user_clubs(user):
     return user.coordination.all() | user.memberships.all()
 
+def is_media_coordinator_or_member(user):
+    if not (is_coordinator_or_member(get_media_center(), user) or user.is_superuser):
+        raise PermissionDenied
+    return True
+
+def is_club_coordinator_or_member(user):
+    if not ((is_coordinator_of_any_club(user) or is_member_of_any_club(user)
+        and not (is_coordinator_or_member(get_media_center(), user))) or user.is_superuser):
+        raise PermissionDenied
+    return True
+
+def is_media_or_club_coordinator_or_member(user):
+    if not (is_coordinator_of_any_club(user) or is_member_of_any_club(user) or user.is_superuser):
+        raise PermissionDenied
+    return True
 # --- Views ---
 
 @login_required
@@ -35,13 +49,14 @@ def index(request):
     # a welcome page with a link to article submission
 
 @login_required
+@user_passes_test(is_media_coordinator_or_member)
 def list_activities(request):
     """
     Show a list of activities, with recently approved ones marked, together with
     the available options of FollowUpReports and Stories.
     """
     # Get all approved activities
-    activities = filter(lambda x: x.is_approved() == True, Activity.objects.all())
+    activities = get_approved_activities()
     media_center = get_media_center()
     return render(request, 'media/list_activities.html', {'activities': activities,
                                                           'media_center': media_center})
@@ -49,6 +64,7 @@ def list_activities(request):
 # --- Follow-up Reports ---
 
 @login_required
+@user_passes_test(is_media_coordinator_or_member)
 def list_reports(request):
     """
     Show a list of all reports in a single table.
@@ -59,6 +75,7 @@ def list_reports(request):
 
 #@permission_required('add_followupreport')
 @login_required
+@user_passes_test(is_club_coordinator_or_member)
 def submit_report(request, episode_pk):
     """
     Submit a FollowUpReport.
@@ -108,6 +125,7 @@ def submit_report(request, episode_pk):
                                                        'episode': episode})
 
 @login_required
+@user_passes_test(is_media_or_club_coordinator_or_member)
 def show_report(request, episode_pk):
     """
     Show a FollowUpReport.
@@ -119,6 +137,7 @@ def show_report(request, episode_pk):
 # --- Stories ---
 
 @login_required
+@user_passes_test(is_media_coordinator_or_member)
 def create_story(request, episode_pk):
     """
     Create a story for an episode.
@@ -174,6 +193,7 @@ def create_story(request, episode_pk):
     return render(request, 'media/story_write.html', context)
 
 @login_required
+@user_passes_test(is_media_coordinator_or_member)
 def show_story(request, episode_pk):
     """
     Show a Story.
@@ -194,6 +214,7 @@ def show_story(request, episode_pk):
                                                      'episode': episode})
 
 @login_required
+@user_passes_test(is_media_coordinator_or_member)
 def edit_story(request, episode_pk):
     """
     Review a Story by writing notes or editing it directly.
@@ -378,6 +399,7 @@ def edit_article(request, pk):
                                                         'review': review})
 
 @login_required
+@user_passes_test(is_media_coordinator_or_member)
 def review_article(request, pk):
     """
     Review an article.

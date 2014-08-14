@@ -47,4 +47,11 @@ def create_groups(sender, **kwargs):
                                      view_deanship_review,
                                      add_presidency_review)
     presidency_group.save()
+
+
+def create_custom_permission(sender, **kwargs):
+    Permission.objects.create(name="Is a deanship employee.", codename="deanship_employee",
+                              content_type=ContentType.objects.get(model='user'))
+
 post_syncdb.connect(create_groups, sender=accounts.models)
+post_syncdb.connect(create_custom_permission, sender=accounts.models)

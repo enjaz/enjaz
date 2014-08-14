@@ -597,6 +597,7 @@ class ListActivityViewTests(TestCase):
         self.assertIn(self.activity_aa, response.context['approved'])
         self.assertIn(self.another_approved_activity, response.context['approved'])
 
+        self.assertNotIn(self.activity_aa, response.context['club_approved'])
         self.assertIn(self.another_approved_activity, response.context['club_approved'])
 
 

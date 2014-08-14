@@ -14,7 +14,7 @@ from accounts.models import get_gender
 from activities.utils import get_pending_activities, get_approved_activities, get_rejected_activities
 from clubs.models import Club
 from clubs.utils import get_presidency, is_coordinator_or_member, is_coordinator_of_any_club, get_media_center, \
-    is_member_of_any_club
+    is_member_of_any_club, is_employee_of_any_club
 from core.utilities import FVP_EMAIL, MVP_EMAIL, DHA_EMAIL
 
 def list_activities(request):
@@ -53,7 +53,17 @@ def list_activities(request):
                                                                             | request.user.memberships.all())
         context['rejected'] = get_rejected_activities().filter(primary_club__in=request.user.coordination.all()
                                                                               | request.user.memberships.all())
+    elif is_employee_of_any_club(request.user):
+        # For employees, display all approved activities, as well as their clubs' approved activities in
+        # a separate table
+        # An employee is basically similar to a normal user, the only difference is having another table that
+        # includes the employee's relevant activities
+        context['approved'] = get_approved_activities()
+        context['pending'] = Activity.objects.none()
+        context['rejected'] = Activity.objects.none()
+        context['club_approved'] = get_approved_activities().filter(primary_club__in=request.user.employee.all())
 
+        template = 'activities/list_employee.html'
     else:
         context['approved'] = get_approved_activities()
         context['pending'] = Activity.objects.none()

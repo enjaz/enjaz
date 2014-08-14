@@ -1,0 +1,127 @@
+{% extends 'activities_base.html' %}{% load staticfiles %}
+{% block title %}الأنشطة{% endblock %}
+
+{% block content %}
+<div class="panel-group" id="activities-accordion">
+
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseOne-2" class="collapsed">
+                    قائمة الأنشطة
+                </a>
+            </h4>
+        </div>
+        <div id="collapseOne-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <div class="row">
+                {% with activities=approved %}
+                    {% include 'activities/components/activities_table.html' %}
+                {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseTwo-2" class="collapsed">
+                    أنشطة أنديتي
+                </a>
+            </h4>
+        </div>
+        <div id="collapseTwo-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <div class="row">
+                {% with activities=club_approved %}
+                    {% include 'activities/components/activities_table.html' %}
+                {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseFour-2" class="collapsed">
+                    التقويم
+                </a>
+            </h4>
+        </div>
+        <div id="collapseFour-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+
+                <style>
+                    .calendar-env .calendar-body {
+                        width: 100%;
+                    }
+                </style>
+
+                <div class="row"><div class="calendar-env" dir="ltr"> <!-- It's problematic in rtl -->
+                    <!-- Calendar Body -->
+                    <div class="calendar-body">
+                        <div id="calendar"></div>
+                    </div>
+
+                </div><!-- end .calendar-env --></div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block customscript %}
+	<script src="{% static 'neon/assets/js/fullcalendar/fullcalendar.min.js' %}"></script>
+    <script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+	<script>
+    var approved = [
+		{% for activity in approved %}
+			{% for episode in activity.episode_set.all %}
+				{
+					title : '{{ activity.name }}',
+					start : '{{ episode.start_datetime.isoformat }}',
+					end   : '{{ episode.end_datetime.isoformat }}',
+					{% if not episode.is_single_day %}
+					allDay: true,
+					{% else %}
+					allDay: false,
+					{% endif %}
+					url   : '{{ activity.id }}/'
+				}{% if approved|length > forloop.counter %},{% endif %}
+			{% endfor %}
+		{% endfor %}
+	];
+
+	var calendar = $('#calendar');
+    calendar.fullCalendar({
+        header: {
+            left: 'title',
+            right: 'month,agendaWeek,agendaDay today prev,next'
+        },
+
+        //defaultView: 'basicWeek',
+
+        editable: false,
+        firstDay: 7,
+        height: 600,
+        droppable: false,
+        allDayDefault: false,
+        eventSources: [
+            {events: approved,
+             color: 'rgb(0, 166, 81)'
+            }
+        ]
+    });
+
+    $('#collapseFour-2').on('shown.bs.collapse', function (e) {
+        calendar.fullCalendar('render');
+    });
+
+    $('.datatable').DataTable();
+	</script>
+{% endblock %}

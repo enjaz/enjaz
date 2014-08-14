@@ -573,6 +573,34 @@ class ListActivityViewTests(TestCase):
         self.assertNotIn(self.activity_ar, response.context['rejected'])
         self.assertIn(self.activity_aa, response.context['approved'])
 
+    def test_list_view_with_employee(self):
+        """
+        Test that an employee will have two tables: (1) all approved activities (including their clubs')
+        (2) their clubs' approved activities
+        """
+        self.employee = create_user()
+        self.club2.employee = self.employee
+        self.club2.save()
+
+        self.another_approved_activity = add_deanship_review(add_presidency_review(create_activity(club=self.club2),
+                                                                                   True), True)
+        self.client.login(username=self.employee.username, password="12345678")
+        response = self.client.get(reverse('activities:list'))
+        self.assertEqual(response.status_code, 200)
+
+        self.assertNotIn(self.activity_nn, response.context['pending'])
+        self.assertNotIn(self.activity_pn, response.context['pending'])
+        self.assertNotIn(self.activity_rn, response.context['rejected'])
+        self.assertNotIn(self.activity_an, response.context['pending'])
+        self.assertNotIn(self.activity_ap, response.context['pending'])
+        self.assertNotIn(self.activity_ar, response.context['rejected'])
+        self.assertIn(self.activity_aa, response.context['approved'])
+        self.assertIn(self.another_approved_activity, response.context['approved'])
+
+        self.assertNotIn(self.activity_aa, response.context['club_approved'])
+        self.assertIn(self.another_approved_activity, response.context['club_approved'])
+
+
     def test_list_view_with_normal_user(self):
         """
         Test that a normal user will only see approved activities.

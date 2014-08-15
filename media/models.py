@@ -7,7 +7,7 @@ from activities.models import Activity, Episode
 
 class FollowUpReport(models.Model):
     """
-    A follow-up report, submitted after 7 days of an activity episode.
+    A follow-up report, submitted after REPORT_DUE_AFTER days of an activity episode.
     """
     episode = models.OneToOneField(Episode, verbose_name=u"الموعد")
     

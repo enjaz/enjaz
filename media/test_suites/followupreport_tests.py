@@ -11,6 +11,8 @@ from django.contrib.auth.models import User
 from clubs.models import Club
 from activities.models import Activity, Episode
 from media.models import FollowUpReport
+from media.utils import REPORT_DUE_AFTER
+
 
 class ReportDueAndOverdueDateTests(TestCase):
     """
@@ -72,7 +74,7 @@ class ReportDueAndOverdueDateTests(TestCase):
         # after the episode end datetime.
         for episode in Episode.objects.all():
             self.assertEqual(episode.report_due_date(),
-                             episode.end_datetime() + timedelta(days=episode.REPORT_DUE_AFTER)
+                             episode.end_datetime() + timedelta(days=REPORT_DUE_AFTER)
                              )
     
     def test_report_is_due(self):

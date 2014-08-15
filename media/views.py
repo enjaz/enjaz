@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
+from post_office import mail
 from activities.utils import get_approved_activities
 from clubs.utils import get_media_center, is_coordinator_or_member, is_coordinator_of_any_club, is_member_of_any_club
 
@@ -286,6 +287,11 @@ def assign_story_task(request):
                                     assigner=request.user,
                                     assignee=assignee,
                                     episode=episode)
+    # Email the assignee with the task
+    mail.send([assignee.email],
+              template="story_task_assigned",
+              context={"task": task})
+
     assignee_name = assignee.student_profile.ar_first_name + " " + assignee.student_profile.ar_last_name
     return {"episode_pk": episode.pk,
             "assignee_name": assignee_name}
@@ -326,7 +332,12 @@ def submit_article(request):
             # assign a task to a random MC member to review the article
             article.assignee = random.choice(get_media_center().members.all())
             article.save()
-            
+
+            # Email the assignee with the task
+            mail.send([article.assignee.email],
+                      template="article_task_assigned",
+                      context={"article": article})
+
             return HttpResponseRedirect(reverse('media:list_articles'))
     else:
         form = ArticleForm()

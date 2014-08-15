@@ -17,6 +17,8 @@ from clubs.models import Club
 from clubs.utils import get_presidency, is_coordinator_or_member, is_coordinator_of_any_club, get_media_center, \
     is_member_of_any_club
 from core.utilities import FVP_EMAIL, MVP_EMAIL, DHA_EMAIL
+from media.utils import MAX_OVERDUE_REPORTS
+
 
 def list_activities(request):
     """
@@ -54,6 +56,11 @@ def list_activities(request):
                                                                             | request.user.memberships.all())
         context['rejected'] = get_rejected_activities().filter(primary_club__in=request.user.coordination.all()
                                                                               | request.user.memberships.all())
+
+        # Media-related
+        context['due_report_count'] = request.user.coordination.all()[0].get_due_report_count()
+        context['overdue_report_count'] = request.user.coordination.all()[0].get_overdue_report_count()
+        context['MAX_OVERDUE_REPORTS'] = MAX_OVERDUE_REPORTS
 
     else:
         context['approved'] = get_approved_activities()
@@ -150,7 +157,7 @@ def create(request):
     # If any club coordinated by the user exceeds the 3-report threshold,
     # prevent new activity submission (again in reality the user will only coordinate
     # one club)
-    if any(club.get_overdue_report_count() > 3 for club in user_coordination):
+    if any(club.get_overdue_report_count() > MAX_OVERDUE_REPORTS for club in user_coordination):
         raise PermissionDenied
     
     presidency = get_presidency() # Club.objects.get(english_name="Presidency")

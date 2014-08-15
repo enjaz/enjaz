@@ -9,7 +9,8 @@ class FollowUpReportForm(ModelForm):
         model = FollowUpReport
         fields = ['description', 'start_date', 'end_date',
                   'start_time', 'end_time', 'location',
-                  'organizer_count', 'participant_count']
+                  'organizer_count', 'participant_count',
+                  'announcement_sites', 'images', 'notes']
         
 class StoryForm(ModelForm):
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control input-lg', 'placeholder': u'العنوان'}))

@@ -26,6 +26,11 @@ class FollowUpReport(models.Model):
                                 verbose_name=u"المكان")
     organizer_count = models.IntegerField(verbose_name=u"عدد المنظمين")
     participant_count = models.IntegerField(verbose_name=u"عدد المشاركين")
+
+    announcement_sites = models.TextField(verbose_name=u"أماكن النشر و الإعلان")
+    images = models.FileField(verbose_name=u"الصور", null=True, blank=True,
+                              upload_to="media/images/", help_text=u"في حال وجود أكثر من صورة، يرجى رفعها كملف مضغوط.")
+    notes = models.TextField(verbose_name=u"ملاحظات", null=True, blank=True)
     
     def __unicode__(self):
         "Return the name of the parent activity followed by the number of the episode"
@@ -58,7 +63,7 @@ class Story(models.Model):
     
     def __unicode__(self):
         return self.episode.activity.name + ": " + self.title
-    
+
     class Meta:
         permissions = (
             ("view_story", "Can view all available stories."),

@@ -41,7 +41,17 @@
 				<td>{{ report.organizer_count }}</td>
 				<th class="text-center">عدد المشاركين</th>
 				<td>{{ report.participant_count }}</td>
-			</tr>		
+			</tr>
+
+            <tr>
+                <th class="text-center">أماكن النشر و الإعلان</th>
+                <td colspan="3">{{ report.announcement_sites }}</td>
+            </tr>
+
+            <tr>
+                <th class="text-center">ملاحظات</th>
+                <td colspan="3">{{ report.notes }}</td>
+            </tr>
 		</tbody>
 	</table>
 	{% else %}

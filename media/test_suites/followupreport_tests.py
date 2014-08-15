@@ -21,7 +21,7 @@ class ReportDueAndOverdueDateTests(TestCase):
     def setUp(self):
         # Create a user, a club (and make the user its coordinator),
         # and 3 activities with 1, 2, 3 episodes respectively
-        self.user = User.objects.create_user('enjazuser', 'test@enjazportal.com', '12345678')
+        self.user = User.objects.create_user('msarabi', 'test@enjazportal.com', '12345678')
         self.club = Club.objects.create(name="Test Arabic Club Name",
                                         english_name="Test English Club Name",
                                         description="Test Club Description",
@@ -127,7 +127,7 @@ class ActivityViewsWithNoReportPenalty(TestCase):
         # Set the number of due reports to 3
         # Also set overdue reports to 3
         # Therefore no penalties are expected 
-        self.user = User.objects.create_user('enjazuser', 'test@enjazportal.com', '12345678')
+        self.user = User.objects.create_user('msarabi', 'test@enjazportal.com', '12345678')
         self.client.login(username=self.user.username, password='12345678')
         self.club = Club.objects.create(name="Test Arabic Club Name",
                                         english_name="Presidency",
@@ -188,7 +188,7 @@ class ActivityViewsWithReportPenalty(TestCase):
         # Set the number of due reports to 4
         # Also set overdue reports to 6
         # Therefore penalties are expected 
-        self.user = User.objects.create_user('enjazuser', 'test@enjazportal.com', '12345678')
+        self.user = User.objects.create_user('msarabi', 'test@enjazportal.com', '12345678')
         self.client.login(username=self.user.username, password='12345678')
         self.club = Club.objects.create(name="Test Arabic Club Name",
                                         english_name="Presidency", # due to dependent nature of create view,

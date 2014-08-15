@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+from datetime import timedelta
 from django.contrib.auth.decorators import permission_required, login_required
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
@@ -331,13 +332,29 @@ def review(request, activity_id, lower_reivew_type=None):
                               template="activity_presidency_approved",
                               context=email_context)
                 elif review_type == 'D':
-                    email_context['full_url'] = activity_full_url
-                    mail.send([activity.primary_club.coordinator.email],
-                              template="activity_deanship_approved",
-                              context=email_context)
-                    # FIXME: When we launch the website, not all clubs
-                    # will have employees assigned.  This check is to
-                    # be remvoed later.
+                    if activity.primary_club.coordinator:
+                        email_context['full_url'] = activity_full_url
+                        mail.send([activity.primary_club.coordinator.email],
+                                  template="activity_deanship_approved",
+                                  context=email_context)
+
+                        for episode in activity.episode_set.all():
+                            # Schedule an email at the date of the episode
+                            # to remind the coordinator of submitting the media report
+                            mail.send([activity.primary_club.coordinator.email],
+                                      template="first_report_reminder",
+                                      scheduled_time=episode.start_date,
+                                      context={"episode": episode})
+
+                            # Schedule another email 3 days after the episode as a second reminder
+                            # to submit the media report
+                            # TODO: there should be a better way that doesn't send the second email
+                            # if the report is already submitted
+                            mail.send([activity.primary_club.coordinator.email],
+                                      template="first_report_reminder",
+                                      scheduled_time=episode.start_date + timedelta(days=3),
+                                      context={"episode": episode})
+
                     if activity.primary_club.employee:
                         email_context['full_url'] = deanship_full_url
                         mail.send([activity.primary_club.employee.email],

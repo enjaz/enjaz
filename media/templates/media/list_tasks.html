@@ -1,0 +1,33 @@
+{% extends 'media_base.html' %}
+{% block title %}المهام{% endblock %}
+
+{% block content %}
+    <table class="table table-bordered datatable">
+        <thead>
+            <th><!-- status --></th>
+            <th>العنوان</th>
+            <th>الوصف</th>
+            <th>المكلف</th>
+            <th>التاريخ المطلوب</th>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr>
+                <td>
+                    {% if task.completed %}
+                        <i class="entypo-check"></i>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'media:show_task' task.pk %}">
+                    {{ task.title }}
+                    </a>
+                </td>
+                <td>{{ task.description }}</td>
+                <td>{{ task.assignee.student_profile.get_ar_full_name }}</td>
+                <td>{{ task.due_date|date:"j F Y" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

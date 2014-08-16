@@ -10,13 +10,15 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
 from post_office import mail
 from activities.utils import get_approved_activities
-from clubs.utils import get_media_center, is_coordinator_or_member, is_coordinator_of_any_club, is_member_of_any_club
+from clubs.utils import get_media_center, is_coordinator_or_member, is_coordinator_of_any_club, is_member_of_any_club, \
+    is_coordinator
 
 from core import decorators
 from clubs.models import Club
 from activities.models import Activity, Episode
-from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask
-from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm
+from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment
+from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
+    TaskCommentForm
 
 # --- Helper functions
 
@@ -453,3 +455,96 @@ def review_article(request, pk):
         return HttpResponseRedirect(reverse('media:show_article',
                                             args=(pk, ))
                                     )
+
+@login_required
+@user_passes_test(is_media_coordinator_or_member)
+def list_tasks(request):
+    """
+    For the media center coordinator, list the tasks for all media center members.
+    For media center members, list tasks assigned to them.
+    """
+    context = {}
+    if is_coordinator(get_media_center(), request.user) or request.user.is_superuser:
+        context['tasks'] = CustomTask.objects.all()
+        context['add_task_form'] = TaskForm()
+    else:
+        context['tasks'] = CustomTask.objects.filter(assignee=request.user)
+    return render(request, 'media/list_tasks.html', context)
+
+@login_required
+def create_task(request):
+    """
+    Create a new task.
+    """
+    # Only the media center coordinator is allowed to assign tasks
+    if not is_coordinator(get_media_center(), request.user) and not request.user.is_superuser:
+        raise PermissionDenied
+    if request.method == "POST":
+        task = TaskForm(request.POST,
+                        instance=CustomTask(assigner=request.user))
+        if task.is_valid():
+            task.save()
+            return HttpResponseRedirect(reverse('media:list_tasks'))
+    else:
+        task = TaskForm()
+    return render(request, 'media/create_task.html', {'task_form': task})
+
+@login_required
+@user_passes_test(is_media_coordinator_or_member)
+def show_task(request, pk):
+    """
+    Show the task with the given pk.
+    """
+    task = get_object_or_404(CustomTask, pk=pk)
+    return render(request, 'media/show_task.html', {'task': task})
+
+@login_required
+@user_passes_test(is_media_coordinator_or_member)
+def edit_task(request, pk):
+    """
+    Show the edit task form if the request is GET.
+    Update the task if the request is POST.
+    """
+    task = get_object_or_404(CustomTask, pk=pk)
+    if request.method == "POST":
+        form = TaskForm(request.POST, instance=task)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('media:list_tasks'))
+    else:
+        # just show the edit form
+        form = TaskForm(instance=task)
+    return render(request, 'media/create_task.html', {'task_form': form})
+
+@login_required
+@decorators.post_only
+def mark_task_complete(request, pk):
+    """
+    Mark the passed task as complete.
+    This can only be done by the task's assignee.
+    """
+    task = get_object_or_404(CustomTask, pk=pk)
+
+    if not task.assignee == request.user and not request.user.is_superuser:
+        raise PermissionDenied
+
+    task.completed = True
+    task.save()
+    return HttpResponseRedirect(reverse('media:show_task',
+                                        args=(pk, )))
+
+@login_required
+@decorators.post_only
+@user_passes_test(is_media_coordinator_or_member)
+def add_comment(request, pk):
+    """
+    Add a comment to the task with given pk.
+    """
+    task = get_object_or_404(CustomTask, pk=pk)
+    comment = TaskCommentForm(request.POST,
+                              instance=TaskComment(author=request.user,
+                                                   task=task))
+    if comment.is_valid():
+        comment.save()
+    return HttpResponseRedirect(reverse('media:show_task',
+                                        args=(pk, )))

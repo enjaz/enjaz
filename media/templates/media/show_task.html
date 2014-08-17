@@ -1,7 +1,103 @@
-{% extends 'media_base.html' %}
+{% extends 'media_base.html' %}{% load staticfiles %}{% load bootstrap3 %}
 
 {% block title %}{{ task.title }}{% endblock %}
 
 {% block content %}
+    <h3>
+        {% if task.completed %}
+        <!--<div class="badge badge-roundless badge-green"><i class="entypo-check"></i> تم إنهاء المهمة</div>-->
+        <i class="fa fa-check-circle"></i>
+        {% else %}
+        <!--<div class="badge badge-roundless"><i class="entypo-hourglass"></i> لم تتم المهمة بعد</div>-->
+        <i class="fa fa-circle-o"></i>
+        {% endif %}
+        {{ task.title }}
+        {% if task.assignee == user and not task.completed %}
+        <form action="{% url 'media:mark_task_complete' task.pk %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-green btn-xs btn-icon">
+                تمت المهمة
+                <i class="entypo-check"></i>
+            </button>
+        </form>
+        {% endif %}
+    </h3>
+    <hr>
+    <table class="table table-bordered">
+		<thead>
+			<tr>
+				<th colspan="4" class="text-center">تفاصيل المهمة</th>
+			</tr>
+		</thead>
 
+		<tbody>
+            <tr>
+				<th class="text-center">العنوان</th>
+				<td colspan="3">{{ task.title }}</td>
+			</tr>
+
+			<tr>
+				<th class="text-center">الوصف</th>
+				<td colspan="3">{{ task.description }}</td>
+			</tr>
+
+			<tr>
+				<th class="text-center">المكلَّف</th>
+				<td colspan="3">{{ task.assignee.student_profile.get_ar_full_name }}</td>
+			</tr>
+
+			<tr>
+				<th class="text-center">التاريخ المطلوب</th>
+				<td colspan="3">
+                {% if task.due_date %}
+                    {{ task.due_date }}
+                {% else %}
+                    غير محدد
+                {% endif %}
+                </td>
+			</tr>
+		</tbody>
+	</table>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <div class="panel-title">
+                <h4>
+                    التعليقات
+                    <span class="badge badge-danger">{{ task.comment_set.count }}</span>
+                </h4>
+            </div>
+        </div>
+        <div class="panel-body no-padding">
+            <!-- List of Comments --><ul class="comments-list">
+                {% for comment in task.taskcomment_set.all %}
+                <!-- Comment Entry --><li>
+                    <div class="comment-details">
+                        <div class="comment-head">
+                            <a href="#">{{ comment.author.student_profile.get_ar_full_name }}</a>
+                            -
+                            {{ comment.date|date:"j F Y" }}
+                        </div>
+                        <p class="comment-text">
+                            {{ comment.body }}
+                        </p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <div class="col-md-12">
+                {% if task.taskcomment_set.count > 0 %}<hr>{% else %}<br>{% endif %}
+            <!-- Add comment form --><form action="{% url 'media:add_comment' task.pk %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ comment_form.body }}
+                </div>
+                <button class="btn btn-block btn-primary">أرسل</button>
+                <br>
+            </form>
+            </div>
+        </div>
+    </div>
+    <link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/font-awesome/css/font-awesome.min.css' %}">
 {% endblock %}

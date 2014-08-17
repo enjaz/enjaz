@@ -3,6 +3,7 @@ import random
 
 from django.contrib.auth.decorators import permission_required, login_required, user_passes_test
 from django.contrib.auth.models import User
+from django.core import mail
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
@@ -483,7 +484,10 @@ def create_task(request):
         task = TaskForm(request.POST,
                         instance=CustomTask(assigner=request.user))
         if task.is_valid():
-            task.save()
+            task = task.save()
+            mail.send([task.assignee.email],
+                  template="customtask_assigned",
+                  context={"task": task})
             return HttpResponseRedirect(reverse('media:list_tasks'))
     else:
         task = TaskForm()
@@ -496,7 +500,8 @@ def show_task(request, pk):
     Show the task with the given pk.
     """
     task = get_object_or_404(CustomTask, pk=pk)
-    return render(request, 'media/show_task.html', {'task': task})
+    return render(request, 'media/show_task.html', {'task': task,
+                                                    'comment_form': TaskCommentForm()})
 
 @login_required
 @user_passes_test(is_media_coordinator_or_member)
@@ -530,6 +535,9 @@ def mark_task_complete(request, pk):
 
     task.completed = True
     task.save()
+
+    # TODO: email assigner and the media center coordinators
+
     return HttpResponseRedirect(reverse('media:show_task',
                                         args=(pk, )))
 
@@ -545,6 +553,17 @@ def add_comment(request, pk):
                               instance=TaskComment(author=request.user,
                                                    task=task))
     if comment.is_valid():
-        comment.save()
+        # Send email to task assigner, assignee, and all participants in the comment thread,
+        # excluding -of course- the comment's author
+        comment = comment.save()
+        recipients = list(set(
+            list(task.taskcomment_set.exclude(author=comment.author).values_list('author__email', flat=True))
+            + ([task.assigner.email] if task.assigner != comment.author else [])
+            + ([task.assignee.email] if task.assignee != comment.author else [])
+        ))
+        mail.send(recipients,
+                  template="taskcomment_added",
+                  context={"comment": comment})
+        print recipients
     return HttpResponseRedirect(reverse('media:show_task',
                                         args=(pk, )))

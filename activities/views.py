@@ -30,7 +30,8 @@ def list_activities(request):
     """
     context = {}
     template = 'activities/list_privileged.html'
-    if request.user.is_superuser or is_coordinator_or_member(get_presidency(), request.user):
+    if request.user.is_superuser or is_coordinator_or_member(get_presidency(), request.user)\
+            or request.user.has_perm('activities.add_presidency_review'):
         # If the user is a super user or part of the presidency, then show all activities
         context['approved'] = get_approved_activities()
         context['pending'] = get_pending_activities()

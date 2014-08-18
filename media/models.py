@@ -83,13 +83,25 @@ class Article(models.Model):
     author = models.ForeignKey(User,
                                related_name=u"authored_articles",
                                verbose_name=u"الكاتب")
+    author_photo = models.ImageField(
+        verbose_name=u"صورة شخصية",
+        upload_to='media/author_photos/',
+    )
     date_submitted = models.DateTimeField(auto_now_add=True,
                                       verbose_name=u"تاريخ الرفع")
     
     title = models.CharField(max_length=128,
                              verbose_name=u"العنوان")
-    text = models.TextField(verbose_name=u"النص")
-    
+    text = models.TextField(
+        verbose_name=u"النص",
+        null=True, blank=True,
+    )
+    attachment = models.FileField(
+        verbose_name=u"المرفقات",
+        upload_to='media/articles/',
+        null=True, blank=True,
+    )
+
     STATUS_CHOICES = (
         ('A', u'تم قبوله'),
         ('P', u'ينتظر المراجعة'),

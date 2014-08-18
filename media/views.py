@@ -328,6 +328,7 @@ def submit_article(request):
     """
     if request.method == 'POST':
         form = ArticleForm(request.POST,
+                           request.FILES,
                            instance=Article(author=request.user),
                            )
         if form.is_valid():
@@ -358,7 +359,8 @@ def show_article(request, pk):
     # the article before it's approved
     if not article.status == 'A':
         if not get_media_center() in get_user_clubs(request.user) \
-           and not article.author == request.user:
+           and not article.author == request.user \
+           and not request.user.is_superuser:
             raise PermissionDenied
         
     try:
@@ -373,7 +375,8 @@ def show_article(request, pk):
     # assignee, show the review form; otherwise only show the review
     if (get_media_center() in get_user_clubs(request.user) and \
        article.assignee == request.user) or \
-       get_media_center().coordinator == request.user:
+       get_media_center().coordinator == request.user or \
+       request.user.is_superuser:
         context['review_form'] = review_form
     else:
         context['review'] = review
@@ -388,7 +391,8 @@ def edit_article(request, pk):
     # --- Permission Checks ---
     # Only the article's author should be able to edit it
     # and only when the reviewer asks for an edit
-    if not article.author == request.user or not article.status == 'E':
+    if (not article.author == request.user or not article.status == 'E') \
+       and not request.user.is_superuser:
         raise PermissionDenied
     
     try:
@@ -398,6 +402,7 @@ def edit_article(request, pk):
     
     if request.method == 'POST':
         form = ArticleForm(request.POST,
+                           request.FILES,
                            instance=article
                            )
         if form.is_valid():
@@ -426,7 +431,8 @@ def review_article(request, pk):
     # head is allowed to review articles
     if (get_media_center() not in get_user_clubs(request.user) or \
        not article.assignee == request.user) and \
-       not get_media_center().coordinator == request.user:
+       not get_media_center().coordinator == request.user and \
+       not request.user.is_superuser:
         raise PermissionDenied
     
     try:

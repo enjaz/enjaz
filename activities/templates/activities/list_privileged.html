@@ -2,6 +2,22 @@
 {% block title %}الأنشطة{% endblock %}
 
 {% block content %}
+{% if due_report_count > 0 %}
+<div class="alert alert-minimal">
+    <strong>تنبيه</strong> لديك <span class="badge badge-warning">{{ due_report_count }}</span> تقارير إعلامية حان وقت تسليمها. يرجى كتابتها و رتسليمها في أقرب فرصة.
+</div>
+{% endif %}
+{% if overdue_report_count > 0 and overdue_report_count <= MAX_OVERDUE_REPORTS %}
+<div class="alert alert-minimal">
+    <strong>تنبيه!</strong> لديك <span class="badge badge-danger">{{ overdue_report_count }}</span> تقارير إعلامية تأخرت في تسليمها؛ يرجى تسليمها في أقرب فرصة قبل أن يتم حرمانك من رفع أنشطة جديدة.
+</div>
+{% endif %}
+{% if overdue_report_count > MAX_OVERDUE_REPORTS %}
+<div class="alert alert-minimal">
+    <strong>تنبيه!</strong> لديك <span class="badge badge-danger">{{ overdue_report_count }}</span> تقارير إعلامية تأخرت في تسليمها؛
+    <strong>يجب عليك تسليمها قبل أن تتمكن من رفع أنشطة جديدة.</strong>
+</div>
+{% endif %}
 <div class="panel-group" id="activities-accordion">
 		
     <div class="panel panel-success">

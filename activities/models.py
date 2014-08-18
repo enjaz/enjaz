@@ -5,6 +5,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime, timedelta
 
 from clubs.models import College
+from media.utils import REPORT_DUE_AFTER
+
 
 class Activity(models.Model):
     # For now, we will follow the current practice: only one club will
@@ -294,11 +296,11 @@ class Episode(models.Model):
     # google_event = models.URLField()
     
     def __unicode__(self):
-        return self.activity.name + " #" + str(self.get_index() + 1)
+        return self.activity.name + " #" + str(self.get_index())
     
     def get_index(self):
-        "Return the index of the episode within the parent activity's episode set"
-        return list(self.activity.episode_set.all()).index(self)
+        "Return the index (starting from 1) of the episode within the parent activity's episode set"
+        return list(self.activity.episode_set.all()).index(self) + 1
     
     def is_single_day(self):
         return self.start_date == self.end_date
@@ -314,14 +316,13 @@ class Episode(models.Model):
         return datetime.combine(self.end_date, self.end_time)
     
     # Media-related methods
-    REPORT_DUE_AFTER = 7 # in days
-    
+
     def report_due_date(self):
         """
         Return the due date of the report, which is within 7
         days of the end of the corresponding episode.
         """
-        return self.end_datetime() + timedelta(days=self.REPORT_DUE_AFTER)
+        return self.end_datetime() + timedelta(days=REPORT_DUE_AFTER)
     
     def report_is_due(self):
         """

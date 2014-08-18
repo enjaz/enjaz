@@ -1,0 +1,82 @@
+{% extends 'media_base.html' %}{% load staticfiles %}{% load bootstrap3 %}
+{% block title %}المهام{% endblock %}
+
+{% block content %}
+{% if add_task_form %}<div class="col-md-8">{% endif %}
+<h3>المهام</h3>
+<hr>
+<table class="table table-bordered datatable">
+    <thead>
+        <th><!-- status --></th>
+        <th>العنوان</th>
+        <th>الوصف</th>
+        <th>المكلف</th>
+        <th>التاريخ المطلوب</th>
+    </thead>
+    <tbody>
+        {% for task in tasks %}
+        <tr>
+            <td>
+                {% if task.completed %}
+                    <i class="fa fa-check-circle"></i>
+                {% else %}
+                    <i class="fa fa-circle-o"></i>
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'media:show_task' task.pk %}">
+                {{ task.title }}
+                </a>
+            </td>
+            <td>{{ task.description }}</td>
+            <td>{{ task.assignee.student_profile.get_ar_full_name }}</td>
+            <td>{{ task.due_date|date:"j F Y" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if add_task_form %}
+</div>
+<div class="col-md-4">
+    <!--<h4>مهمة جديدة</h4>-->
+    <form action="{% url 'media:create_task' %}" method="post">
+        {% csrf_token %}
+        <div class="tile-block tile-green">
+
+			<div class="tile-header">
+				<i class="entypo-plus-circled"></i>
+
+				<a href="#">
+					مهمة جديدة
+					<span>كلّف أحد الأعضاء بمهمة جديدة.</span>
+				</a>
+			</div>
+
+			<div class="tile-content">
+
+				<!--<p>Pleased him another was settled for. Moreover end horrible endeavor entrance any families.</p>-->
+				<!---->
+				<!--<input type="text" class="form-control" placeholder="Enter your email...">-->
+				{% bootstrap_form add_task_form %}
+
+			</div>
+
+			<div class="tile-footer">
+				<!--<button type="button" class="btn btn-block">Subscribe</button>-->
+                <button type="submit" class="btn btn-block btn-green">أرسل</button>
+			</div>
+
+		</div>
+    </form>
+</div>
+{% endif %}
+<link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/font-awesome/css/font-awesome.min.css' %}">
+{% endblock %}
+{% block customscript %}
+<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+<script>
+    $(".datatable").DataTable();
+    $("input[name=due_date]").datepicker({isRTL: true});
+</script>
+{% endblock %}

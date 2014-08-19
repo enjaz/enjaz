@@ -124,30 +124,30 @@ class Activity(models.Model):
         return self.episode_set.count() == 1
     
     def get_first_date(self):
-        return self.episode_set.all()[0].start_date # NOTE: This is not accurate as the
-                                                    # first episode in the queryset may
-                                                    # or may not be the first in terms
-                                                    # of date and time.
-                                                    # [Saeed, 4 Jul 2014]
+        return self.get_first_episode().start_date
         
     def get_first_time(self):
-        return self.episode_set.all()[0].start_time
+        return self.get_first_episode().start_time
     
     def get_first_location(self):
-        return self.episode_set.all()[0].location
+        return self.get_first_episode().location
     
     def get_first_episode(self):
         """
         Return the first scheduled episode for this activity.
         *** This should replace the three above-mentioned methods. ***
         """
-        pass # TODO: implement get_first_episode
-    
+        return self.episode_set.order_by('start_date', 'start_time').first()
+
     def get_next_episode(self):
         """
         Return the next scheduled episode for this activity.
         """
-        pass # TODO: implement get_next_episode
+        sorted_episodes = self.episode_set.order_by('start_date', 'start_time')
+        next_episodes = sorted_episodes.filter(start_date__gt=datetime.today()) \
+        | sorted_episodes.filter(start_date=datetime.today(), start_time__gte=datetime.now())
+        # episodes from tomorrow onward +  episodes that are today but later in the day
+        return next_episodes.first()
 
     # Evaluation-related
     def get_relevance_score_average(self):

@@ -65,7 +65,17 @@
         droppable: false,
         allDayDefault: false,
         events: approved,
-        eventColor: 'rgb(0, 166, 81)'
+        eventColor: 'rgb(0, 166, 81)',
+        eventRender: function(event, element) {
+            var start = event.start;
+            var end = event.end;
+            var timeDiff = Math.abs(end - start);
+            var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            if (diffDays > 14) {
+                // hide episodes greater than 14 days in length
+                return false;
+            }
+        }
     });
 </script>
 {% endblock %}

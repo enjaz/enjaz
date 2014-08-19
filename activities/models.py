@@ -313,7 +313,11 @@ class Episode(models.Model):
         return datetime.combine(self.start_date, self.start_time)
     
     def end_datetime(self):
-        return datetime.combine(self.end_date, self.end_time)
+        end_datetime = datetime.combine(self.end_date, self.end_time)
+        if self.start_datetime() == end_datetime:
+            return end_datetime + timedelta(seconds=1)
+        else:
+            return end_datetime
     
     # Media-related methods
 

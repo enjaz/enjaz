@@ -61,21 +61,9 @@
     <script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
 	<script>
     var approved = [
-		{% for activity in approved %}
-			{% for episode in activity.episode_set.all %}
-				{
-					title : '{{ activity.name }}',
-					start : '{{ episode.start_datetime.isoformat }}',
-					end   : '{{ episode.end_datetime.isoformat }}',
-					{% if not episode.is_single_day %}
-					allDay: true,
-					{% else %}
-					allDay: false,
-					{% endif %}
-					url   : '{{ activity.id }}/'
-				}{% if approved|length > forloop.counter %},{% endif %}
-			{% endfor %}
-		{% endfor %}
+		{% with activities=approved %}
+			{% include 'activities/components/activities_array_for_calendar.html' %}
+		{% endwith %}
 	];
 
 	var calendar = $('#calendar');

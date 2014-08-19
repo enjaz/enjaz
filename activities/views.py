@@ -57,10 +57,13 @@ def list_activities(request):
                                                                             | request.user.memberships.all())
         context['rejected'] = get_rejected_activities().filter(primary_club__in=request.user.coordination.all()
                                                                               | request.user.memberships.all())
+
         # Media-related
-        context['due_report_count'] = request.user.coordination.all()[0].get_due_report_count()
-        context['overdue_report_count'] = request.user.coordination.all()[0].get_overdue_report_count()
-        context['MAX_OVERDUE_REPORTS'] = MAX_OVERDUE_REPORTS
+        # Only display to coordinators
+        if is_coordinator_of_any_club(request.user):
+            context['due_report_count'] = request.user.coordination.all()[0].get_due_report_count()
+            context['overdue_report_count'] = request.user.coordination.all()[0].get_overdue_report_count()
+            context['MAX_OVERDUE_REPORTS'] = MAX_OVERDUE_REPORTS
 
     elif is_employee_of_any_club(request.user):
         # For employees, display all approved activities, as well as their clubs' approved activities in

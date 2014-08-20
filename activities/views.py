@@ -129,7 +129,7 @@ def show(request, activity_id):
         if request.user.has_perm('niqati.view_order') or \
             is_coordinator:
             context['can_view_niqati_orders'] = True
-            
+
     else:
         user_clubs = Club.objects.none()
 
@@ -475,7 +475,8 @@ def view_participation(request, activity_id):
         raise PermissionDenied
 
     participations = Participation.objects.filter(activity=activity)
-    context = {'participations': participations, 'activity': activity}
+    context = {'participations': participations, 'activity': activity,
+               'active_tab': 'view_participation'}
     return render(request, 'activities/view_participations.html', context)
 
 # TODO: remove this view and the associated url since its function is now done by datatables

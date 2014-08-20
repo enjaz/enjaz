@@ -4,10 +4,12 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core.exceptions import PermissionDenied
+from django.views.decorators import csrf
 
 from post_office import mail
 import unicodecsv
 
+from core import decorators
 from clubs.forms import MembershipForm, DisabledClubForm, ClubForm
 from clubs.models import Club, MembershipApplication
 
@@ -148,6 +150,55 @@ def view_application(request, club_id):
     applications = MembershipApplication.objects.filter(club=club)
     context = {'applications': applications, 'club': club}
     return render(request, 'clubs/view_application.html', context)
+
+# @login_required
+@csrf.csrf_exempt
+@decorators.ajax_only
+@decorators.post_only
+def approve_application(request, club_id):
+    """
+    Add the application's applicant to the application's club.
+    Then, delete the application.
+    """
+    print request.user
+    application = get_object_or_404(MembershipApplication, pk=request.POST['application_pk'])
+    # --- Permission Checks ---
+    # The user should be the application's club coordinator
+    if application.club not in request.user.coordination.all() and \
+       not request.user.has_perm('clubs.view_application'):
+        raise Exception(u"ليس لديك الصلاحيات الكافية للقيام بذلك.")
+
+    # Check that the application's applicant isn't a member of
+    # the application's club
+    if application.user in application.club.members.all():
+        # Now this shouldn't happen since the join view already prevents
+        # members from accessing the view
+        raise Exception(u"هذا المستخدم عضو في النادي أصلًا")
+
+    # If all went OK, add the user to the club and delete the application
+    application.club.members.add(application.user)
+    application.delete()
+
+    # return {}
+
+# @login_required
+@csrf.csrf_exempt
+@decorators.ajax_only
+@decorators.post_only
+def ignore_application(request, club_id):
+    """
+    Basically delete the application.
+    """
+    application = get_object_or_404(MembershipApplication, pk=request.POST['application_pk'])
+    # --- Permission Checks ---
+    # The user should be the application's club coordinator
+    if application.club not in request.user.coordination.all() and \
+       not request.user.has_perm('clubs.view_application'):
+        raise Exception(u"ليس لديك الصلاحيات الكافية للقيام بذلك.")
+
+    application.delete()
+
+    # return {}
 
 # TODO: remove this view and the associated url since its function is now done by datatables
 @login_required

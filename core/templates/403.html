@@ -1,0 +1,30 @@
+{% extends 'error_base.html' %}{% load staticfiles %}
+{% block title %}403{% endblock %}
+{% block content %}
+<div class="page-error-404">
+
+
+	<div class="error-symbol">
+		<i class="fa fa-shield"></i>
+	</div>
+
+	<div class="error-text">
+		<h2>403</h2>
+		<p>عفوًا! غير مصرح لك بالوصول إلى هذه الصفحة.</p>
+	</div>
+
+	<hr />
+
+	<div class="error-text">
+
+		إذا كنت تعتقد أن هناك خطأً ما، نرجو
+        <a href="mailto:hello@enjazportal.com">
+            <span class="entypo-export"></span>
+           التواصل معنا.
+        </a>
+
+	</div>
+
+</div>
+<link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/font-awesome/css/font-awesome.min.css' %}">
+{% endblock %}

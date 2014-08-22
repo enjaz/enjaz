@@ -88,12 +88,14 @@
 					<span>أنشطة</span>
 				</a>
 			</li>
+            {% if user.student_profile %}
 			<li>
 				<a href="{% url 'niqati:index' %}">
 					<i class="entypo-chart-bar"></i>
 					<span>نقاطي</span>
 				</a>
 			</li>
+            {% endif %}
 			<li>
 				<a href="{% url 'books:list' %}">
 					<i class="entypo-book"></i>

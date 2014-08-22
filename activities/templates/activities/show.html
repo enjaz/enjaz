@@ -88,7 +88,7 @@
 		<div class="row">
 			
 			<div class="col-sm-offset-2 col-sm-10">
-				
+
 				<ul class="user-details">{# if the user is privileged, show them the internal description #}{% if can_view_deanship_review or perms.activities.add_deanship_review or can_view_presidency_review or perms.activities.add_presidency_review %}
 					<li>
 						<a href="#">
@@ -134,15 +134,15 @@
 			            	{% if episode.followupreport %}
 			            		<a href="{% url 'media:show_report' episode.pk %}"
 			            		class="btn btn-block btn-green btn-xs">استعرض التقرير</a>
-			            		
+
 			            	{% elif episode.report_is_due %}
 			            		<a href="{% url 'media:submit_report' episode.pk %}"
 			            		class="btn btn-block btn-gold btn-xs">ارفع التقرير</a>
-			            		
+
 			            	{% elif episode.report_is_overdue %}
 			            		<a href="{% url 'media:submit_report' episode.pk %}"
 			            		class="btn btn-block btn-red btn-xs">ارفع التقرير</a>
-			            		
+
 			            	{% else %}
 			            		<a class="btn btn-block btn-primary btn-xs disabled">بانتظار انتهاء النشاط</a>
 			            	{% endif %}
@@ -165,12 +165,16 @@
 						<a href="{% url 'activities:review_with_type' activity.pk 'd' %}">مراجعة عمادة شؤون الطلاب</a>
 					</li>
 					{% endif %}
+                    {% if can_view_participation %}
+					<li{% if active_tab == 'view_participation' %} class="active"{% endif %}>
+						<a href="{% url 'activities:view_participation' activity.pk %}">عرض المشاركات</a>
+					</li>
+					{% endif %}
                     {% if can_view_niqati_orders %}
 					<li{% if active_tab == 'niqati' %} class="active"{% endif %}>
 						<a href="{% url 'activities:niqati_orders' activity.pk %}">نقاطي</a>
 					</li>
 					{% endif %}
-                    <!--{# TODO: Add a tab to view participations #}-->
 				</ul>
 			</div>
 		</div>

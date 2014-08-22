@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+import datetime
 from django.db import models
 
 from django.contrib.auth.models import User
@@ -7,7 +8,7 @@ from activities.models import Activity, Episode
 
 class FollowUpReport(models.Model):
     """
-    A follow-up report, submitted after 7 days of an activity episode.
+    A follow-up report, submitted after REPORT_DUE_AFTER days of an activity episode.
     """
     episode = models.OneToOneField(Episode, verbose_name=u"الموعد")
     
@@ -26,6 +27,11 @@ class FollowUpReport(models.Model):
                                 verbose_name=u"المكان")
     organizer_count = models.IntegerField(verbose_name=u"عدد المنظمين")
     participant_count = models.IntegerField(verbose_name=u"عدد المشاركين")
+
+    announcement_sites = models.TextField(verbose_name=u"أماكن النشر و الإعلان")
+    images = models.FileField(verbose_name=u"الصور", null=True, blank=True,
+                              upload_to="media/images/", help_text=u"في حال وجود أكثر من صورة، يرجى رفعها كملف مضغوط.")
+    notes = models.TextField(verbose_name=u"ملاحظات", null=True, blank=True)
     
     def __unicode__(self):
         "Return the name of the parent activity followed by the number of the episode"
@@ -52,13 +58,13 @@ class Story(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True,
                                       verbose_name=u"تاريخ رفع التغطية")
     
-    title = models.CharField(max_length=256,
+    title = models.CharField(max_length=128,
                              verbose_name=u"العنوان")
     text = models.TextField(verbose_name=u"النص")
     
     def __unicode__(self):
         return self.episode.activity.name + ": " + self.title
-    
+
     class Meta:
         permissions = (
             ("view_story", "Can view all available stories."),
@@ -77,13 +83,25 @@ class Article(models.Model):
     author = models.ForeignKey(User,
                                related_name=u"authored_articles",
                                verbose_name=u"الكاتب")
+    author_photo = models.ImageField(
+        verbose_name=u"صورة شخصية",
+        upload_to='media/author_photos/',
+    )
     date_submitted = models.DateTimeField(auto_now_add=True,
                                       verbose_name=u"تاريخ الرفع")
     
-    title = models.CharField(max_length=256,
+    title = models.CharField(max_length=128,
                              verbose_name=u"العنوان")
-    text = models.TextField(verbose_name=u"النص")
-    
+    text = models.TextField(
+        verbose_name=u"النص",
+        null=True, blank=True,
+    )
+    attachment = models.FileField(
+        verbose_name=u"المرفقات",
+        upload_to='media/articles/',
+        null=True, blank=True,
+    )
+
     STATUS_CHOICES = (
         ('A', u'تم قبوله'),
         ('P', u'ينتظر المراجعة'),
@@ -154,9 +172,6 @@ class Task(models.Model):
     """
     assigner = models.ForeignKey(User,
                                  verbose_name="المعيِّن")
-    assignee = models.ForeignKey(User,
-                                 related_name="assigned_tasks",
-                                 verbose_name="المعيَّن")
     date_assigned = models.DateTimeField(auto_now_add=True,
                                          verbose_name="تاريخ التعيين")
     completed = models.BooleanField(default=False)
@@ -169,6 +184,9 @@ class StoryTask(Task):
     A task to write a story.
     """
     episode = models.OneToOneField(Episode)
+    assignee = models.ForeignKey(User,
+                                 related_name="assigned_storytasks",
+                                 verbose_name="المعيَّن")
     story = models.OneToOneField(Story, blank=True, null=True)
     
     def __unicode__(self):
@@ -187,3 +205,66 @@ class StoryTask(Task):
 #     
 #     def __unicode__(self):
 #         return self.article.__unicode__()
+
+# The following models are for creating custom tasks to be assigned to the media center
+# members
+# Based partially on models from django-todo app:
+# Check: https://github.com/shacker/django-todo/
+
+class CustomTask(Task):
+    ## list = models.ForeignKey(List)
+    # created_date = models.DateField(auto_now=True, auto_now_add=True)
+    # completed = models.BooleanField()
+    # created_by = models.ForeignKey(User, related_name='todo_created_by')
+    # assigned_to = models.ForeignKey(User, related_name='todo_assigned_to')
+    ## priority = models.PositiveIntegerField(max_length=3)
+    assignee = models.ForeignKey(User,
+                                 related_name="assigned_tasks",
+                                 verbose_name="المعيَّن")
+    title = models.CharField(max_length=140, verbose_name=u"العنوان")
+    description = models.TextField(blank=True, null=True, verbose_name=u"الوصف")
+    due_date = models.DateField(blank=True, null=True, verbose_name=u"التاريخ المطلوب")
+    completed_date = models.DateField(blank=True, null=True, verbose_name=u"تاريخ الإنهاء")
+
+    # Model method: Has due date for an instance of this object passed?
+    def is_overdue(self):
+        "Returns whether the custom task's due date has passed or not."
+        if self.due_date and datetime.date.today() > self.due_date:
+            return True
+        else:
+            return False
+
+    def __unicode__(self):
+        return self.title
+
+    # Auto-set the custom creation / completed date
+    def save(self, *args, **kwargs):
+        # If custom task is being marked complete, set the completed_date
+        if self.completed:
+            self.completed_date = datetime.datetime.now()
+        super(CustomTask, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = u"مهمة"
+        verbose_name_plural = u"المهام"
+
+class TaskComment(models.Model):
+    """
+    Not using Django's built-in comments because we want to be able to save
+    a comment and change task details at the same time. Rolling our own since it's easy.
+    """
+    author = models.ForeignKey(User, verbose_name=u"المعلق")
+    task = models.ForeignKey(CustomTask, verbose_name=u"المهمة")
+    date = models.DateTimeField(auto_now_add=True, verbose_name=u"التاريخ")
+    body = models.TextField(blank=True, verbose_name=u"النص")
+
+    def __unicode__(self):
+        return '%s, %s - %s' % (
+            self.task,
+            self.author,
+            self.date,
+        )
+
+    class Meta:
+        verbose_name = u"تعليق على مهمة"
+        verbose_name_plural = u"التعليقات على المهام"

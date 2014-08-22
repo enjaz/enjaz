@@ -1,0 +1,17 @@
+{% extends 'media_base.html' %}{% load bootstrap3 %}
+{% block title %}مهمة جديدة{% endblock %}
+{% block content %}
+    <h3>مهمة جديدة</h3>
+    <hr>
+    <form action="{% url 'media:create_task' %}" method="post">
+    {% csrf_token %}
+    {% bootstrap_form task_form %}
+    <button class="btn btn-block btn-green">أرسل</button>
+    </form>
+{% endblock %}
+
+{% block customscript %}
+    <script>
+        $("input[name=due_date]").datepicker({isRTL: true});
+    </script>
+{% endblock %}

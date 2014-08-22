@@ -1,28 +1,46 @@
 # -*- coding: utf-8  -*-
 import random
 
-from django.contrib.auth.decorators import permission_required, login_required
+from django.contrib.auth.decorators import permission_required, login_required, user_passes_test
 from django.contrib.auth.models import User
+from django.core import mail
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
+from post_office import mail
+from activities.utils import get_approved_activities
+from clubs.utils import get_media_center, is_coordinator_or_member, is_coordinator_of_any_club, is_member_of_any_club, \
+    is_coordinator
 
 from core import decorators
 from clubs.models import Club
 from activities.models import Activity, Episode
-from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask
-from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm
+from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment
+from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
+    TaskCommentForm
 
 # --- Helper functions
-
-def get_media_center():
-    return Club.objects.get(english_name="Media Center")
 
 def get_user_clubs(user):
     return user.coordination.all() | user.memberships.all()
 
+def is_media_coordinator_or_member(user):
+    if not (is_coordinator_or_member(get_media_center(), user) or user.is_superuser):
+        raise PermissionDenied
+    return True
+
+def is_club_coordinator_or_member(user):
+    if not ((is_coordinator_of_any_club(user) or is_member_of_any_club(user)
+        and not (is_coordinator_or_member(get_media_center(), user))) or user.is_superuser):
+        raise PermissionDenied
+    return True
+
+def is_media_or_club_coordinator_or_member(user):
+    if not (is_coordinator_of_any_club(user) or is_member_of_any_club(user) or user.is_superuser):
+        raise PermissionDenied
+    return True
 # --- Views ---
 
 @login_required
@@ -35,13 +53,14 @@ def index(request):
     # a welcome page with a link to article submission
 
 @login_required
+@user_passes_test(is_media_coordinator_or_member)
 def list_activities(request):
     """
     Show a list of activities, with recently approved ones marked, together with
     the available options of FollowUpReports and Stories.
     """
     # Get all approved activities
-    activities = filter(lambda x: x.is_approved() == True, Activity.objects.all())
+    activities = get_approved_activities()
     media_center = get_media_center()
     return render(request, 'media/list_activities.html', {'activities': activities,
                                                           'media_center': media_center})
@@ -49,6 +68,7 @@ def list_activities(request):
 # --- Follow-up Reports ---
 
 @login_required
+@user_passes_test(is_media_coordinator_or_member)
 def list_reports(request):
     """
     Show a list of all reports in a single table.
@@ -59,6 +79,7 @@ def list_reports(request):
 
 #@permission_required('add_followupreport')
 @login_required
+@user_passes_test(is_club_coordinator_or_member)
 def submit_report(request, episode_pk):
     """
     Submit a FollowUpReport.
@@ -80,6 +101,7 @@ def submit_report(request, episode_pk):
     
     if request.method == 'POST':
         form = FollowUpReportForm(request.POST,
+                                  request.FILES,
                                   instance=FollowUpReport(pk=episode.pk, # make pk equal to episode pk
                                                                          # to keep things synchronized
                                                           episode=episode,
@@ -108,6 +130,7 @@ def submit_report(request, episode_pk):
                                                        'episode': episode})
 
 @login_required
+@user_passes_test(is_media_or_club_coordinator_or_member)
 def show_report(request, episode_pk):
     """
     Show a FollowUpReport.
@@ -119,6 +142,7 @@ def show_report(request, episode_pk):
 # --- Stories ---
 
 @login_required
+@user_passes_test(is_media_coordinator_or_member)
 def create_story(request, episode_pk):
     """
     Create a story for an episode.
@@ -174,6 +198,7 @@ def create_story(request, episode_pk):
     return render(request, 'media/story_write.html', context)
 
 @login_required
+@user_passes_test(is_media_coordinator_or_member)
 def show_story(request, episode_pk):
     """
     Show a Story.
@@ -194,6 +219,7 @@ def show_story(request, episode_pk):
                                                      'episode': episode})
 
 @login_required
+@user_passes_test(is_media_coordinator_or_member)
 def edit_story(request, episode_pk):
     """
     Review a Story by writing notes or editing it directly.
@@ -265,6 +291,11 @@ def assign_story_task(request):
                                     assigner=request.user,
                                     assignee=assignee,
                                     episode=episode)
+    # Email the assignee with the task
+    mail.send([assignee.email],
+              template="story_task_assigned",
+              context={"task": task})
+
     assignee_name = assignee.student_profile.ar_first_name + " " + assignee.student_profile.ar_last_name
     return {"episode_pk": episode.pk,
             "assignee_name": assignee_name}
@@ -297,6 +328,7 @@ def submit_article(request):
     """
     if request.method == 'POST':
         form = ArticleForm(request.POST,
+                           request.FILES,
                            instance=Article(author=request.user),
                            )
         if form.is_valid():
@@ -305,7 +337,12 @@ def submit_article(request):
             # assign a task to a random MC member to review the article
             article.assignee = random.choice(get_media_center().members.all())
             article.save()
-            
+
+            # Email the assignee with the task
+            mail.send([article.assignee.email],
+                      template="article_task_assigned",
+                      context={"article": article})
+
             return HttpResponseRedirect(reverse('media:list_articles'))
     else:
         form = ArticleForm()
@@ -322,7 +359,8 @@ def show_article(request, pk):
     # the article before it's approved
     if not article.status == 'A':
         if not get_media_center() in get_user_clubs(request.user) \
-           and not article.author == request.user:
+           and not article.author == request.user \
+           and not request.user.is_superuser:
             raise PermissionDenied
         
     try:
@@ -337,7 +375,8 @@ def show_article(request, pk):
     # assignee, show the review form; otherwise only show the review
     if (get_media_center() in get_user_clubs(request.user) and \
        article.assignee == request.user) or \
-       get_media_center().coordinator == request.user:
+       get_media_center().coordinator == request.user or \
+       request.user.is_superuser:
         context['review_form'] = review_form
     else:
         context['review'] = review
@@ -352,7 +391,8 @@ def edit_article(request, pk):
     # --- Permission Checks ---
     # Only the article's author should be able to edit it
     # and only when the reviewer asks for an edit
-    if not article.author == request.user or not article.status == 'E':
+    if (not article.author == request.user or not article.status == 'E') \
+       and not request.user.is_superuser:
         raise PermissionDenied
     
     try:
@@ -362,6 +402,7 @@ def edit_article(request, pk):
     
     if request.method == 'POST':
         form = ArticleForm(request.POST,
+                           request.FILES,
                            instance=article
                            )
         if form.is_valid():
@@ -378,6 +419,7 @@ def edit_article(request, pk):
                                                         'review': review})
 
 @login_required
+@user_passes_test(is_media_coordinator_or_member)
 def review_article(request, pk):
     """
     Review an article.
@@ -389,7 +431,8 @@ def review_article(request, pk):
     # head is allowed to review articles
     if (get_media_center() not in get_user_clubs(request.user) or \
        not article.assignee == request.user) and \
-       not get_media_center().coordinator == request.user:
+       not get_media_center().coordinator == request.user and \
+       not request.user.is_superuser:
         raise PermissionDenied
     
     try:
@@ -419,3 +462,114 @@ def review_article(request, pk):
         return HttpResponseRedirect(reverse('media:show_article',
                                             args=(pk, ))
                                     )
+
+@login_required
+@user_passes_test(is_media_coordinator_or_member)
+def list_tasks(request):
+    """
+    For the media center coordinator, list the tasks for all media center members.
+    For media center members, list tasks assigned to them.
+    """
+    context = {}
+    if is_coordinator(get_media_center(), request.user) or request.user.is_superuser:
+        context['tasks'] = CustomTask.objects.all()
+        context['add_task_form'] = TaskForm()
+    else:
+        context['tasks'] = CustomTask.objects.filter(assignee=request.user)
+    return render(request, 'media/list_tasks.html', context)
+
+@login_required
+def create_task(request):
+    """
+    Create a new task.
+    """
+    # Only the media center coordinator is allowed to assign tasks
+    if not is_coordinator(get_media_center(), request.user) and not request.user.is_superuser:
+        raise PermissionDenied
+    if request.method == "POST":
+        task = TaskForm(request.POST,
+                        instance=CustomTask(assigner=request.user))
+        if task.is_valid():
+            task = task.save()
+            mail.send([task.assignee.email],
+                  template="customtask_assigned",
+                  context={"task": task})
+            return HttpResponseRedirect(reverse('media:list_tasks'))
+    else:
+        task = TaskForm()
+    return render(request, 'media/create_task.html', {'task_form': task})
+
+@login_required
+@user_passes_test(is_media_coordinator_or_member)
+def show_task(request, pk):
+    """
+    Show the task with the given pk.
+    """
+    task = get_object_or_404(CustomTask, pk=pk)
+    return render(request, 'media/show_task.html', {'task': task,
+                                                    'comment_form': TaskCommentForm()})
+
+@login_required
+@user_passes_test(is_media_coordinator_or_member)
+def edit_task(request, pk):
+    """
+    Show the edit task form if the request is GET.
+    Update the task if the request is POST.
+    """
+    task = get_object_or_404(CustomTask, pk=pk)
+    if request.method == "POST":
+        form = TaskForm(request.POST, instance=task)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('media:list_tasks'))
+    else:
+        # just show the edit form
+        form = TaskForm(instance=task)
+    return render(request, 'media/create_task.html', {'task_form': form})
+
+@login_required
+@decorators.post_only
+def mark_task_complete(request, pk):
+    """
+    Mark the passed task as complete.
+    This can only be done by the task's assignee.
+    """
+    task = get_object_or_404(CustomTask, pk=pk)
+
+    if not task.assignee == request.user and not request.user.is_superuser:
+        raise PermissionDenied
+
+    task.completed = True
+    task.save()
+
+    # TODO: email assigner and the media center coordinators
+
+    return HttpResponseRedirect(reverse('media:show_task',
+                                        args=(pk, )))
+
+@login_required
+@decorators.post_only
+@user_passes_test(is_media_coordinator_or_member)
+def add_comment(request, pk):
+    """
+    Add a comment to the task with given pk.
+    """
+    task = get_object_or_404(CustomTask, pk=pk)
+    comment = TaskCommentForm(request.POST,
+                              instance=TaskComment(author=request.user,
+                                                   task=task))
+    if comment.is_valid():
+        # Send email to task assigner, assignee, and all participants in the comment thread,
+        # excluding -of course- the comment's author
+        comment = comment.save()
+        recipients = list(set(
+            list(task.taskcomment_set.exclude(author=comment.author).values_list('author__email', flat=True))
+            + ([task.assigner.email] if task.assigner != comment.author else [])
+            + ([task.assignee.email] if task.assignee != comment.author else [])
+        ))
+        mail.send(recipients,
+                  template="taskcomment_added",
+                  context={"comment": comment})
+        print recipients
+    return HttpResponseRedirect(reverse('media:show_task',
+                                        args=(pk, )))

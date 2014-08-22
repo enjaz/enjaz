@@ -1,8 +1,8 @@
-{% extends "activities_base.html" %}{% load staticfiles %}
+{% extends "activities/show.html" %}{% load staticfiles %}
 {% block title %}مشاهدة طلبات المشاركة في {{ activity.name }}{% endblock %}
 
-{% block content %}
-<h2>طلبات المشاركة في {{ activity.name }}</h2>
+{% block review_content %}
+{#<h2>طلبات المشاركة في {{ activity.name }}</h2>#}
 
 <table id="participation_table" class="table table-bordered datatable">
     <thead>

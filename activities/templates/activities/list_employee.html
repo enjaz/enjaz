@@ -2,29 +2,13 @@
 {% block title %}الأنشطة{% endblock %}
 
 {% block content %}
-{% if due_report_count > 0 %}
-<div class="alert alert-minimal">
-    <strong>تنبيه</strong> لديك <span class="badge badge-warning">{{ due_report_count }}</span> تقارير إعلامية حان وقت تسليمها. يرجى كتابتها و رتسليمها في أقرب فرصة.
-</div>
-{% endif %}
-{% if overdue_report_count > 0 and overdue_report_count <= MAX_OVERDUE_REPORTS %}
-<div class="alert alert-minimal">
-    <strong>تنبيه!</strong> لديك <span class="badge badge-danger">{{ overdue_report_count }}</span> تقارير إعلامية تأخرت في تسليمها؛ يرجى تسليمها في أقرب فرصة قبل أن يتم حرمانك من رفع أنشطة جديدة.
-</div>
-{% endif %}
-{% if overdue_report_count > MAX_OVERDUE_REPORTS %}
-<div class="alert alert-minimal">
-    <strong>تنبيه!</strong> لديك <span class="badge badge-danger">{{ overdue_report_count }}</span> تقارير إعلامية تأخرت في تسليمها؛
-    <strong>يجب عليك تسليمها قبل أن تتمكن من رفع أنشطة جديدة.</strong>
-</div>
-{% endif %}
 <div class="panel-group" id="activities-accordion">
-		
+
     <div class="panel panel-success">
         <div class="panel-heading">
             <h4 class="panel-title">
                 <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseOne-2" class="collapsed">
-                    الأنشطة المعتمدة
+                    قائمة الأنشطة
                 </a>
             </h4>
         </div>
@@ -38,38 +22,19 @@
             </div>
         </div>
     </div>
-    
-    <div class="panel panel-warning">
+
+    <div class="panel panel-default">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseTwo-2" class="notcollapsed">
-                    الأنشطة المعلّقة
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseTwo-2" class="collapsed">
+                    أنشطة أنديتي
                 </a>
             </h4>
         </div>
         <div id="collapseTwo-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
                 <div class="row">
-                {% with activities=pending %}
-                    {% include 'activities/components/activities_table.html' %}
-                {% endwith %}
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="panel panel-danger">
-        <div class="panel-heading">
-            <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseThree-2" class="collapsed">
-                    الأنشطة المرفوضة
-                </a>
-            </h4>
-        </div>
-        <div id="collapseThree-2" class="panel-collapse collapse" style="height: 0px;">
-            <div class="panel-body">
-                <div class="row">
-                {% with activities=rejected %}
+                {% with activities=club_approved %}
                     {% include 'activities/components/activities_table.html' %}
                 {% endwith %}
                 </div>
@@ -77,7 +42,7 @@
         </div>
     </div>
 
-    <div class="panel panel-default">
+    <div class="panel panel-primary">
         <div class="panel-heading">
             <h4 class="panel-title">
                 <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseFour-2" class="collapsed">
@@ -115,19 +80,7 @@
     <script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
 	<script>
     var approved = [
-        {% with activities=approved %}
-            {% include 'activities/components/activities_array_for_calendar.html' %}
-        {% endwith %}
-	];
-
-	var pending = [
-		{% with activities=pending %}
-			{% include 'activities/components/activities_array_for_calendar.html' %}
-		{% endwith %}
-	];
-
-	var rejected = [
-		{% with activities=rejected %}
+		{% with activities=approved %}
 			{% include 'activities/components/activities_array_for_calendar.html' %}
 		{% endwith %}
 	];
@@ -149,11 +102,6 @@
         eventSources: [
             {events: approved,
              color: 'rgb(0, 166, 81)'
-            },
-            {events: pending,
-             color: 'rgb(250, 216, 57)'
-            },
-            {events: rejected
             }
         ],
         eventRender: function(event, element) {
@@ -172,8 +120,6 @@
         calendar.fullCalendar('render');
     });
 
-
     $('.datatable').DataTable();
 	</script>
 {% endblock %}
-

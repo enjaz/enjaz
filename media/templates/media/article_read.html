@@ -23,6 +23,20 @@
 		<p>{{ article.text }}</p>
 	</div>
 </div>
+<div class="row">
+    <div class="col-md-12">
+        {% if article.attachment.name %}
+        <a class="btn btn-green btn-icon" href="{{ article.attachment.url }}">
+            تحميل المرفقات ({{ article.attachment.name }})
+            <i class="entypo-down-bold"></i>
+        </a>
+        {% endif %}
+        <a class="btn btn-green btn-icon" href="{{ article.author_photo.url }}">
+            صورة الكاتب
+            <i class="entypo-picture"></i>
+        </a>
+    </div>
+</div>
 {% if review_form %}
 <hr>
 <br>

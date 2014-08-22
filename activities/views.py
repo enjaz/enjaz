@@ -1,7 +1,5 @@
 # -*- coding: utf-8  -*-
-# TODO: replace presidency with get_presidency utility function
-# TODO: revise permissions (attach to club coordination and membership rather than django
-# permissions - that's for normal users and club members and coordinators)
+from datetime import timedelta
 from django.contrib.auth.decorators import permission_required, login_required
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
@@ -14,57 +12,80 @@ import unicodecsv
 from activities.models import Activity, Review, Participation, Episode
 from activities.forms import ActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm
 from accounts.models import get_gender
+from activities.utils import get_pending_activities, get_approved_activities, get_rejected_activities
 from clubs.models import Club
+from clubs.utils import get_presidency, is_coordinator_or_member, is_coordinator_of_any_club, get_media_center, \
+    is_member_of_any_club, is_employee_of_any_club
 from core.utilities import FVP_EMAIL, MVP_EMAIL, DHA_EMAIL
+from media.utils import MAX_OVERDUE_REPORTS
 
-def list(request):
+
+def list_activities(request):
     """
     Return a list of the current year's activities displayed as a calendar as well as a table.
     (For the front-end, only the calendar is visible.)
     * For superusers, SC Presidency members (Chairman, Deputies, and Assistants), all activities should be visible.
     * For Deanship of Student Affairs reviewers, only activities approved by SC Presidency should be visible.
-    * For club coordinators, only activities approved by SC-P and DSA in addition to pending activities of their
-      own club.
+    * For club coordinators, only activities approved by SC-P and DSA in addition to pending and rejected activities
+      of their own club.
     * For Deanship of Student Affairs employees and other users, only activities approved by SC-P and DSA should be
       visible.
     """
-    # TODO: Revisit this view in terms of what appears for different groups (permissions) (See specification above)
-    if request.user.is_authenticated():
-        template = 'activities/list_privileged.html'
-    else:
-        template = 'activities/front/list.html'
+    context = {}
+    template = 'activities/list_privileged.html'
+    if request.user.is_superuser or is_coordinator_or_member(get_presidency(), request.user)\
+            or request.user.has_perm('activities.add_presidency_review'):
+        # If the user is a super user or part of the presidency, then show all activities
+        context['approved'] = get_approved_activities()
+        context['pending'] = get_pending_activities()
+        context['rejected'] = get_rejected_activities()
 
-    # If the user is part of the presidency of the Student Club, or
-    # part of the Media Center, they should be able to view all
-    # activities (i.e. approved, rejected and pending).  Otherwise, a
-    # user should only see approved activities and the activities of
-    # the clubs they have memberships in (regardless of their status).  
+    # elif request.user.groups.filter(name="deanship_master").exists():
+    elif request.user.has_perm('activities.add_deanship_review'):
+        # If the user is part of the deanship of student affairs, only show activities approved by presidency
+        context['approved'] = get_approved_activities()
+        context['pending'] = get_pending_activities().filter(review__review_type="P", review__is_approved=True)
+        context['rejected'] = get_rejected_activities().filter(review__review_type="P", review__is_approved=True)
 
-    if request.user.has_perm('activities.view_activity'):
-        if request.GET.get('pending') == "1":
-            activities = Activity.objects.filter(review__is_approved=None)
-        else:
-            activities = Activity.objects.all()
+    elif (is_coordinator_of_any_club(request.user) or is_member_of_any_club(request.user)) and \
+         not is_coordinator_or_member(get_presidency(), request.user) and \
+         not is_coordinator_or_member(get_media_center(), request.user):
+        # For club coordinators (and members?), show approved activities as well as their own club's pending and
+        # rejected activities
+        context['approved'] = get_approved_activities()
+        context['pending'] = get_pending_activities().filter(primary_club__in=request.user.coordination.all()
+                                                                            | request.user.memberships.all())
+        context['rejected'] = get_rejected_activities().filter(primary_club__in=request.user.coordination.all()
+                                                                              | request.user.memberships.all())
+
+        # Media-related
+        # Only display to coordinators
+        if is_coordinator_of_any_club(request.user):
+            context['due_report_count'] = request.user.coordination.all()[0].get_due_report_count()
+            context['overdue_report_count'] = request.user.coordination.all()[0].get_overdue_report_count()
+            context['MAX_OVERDUE_REPORTS'] = MAX_OVERDUE_REPORTS
+
+    elif is_employee_of_any_club(request.user):
+        # For employees, display all approved activities, as well as their clubs' approved activities in
+        # a separate table
+        # An employee is basically similar to a normal user, the only difference is having another table that
+        # includes the employee's relevant activities
+        context['approved'] = get_approved_activities()
+        context['pending'] = Activity.objects.none()
+        context['rejected'] = Activity.objects.none()
+        context['club_approved'] = get_approved_activities().filter(primary_club__in=request.user.employee.all())
+
+        template = 'activities/list_employee.html'
     else:
-        approved_activities = Activity.objects.filter(review__is_approved=True) # This doesn't work
-                                                                                # (It returns activities that have
-                                                                                # either reviews (P or D) approved,
-                                                                                # whereas both have to be True
+        context['approved'] = get_approved_activities()
+        context['pending'] = Activity.objects.none()
+        context['rejected'] = Activity.objects.none()
+
         if request.user.is_authenticated():
-            user_activities = request.user.activity_set.all()
-            user_clubs = request.user.memberships.all() | request.user.coordination.all()
-            primary_activities = Activity.objects.filter(
-                primary_club__in=user_clubs)
-            secondary_activities = Activity.objects.filter(
-                secondary_clubs__in=user_clubs)
+            template = 'activities/list_normal.html'
         else:
-            user_activities = Activity.objects.none()
-            primary_activities = Activity.objects.none()
-            secondary_activities = Activity.objects.none()
-        activities = approved_activities | user_activities | \
-                     primary_activities | secondary_activities
+            template = 'activities/front/list.html'
 
-    context = {'page_activities': activities}
     return render(request, template, context)
 
 @login_required
@@ -108,7 +129,7 @@ def show(request, activity_id):
         if request.user.has_perm('niqati.view_order') or \
             is_coordinator:
             context['can_view_niqati_orders'] = True
-            
+
     else:
         user_clubs = Club.objects.none()
 
@@ -150,10 +171,10 @@ def create(request):
     # If any club coordinated by the user exceeds the 3-report threshold,
     # prevent new activity submission (again in reality the user will only coordinate
     # one club)
-    if any(club.get_overdue_report_count() > 3 for club in user_coordination):
+    if any(club.get_overdue_report_count() > MAX_OVERDUE_REPORTS for club in user_coordination):
         raise PermissionDenied
     
-    presidency = Club.objects.get(english_name="Presidency")
+    presidency = get_presidency() # Club.objects.get(english_name="Presidency")
     if request.method == 'POST':
         activity = Activity(submitter=request.user)
         if request.user.has_perm('activities.directly_add_activity'):
@@ -332,13 +353,29 @@ def review(request, activity_id, lower_reivew_type=None):
                               template="activity_presidency_approved",
                               context=email_context)
                 elif review_type == 'D':
-                    email_context['full_url'] = activity_full_url
-                    mail.send([activity.primary_club.coordinator.email],
-                              template="activity_deanship_approved",
-                              context=email_context)
-                    # FIXME: When we launch the website, not all clubs
-                    # will have employees assigned.  This check is to
-                    # be remvoed later.
+                    if activity.primary_club.coordinator:
+                        email_context['full_url'] = activity_full_url
+                        mail.send([activity.primary_club.coordinator.email],
+                                  template="activity_deanship_approved",
+                                  context=email_context)
+
+                        for episode in activity.episode_set.all():
+                            # Schedule an email at the date of the episode
+                            # to remind the coordinator of submitting the media report
+                            mail.send([activity.primary_club.coordinator.email],
+                                      template="first_report_reminder",
+                                      scheduled_time=episode.start_date,
+                                      context={"episode": episode})
+
+                            # Schedule another email 3 days after the episode as a second reminder
+                            # to submit the media report
+                            # TODO: there should be a better way that doesn't send the second email
+                            # if the report is already submitted
+                            mail.send([activity.primary_club.coordinator.email],
+                                      template="first_report_reminder",
+                                      scheduled_time=episode.start_date + timedelta(days=3),
+                                      context={"episode": episode})
+
                     if activity.primary_club.employee:
                         email_context['full_url'] = deanship_full_url
                         mail.send([activity.primary_club.employee.email],
@@ -438,7 +475,8 @@ def view_participation(request, activity_id):
         raise PermissionDenied
 
     participations = Participation.objects.filter(activity=activity)
-    context = {'participations': participations, 'activity': activity}
+    context = {'participations': participations, 'activity': activity,
+               'active_tab': 'view_participation'}
     return render(request, 'activities/view_participations.html', context)
 
 # TODO: remove this view and the associated url since its function is now done by datatables

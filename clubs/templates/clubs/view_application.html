@@ -30,8 +30,8 @@
             <!--TODO: Add registration note field (as drawer) -->
             <td>
                 <div class="btn-group-vertical">
-                    <button class="btn btn-success btn-xs">اقبل</button>
-                    <button class="btn btn-default btn-xs">تجاهل</button>
+                    <button class="btn btn-success btn-xs btn-approve-application" data-application-pk="{{ app.pk }}" data-action="approve">اقبل</button>
+                    <button class="btn btn-default btn-xs btn-ignore-application" data-application-pk="{{ app.pk }}" data-action="ignore">تجاهل</button>
                 </div>
             </td>
         </tr>
@@ -46,6 +46,46 @@
 <script src="{% static 'neon/assets/js/datatables/TableTools.min.js' %}"></script>
 <script>
 $(document).ready(function () {
+    // Attach the ajax function to approve and ignore buttons
+    $(".btn-approve-application, .btn-ignore-application").click(function () {
+        console.log("I've been called");
+		var data = {'application_pk': $(this).attr('data-application-pk')};
+		var action = $(this).attr('data-action');
+		var ajaxUrl;
+		if (action == "approve") {
+		    ajaxUrl = "{% url 'clubs:approve_application' club.pk %}";
+		} else {
+		    ajaxUrl = "{% url 'clubs:ignore_application' club.pk %}";
+		}
+        var parentRow = $(this).parent().parent().parent();
+        var self = $(this);
+        $.ajax({
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            url: ajaxUrl,
+            cache: false,
+            success: function(data){
+                if (data['success'] == true){
+                    var table = $("#application_table").DataTable();
+                    // If the action is approval, briefly display a check mark
+                    console.log(table);
+                    parentRow.fadeOut(400, function() {
+                        //parentRow.animate({backgroundColor: '#FF0000'}, 'fast');
+                        // Get the position of the current data from the node
+                        var aPos = table.fnGetPosition( self.closest('tr').get(0) );
+                        // Delete the row
+                        table.fnDeleteRow(aPos);
+                    });
+
+                } else {
+                    alert(data['message']);
+                }
+            }
+        });
+	});
+
+	// Initialize the datatable
 	$('#application_table').DataTable({
 		"sDom": "<'row'<'col-xs-6 col-left'l><'col-xs-6 col-right'<'export-data btn-group'T>f>r>t<'row'<'col-xs-6 col-left'i><'col-xs-6 col-right'p>>",
 		"oTableTools": {

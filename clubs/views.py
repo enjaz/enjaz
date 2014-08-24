@@ -1,70 +1,26 @@
 # -*- coding: utf-8  -*-
-import unicodecsv
-
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
-from django.forms import ModelForm
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core.exceptions import PermissionDenied
+from django.views.decorators import csrf
 
+from post_office import mail
+import unicodecsv
+
+from core import decorators
+from clubs.forms import MembershipForm, DisabledClubForm, ClubForm
 from clubs.models import Club, MembershipApplication
 
-class ClubForm(ModelForm):
-    class Meta:
-        model = Club
-        fields = ['name','english_name','description', 'email',
-                  'parent', 'coordinator', 'open_membership']
-    def clean(self):
-        # Remove spaces at the start and end of all text fields.
-        cleaned_data = super(ClubForm, self).clean()
-        for field in cleaned_data:
-            if isinstance(cleaned_data[field], unicode):
-                cleaned_data[field] = cleaned_data[field].strip()
-        return cleaned_data
-
-class DisabledClubForm(ClubForm):
-    def __init__(self, *args, **kwargs):
-        # Fields to keep enabled.
-        self.enabled_fields = ['description', 'open_membership']
-        # If an instance is passed, then store it in the instance variable.
-        # This will be used to disable the fields.
-        self.instance = kwargs.get('instance', None)
-
-        # Initialize the form
-        super(DisabledClubForm, self).__init__(*args, **kwargs)
-
-        # Make sure that an instance is passed (i.e. the form is being
-        # edited).
-        if self.instance:
-            for field in self.fields:
-                if not field in self.enabled_fields:
-                    self.fields[field].widget.attrs['readonly'] = 'readonly'
-
-    def clean(self):
-        cleaned_data = super(DisabledClubForm, self).clean()
-        if self.instance:
-            for field in cleaned_data:
-                if not field in self.enabled_fields:
-                    cleaned_data[field] = getattr(self.instance, field)
-
-        return cleaned_data
-
-class ModifyClubForm(ModelForm):
-    class Meta:
-        model = Club
-        fields = ['description', 'email',
-                  'parent', 'coordinator', 'open_membership']
-
-
-class MembershipForm(ModelForm):
-    class Meta:
-        model = MembershipApplication
-        fields = ['note']
+# TODO:
+#   * After applying  the data  table with  the new  membership action
+#     buttons,  create a  message to  inform the  user about  whatever
+#     action was taken regarding their membership. [Osama, Aug 2]
 
 @login_required
 def list(request):
-    clubs = Club.objects.exclude(english_name="Presidency")
+    clubs = Club.objects.exclude(english_name="Presidency").exclude(english_name="Media Center")
     context = {'clubs':clubs}
     return render(request, 'clubs/list.html', context)
 
@@ -167,6 +123,13 @@ def join(request, club_id):
         form = MembershipForm(request.POST, instance=application)
         if form.is_valid():
             form.save()
+            view_application_url = reverse('clubs:view_application', args=(club_id,))
+            full_url = request.build_absolute_uri(view_application_url)
+            email_context = {'club': club, 'user': request.user,
+                             'full_url': full_url}
+            mail.send([club.coordinator.email],
+                      template="club_membership_applied",
+                      context=email_context)
             return HttpResponseRedirect(reverse('clubs:join_done',
                                                 args=(club_id,)))
         else:
@@ -188,6 +151,56 @@ def view_application(request, club_id):
     context = {'applications': applications, 'club': club}
     return render(request, 'clubs/view_application.html', context)
 
+# @login_required
+@csrf.csrf_exempt
+@decorators.ajax_only
+@decorators.post_only
+def approve_application(request, club_id):
+    """
+    Add the application's applicant to the application's club.
+    Then, delete the application.
+    """
+    print request.user
+    application = get_object_or_404(MembershipApplication, pk=request.POST['application_pk'])
+    # --- Permission Checks ---
+    # The user should be the application's club coordinator
+    if application.club not in request.user.coordination.all() and \
+       not request.user.has_perm('clubs.view_application'):
+        raise Exception(u"ليس لديك الصلاحيات الكافية للقيام بذلك.")
+
+    # Check that the application's applicant isn't a member of
+    # the application's club
+    if application.user in application.club.members.all():
+        # Now this shouldn't happen since the join view already prevents
+        # members from accessing the view
+        raise Exception(u"هذا المستخدم عضو في النادي أصلًا")
+
+    # If all went OK, add the user to the club and delete the application
+    application.club.members.add(application.user)
+    application.delete()
+
+    # return {}
+
+# @login_required
+@csrf.csrf_exempt
+@decorators.ajax_only
+@decorators.post_only
+def ignore_application(request, club_id):
+    """
+    Basically delete the application.
+    """
+    application = get_object_or_404(MembershipApplication, pk=request.POST['application_pk'])
+    # --- Permission Checks ---
+    # The user should be the application's club coordinator
+    if application.club not in request.user.coordination.all() and \
+       not request.user.has_perm('clubs.view_application'):
+        raise Exception(u"ليس لديك الصلاحيات الكافية للقيام بذلك.")
+
+    application.delete()
+
+    # return {}
+
+# TODO: remove this view and the associated url since its function is now done by datatables
 @login_required
 def download_application(request, club_id):
     club = get_object_or_404(Club, pk=club_id)

@@ -1,31 +1,60 @@
-{% extends "activities_base.html" %}
+{% extends "activities/show.html" %}{% load staticfiles %}
 {% block title %}مشاهدة طلبات المشاركة في {{ activity.name }}{% endblock %}
 
-{% block content %}
-<h2>طلبات المشاركة في {{ activity.name }}</h2>
-{% if participations %}
-<div class="col-md-3">
-	<div class="panel panel-primary" data-collapsed="0">
-		<!-- panel head -->
-		<div class="panel-heading">
-			<div class="panel-title">خيارات</div>
-		</div>
-		
-		<!-- panel body -->
-		<div class="panel-body">
-			<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'activities:download_participation' activity.pk %}"><span class="glyphicon glyphicon-download"></span> نزّل الطلبات</a>.</il></ul></p>
-		</div>
-	</div>
-</div>
-<div class="col-md-9">
-	<ul>
-		{% for participation in participations %}
-		<li>{% if participation.user.first_name %}{{ participation.user.first_name }} {{ participation.user.last_name }}{% else %}{{ participation.user.username }}{% endif %} - {{ participation.submission_date }}</li>
-		{% endfor %}
-	</ul>
-</div>
-{% else %}
-<p>لا توجد طلبات مشاركة.</p>
-{% endif %}
+{% block review_content %}
+{#<h2>طلبات المشاركة في {{ activity.name }}</h2>#}
+
+<table id="participation_table" class="table table-bordered datatable">
+    <thead>
+        <th>الاسم</th>
+        <th>الاسم الإنجليزي</th>
+        <th>الكلية</th>
+        <th>الرقم الجامعي</th>
+        <th>رقم البطاقة الجامعية</th>
+        <th>البريد الإلكتروني</th>
+        <th>رقم الجوال</th>
+        <th>تاريخ الطلب</th>
+    </thead>
+    <tbody>
+        {% for par in participations %}
+        <tr>
+            <td>{% if par.user.student_profile %}{{ par.user.student_profile.get_ar_full_name }}{% else %}{{ par.user.username }}{% endif %}</td>
+            <td>{% if par.user.student_profile %}{{ par.user.student_profile.get_en_full_name }}{% else %}{{ par.user.username }}{% endif %}</td>
+            <td>{{ par.user.student_profile.college }}</td>
+            <td>{{ par.user.student_profile.student_id }}</td>
+            <td>{{ par.user.student_profile.badge_number }}</td>
+            <td>{{ par.user.email }}</td>
+            <td>{{ par.user.student_profile.mobile_number }}</td>
+            <td>{{ par.submission_date }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
 
+{% block customscript %}
+<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+<script src="{% static 'neon/assets/js/datatables/TableTools.min.js' %}"></script>
+<script>
+$(document).ready(function () {
+	$('#participation_table').DataTable({
+		"sDom": "<'row'<'col-xs-6 col-left'l><'col-xs-6 col-right'<'export-data btn-group'T>f>r>t<'row'<'col-xs-6 col-left'i><'col-xs-6 col-right'p>>",
+		"oTableTools": {
+		    "sSwfPath": "{% static 'neon/assets/js/datatables/copy_csv_xls_pdf.swf' %}",
+		    "aButtons": [
+                {
+                    "sExtends":     "print",
+                    "sButtonClass": "btn btn-default btn-xs"
+                },
+                {
+                    "sExtends":     "xls",
+                    "sButtonText":  "Download",
+                    "sButtonClass": "btn btn-white btn-xs"
+                }
+            ]
+		}
+	});
+});
+</script>
+{% endblock %}

@@ -4,6 +4,14 @@ from django.db.models.signals import post_syncdb
 import accounts.models
 
 def create_groups(sender, **kwargs):
+    # This group is for the head of activities in the Deanship of Student
+    # Affairs and anyone else who is responsible for approved and reviewing
+    # activities
+    deanship_master_group = Group.objects.create(name='deanship_master')
+    add_deanship_review = Permission.objects.get(codename='add_deanship_review')
+    deanship_master_group.permissions.add(add_deanship_review)
+    deanship_master_group.save()
+
     # In order for the employees to be able to use the Deanship Admin
     # interface, we create a group for them.  Further more, we make
     # them able to see the deanship review.
@@ -12,7 +20,7 @@ def create_groups(sender, **kwargs):
     deanship_group.permissions.add(view_deanship_review)
     deanship_group.save()
 
-    # This group is meant for the President of the Studnet Club and
+    # This group is meant for the President of the Student Club and
     # his deputies.
     presidency_group = Group.objects.create(name='presidency')
     add_activity = Permission.objects.get(codename='add_activity')
@@ -26,17 +34,24 @@ def create_groups(sender, **kwargs):
     view_participation = Permission.objects.get(codename='view_participation')
     add_club = Permission.objects.get(codename='add_club')
     change_club = Permission.objects.get(codename='change_club')
-    change_book = Permission.objects.get(codename='change_book')
-    delete_book = Permission.objects.get(codename='delete_book')
+    # change_book = Permission.objects.get(codename='change_book')
+    # delete_book = Permission.objects.get(codename='delete_book')
     view_presidency_review = Permission.objects.get(codename='view_presidency_review')
     add_presidency_review = Permission.objects.get(codename='add_presidency_review')
     presidency_group.permissions.add(add_activity,
                                      directly_add_activity,
                                      change_activity, view_activity,
                                      view_participation, add_club,
-                                     change_club, change_book,
+                                     change_club, #change_book,
                                      view_presidency_review,
                                      view_deanship_review,
                                      add_presidency_review)
     presidency_group.save()
+
+
+def create_custom_permission(sender, **kwargs):
+    Permission.objects.create(name="Is a deanship employee.", codename="deanship_employee",
+                              content_type=ContentType.objects.get(model='user'))
+
 post_syncdb.connect(create_groups, sender=accounts.models)
+post_syncdb.connect(create_custom_permission, sender=accounts.models)

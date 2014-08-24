@@ -1,7 +1,7 @@
 {% extends 'userena/base_userena.html' %}{% load staticfiles %}
 
 {% block title %}التسجيل{% endblock %}
-{% block description %}فضلًا املأ النموذج التالي لإتمام عملية التسجيل. ستكون هذه آخر مرة نطلب منك كل هذه التفاصيل!<br/>إذا لم تكن طالبا <a href="{% url 'nonstudent_signup' %}">سجّل هنا</a>.{% endblock %}
+{% block description %}فضلًا املأ النموذج التالي لإتمام عملية التسجيل.<br/><span style="font-size: 1.6em;"> إذا لم تكن طالبا <a href="{% url 'nonstudent_signup' %}">سجّل هنا</a>.</span>{% endblock %}
 
 {% block content %}
 {% comment %}
@@ -161,6 +161,23 @@
 					{% if form.section.errors %}
 					    {% for error in form.section.errors %}
 					        <label class='error' for='section' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="input-group{% if form.gender.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-docs"></i>
+					</div>
+					<select {% if form.gender.value and not form.gender.errors %}value="{{ form.gender.value }}" {% endif %}class="form-control" id="gender" name="gender"  title="{{ form.gender.label }}" required="required">
+                                                <option value="">{{ form.gender.label }}</option>
+                                                {% for value, label in form.fields.gender.widget.choices %}
+                                                <option {% if form.gender.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
+					</select>
+					{% if form.gender.errors %}
+					    {% for error in form.gender.errors %}
+					        <label class='error' for='gender' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 				</div>

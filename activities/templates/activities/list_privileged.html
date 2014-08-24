@@ -1,0 +1,179 @@
+{% extends 'activities_base.html' %}{% load staticfiles %}
+{% block title %}الأنشطة{% endblock %}
+
+{% block content %}
+{% if due_report_count > 0 %}
+<div class="alert alert-minimal">
+    <strong>تنبيه</strong> لديك <span class="badge badge-warning">{{ due_report_count }}</span> تقارير إعلامية حان وقت تسليمها. يرجى كتابتها و رتسليمها في أقرب فرصة.
+</div>
+{% endif %}
+{% if overdue_report_count > 0 and overdue_report_count <= MAX_OVERDUE_REPORTS %}
+<div class="alert alert-minimal">
+    <strong>تنبيه!</strong> لديك <span class="badge badge-danger">{{ overdue_report_count }}</span> تقارير إعلامية تأخرت في تسليمها؛ يرجى تسليمها في أقرب فرصة قبل أن يتم حرمانك من رفع أنشطة جديدة.
+</div>
+{% endif %}
+{% if overdue_report_count > MAX_OVERDUE_REPORTS %}
+<div class="alert alert-minimal">
+    <strong>تنبيه!</strong> لديك <span class="badge badge-danger">{{ overdue_report_count }}</span> تقارير إعلامية تأخرت في تسليمها؛
+    <strong>يجب عليك تسليمها قبل أن تتمكن من رفع أنشطة جديدة.</strong>
+</div>
+{% endif %}
+<div class="panel-group" id="activities-accordion">
+		
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseOne-2" class="collapsed">
+                    الأنشطة المعتمدة
+                </a>
+            </h4>
+        </div>
+        <div id="collapseOne-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <div class="row">
+                {% with activities=approved %}
+                    {% include 'activities/components/activities_table.html' %}
+                {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseTwo-2" class="notcollapsed">
+                    الأنشطة المعلّقة
+                </a>
+            </h4>
+        </div>
+        <div id="collapseTwo-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <div class="row">
+                {% with activities=pending %}
+                    {% include 'activities/components/activities_table.html' %}
+                {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="panel panel-danger">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseThree-2" class="collapsed">
+                    الأنشطة المرفوضة
+                </a>
+            </h4>
+        </div>
+        <div id="collapseThree-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <div class="row">
+                {% with activities=rejected %}
+                    {% include 'activities/components/activities_table.html' %}
+                {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseFour-2" class="collapsed">
+                    التقويم
+                </a>
+            </h4>
+        </div>
+        <div id="collapseFour-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+
+                <style>
+                    .calendar-env .calendar-body {
+                        width: 100%;
+                    }
+                </style>
+
+                <div class="row"><div class="calendar-env" dir="ltr"> <!-- It's problematic in rtl -->
+                    <!-- Calendar Body -->
+                    <div class="calendar-body">
+                        <div id="calendar"></div>
+                    </div>
+
+                </div><!-- end .calendar-env --></div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block customscript %}
+	<script src="{% static 'neon/assets/js/fullcalendar/fullcalendar.min.js' %}"></script>
+    <script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+	<script>
+    var approved = [
+        {% with activities=approved %}
+            {% include 'activities/components/activities_array_for_calendar.html' %}
+        {% endwith %}
+	];
+
+	var pending = [
+		{% with activities=pending %}
+			{% include 'activities/components/activities_array_for_calendar.html' %}
+		{% endwith %}
+	];
+
+	var rejected = [
+		{% with activities=rejected %}
+			{% include 'activities/components/activities_array_for_calendar.html' %}
+		{% endwith %}
+	];
+
+	var calendar = $('#calendar');
+    calendar.fullCalendar({
+        header: {
+            left: 'title',
+            right: 'month,agendaWeek,agendaDay today prev,next'
+        },
+
+        //defaultView: 'basicWeek',
+
+        editable: false,
+        firstDay: 7,
+        height: 600,
+        droppable: false,
+        allDayDefault: false,
+        eventSources: [
+            {events: approved,
+             color: 'rgb(0, 166, 81)'
+            },
+            {events: pending,
+             color: 'rgb(250, 216, 57)'
+            },
+            {events: rejected
+            }
+        ],
+        eventRender: function(event, element) {
+            var start = event.start;
+            var end = event.end;
+            var timeDiff = Math.abs(end - start);
+            var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            if (diffDays > 14) {
+                // hide episodes greater than 14 days in length
+                return false;
+            }
+        }
+    });
+
+    $('#collapseFour-2').on('shown.bs.collapse', function (e) {
+        calendar.fullCalendar('render');
+    });
+
+
+    $('.datatable').DataTable();
+	</script>
+{% endblock %}
+

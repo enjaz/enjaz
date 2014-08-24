@@ -5,7 +5,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth import authenticate
 from django.core.exceptions import ObjectDoesNotExist
 from userena.forms import SignupForm
-from clubs.models import College, college_choices, section_choices
+from clubs.models import College, college_choices, section_choices, gender_choices
 from accounts.models import StudentProfile, NonStudentProfile
 
 
@@ -33,6 +33,7 @@ class StudentSignupForm(SignupForm):
     mobile_number = forms.CharField(label=StudentProfile._meta.get_field('mobile_number').verbose_name)
     section = forms.CharField(label=u"القسم", max_length=2, widget=forms.Select(choices=section_choices))
     college = forms.CharField(label=StudentProfile._meta.get_field('college').verbose_name, max_length=1, widget=forms.Select(choices=college_choices))
+    gender = forms.CharField(label=u"الجنس", max_length=1, widget=forms.Select(choices=gender_choices))
 
     def __init__(self, *args, **kw):
         """
@@ -79,15 +80,18 @@ class StudentSignupForm(SignupForm):
         try:
             College.objects.get(
             name=self.cleaned_data['college'],
-            section=self.cleaned_data['section'])
+            section=self.cleaned_data['section'],
+            gender=self.cleaned_data['gender'])
         except ObjectDoesNotExist:
             college_msg = u"ليست كلية مسجلة."
             # Add an error message to specific fields.
             self._errors['college'] = self.error_class([college_msg])
             self._errors['section'] = self.error_class([college_msg])
+            self._errors['gender'] = self.error_class([college_msg])
             # Remove invalid fields
             del cleaned_data['college']
             del cleaned_data['section']
+            del cleaned_data['gender']
 
         return cleaned_data
 
@@ -142,7 +146,8 @@ class StudentSignupForm(SignupForm):
         #user_profile = new_user.get_profile()
         student_college = College.objects.get(
                             name=self.cleaned_data['college'],
-                            section=self.cleaned_data['section'])
+                            section=self.cleaned_data['section'],
+                            gender=self.cleaned_data['gender'])
         student_profile = StudentProfile.objects.create(user=new_user,
                    ar_first_name=self.cleaned_data['ar_first_name'],
                    ar_middle_name=self.cleaned_data['ar_middle_name'],

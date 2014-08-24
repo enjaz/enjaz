@@ -5,13 +5,15 @@ from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime, timedelta
 
 from clubs.models import College
+from media.utils import REPORT_DUE_AFTER
+
 
 class Activity(models.Model):
     # For now, we will follow the current practice: only one club will
     # be considered the primary orginzier.  Others will be cosidered
     # secondary.
     #clubs = models.ManyToManyField('clubs.Club',
-    #                               verbose_name=u"النوادي")
+    #                               verbose_name=u"الأندية")
     primary_club = models.ForeignKey('clubs.Club', null=True,
                                      on_delete=models.SET_NULL,
                                      related_name='primary_activity',
@@ -54,10 +56,7 @@ class Activity(models.Model):
     def is_approved_by_deanship(self):
         try:
             d_review = self.review_set.get(review_type='D')
-            if d_review.is_approved:
-                return True
-            else:
-                return False
+            return d_review.is_approved
         except (KeyError, Review.DoesNotExist): # deanship review does not exist
             return None
     is_approved_by_deanship.boolean = True
@@ -66,47 +65,108 @@ class Activity(models.Model):
     def is_approved_by_presidency(self):
         try:
             p_review = self.review_set.get(review_type='P')
-            if p_review.is_approved:
-                return True
-            else:
-                return False
-        except (KeyError, Review.DoesNotExist): # deanship review does not exist
+            return p_review.is_approved
+        except (KeyError, Review.DoesNotExist): # presidency review does not exist
             return None
     is_approved_by_presidency.boolean = True
     is_approved_by_presidency.short_description = u"اعتمدته الرئاسة؟"
 
     def is_approved(self):
-        return self.is_approved_by_deanship()
-    
+        if self.get_approval_status() == 6:
+            return True
+        elif self.get_approval_status() == 2 or self.get_approval_status() == 5:
+            return False
+        else:
+            return None
+        # return self.is_approved_by_deanship()
+
+    def get_approval_status(self):
+        """
+        Returns the approval status of the activity as a number within the range 0 to 6, where 6 is approved.
+        """
+        reviews = self.review_set.all()
+        if not reviews.exists():
+            return 0
+        elif reviews.filter(review_type="P", is_approved=None).exists() and \
+            not reviews.filter(review_type="D").exists():
+            return 1
+        elif reviews.filter(review_type="P", is_approved=False).exists() and \
+            not reviews.filter(review_type="D").exists():
+            return 2
+        elif reviews.filter(review_type="P", is_approved=True).exists() and \
+            not reviews.filter(review_type="D").exists():
+            return 3
+        elif reviews.filter(review_type="P", is_approved=True).exists() and \
+            reviews.filter(review_type="D", is_approved=None).exists():
+            return 4
+        elif reviews.filter(review_type="P", is_approved=True).exists() and \
+            reviews.filter(review_type="D", is_approved=False).exists():
+            return 5
+        elif reviews.filter(review_type="P", is_approved=True).exists() and \
+            reviews.filter(review_type="D", is_approved=True).exists():
+            return 6
+
+    def get_approval_status_message(self):
+        """
+        Return a verbose version of the approval status.
+        """
+        return {0: u"لم تتم مراجعته بعد.",
+                1: u"ينتظر تعديلاً.",
+                2: u"رفضته رئاسة نادي الطلاب.",
+                3: u"ينتظر مراجعة عمادة شؤون الطلاب.",
+                4: u"ينتظر تعديلًا.",
+                5: u"رفضته عمادة شؤون الطلاب.",
+                6: u"تمت الموافقة على النشاط.",
+                None: u"غير معروف",
+                }[self.get_approval_status()]
+
     def is_single_episode(self):
         return self.episode_set.count() == 1
     
     def get_first_date(self):
-        return self.episode_set.all()[0].start_date # NOTE: This is not accurate as the
-                                                    # first episode in the queryset may
-                                                    # or may not be the first in terms
-                                                    # of date and time.
-                                                    # [Saeed, 4 Jul 2014]
+        return self.get_first_episode().start_date
         
     def get_first_time(self):
-        return self.episode_set.all()[0].start_time
+        return self.get_first_episode().start_time
     
     def get_first_location(self):
-        return self.episode_set.all()[0].location
+        return self.get_first_episode().location
     
     def get_first_episode(self):
         """
         Return the first scheduled episode for this activity.
         *** This should replace the three above-mentioned methods. ***
         """
-        pass
-    
+        return self.episode_set.order_by('start_date', 'start_time').first()
+
     def get_next_episode(self):
         """
         Return the next scheduled episode for this activity.
         """
-        pass
-    
+        sorted_episodes = self.episode_set.order_by('start_date', 'start_time')
+        next_episodes = sorted_episodes.filter(start_date__gt=datetime.today()) \
+        | sorted_episodes.filter(start_date=datetime.today(), start_time__gte=datetime.now())
+        # episodes from tomorrow onward +  episodes that are today but later in the day
+        return next_episodes.first()
+
+    # Evaluation-related
+    def get_relevance_score_average(self):
+        """
+        Return the average evaluation score for relevance to student needs.
+        """
+        relevance_scores = [e.relevance for e in self.evaluation_set.all()]
+        return float(sum(relevance_scores))/len(relevance_scores) if len(relevance_scores) > 0 else 0
+        # NOTE: the conditional is to avoid division by zero
+    get_relevance_score_average.short_description = u"معدل تقييم ملاءمة النشاط"
+
+    def get_quality_score_average(self):
+        """
+        Return the average evaluation score for quality of the activity.
+        """
+        quality_scores = [e.quality for e in self.evaluation_set.all()]
+        return float(sum(quality_scores))/len(quality_scores) if len(quality_scores) > 0 else 0
+    get_quality_score_average.short_description = u"معدل تقييم جودة النشاط"
+
     class Meta:
         permissions = (
             ("view_activity", "Can view all available activities."),
@@ -236,11 +296,11 @@ class Episode(models.Model):
     # google_event = models.URLField()
     
     def __unicode__(self):
-        return self.activity.name + " #" + str(self.get_index() + 1)
+        return self.activity.name + " #" + str(self.get_index())
     
     def get_index(self):
-        "Return the index of the episode within the parent activity's episode set"
-        return list(self.activity.episode_set.all()).index(self)
+        "Return the index (starting from 1) of the episode within the parent activity's episode set"
+        return list(self.activity.episode_set.all()).index(self) + 1
     
     def is_single_day(self):
         return self.start_date == self.end_date
@@ -253,17 +313,20 @@ class Episode(models.Model):
         return datetime.combine(self.start_date, self.start_time)
     
     def end_datetime(self):
-        return datetime.combine(self.end_date, self.end_time)
+        end_datetime = datetime.combine(self.end_date, self.end_time)
+        if self.start_datetime() == end_datetime:
+            return end_datetime + timedelta(seconds=1)
+        else:
+            return end_datetime
     
     # Media-related methods
-    REPORT_DUE_AFTER = 7 # in days
-    
+
     def report_due_date(self):
         """
         Return the due date of the report, which is within 7
         days of the end of the corresponding episode.
         """
-        return self.end_datetime() + timedelta(days=self.REPORT_DUE_AFTER)
+        return self.end_datetime() + timedelta(days=REPORT_DUE_AFTER)
     
     def report_is_due(self):
         """

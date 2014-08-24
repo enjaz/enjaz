@@ -25,6 +25,15 @@ group_status_choices = (
     ('R', u'مرفوضة'),
 )
 
+supervision_request_status_choices = (
+    ('P', u'تنتظر المراجعة'),
+    ('A', u'مقبول'), # Currently accepted
+    ('R', u'مرفوض'), # Never been accepted
+    ('D', u'ألغاه الطالب المستجد قبل أن يراجعه الزميل الطلابي'), # Never been accepted
+    ('WN', u'ألغاه الطالب المستجد'), # After it has been accepted
+    ('WC', u'ألغاه الزميل الطلابي'), # After it has been accepted
+)
+
 class ArshidniProfile(models.Model):
     interests = models.TextField(u"الاهتمامات", help_text=u"ما هي اهتمامتك الأكاديمية؟")
     contacts = models.CharField(max_length=100,
@@ -48,6 +57,10 @@ class GraduateProfile(ArshidniProfile):
                                             default=True)
     gives_lectures = models.BooleanField(verbose_name=u"هل تريد إلقاء محاضرات للطلاب عن موضوع من اختيارك؟",
                                             default=True)
+    class Meta:
+        verbose_name = u"ملف خريج متعاون"
+        verbose_name_plural = u"ملفات الخريجين المتعاونين"
+
 
 class Question(models.Model):
     submitter = models.ForeignKey(User, null=True,
@@ -117,6 +130,11 @@ class Answer(models.Model):
                                            auto_now_add=True)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
 
+    class Meta:
+        verbose_name = u"إجابة"
+        verbose_name_plural = u"الإجابات"
+
+
 # Groups
 
 class StudyGroup(models.Model):
@@ -145,7 +163,6 @@ class StudyGroup(models.Model):
 
     def get_period_in_days(self):
         return (self.ending_date - self.starting_date).days
-
     get_period_in_days.short_description = u"المدة بالأيام"
 
     def get_period_in_weeks(self):
@@ -153,7 +170,6 @@ class StudyGroup(models.Model):
         # Round up
         weeks = math.ceil(float_weeks)
         return int(weeks)
-
     get_period_in_weeks.short_description = u"المدة بالأسابيع"
 
     def get_remaining_members(self):
@@ -178,6 +194,11 @@ class LearningObjective(models.Model):
     submission_date = models.DateTimeField(u'تاريخ الإرسال',
                                            auto_now_add=True)
 
+    class Meta:
+        verbose_name = u"هدف تعليمي"
+        verbose_name_plural = u"الأهداف التعليمية"
+
+
 class JoinStudyGroupRequest(models.Model):
     # TODO: Add status
     submitter = models.ForeignKey(User, null=True,
@@ -193,9 +214,10 @@ class JoinStudyGroupRequest(models.Model):
     submission_date = models.DateTimeField(u'تاريخ الإرسال',
                                            auto_now_add=True)
 
-    def get_full_status(self):
-        is_accepted_dict = dict(is_accepted_choices)
-        return is_accepted_dict[self.is_accepted]
+    class Meta:
+        verbose_name = u"طلب انضمام لمجموعة دراسية"
+        verbose_name_plural = u"طلبات الانضمام لمجموعة دراسية"
+
 
 # Studnet Colleague
 
@@ -210,27 +232,23 @@ class ColleagueProfile(ArshidniProfile):
     # very expensive.
     is_available = models.BooleanField(verbose_name=u"هل هو متاح؟",
                                             default=True)
+    class Meta:
+        verbose_name = u"ملف زميل طلابي"
+        verbose_name_plural = u"ملفات الزملاء الطلابيين"
+
     
 class SupervisionRequest(models.Model):    
     user = models.ForeignKey(User, null=True,
                              on_delete=models.SET_NULL,
-                             verbose_name=u"المستخدم",
+                             verbose_name=u"الطالب المستجد",
                              related_name="supervision_requests")
     colleague = models.ForeignKey(ColleagueProfile, null=True,
                                   on_delete=models.SET_NULL,
-                                  verbose_name=u"المستخدم",
+                                  verbose_name=u"الزميل",
                                   related_name="colleague")
-    status_choices = (
-        ('P', u'تنتظر المراجعة'),
-        ('A', u'مقبول'), # Currently accepted
-        ('R', u'مرفوض'), # Never been accepted
-        ('D', u'ألغاه الطالب المستجد قبل أن يراجعه الزميل الطلابي'), # Never been accepted
-        ('WN', u'ألغاه الطالب المستجد'), # After it has been accepted
-        ('WC', u'ألغاه الزميل الطلابي'), # After it has been accepted
-    )
     status = models.CharField(max_length=2, verbose_name=u"الحالة",
                               default='P',
-                              choices=status_choices)
+                              choices=supervision_request_status_choices)
     contacts = models.CharField(max_length=100,
                                 verbose_name=u"طريقة التواصل", help_text=u"جوال مثلا؟")
     interests = models.TextField(u"الاهتمامات", help_text=u"ما المجالات التي تريد تطوير نفسك فيها؟")
@@ -242,6 +260,9 @@ class SupervisionRequest(models.Model):
                                            default=None)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
 
-    def get_full_status(self):
-        status_dict = dict(self.status_choices)
-        return status_dict[self.status]
+    def __unicode__(self):
+        return self.user.student_profile.get_en_full_name()
+
+    class Meta:
+        verbose_name = u"طلب زمالة"
+        verbose_name_plural = u"طلبات الزمالة"

@@ -5,6 +5,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 
 from activities.models import Activity
+from activities.utils import get_approved_activities
 from books.models import Book
 from .models import Announcement
 
@@ -16,19 +17,14 @@ def portal_home(request):
         # --- activities ---
         current_year_activities = Activity.objects.all()
         # count only approved activites
-        approved_activities = []
-        for a in current_year_activities:
-            if a.is_approved(): approved_activities.append(a)
-        context['activity_count'] = len(approved_activities)
+        approved_activities = get_approved_activities()
+        context['activity_count'] = approved_activities.count()
         
         today = date.today()
         next_week = today + timedelta(weeks=1)
-        next_week_activities = filter(lambda a: a.get_first_date() >= today and a.get_first_date() <= next_week, Activity.objects.all()) # filter(date__gte=today , date__lte=next_week)
-        # show only approved activities
-        upcoming_activities = []
-        for a in next_week_activities:
-            if a.is_approved(): upcoming_activities.append(a)
-        context['upcoming_activities'] = upcoming_activities[::-1]
+        upcoming_activities = filter(lambda a: a.get_next_episode() is not None, get_approved_activities())
+        next_week_activities = filter(lambda a: a.get_next_episode().start_date <= next_week, upcoming_activities)
+        context['upcoming_activities'] = next_week_activities[::-1]
         
         # --- niqati -------
         context['niqati_sum'] = sum(code.category.points for code in request.user.code_set.all())
@@ -38,7 +34,7 @@ def portal_home(request):
         # --- books --------
         context['books_count'] = Book.objects.count()
         context['my_books_count'] = request.user.book_contributions.count()
-        context['latest_books'] = Book.objects.all()[::-1][:5]
+        context['latest_books'] = Book.objects.all()[::-1][:5] # TODO: update to be gender-segregated
         
         # --- announcements 
         context['student_researches'] = Announcement.objects.filter(type='R')[::-1] # show last first

@@ -234,7 +234,7 @@ class EvaluationForm(ModelForm):
         super(EvaluationForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             self.fields[field].widget = TextInput()
-            self.fields[field].widget.attrs = {'class': 'knob', 'data-min': 1, 'data-max': 5,
+            self.fields[field].widget.attrs = {'class': 'knob', 'data-min': 0, 'data-max': 5,
                                                'data-width': 125, 'data-height': 125, 'data-thickness': .25,
                                                'data-fgcolor': '#00b19d', 'data-bgcolor': '#ebebeb',
                                                'data-anglearc': 240, 'data-angleoffset': -120}

@@ -10,19 +10,23 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import permission_required, login_required
 from django.views.decorators import csrf
 
+from post_office import mail
+
 from core import decorators
 from arshidni.models import GraduateProfile, Question, Answer, StudyGroup, LearningObjective, JoinStudyGroupRequest, ColleagueProfile, SupervisionRequest
-from clubs.models import College, college_choices
+from arshidni.utilities import get_arshidni_coordinator
+from clubs.models import College
+from accounts.models import get_gender
 
 # Anything that should solely be done by the Arshidni coordinator
-# should be done by the arshidni coordinator.
+# should be done through the arshidni admin interface.
 
 # TODO:
-#  * Add college to college and graduate form pages.
-#  * Add view_* permissions
+#  * Add college to college and graduate form pages. [Osama, Aug 2]
+#  * Add view_* permissions [Osama, Aug 2]
 #  * End date pickers should start at present date. (Don't apply this
 #    rule to the start date because some groups may be register after
-#    they have already started
+#    they have already started. [Osama, Aug 2]
  
 class GraduateProfileForm(forms.ModelForm):
     class Meta:
@@ -125,8 +129,17 @@ def register_graduate_profile(request):
                                    instance=graduate_profile_object)
         if form.is_valid():
             new_graduate_profile = form.save()
-            return HttpResponseRedirect(reverse('arshidni:show_graduate_profile',
-                                                args=(new_graduate_profile.pk,)))
+            graduate_profile_url = reverse('arshidni:show_graduate_profile',
+                                           args=(new_graduate_profile.pk,))
+            full_url = request.build_absolute_uri(graduate_profile_url)
+            arshidni_coordinator = get_arshidni_coordinator()
+            email_context = {'arshidni_coordinator': arshidni_coordinator,
+                             'graduate_profile': new_graduate_profile,
+                             'full_url': full_url}
+            mail.send([arshidni_coordinator.email],
+                      template="graduate_profile_submitted",
+                      context=email_context)
+            return HttpResponseRedirect(graduate_profile_url)
         else:
             context = {'form': form}
     elif request.method == 'GET':
@@ -198,11 +211,10 @@ def list_questions(request, college_name):
     upper_college_name = college_name.upper()
     # Make sure that there are actually colleges with that name (this
     # query makes things as dynamic as possible.)
-    get_list_or_404(College, name=upper_college_name)
+    college = get_list_or_404(College, name=upper_college_name)[0]
+    college_full_name = college.get_name_display()
 
     form = QuestionForm()
-    college_dict = dict(college_choices)
-    college_full_name = college_dict[upper_college_name]
 
     # If the user has the view_questions permission, show questions
     # that are pending-revision.
@@ -402,40 +414,7 @@ def list_groups(request):
         approved_groups = StudyGroup.objects.filter(status='A')
         groups = user_groups | approved_groups
 
-    group_filter = request.GET.get('filter')
-    if group_filter == 'mine':
-        filtered_groups = groups.filter(coordinator=request.user)
-    elif group_filter == 'day':
-        one_day_ago = datetime.datetime.now() - datetime.timedelta(days=1)
-        filtered_groups = groups.filter(submission_date__gte=one_day_ago)
-    elif group_filter == 'week':
-        one_week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
-        filtered_groups = groups.filter(submission_date__gte=one_week_ago)
-    elif group_filter == 'motnh':
-        one_month_ago = datetime.datetime.now() - datetime.timedelta(days=30)
-        filtered_groups = groups.filter(submission_date__gte=one_month_ago)
-    else:
-        filtered_groups = groups
-
-    group_order = request.GET.get('order')
-    #TODO: Find out more useful orders
-    if True:
-        ordered_groups = filtered_groups.order_by('-submission_date')
-
-    # Each page of results should have a maximum of 25 activities.
-    paginator = Paginator(ordered_groups, 25)
-    page = request.GET.get('page')
-
-    try:
-        page_groups = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        page_groups = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        page_groups = paginator.page(paginator.num_pages)
-
-    context = {'page_groups': page_groups}
+    context = {'page_groups': groups}
     return render(request, 'arshidni/group_list.html', context)
 
 @login_required
@@ -446,6 +425,15 @@ def list_groups(request):
 def join_group(request):
     group_id = request.POST.get('group_id')
     group = get_object_or_404(StudyGroup, pk=group_id)
+
+    user_gender = get_gender(request.user)
+    coordinator_gender = get_gender(group.coordinator)
+
+    if user_gender != coordinator_gender:
+        if coordinator_gender == 'F':
+            raise Exception(u'المجموعة متاحة للطالبات فقط')
+        elif coordinator_gender == 'M':
+            raise Exception(u'المجموعة متاحة للطلاب فقط')
 
     if not group.max_members > group.members.count():
         raise Exception(u'المجموعة تجاوزت العدد الأقصى')
@@ -470,8 +458,20 @@ def submit_group(request):
         form = StudyGroupForm(request.POST, instance=group_object)
         if form.is_valid():
             new_group = form.save()
-            return HttpResponseRedirect(reverse('arshidni:show_group',
-                                                args=(new_group.pk,)))
+            group_url = reverse('arshidni:show_group',
+                                args=(new_group.pk,))
+            group_full_url = request.build_absolute_uri(group_url)
+            admin_url = reverse('arshidni_admin:index')
+            admin_full_url = request.build_absolute_uri(admin_url)
+            arshidni_coordinator = get_arshidni_coordinator()
+            email_context = {'arshidni_coordinator': arshidni_coordinator,
+                             'group': new_group,
+                             'full_url': group_full_url,
+                             'admin_full_url': admin_full_url}
+            mail.send([arshidni_coordinator.email],
+                      template="study_group_submitted",
+                      context=email_context)
+            return HttpResponseRedirect(group_url)
         else:
             context = {'form': form}
     elif request.method == 'GET':
@@ -561,7 +561,7 @@ def group_action(request):
             raise Exception(u'سبق أن استجبت لهذا الطلب.')
         else:
             join_request.is_accepted = True
-            group.members.add(join_request.user)
+            group.members.add(join_request.submitter)
             join_request.save()
             group.save()
     elif action == 'reject':
@@ -569,14 +569,14 @@ def group_action(request):
             raise Exception(u'سبق أن استجبت لهذا الطلب.')
         else:
             join_request.is_accepted = False
-            group.members.remove(join_request.user)
+            group.members.remove(join_request.submitter)
             join_request.save()
             group.save()
     else:
         raise Exception(u'حدث خطأ غير معروف.')
 
     return  {'current_status': join_request.is_accepted,
-             'full_current_status': join_request.get_full_status()}
+             'full_current_status': join_request.get_is_accepted_display()}
 
 def search_groups(request):
     pass
@@ -592,38 +592,7 @@ def list_colleagues(request):
     else:
         colleague_profiles = ColleagueProfile.objects.filter(is_available=True, is_published=True)
 
-    profile_filter = request.GET.get('filter')
-    if profile_filter == 'day':
-        one_day_ago = datetime.datetime.now() - datetime.timedelta(days=1)
-        filtered_colleague_profiles = colleague_profiles.filter(submission_date__gte=one_day_ago)
-    elif profile_filter == 'week':
-        one_week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
-        filtered_colleague_profiles = colleague_profiles.filter(submission_date__gte=one_week_ago)
-    elif profile_filter == 'motnh':
-        one_month_ago = datetime.datetime.now() - datetime.timedelta(days=30)
-        filtered_colleague_profiles = colleague_profiles.filter(submission_date__gte=one_month_ago)
-    else:
-        filtered_colleague_profiles = colleague_profiles
-
-    profile_order = request.GET.get('order')
-    #TODO: Find out more useful orders
-    if True:
-        ordered_colleague_profiles = filtered_colleague_profiles.order_by('-submission_date')
-
-    # Each page of results should have a maximum of 25 activities.
-    paginator = Paginator(ordered_colleague_profiles, 25)
-    page = request.GET.get('page')
-
-    try:
-        page_colleague_profiles = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        page_colleague_profiles = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        page_colleague_profiles = paginator.page(paginator.num_pages)
-
-    context = {'page_colleague_profiles': page_colleague_profiles}
+    context = {'page_colleague_profiles': colleague_profiles}
     return render(request, 'arshidni/colleague_list.html', context)
 
 @login_required
@@ -633,16 +602,27 @@ def submit_supervision_request(request, colleague_profile_id):
     colleague_profile = get_object_or_404(ColleagueProfile,
                                           pk=colleague_profile_id,
                                           is_published=True)
+    context = {'colleague_profile': colleague_profile}
     if request.method == 'POST':
         request_object = SupervisionRequest(user=request.user,
                                             colleague=colleague_profile)
         form = SupervisionRequestForm(request.POST, instance=request_object)
         if form.is_valid():
             new_request = form.save()
+            to_me_url = reverse('arshidni:supervision_requests_to_me')
+            full_url = request.build_absolute_uri(to_me_url)
+            arshidni_coordinator = get_arshidni_coordinator()
+            email_context = {'full_url': full_url,
+                             'supervision_request': new_request,
+                             'colleague_profile': colleague_profile}
+            mail.send([colleague_profile.user.email],
+                      cc=[arshidni_coordinator.email],
+                      template="supervision_request_submitted",
+                      context=email_context)
             after_url = reverse('arshidni:my_supervision_requests') + '#request-' + str(new_request.pk)
             return HttpResponseRedirect(after_url)
         else:
-            context = {'form': form}
+            context['form'] = form
     elif request.method == 'GET':
         # Check if the user has any pending or accepted supervision
         # requests
@@ -654,12 +634,14 @@ def submit_supervision_request(request, colleague_profile_id):
             colleague=colleague_profile, status='A')
 
         if current_student_requests:
-            context = {'error': 'current_student_requests'}
+            context['error'] = 'current_student_requests'
         elif current_colleague_requests:
-            context = {'error': 'current_colleague_requests'}
+            context['error'] = 'current_colleague_requests'
+        elif get_gender(request.user) != get_gender(colleague_profile.user):
+            context['error'] = 'gender'
         else:
             form = SupervisionRequestForm()
-            context = {'form': form, 'colleague_profile': colleague_profile}
+            context['form'] = form
 
     return render(request, 'arshidni/colleague_choose.html', context)
 
@@ -746,26 +728,16 @@ def supervision_requests_to_me(request):
         colleague_profile = ColleagueProfile.objects.get(user=request.user)
     except ObjectDoesNotExist:
         colleague_profile = None
-        context = {}
 
     if colleague_profile:
         # No need to show the requests that were removed for
         # acceptance.  They could be just a mistake.
         supervision_requests = SupervisionRequest.objects.filter(colleague=colleague_profile,
                                                                  status__in=['P', 'A', 'R', 'WC', 'WN'])
-        ordered_supervision_requests = supervision_requests.order_by('-submission_date')
 
-        paginator = Paginator(ordered_supervision_requests, 25)
-        page = request.GET.get('page')
-
-        try:
-            page_requests = paginator.page(page)
-        except PageNotAnInteger:
-            page_requests = paginator.page(1)
-        except EmptyPage:
-            page_requests = paginator.page(paginator.num_pages)
-
-        context = {'colleague_profile': colleague_profile, 'page_requests': page_requests}
+        context = {'colleague_profile': colleague_profile, 'page_requests': supervision_requests}
+    else:
+        context = {}
 
     return render(request, 'arshidni/supervision_requests_to_me.html', context)
 
@@ -773,23 +745,9 @@ def supervision_requests_to_me(request):
 def my_supervision_requests(request):
     # TODO: [Arshidni-wide] if you the user is colleague himself, they
     # shouldn't be able to submit any requests.
-    context = {}
-
     supervision_requests = SupervisionRequest.objects.filter(user=request.user)
-    ordered_supervision_requests = supervision_requests.order_by('-submission_date')
 
-    paginator = Paginator(ordered_supervision_requests, 25)
-    page = request.GET.get('page')
-
-    try:
-        page_requests = paginator.page(page)
-    except PageNotAnInteger:
-        page_requests = paginator.page(1)
-    except EmptyPage:
-        page_requests = paginator.page(paginator.num_pages)
-
-    context = {'page_requests': page_requests}
-
+    context = {'page_requests': supervision_requests}
     return render(request, 'arshidni/my_supervision_requests.html', context)
 
 
@@ -810,6 +768,15 @@ def student_action(request):
             now = datetime.datetime.now()
             supervision_request.status = 'WN'
             supervision_request.withdrawal_date = now
+            to_me_url = reverse('arshidni:supervision_requests_to_me')
+            full_url = request.build_absolute_uri(to_me_url)
+            arshidni_coordinator = get_arshidni_coordinator()
+            email_context = {'full_url': full_url,
+                             'supervision_request': supervision_request}
+            mail.send([supervision_request.colleague.user.email],
+                      cc=[arshidni_coordinator.email],
+                      template="supervision_request_withdrawn",
+                      context=email_context)
         elif supervision_request.status == 'P':
             supervision_request.status = 'D'
         else: # Just in case
@@ -819,7 +786,7 @@ def student_action(request):
         raise Exception(u'حدث خطأ غير معروف.')
 
     return  {'current_status': supervision_request.status,
-             'full_current_status': supervision_request.get_full_status()}
+             'full_current_status': supervision_request.get_status_display()}
 
 @login_required
 @csrf.csrf_exempt
@@ -845,6 +812,15 @@ def colleague_action(request):
             supervision_request.save()
             colleague_profile.is_available = False
             colleague_profile.save()
+            mine_url = reverse('arshidni:my_supervision_requests')
+            full_url = request.build_absolute_uri(mine_url)
+            arshidni_coordinator = get_arshidni_coordinator()
+            email_context = {'full_url': full_url,
+                             'supervision_request': supervision_request}
+            mail.send([supervision_request.user.email],
+                      cc=[arshidni_coordinator.email],
+                      template="supervision_request_accepted",
+                      context=email_context)
         else: # Just in case
             raise Exception(u'حدث خطأ غير معروف.')
 
@@ -866,7 +842,7 @@ def colleague_action(request):
         raise Exception(u'حدث خطأ غير معروف.')
 
     return  {'current_status': supervision_request.status,
-             'full_current_status': supervision_request.get_full_status(),
+             'full_current_status': supervision_request.get_status_display(),
              'contacts': supervision_request.contacts}
 
 # Acadmic activities

@@ -59,9 +59,9 @@
       <tr>
         <td style="direction:ltr;"><a href="{% url 'books:show' book.pk %}">{{ book.title }}</a></td>
         <td>{{ book.submitter.student_profile.get_ar_full_name }}</td>
-        <td>{{ book.submission_date|date }}</td>
-        <td>{{ book.available_from }}</td>
-        <td>{% if book.available_until %}{{ book.available_until }}{% else %} - {% endif %}</td>
+        <td data-order="{{ book.submission_date|date:"U" }}">{{ book.submission_date|date }}</td>
+        <td data-order="{{ book.available_from|date:"U" }}">{{ book.available_from }}</td>
+        <td data-order="{% if book.available_until %}{{ book.available_until|date:"U" }}{% else %}-{% endif %}">{% if book.available_until %}{{ book.available_until }}{% else %} - {% endif %}</td>
         <td>{{ book.get_status_display }}</td>
       </tr>
 

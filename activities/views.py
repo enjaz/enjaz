@@ -393,7 +393,7 @@ def review(request, activity_id, lower_reivew_type=None):
 
                     if activity.primary_club.employee:
                         email_context['full_url'] = deanship_full_url
-                        mail.send([club_notification_email],
+                        mail.send([activity.primary_club.employee.email],
                                   template="activity_approved_employee",
                                   context=email_context)
             elif review.cleaned_data['is_approved'] == False:

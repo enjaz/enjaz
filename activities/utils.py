@@ -41,3 +41,7 @@ def get_pending_activities():
         |  Activity.objects.filter(review__review_type="P").exclude(review__review_type=
                                                                     "D").exclude(review__is_approved=False)\
         |  Activity.objects.filter(review__isnull=True)
+
+def has_submitted_any_activity(user):
+    """Return whether the user has ever submitted any activities."""
+    return bool(Activity.objects.filter(submitter=user))

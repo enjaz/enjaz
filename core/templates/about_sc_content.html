@@ -1,0 +1,657 @@
+{% extends base %}{% load staticfiles %}
+{% block title %}عن نادي الطلاب{% endblock %}
+{% block content %}
+<style>
+    p, li {
+        font-size: 17px !important;
+    }
+    .featuring-column p
+    {
+        text-align: justify;
+        margin-right: 35px;
+    }
+    .sc-value h4 {
+        font-size: 18px;
+        text-align: center;
+        vertical-align: -50px;
+        background-color: {% if user.is_authenticated %}#EEEEEE{% else %}#FFFFFF{% endif %};
+        border-radius: 100px;
+        height: 120px;
+        width: 120px;
+        margin-right: auto;
+        margin-left: auto;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .sc-value h4 span {
+        vertical-align: -50px;
+    }
+</style>
+{% if not user.is_authenticated %}
+<section class="breadcrumb">
+
+	<div class="container">
+
+		<div class="row">
+
+			<div class="col-sm-12">
+
+				<h1>عن نادي الطلاب</h1>
+
+			</div>
+
+		</div>
+
+	</div>
+
+</section>
+{% else %}
+    <h2>
+        عن نادي الطلاب
+    </h2>
+{% endif %}
+
+<section class="content-section">
+	<div{% if not user.is_authenticated %} class="container"{% endif %}>
+		<div class="row">
+			<div class="col-md-7">
+
+
+                <h3>نادي الطلاب</h3>
+
+                <p>
+                    هو نادي طلابي تطوعي لجميع طلاب وطالبات جامعة الملك سعود بن عبدالعزيز للعلوم الصحية يقوم بترتيب وتنظيم الأنشطة الطلابية من خلال أنديته الرئيسية والفرعية.
+                </p>
+
+            </div>
+
+            <div class="col-md-5">
+                <!--Students Club logo-->
+                <!--<img width="100%" src="{% static 'logo/enjaz_logo_shadow_full.png' %}">-->
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if user.is_authenticated %}
+        <hr>
+{% endif %}
+
+<section class="content-section bg-gray">
+	<div{% if not user.is_authenticated %} class="container"{% endif %}>
+		<div class="row">
+			<div class="col-md-6 featuring-column">
+
+                <h3>
+                    <i class="entypo-address"></i>
+                    الرؤية
+                </h3>
+
+                <p>
+يسعى نادي الطلاب لأن يكون نموذجًا في التميز والريادة من خلال أنديته الرئيسية والفرعية.
+                </p>
+
+            </div>
+
+            <div class="col-md-6 featuring-column">
+                <h3>
+                    <i class="entypo-compass"></i>
+                    الرسالة
+                </h3>
+                <p>
+                    أن يستثمر طاقات الطلاب والطالبات وإبداعاتهم على المستوى الفردي وعلى مستوى الكلية ، كما يسعى النادي إلى الخروج بالطلاب من الجو الدراسي وتغييره بما يصقل مواهبهم وهواياتهم.
+                </p>
+            </div>
+
+        </div>
+
+            <br>
+
+        <div class="row">
+            <div class="col-md-12 featuring-column">
+                <h3>
+                    <i class="entypo-flag"></i>
+                    الأهداف
+                </h3>
+
+                <ol class="list-group">
+                  <li class="list-group-item">
+                      الإسهام في التعريف بالجامعة من خلال المشاركة الفعالة في مختلف الأنشطة الثقافية والاجتماعية والرياضية.
+                  </li>
+                  <li class="list-group-item">
+                      إثبات أن طلاب الجامعة وطالباتها قادرين على الإنجاز والإبداع في مجالهم الصحي وفي المجالات الأخرى.
+                  </li>
+                  <li class="list-group-item">
+                      المساهمة في زيادة الوعي الصحي والثقافة الصحية لدى أفراد المجتمع.
+                  </li>
+                  <li class="list-group-item">
+                      العمل على تقوية التواصل بين الطلاب وإدارة الجامعة بمختلف كلياتها وإداراتها.
+                  </li>
+                  <li class="list-group-item">
+                      المساهمة في رفع كفاءة طلاب الكليات الصحية عن طريق الأخذ بأيديهم لتجاوز مرحلة الدراسة على أكمل وجه وذلك من خلال برنامج أرشدني وبرامج التطوير.
+                  </li>
+                  <li class="list-group-item">
+                      تنظيم مشاركات الطلاب في الأنشطة بحيث يأخذ كل طالب حقه في المشاركة.
+                  </li>
+                  <li class="list-group-item">
+                      إدارة الأنشطة التي تتبناها عمادة شؤون الطلاب من جهة ترتيبها وتطويرها.
+                  </li>
+                  <li class="list-group-item">
+                      تعزيز انتماء الطلاب وولائهم لجامعتهم وللوطن.
+                  </li>
+                  <li class="list-group-item">
+                      خلق بيئة طلابية فعالة وجاذبة من ناحية الخدمات والفعاليات المتاحة للطلاب.
+                  </li>
+                  <li class="list-group-item">
+                      تنمية الوعي الطلابي بالفرص المتاحة بالمدينة الجامعية واندماجهم في الأنشطة الطلابية المشتركة.
+                  </li>
+                </ol>
+
+            </div>
+        </div>
+
+        <br>
+
+        <div class="row">
+            <div class="col-md-12 featuring-column">
+                <h3>
+                    <i class="entypo-trophy"></i>
+                    <span>
+                    القيم
+                    </span>
+                </h3>
+
+                <div class="row">
+                    <div class="col-sm-3 sc-value">
+                        <h4>
+                            <span>
+                            القيم الإسلامية
+                            </span>
+                        </h4>
+                    </div>
+                    <div class="col-sm-3 sc-value">
+                        <h4>
+                            <span>
+                            الإبداع
+                            </span>
+                        </h4>
+                    </div>
+                    <div class="col-sm-3 sc-value">
+                        <h4>
+                            <span>
+                            القيادة
+                            </span>
+                        </h4>
+                    </div>
+                    <div class="col-sm-3 sc-value">
+                        <h4>
+                            <span>
+                            التميز
+                            </span>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if user.is_authenticated %}
+        <hr>
+{% endif %}
+
+<section class="content-section">
+	<div{% if not user.is_authenticated %} class="container"{% endif %}>
+		<div class="row">
+			<div class="col-md-12">
+
+                <h3 style="text-align:center;">
+                    لكل طالب وطالبة في الجامعة الحق أن يكون عضوا في نادي الطلاب. ويتم فتح باب التسجيل للانضمام إلى عضوية النادي سنوياً عن طريق تعبئة استمارة التسجيل الإلكترونية.
+                </h3>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if user.is_authenticated %}
+        <hr>
+{% endif %}
+
+<section class="content-section bg-gray">
+    <div{% if not user.is_authenticated %} class="container"{% endif %}>
+        <div class="row">
+            <div class="col-md-12 featuring-column">
+                <h3>
+                    <i class="entypo-users"></i>
+                    أندية نادي الطلاب
+                    <small>و هي قسمان</small>
+                </h3>
+                <br>
+                <div class="row">
+                    <div class="col-md-5 col-md-offset-1">
+                        <h3 style="text-align: center;">
+                            <span class="badge badge-primary">1</span>
+                            أندية الكليات
+                        </h3>
+                        <p>
+                            لكل كلية نادٍ مختص بها وهو مرجع طلاب الكلية، ويتكون كل نادي من ثلاثة فرق:
+                            <ol style="text-align: justify;">
+                                <li>
+                                    <h4>
+                                        الفريق الاجتماعي
+                                    </h4>
+                                    <p>
+                                        وهو الفريق المختص بالنشاطات التي تخدم المجتمع من حملات للتوعية بالصحة وأعمال تطوعية.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4>
+                                        الفريق الثقافي
+                                    </h4>
+                                    <p>
+                                        ومهمته تنظيم النشاطات الثقافية الأكاديمية وغير الأكاديمية، من محاضرات ومسابقات ثقافية وغيرها.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4>
+                                        الفريق الرياضي
+                                    </h4>
+                                    <p>
+                                        ومهمته تنظيم النشاطات والمسابقات الرياضية ومنها دوري الجامعة لكرة القدم.
+                                    </p>
+                                </li>
+                            </ol>
+                        </p>
+                    </div>
+                    <div class="col-md-5">
+                        <h3 style="text-align: center;">
+                            <span class="badge badge-primary">2</span>
+                            الأندية الفرعية
+                        </h3>
+                        <p>
+                            وهي أندية متخصصة ومتعلقة بتطوير وتنمية الهوايات والاهتمامات.
+وهناك سبعة أندية فرعية وهي:
+                            <ol>
+                                <li>
+                                    <h4>نادي القراءة</h4>
+                                    <p>
+                                        يهدف إلى تطوير الجانب الثقافي واللغوي لدى الطلاب من خلال تحفيز القراءة اللاصفية، وعقد مناقشات ومسابقات ولقاءات، بالإضافة إلى خمس مكتبات موزعة بين كليات الطلاب والطالبات.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4>نادي التصوير الفوتوغرافي</h4>
+                                    <p>
+                                        و يهتم بتعريف الطلاب بهواية وثقافة التصوير الفوتوغرافي ومجالاته وتطوير مهارات التصوير لدى الطلاب، بالإضافة إلى التعاون مع الأندية لتغطية فعالياتهم.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4>نادي البحث العلمي</h4>
+                                    <p>و يهدف إلى توعية الطلاب بأهمية البحث العلمي في المجال الصحي، وإلى تحفيزهم ومساعدتهم لعمل البحوث العلمية.</p>
+                                </li>
+                                <li>
+                                    <h4>نادي خير أمة</h4>
+                                    <p>
+                                        ويهتم بتأسيس جيل مسلم متزن يعمل على تطوير أمته بعلم وبصيرة، ويهتم بنشر العلم الشرعي المعتدل، بالإضافة إلى غرس القيم الأخلاقية والمهنية في نفوس الطلاب والطالبات الذين سيمارسون المهن الصحية في المستقبل.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4>نادي الفنون</h4>
+                                    <p>ويهتم بالمواهب والفنون بجميع أنواعها سواءً أدبية أو مسرحية أو تشكيلية، وكذلك العروض المرئية بالإضافة إلى صقل المواهب الطلابية والعمل على تنميتها من خلال دورات وورش عمل.</p>
+                                </li>
+                                <li>
+                                    <h4>نادي الحواسيب</h4>
+                                    <p>ويهدف إلى زيادة الوعي التقني الهادف لدى الطلاب من خلال دورات تدريبة تقنية للطلاب.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4>نادي ابتكار</h4>
+                                    <p>ويهدف إلى توعية الطلاب بأهمية الابتكار والاختراع في كل المجالات، وتشجيع ودعم أفكار وابتكارات الطلاب وتنمية مواهبهم في هذا المجال.
+                                    </p>
+                                </li>
+                            </ol>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if user.is_authenticated %}
+        <hr>
+{% endif %}
+
+<section class="content-section">
+	<div{% if not user.is_authenticated %} class="container"{% endif %}>
+		<div class="row">
+			<div class="col-md-12 featuring-column">
+                <h3>
+                    <i class="entypo-megaphone"></i>
+                    المركز الإعلامي
+                </h3>
+                <p>
+                    يعتبر حلقة الوصل بين النادي والعالم الخارجي ومهمته الارتقاء بالفكر الإعلامي لدى طلاب وطالبات الجامعة وكذلك التعاون مع جميع الوسائل الإعلامية داخل الجامعة كصحيفة نبض الجامعة وموقع الجامعة الإلكتروني لتزويدها بالمواد الإعلامية. كما يهتم الفريق بتنمية قدرات الطلاب الإعلامية وتعزيز ثقتهم بأنفسهم من خلال خلق بيئة ترتقي بالحوار.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if user.is_authenticated %}
+        <hr>
+{% endif %}
+
+<section class="content-section bg-gray">
+	<div{% if not user.is_authenticated %} class="container"{% endif %}>
+		<div class="row">
+			<div class="col-md-12">
+                <h3>
+                    <i class=""></i>
+                    البرامج العامة
+                </h3>
+                <ul>
+                    <li>
+                        <h4>
+                            بداية خير
+                        </h4>
+                        <p>
+                            أيها الطالب المستجد ، نحُن هنا لإستقبالك ولنساعدك لتبدأ بداية خير .
+                        </p>
+                    </li>
+
+                    <li>
+                        <h4>
+                       المؤتمر التحضيري لمؤتمر طلاب وطالبات التعليم العالي
+                        </h4>
+                        <p>
+                            هل لديك الموهبة والإبداع ؟! ، إذاً شاركنا أعمالك مع المؤتمر التحضيري لطلاب وطالبات التعليم العالي.
+                        </p>
+                    </li>
+
+                    <li>
+                        <h4>
+                            الماراثون الجامعي
+                        </h4>
+                        <p>
+                            جدد نشاطك ولياقتك ،و سابق أصدقائك في المارثون الجامعي السنوي .
+                        </p>
+                    </li>
+
+                    <li>
+                        <h4>
+                            البرنامج الثقافي
+                        </h4>
+                        <p>
+                            لأصحاب الفن الادبي وعشاقه ، شارك فعالياتنا للبرنامج الثقافي واستمتع معنا.
+                        <br>
+                    انتظرونا في فعاليات البرنامج الثقافي سنبهركم بكل جديد.
+                        </p>
+                    </li>
+
+                    <li>
+                        <h4>
+                            نقل الخبرات
+                        </h4>
+                        <p>
+                            تعرف على طبيعة سنواتك الدراسيه القادمة ، من خلال توجيه أسئلتك لمن هم أكبر منك واستفد من خبراتهم وتجاربهم في برنامج نقل الخبرات .
+                        </p>
+                    </li>
+
+                    <li>
+                        <h4>
+                            الحفل الختامي للأنشطة الطلابية
+                        </h4>
+                        <p>
+                            دعنا نحتفل بإنجازاتنا سوياً ، ونُبهر العالم بشغفنا للنادي الطلاب في الحفل الختامي للأنشطة الطلابية نهايه كل عام.
+                        </p>
+                    </li>
+
+                    <li>
+                        <h4>
+                            برنامج أرشدني
+                        </h4>
+                        <p>
+ هل تعتقد انك لا تستطيع التأقلم مع حياتك الجامعية؟! يمكنك الآن أن تحصل على مرشد يرافقك في طريقك للإنجاز والنجاح من برنامج أرشدني .
+                        </p>
+                    </li>
+
+                    <li>
+                        <h4>
+                            برنامج نقاطي
+                        </h4>
+                        <p>
+                            لا تترك سنة دراسية كاملة بدون نشاط مع نادي الطلاب! اصنع لك أثر بالنادي وسوف نكافئك بما تستحق مع برنامج النقاط التكريمي
+                        </p>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if user.is_authenticated %}
+        <hr>
+{% endif %}
+
+<section class="content-section">
+	<div{% if not user.is_authenticated %} class="container"{% endif %}>
+		<div class="row">
+			<div class="col-md-12">
+
+                <h3>
+                    <i class="entypo-flow-tree"></i>
+                    هيكلة نادي الطلاب للعام ٢٠١٤-٢٠١٥
+                </h3>
+
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <h4>
+                                رئيس نادي الطلاب: خالد العبدالجبار
+                                </h4>
+                            </li>
+                            <li class="list-group-item">
+                                نائب رئيس النادي – للطلاب: عبد العزيز المنصور
+
+                            </li>
+                            <li class="list-group-item">
+                                نائبة رئيس النادي - للطالبات: نورة السبتي
+                            </li>
+                            <li class="list-group-item">
+                                مساعد رئيس نادي الطلاب: سعيد عرابي
+                            </li>
+                            <li class="list-group-item">
+                                مساعد رئيس نادي الطلاب: أسامة المبيريك
+                            </li>
+                        </ul>
+
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <h4>
+                                رئيس المركز الإعلامي: سلطان العشيوي
+                                </h4>
+                            </li>
+                            <li class="list-group-item">
+نائب رئيس المركز الإعلامي – للطلاب: فهد القباع
+                            </li>
+                            <li class="list-group-item">
+نائبة رئيس المركز الإعلامي – للطالبات: بدور الرشيد
+                            </li>
+                        </ul>
+
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <h4>
+مسؤولة برنامج أرشدني: دلال العيسى
+                                </h4>
+                            </li>
+                        </ul>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <br>
+        <div style="text-align: center;">
+            <i class="entypo-dot-3"></i>
+        </div>
+        <br>
+
+        <div class="row">
+            <div class="col-md-6">
+                <h3>
+                    <i class="entypo-left-open-big"></i>
+                    أندية الكليات
+                </h3>
+                <ol class="list-group">
+                    <li class="list-group-item">
+                        كلية العلوم والمهن الصحية - طلاب: محمد الريفي
+                    </li>
+                    <li class="list-group-item">
+                        كلية العلوم والمهن الصحية – طالبات: ميس الريم شاهين
+                    </li>
+                    <li class="list-group-item">
+                        كلية الطب – طلاب: عبدالله العولة
+                    </li>
+                    <li class="list-group-item">
+                        كلية الطب – طالبات: أريج مدني
+                    </li>
+                    <li class="list-group-item">
+                        كلية العلوم الطبية التطبيقية: عبدالله الموسى
+                    </li>
+                    <li class="list-group-item">
+                        كلية التمريض: أماني بخاري
+                    </li>
+                    <li class="list-group-item">
+                        كلية الصيدلة: عبدالرحمن العنزي
+                    </li>
+                    <li class="list-group-item">
+                        كلية طب الأسنان - طلاب: فهد العواد
+                    </li>
+                    <li class="list-group-item">
+                        كلية طب الأسنان - طالبات: حنان الغامدي
+                    </li>
+                </ol>
+            </div>
+            <div class="col-md-6">
+                <h3>
+                    <i class="entypo-left-open-big"></i>
+                    الأندية الفرعية
+                </h3>
+                <ol class="list-group">
+                    <li class="list-group-item">
+                        نادي التصوير الفوتوغرافي: أحمد الشدوخي
+                    </li>
+                    <li class="list-group-item">
+                        نادي القراءة: ظبية القحطاني
+                    </li>
+                    <li class="list-group-item">
+                        نادي البحث العلمي: سارة مرعي
+                    </li>
+                    <li class="list-group-item">
+                        نادي خير أمة: سلوى المخضوب
+                    </li>
+                    <li class="list-group-item">
+                        نادي الفنون: يوسف الشرهان
+                    </li>
+                    <li class="list-group-item">
+                        نادي الحواسيب: عادل يسقي
+                    </li>
+                    <li class="list-group-item">
+                        نادي ابتكار: سليمان التويجري
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if user.is_authenticated %}
+        <hr>
+{% endif %}
+
+<section class="content-section bg-gray">
+	<div{% if not user.is_authenticated %} class="container"{% endif %}>
+		<div class="row">
+			<div class="col-md-12 featuring-column">
+                <h3>
+                    <i class="entypo-book-open"></i>
+                    إصدارات نادي الطلاب
+                </h3>
+                <ul>
+                    <li>
+                        <a href="https://www.dropbox.com/sh/b6scgxt5edc0jsz/AABqqyLyvAah3YcWidmKf2BJa/Booklet%202013-2014.pdf?dl=0">
+                            <i class="entypo-export"></i>
+                            دليل الأنشطة الطلابية للعام ٢٠١٣-٢٠١٤
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% if user.is_authenticated %}
+        <hr>
+{% endif %}
+
+<section class="footer-widgets">
+	<div{% if not user.is_authenticated %} class="container"{% endif %}>
+		<div class="row">
+			<div class="col-md-12 featuring-column">
+                <h3>
+                    <i class="entypo-switch"></i>
+                    للتواصل مع نادي الطلاب
+                </h3>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h4>
+                            رئاسة نادي الطلاب
+                        </h4>
+                        <h4>
+                            <a href="mailto:studentsclub@ksau-hs.edu.sa">
+                                <i class="entypo-mail"></i>
+                                studentsclub@ksau-hs.edu.sa
+                            </a>
+                        </h4>
+                    </div>
+                    <div class="col-md-4">
+                        <h4>
+                            المركز الإعلامي
+                        </h4>
+                        <h4>
+                            <a href="mailto:sc-media@ksau-hs.edu.sa">
+                                <i class="entypo-mail"></i>
+                                sc-media@ksau-hs.edu.sa
+                            </a>
+                        </h4>
+                    </div>
+                    <div class="col-md-4">
+                        <h4>
+                            نادي الطلاب على تويتر
+                        </h4>
+                        <h4>
+                            <a href="https://twitter.com/StudentsofKSAUH">
+                                <i class="entypo-twitter"></i>
+                                <span dir="ltr">@StudentsofKSAUH</span>
+                            </a>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% if user.is_authenticated %}
+    {% block pageheaderurl %}{% url 'about_sc' %}{% endblock %}
+    {% block pageheader %}عن نادي الطلاب{% endblock %}
+{% endif %}

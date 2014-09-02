@@ -11,7 +11,7 @@
 
 {% if activities %}
 {% for activity in activities %}
-<h3>{{ activity.name }} <small>{{ activity.primary_club.name }}</small></h3> 
+<h3><a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a> <small>{{ activity.primary_club.name }}</small></h3>
 <table class="table">
 	<tr>
 		<th>تاريخ الطلب</th>

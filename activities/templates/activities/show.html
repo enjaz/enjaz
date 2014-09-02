@@ -1,4 +1,4 @@
-{% extends 'activities_base.html' %}{% load staticfiles %}
+{% extends 'activities_base.html' %}{% load staticfiles %}{% load clubs_utils %}
 {% block title %}{{ activity.name }}{% endblock %}
 {% block content %}
 {% if error_message %}
@@ -72,7 +72,7 @@
 				</a>
 				{% endif %}
 				
-				{% if can_edit %}
+				{% if user|is_coordinator:activity.primary_club and activity.is_editable or perms.activities.change_activity %}
 				<a href="{% url 'activities:edit' activity.pk %}" class="btn btn-default">
 					<i class="entypo-pencil"></i>
 					عدّل
@@ -89,7 +89,8 @@
 			
 			<div class="col-sm-offset-2 col-sm-10">
 
-				<ul class="user-details">{# if the user is privileged, show them the internal description #}{% if can_view_deanship_review or perms.activities.add_deanship_review or can_view_presidency_review or perms.activities.add_presidency_review %}
+				<ul class="user-details">{# if the user is privileged, show them the internal description #}
+                    {% if user|is_coordinator:activity.primary_club or perms.view_deanship_review or perms.activities.add_deanship_review or user|is_coordinator:activity.primary_club or perms.view_presidency_review or perms.activities.add_presidency_review %}
 					<li>
 						<a href="#">
 							<i class="entypo-info-circled"></i>
@@ -105,7 +106,7 @@
 					{% for episode in activity.episode_set.all %}
 					<li>
 						<div class="row">
-						{% if can_add_followupreport %}
+						{% if user|is_coordinator:activity.primary_club or perms.media.add_followupreport %}
 						{# group the activity info in a div to make #}
 						{# space for the report button #}
 						<div class="col-md-10">
@@ -128,7 +129,7 @@
 								{{ episode.location }}
 							</div>
 						</a>
-						{% if can_add_followupreport %}
+						{% if user|is_coordinator:activity.primary_club or perms.media.add_followupreport %}
 						</div>
 						<div class="followupreport_zone col-md-2">
 			            	{% if episode.followupreport %}
@@ -155,22 +156,22 @@
 
 				<!-- tabs for the profile links -->
 				<ul class="nav nav-tabs">
-					{% if can_view_presidency_review or perms.activities.add_presidency_review %}
+					{% if user|is_coordinator:activity.primary_club or perms.activities.add_presidency_review %}
 					<li{% if active_tab == 'presidency' %} class="active"{% endif %}>
 						<a href="{% url 'activities:review_with_type' activity.pk 'p' %}">مراجعة رئاسة نادي الطلاب</a>
 					</li>
 					{% endif %}
-					{% if can_view_deanship_review or perms.activities.add_deanship_review %}
+					{% if user|is_coordinator:activity.primary_club or perms.activities.add_deanship_review %}
 					<li{% if active_tab == 'deanship' %} class="active"{% endif %}>
 						<a href="{% url 'activities:review_with_type' activity.pk 'd' %}">مراجعة عمادة شؤون الطلاب</a>
 					</li>
 					{% endif %}
-                    {% if can_view_participation %}
+                    {% if user|is_coordinator:activity.primary_club or perms.activities.view_participation %}
 					<li{% if active_tab == 'view_participation' %} class="active"{% endif %}>
 						<a href="{% url 'activities:view_participation' activity.pk %}">عرض المشاركات</a>
 					</li>
 					{% endif %}
-                    {% if can_view_niqati_orders %}
+                    {% if user|is_coordinator:activity.primary_club or perms.niqati.view_order %}
 					<li{% if active_tab == 'niqati' %} class="active"{% endif %}>
 						<a href="{% url 'activities:niqati_orders' activity.pk %}">نقاطي</a>
 					</li>

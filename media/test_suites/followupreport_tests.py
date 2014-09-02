@@ -11,6 +11,8 @@ from django.contrib.auth.models import User
 from clubs.models import Club
 from activities.models import Activity, Episode
 from media.models import FollowUpReport
+from media.utils import REPORT_DUE_AFTER
+
 
 class ReportDueAndOverdueDateTests(TestCase):
     """
@@ -21,7 +23,7 @@ class ReportDueAndOverdueDateTests(TestCase):
     def setUp(self):
         # Create a user, a club (and make the user its coordinator),
         # and 3 activities with 1, 2, 3 episodes respectively
-        self.user = User.objects.create_user('enjazuser', 'test@enjazportal.com', '12345678')
+        self.user = User.objects.create_user('msarabi', 'test@enjazportal.com', '12345678')
         self.club = Club.objects.create(name="Test Arabic Club Name",
                                         english_name="Test English Club Name",
                                         description="Test Club Description",
@@ -72,7 +74,7 @@ class ReportDueAndOverdueDateTests(TestCase):
         # after the episode end datetime.
         for episode in Episode.objects.all():
             self.assertEqual(episode.report_due_date(),
-                             episode.end_datetime() + timedelta(days=episode.REPORT_DUE_AFTER)
+                             episode.end_datetime() + timedelta(days=REPORT_DUE_AFTER)
                              )
     
     def test_report_is_due(self):
@@ -127,7 +129,7 @@ class ActivityViewsWithNoReportPenalty(TestCase):
         # Set the number of due reports to 3
         # Also set overdue reports to 3
         # Therefore no penalties are expected 
-        self.user = User.objects.create_user('enjazuser', 'test@enjazportal.com', '12345678')
+        self.user = User.objects.create_user('msarabi', 'test@enjazportal.com', '12345678')
         self.client.login(username=self.user.username, password='12345678')
         self.club = Club.objects.create(name="Test Arabic Club Name",
                                         english_name="Presidency",
@@ -188,7 +190,7 @@ class ActivityViewsWithReportPenalty(TestCase):
         # Set the number of due reports to 4
         # Also set overdue reports to 6
         # Therefore penalties are expected 
-        self.user = User.objects.create_user('enjazuser', 'test@enjazportal.com', '12345678')
+        self.user = User.objects.create_user('msarabi', 'test@enjazportal.com', '12345678')
         self.client.login(username=self.user.username, password='12345678')
         self.club = Club.objects.create(name="Test Arabic Club Name",
                                         english_name="Presidency", # due to dependent nature of create view,

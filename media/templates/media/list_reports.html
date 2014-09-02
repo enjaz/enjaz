@@ -18,6 +18,8 @@
 		<th>المكان</th>
 		<th>عدد المنظمين</th>
 		<th>عدد المشاركين</th>
+        <th>أماكن النشر و الإعلان</th>
+        <th>ملاحظات</th>
 		<th>التقرير الكامل</th>
 	</thead>
 	<tbody>
@@ -35,6 +37,8 @@
 			<td>{{ report.location }}</td>
 			<td>{{ report.organizer_count }}</td>
 			<td>{{ report.participant_count }}</td>
+            <td>{{ report.announcement_sites }}</td>
+            <td>{{ report.notes }}</td>
 			<td><a href="{% url 'media:show_report' report.pk %}"
 				class="btn btn-xs btn-green">
 					<i class="entypo-left-bold"></i>
@@ -44,17 +48,33 @@
 		{% endfor %}
 	</tbody>
 </table>
+<link type="text/css" rel="stylesheet" href="{% static 'neon/assets/js/datatables/ColVis/dataTables.colVis.min.css' %}">
+{#<link type="text/css" rel="stylesheet" href="{% static 'neon/assets/js/datatables/ColRec/dataTables.colReorder.min.css' %}">#}
 {% endblock %}
 
 {% block customscript %}
 <script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
 <script src="{% static 'neon/assets/js/datatables/TableTools.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/datatables/ColVis/dataTables.colVis.min.js' %}"></script>
+{#<script src="{% static 'neon/assets/js/datatables/ColRec/dataTables.colReorder.min.js' %}"></script>#}
 <script>
 $(document).ready(function () {
 	$('#report_list').DataTable({
-		"sDom": "<'row'<'col-xs-6 col-left'l><'col-xs-6 col-right'<'export-data'T>f>r>t<'row'<'col-xs-6 col-left'i><'col-xs-6 col-right'p>>",
+		"sDom": "R<'row'<'col-xs-12'C>><'row'<'col-xs-6 col-left'l><'col-xs-6 col-right'<'export-data'T>f>r>t<'row'<'col-xs-6 col-left'i><'col-xs-6 col-right'p>>",
 		"oTableTools": {
+		    "sSwfPath": "{% static 'neon/assets/js/datatables/copy_csv_xls_pdf.swf' %}",
+		    "aButtons": [
+                {
+                    "sExtends":     "print",
+                    "sButtonClass": "btn btn-default btn-xs"
+                },
+                {
+                    "sExtends":     "xls",
+                    "sButtonText":  "Download",
+                    "sButtonClass": "btn btn-white btn-xs"
+                }
+            ]
 		}
 	});
 });

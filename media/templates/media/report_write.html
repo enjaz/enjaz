@@ -4,7 +4,10 @@
 <h2>تقرير {{ episode.activity.name }}</h2>
 <p>التقرير التالي يحتوي معلومات النشاط الافتراضية كما تم رفعها في طلب النشاط؛ نرجو تحديث البيانات أو تعديلها حسب المعلومات و الإحصائيات الحقيقية.</p>
 <hr>
-<form action="{% url 'media:submit_report' episode.pk %}" method="post">
+<form action="{% url 'media:submit_report' episode.pk %}" enctype="multipart/form-data" method="post">
+    {# The enctype="multipart/form-data" attribute is required for uploading files via html forms in django. #}
+    {# Also make sure you pass request.FILES to the django form. #}
+    {# See: https://docs.djangoproject.com/en/dev/topics/http/file-uploads/#basic-file-uploads #}
 {% csrf_token %}
 {% bootstrap_form form %}
 <button class="btn btn-block btn-green" type="submit">

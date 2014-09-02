@@ -71,9 +71,13 @@ class Club(models.Model):
     city = models.CharField(max_length=1, choices=city_choices, verbose_name=u"المدينة")
     def get_due_report_count(self):
         "Get the number of due follow-up reports."
+        # The following import is not very neat, but importing it at the beginning of
+        # the file causes an ImportError because components of the other files use
+        # parts of this file that are only loaded later
+        from activities.utils import get_approved_activities
         # Get all club's episodes
         episodes = []
-        for activity in self.primary_activity.all():
+        for activity in get_approved_activities().filter(primary_club=self): #self.primary_activity.all():
             episodes.extend(activity.episode_set.all())
         # Get all club's episodes whose report is due
         due_episodes = filter(lambda x: x.report_is_due(),
@@ -82,9 +86,13 @@ class Club(models.Model):
     
     def get_overdue_report_count(self):
         "Get the number of overdue follow-up reports."
+        # The following import is not very neat, but importing it at the beginning of
+        # the file causes an ImportError because components of the other files use
+        # parts of this file that are only loaded later
+        from activities.utils import get_approved_activities
         # Get all club's episodes
         episodes = []
-        for activity in self.primary_activity.all():
+        for activity in get_approved_activities().filter(primary_club=self): #self.primary_activity.all():
             episodes.extend(activity.episode_set.all())
         # Get all club's episodes whose report is overdue
         overdue_episodes = filter(lambda x: x.report_is_overdue(),
@@ -112,7 +120,7 @@ class MembershipApplication(models.Model):
         )
 
     def __unicode__(self):
-        return self.user
+        return "%s" % (self.user)
 
 class College(models.Model):
     section = models.CharField(max_length=2, choices=section_choices, verbose_name=u"القسم")

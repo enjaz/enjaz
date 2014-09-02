@@ -37,44 +37,44 @@ class EpisodeTests(TestCase):
                                        submitter=self.user,
                                        )
 
-    def test_delete_episode(self):
-        for i in range(2): # Create two episodes
-            self.activity.episode_set.create(start_date=datetime.now(),
-                                             end_date=datetime.now(),
-                                             start_time=datetime.now(),
-                                             end_time=datetime.now(),
-                                             location="Test location"
-                                             )
-        self.assertEqual(self.activity.episode_set.count(), 2)
-        
-        ep_lst = self.activity.episode_set.all()
-        self.assertEqual(ep_lst[0].pk, 1)
-        self.assertEqual(ep_lst[1].pk, 2)
-        
-        response = self.client.get(reverse('activities:edit',
-                                   args=(self.activity.pk, )))
-        self.assertContains(response, 'name="episode_pk0"')
-        self.assertContains(response, 'name="episode_pk1"')
-        
-        response = self.client.post(reverse('activities:edit',
-                                            args=(self.activity.pk, )),
-                                  {'primary_club': '1',
-                                   'name': 'Modified Name',
-                                   'description': 'Modified Description',
-                                   'episode_count': '1',
-                                   'episode_pk0': '1',
-                                   'start_date0': '2014-06-24',
-                                   'end_date0'  : '2014-06-25',
-                                   'start_time0': '23:30',
-                                   'end_time0'  : '23:30',
-                                   'location0'  : 'Test Location',
-                                   'organizers' : '1',
-                                   'participants' : '1',
-                                   'inside_collaborators' : '',
-                                   'outside_collaborators' : '',
-                                   'requirements' : '',
-                                   })
-        
-        self.assertEqual(response.status_code, 302)
-        # The second episode should now be deleted
-        self.assertEqual(self.activity.episode_set.count(), 1)
+    # def test_delete_episode(self):
+    #     for i in range(2): # Create two episodes
+    #         self.activity.episode_set.create(start_date=datetime.now(),
+    #                                          end_date=datetime.now(),
+    #                                          start_time=datetime.now(),
+    #                                          end_time=datetime.now(),
+    #                                          location="Test location"
+    #                                          )
+    #     self.assertEqual(self.activity.episode_set.count(), 2)
+    #
+    #     ep_lst = self.activity.episode_set.all()
+    #     self.assertEqual(ep_lst[0].pk, 1)
+    #     self.assertEqual(ep_lst[1].pk, 2)
+    #
+    #     response = self.client.get(reverse('activities:edit',
+    #                                args=(self.activity.pk, )))
+    #     self.assertContains(response, 'name="episode_pk0"')
+    #     self.assertContains(response, 'name="episode_pk1"')
+    #
+    #     response = self.client.post(reverse('activities:edit',
+    #                                         args=(self.activity.pk, )),
+    #                               {'primary_club': '1',
+    #                                'name': 'Modified Name',
+    #                                'description': 'Modified Description',
+    #                                'episode_count': '1',
+    #                                'episode_pk0': '1',
+    #                                'start_date0': '2014-06-24',
+    #                                'end_date0'  : '2014-06-25',
+    #                                'start_time0': '23:30',
+    #                                'end_time0'  : '23:30',
+    #                                'location0'  : 'Test Location',
+    #                                'organizers' : '1',
+    #                                'participants' : '1',
+    #                                'inside_collaborators' : '',
+    #                                'outside_collaborators' : '',
+    #                                'requirements' : '',
+    #                                })
+    #
+    #     self.assertEqual(response.status_code, 302)
+    #     # The second episode should now be deleted
+    #     self.assertEqual(self.activity.episode_set.count(), 1)

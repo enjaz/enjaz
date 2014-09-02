@@ -1,0 +1,15 @@
+{% for activity in activities %}
+    {% for episode in activity.episode_set.all %}
+        {
+            title : '{{ activity.name }}',
+            start : '{{ episode.start_datetime.isoformat }}',
+            end   : '{{ episode.end_datetime.isoformat }}',
+            {% if not episode.is_single_day %}
+            allDay: true,
+            {% else %}
+            allDay: false,
+            {% endif %}
+            url   : '{{ activity.id }}/'
+        }{% if approved|length > forloop.counter %},{% endif %}
+    {% endfor %}
+{% endfor %}

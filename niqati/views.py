@@ -237,7 +237,8 @@ def view_orders(request, activity_id):
     orders = Code_Order.objects.filter(activity=activity)
     return render(request, 'niqati/activity_orders.html', {'activity': activity,
                                                            'orders': orders,
-                                                           'form': OrderForm()})
+                                                           'form': OrderForm(),
+                                                           'active_tab': 'niqati'})
 
 # TODO: make neater; change url name from activities:niqati_orders to activities:niqati
 @login_required

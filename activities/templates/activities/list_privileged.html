@@ -4,7 +4,7 @@
 {% block content %}
 {% if due_report_count > 0 %}
 <div class="alert alert-minimal">
-    <strong>تنبيه</strong> لديك <span class="badge badge-warning">{{ due_report_count }}</span> تقارير إعلامية حان وقت تسليمها. يرجى كتابتها و رتسليمها في أقرب فرصة.
+    <strong>تنبيه</strong> لديك <span class="badge badge-warning">{{ due_report_count }}</span> تقارير إعلامية حان وقت تسليمها. يرجى كتابتها و تسليمها في أقرب فرصة.
 </div>
 {% endif %}
 {% if overdue_report_count > 0 and overdue_report_count <= MAX_OVERDUE_REPORTS %}

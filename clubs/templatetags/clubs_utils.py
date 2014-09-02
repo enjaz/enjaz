@@ -1,32 +1,32 @@
 from django import template
-from clubs.utils import *
+from clubs import utils
 
 register = template.Library()
 
-@register.simple_tag
+@register.filter
 def is_coordinator_of_any_club(user):
-    return is_coordinator_of_any_club(user)
+    return utils.is_coordinator_of_any_club(user)
 
-@register.simple_tag
+@register.filter
 def is_member_of_any_club(user):
-    return is_member_of_any_club(user)
+    return utils.is_member_of_any_club(user)
 
-@register.simple_tag
-def is_coordinator(club, user):
-    return is_coordinator(club, user)
+@register.filter
+def is_coordinator(user, club):
+    return utils.is_coordinator(club, user)
 
-@register.simple_tag
-def is_member(club, user):
-    return is_member(club, user)
+@register.filter
+def is_member(user, club):
+    return utils.is_member(club, user)
 
-@register.simple_tag
-def is_coordinator_or_member(club, user):
-    return is_coordinator_or_member(club, user)
-
-@register.simple_tag
-def get_presidency():
-    return get_presidency()
-
-@register.simple_tag
-def get_media_center():
-    return get_media_center()
+@register.filter
+def is_coordinator_or_member(user, club):
+    return utils.is_coordinator_or_member(club, user)
+#
+# @register.filter
+# def get_presidency():
+#     return utils.get_presidency()
+#
+# @register.filter
+# def get_media_center():
+#     return utils.get_media_center()

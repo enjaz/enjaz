@@ -112,7 +112,7 @@ class MembershipApplication(models.Model):
         )
 
     def __unicode__(self):
-        return "%s" % (self.user)
+        return self.user
 
 class College(models.Model):
     section = models.CharField(max_length=2, choices=section_choices, verbose_name=u"القسم")

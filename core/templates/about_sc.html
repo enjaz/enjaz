@@ -1,9 +1,0 @@
-{% if user.is_authenticated %}
-    {% with base="base.html" %}
-        {% include "about_sc_content.html" %}
-    {% endwith %}
-{% else %}
-    {% with base="front/front_base.html" %}
-        {% include "about_sc_content.html" %}
-    {% endwith %}
-{% endif %}

@@ -44,7 +44,7 @@ class Book(models.Model):
     submitter = models.ForeignKey(User, null=True,
                                   on_delete=models.SET_NULL,
                                   related_name='book_contributions')
-    holder = models.ForeignKey(User, null=True, blank=True,
+    holder = models.ForeignKey(User, null=True,
                                on_delete=models.SET_NULL,
                                related_name='book_holdings')
     cover_url = models.CharField(max_length=200, blank=True, verbose_name=u"صورة الغلاف", help_text=u"صورة لغلاف الكتاب (مستحسن)")

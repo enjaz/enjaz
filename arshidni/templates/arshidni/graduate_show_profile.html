@@ -1,7 +1,64 @@
 {% extends 'arshidni_base.html' %}
-{% block title %}{% endblock %}
-{% block navbar %}{% endblock %}
+{% block title %}الخريجون المتعاونون{% endblock %}
+{% block navbar %}
+ 	{% if user.student_profile and not user.graduate_profile %}
+		<li><a href="{% url 'arshidni:register_graduate_profile' %}"><span class="glyphicon glyphicon-plus"></span> سجّل نفسك خريجا متعاونا</a></li>
+ 	{% endif %}
+	{% if graduate_profile == user.graduate_profile or perms.change_graduateprofile %}
+		<li><a href="{% url 'arshidni:edit_graduate_profile' graduate_profile.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل الملف</a></li>
+	{% endif %}
+{% endblock %}
 {% block content %}
-
+{% if graduate_profile.user == user %}
+<p class="alert alert-success">
+شكرا على تسجيلك!  سوف يتواصل معك منسق برنامج أرشدني.
+</p>
+{% endif %}
+<div class="row">
+	<div class="col-md-9">
+	<table class="table-hover table">
+		<colgroup>
+			<col class="col-xs-2">
+			<col class="col-xs-6">
+		</colgroup>
+		<tr>
+			<th>الاسم</th>
+			<td>{{ graduate_profile.user.student_profile.get_ar_full_name|default:graduate_profile.user.username }}</td>
+		</tr>
+		<tr>
+			<th>طريقة التواصل</th>
+			<td>{{ graduate_profile.contacts }}</td>
+		</tr>
+		<tr>
+			<th>الكلية</th>
+			<td>{{ graduate_profile.user.student_profile.college }}</td>
+		</tr>
+		<tr>
+			<th>المدينة</th>
+			<td>{{ graduate_profile.user.student_profile.college.get_city_display }}</td>
+		</tr>
+		<tr>
+			<th>نبذة</th>
+			<td>{{ graduate_profile.bio }}</td>
+		</tr>
+		<tr>
+			<th>محاضرات؟</th>
+			<td>{% if graduate_profile.gives_lectures %}نعم{% else %}لا{% endif %}</td>
+		</tr>
+		<tr>
+			<th>أسئلة؟</th>
+			<td>{% if graduate_profile.answers_questions %}نعم{% else %}لا{% endif %}</td>
+		</tr>
+		<tr>
+			<th>الاهتمامات</th>
+			<td>{{ graduate_profile.interests }}</td>
+		</tr>
+		<tr>
+			<th>تاريخ الإضافة</th>
+			<td>{{ graduate_profile.submission_date|date:"j F Y" }}</td>
+		</tr>
+	</table>
+	</div>
+</div>
 {% endblock %}
 

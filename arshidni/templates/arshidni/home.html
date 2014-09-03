@@ -217,7 +217,7 @@
 						{% for c in latest_colleagues %}
 						<tr>
 							<td><a href="{% url 'arshidni:show_colleague_profile' c.pk %}">{{ c.user.student_profile.get_ar_full_name|default:c.user.username }}</a></td>
-							<td>{{ c.user.student_profile.college.college }}</a></td>
+							<td>{{ c.user.student_profile.college }}</a></td>
 							<td>{{ c.batch }}</td>
 							<td>{{ c.submission_date|date:"j F Y" }}</td>
 						</tr>

@@ -1,14 +1,6 @@
 [
 {
     "pk": 1, 
-    "model": "sites.site", 
-    "fields": {
-        "domain": "enjazportal.com", 
-        "name": "Enjaz Portal"
-    }
-},
-{
-    "pk": 1, 
     "model": "post_office.emailtemplate", 
     "fields": {
         "last_updated": "2014-08-02T19:17:24.217Z", 

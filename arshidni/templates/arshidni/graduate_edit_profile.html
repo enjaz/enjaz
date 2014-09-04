@@ -2,6 +2,7 @@
 {% block title %}{% if edit %} تعديل ملف {{ graduate_profile.user.student_profile.get_ar_full_name }}{% else %} تسجيل خريج متعاون {% endif %}{% endblock %}
 
 {% block content %}
+
 <h2>{% if edit %} تعديل ملف {{ graduate_profile.user.student_profile.get_ar_full_name }} {% else %} تسجيل خريج متعاون{% endif %}</h2>
 
 {% if error %}
@@ -11,6 +12,16 @@
 	{% endif %}
 	</p>
 {% else %}
+{% if not edit %}
+<div class="row">
+	<div class="col-md-10 col-md-offset-1">
+		<p class="alert alert-info arshidni-intro">
+		هنا نتعرف عليكم زملائنا الخريجين ونستفيد من تجاربكم: من إجابة أسئلة الطلبة إلى إلقاء المحاضرات وورش عمل. انضموا معنا هنا كي نكون حلقة تواصل بينكم وبين الطلاب الذين لا يزالون في بداية الطريق، كي نستشيركم وندعوكم للمحافل التي تجمع طلاب الجامعة وخريجيها.
+		</p>
+	</div>
+</div>
+{% endif %}
+
 <form action="{% if edit %}{% url 'arshidni:edit_graduate_profile' graduate_profile.pk %}{% else %}{% url 'arshidni:register_graduate_profile' %}{% endif %}" method="post" class="form">
 {% csrf_token %}
     {% bootstrap_form form %}

@@ -79,12 +79,8 @@
 {% endblock %}
 
 {% block customscript %}
-    {#<link rel="stylesheet" href="{% static 'css/dataTables.bootstrap.css' %}">#}
-    {#<link rel="stylesheet" href="{% static 'css/dataTables.responsive.css' %}">#}
-    <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
-    {#<script src="{% static 'js/datatables.responsive.js' %}"></script>#}
-    <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
-    {#<script src="{% static 'js/dataTables.bootstrap.js' %}"></script>#}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 
 	<script>
     var table = $('#books').dataTable({

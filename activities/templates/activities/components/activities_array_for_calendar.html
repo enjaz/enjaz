@@ -1,3 +1,4 @@
+{{ approved|length }}
 {% for activity in activities %}
     {% for episode in activity.episode_set.all %}
         {
@@ -10,6 +11,6 @@
             allDay: false,
             {% endif %}
             url   : '{{ activity.id }}/'
-        }{% if approved|length > forloop.counter %},{% endif %}
+        },
     {% endfor %}
 {% endfor %}

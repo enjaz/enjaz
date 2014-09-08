@@ -140,17 +140,22 @@ def show(request, activity_id):
     activity_secondary_clubs = activity.secondary_clubs.all()
     activity_clubs = [activity_primary_club] + [club for club in activity_secondary_clubs]
 
-    # The third test condition, that is:
-    #   any([club in activity_clubs for club in user_clubs])
-    #  checks if any of the clubs the user is a member of is also
-    #  orginizing the activity that the user is trying to see.  If
-    #  will be True if any club is one of the organizers and it will
-    #  be False if none is.
-    if not activity.is_approved() and \
-       not request.user.has_perm('activities.view_activity') and \
-       not any([club in activity_clubs for club in user_clubs]) and \
-       not request.user == activity.submitter:
-        raise PermissionDenied
+    # --- Permission checks ---
+
+    # If the user is a superuser or part of presidency or user is the activity's club coordinator or
+    #  a coordinator of a secondary club in the activity, show the activity regardless of status
+    # Elseif user is a DSA reviewer, show the activity if it's approved by presidency
+    # Else (employees or others), show activity only if approved
+    if request.user.is_superuser or request.user.has_perm('activities.add_presidency_review') \
+        or any([club in activity_clubs for club in user_clubs]):
+        # Don't raise any errors
+        pass
+    elif request.user.has_perm('activities.add_deanship_review'):
+        if not activity.is_approved_by_presidency():
+            raise PermissionDenied
+    else:
+        if not activity.is_approved():
+            raise PermissionDenied
 
     return render(request, 'activities/show.html', context)
 

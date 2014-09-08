@@ -40,6 +40,7 @@ so they can monitor the different aspects of the section."""
 
     def has_permission(self, request):
         arshidni_group = Group.objects.get(name='arshidni')
+        print arshidni_group
         return arshidni_group in request.user.groups.all() or request.user.is_superuser
 
 class AnswerInline(admin.StackedInline):
@@ -146,7 +147,7 @@ class SupervisionRequestAdmin(admin.ModelAdmin):
 class JoinStudyGroupRequestAdmin(admin.ModelAdmin):
     list_display = ('submitter', 'group', 'is_accepted', 'submission_date')
 
-arshidni_admin = ArshidniAdmin("Arshidni Admin", 'arshidni_admin')
+arshidni_admin = ArshidniAdmin('arshidni_admin')
 
 admin.site.register(StudyGroup, StudyGroupAdmin)
 arshidni_admin.register(StudyGroup, StudyGroupAdmin)

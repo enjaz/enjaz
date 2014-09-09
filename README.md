@@ -79,6 +79,8 @@ Current required settings:
 * `DHA_USERNAME = 'username'` for the Deanship Head of Activities
 * `AUTH_PROFILE_MODULE = 'accounts.EnjazProfile'`
 * `USERENA_WITHOUT_USERNAMES = True`
+* `USERENA_ACTIVATION_RETRY = True`
+* `USERENA_ACTIVATION_DAYS = 30`
 * Add `"django.core.context_processors.request"` to the [default TEMPLATE_CONTEXT_PROCESSORS](https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATE_CONTEXT_PROCESSORS)
 
 # First run

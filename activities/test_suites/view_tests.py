@@ -59,7 +59,7 @@ class ShowActivityViewTests(TestCase):
         add_deanship_review(self.activity2, True)
         response = self.client.get(reverse('activities:show', args=(self.activity2.pk, )))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.activity1.name)  # sanity check
+        self.assertContains(response, self.activity2.name)  # sanity check
 
     def test_with_deanship_reviewer(self):
         add_d_review = Permission.objects.get(codename="add_deanship_review")
@@ -86,7 +86,7 @@ class ShowActivityViewTests(TestCase):
         add_deanship_review(self.activity2, True)
         response = self.client.get(reverse('activities:show', args=(self.activity2.pk, )))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.activity1.name)  # sanity check
+        self.assertContains(response, self.activity2.name)  # sanity check
 
     def test_with_normal_user(self):
         # Test with pending activity
@@ -108,7 +108,7 @@ class ShowActivityViewTests(TestCase):
         add_deanship_review(self.activity2, True)
         response = self.client.get(reverse('activities:show', args=(self.activity2.pk, )))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.activity1.name)  # sanity check
+        self.assertContains(response, self.activity2.name)  # sanity check
 
     def test_show_view_with_a_normal_user(self):
         """

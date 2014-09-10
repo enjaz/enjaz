@@ -371,3 +371,11 @@ span.unpublished {
 	font-size: 1.3em;
 	text-align: justify;
 }
+
+body.login-page .login-content .form-register-success a {
+	background-color: rgba(4, 113, 57, 1);
+}
+
+ul.navbar-left li a {
+	display: table-cell;
+}

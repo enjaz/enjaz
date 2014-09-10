@@ -8,6 +8,7 @@ from django.views.decorators import csrf
 
 from post_office import mail
 import unicodecsv
+from clubs.utils import is_coordinator
 
 from core import decorators
 from clubs.forms import MembershipForm, DisabledClubForm, ClubForm
@@ -43,9 +44,12 @@ def show(request, club_id):
 
     can_edit = request.user == club.coordinator or \
                request.user.has_perm('clubs.change_club')
+    can_view_members = request.user == club.coordinator or \
+                       request.user.has_perm('clubs.view_members')
     can_view_applications = request.user == club.coordinator or \
                             request.user.has_perm('clubs.view_application')
     context = {'club': club, 'can_edit': can_edit,
+               'can_view_members': can_view_members,
                'can_view_applications': can_view_applications,
                'activities': activities}
     return render(request, 'clubs/show.html', context)
@@ -143,7 +147,7 @@ def join(request, club_id):
 @login_required
 def view_application(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
-    if not club in request.user.coordination.all() and \
+    if not is_coordinator(club, request.user) and \
        not request.user.has_perm('clubs.view_application'):
         raise PermissionDenied
 
@@ -164,7 +168,7 @@ def approve_application(request, club_id):
     application = get_object_or_404(MembershipApplication, pk=request.POST['application_pk'])
     # --- Permission Checks ---
     # The user should be the application's club coordinator
-    if application.club not in request.user.coordination.all() and \
+    if not is_coordinator(application.club, request.user) and \
        not request.user.has_perm('clubs.view_application'):
         raise Exception(u"ليس لديك الصلاحيات الكافية للقيام بذلك.")
 
@@ -192,7 +196,7 @@ def ignore_application(request, club_id):
     application = get_object_or_404(MembershipApplication, pk=request.POST['application_pk'])
     # --- Permission Checks ---
     # The user should be the application's club coordinator
-    if application.club not in request.user.coordination.all() and \
+    if not is_coordinator(application.club, request.user) and \
        not request.user.has_perm('clubs.view_application'):
         raise Exception(u"ليس لديك الصلاحيات الكافية للقيام بذلك.")
 
@@ -200,6 +204,17 @@ def ignore_application(request, club_id):
 
     # return {}
 
+@login_required
+def view_members(request, club_id):
+    """
+    View a list of the club's members.
+    """
+    club = get_object_or_404(Club, pk=club_id)
+    if not is_coordinator(club, request.user) and \
+       not request.user.has_perm('clubs.view_members'):
+        raise PermissionDenied
+    return render(request, 'clubs/members.html', {'club': club})
+    
 # TODO: remove this view and the associated url since its function is now done by datatables
 @login_required
 def download_application(request, club_id):

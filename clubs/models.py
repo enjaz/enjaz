@@ -103,6 +103,10 @@ class Club(models.Model):
         # For the admin interface.
         verbose_name = u"نادي"
         verbose_name_plural = u"الأندية"
+        permissions = (
+            ("view_members", "Can view club members list."),
+        )
+
     def __unicode__(self):
         return self.name
 

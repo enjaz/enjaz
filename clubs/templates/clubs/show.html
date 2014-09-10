@@ -15,7 +15,10 @@
 		<div class="panel-body">
 			{% if can_edit %}
 			<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:edit' club.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
-			{% if can_view_applications %}
+			{% if can_view_members %}
+            <li><a href="{% url 'clubs:view_members' club.pk %}"><span class="entypo-users"></span> استعرض أعضاء النادي</a></li>
+            {% endif %}
+            {% if can_view_applications %}
 			<li><a href="{% url 'clubs:view_application' club.pk %}"><span class="glyphicon glyphicon-list-alt"></span> راجع طلبات الانضمام</a></li>
 			{% endif %}{% endif %}{% if can_edit %}</ul></p>{% endif %}
 			{% if user.is_authenticated and club.open_membership %}

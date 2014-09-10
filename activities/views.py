@@ -147,7 +147,7 @@ def show(request, activity_id):
     # Elseif user is a DSA reviewer, show the activity if it's approved by presidency
     # Else (employees or others), show activity only if approved
     if request.user.is_superuser or request.user.has_perm('activities.add_presidency_review') \
-        or any([club in activity_clubs for club in user_clubs]):
+       or request.user.has_perm('activities.view_activity') or any([club in activity_clubs for club in user_clubs]):
         # Don't raise any errors
         pass
     elif request.user.has_perm('activities.add_deanship_review'):

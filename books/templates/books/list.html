@@ -44,20 +44,22 @@
 </div>
 {% endif %}
 <div class="row">
-	<div class="col-md-12">
-<table id="books" class="table table-bordered datatable dataTable">
+	<div class="col-xs-12">
+<table id="books" class="display">
   <thead>
-    <th style="text-align: right;">اسم الكتاب</th>
-    <th style="text-align: right;">المساهم</th>
-    <th style="text-align: right;">تاريخ المساهمة</th>
-    <th style="text-align: right;">متوفر من</th>
-    <th style="text-align: right;">متوفر حتى</th>
-    <th style="text-align: right;">الحالة</th>
+    <tr>
+      <th style="text-align: right;">اسم الكتاب</th>
+      <th style="text-align: right;">المساهم</th>
+      <th style="text-align: right;">تاريخ المساهمة</th>
+      <th style="text-align: right;">متوفر من</th>
+      <th style="text-align: right;">متوفر حتى</th>
+      <th style="text-align: right;">الحالة</th>
+    </tr>
   </thead>
   <tbody>
     {% for book in page_books %}
       <tr>
-        <td style="direction:ltr;"><a href="{% url 'books:show' book.pk %}">{{ book.title }}</a></td>
+        <td class="english-field" style="direction:ltr;"><a href="{% url 'books:show' book.pk %}">{{ book.title }}</a></td>
         <td>{{ book.submitter.student_profile.get_ar_full_name }}</td>
         <td data-order="{{ book.submission_date|date:"U" }}">{{ book.submission_date|date }}</td>
         <td data-order="{{ book.available_from|date:"U" }}">{{ book.available_from }}</td>
@@ -74,16 +76,19 @@
 </div>
 </div>
 {% endif %}
-
-{#<link rel="stylesheet" href="{% static 'neon/assets/js/datatables/responsive/css/datatables.responsive.css' %}">#}
 {% endblock %}
 
 {% block customscript %}
-    <script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
-    <script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
-    {#<script src="{% static 'neon/assets/js/datatables/responsive/js/datatables.responsive.js' %}"></script>#}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+
 	<script>
-    var table = $('#books').DataTable();
+    var table = $('#books').dataTable({
+        "order": [[ 2, "desc" ]],
+        "language": {
+            "url": "{% static 'js/dataTables-arabic.json' %}"
+        }
+    });
 
     {% if user.is_authenticated %}
     var filterBy = "";

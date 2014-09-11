@@ -12,7 +12,7 @@
 	<i class="entypo-left-bold"></i>
 </a>
 </h3>
-<table id="activity_list" class="table table-bordered datatable">
+<table id="activity_list" class="display">
 	<thead>
         <tr>
             <th>اسم النشاط</th>
@@ -142,16 +142,18 @@
 {% endblock %}
 
 {% block customscript %}
-<!-- <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script> -->
-<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
-<!-- <script src="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/3/dataTables.bootstrap.js"></script> -->
-<script src="{% static 'neon/assets/js/datatables/TableTools.min.js' %}"></script>
-<script src="{% static 'neon/assets/js/datatables/responsive/js/datatables.responsive.js' %}"></script>
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+	<script src="{% static 'js/dataTables.tableTools.min.js' %}"></script>
 <script>
-$(document).ready(function () {
+$(function () {
 	attach_assign_task_to_click_event();
-	$('#activity_list').DataTable();
+	$('#activity_list').dataTable({
+		"order": [[ 3, "desc" ]],
+		"language": {
+			"url": "{% static 'js/dataTables-arabic.json' %}"
+		},
+	});
 });
 function attach_assign_task_to_click_event() {
 	$(".assign_story_task_menu li a").click(function () {
@@ -176,7 +178,7 @@ function attach_assign_task_to_click_event() {
                     container.append(new_btn);
                     container.find("div").remove();
                 } else {
-                    alert("حصل خطأ ما!");
+                    alert(data["message"]);
                 }
             }
         });

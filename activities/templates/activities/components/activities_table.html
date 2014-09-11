@@ -1,17 +1,19 @@
-<table class="table table-bordered datatable">
+<table class="display datatable">
     <thead>
-        <th>الاسم</th>
-        <th>النادي المنظم</th>
-        <th>تاريخ الانعقاد</th>
-        <th>الحالة</th>
-        <th>الخيارات</th>
+        <tr>
+            <th>الاسم</th>
+            <th>النادي المنظم</th>
+            <th>تاريخ الانعقاد</th>
+            <th>الحالة</th>
+            <th>الخيارات</th>
+        </tr>
     </thead>
     <tbody>
     {% for activity in activities %}
         <tr>
             <td><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}</a></td>
             <td><a href="{% url 'clubs:show' activity.primary_club.id %}">{{ activity.primary_club.name }}</a></td>
-            <td>{{ activity.get_first_date|date:"j F" }}</td>
+            <td data-order="{{ activity.get_first_date|date:"U" }}">{{ activity.get_first_date|date:"j F" }}</td>
             <td>{{ activity.get_approval_status_message }}</td>
             <td>
                 {% with status=activity.get_approval_status %}

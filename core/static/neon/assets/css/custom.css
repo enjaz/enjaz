@@ -396,6 +396,7 @@ span.unpublished {
     border-width: none;
     border-style: none;
     border-color: none;
+}
 
 body.login-page .login-content .form-register-success a {
 	background-color: rgba(4, 113, 57, 1);

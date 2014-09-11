@@ -4,7 +4,7 @@
 {% block review_content %}
 {#<h2>طلبات المشاركة في {{ activity.name }}</h2>#}
 
-<table id="participation_table" class="table table-bordered datatable">
+<table id="participation_table" class="display">
     <thead>
         <th>الاسم</th>
         <th>الاسم الإنجليزي</th>
@@ -33,26 +33,31 @@
 {% endblock %}
 
 {% block customscript %}
-<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
-<script src="{% static 'neon/assets/js/datatables/TableTools.min.js' %}"></script>
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+	<script src="{% static 'js/dataTables.tableTools.min.js' %}"></script>
 <script>
 $(document).ready(function () {
-	$('#participation_table').DataTable({
-		"sDom": "<'row'<'col-xs-6 col-left'l><'col-xs-6 col-right'<'export-data btn-group'T>f>r>t<'row'<'col-xs-6 col-left'i><'col-xs-6 col-right'p>>",
+	$('#participation_table').dataTable({
+		"order": [[ 7, "desc" ]],
+		"language": {
+			"url": "{% static 'js/dataTables-arabic.json' %}"
+		},
+		"dom": "<'row'<'col-xs-6 col-left'l><'col-xs-6 col-right'<'export-data btn-group'T>f>r>t<'row'<'col-xs-6 col-left'i><'col-xs-6 col-right'p>>",
 		"oTableTools": {
-		    "sSwfPath": "{% static 'neon/assets/js/datatables/copy_csv_xls_pdf.swf' %}",
-		    "aButtons": [
-                {
-                    "sExtends":     "print",
-                    "sButtonClass": "btn btn-default btn-xs"
-                },
-                {
-                    "sExtends":     "xls",
-                    "sButtonText":  "Download",
-                    "sButtonClass": "btn btn-white btn-xs"
-                }
-            ]
+			"sSwfPath": "{% static 'js/copy_csv_xls_pdf.swf' %}",
+			"aButtons": [
+				{
+				"sExtends":     "print",
+				"sButtonText":  "اطبع",
+				"sButtonClass": "btn btn-default btn-xs"
+				},
+				{
+				"sExtends":     "xls",
+				"sButtonText":  "نزّل",
+				"sButtonClass": "btn btn-white btn-xs"
+				}
+			]
 		}
 	});
 });

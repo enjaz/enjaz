@@ -372,6 +372,31 @@ span.unpublished {
 	text-align: justify;
 }
 
+/* Override neon customization to DataTables.*/
+.dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter {
+	border-width: none;
+	border-style: none;
+	border-color: none;
+}
+
+.dataTables_wrapper .dataTables_info.dataTables_paginate, .dataTables_wrapper .dataTables_paginate.dataTables_paginate {
+	border-right: none;
+	border-width: none;
+	border-style: none;
+	border-color: none;
+}
+
+.dataTables_wrapper .dataTables_info.dataTables_info, .dataTables_wrapper .dataTables_paginate.dataTables_info {
+    border-right: none;
+    border-radius: none;
+    background-clip: none;
+}
+.dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_paginate {
+    border-right: none;
+    border-width: none;
+    border-style: none;
+    border-color: none;
+
 body.login-page .login-content .form-register-success a {
 	background-color: rgba(4, 113, 57, 1);
 }

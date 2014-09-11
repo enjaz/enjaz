@@ -53,6 +53,7 @@ from core.views import visit_announcement
     url(r'^$', 'core.views.portal_home', name='home'),
     url(r'^visit/(?P<pk>\d+)/$', visit_announcement, name='visit_announcement'),
     url(r'^about/$', TemplateView.as_view(template_name='about.html'), name='about'),
+    url(r'^aboutsc/$', TemplateView.as_view(template_name='about_sc.html'), name='about_sc'),
     url(r'^activities/', include('activities.urls', namespace="activities")),
     url(r'^clubs/', include('clubs.urls', namespace="clubs")),
     url(r'^books/', include('books.urls', namespace="books")),

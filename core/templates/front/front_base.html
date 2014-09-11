@@ -68,7 +68,17 @@
 								<span>الرئيسية</span>
 							</a>
 						</li>
-						<li>
+                                                <li>
+                                                        <a href="{% url 'about_sc' %}">
+                                                                <span>عن نادي الطلاب</span>
+                                                        </a>
+                                                </li>
+                                                <li>
+                                                        <a href="{% url 'about' %}">
+                                                                <span>عن إنجاز</span>
+                                                        </a>
+                                                </li>
+                                                <li>
 							<a href="{% url 'clubs:list' %}">
 								<span>الأندية</span>
 							</a>
@@ -91,6 +101,7 @@
 								<span>الكتب</span>
 							</a>
 						</li>
+{% comment %}
 						<li>
 							<a href="{% url 'about' %}">
 								<span>عن إنجاز</span>
@@ -101,6 +112,7 @@
 								<span>عن نادي الطلاب</span>
 							</a>
 						</li>
+{% endcomment %}
                                                 <span class="visible-xs">
 						<li>
 							<a href="{% url 'userena_signin' %}">

@@ -1,6 +1,7 @@
 """
 Utility functions for the activities app.
 """
+from django.contrib.auth.models import User
 from activities.models import Activity
 
 def get_approved_activities():
@@ -44,4 +45,4 @@ def get_pending_activities():
 
 def has_submitted_any_activity(user):
     """Return whether the user has ever submitted any activities."""
-    return bool(Activity.objects.filter(submitter=user))
+    return Activity.objects.filter(submitter__pk=user.pk).exists()

@@ -76,8 +76,8 @@
 {% endblock %}
 {% block customscript %}
 	<script src="{% static 'neon/assets/js/fullcalendar/fullcalendar.min.js' %}"></script>
-    <script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
-    <script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 	<script>
     var approved = [
 		{% with activities=approved %}
@@ -120,6 +120,11 @@
         calendar.fullCalendar('render');
     });
 
-    $('.datatable').DataTable();
+    $('.datatable').dataTable({
+        "order": [[ 2, "asc" ]],
+        "language": {
+            "url": "{% static 'js/dataTables-arabic.json' %}"
+        }
+    });
 	</script>
 {% endblock %}

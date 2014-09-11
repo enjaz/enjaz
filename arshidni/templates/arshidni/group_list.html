@@ -20,12 +20,13 @@
 	</div>
 	 <div class="panel-body">
 
-		<table id="group-table" class="table table-bordered datatable">
+		<table id="group-table" class="display">
 			<thead>
 				<tr>
 					<th>الاسم</th>
 					<th>المدة (بالأسابيع)</th>
 					<th>عدد المقاعد المتاحة</th>
+					<th>تاريخ الإضافة</th>
 				</tr>
 			</thead>
 			 <tbody>
@@ -34,6 +35,7 @@
 					<td><a href="{% url 'arshidni:show_group' g.pk %}">{{ g.name }}</a></td>
 					<td>{{ g.get_period_in_weeks }}</td>
 					<td>{{ g.get_remaining_members }}</td>
+					<td data-order="{{ g.submission_date|date:"U" }}">{{ g.submission_date|date:"j F Y" }}</td>
 				</tr>
 				{% endfor %}
 			</tbody>
@@ -43,11 +45,15 @@
 {% endblock %}
 
 {% block customscript %}
-<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 <script>
-$(document).ready(function () {
-	$('#group-table').DataTable();
+$(function () {
+	$('#group-table').dataTable({
+		"order": [[ 3, "desc" ]],
+		"language": {
+			"url": "{% static 'js/dataTables-arabic.json' %}"}
+	});
 });
 </script>
 {% endblock %}

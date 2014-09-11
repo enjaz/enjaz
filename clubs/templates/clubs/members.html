@@ -1,10 +1,10 @@
-{% extends "activities/show.html" %}{% load staticfiles %}
-{% block title %}مشاهدة طلبات المشاركة في {{ activity.name }}{% endblock %}
+{% extends "clubs_base.html" %}{% load staticfiles %}
+{% block title %}أعضاء {{ club.name }}{% endblock %}
 
-{% block review_content %}
-{#<h2>طلبات المشاركة في {{ activity.name }}</h2>#}
+{% block content %}
+<h2>أعضاء <a href="{% url 'clubs:show' club.pk %}">{{ club.name }}</a></h2>
 
-<table id="participation_table" class="display">
+<table id="members_table" class="display">
     <thead>
         <th>الاسم</th>
         <th>الاسم الإنجليزي</th>
@@ -13,19 +13,17 @@
         <th>رقم البطاقة الجامعية</th>
         <th>البريد الإلكتروني</th>
         <th>رقم الجوال</th>
-        <th>تاريخ الطلب</th>
     </thead>
     <tbody>
-        {% for par in participations %}
+        {% for member in club.members.all %}
         <tr>
-            <td>{% if par.user.student_profile %}{{ par.user.student_profile.get_ar_full_name }}{% else %}{{ par.user.username }}{% endif %}</td>
-            <td>{% if par.user.student_profile %}{{ par.user.student_profile.get_en_full_name }}{% else %}{{ par.user.username }}{% endif %}</td>
-            <td>{{ par.user.student_profile.college }}</td>
-            <td>{{ par.user.student_profile.student_id }}</td>
-            <td>{{ par.user.student_profile.badge_number }}</td>
-            <td>{{ par.user.email }}</td>
-            <td>{{ par.user.student_profile.mobile_number }}</td>
-            <td>{{ par.submission_date }}</td>
+            <td>{% if member.student_profile %}{{ member.student_profile.get_ar_full_name }}{% else %}{{ member.username }}{% endif %}</td>
+            <td>{% if member.student_profile %}{{ member.student_profile.get_en_full_name }}{% else %}{{ member.username }}{% endif %}</td>
+            <td>{{ member.student_profile.college }}</td>
+            <td>{{ member.student_profile.student_id }}</td>
+            <td>{{ member.student_profile.badge_number }}</td>
+            <td>{{ member.email }}</td>
+            <td>{{ member.student_profile.mobile_number }}</td>
         </tr>
         {% endfor %}
     </tbody>
@@ -38,8 +36,8 @@
 	<script src="{% static 'js/dataTables.tableTools.min.js' %}"></script>
 <script>
 $(document).ready(function () {
-	$('#participation_table').dataTable({
-		"order": [[ 7, "desc" ]],
+	// Initialize the datatable
+	$('#members_table').DataTable({
 		"language": {
 			"url": "{% static 'js/dataTables-arabic.json' %}"
 		},
@@ -47,18 +45,18 @@ $(document).ready(function () {
 		"oTableTools": {
 			"sSwfPath": "{% static 'js/copy_csv_xls_pdf.swf' %}",
 			"aButtons": [
-				{
+			{
 				"sExtends":     "print",
 				"sButtonText":  "اطبع",
 				"sButtonClass": "btn btn-default btn-xs"
-				},
-				{
+			},
+			{
 				"sExtends":     "xls",
 				"sButtonText":  "نزّل",
 				"sButtonClass": "btn btn-white btn-xs"
-				}
+			}
 			]
-		}
+		},
 	});
 });
 </script>

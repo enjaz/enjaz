@@ -23,16 +23,17 @@
 </table>
 </div>
 {% endblock %}
-
+{% comment %}
 {% block customscript %}
 <script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
 <script>
-$(document).ready(function () {
-	/* $('#club_list').DataTable({
-	    "bPaginate": false,
-	    "bSort": false
-	}); */
+$(function () {
+	$('#club_list').DataTable({
+		"bPaginate": false,
+		"bSort": false
+	});
 });
 </script>
 {% endblock %}
+{% endcomment %}

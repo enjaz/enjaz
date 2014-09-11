@@ -5,7 +5,7 @@
 {% if add_task_form %}<div class="col-md-8">{% endif %}
 <h3>المهام</h3>
 <hr>
-<table class="table table-bordered datatable">
+<table id="task_list" class="display">
     <thead>
         <th><!-- status --></th>
         <th>العنوان</th>
@@ -73,10 +73,17 @@
 <link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/font-awesome/css/font-awesome.min.css' %}">
 {% endblock %}
 {% block customscript %}
-<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 <script>
-    $(".datatable").DataTable();
-    $("input[name=due_date]").datepicker({isRTL: true});
+$(function () {
+	$("#task_list").dataTable({
+		"order": [[ 4, "asc" ]],
+		"language": {
+			"url": "{% static 'js/dataTables-arabic.json' %}"
+		},
+	});
+	$("input[name=due_date]").datepicker({isRTL: true});
+});
 </script>
 {% endblock %}

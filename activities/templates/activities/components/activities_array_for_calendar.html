@@ -10,6 +10,6 @@
             allDay: false,
             {% endif %}
             url   : '{{ activity.id }}/'
-        }{% if approved|length > forloop.counter %},{% endif %}
+        },
     {% endfor %}
 {% endfor %}

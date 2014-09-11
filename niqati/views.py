@@ -253,7 +253,7 @@ def coordinator_view(request, activity_id):
 
 
 @login_required
-@permission_required('niqati.view_order', raise_exception=True)
+#@permission_required('niqati.view_order', raise_exception=True)
 def view_collection(request, pk):
     collec = get_object_or_404(Code_Collection, pk=pk)
     try:

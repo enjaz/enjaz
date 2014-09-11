@@ -8,7 +8,8 @@ from django.views.decorators import csrf
 
 from post_office import mail
 import unicodecsv
-from clubs.utils import is_coordinator
+from activities.utils import get_approved_activities
+from clubs.utils import is_coordinator, is_coordinator_or_member
 
 from core import decorators
 from clubs.forms import MembershipForm, DisabledClubForm, ClubForm
@@ -29,18 +30,34 @@ def list(request):
 def show(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
 
+    # If the user has view_activity perm, is member of presidency, or is club coordinator or member,
+    # show all club activities.
+    # If user is a deanship reviewer, show only those approved by presidency.
+    # If user is none of above (employee, student, or other), show only approved activities
+
+    if request.user.has_perm('activities.view_activity') or \
+       request.user.has_perm('activities.add_presidency_review') or \
+       is_coordinator_or_member(club, request.user):
+        activities = club.primary_activity.all()
+
+    elif request.user.has_perm('activities.add_deanship_review'):
+        activities = club.primary_activity.filter(review__review_type="P", review__is_approved=True)
+
+    else:
+        activities = get_approved_activities().filter(primary_club=club)
+
     # If the user has the view_activity permission, is a member or is
     # the coordinator of the given club, they will be able to see all
     # related activities regardless fo their status.  Otherwise, only
     # see the approved ones.
-    if request.user.is_authenticated() and \
-       (request.user.has_perm('activities.view_activity') or \
-        club in request.user.memberships.all() or \
-        club in request.user.coordination.all()):
-        activities = club.primary_activity.all() | club.secondary_activity.all()
-    else:
-        activities = club.primary_activity.filter(review__is_approved=True) |\
-                     club.secondary_activity.filter(review__is_approved=True)
+    # if request.user.is_authenticated() and \
+    #    (request.user.has_perm('activities.view_activity') or \
+    #     club in request.user.memberships.all() or \
+    #     club in request.user.coordination.all()):
+    #     activities = club.primary_activity.all() | club.secondary_activity.all()
+    # else:
+    #     activities = club.primary_activity.filter(review__is_approved=True) |\
+    #                  club.secondary_activity.filter(review__is_approved=True)
 
     can_edit = request.user == club.coordinator or \
                request.user.has_perm('clubs.change_club')

@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 import string
 import random
+from django.core.urlresolvers import reverse
 import requests
 import os
 import pdfcrowd
@@ -136,6 +137,12 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
     date_created = models.DateTimeField(null=True, blank=True, default=None) # date/time of actual code generation (after approval)
     asset = models.FileField(upload_to='niqati/codes/') # either the PDF file for coupons or the list of short links (as txt/html?)
     # thought: txt or html file not for download; instead read as strings and displayed in browser
+
+    def admin_asset_link(self):
+        if self.pk:
+            link = reverse('niqati:view_collec', args=(self.pk, ))
+            return "<a href='%s'>%s</a>" % (link, u"اعرض الملف المرفق")
+    admin_asset_link.allow_tags = True
 
     def __unicode__(self):
         return self.parent_order.activity.name + " - " + self.code_category.ar_label

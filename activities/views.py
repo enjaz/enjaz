@@ -302,12 +302,12 @@ def edit(request, activity_id):
         return render(request, 'activities/new.html', context)
 
 @login_required
-def review(request, activity_id, lower_reivew_type=None):
+def review(request, activity_id, lower_review_type=None):
     activity = get_object_or_404(Activity, pk=activity_id)
     is_coordinator = activity.primary_club in request.user.coordination.all()
     is_submitter = activity.submitter == request.user
 
-    if lower_reivew_type == None:
+    if lower_review_type == None:
         # If the user has any permission (read or write) related to
         # the deanship review, redirect to review/d/. Otherwise, if
         # the user has any permission (read or write) related to the
@@ -324,8 +324,8 @@ def review(request, activity_id, lower_reivew_type=None):
                                                 args=(activity_id, 'p')))
         else:
             raise PermissionDenied
-    elif lower_reivew_type in ['d', 'p']:
-        review_type = lower_reivew_type.upper()
+    elif lower_review_type in ['d', 'p']:
+        review_type = lower_review_type.upper()
     else:
         raise Http404
     

@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 import string
 import random
+from django.core.urlresolvers import reverse
 import requests
 import os
 import pdfcrowd
@@ -85,6 +86,8 @@ class Code(models.Model):
         return spaced_code
     
     class Meta:
+        verbose_name = u"نقطة"
+        verbose_name_plural = u"النقاط"
         permissions = (
             ("submit_code", "Can submit a code."),
             ("view_student_report", "Can view a report of own's codes."),
@@ -134,6 +137,19 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
     date_created = models.DateTimeField(null=True, blank=True, default=None) # date/time of actual code generation (after approval)
     asset = models.FileField(upload_to='niqati/codes/') # either the PDF file for coupons or the list of short links (as txt/html?)
     # thought: txt or html file not for download; instead read as strings and displayed in browser
+
+    def admin_asset_link(self):
+        if self.pk:
+            link = reverse('niqati:view_collec', args=(self.pk, ))
+            return "<a href='%s'>%s</a>" % (link, u"اعرض الملف المرفق")
+    admin_asset_link.allow_tags = True
+
+    def __unicode__(self):
+        return self.parent_order.activity.name + " - " + self.code_category.ar_label
+
+    class Meta:
+        verbose_name = u"مجموعة نقاط"
+        verbose_name_plural = u"مجموعات النقاط"
 
     def process(self, host):
         if self.approved and (self.date_created == None):
@@ -225,11 +241,15 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
             return True
         else:
             return False
-    
+
+    def __unicode__(self):
+        return self.activity.name
+
     class Meta:
         permissions = (
             ("request_order", "Can place a request for a code order."),
             ("view_order", "Can view existing code orders."),
             ("approve_order", "Can approve order requests."),
         )
-
+        verbose_name = u"طلب نقاط"
+        verbose_name_plural = u"طلبات النقاط"

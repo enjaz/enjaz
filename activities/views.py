@@ -205,7 +205,6 @@ def create(request):
                 email_context = {'activity': form_object, 'full_url':
                            full_url}
                 if submitter_gender == 'M':
-                    print MVP_EMAIL
                     mail.send([MVP_EMAIL],
                               template="activity_submitted",
                               context=email_context)
@@ -276,6 +275,28 @@ def edit(request, activity_id):
         # Should check that edits are valid before saving
         if modified_activity.is_valid():
             modified_activity.save()
+
+            # If the edit has been done in response to a review, send a notification email
+            try:
+                pending_review = activity.review_set.get(is_approved=None)
+
+                email_context = {'activity': activity}
+                if pending_review.review_type == 'P':
+                    if get_gender(activity.primary_club.coordinator) == 'M':
+                        mail.send([MVP_EMAIL],
+                                  template="activity_presidency_edited",
+                                  context=email_context)
+                    elif get_gender(activity.primary_club.coordinator) == 'F':
+                        mail.send([FVP_EMAIL],
+                                  template="activity_presidency_edited",
+                                  context=email_context)
+                elif pending_review.review_type == 'D':
+                    mail.send([DHA_EMAIL],
+                              template="activity_deanship_edited",
+                              context=email_context)
+            except ObjectDoesNotExist:
+                pass
+
             return HttpResponseRedirect(reverse('activities:show',
                                                 args=(activity.pk, ))
                                         )
@@ -302,12 +323,12 @@ def edit(request, activity_id):
         return render(request, 'activities/new.html', context)
 
 @login_required
-def review(request, activity_id, lower_reivew_type=None):
+def review(request, activity_id, lower_review_type=None):
     activity = get_object_or_404(Activity, pk=activity_id)
     is_coordinator = activity.primary_club in request.user.coordination.all()
     is_submitter = activity.submitter == request.user
 
-    if lower_reivew_type == None:
+    if lower_review_type == None:
         # If the user has any permission (read or write) related to
         # the deanship review, redirect to review/d/. Otherwise, if
         # the user has any permission (read or write) related to the
@@ -324,8 +345,8 @@ def review(request, activity_id, lower_reivew_type=None):
                                                 args=(activity_id, 'p')))
         else:
             raise PermissionDenied
-    elif lower_reivew_type in ['d', 'p']:
-        review_type = lower_reivew_type.upper()
+    elif lower_review_type in ['d', 'p']:
+        review_type = lower_review_type.upper()
     else:
         raise Http404
     
@@ -413,7 +434,20 @@ def review(request, activity_id, lower_reivew_type=None):
                     mail.send([club_notification_email],
                               template="activity_deanship_rejected",
                               context=email_context)
-            return HttpResponseRedirect(reverse('activities:list'))
+            else:  # If changes are requested (review.is_approved == None)
+                # TODO: If the review is being edited, only do the following if an actual change has been made
+                # Enable coordinators to edit the activity request in correspondence to the review
+                activity.is_editable = True
+                activity.save()
+                if review_type == 'P':
+                    mail.send([club_notification_email],
+                              template="activity_presidency_holded",
+                              context=email_context)
+                elif review_type == 'D':
+                    mail.send([club_notification_email],
+                              template="activity_deanship_holded",
+                              context=email_context)
+            return HttpResponseRedirect(reverse('activities:show', args=(activity.pk, )))
         # TODO: if not valid, show the error messages.
     else: # if not POST
         # If the user has the permission to add a review of the

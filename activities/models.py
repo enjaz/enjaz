@@ -35,7 +35,7 @@ class Activity(models.Model):
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
     is_editable = models.BooleanField(default=True, verbose_name=u"هل يمكن تعديله؟")
     collect_participants = models.BooleanField(default=False,
-                                               verbose_name=u"افتح التسجيل للمنظمين؟")
+                                               verbose_name=u"افتح التسجيل؟")
     participant_colleges = models.ManyToManyField(College,
                                                   verbose_name=u"الكليات المستهدفة",
                                                   null=True, blank=True)

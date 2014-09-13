@@ -7,7 +7,10 @@ from django.utils import timezone
 
 from django.core.exceptions import PermissionDenied
 
+from post_office import mail
+from accounts.models import get_gender
 from core.decorators import post_only
+from core.utilities import MVP_EMAIL, FVP_EMAIL
 from activities.models import Activity, Evaluation
 from activities.forms import EvaluationForm
 from niqati.models import Niqati_User, Category, Code, Code_Order, Code_Collection
@@ -187,19 +190,23 @@ def create_codes(request, activity_id):
                         x.approved = True
                     x.save()
 
-            # create the codes
-            # TODO: the url should always point to enjazportal.com. (use sites framework)
-            # With this configuration, it can point to local host
-            host = request.build_absolute_uri(reverse('niqati:submit'))
-            print "host: " + host
-            o.process(host)
+            # TODO: send email to presidency for approval
+            email_context = {'order': o}
+            if get_gender(activity.primary_club.coordinator) == 'M':
+                mail.send([MVP_EMAIL],
+                          template="niqati_order_submit",
+                          context=email_context)
+            elif get_gender(activity.primary_club.coordinator) == 'F':
+                mail.send([FVP_EMAIL],
+                          template="niqati_order_submit",
+                          context=email_context)
+            
             msg = u"تم إرسال الطلب؛ و سيتم إنشاء النقاط فور الموافقة عليه"
         else:
             pass
             msg = u"لم تطلب أية أكواد!"
         form = OrderForm()
     else:
-        print "INvalid form"
         msg = u"الرجاء تصحيح الأخطاء أدناه"
     # return HttpResponseRedirect(reverse('activities:niqati_orders',
     #                                     args=(activity_id, )))
@@ -297,6 +304,16 @@ def approve_codes(request):
             for collec in order.code_collection_set.filter(approved=None):
                 collec.approved = False
                 collec.save()
+
+                # Send email notification after code generation
+                email_context = {'order': order}
+                if order.activity.primary_club.coordinator:
+                    recipient = order.activity.primary_club.coordinator.email
+                else:
+                    recipient = order.activity.submitter.email
+                mail.send([recipient],
+                          template="niqati_order_reject",
+                          context=email_context)
 
         elif request.POST['action'] == "approve_collec":
             collec = Code_Collection.objects.get(pk=pk)

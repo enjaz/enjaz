@@ -13,6 +13,7 @@ from django.utils.http import urlquote
 from django.template.loader import render_to_string
 from django.core.files import File
 
+from post_office import mail
 from activities.models import Activity
 from clubs.models import Club
 
@@ -235,6 +236,16 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
         for collec in self.code_collection_set.all():
             collec.process(host)
         self.save()
+
+        # Send email notification after code generation
+        email_context = {'order': self}
+        if self.activity.primary_club.coordinator:
+            recipient = self.activity.primary_club.coordinator.email
+        else:
+            recipient = self.activity.submitter.email
+        mail.send([recipient],
+                  template="niqati_order_approve",
+                  context=email_context)
     
     def is_reviewed(self):
         if len(self.code_collection_set.filter(approved=None)) == 0:

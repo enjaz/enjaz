@@ -205,7 +205,6 @@ def create(request):
                 email_context = {'activity': form_object, 'full_url':
                            full_url}
                 if submitter_gender == 'M':
-                    print MVP_EMAIL
                     mail.send([MVP_EMAIL],
                               template="activity_submitted",
                               context=email_context)
@@ -276,6 +275,28 @@ def edit(request, activity_id):
         # Should check that edits are valid before saving
         if modified_activity.is_valid():
             modified_activity.save()
+
+            # If the edit has been done in response to a review, send a notification email
+            try:
+                pending_review = activity.review_set.get(is_approved=None)
+
+                email_context = {'activity': activity}
+                if pending_review.review_type == 'P':
+                    if get_gender(activity.primary_club.coordinator) == 'M':
+                        mail.send([MVP_EMAIL],
+                                  template="activity_presidency_edited",
+                                  context=email_context)
+                    elif get_gender(activity.primary_club.coordinator) == 'F':
+                        mail.send([FVP_EMAIL],
+                                  template="activity_presidency_edited",
+                                  context=email_context)
+                elif pending_review.review_type == 'D':
+                    mail.send([DHA_EMAIL],
+                              template="activity_deanship_edited",
+                              context=email_context)
+            except ObjectDoesNotExist:
+                pass
+
             return HttpResponseRedirect(reverse('activities:show',
                                                 args=(activity.pk, ))
                                         )
@@ -412,6 +433,19 @@ def review(request, activity_id, lower_review_type=None):
                     email_context['full_url'] = deanship_full_url
                     mail.send([club_notification_email],
                               template="activity_deanship_rejected",
+                              context=email_context)
+            else:  # If changes are requested (review.is_approved == None)
+                # TODO: If the review is being edited, only do the following if an actual change has been made
+                # Enable coordinators to edit the activity request in correspondence to the review
+                activity.is_editable = True
+                activity.save()
+                if review_type == 'P':
+                    mail.send([club_notification_email],
+                              template="activity_presidency_holded",
+                              context=email_context)
+                elif review_type == 'D':
+                    mail.send([club_notification_email],
+                              template="activity_deanship_holded",
                               context=email_context)
             return HttpResponseRedirect(reverse('activities:show', args=(activity.pk, )))
         # TODO: if not valid, show the error messages.

@@ -405,3 +405,7 @@ body.login-page .login-content .form-register-success a {
 ul.navbar-left li a {
 	display: table-cell;
 }
+
+.remove_learningobjective {
+	color: #D42020;
+}

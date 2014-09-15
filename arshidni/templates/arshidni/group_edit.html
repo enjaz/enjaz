@@ -16,7 +16,19 @@
 <form action="{% if edit %}{% url 'arshidni:edit_group' group.pk %}{% else %}{% url 'arshidni:submit_group' %}{% endif %}" method="post" class="form">
 {% csrf_token %}
     {% bootstrap_form form %}
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">الأهداف التعليمية</h3>
+		</div>
+		<div class="panel-body">
+			<p>ما المواضيع التي تطمح لدراستها؟  فصّل فذلك سيساعد زملائك على فهم خطتك وسيساعدك على إنجازها.</p>
+    			<div id="learningobjective_fields_wrap"></div>
+			<a href="#" class="btn btn-primary" id="add_learningobjective_button">أضف هدفا تعليميا</a>
+		</div>
+	</div>
+
     {% buttons %}
+
         <button type="submit" class="btn btn-primary">
             {% bootstrap_icon "ok-sign" %} {% if edit %} عدّل {% else %} أنشئ {% endif %}
         </button>
@@ -28,8 +40,46 @@ $(function(){
 	$('#id_starting_date, #id_ending_date').datepicker({isRTL: true});
 		$("#id_max_members").attr({
 		"max" : 8,        // substitute your own
-	       "min" : 3          // values (or variables) here
+		"min" : 3          // values (or variables) here
 	});
+
+// Here is a different cleaner way to implement dynamic form fields:
+// We can either have existing fields that can be modified, or we can
+// have new fields.  The way they are dealt with in the server side is
+// different, so it would save our time to also handle them
+// differently on the client side.
+
+// For the already-existing fields, the server would supply the client
+// with each one with the LearningObjective pk.  The client should
+// display them and return whatever left after user modifications and
+// removals.
+
+// For the new fields, the client should append ordered fields and
+// then the server should handle them.
+
+// If the form is invalid, the server would return the new fields in
+// the order provided by the client.  The server shall only create new
+// LearningObjective objects.
+
+	var wrapper         = $("#learningobjective_fields_wrap"); //Fields wrapper
+	var add_button      = $("#add_learningobjective_button"); //Add button ID
+	var new_field_count = 0;
+
+{% for existing_field in group.learningobjective_set.all %}
+	$(wrapper).append('<div class="form-group"><a href="#" class="remove_learningobjective">احذف</a><input class="form-control" value="{{ existing_field.text }}" type="text" name="existing_learningobjective-{{ existing_field.pk }}"/></div>'); //add input box
+{% endfor %}
+
+    $(add_button).click(function(e){ //on add input button click
+        e.preventDefault();
+	new_field_count++;
+	var new_field_html = '<div class="form-group"><a href="#" class="remove_learningobjective">احذف</a><input class="form-control" type="text" name="new_learningobjective-{id}"/></div>';
+        $(wrapper).append(new_field_html.replace('{id}', new_field_count)); //add input box
+    });
+   
+    $(wrapper).on("click",".remove_learningobjective", function(e){ //user click on remove text
+        e.preventDefault(); $(this).parent('div').remove();
+    });
+
 });
 </script>
 

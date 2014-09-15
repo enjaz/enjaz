@@ -45,6 +45,11 @@ class AnswerForm(forms.ModelForm):
         fields = ['text']
 
 class StudyGroupForm(forms.ModelForm):
+    class Meta:
+        model = StudyGroup
+        fields = ['name', 'starting_date', 'ending_date',
+                  'max_members']
+
     def clean(self):
         cleaned_data = super(StudyGroupForm, self).clean()
         if 'starting_date' in cleaned_data and 'ending_date' in cleaned_data:
@@ -55,6 +60,21 @@ class StudyGroupForm(forms.ModelForm):
                 # Remove invalid fields
                 del cleaned_data["starting_date"]
                 del cleaned_data["ending_date"]
+
+        new_learningobjective_fields = [field for field in self.data if field.startswith('new_learningobjective-')]
+        existing_learningobjective_fields = [field for field in self.data if field.startswith('existing_learningobjective-')]
+
+        for field_name in new_learningobjective_fields:
+            text = self.data[field_name].strip()
+            if not text: # if empty
+                continue
+            cleaned_data[field_name] = self.data[field_name]
+        for field_name in existing_learningobjective_fields:
+            text = self.data[field_name].strip()
+            if not text: # if empty
+                continue
+            cleaned_data[field_name] = self.data[field_name]
+
         return cleaned_data
 
     def clean_max_members(self):
@@ -70,10 +90,33 @@ class StudyGroupForm(forms.ModelForm):
             self._errors["max_members"] = self.error_class([msg])
         return max_members
 
-    class Meta:
-        model = StudyGroup
-        fields = ['name', 'starting_date', 'ending_date',
-                  'max_members']
+    def save(self, *args, **kwargs):
+        group = super(StudyGroupForm, self).save(*args, **kwargs)
+        remaining_pk = [] # List of kept learning objects (whether
+                          # modified or not)
+        new_learningobjective_fields = [field for field in self.cleaned_data if field.startswith('new_learningobjective-')]
+        existing_learningobjective_fields = [field for field in self.cleaned_data if field.startswith('existing_learningobjective-')]
+
+        for field_name in new_learningobjective_fields:
+            text = self.cleaned_data[field_name]
+            new_learningobjective = LearningObjective.objects.create(group=group,text=text)
+            remaining_pk.append(new_learningobjective.pk)
+
+        for field_name in existing_learningobjective_fields:
+            pk_str = field_name.lstrip("existing_learningobjective-")
+            pk = int(pk_str)
+            remaining_pk.append(pk)
+            text = self.cleaned_data[field_name]
+            existing_learningobjective = LearningObjective.objects.get(pk=pk)
+            existing_learningobjective.text = text
+            existing_learningobjective.save()
+
+        deleted_learningobjectives = LearningObjective.objects.exclude(pk__in=remaining_pk).filter(group=group)
+        for deleted_learningobjective in deleted_learningobjectives:
+            print "Deleting", deleted_learningobjective.text
+            deleted_learningobjective.delete()
+
+        return group
 
 class ColleagueProfileForm(forms.ModelForm):
     class Meta:

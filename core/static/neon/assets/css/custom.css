@@ -409,3 +409,7 @@ ul.navbar-left li a {
 .remove_learningobjective {
 	color: #D42020;
 }
+
+body.login-page .login-content .alert-warning a {
+	color: #000;
+}

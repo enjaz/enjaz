@@ -62,6 +62,7 @@ from core.views import visit_announcement
     url(r'^arshidni/admin/', include(arshidni_admin.urls, namespace="arshidni_admin")),
     url(r'^arshidni/', include('arshidni.urls', namespace="arshidni")),
     url(r'^media/', include('media.urls', namespace="media")),
+    url(r'^accounts/resend/$', 'accounts.views.resend_confirmation_key', name='resend_confirmation_key'),
     url(r'^accounts/signup/$', 'userena.views.signup', {'signup_form': StudentSignupForm, 'template_name': 'userena/student_signup_form.html'}),
     url(r'^accounts/signup/nonstudents/$', 'userena.views.signup', {'signup_form': NonStudentSignupForm, 'template_name': 'userena/nonstudent_signup_form.html'}, name="nonstudent_signup"),
     url(r'^accounts/signin/$', 'userena.views.signin', {'auth_form': ModifiedAuthenticationForm}),

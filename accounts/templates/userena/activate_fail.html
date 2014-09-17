@@ -7,8 +7,8 @@
 <div class="form-register-success visible dinar-light">
 	<i class="entypo-lock"></i>
 	<h3 class="dinar-medium">تعذّر تأكيد حسابك.</h3>
-	<p>وذلك لأن رابط التفعيل غير صحيح.</p>
-	<p>الرجاء <a href="mailto:hello@enjazportal.com">الاتصال بنا</a> في حال ظننت أن إشكالا وقع.</p>
+	<p>وذلك لأن رابط التأكيد غير صحيح. يمكنك <a href="{% url "resend_confirmation_key" %}">طلب رابط تأكيد جديد</a>.</p>
+	<p>ويمكنك دوما <a href="mailto:hello@enjazportal.com">الاتصال بنا</a> في حال ظننت أن إشكالا وقع.</p>
 </div>
 {% endblock %}
 

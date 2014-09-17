@@ -1,0 +1,41 @@
+{% extends 'userena/base_userena.html' %}{% load staticfiles %}
+{% block title %}إعادة إرسال رابط التأكيد{% endblock %}
+
+{% block description %}أدخل بريدك الإلكتروني ليعاد إرسال رابط التأكيد.{% endblock %}
+ 
+{% block content %}
+	{% if error %}
+	<div class="form-login-error visible dinar-light">
+		<h3 class="dinar-medium">عفوًا</h3>
+		<p>{% if error == 'nonexistent' %}
+		ليس في بوابة إنجاز حساب يستخدم هذا البريد. <a href="{% url 'userena_signup' %}">سجّل</a>.
+		{% elif error == 'already_active' %}
+		سبق أن نشّط حسابك!  يمكنك <a href="{% url 'userena_signin' %}">الدخول الآن</a>.
+		{% endif %}
+		</p>
+	</div>
+	{% endif %}
+
+	<form method="post" role="form" id="form_login" action="">
+		{% csrf_token %}
+		<div class="english-field form-group">
+
+			<div class="input-group{% if form.errors or error %} validate-has-error{% endif %}">
+				<div class="input-group-addon">
+					<i class="entypo-mail"></i>
+				</div>
+
+				<input type="email" class="form-control dinar-light" name="email" id="id_email" placeholder="البريد الجامعي" autocomplete="off" />
+			</div>
+
+		</div>
+
+		<div class="form-group">
+			<button type="submit" class="btn btn-primary btn-block btn-login dinar-medium">
+				<i class="entypo-left-open-mini"></i>
+				أرسل
+			</button>
+		</div>
+	</form>
+{% endblock %}
+{% block customscript %}<script src="{% static 'neon/assets/js/neon-login.js' %}?v=0001"></script>{% endblock %}

@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.utils.http import urlquote
 from django.template.loader import render_to_string
 from django.core.files import File
+from django.conf import settings
 
 from post_office import mail
 from activities.models import Activity
@@ -176,7 +177,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
 
                 try:
                     # create an API client instance
-                    client = pdfcrowd.Client("msarabi95", "78a46547997be8ccadbe1ff05f84e967")
+                    client = pdfcrowd.Client(settings.PDFCROWD_USERNAME, settings.PDFCROWD_KEY)
 
                     # convert HTML string and save the result to a file
                     output_file = open('codes.pdf', 'wb')
@@ -196,7 +197,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 # generate short links for each code
                 for code in self.code_set.all():
                     long_link = urlquote(host + code.code_string)
-                    response = requests.get("https://api-ssl.bitly.com/v3/shorten?access_token=9b21f7babc55d7d58661688fbf32c70067731429&format=txt&longUrl=" + long_link)
+                    response = requests.get("https://api-ssl.bitly.com/v3/shorten?access_token=" + settings.BITLY_KEY + "&format=txt&longUrl=" + long_link)
                     short_link = response.text
                     code.asset = short_link
                     code.save()

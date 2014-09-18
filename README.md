@@ -74,7 +74,10 @@ Current required settings:
 * DEFAULT_FROM_EMAIL: The default _noreply_ email.
 * MEDIA_ROOT: Where do you want to save the covers on the server?
 * MEDIA_URL: Where do you want users to access the covers?
-* GOOGLE_BOOKS_KEY: to be generated from https://code.google.com/apis/console/
+* `GOOGLE_BOOKS_KEY`: to be generated from https://code.google.com/apis/console/
+* `PDFCROWD_USERNAME`: a pdfcrowd username
+* `PDFCROWD_KEY`: a pdfcrowd api key
+* `BITLY_KEY`: a bit.ly api key
 * `FVP_USERNAME = 'username'` for the female vice president.
 * `MVP_USERNAME = 'username'` for the male vice president.
 * `DHA_USERNAME = 'username'` for the Deanship Head of Activities

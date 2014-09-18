@@ -253,6 +253,17 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
         else:
             return False
 
+    def get_delivery_type(self):
+        # This is a dirty hack, should be fixed later
+        return self.code_collection_set.first().delivery_type
+
+    def is_approved(self):
+        # Might be a dirty hack as well
+        return all([collec.approved for collec in self.code_collection_set.all()])
+
+    def is_processed(self):
+        return all([collec.date_created is not None for collec in self.code_collection_set.all()])
+
     def __unicode__(self):
         return self.activity.name
 

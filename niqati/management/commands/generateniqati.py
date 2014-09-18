@@ -11,14 +11,12 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Get all approved and unprocessed orders
         orders = filter(lambda order: order.is_approved() and order.is_processed() == False, Code_Order.objects.all())
-        print timezone.now()
         # Process the orders one at a time so take only the first order
         if len(orders) > 0:
             order = orders.pop(0)
-
             domain = Site.objects.get_current().domain
             submit_link = "http://" + domain + reverse('niqati:submit')
-
+            print timezone.now()
             if order.get_delivery_type() == '0':  # Coupon
                 # Check if no other coupons are already being generated at the moment
                 if not os.path.isfile('codes.pdf'):
@@ -41,5 +39,3 @@ class Command(BaseCommand):
                 else:
                     print "  Other short links are currently being generated."
                     print "  Aborting..."
-        else:
-            print "  No approved and unprocessed orders."

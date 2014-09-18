@@ -15,25 +15,27 @@ class Command(BaseCommand):
             order = orders.pop(0)
 
             domain = Site.objects.get_current().domain
-            submit_link = domain + reverse('niqati:submit')
-            print domain
-            print submit_link
+            submit_link = "http://" + domain + reverse('niqati:submit')
 
             if order.get_delivery_type() == '0':  # Coupon
                 # Check if no other coupons are already being generated at the moment
                 if not os.path.isfile('codes.pdf'):
-                    print "No codes being generated; proceeding..."
-
+                    print "No coupons currently being generated."
+                    print "Processing order number ", order.pk, " for the activity ", order.activity
                     order.process(submit_link)
+                    print "Successfully generated requested coupons."
                 else:
-                    print "Other codes are currently being generated; aborting..."
+                    print "Other codes are currently being generated"
+                    print "Aborting..."
             elif order.get_delivery_type() == '1':  # Short links
                 # Check if no other links are being generated
                 if not os.path.isfile('links.html'):
-                    print "No other links are being generated; proceeding..."
-
+                    print "No other short links are being generated"
+                    print "Processing order number ", order.pk, " for the activity ", order.activity
                     order.process(submit_link)
+                    print "Successfully generated requested short links."
                 else:
-                    print "Other links are currently being generated; aborting..."
+                    print "Other short links are currently being generated."
+                    print "Aborting..."
         else:
-            print "No approved and unprocessed orders"
+            print "No approved and unprocessed orders."

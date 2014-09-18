@@ -25,7 +25,7 @@ class Command(BaseCommand):
                     print "  No coupons currently being generated."
                     print "  Processing order number ", order.pk, " for the activity ", order.activity
                     order.process(submit_link)
-                    print timezone.now()
+                    print "  ", timezone.now()
                     print "  Successfully generated requested coupons."
                 else:
                     print "  Other codes are currently being generated"
@@ -36,7 +36,7 @@ class Command(BaseCommand):
                     print "  No other short links are being generated"
                     print "  Processing order number ", order.pk, " for the activity ", order.activity
                     order.process(submit_link)
-                    print timezone.now()
+                    print "  ", timezone.now()
                     print "  Successfully generated requested short links."
                 else:
                     print "  Other short links are currently being generated."

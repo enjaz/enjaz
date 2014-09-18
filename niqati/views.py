@@ -296,8 +296,8 @@ def approve_codes(request):
                 collec.approved = True
                 collec.save()
 
-            host = request.build_absolute_uri(reverse('niqati:submit'))
-            order.process(host)
+            # host = request.build_absolute_uri(reverse('niqati:submit'))
+            # order.process(host)
 
         elif request.POST['action'] == "reject_order":
             order = Code_Order.objects.get(pk=pk)

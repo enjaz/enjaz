@@ -153,21 +153,18 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
         verbose_name_plural = u"مجموعات النقاط"
 
     def process(self, host):
-        if self.approved and (self.date_created == None):
+        if self.approved and (self.date_created is not None):
             for i in range(self.code_count):
                 c = Code(category=self.code_category,
                          activity=self.parent_order.activity,
                          collection=self)
                 c.generate_unique()
                 c.save()
-            self.date_created = timezone.now()
-            self.save()
 
-        # if self.asset == None:
             if self.delivery_type == self.COUPON:
 
                 # generate QR codes for each coupon
-                qr_endpoint = "http://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" + host # "http://127.0.0.1:8000/niqati/submit/"
+                qr_endpoint = "http://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" + host
                 for code in self.code_set.all():
                     code.asset = qr_endpoint + code.code_string
                     code.save()
@@ -177,17 +174,6 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 context = {'collec': self}
                 html_file = render_to_string('niqati/coupons.html', context)
 
-                
-                # never mind this commented-out bit; it's just for testing
-#                 output_file = open("codes.html", "wb")
-#                 output_file.write(html_file.encode('utf-8'))
-#                 output_file = open("codes.html", "r+")
-#                 self.asset.save(self.parent_order.activity.name + " - " + self.code_category.ar_label, File(output_file))
-#                 output_file.close()
-#                 
-#                 os.remove(output_file)
-                
-                
                 try:
                     # create an API client instance
                     client = pdfcrowd.Client("msarabi95", "78a46547997be8ccadbe1ff05f84e967")
@@ -226,6 +212,12 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 output_file.close()
                 
                 os.remove('links.html')
+
+            # Record the date and time the collection was processed
+            # Placing this at the end ensures that collections which experience issues while
+            # being processed won't be falsely marked as processed
+            self.date_created = timezone.now()
+            self.save()
                 
 
 class Code_Order(models.Model): # consists of one Code_Collection or more

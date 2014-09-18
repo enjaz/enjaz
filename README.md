@@ -2,7 +2,7 @@ student-portal
 ==============
 
 The Student Portal is a [Django-based](https://www.djangoproject.com) platform for university student activity.
-Through the platform, students can sumbit activities for approval,
+Through the platform, students can submit activities for approval,
 join clubs, enter their 'Activity Points' (Niqati) and contribute and
 borrow books.
 
@@ -40,6 +40,11 @@ Current dependencies:
 * post_office _(with the cronjob)_
 * requests
 * unicodecsv
+
+A cronjob is required to process niqati code orders as follows:
+```
+* * * * * cd ~/path/to/portal/ && /path/to/python manage.py generateniqati >> ~/path/to/log/generate_niqati.log 2>&1
+```
 
 In the project `urls.py`, add the following:
 ```

@@ -180,14 +180,14 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                     client = pdfcrowd.Client(settings.PDFCROWD_USERNAME, settings.PDFCROWD_KEY)
 
                     # convert HTML string and save the result to a file
-                    output_file = open('codes.pdf', 'wb')
+                    output_file = open('codes_' + str(self.pk) + '.pdf', 'wb')
                     client.convertHtml(html_file.encode('utf-8'), output_file)
-                    output_file = open('codes.pdf', 'r+')
+                    output_file = open('codes_' + str(self.pk) + '.pdf', 'r+')
                     self.asset.save(self.parent_order.activity.name + " - " + self.code_category.ar_label, File(output_file))
                     self.save()
                     
                     output_file.close()
-                    os.remove('codes.pdf')
+                    os.remove('codes_' + str(self.pk) + '.pdf')
 
                 except pdfcrowd.Error, why:
                     print 'Failed:', why
@@ -206,13 +206,13 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 context = {'collec': self}
                 html_file = render_to_string('niqati/links.html', context)
                 
-                output_file = open('links.html', 'wb')
+                output_file = open('links_' + str(self.pk) + '.html', 'wb')
                 output_file.write(html_file.encode('utf-16'))
-                output_file = open("links.html", "r+")
+                output_file = open('links_' + str(self.pk) + '.html', "r+")
                 self.asset.save(self.parent_order.activity.name + " - " + self.code_category.ar_label, File(output_file))
                 output_file.close()
                 
-                os.remove('links.html')
+                os.remove('links_' + str(self.pk) + '.html')
 
             # Record the date and time the collection was processed
             # Placing this at the end ensures that collections which experience issues while

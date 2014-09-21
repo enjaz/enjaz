@@ -57,7 +57,7 @@ class StudentSignupForm(SignupForm):
                 cleaned_data[field] = cleaned_data[field].strip()
 
         # Make sure that the email is of the university.
-        if 'email' in cleaned_data and not cleaned_data['email'].endswith('ksau-hs.edu.sa'):
+        if 'email' in cleaned_data and not cleaned_data['email'].endswith('@ksau-hs.edu.sa'):
             email_msg = u"أدخل عنوانا جامعيا"
             self._errors['email'] = self.error_class([email_msg])
             del cleaned_data['email']

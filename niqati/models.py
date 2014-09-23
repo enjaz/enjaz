@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.utils.http import urlquote
 from django.template.loader import render_to_string
 from django.core.files import File
+from django.conf import settings
 
 from post_office import mail
 from activities.models import Activity
@@ -153,21 +154,18 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
         verbose_name_plural = u"مجموعات النقاط"
 
     def process(self, host):
-        if self.approved and (self.date_created == None):
+        if self.approved and (self.date_created is None):
             for i in range(self.code_count):
                 c = Code(category=self.code_category,
                          activity=self.parent_order.activity,
                          collection=self)
                 c.generate_unique()
                 c.save()
-            self.date_created = timezone.now()
-            self.save()
 
-        # if self.asset == None:
             if self.delivery_type == self.COUPON:
 
                 # generate QR codes for each coupon
-                qr_endpoint = "http://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" + host # "http://127.0.0.1:8000/niqati/submit/"
+                qr_endpoint = "http://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" + host
                 for code in self.code_set.all():
                     code.asset = qr_endpoint + code.code_string
                     code.save()
@@ -177,30 +175,19 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 context = {'collec': self}
                 html_file = render_to_string('niqati/coupons.html', context)
 
-                
-                # never mind this commented-out bit; it's just for testing
-#                 output_file = open("codes.html", "wb")
-#                 output_file.write(html_file.encode('utf-8'))
-#                 output_file = open("codes.html", "r+")
-#                 self.asset.save(self.parent_order.activity.name + " - " + self.code_category.ar_label, File(output_file))
-#                 output_file.close()
-#                 
-#                 os.remove(output_file)
-                
-                
                 try:
                     # create an API client instance
-                    client = pdfcrowd.Client("msarabi95", "78a46547997be8ccadbe1ff05f84e967")
+                    client = pdfcrowd.Client(settings.PDFCROWD_USERNAME, settings.PDFCROWD_KEY)
 
                     # convert HTML string and save the result to a file
-                    output_file = open('codes.pdf', 'wb')
+                    output_file = open('codes_' + str(self.pk) + '.pdf', 'wb')
                     client.convertHtml(html_file.encode('utf-8'), output_file)
-                    output_file = open('codes.pdf', 'r+')
+                    output_file = open('codes_' + str(self.pk) + '.pdf', 'r+')
                     self.asset.save(self.parent_order.activity.name + " - " + self.code_category.ar_label, File(output_file))
                     self.save()
                     
                     output_file.close()
-                    os.remove('codes.pdf')
+                    os.remove('codes_' + str(self.pk) + '.pdf')
 
                 except pdfcrowd.Error, why:
                     print 'Failed:', why
@@ -210,7 +197,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 # generate short links for each code
                 for code in self.code_set.all():
                     long_link = urlquote(host + code.code_string)
-                    response = requests.get("https://api-ssl.bitly.com/v3/shorten?access_token=9b21f7babc55d7d58661688fbf32c70067731429&format=txt&longUrl=" + long_link)
+                    response = requests.get("https://api-ssl.bitly.com/v3/shorten?access_token=" + settings.BITLY_KEY + "&format=txt&longUrl=" + long_link)
                     short_link = response.text
                     code.asset = short_link
                     code.save()
@@ -219,13 +206,19 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 context = {'collec': self}
                 html_file = render_to_string('niqati/links.html', context)
                 
-                output_file = open('links.html', 'wb')
+                output_file = open('links_' + str(self.pk) + '.html', 'wb')
                 output_file.write(html_file.encode('utf-16'))
-                output_file = open("links.html", "r+")
+                output_file = open('links_' + str(self.pk) + '.html', "r+")
                 self.asset.save(self.parent_order.activity.name + " - " + self.code_category.ar_label, File(output_file))
                 output_file.close()
                 
-                os.remove('links.html')
+                os.remove('links_' + str(self.pk) + '.html')
+
+            # Record the date and time the collection was processed
+            # Placing this at the end ensures that collections which experience issues while
+            # being processed won't be falsely marked as processed
+            self.date_created = timezone.now()
+            self.save()
                 
 
 class Code_Order(models.Model): # consists of one Code_Collection or more
@@ -252,6 +245,27 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
             return True
         else:
             return False
+
+    def get_delivery_type(self):
+        # This is a dirty hack, should be fixed later
+        return self.code_collection_set.first().delivery_type
+
+    def is_approved(self):
+        # Might be a dirty hack as well
+        return all([collec.approved for collec in self.code_collection_set.all()])
+
+    def is_processed(self):
+        return all([collec.date_created is not None for collec in self.code_collection_set.all()])
+
+    def mark_as_processed(self):
+        """
+        Mark the code collections constituting the current order as processed.
+        This is to prevent troublesome orders from causing delays in the generation queue.
+        """
+        for collec in self.code_collection_set.all():
+            if collec.date_created is None:
+                collec.date_created = timezone.now()
+                collec.save()
 
     def __unicode__(self):
         return self.activity.name

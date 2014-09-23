@@ -257,6 +257,16 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
     def is_processed(self):
         return all([collec.date_created is not None for collec in self.code_collection_set.all()])
 
+    def mark_as_processed(self):
+        """
+        Mark the code collections constituting the current order as processed.
+        This is to prevent troublesome orders from causing delays in the generation queue.
+        """
+        for collec in self.code_collection_set.all():
+            if collec.date_created is None:
+                collec.date_created = timezone.now()
+                collec.save()
+
     def __unicode__(self):
         return self.activity.name
 

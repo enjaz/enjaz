@@ -20,9 +20,14 @@ class Command(BaseCommand):
                 if not any([os.path.isfile('codes_' + str(collec.pk) + '.pdf') for collec in order.code_collection_set.all()]):
                     print "  Order not currently being processed."
                     print "  Processing order number ", order.pk, " for the activity ", order.activity
-                    order.process(submit_link)
-                    print "  ", timezone.now()
-                    print "  Successfully generated requested coupons."
+                    try:
+                        order.process(submit_link)
+                        print "  ", timezone.now()
+                        print "  Successfully generated requested coupons."
+                    except:
+                        order.mark_as_processed()
+                        print "  ", timezone.now()
+                        print "  Generation failed; marking order as complete and proceeding"
                 else:
                     print "  Order currently being processed."
                     print "  Aborting..."
@@ -31,9 +36,14 @@ class Command(BaseCommand):
                 if not any([os.path.isfile('links_' + str(collec.pk) + '.html') for collec in order.code_collection_set.all()]):
                     print "  Order not currently being processed."
                     print "  Processing order number ", order.pk, " for the activity ", order.activity
-                    order.process(submit_link)
-                    print "  ", timezone.now()
-                    print "  Successfully generated requested short links."
+                    try:
+                        order.process(submit_link)
+                        print "  ", timezone.now()
+                        print "  Successfully generated requested short links."
+                    except:
+                        order.mark_as_processed()
+                        print "  ", timezone.now()
+                        print "  Generation failed; marking order as complete and proceeding"
                 else:
                     print "  Order currently being processed."
                     print "  Aborting..."

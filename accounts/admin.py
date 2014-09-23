@@ -132,9 +132,28 @@ class ModifiedUserAdmin(UserenaAdmin):
 ones) deal with the User model."""
     actions = [remove_add_code_perm, remove_add_bookrequest_perm,
                remove_add_book_perm]
-    list_display = ('username', 'full_en_name', 'email', 'is_coordinator', 'is_employee')
+    list_display = ('username', 'full_en_name', 'email', 'is_active',
+                    'is_coordinator', 'is_employee', 'date_joined')
     list_filter = (EmployeeFilter, CoordinatorFilter, CollegeFilter,
                    SectionFilter)
+    search_fields= ('username', 'email',
+                    'student_profile__en_first_name',
+                    'student_profile__en_middle_name',
+                    'student_profile__en_last_name',
+                    'student_profile__ar_first_name',
+                    'student_profile__ar_middle_name',
+                    'student_profile__ar_last_name',
+                    'student_profile__student_id',
+                    'student_profile__badge_number',
+                    'student_profile__mobile_number',
+                    'nonstudent_profile__en_first_name',
+                    'nonstudent_profile__en_middle_name',
+                    'nonstudent_profile__en_last_name',
+                    'nonstudent_profile__ar_first_name',
+                    'nonstudent_profile__ar_middle_name',
+                    'nonstudent_profile__ar_last_name',
+                    'nonstudent_profile__badge_number',
+                    'nonstudent_profile__job_description')
     inlines = [StudentProfileInline, NonStudentProfileInline]
 
     def is_coordinator(self, obj):

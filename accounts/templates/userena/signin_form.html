@@ -12,7 +12,7 @@
 		{% endfor %}
 	</div>
 	{% endif %}
-	
+	<p class="altert alert-warning">في حال لم تصلك رسالة التأكيد، <a href="{% url "resend_confirmation_key" %}">اطلبها مجددا من هنا</a>.</p>
 	<form method="post" role="form" id="form_login" action="{% url 'userena_signin' %}">
 		{% csrf_token %}
 		<div class="english-field form-group">

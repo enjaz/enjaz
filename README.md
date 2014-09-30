@@ -2,7 +2,7 @@ student-portal
 ==============
 
 The Student Portal is a [Django-based](https://www.djangoproject.com) platform for university student activity.
-Through the platform, students can sumbit activities for approval,
+Through the platform, students can submit activities for approval,
 join clubs, enter their 'Activity Points' (Niqati) and contribute and
 borrow books.
 
@@ -41,6 +41,11 @@ Current dependencies:
 * requests
 * unicodecsv
 
+A cronjob is required to process niqati code orders as follows:
+```
+* * * * * cd ~/path/to/portal/ && /path/to/python manage.py generateniqati >> ~/path/to/log/generate_niqati.log 2>&1
+```
+
 In the project `urls.py`, add the following:
 ```
 # [...]
@@ -75,10 +80,14 @@ Current required settings:
 * DEFAULT_FROM_EMAIL: The default _noreply_ email.
 * MEDIA_ROOT: Where do you want to save the covers on the server?
 * MEDIA_URL: Where do you want users to access the covers?
-* GOOGLE_BOOKS_KEY: to be generated from https://code.google.com/apis/console/
+* `GOOGLE_BOOKS_KEY`: to be generated from https://code.google.com/apis/console/
+* `PDFCROWD_USERNAME`: a pdfcrowd username
+* `PDFCROWD_KEY`: a pdfcrowd api key
+* `BITLY_KEY`: a bit.ly api key
 * `FVP_USERNAME = 'username'` for the female vice president.
 * `MVP_USERNAME = 'username'` for the male vice president.
 * `DHA_USERNAME = 'username'` for the Deanship Head of Activities
+* `STUDENTVOICE_THRESHOLD = 30`, adjustable threshold for sending notifications.
 * `AUTH_PROFILE_MODULE = 'accounts.EnjazProfile'`
 * `USERENA_WITHOUT_USERNAMES = True`
 * `USERENA_ACTIVATION_RETRY = True`

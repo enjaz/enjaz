@@ -1,0 +1,112 @@
+[
+{
+  "pk": 1, 
+  "model": "studentvoice.recipient", 
+  "fields": {
+    "name": "\u0639\u0645\u0627\u062f\u0629 \u0643\u0644\u064a\u0629 \u0627\u0644\u0637\u0628", 
+    "secondary_email": "", 
+    "creation_date": "2014-09-30T16:18:49.434Z", 
+    "college": [
+      1, 
+      6, 
+      8
+    ], 
+    "english_name": "Deanship of the College of Medicine", 
+    "email": "com@ksau-hs.edu.sa", 
+    "users": []
+  }
+},
+{
+  "pk": 2, 
+  "model": "studentvoice.recipient", 
+  "fields": {
+    "name": "\u0639\u0645\u0627\u062f\u0629 \u0643\u0644\u064a\u0629 \u0637\u0628 \u0627\u0644\u0623\u0633\u0646\u0627\u0646", 
+    "secondary_email": "", 
+    "creation_date": "2014-09-30T16:19:48.741Z", 
+    "college": [
+      3, 
+      10
+    ], 
+    "english_name": "Deanship of the College of Dentistry", 
+    "email": "cod@ksau-hs.edu.sa", 
+    "users": []
+  }
+},
+{
+  "pk": 3, 
+  "model": "studentvoice.recipient", 
+  "fields": {
+    "name": "\u0639\u0645\u0627\u062f\u0629 \u0643\u0644\u064a\u0629 \u0627\u0644\u0635\u064a\u062f\u0644\u0629", 
+    "secondary_email": "", 
+    "creation_date": "2014-09-30T16:20:24.495Z", 
+    "college": [
+      2
+    ], 
+    "english_name": "Deanship of the College of Pharmacy", 
+    "email": "cop@ksau-hs.edu.sa", 
+    "users": []
+  }
+},
+{
+  "pk": 4, 
+  "model": "studentvoice.recipient", 
+  "fields": {
+    "name": "\u0639\u0645\u0627\u062f\u0629 \u0643\u0644\u064a\u0629 \u0627\u0644\u0639\u0644\u0648\u0645 \u0648\u0627\u0644\u0645\u0647\u0646 \u0627\u0644\u0635\u062d\u064a\u0629 \u0644\u0644\u0637\u0644\u0627\u0628", 
+    "secondary_email": "", 
+    "creation_date": "2014-09-30T16:21:12.560Z", 
+    "college": [
+      4
+    ], 
+    "english_name": "Deanship of the College of Science and Health Professions", 
+    "email": "coshp-r@ksau-hs.edu.sa", 
+    "users": []
+  }
+},
+{
+  "pk": 5, 
+  "model": "studentvoice.recipient", 
+  "fields": {
+    "name": "\u0639\u0645\u0627\u062f\u0629 \u0643\u0644\u064a\u0629 \u0627\u0644\u0639\u0644\u0648\u0645 \u0648\u0627\u0644\u0645\u0647\u0646 \u0627\u0644\u0635\u062d\u064a\u0629 \u0644\u0644\u0637\u0627\u0644\u0628\u0627\u062a", 
+    "secondary_email": "", 
+    "creation_date": "2014-09-30T16:26:37.210Z", 
+    "college": [
+      9
+    ], 
+    "english_name": "Deanship of the College of Science and Health Professions - Female", 
+    "email": "coshp-f@ksau-hs.edu.sa", 
+    "users": []
+  }
+},
+{
+  "pk": 6, 
+  "model": "studentvoice.recipient", 
+  "fields": {
+    "name": "\u0639\u0645\u0627\u062f\u0629 \u0643\u0644\u064a\u0629 \u0627\u0644\u062a\u0645\u0631\u064a\u0636", 
+    "secondary_email": "", 
+    "creation_date": "2014-09-30T16:28:46.380Z", 
+    "college": [
+      7
+    ], 
+    "english_name": "Deanship of the College of Nursing", 
+    "email": "con-r.nursing@ksau-hs.edu.sa", 
+    "users": []
+  }
+},
+{
+  "pk": 7, 
+  "model": "studentvoice.recipient", 
+  "fields": {
+    "name": "\u0639\u0645\u0627\u062f\u0629 \u0643\u0644\u064a\u0629 \u0627\u0644\u0639\u0644\u0648\u0645 \u0627\u0644\u0637\u0628\u064a\u0629 \u0627\u0644\u062a\u0637\u0628\u064a\u0642\u064a\u0629", 
+    "secondary_email": "", 
+    "creation_date": "2014-09-30T16:29:51.606Z", 
+    "college": [
+      5
+    ], 
+    "english_name": "Deanship of the College of Applied Medical Sciences;", 
+    "email": "cams@ksau-hs.edu.sa", 
+    "users": [
+      14
+    ]
+  }
+}
+]

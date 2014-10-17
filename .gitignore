@@ -9,5 +9,5 @@ mediafiles/
 .project
 .pydevproject
 .settings/
-db.sqlite3
+*.sqlite3
 */migrations/

@@ -1,0 +1,53 @@
+<!DOCTYPE html>{% load i18n %}{% load url from future %}
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>{% trans "Forms" %}</title>
+    <style>
+        body {font-family:sans-serif; padding:1em 2em;}
+        p {width:50em; clear:both;}
+        label {display:block; float:left; width:8em; margin:0 1.2em 1.2em 0;}
+        li {list-style-type:none;}
+        li label {width:auto; cursor:pointer;}
+        .errorlist {color:#f00;}
+    </style>
+</head>
+<body>
+    <h1>{% trans "Forms" %}</h1>
+    <h4><a href="{% url 'forms:create_form' object_id %}">{% trans "+ Add Form" %}</a></h4>
+    <hr>
+    <table>
+        <thead>
+            <th>{% trans "Title" %}</th>
+            <th>{% trans "Status" %}</th>
+            <th>{% trans "Send copies to" %}</th>
+            <th>{% trans "Published from" %}</th>
+            <th>{% trans "Expires on" %}</th>
+            <th>{% trans "Total entries" %}</th>
+            <th></th>
+        </thead>
+        <tbody>
+        {% for form in forms %}
+            <tr>
+                <td>
+                    <a href="{% url 'forms:form_detail' object_id form.get_url_attr %}">
+                    {{ form.title }}
+                    </a>
+                </td>
+                <td>{{ form.get_status_display }}</td>
+                <td>{{ form.send_copies_to }}</td>
+                <td>{{ form.publish_date|date }}</td>
+                <td>{{ form.publish_date|date }}</td>
+                <td>{{ form.total_entries }}</td>
+                <td>
+                    <a href="{% url 'forms:edit_form' object_id form.pk %}">{% trans "Edit form" %}</a><br>
+                    <a href="{% url 'forms:form_entries' object_id form.pk %}">{% trans "Filter entries" %}</a><br>
+                    <a href="{% url 'forms:form_entries_show' object_id form.pk %}">{% trans "View all entries" %}</a><br>
+                    <a href="{% url 'forms:form_entries_export' object_id form.pk %}">{% trans "Export all entries" %}</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

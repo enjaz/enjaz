@@ -49,7 +49,11 @@
           </tr>
         {% endfor %}
         </table>
-        <button type="submit">{% trans "Submit" %}</button>
+        <hr>
+        <button class="btn btn-primary btn-block" type="submit">
+            <i class="entypo-check"></i>
+            {% trans "Submit" %}
+        </button>
     </form>
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.formset/1.2/jquery.formset.min.js"></script>
@@ -61,7 +65,10 @@
         added: function (row) {
             // Set default values for `required` and `visible` fields
             row.find("[type=checkbox]").prop("checked", true);
-        }
+        },
+        addText: 'أضف حقلاً',
+        deleteText: 'احذف',
+        addCssClass: 'add-row btn btn-xs btn-primary',
     });
 </script>
 {% endblock %}

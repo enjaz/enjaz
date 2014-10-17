@@ -30,10 +30,22 @@
                 <td>{{ form.publish_date|date }}</td>
                 <td>{{ form.total_entries }}</td>
                 <td>
-                    <a href="{% url 'forms:edit_form' object_id form.pk %}">{% trans "Edit form" %}</a><br>
-                    <a href="{% url 'forms:form_entries' object_id form.pk %}">{% trans "Filter entries" %}</a><br>
-                    <a href="{% url 'forms:form_entries_show' object_id form.pk %}">{% trans "View all entries" %}</a><br>
-                    <a href="{% url 'forms:form_entries_export' object_id form.pk %}">{% trans "Export all entries" %}</a>
+                    <a class="btn btn-xs btn-icon btn-gold" href="{% url 'forms:edit_form' object_id form.pk %}">
+                        <i class="entypo-pencil"></i>
+                        {% trans "Edit form" %}
+                    </a><br>
+                    <a class="btn btn-xs btn-icon btn-default" href="{% url 'forms:form_entries' object_id form.pk %}">
+                        <i class="entypo-search"></i>
+                        {% trans "Filter entries" %}
+                    </a><br>
+                    <a class="btn btn-xs btn-icon btn-default" href="{% url 'forms:form_entries_show' object_id form.pk %}">
+                        <i class="entypo-list"></i>
+                        {% trans "View all entries" %}
+                    </a><br>
+                    <a class="btn btn-xs btn-icon btn-default" href="{% url 'forms:form_entries_export' object_id form.pk %}">
+                        <i class="entypo-download"></i>
+                        {% trans "Export all entries" %}
+                    </a>
                 </td>
             </tr>
         {% endfor %}

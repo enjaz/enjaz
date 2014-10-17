@@ -99,9 +99,9 @@
                 <td class="last" colspan="2">&nbsp;</td>
             </tr>
         </table>
-        <input type="submit" name="back" class="button" value="{% trans "Back to form" %}">
-        <input type="submit" class="button default" value="{% trans "View entries" %}">
-        <input type="submit" class="button default" name="export" value="{% trans "Export CSV" %}">
+        <input type="submit" name="back" class="button btn btn-xs btn-default" value="{% trans "Back to form" %}">
+        <input type="submit" class="button btn btn-xs btn-primary" value="{% trans "View entries" %}">
+        <input type="submit" class="button btn btn-xs btn-primary" name="export" value="{% trans "Export CSV" %}">
         {% if xlwt_installed %}
         <input type="submit" class="button default" name="export_xls" value="{% trans "Export XLS" %}">
         {% endif %}
@@ -140,8 +140,8 @@
         -->
         <style>#entries-title:after {content: ' ({{ forloop.counter }})';}</style>
         {% if can_delete_entries %}
-        <input type="submit" name="back" class="button" value="{% trans "Back to form" %}">
-        <input type="submit" name="delete" class="button default" value="{% trans "Delete selected" %}">
+        <input type="submit" name="back" class="button btn btn-xs btn-default" value="{% trans "Back to form" %}">
+        <input type="submit" name="delete" class="button btn btn-xs btn-danger" value="{% trans "Delete selected" %}">
         {% endif %}
         {% endif %}
         {% empty %}

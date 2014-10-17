@@ -1,0 +1,17 @@
+{% extends 'activities_base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Forms" %}{% endblock %}
+{% block content %}
+    <style>
+        .errorlist {color:#f00;}
+    </style>
+
+    <h1>{% trans "Forms" %}</h1>
+    <hr>
+    {% for form in forms %}
+    <p><a href="{% url 'forms:form_detail' object_id form.get_url_attr %}">{{ form.title }}</a></p>
+    {% empty %}
+    <p>{% trans "No forms to display." %}</p>
+    {% endfor %}
+
+{% endblock %}

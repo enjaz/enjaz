@@ -1,0 +1,14 @@
+{% extends 'activities_base.html' %}
+{% load forms_builder_tags %}
+{% block title %}{{ form.title }}{% endblock %}
+{% block content %}
+    <style>
+        body {font-family:sans-serif; padding:1em 2em;}
+        p {width:50em; clear:both;}
+        label {display:block; float:left; width:8em; margin:0 1.2em 1.2em 0;}
+        li {list-style-type:none;}
+        li label {width:auto; cursor:pointer;}
+        .errorlist {color:#f00;}
+    </style>
+    {% render_built_form form %}
+{% endblock %}

@@ -16,7 +16,8 @@
     {% endif %}
     <form method="post">
         {% csrf_token %}
-        {{ builder_form.as_p }}
+        {% load bootstrap3 %}
+        {% bootstrap_form builder_form %}
 
         {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
         {{ formset.management_form }}

@@ -47,13 +47,15 @@ class FormDetail(TemplateView):
 
     def get_context_data(self, content_type=None, object_id=None, **kwargs):
         context = super(FormDetail, self).get_context_data(**kwargs)
-        get_object_or_404(content_type.model_class(), id=object_id) if content_type is not None else None
+        self.object = get_object_or_404(content_type.model_class(), id=object_id) if content_type is not None else None
         published = Form.objects.published(for_user=self.request.user)
         kw = {"slug": kwargs["slug"]} if wrapper_settings.USE_SLUGS else {"id": kwargs["form_id"]}
         context["form"] = get_object_or_404(published,
                                             content_type=content_type, object_id=object_id,
                                             **kw)
         context["object_id"] = object_id
+        context[kwargs.pop("object_context_name", "object")] = self.object
+        context.update(kwargs.pop("custom_context", {}))
         return context
 
     def get(self, request, form_detail_template="forms/form_detail.html",
@@ -70,7 +72,7 @@ class FormDetail(TemplateView):
     def post(self, request, content_type=None, object_id=None,
              form_detail_template="forms/form_detail.html",
              *args, **kwargs):
-        get_object_or_404(content_type.model_class(), id=object_id) if content_type is not None else None
+        self.object = get_object_or_404(content_type.model_class(), id=object_id) if content_type is not None else None
         published = Form.objects.published(for_user=request.user)
         kw = {"slug": kwargs["slug"]} if wrapper_settings.USE_SLUGS else {"id": kwargs["form_id"]}
         form = get_object_or_404(published,
@@ -99,6 +101,8 @@ class FormDetail(TemplateView):
                     reverse("forms:form_sent", current_app=request.resolver_match.namespace,
                             kwargs={key: form.get_url_attr(), "object_id": object_id}))
         context = {"form": form, "form_for_form": form_for_form, "object_id": object_id}
+        context[kwargs.pop("object_context_name", "object")] = self.object
+        context.update(kwargs.pop("custom_context", {}))
         self.template_name = form_detail_template
         return self.render_to_response(context)
 
@@ -157,6 +161,8 @@ def form_sent(request, content_type=None, object_id=None,
     kw = {"slug": kwargs["slug"]} if wrapper_settings.USE_SLUGS else {"id": kwargs["form_id"]}
     context = {"form": get_object_or_404(published, content_type=content_type, object_id=object_id, **kw),
                "object_id": object_id}
+    context[kwargs.pop("object_context_name", "object")] = object
+    context.update(kwargs.pop("custom_context", {}))
     template = form_sent_template
     return render_to_response(template, context, RequestContext(request, current_app=request.resolver_match.namespace))
 
@@ -186,6 +192,8 @@ def form_list(request, content_type=None, object_id=None,
         forms = Form.objects.published(for_user=request.user).filter(content_type=content_type, object_id=object_id)
         template = form_list_template
     context = {"forms": forms.annotate(total_entries=Count("entries")), "object_id": object_id}
+    context[kwargs.pop("object_context_name", "object")] = object
+    context.update(kwargs.pop("custom_context", {}))
     return render_to_response(template, context, RequestContext(request, current_app=request.resolver_match.namespace))
 
 
@@ -215,7 +223,10 @@ def create_form(request, content_type=None, object_id=None,
         builder_form = FormToBuildForm()
         formset = FieldFormSet()
     template = edit_form_template
-    return render_to_response(template, {"builder_form": builder_form, "formset": formset, "object_id": object_id},
+    context = {"builder_form": builder_form, "formset": formset, "object_id": object_id}
+    context[kwargs.pop("object_context_name", "object")] = object
+    context.update(kwargs.pop("custom_context", {}))
+    return render_to_response(template, context,
                               RequestContext(request, current_app=request.resolver_match.namespace))
 
 
@@ -243,7 +254,10 @@ def edit_form(request, form_id, content_type=None, object_id=None,
         builder_form = FormToBuildForm(instance=form)
         formset = FieldFormSet(instance=form)
     template = edit_form_template
-    return render_to_response(template, {"builder_form": builder_form, "formset": formset, "object_id": object_id},
+    context = {"builder_form": builder_form, "formset": formset, "object_id": object_id}
+    context[kwargs.pop("object_context_name", "object")] = object
+    context.update(kwargs.pop("custom_context", {}))
+    return render_to_response(template, context,
                               RequestContext(request, current_app=request.resolver_match.namespace))
 
 
@@ -271,7 +285,10 @@ def delete_form(request, form_id, content_type=None, object_id=None,
             return HttpResponseRedirect(reverse('forms:edit_form', current_app=request.resolver_match.namespace,
                                                 kwargs={"object_id": object_id, "form_id": form_id}))
     else:
-        return render_to_response(template, {"form": form, "object_id": object_id},
+        context = {"form": form, "object_id": object_id}
+        context[kwargs.pop("object_context_name", "object")] = object
+        context.update(kwargs.pop("custom_context", {}))
+        return render_to_response(template, context,
                                   RequestContext(request, current_app=request.resolver_match.namespace))
 
 
@@ -371,6 +388,8 @@ def entries_view(request, form_id, show=False, export=False,
                "submitted": submitted,
                "xlwt_installed": XLWT_INSTALLED,
                "object_id": object_id}
+    context[kwargs.pop("object_context_name", "object")] = object
+    context.update(kwargs.pop("custom_context", {}))
     return render_to_response(template, context, RequestContext(request, current_app=request.resolver_match.namespace))
 
 

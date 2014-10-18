@@ -4,11 +4,18 @@
     <style>
         .errorlist {color:#f00;}
     </style>
+    <div class="panel panel-default panel-shadow" data-collapsed="0">
+    <div class="panel-heading">
+        <div class="panel-title">{% trans "Forms" %}</div>
 
-    <h1>{% trans "Forms" %}</h1>
-    <h4><a class="btn btn-default" href="{% url 'forms:create_form' object_id %}"><i class="glyphicon glyphicon-plus"></i> {% trans "Add Form" %}</a></h4>
-    <hr>
-    <table class="table table-bordered datatable">
+        <div class="panel-options">
+            <a href="{% url 'forms:create_form' object_id %}" class="btn btn-xs btn-default"><i class="entypo-plus"></i> {% trans "Add Form" %}</a>
+        </div>
+    </div>
+	<!-- panel body -->
+	<div class="panel-body">
+        <div class="row">
+    <table class="table datatable">
         <thead>
             <th>{% trans "Title" %}</th>
             <th>{% trans "Status" %}</th>
@@ -51,6 +58,9 @@
         {% endfor %}
         </tbody>
     </table>
+    </div>
+    </div>
+    </div>
 {% endblock %}
 {% block customscript %}
     <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">

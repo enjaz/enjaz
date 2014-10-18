@@ -5,7 +5,14 @@
     <style>
         .errorlist {color:#f00;}
     </style>
-    {% render_built_form form %}
+    <div class="panel panel-default panel-shadow" data-collapsed="0">
+	<!-- panel body -->
+	<div class="panel-body">
+        <div class="col-md-12">
+        {% render_built_form form %}
+        </div>
+	</div>
+    </div>
 {% endblock %}
 {% block customscript %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/jquery.datetimepicker.css' %}"/>

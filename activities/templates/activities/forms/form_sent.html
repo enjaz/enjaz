@@ -4,8 +4,15 @@
     <style>
         .errorlist {color:#f00;}
     </style>
-    <h1>{{ form.title }}</h1>
+<div class="panel panel-default panel-shadow" data-collapsed="0">
+    <div class="panel-heading">
+        <div class="panel-title">{{ form.title }}</div>
+    </div>
+	<!-- panel body -->
+	<div class="panel-body">
     {% if form.response %}
     <p>{{ form.response|linebreaksbr }}</p>
     {% endif %}
+    </div>
+</div>
 {% endblock %}

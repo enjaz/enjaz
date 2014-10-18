@@ -64,8 +64,13 @@
         });
     });
     </script>
-</head>
-<body>
+<div class="panel panel-default panel-shadow" data-collapsed="0">
+    <div class="panel-heading">
+        <div class="panel-title">{% trans "Entries" %}</div>
+    </div>
+	<!-- panel body -->
+	<div class="panel-body">
+
     <div id="content-main">
         <form method="post">
         {% csrf_token %}
@@ -150,4 +155,6 @@
         {% endif %}
         </form>
     </div>
+</div>
+</div>
 {% endblock %}

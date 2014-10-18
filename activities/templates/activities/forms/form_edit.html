@@ -4,31 +4,41 @@
     <style>
         .errorlist {color:#f00;}
     </style>
+    <div class="panel panel-default panel-shadow" data-collapsed="0">
 
-    {% if builder_form.instance.pk %}
-    <h1>{% trans "Edit Form" %}</h1>
-    <a class="btn btn-xs btn-default btn-icon" href="{% url 'forms:form_detail' object_id builder_form.instance.get_url_attr %}">
-        <i class="entypo-eye"></i>
-        {% trans "View on site" %}
-    </a>
-    <a class="btn btn-xs btn-default btn-icon" href="{% url 'forms:form_entries' object_id builder_form.instance.pk %}">
-        <i class="entypo-list"></i>
-        {% trans "View entries" %}
-    </a>
+    <div class="panel-heading">
+        {% if builder_form.instance.pk %}
+        <div class="panel-title">{% trans "Edit Form" %}</div>
+        <div class="panel-options">
+            <a class="btn btn-xs btn-danger" href="{% url 'forms:delete_form' object_id builder_form.instance.pk %}">
+                <span style="color:#fff"><i class="entypo-trash"></i>
+                {% trans "Delete form" %}</span>
+            </a>
+            <a class="btn btn-xs btn-default" href="{% url 'forms:form_entries' object_id builder_form.instance.pk %}">
+                <i class="entypo-list"></i>
+                {% trans "View entries" %}
+            </a>
+            <a class="btn btn-xs btn-default" href="{% url 'forms:form_detail' object_id builder_form.instance.get_url_attr %}">
+                <i class="entypo-eye"></i>
+                {% trans "View on site" %}
+            </a>
+        </div>
+        {% else %}
+        <div class="panel-title">{% trans "Add Form" %}</div>
+        {% endif %}
+    </div>
+	<!-- panel body -->
+	<div class="panel-body">
+        <div class="col-md-12">
 
-    <a class="btn btn-xs btn-danger btn-icon" href="{% url 'forms:delete_form' object_id builder_form.instance.pk %}">
-        <i class="entypo-trash"></i>
-        {% trans "Delete form" %}
-    </a>
-    {% else %}
-    <h1>{% trans "Add Form" %}</h1>
-    {% endif %}
-    <hr>
     <form method="post">
         {% csrf_token %}
         {% load bootstrap3 %}
         {% bootstrap_form builder_form %}
 
+        <hr>
+        <h4>{% trans "Fields" %}</h4>
+        <br>
         {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
         {{ formset.management_form }}
         {{ formset.non_form_errors.as_ul }}
@@ -65,6 +75,9 @@
             {% trans "Submit" %}
         </button>
     </form>
+    </div>
+    </div>
+    </div>
 {% endblock %}
 {% block customscript %}
 <script src="{% static 'js/jquery.formset.js' %}"></script>

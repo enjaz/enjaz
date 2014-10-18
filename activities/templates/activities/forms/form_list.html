@@ -5,9 +5,12 @@
     <style>
         .errorlist {color:#f00;}
     </style>
-
-    <h1>{% trans "Forms" %}</h1>
-    <hr>
+<div class="panel panel-default panel-shadow" data-collapsed="0">
+    <div class="panel-heading">
+        <div class="panel-title">{% trans "Forms" %}</div>
+    </div>
+	<!-- panel body -->
+	<div class="panel-body">
     {% for form in forms %}
         {# Use `cycle` to help with arrangement of forms into 3 per row. #}
         {# It's in an HTML comment so that its output isn't printed on the page. #}
@@ -31,4 +34,6 @@
     {% empty %}
     <p>{% trans "No forms to display." %}</p>
     {% endfor %}
+    </div>
+</div>
 {% endblock %}

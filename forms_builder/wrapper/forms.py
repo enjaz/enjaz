@@ -9,6 +9,8 @@ class FormToBuildForm(forms.ModelForm):
     """
     class Meta:
         model = Form
+        exclude = ('sites', 'redirect_url', 'login_required', 'send_email', 'email_from',
+                   'email_copies', 'email_subject', 'email_message')
 
 # A form set to manage adding, modifying, or deleting fields of a form
 FieldFormSet = inlineformset_factory(Form, Field, exclude=('slug',), extra=1, can_delete=True)

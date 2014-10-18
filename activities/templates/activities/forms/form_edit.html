@@ -1,4 +1,4 @@
-{% extends 'activities_base.html' %}{% load i18n %}
+{% extends 'activities_base.html' %}{% load i18n %}{% load staticfiles %}
 {% block title %}{% if builder_form.instance.pk %}{% trans "Edit Form" %}{% else %}{% trans "Add Form" %}{% endif %}{% endblock %}
 {% block content %}
     <style>
@@ -65,8 +65,9 @@
             {% trans "Submit" %}
         </button>
     </form>
-<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.formset/1.2/jquery.formset.min.js"></script>
+{% endblock %}
+{% block customscript %}
+<script src="{% static 'js/jquery.formset.js' %}"></script>
 <script type="text/javascript">
     // Style the formset fields properly
     $(".form-container .form-group").find("input").addClass("form-control");

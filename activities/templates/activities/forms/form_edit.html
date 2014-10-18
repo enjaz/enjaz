@@ -1,6 +1,6 @@
-{% extends 'activities_base.html' %}{% load i18n %}{% load staticfiles %}
+{% extends 'activities/show.html' %}{% load i18n %}{% load staticfiles %}
 {% block title %}{% if builder_form.instance.pk %}{% trans "Edit Form" %}{% else %}{% trans "Add Form" %}{% endif %}{% endblock %}
-{% block content %}
+{% block review_content %}
     <style>
         .errorlist {color:#f00;}
     </style>

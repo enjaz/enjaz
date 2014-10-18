@@ -1,7 +1,7 @@
-{% extends 'activities_base.html' %}
+{% extends 'activities/show.html' %}
 {% load i18n %}
 {% block title %}{% trans "Forms" %}{% endblock %}
-{% block content %}
+{% block review_content %}
     <style>
         .errorlist {color:#f00;}
     </style>
@@ -31,15 +31,4 @@
     {% empty %}
     <p>{% trans "No forms to display." %}</p>
     {% endfor %}
-
-
-    {% comment %}
-    <div class="list-group">
-      <a href="{% url 'forms:form_detail' object_id form.get_url_attr %}" class="list-group-item">
-        <h4 class="list-group-item-heading">{{ form.title }}</h4>
-        <p class="list-group-item-text">{{ form.intro }}</p>
-      </a>
-    </div>
-    {% endcomment %}
-    {#<p><a href="{% url 'forms:form_detail' object_id form.get_url_attr %}">{{ form.title }}</a></p>#}
 {% endblock %}

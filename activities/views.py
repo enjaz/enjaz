@@ -132,6 +132,10 @@ def show(request, activity_id):
         if request.user.has_perm('niqati.view_order') or \
             is_coordinator or is_submitter:
             context['can_view_niqati_orders'] = True
+        # Anyone can view forms; yet due to URL reversing issues it has to be restricted to this view only
+        # Otherwise, we'll end up having to specify the `current_app` attribute for every view that contains a link
+        # to the forms
+        context['can_view_forms'] = True
 
     else:
         user_clubs = Club.objects.none()
@@ -157,7 +161,7 @@ def show(request, activity_id):
         if not activity.is_approved():
             raise PermissionDenied
 
-    return render(request, 'activities/show.html', context)
+    return render(request, 'activities/show.html', context, current_app="activity_forms")
 
 @login_required
 def create(request):

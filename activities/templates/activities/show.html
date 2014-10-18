@@ -175,6 +175,19 @@
 						<a href="{% url 'activities:niqati_orders' activity.pk %}">نقاطي</a>
 					</li>
 					{% endif %}
+                    {% comment %}
+                    In order to avoid URL reversing issues, the forms button has to be (at least temporarily) restricted
+                    to the `show` view and the very views of the forms app. The `show` view will pass a `can_view_forms`
+                    attribute to the context. All django-pluggable-forms views pass a context variable `object_id` to
+                    their templates. That's how we can know the request is coming from any of these 2.
+                    {% endcomment %}
+                    {% if can_view_forms or object_id %}
+					<li{% if active_tab == 'forms' %} class="active"{% endif %}>
+                    {% with current_app='activity_forms' %}
+						<a href="{% url 'forms:form_list' activity.pk %}">النماذج</a>
+                    {% endwith %}
+					</li>
+					{% endif %}
 				</ul>
 			</div>
 		</div>

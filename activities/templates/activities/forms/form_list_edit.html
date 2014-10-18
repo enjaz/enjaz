@@ -1,4 +1,4 @@
-{% extends 'activities_base.html' %}{% load i18n %}{% load url from future %}
+{% extends 'activities_base.html' %}{% load staticfiles %}{% load i18n %}{% load url from future %}
 {% block title %}{% trans "Forms" %}{% endblock %}
 {% block content %}
     <style>
@@ -8,7 +8,7 @@
     <h1>{% trans "Forms" %}</h1>
     <h4><a class="btn btn-default" href="{% url 'forms:create_form' object_id %}"><i class="glyphicon glyphicon-plus"></i> {% trans "Add Form" %}</a></h4>
     <hr>
-    <table class="table">
+    <table class="table table-bordered datatable">
         <thead>
             <th>{% trans "Title" %}</th>
             <th>{% trans "Status" %}</th>
@@ -51,4 +51,16 @@
         {% endfor %}
         </tbody>
     </table>
+{% endblock %}
+{% block customscript %}
+    <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+    <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript">
+    $('.datatable').dataTable({
+        "order": [[ 0, "asc" ]],
+        "language": {
+            "url": "{% static 'js/dataTables-arabic.json' %}"
+        }
+    });
+    </script>
 {% endblock %}

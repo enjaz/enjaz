@@ -156,7 +156,7 @@ def form_sent(request, content_type=None, object_id=None,
     """
     Show the response message.
     """
-    get_object_or_404(content_type.model_class(), id=object_id) if content_type is not None else None
+    object = get_object_or_404(content_type.model_class(), id=object_id) if content_type is not None else None
     published = Form.objects.published(for_user=request.user)
     kw = {"slug": kwargs["slug"]} if wrapper_settings.USE_SLUGS else {"id": kwargs["form_id"]}
     context = {"form": get_object_or_404(published, content_type=content_type, object_id=object_id, **kw),

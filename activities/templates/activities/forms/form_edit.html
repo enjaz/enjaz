@@ -68,6 +68,8 @@
 {% endblock %}
 {% block customscript %}
 <script src="{% static 'js/jquery.formset.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'css/jquery.datetimepicker.css' %}"/>
+<script src="{% static 'js/jquery.datetimepicker.js' %}"></script>
 <script type="text/javascript">
     // Style the formset fields properly
     $(".form-container .form-group").find("input").addClass("form-control");
@@ -80,6 +82,10 @@
         addText: 'أضف حقلاً',
         deleteText: 'احذف',
         addCssClass: 'add-row btn btn-xs btn-primary',
+    });
+    $("input[name=publish_date], input[name=expiry_date]").addClass("english-field");
+    $("input[name=publish_date], input[name=expiry_date]").datetimepicker({
+        format: 'Y-m-d H:i',
     });
 </script>
 {% endblock %}

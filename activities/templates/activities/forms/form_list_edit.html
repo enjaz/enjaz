@@ -26,8 +26,8 @@
                     </a>
                 </td>
                 <td>{{ form.get_status_display }}</td>
-                <td>{{ form.publish_date|date }}</td>
-                <td>{{ form.publish_date|date }}</td>
+                <td data-order="{{ form.publish_date|date:'U' }}">{{ form.publish_date|date }}</td>
+                <td data-order="{{ form.expiry_date|date:'U' }}">{{ form.expiry_date|date }}</td>
                 <td>{{ form.total_entries }}</td>
                 <td>
                     <a class="btn btn-xs btn-icon btn-gold" href="{% url 'forms:edit_form' object_id form.pk %}">

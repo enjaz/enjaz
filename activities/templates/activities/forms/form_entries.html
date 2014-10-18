@@ -128,7 +128,7 @@
                 {% endif %}
                 {% for field in row %}
                 {% if not forloop.first %}
-                <td{% if forloop.last %} class="last"{% endif %}>{{ field }}</td>
+                <td{% if forloop.last %} class="last"{% endif %}>{{ field|linebreaksbr }}</td>
                 {% endif %}
                 {% endfor %}
             </tr>

@@ -6,6 +6,6 @@
     </style>
     <h1>{{ form.title }}</h1>
     {% if form.response %}
-    <p>{{ form.response }}</p>
+    <p>{{ form.response|linebreaksbr }}</p>
     {% endif %}
 {% endblock %}

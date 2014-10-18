@@ -263,7 +263,7 @@ class EntriesForm(forms.Form):
         self.formentry_model = formentry_model
         self.fieldentry_model = fieldentry_model
         self.form_fields = form.fields.all()
-        self.submitter_fields = kwargs.pop("submitter_fields")
+        self.submitter_fields = kwargs.pop("submitter_fields", ())
         # If the form doens't require login, then don't show the user fields
         if not self.form.login_required: self.submitter_fields = []
         self.entry_time_name = str(self.formentry_model._meta.get_field(

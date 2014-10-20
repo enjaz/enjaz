@@ -3,13 +3,14 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import permission_required, login_required
+from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.views.decorators import csrf
 
 from post_office import mail
 import unicodecsv
 from activities.utils import get_approved_activities
-from clubs.utils import is_coordinator, is_coordinator_or_member
+from clubs.utils import is_coordinator, is_coordinator_or_member, is_coordinator_or_deputy
 
 from core import decorators
 from clubs.forms import MembershipForm, DisabledClubForm, ClubForm
@@ -59,15 +60,18 @@ def show(request, club_id):
     #     activities = club.primary_activity.filter(review__is_approved=True) |\
     #                  club.secondary_activity.filter(review__is_approved=True)
 
-    can_edit = request.user == club.coordinator or \
+    can_edit = is_coordinator(club, request.user) or \
                request.user.has_perm('clubs.change_club')
-    can_view_members = request.user == club.coordinator or \
+    can_view_members = is_coordinator_or_deputy(club, request.user) or \
                        request.user.has_perm('clubs.view_members')
-    can_view_applications = request.user == club.coordinator or \
+    can_view_deputies = is_coordinator(club, request.user) or \
+               request.user.has_perm('clubs.view_deputies')
+    can_view_applications = is_coordinator_or_deputy(club, request.user) or \
                             request.user.has_perm('clubs.view_application')
     context = {'club': club, 'can_edit': can_edit,
                'can_view_members': can_view_members,
                'can_view_applications': can_view_applications,
+               'can_view_deputies': can_view_deputies,
                'activities': activities}
     return render(request, 'clubs/show.html', context)
 
@@ -164,7 +168,7 @@ def join(request, club_id):
 @login_required
 def view_application(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
-    if not is_coordinator(club, request.user) and \
+    if not is_coordinator_or_deputy(club, request.user) and \
        not request.user.has_perm('clubs.view_application'):
         raise PermissionDenied
 
@@ -219,7 +223,34 @@ def ignore_application(request, club_id):
 
     application.delete()
 
-    # return {}
+@login_required
+@csrf.csrf_exempt
+@decorators.ajax_only
+@decorators.post_only
+def control_deputies(request, club_id):
+    club = get_object_or_404(Club, pk=club_id)
+    if not is_coordinator_or_deputy(club, request.user) and \
+       not request.user.is_superuser:
+        raise PermissionDenied
+    username = request.POST.get('username')
+    action = request.POST.get('action')
+
+    if not username or not action:
+        raise Exception(u'حدث خطأ!')
+
+    user = User.objects.get(username=username)
+    current_deputies = club.deputies.all()
+
+    if action == 'set':
+        if user in current_deputies:
+            raise Exception(u'المستخدم نائب حاليا!')
+        else:
+            club.deputies.add(user)
+    elif action == 'unset':
+        if not user in current_deputies:
+            raise Exception(u'المستخدم ليس نائبا!')
+        else:
+            club.deputies.remove(user)
 
 @login_required
 def view_members(request, club_id):
@@ -227,11 +258,22 @@ def view_members(request, club_id):
     View a list of the club's members.
     """
     club = get_object_or_404(Club, pk=club_id)
-    if not is_coordinator(club, request.user) and \
+    if not is_coordinator_or_deputy(club, request.user) and \
        not request.user.has_perm('clubs.view_members'):
         raise PermissionDenied
     return render(request, 'clubs/members.html', {'club': club})
-    
+
+@login_required
+def view_deputies(request, club_id):
+    """
+    View a list of the club's members.
+    """
+    club = get_object_or_404(Club, pk=club_id)
+    if not is_coordinator_or_deputy(club, request.user) and \
+       not request.user.has_perm('clubs.view_deputies'):
+        raise PermissionDenied
+    return render(request, 'clubs/deputies.html', {'club': club})
+
 # TODO: remove this view and the associated url since its function is now done by datatables
 @login_required
 def download_application(request, club_id):

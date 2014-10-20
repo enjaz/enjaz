@@ -6,7 +6,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User, Permission, Group
 from django.core.exceptions import ObjectDoesNotExist
 
-from studentvoice.models import Voice, Vote, Recipient, Response, View
+from studentvoice.models import Voice, Vote, Response, View
 
 class ResponseInline(admin.StackedInline):
     model = Response
@@ -93,7 +93,6 @@ class VoiceAdmin(admin.ModelAdmin):
     get_full_name.short_description = u"المستخدم"
 
 admin.site.register(Voice, VoiceAdmin)
-admin.site.register(Recipient)
 admin.site.register(Response)
 admin.site.register(Vote)
 admin.site.register(View)

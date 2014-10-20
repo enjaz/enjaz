@@ -2,6 +2,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from clubs.models import College
+
+
 class Voice(models.Model):
     # A Voice is both: a parent Voice, or a reply Voice (i.e. comment
     # on a voice).  It could have been two different models but since
@@ -10,11 +13,18 @@ class Voice(models.Model):
     submitter = models.ForeignKey(User, null=True,
                                   on_delete=models.SET_NULL,
                                   verbose_name=u"المرسل", blank=True)
-    title = models.CharField(max_length=100, verbose_name=u"العنوان",
+    title = models.CharField(max_length=100, verbose_name=u"ملخص",
+                             help_text=u"لخص صوتك في عشر كلمات أو أقل",
                              blank=True)
     text = models.TextField(u"النص")
-    recipient = models.CharField(max_length=50, verbose_name=u"موجه إلى",
-                                 blank=True)
+    # Greatest parent specific fields
+    solution = models.TextField(u"الحل المقترح", blank=True)
+    recipient = models.ForeignKey('Recipient', null=True,
+                                  on_delete=models.SET_NULL,
+                                  verbose_name=u"المستقبل",
+                                  blank=True)
+    was_sent = models.BooleanField(verbose_name=u"أرسل؟",
+                                   default=False)
     is_published_choices = (
         (None, u'لم يراجع بعد'),
         (True, u'منشور'),
@@ -175,3 +185,23 @@ class View(models.Model):
     class Meta:
         verbose_name = u"مشاهدة"
         verbose_name_plural = u"المشاهدات"
+
+class Recipient(models.Model):
+    name = models.CharField(max_length=200, verbose_name=u"الاسم")
+    english_name = models.CharField(max_length=200, verbose_name=u"الاسم الإنجليزي")
+    email = models.EmailField(max_length=254, verbose_name=u"البريد الإلكتروني")
+    college = models.ManyToManyField(College, null=True,
+                                blank=True,
+                                verbose_name=u"الكلية")
+    users = models.ManyToManyField(User, null=True, blank=True,
+                                   verbose_name=u"المستخدمون",
+                                   limit_choices_to={'nonstudent_profile__isnull': False})
+    secondary_email = models.EmailField(max_length=254, verbose_name=u"البريد الإلكتروني", blank=True)
+    creation_date = models.DateTimeField(u'تاريخ الإرسال',
+                                         auto_now_add=True)
+    class Meta:
+        verbose_name = u"مستقبل"
+        verbose_name_plural = u"المستقبلون"
+
+    def __unicode__(self):
+        return self.name

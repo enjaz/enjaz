@@ -87,6 +87,7 @@ Current required settings:
 * `FVP_USERNAME = 'username'` for the female vice president.
 * `MVP_USERNAME = 'username'` for the male vice president.
 * `DHA_USERNAME = 'username'` for the Deanship Head of Activities
+* `STUDENTVOICE_THRESHOLD = 30`, adjustable threshold for sending notifications.
 * `AUTH_PROFILE_MODULE = 'accounts.EnjazProfile'`
 * `USERENA_WITHOUT_USERNAMES = True`
 * `USERENA_ACTIVATION_RETRY = True`

@@ -13,7 +13,7 @@
 	<tbody>
 	{% for member in club.members.all %}
 	<tr>
-		<td>{% if member.student_profile %}{{ member.student_profile.get_ar_full_name }} ({{ member.username }}){% else %}{{ member.username }}{% endif %}</td>
+		<td>{% if member.student_profile %}{{ member.student_profile.get_ar_full_name }} (<span class="english-field">{{ member.username }}</span>){% else %}{{ member.username }}{% endif %}</td>
 		<td>{% if member in club.deputies.all %}نائب{% else %}عضو{% endif %}</td>
 		<td>
 			{% if member in club.deputies.all %}

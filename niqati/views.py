@@ -13,10 +13,14 @@ from core.decorators import post_only
 from core.utilities import MVP_EMAIL, FVP_EMAIL
 from activities.models import Activity, Evaluation
 from activities.forms import EvaluationForm
+from clubs.utils import has_coordination_to_activity
 from niqati.models import Niqati_User, Category, Code, Code_Order, Code_Collection
-from niqati.forms import OrderForm  #, SubmissionForm
+from niqati.forms import OrderForm
 
-# from django.db.models import Q
+# TODO: The Core_Order model should have a submitter field, and the
+# notifications should be sent to the person who requested the codes.
+# This is espically important with the introduction of deputies and
+# notifications to secondary clubs.
 
 
 @login_required
@@ -164,7 +168,8 @@ def create_codes(request, activity_id):
 
     # --- Permission checks ---
     # The user must be the coordinator of the club that owns the activity.
-    if not activity.primary_club.coordinator == request.user and not request.user.is_superuser:
+    if not has_coordination_to_activity(request.user, activity) \
+       and not request.user.is_superuser:
         raise PermissionDenied
 
     form = OrderForm(request.POST)
@@ -238,7 +243,8 @@ def view_orders(request, activity_id):
     # --- Permission checks ---
     # Only the club coordinator has the permission to view
     # niqati orders
-    if not activity.primary_club.coordinator == request.user and not request.user.is_superuser:
+    if not has_coordination_to_activity(request.user, activity) \
+       and not request.user.is_superuser:
         raise PermissionDenied
 
     orders = Code_Order.objects.filter(activity=activity)

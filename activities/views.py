@@ -392,14 +392,14 @@ def review(request, activity_id, lower_review_type=None):
             activity_full_url = request.build_absolute_uri(activity_url)
             email_context = {'activity': activity}
             if review.cleaned_data['is_approved']:
-                activity.is_editable = False
-                activity.save()
                 if review_type == 'P':
                     email_context['full_url'] = presidency_full_url
                     mail.send([DHA_EMAIL],
                               template="activity_presidency_approved",
                               context=email_context)
                 elif review_type == 'D':
+                    activity.is_editable = False
+                    activity.save()
                     if activity.primary_club.coordinator:
                         email_context['full_url'] = activity_full_url
                         mail.send(get_club_notification_to(activity),

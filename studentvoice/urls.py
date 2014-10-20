@@ -13,4 +13,6 @@ urlpatterns = patterns('',
     url(r'^(?P<voice_id>\d+)/create_comment/$', views.create_comment, name='create_comment'),
     url(r'^delete/(?P<voice_id>\d+)/$', views.delete, name='delete'),
     url(r'^(?P<voice_id>\d+)/edit/$', views.edit, name='edit'),
+    url(r'^(?P<voice_id>\d+)/respond/$', views.respond, name='respond'),
+    url(r'^(?P<voice_id>\d+)/respond/edit/$', views.edit_response, name='edit_response'),
 )

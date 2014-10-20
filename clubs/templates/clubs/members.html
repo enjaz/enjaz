@@ -18,11 +18,11 @@
         {% for member in club.members.all %}
         <tr>
             <td>{% if member.student_profile %}{{ member.student_profile.get_ar_full_name }}{% else %}{{ member.username }}{% endif %}</td>
-            <td class="english-field">{% if member.student_profile %}{{ member.student_profile.get_en_full_name }}{% else %}{{ member.username }}{% endif %}</td>
+            <td>{% if member.student_profile %}{{ member.student_profile.get_en_full_name }}{% else %}{{ member.username }}{% endif %}</td>
             <td>{{ member.student_profile.college }}</td>
             <td>{{ member.student_profile.student_id }}</td>
             <td>{{ member.student_profile.badge_number }}</td>
-            <td class="english-field">{{ member.email }}</td>
+            <td>{{ member.email }}</td>
             <td>{{ member.student_profile.mobile_number }}</td>
         </tr>
         {% endfor %}

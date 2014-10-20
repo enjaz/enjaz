@@ -42,3 +42,26 @@ def get_pending_activities():
         |  Activity.objects.filter(review__review_type="P").exclude(review__review_type=
                                                                     "D").exclude(review__is_approved=False)\
         |  Activity.objects.filter(review__isnull=True)
+
+
+def get_club_notification_to(activity):
+    """Return the address that should be sent an email notifcation in the
+    'to' field.
+    """
+    # The submitter, whether they are the coordinator or not shoudl
+    # receive be in the 'to' field.
+    return [activity.submitter.email]
+
+def get_club_notification_cc(activity):
+    """Return the address that should be sent an email notifcation in the
+    'cc' field.
+    """
+    addresses = []
+    # If the person who submitted the activity is not the coordinator,
+    # add the coordinator to the CC list.
+    if activity.submitter != activity.primary_club.coordinator:
+        addresses.append(activity.primary_club.coordinator.email)
+    for secondary_club in activity.secondary_clubs.all():
+        addresses.append(secondary_club.coordinator.email)
+    return addresses
+        

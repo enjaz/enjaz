@@ -41,6 +41,8 @@ class Command(BaseCommand):
                         print "  ", timezone.now()
                         print "  Successfully generated requested short links."
                     except:
+                        # FIXME: such an unspecific 'except' should
+                        # never, ever be used.
                         order.mark_as_processed()
                         print "  ", timezone.now()
                         print "  Generation failed; marking order as complete and proceeding"

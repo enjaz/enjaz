@@ -69,7 +69,7 @@ def show(request, club_id):
                'can_view_members': can_view_members,
                'can_view_applications': can_view_applications,
                'activities': activities}
-    return render(request, 'clubs/show.html', context)
+    return render(request, 'clubs/show.html', context, current_app='club_forms')
 
 @login_required
 @permission_required('clubs.add_club', raise_exception=True)

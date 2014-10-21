@@ -24,6 +24,11 @@
 			{% if user.is_authenticated and club.open_membership %}
 			<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:join' club.pk %}"><span class="glyphicon glyphicon-star"></span> انضم للنادي</a></li></ul></p>
 			{% endif %}
+            <p style="font-size: 1em;">
+                <ul class="list-unstyled">
+                    <li><a href="{% url 'forms:form_list' club.id %}"><span class="entypo-docs"></span> النماذج</a></li>
+                </ul>
+            </p>
 		</div>
 	</div>
 </div>

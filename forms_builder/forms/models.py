@@ -279,6 +279,16 @@ class Form(AbstractForm):
     content_type = models.ForeignKey(ContentType, null=True, blank=True, editable=False)
     object_id = models.PositiveIntegerField(null=True, blank=True, editable=False)
     content_object = GenericForeignKey()
+    is_primary = models.BooleanField(_("Primary form?"), default=False,
+                                     help_text=_("Is this the primary form for this object?"))
+
+    def save(self, *args, **kwargs):
+        """Make sure that only one primary form exists per object."""
+        if self.is_primary is True:
+            # Make sure there is no other primary form related to the same object
+            object_forms = Form.objects.filter(content_type=self.content_type, object_id=self.object_id)
+            object_forms.update(is_primary=False)
+        super(Form, self).save(*args, **kwargs)
 
 
 class Field(AbstractField):

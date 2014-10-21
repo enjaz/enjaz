@@ -21,6 +21,7 @@
             <th>{% trans "Status" %}</th>
             <th>{% trans "Published from" %}</th>
             <th>{% trans "Expires on" %}</th>
+            <th>{% trans "Primary form" %}</th>
             <th>{% trans "Total entries" %}</th>
             <th></th>
         </thead>
@@ -35,6 +36,17 @@
                 <td>{{ form.get_status_display }}</td>
                 <td data-order="{{ form.publish_date|date:'U' }}">{{ form.publish_date|date }}</td>
                 <td data-order="{{ form.expiry_date|date:'U' }}">{{ form.expiry_date|date }}</td>
+                <td>
+                    {% if form.is_primary %}
+                        <span class="badge badge-success">
+                            <i class="entypo-check"></i>
+                        </span>
+                    {% else %}
+                        <span class="badge badge-default">
+                            <i class="entypo-cancel"></i>
+                        </span>
+                    {% endif %}
+                </td>
                 <td>{{ form.total_entries }}</td>
                 <td>
                     <a class="btn btn-xs btn-icon btn-gold" href="{% url 'forms:edit_form' object_id form.pk %}">

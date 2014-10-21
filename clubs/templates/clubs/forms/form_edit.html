@@ -1,0 +1,108 @@
+{% extends 'activities_base.html' %}{% load i18n %}{% load staticfiles %}
+{% block title %}{% if builder_form.instance.pk %}{% trans "Edit Form" %}{% else %}{% trans "Add Form" %}{% endif %}{% endblock %}
+{% block content %}
+    <style>
+        .errorlist {color:#f00;}
+    </style>
+
+    <div class="panel panel-default panel-shadow" data-collapsed="0">
+
+    <div class="panel-heading">
+
+        <div class="panel-title">
+            {% include 'clubs/forms/breadcrumb.html' %}
+        </div>
+        {% if builder_form.instance.pk %}
+        <div class="panel-options">
+            <a class="btn btn-xs btn-danger" href="{% url 'forms:delete_form' object_id builder_form.instance.pk %}">
+                <span style="color:#fff"><i class="entypo-trash"></i>
+                {% trans "Delete form" %}</span>
+            </a>
+            <a class="btn btn-xs btn-default" href="{% url 'forms:form_entries' object_id builder_form.instance.pk %}">
+                <i class="entypo-list"></i>
+                {% trans "View entries" %}
+            </a>
+            <a class="btn btn-xs btn-default" href="{% url 'forms:form_detail' object_id builder_form.instance.get_url_attr %}">
+                <i class="entypo-eye"></i>
+                {% trans "View on site" %}
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+	<!-- panel body -->
+	<div class="panel-body">
+        <div class="col-md-12">
+        {% if builder_form.instance.pk %}
+            <h3>{% trans "Edit form" %}</h3>
+        {% else %}
+            <h3>{% trans "Add Form" %}</h3>
+        {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {% load bootstrap3 %}
+        {% bootstrap_form builder_form %}
+
+        {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
+        {{ formset.management_form }}
+        {{ formset.non_form_errors.as_ul }}
+        <table id="formset" class="form">
+        {% for form in formset.forms %}
+          {% if forloop.first %}
+          <thead><tr>
+            {% for field in form.visible_fields %}
+            <th>{{ field.label|capfirst }}</th>
+            {% endfor %}
+          </tr></thead>
+          {% endif %}
+          <tr class="form-container">
+          {% for field in form.visible_fields %}
+            <td>
+            {# Include the hidden fields in the form #}
+            {% if forloop.first %}
+              {% for hidden in form.hidden_fields %}
+              {{ hidden }}
+              {% endfor %}
+            {% endif %}
+                <div class="form-group">
+              {{ field.errors.as_ul }}
+              {{ field }}
+                </div>
+            </td>
+          {% endfor %}
+          </tr>
+        {% endfor %}
+        </table>
+        <hr>
+        <button class="btn btn-primary btn-block" type="submit">
+            <i class="entypo-check"></i>
+            {% trans "Submit" %}
+        </button>
+    </form>
+    </div>
+    </div>
+</div>
+{% endblock %}
+{% block customscript %}
+<script src="{% static 'js/jquery.formset.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'css/jquery.datetimepicker.css' %}"/>
+<script src="{% static 'js/jquery.datetimepicker.js' %}"></script>
+<script type="text/javascript">
+    // Style the formset fields properly
+    $(".form-container .form-group").find("input").addClass("form-control");
+    $(".form-container").formset({
+        prefix: '{{ formset.prefix }}',
+        added: function (row) {
+            // Set default values for `required` and `visible` fields
+            row.find("[type=checkbox]").prop("checked", true);
+        },
+        addText: 'أضف حقلاً',
+        deleteText: 'احذف',
+        addCssClass: 'add-row btn btn-xs btn-primary',
+    });
+    $("input[name=publish_date], input[name=expiry_date]").addClass("english-field");
+    $("input[name=publish_date], input[name=expiry_date]").datetimepicker({
+        format: 'Y-m-d H:i',
+    });
+</script>
+{% endblock %}

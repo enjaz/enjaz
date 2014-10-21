@@ -1,10 +1,12 @@
 # -*- coding: utf-8  -*-
+from django.contrib.contenttypes.generic import GenericRelation
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime, timedelta
 
 from clubs.models import College
+from forms_builder.forms.models import Form
 from media.utils import REPORT_DUE_AFTER
 
 
@@ -52,6 +54,7 @@ class Activity(models.Model):
                                  limit_choices_to={'category__isnull': True})
     organizers = models.IntegerField(verbose_name=u"عدد المنظمين",
                                        help_text=u"عدد الطلاب الذين سينظمون النشاط")
+    forms = GenericRelation(Form)
 
     def is_approved_by_deanship(self):
         try:

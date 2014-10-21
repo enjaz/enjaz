@@ -1,6 +1,8 @@
 # -*- coding: utf-8  -*-
+from django.contrib.contenttypes.generic import GenericRelation
 from django.db import models
 from django.contrib.auth.models import User
+from forms_builder.forms.models import Form
 
 section_choices = (
     ('NG', u'الحرس الوطني'),
@@ -70,6 +72,8 @@ class Club(models.Model):
                                   verbose_name=u"نادي مميز؟") # To allow more flexible exceptions with
                                                          # presidency, media club and arshidny
     city = models.CharField(max_length=1, choices=city_choices, verbose_name=u"المدينة")
+    forms = GenericRelation(Form)
+
     def get_due_report_count(self):
         "Get the number of due follow-up reports."
         # The following import is not very neat, but importing it at the beginning of

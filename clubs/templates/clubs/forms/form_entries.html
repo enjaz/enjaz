@@ -64,8 +64,16 @@
         });
     });
     </script>
-</head>
-<body>
+<div class="row">
+<div class="panel panel-default panel-shadow" data-collapsed="0">
+    <div class="panel-heading">
+        <div class="panel-title">{% include "clubs/forms/breadcrumb.html" %}</div>
+    </div>
+	<!-- panel body -->
+	<div class="panel-body">
+
+    <h3>{% trans "Entries" %}</h3>
+
     <div id="content-main">
         <form method="post">
         {% csrf_token %}
@@ -150,4 +158,7 @@
         {% endif %}
         </form>
     </div>
+</div>
+</div>
+</div>
 {% endblock %}

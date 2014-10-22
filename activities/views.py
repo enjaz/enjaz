@@ -19,6 +19,7 @@ from clubs.utils import get_presidency, is_coordinator_or_member, is_coordinator
 from core.utilities import FVP_EMAIL, MVP_EMAIL, DHA_EMAIL
 from media.utils import MAX_OVERDUE_REPORTS
 
+FORMS_CURRENT_APP = "activity_forms"
 
 def list_activities(request):
     """
@@ -161,7 +162,7 @@ def show(request, activity_id):
         if not activity.is_approved():
             raise PermissionDenied
 
-    return render(request, 'activities/show.html', context, current_app="activity_forms")
+    return render(request, 'activities/show.html', context, current_app=FORMS_CURRENT_APP)
 
 @login_required
 def create(request):

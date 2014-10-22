@@ -21,7 +21,7 @@
             {% if can_view_applications %}
 			<li><a href="{% url 'clubs:view_application' club.pk %}"><span class="glyphicon glyphicon-list-alt"></span> راجع طلبات الانضمام</a></li>
 			{% endif %}{% endif %}{% if can_edit %}</ul></p>{% endif %}
-			{% if user.is_authenticated and club.open_membership %}
+			{% if user.is_authenticated and club.registration_is_open %}
 			<p style="font-size:1em;"><ul class="list-unstyled"><li><a href="{% url 'clubs:join' club.pk %}"><span class="glyphicon glyphicon-star"></span> انضم للنادي</a></li></ul></p>
 			{% endif %}
             <p style="font-size: 1em;">

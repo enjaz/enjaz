@@ -79,6 +79,13 @@ class Club(models.Model):
         Return ``True`` if there is 1 form marked as primary. Return ``False`` if there isn't or, by any chance,
         there is more than one
         """
+        # FIXME: update to account for publised status and publish dates
+        return self.forms.filter(is_primary=True).count() == 1
+
+    def has_registration_form(self):
+        """
+        A memory-efficient method to check for the presence of 1 (an only 1) primary form for a club.
+        """
         return self.forms.filter(is_primary=True).count() == 1
 
     def get_registration_form(self):
@@ -131,6 +138,7 @@ class Club(models.Model):
     def __unicode__(self):
         return self.name
 
+# TODO: remove as no longer needed
 class MembershipApplication(models.Model):
     club = models.ForeignKey(Club, related_name='club')
     user = models.ForeignKey(User, related_name='user')

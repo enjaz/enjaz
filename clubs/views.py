@@ -15,6 +15,8 @@ from core import decorators
 from clubs.forms import MembershipForm, DisabledClubForm, ClubForm
 from clubs.models import Club, MembershipApplication
 
+FORMS_CURRENT_APP = "club_forms"
+
 # TODO:
 #   * After applying  the data  table with  the new  membership action
 #     buttons,  create a  message to  inform the  user about  whatever
@@ -122,47 +124,28 @@ def edit(request, club_id):
 def join(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
     context = {'club': club}
-    if not club.open_membership:
-        context = {'error_message': 'closed_membership'}
-        return render(request, 'clubs/join.html', context)
-
-    # Make sure that the user hasn't already applied!
-    existing_application = MembershipApplication.objects.filter(club=club,
-                                                       user=request.user)
-    if existing_application:
-        context['error_message'] = 'already_applied'
-        return render(request, 'clubs/join.html', context)
 
     # Make sure the user isn't already a member!
-    if club in request.user.memberships.all() or\
-       club in request.user.coordination.all():
+    # NOTE: This is only a superficial protection as the user can simply navigate to the form via the form list or URL
+    if is_coordinator_or_member(club, request.user):
         context['error_message'] = 'already_in'
-        return render(request, 'clubs/join.html', context)        
-
-    if request.method == 'POST':
-        application = MembershipApplication(club=club, user=request.user)
-        form = MembershipForm(request.POST, instance=application)
-        if form.is_valid():
-            form.save()
-            view_application_url = reverse('clubs:view_application', args=(club_id,))
-            full_url = request.build_absolute_uri(view_application_url)
-            email_context = {'club': club, 'user': request.user,
-                             'full_url': full_url}
-            mail.send([club.coordinator.email],
-                      template="club_membership_applied",
-                      context=email_context)
-            return HttpResponseRedirect(reverse('clubs:join_done',
-                                                args=(club_id,)))
-        else:
-            context['form'] = form
-            return render(request, 'clubs/join.html', context)
-    else:
-        form = MembershipForm()
-        context['form'] = form
         return render(request, 'clubs/join.html', context)
+
+    # If the club's registration is open, then redirect to the registration form
+    # Otherwise, return a message that registration is closed
+    if club.registration_is_open():
+        reg_form = club.get_registration_form()
+        return HttpResponseRedirect(reverse("forms:form_detail",
+                                            args=(club.id, reg_form.id),
+                                            current_app=FORMS_CURRENT_APP))
+    else:
+        context['error_message'] = 'closed_membership'
+        return render(request, 'clubs/join.html', context)
+
 
 @login_required
 def view_application(request, club_id):
+    # FIXME: rewrite to be based on forms
     club = get_object_or_404(Club, pk=club_id)
     if not is_coordinator(club, request.user) and \
        not request.user.has_perm('clubs.view_application'):

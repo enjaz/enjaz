@@ -74,6 +74,22 @@ class Club(models.Model):
     city = models.CharField(max_length=1, choices=city_choices, verbose_name=u"المدينة")
     forms = GenericRelation(Form)
 
+    def registration_is_open(self):
+        """
+        Return ``True`` if there is 1 form marked as primary. Return ``False`` if there isn't or, by any chance,
+        there is more than one
+        """
+        return self.forms.filter(is_primary=True).count() == 1
+
+    def get_registration_form(self):
+        """
+        If registration is open, return the registration form; otherwise return ``None``.
+        """
+        if self.registration_is_open():
+            return self.forms.get(is_primary=True)
+        else:
+            return None
+
     def get_due_report_count(self):
         "Get the number of due follow-up reports."
         # The following import is not very neat, but importing it at the beginning of

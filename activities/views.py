@@ -504,27 +504,18 @@ def review(request, activity_id, lower_review_type=None):
 @login_required
 def participate(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id)
-    colleges = activity.participant_colleges.all()
-    if colleges:
-        request.user
-    existing_participation = Participation.objects.filter(activity=activity,
-                                                       user=request.user)
-    context = {'activity': activity}
 
-    if existing_participation:
-        context['error_message'] = 'already_applied'
-        return render(request, 'activities/participate.html', context)
-        
-    if request.method == 'POST':
-        if request.POST['status'] == '1':
-            Participation.objects.create(activity=activity,
-                                         user=request.user)
-            return HttpResponseRedirect(reverse('activities:participate_done',
-                                                args=(activity_id,)))
-        else:
-            context['error_message'] = 'unknown'
-            return render(request, 'activities/participate.html', context)
+    context = {"activity": activity}
+
+    # If the activity's registration is open, then redirect to the registration form
+    # Otherwise, return a message that registration is closed
+    if activity.registration_is_open():
+        reg_form = activity.get_registration_form()
+        return HttpResponseRedirect(reverse("forms:form_detail",
+                                            args=(activity.id, reg_form.id),
+                                            current_app=FORMS_CURRENT_APP))
     else:
+        context['error_message'] = 'closed'
         return render(request, 'activities/participate.html', context)
 
 @login_required

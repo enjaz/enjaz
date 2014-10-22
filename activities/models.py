@@ -56,6 +56,28 @@ class Activity(models.Model):
                                        help_text=u"عدد الطلاب الذين سينظمون النشاط")
     forms = GenericRelation(Form)
 
+    def registration_is_open(self):
+        """
+        Return ``True`` if there is 1 published form marked as primary. Return ``False`` if there isn't or,
+        by any chance, there is more than one
+        """
+        return self.forms.published().filter(is_primary=True).count() == 1
+
+    def has_registration_form(self):
+        """
+        A memory-efficient method to check for the presence of 1 (an only 1) primary form for a club.
+        """
+        return self.forms.filter(is_primary=True).count() == 1
+
+    def get_registration_form(self):
+        """
+        If registration is open, return the registration form; otherwise return ``None``.
+        """
+        if self.has_registration_form():
+            return self.forms.get(is_primary=True)
+        else:
+            return None
+
     def is_approved_by_deanship(self):
         try:
             d_review = self.review_set.get(review_type='D')

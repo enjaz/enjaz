@@ -9,11 +9,12 @@ from django.views.decorators import csrf
 from post_office import mail
 import unicodecsv
 from activities.utils import get_approved_activities
-from clubs.utils import is_coordinator, is_coordinator_or_member
+from clubs.utils import is_coordinator, is_coordinator_or_member, is_member
 
 from core import decorators
 from clubs.forms import MembershipForm, DisabledClubForm, ClubForm
 from clubs.models import Club, MembershipApplication
+from forms_builder.forms.models import FormEntry
 
 FORMS_CURRENT_APP = "club_forms"
 
@@ -159,35 +160,42 @@ def view_application(request, club_id):
         return render(request, "clubs/view_application_error.html", {"club": club}, current_app=FORMS_CURRENT_APP)
 
 # @login_required
-@csrf.csrf_exempt
-@decorators.ajax_only
+# @csrf.csrf_exempt
+# @decorators.ajax_only
 @decorators.post_only
 def approve_application(request, club_id):
     """
     Add the application's applicant to the application's club.
     Then, delete the application.
     """
-    print request.user
-    application = get_object_or_404(MembershipApplication, pk=request.POST['application_pk'])
+    club = get_object_or_404(Club, pk=club_id)
     # --- Permission Checks ---
     # The user should be the application's club coordinator
-    if not is_coordinator(application.club, request.user) and \
+    if not is_coordinator(club, request.user) and \
        not request.user.has_perm('clubs.view_application'):
         raise Exception(u"ليس لديك الصلاحيات الكافية للقيام بذلك.")
 
-    # Check that the application's applicant isn't a member of
-    # the application's club
-    if application.user in application.club.members.all():
-        # Now this shouldn't happen since the join view already prevents
-        # members from accessing the view
-        raise Exception(u"هذا المستخدم عضو في النادي أصلًا")
+    # Get the list of selected form entries (list of pk's)
+    selected = request.POST.getlist("selected")
+    if selected:
+        # if request.POST.get("approve"):
+        entries = FormEntry.objects.filter(id__in=selected)
 
-    # If all went OK, add the user to the club and delete the application
-    application.club.members.add(application.user)
-    application.delete()
+        for entry in entries:
+            user = entry.submitter
+            # Add user to club members, in they're not already in
+            if not is_member(club, user):
+                club.members.add(user)
 
-    # return {}
+        if request.POST.get("approve_and_delete"):
+            entries.delete()
 
+    return HttpResponseRedirect(reverse("forms:form_entries_show",
+                                        args=(club.id, club.get_registration_form().id),
+                                        current_app=FORMS_CURRENT_APP))
+
+
+# TODO: remove as no longer needed + remove url
 # @login_required
 @csrf.csrf_exempt
 @decorators.ajax_only
@@ -218,7 +226,7 @@ def view_members(request, club_id):
         raise PermissionDenied
     return render(request, 'clubs/members.html', {'club': club})
 
-# TODO: remove as no longer needed
+# TODO: remove as no longer needed + remove url
 # TODO: remove this view and the associated url since its function is now done by datatables
 @login_required
 def download_application(request, club_id):

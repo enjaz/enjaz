@@ -145,15 +145,18 @@ def join(request, club_id):
 
 @login_required
 def view_application(request, club_id):
-    # FIXME: rewrite to be based on forms
     club = get_object_or_404(Club, pk=club_id)
     if not is_coordinator(club, request.user) and \
        not request.user.has_perm('clubs.view_application'):
         raise PermissionDenied
 
-    applications = MembershipApplication.objects.filter(club=club)
-    context = {'applications': applications, 'club': club}
-    return render(request, 'clubs/view_application.html', context)
+    if club.has_registration_form():
+        reg_form = club.get_registration_form()
+        return HttpResponseRedirect(reverse("forms:form_entries_show",
+                                            args=(club.id, reg_form.id),
+                                            current_app=FORMS_CURRENT_APP))
+    else:
+        return render(request, "clubs/view_application_error.html", {"club": club}, current_app=FORMS_CURRENT_APP)
 
 # @login_required
 @csrf.csrf_exempt
@@ -214,7 +217,8 @@ def view_members(request, club_id):
        not request.user.has_perm('clubs.view_members'):
         raise PermissionDenied
     return render(request, 'clubs/members.html', {'club': club})
-    
+
+# TODO: remove as no longer needed
 # TODO: remove this view and the associated url since its function is now done by datatables
 @login_required
 def download_application(request, club_id):

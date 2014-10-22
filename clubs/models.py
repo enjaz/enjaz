@@ -76,11 +76,10 @@ class Club(models.Model):
 
     def registration_is_open(self):
         """
-        Return ``True`` if there is 1 form marked as primary. Return ``False`` if there isn't or, by any chance,
-        there is more than one
+        Return ``True`` if there is 1 published form marked as primary. Return ``False`` if there isn't or,
+        by any chance, there is more than one
         """
-        # FIXME: update to account for publised status and publish dates
-        return self.forms.filter(is_primary=True).count() == 1
+        return self.forms.published().filter(is_primary=True).count() == 1
 
     def has_registration_form(self):
         """
@@ -92,7 +91,7 @@ class Club(models.Model):
         """
         If registration is open, return the registration form; otherwise return ``None``.
         """
-        if self.registration_is_open():
+        if self.has_registration_form():
             return self.forms.get(is_primary=True)
         else:
             return None

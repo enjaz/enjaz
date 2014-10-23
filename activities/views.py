@@ -7,7 +7,6 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
 from post_office import mail
-import unicodecsv
 
 from activities.models import Activity, Review, Participation, Episode
 from activities.forms import ActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm
@@ -106,21 +105,9 @@ def show(request, activity_id):
         is_coordinator = activity.primary_club in request.user.coordination.all()
         is_submitter = activity.submitter == request.user
 
-#        By definition, the coordinator should have all the below-mentioned
-#        permissions; all we need is use {{ perms }} from within the template
-#        [Saeed, 17 Jun 2014]
-
-#        {{ perms }} cannot figure out whether or not someone is a
-#        coordinator of this specific club.  In addition, Django
-#        templates are limited when dealing with combined and/or
-#        conditions. [Osama, 27 Jun 2014]
-
         if request.user.has_perm('activities.change_activity') or \
             is_coordinator or is_submitter:
             context['can_edit'] = True
-        if request.user.has_perm('activities.view_participation') or \
-            is_coordinator or is_submitter:
-            context['can_view_participation'] = True
         if request.user.has_perm('activities.view_deanship_review') or \
             is_coordinator or is_submitter:
             context['can_view_deanship_review'] = True
@@ -489,9 +476,6 @@ def review(request, activity_id, lower_review_type=None):
     if request.user.has_perm('activities.change_activity') or \
         is_coordinator or is_submitter:
         context['can_edit'] = True
-    if request.user.has_perm('activities.view_participation') or \
-        is_coordinator or is_submitter:
-        context['can_view_participation'] = True
     if request.user.has_perm('activities.view_deanship_review') or \
         is_coordinator or is_submitter:
         context['can_view_deanship_review'] = True
@@ -517,41 +501,3 @@ def participate(request, activity_id):
     else:
         context['error_message'] = 'closed'
         return render(request, 'activities/participate.html', context)
-
-@login_required
-def view_participation(request, activity_id):
-    activity = get_object_or_404(Activity, pk=activity_id)
-    is_coordinator = activity.primary_club in request.user.coordination.all()
-    is_submitter = activity.submitter == request.user
-
-    if not is_coordinator and not is_submitter and \
-       not request.user.has_perm('activities.view_participation'):
-        raise PermissionDenied
-
-    participations = Participation.objects.filter(activity=activity)
-    context = {'participations': participations, 'activity': activity,
-               'active_tab': 'view_participation'}
-    return render(request, 'activities/view_participations.html', context)
-
-# TODO: remove this view and the associated url since its function is now done by datatables
-@login_required
-def download_participation(request, activity_id):
-    activity = get_object_or_404(Activity, pk=activity_id)
-    if not activity.primary_club in request.user.coordination.all() and \
-       not request.user.has_perm('activities.view_participation'):
-        raise PermissionDenied
-
-    participations = Participation.objects.filter(activity=activity)
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="Participants in Activity %s.csv"' % activity_id
-
-    writer = unicodecsv.writer(response, encoding='utf-8')
-    writer.writerow([u"الاسم", u"البريد"])
-    for participantion in participations:
-        if participantion.user.first_name:
-            name = u"%s %s" % (participantion.user.first_name, participantion.user.last_name)
-        else:
-            name = participantion.user.username
-        email = participantion.user.email
-        writer.writerow([name, email])
-    return response

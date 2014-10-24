@@ -45,8 +45,14 @@ club_forms_urls = url(r'^clubs/(?P<object_id>\d+)/forms/',
          'entries_perm_check': forms_editor_check,
          'file_perm_check': forms_editor_check,
          ### Submitter fields ###
-         # 'submitter_fields': ('user.first_name', 'user.last_name',
-         #                      'user.someattr.somesubattr')
+         'submitter_fields': ('user.student_profile.get_ar_full_name|default:user.username',
+                              'user.student_profile.get_en_full_name|default:user.username',
+                              'user.student_profile.student_number',
+                              'user.student_profile.badge_number',
+                              'user.student_profile.college',
+                              'user.email',
+                              'user.student_profile.mobile_number',
+                              ),
          ### Settings ###
          'login_required_for_list': True,
          'object_context_name': 'club',

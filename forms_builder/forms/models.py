@@ -188,7 +188,7 @@ class AbstractField(models.Model):
 
     def get_choices(self):
         """
-        Parse a comma separated choice string into a list of choices taking
+        Parse a choice string separated by ``wrapper_settings.CHOICES_SEPARATOR`` into a list of choices taking
         into account quoted choices using the ``settings.CHOICES_QUOTE`` and
         ``settings.CHOICES_UNQUOTE`` settings.
         """
@@ -199,7 +199,7 @@ class AbstractField(models.Model):
                 quoted = True
             elif quoted and char == settings.CHOICES_UNQUOTE:
                 quoted = False
-            elif char == "," and not quoted:
+            elif char == wrapper_settings.CHOICES_SEPARATOR and not quoted:
                 choice = choice.strip()
                 if choice:
                     yield choice, choice

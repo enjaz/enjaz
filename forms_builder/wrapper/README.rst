@@ -50,6 +50,8 @@ Linking forms to an existing model is an easy process that takes the following s
 
 2. GenericRelation
 3. FORMS_BUILDER_USE_SLUGS setting
+4. FORMS_BUILDER_CHOICES_SEPARATOR setting
+   NOTE - Don't change once specified
 
 On making django-pluggable-forms
 ================================

@@ -1,4 +1,5 @@
 """Utility functions related to the clubs app."""
+from clubs.models import Club
 from .models import Club
 
 
@@ -39,3 +40,11 @@ def get_presidency():
 
 def get_media_center():
     return Club.objects.get(english_name="Media Center")
+
+
+def forms_editor_check(user, object):
+    """A function to evaluate if user is eligible to create/edit forms for clubs."""
+    # Confirm that the passed object is a ``Club`` instance
+    if not isinstance(object, Club):
+        raise TypeError("Expected a Club object, received %s" % type(object))
+    return is_coordinator(object, user) or user.is_superuser

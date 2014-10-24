@@ -1,8 +1,9 @@
 """
 Utility functions for the activities app.
 """
-from django.contrib.auth.models import User
 from activities.models import Activity
+from clubs.utils import is_coordinator
+
 
 def get_approved_activities():
     """
@@ -43,6 +44,15 @@ def get_pending_activities():
                                                                     "D").exclude(review__is_approved=False)\
         |  Activity.objects.filter(review__isnull=True)
 
+
 def has_submitted_any_activity(user):
     """Return whether the user has ever submitted any activities."""
     return Activity.objects.filter(submitter__pk=user.pk).exists()
+
+
+def forms_editor_check(user, object):
+    """A function to evaluate if user is eligible to create/edit forms for activities."""
+    # Confirm that the passed object is an ``Activity`` instance
+    if not isinstance(object, Activity):
+        raise TypeError("Expected an Activity object, received %s" % type(object))
+    return is_coordinator(object.primary_club, user) or user.is_superuser

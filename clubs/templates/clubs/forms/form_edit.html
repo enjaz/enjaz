@@ -101,8 +101,8 @@
             // Set default values for `required` and `visible` fields
             row.find("[type=checkbox]").prop("checked", true);
         },
-        addText: 'أضف حقلاً',
-        deleteText: 'احذف',
+        addText: '{% trans "Add field" %}',
+        deleteText: '{% trans "Delete" %}',
         addCssClass: 'add-row btn btn-xs btn-primary',
     });
     $("input[name=publish_date], input[name=expiry_date]").addClass("english-field");

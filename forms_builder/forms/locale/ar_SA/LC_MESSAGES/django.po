@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-12 22:55+0300\n"
+"POT-Creation-Date: 2014-10-24 16:55+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -337,7 +337,15 @@ msgstr "مدخلات حقول"
 msgid "Login for this form is required but submitter field is empty."
 msgstr ""
 
-#: models.py:290
+#: models.py:282
+msgid "Primary form?"
+msgstr "النموذج الرئيسي؟"
+
+#: models.py:283
+msgid "Is this the primary form for this object?"
+msgstr "هل هذا هو النموذج الرئيسي لهذا العنصر؟"
+
+#: models.py:300
 msgid "Order"
 msgstr "الترتيب"
 

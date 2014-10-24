@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-12 22:41+0300\n"
+"POT-Creation-Date: 2014-10-24 17:03+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,14 +18,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:365
+#: views.py:382
 #, python-format
 msgid "1 entry deleted"
 msgid_plural "%(count)s entries deleted"
 msgstr[0] "تم حذف مدخل واحد"
 msgstr[1] "تم حذف %(count)s مدخلات"
 
-#: views.py:368
+#: views.py:385
 msgid "View Entries"
 msgstr "اعرض المدخلات"
 
@@ -69,6 +69,15 @@ msgstr "اعرض المدخلات"
 #: templates/forms/form_edit.html:57
 msgid "Submit"
 msgstr "أرسل"
+
+#: templates/forms/form_edit.html:69
+msgid "Add field"
+msgstr "أضف حقلاً"
+
+#: templates/forms/form_edit.html:70
+#, fuzzy
+msgid "Delete"
+msgstr "احذف"
 
 #: templates/forms/form_entries.html:60
 msgid "No entries selected"
@@ -124,13 +133,13 @@ msgstr "ليست هناك مدخلات"
 msgid "Forms"
 msgstr "النماذج"
 
-#: templates/forms/form_list.html:17
-msgid "+ Add Form"
-msgstr "+ أضف نموذجًا"
-
 #: templates/forms/form_list.html:18
 msgid "No forms to display."
 msgstr "ليست هناك نماذج."
+
+#: templates/forms/form_list_edit.html:17
+msgid "+ Add Form"
+msgstr "+ أضف نموذجًا"
 
 #: templates/forms/form_list_edit.html:21
 msgid "Title"

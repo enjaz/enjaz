@@ -67,7 +67,7 @@ def show(request, club_id):
     can_view_members = request.user == club.coordinator or \
                        request.user.has_perm('clubs.view_members')
     can_view_applications = request.user == club.coordinator or \
-                            request.user.has_perm('clubs.view_application')
+                            request.user.is_superuser
     context = {'club': club, 'can_edit': can_edit,
                'can_view_members': can_view_members,
                'can_view_applications': can_view_applications,
@@ -148,7 +148,7 @@ def join(request, club_id):
 def view_application(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
     if not is_coordinator(club, request.user) and \
-       not request.user.has_perm('clubs.view_application'):
+       not request.user.is_superuser:
         raise PermissionDenied
 
     if club.has_registration_form():
@@ -172,7 +172,7 @@ def approve_application(request, club_id):
     # --- Permission Checks ---
     # The user should be the application's club coordinator
     if not is_coordinator(club, request.user) and \
-       not request.user.has_perm('clubs.view_application'):
+       not request.user.is_superuser:
         raise Exception(u"ليس لديك الصلاحيات الكافية للقيام بذلك.")
 
     # Get the list of selected form entries (list of pk's)

@@ -1,0 +1,412 @@
+# Arabic translation for django-forms-builder by Stephen McDonald
+# Copyright (C) 2014 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# SAEED ARABI <msarabi95@gmail.com>, 2014.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-10-24 16:55+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:40 fields.py:33
+msgid "Email"
+msgstr "البريد الإلكتروني"
+
+#: admin.py:45 models.py:62 models.py:163
+msgid "Slug"
+msgstr ""
+
+#: admin.py:48
+msgid "Sites"
+msgstr "المواقع"
+
+#: admin.py:177
+#, python-format
+msgid "1 entry deleted"
+msgid_plural "%(count)s entries deleted"
+msgstr[0] "تم حذف مدخل واحد"
+msgstr[1] "تم حذف %(count)s مدخلات"
+
+#: admin.py:181
+msgid "View Entries"
+msgstr "اعرض المدخلات"
+
+#: fields.py:31
+msgid "Single line text"
+msgstr "نص قصير"
+
+#: fields.py:32
+msgid "Multi line text"
+msgstr "نص متعدد الأسطر"
+
+#: fields.py:34
+msgid "Number"
+msgstr "رقم"
+
+#: fields.py:35
+msgid "URL"
+msgstr "رابط"
+
+#: fields.py:36
+msgid "Check box"
+msgstr ""
+
+#: fields.py:37
+msgid "Check boxes"
+msgstr ""
+
+#: fields.py:38
+msgid "Drop down"
+msgstr ""
+
+#: fields.py:39
+msgid "Multi select"
+msgstr ""
+
+#: fields.py:40
+msgid "Radio buttons"
+msgstr ""
+
+#: fields.py:41
+msgid "File upload"
+msgstr "ملف"
+
+#: fields.py:42
+msgid "Date"
+msgstr "تاريخ"
+
+#: fields.py:43 models.py:231
+msgid "Date/time"
+msgstr "تاريخ/وقت"
+
+#: fields.py:44
+msgid "Date of birth"
+msgstr "تاريخ ميلاد"
+
+#: fields.py:45
+msgid "Hidden"
+msgstr "مخفي"
+
+#: forms.py:53 forms.py:62 forms.py:69 forms.py:78
+msgid "Nothing"
+msgstr "لا شيء"
+
+#: forms.py:54
+msgid "Contains"
+msgstr "يحتوي"
+
+#: forms.py:55
+msgid "Doesn't contain"
+msgstr "لا يحتوي"
+
+#: forms.py:56
+msgid "Equals"
+msgstr "يساوي"
+
+#: forms.py:57
+msgid "Doesn't equal"
+msgstr "لا يساوي"
+
+#: forms.py:63
+msgid "Equals any"
+msgstr "يساوي أي"
+
+#: forms.py:64
+msgid "Doesn't equal any"
+msgstr "لا يساوي أي"
+
+#: forms.py:70
+msgid "Contains any"
+msgstr "يحتوي أي"
+
+#: forms.py:71
+msgid "Contains all"
+msgstr "يحتوي جميع"
+
+#: forms.py:72
+msgid "Doesn't contain any"
+msgstr "لا يحتوي أي"
+
+#: forms.py:73
+msgid "Doesn't contain all"
+msgstr "لا يحتوي جميع"
+
+#: forms.py:79
+msgid "Is between"
+msgstr "بين"
+
+#: forms.py:280
+msgid "Checked"
+msgstr "معبأ"
+
+#: forms.py:280
+msgid "Not checked"
+msgstr "غير معبأ"
+
+#: forms.py:303 forms.py:318
+msgid "and"
+msgstr "و"
+
+#: models.py:23
+msgid "Draft"
+msgstr "مسودة"
+
+#: models.py:24
+msgid "Published"
+msgstr "منشور"
+
+#: models.py:61
+msgid "Title"
+msgstr "العنوان"
+
+#: models.py:64
+msgid "Intro"
+msgstr "المقدمة"
+
+#: models.py:65
+msgid "Button text"
+msgstr "نص الزر"
+
+#: models.py:66
+msgid "Submit"
+msgstr "أرسل"
+
+#: models.py:67
+msgid "Response"
+msgstr "رسالة الرد"
+
+#: models.py:68
+msgid "Redirect url"
+msgstr "رابط التحويل"
+
+#: models.py:70
+msgid "An alternate URL to redirect to after form submission"
+msgstr "رابط بديل ليتم التحويل إليه بعد تعبئة النموذج"
+
+#: models.py:71
+msgid "Status"
+msgstr "الحالة"
+
+#: models.py:73
+msgid "Published from"
+msgstr "منشور ابتداء من"
+
+#: models.py:74
+msgid "With published selected, won't be shown until this time"
+msgstr "إذا تم اختيار منشور فلن يظهر النموذج قبل هذا التاريخ. "
+
+#: models.py:76
+msgid "Expires on"
+msgstr "منشور حتى"
+
+#: models.py:77
+msgid "With published selected, won't be shown after this time"
+msgstr "إذا تم اختيار منشور فلن يظهر النموذج بعد هذا التاريخ"
+
+#: models.py:79
+msgid "Login required"
+msgstr "يتطلب تسجيل الدخول"
+
+#: models.py:80
+msgid "If checked, only logged in users can view the form"
+msgstr "إذا تم تحديده، فلن يمكن تعبئة النموذج إلا لمن قام بتسجيل الدخول"
+
+#: models.py:81
+msgid "Send email"
+msgstr "أرسل بريدًا إلكترونيًا"
+
+#: models.py:82
+msgid "If checked, the person entering the form will be sent an email"
+msgstr "إذا تم تحديده، سيتم إرسال رسالة بريد إلكتروني لمعبئ النموذج"
+
+#: models.py:83
+msgid "From address"
+msgstr "العنوان المرسَل منه"
+
+#: models.py:84
+msgid "The address the email will be sent from"
+msgstr "عنوان البريد الذي سترسل منه الرسائل"
+
+#: models.py:85
+msgid "Send copies to"
+msgstr "أرسل نسخًا إلى"
+
+#: models.py:86
+msgid "One or more email addresses, separated by commas"
+msgstr "عنوان بريدي أو أكثر، مفصولة بفواصل"
+
+#: models.py:88
+msgid "Subject"
+msgstr "العنوان"
+
+#: models.py:89
+msgid "Message"
+msgstr "الرسالة"
+
+#: models.py:94
+msgid "Form"
+msgstr "النموذج"
+
+#: models.py:95
+msgid "Forms"
+msgstr "النماذج"
+
+#: models.py:136
+msgid "View form on site"
+msgstr "اعرض النموذج على الموقع"
+
+#: models.py:137
+msgid "Filter entries"
+msgstr "رشح المدخلات"
+
+#: models.py:138
+msgid "View all entries"
+msgstr "اعرض جميع المدخلات"
+
+#: models.py:139
+msgid "Export all entries"
+msgstr "احفظ جميع المدخلات"
+
+#: models.py:162
+msgid "Label"
+msgstr "النص"
+
+#: models.py:165
+msgid "Type"
+msgstr "النوع"
+
+#: models.py:166
+msgid "Required"
+msgstr "مطلوب؟"
+
+#: models.py:167
+msgid "Visible"
+msgstr "مرئي؟"
+
+#: models.py:168
+msgid "Choices"
+msgstr "الخيارات"
+
+#: models.py:173
+msgid "Default value"
+msgstr "القيمة الافتراضية"
+
+#: models.py:175
+msgid "Placeholder Text"
+msgstr "نص افتراضي"
+
+#: models.py:177
+msgid "Help text"
+msgstr "شرح مختصر"
+
+#: models.py:182 templates/admin/forms/entries.html:88
+msgid "Field"
+msgstr "الحقل"
+
+#: models.py:183
+msgid "Fields"
+msgstr "الحقول"
+
+#: models.py:234
+msgid "Form entry"
+msgstr "ُمدخل"
+
+#: models.py:235
+msgid "Form entries"
+msgstr "مدخلات"
+
+#: models.py:249
+msgid "Form field entry"
+msgstr "مدخل حقل"
+
+#: models.py:250
+msgid "Form field entries"
+msgstr "مدخلات حقول"
+
+#: models.py:269
+msgid "Login for this form is required but submitter field is empty."
+msgstr ""
+
+#: models.py:282
+msgid "Primary form?"
+msgstr "النموذج الرئيسي؟"
+
+#: models.py:283
+msgid "Is this the primary form for this object?"
+msgstr "هل هذا هو النموذج الرئيسي لهذا العنصر؟"
+
+#: models.py:300
+msgid "Order"
+msgstr "الترتيب"
+
+#: templates/admin/forms/change_form.html:10
+#: templates/admin/forms/entries.html:117
+msgid "View entries"
+msgstr "اعرض المدخلات"
+
+#: templates/admin/forms/change_form.html:13
+msgid "History"
+msgstr "التاريخ"
+
+#: templates/admin/forms/change_form.html:17
+msgid "View on site"
+msgstr "اعرض على الموقع"
+
+#: templates/admin/forms/entries.html:62
+msgid "No entries selected"
+msgstr "ليست هناك مدخلات محددة"
+
+#: templates/admin/forms/entries.html:65
+msgid "Delete selected entries?"
+msgstr "احذف المدخلات المحددة؟"
+
+#: templates/admin/forms/entries.html:74
+msgid "Home"
+msgstr "الرئيسية"
+
+#: templates/admin/forms/entries.html:89
+msgid "Include"
+msgstr "اشمل"
+
+#: templates/admin/forms/entries.html:90
+msgid "Filter by"
+msgstr "رشح حسب"
+
+#: templates/admin/forms/entries.html:108
+msgid "All"
+msgstr "الكل"
+
+#: templates/admin/forms/entries.html:116
+#: templates/admin/forms/entries.html:157
+msgid "Back to form"
+msgstr "عد للنموذج"
+
+#: templates/admin/forms/entries.html:118
+msgid "Export CSV"
+msgstr "احفظ كملف CSV"
+
+#: templates/admin/forms/entries.html:120
+msgid "Export XLS"
+msgstr "احفظ كملف XLS"
+
+#: templates/admin/forms/entries.html:124
+msgid "Entries"
+msgstr "المدخلات"
+
+#: templates/admin/forms/entries.html:158
+msgid "Delete selected"
+msgstr "احذف المحدد"
+
+#: templates/admin/forms/entries.html:162
+msgid "No entries to display"
+msgstr "ليست هناك مدخلات"

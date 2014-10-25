@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.11: http://docutils.sourceforge.net/" />
+<title></title>
+<style type="text/css">
+
+/*
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 7614 2013-02-21 15:55:51Z milde $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+object[type="image/svg+xml"], object[type="application/x-shockwave-flash"] {
+  overflow: hidden;
+}
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title, .code .error {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left, .figure.align-left, object.align-left {
+  clear: left ;
+  float: left ;
+  margin-right: 1em }
+
+img.align-right, .figure.align-right, object.align-right {
+  clear: right ;
+  float: right ;
+  margin-left: 1em }
+
+img.align-center, .figure.align-center, object.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.align-left {
+  text-align: left }
+
+.align-center {
+  clear: both ;
+  text-align: center }
+
+.align-right {
+  text-align: right }
+
+/* reset inner alignment in figures */
+div.align-right {
+  text-align: inherit }
+
+/* div.align-center * { */
+/*   text-align: left } */
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font: inherit }
+
+pre.literal-block, pre.doctest-block, pre.math, pre.code {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+pre.code .ln { color: grey; } /* line numbers */
+pre.code, code { background-color: #eeeeee }
+pre.code .comment, code .comment { color: #5C6576 }
+pre.code .keyword, code .keyword { color: #3B0D06; font-weight: bold }
+pre.code .literal.string, code .literal.string { color: #0C5404 }
+pre.code .name.builtin, code .name.builtin { color: #352B84 }
+pre.code .deleted, code .deleted { background-color: #DEB0A1}
+pre.code .inserted, code .inserted { background-color: #A3D289}
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+/* "booktabs" style (no vertical lines) */
+table.docutils.booktabs {
+  border: 0px;
+  border-top: 2px solid;
+  border-bottom: 2px solid;
+  border-collapse: collapse;
+}
+table.docutils.booktabs * {
+  border: 0px;
+}
+table.docutils.booktabs th {
+  border-bottom: thin solid;
+  text-align: left;
+}
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document">
+
+
+<div class="section" id="django-pluggable-forms">
+<h1>django-pluggable-forms</h1>
+<p>A Django app that builds on <a class="reference external" href="https://github.com/stephenmcd/django-forms-builder">django-forms-builder</a>
+by Stephen McDonald. Django-pluggable-forms adds several important features to the ones already present
+in django-forms-builder while preserving all features of the original app. Namely:</p>
+<ol class="arabic simple">
+<li>&quot;Pluggability&quot; - Ability to link forms to any <tt class="docutils literal">ContentType</tt> so that each <tt class="docutils literal">ContentType</tt>'s forms are linked
+at the database level and also have a distinct URL.</li>
+<li>Non-admin interface for editing of forms - the same admin functionality can be done through a non-admin
+interface while still controlling who can access and edit forms. The editor interfaces are specific for
+each <tt class="docutils literal">ContentType</tt>.</li>
+</ol>
+</div>
+<div class="section" id="instructions">
+<h1>Instructions</h1>
+<div class="section" id="installation">
+<h2>Installation</h2>
+<ol class="arabic">
+<li><p class="first">Install the package contents by cloning this repository.</p>
+</li>
+<li><p class="first">Add django-pluggable-forms to your project by adding</p>
+<pre class="literal-block">
+...
+'forms_builder.forms',
+'forms_builder.wrapper',
+...
+</pre>
+<p>to <tt class="docutils literal">INSTALLED_APPS</tt> in your <tt class="docutils literal">settings.py</tt>.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="usage">
+<h2>Usage</h2>
+<p>Linking forms to an existing model is an easy process that takes the following steps:</p>
+<ol class="arabic simple">
+<li>URLconf</li>
+<li>GenericRelation</li>
+</ol>
+</div>
+</div>
+<div class="section" id="on-making-django-pluggable-forms">
+<h1>On making django-pluggable-forms</h1>
+<p>Django-pluggable-forms adds the extra functionality to django-forms-builder in a minimally invasive approach.
+Except for a few edits noted below, all added and modified views, urls, forms, templates, tests, etc are housed
+in a <tt class="docutils literal">wrapper</tt> app that co-exists with the main <tt class="docutils literal">forms</tt> app of django-forms-builder.</p>
+<p>A few exceptions are listed here, where it isn't possible except to modify the original code of <tt class="docutils literal">`forms</tt>:</p>
+<ul class="simple">
+<li>In <tt class="docutils literal">forms/model.py</tt>:<ul>
+<li>Adding <tt class="docutils literal">GenericForeignKey</tt> fields to the <tt class="docutils literal">Form</tt> model</li>
+<li>Modifying URL name from <tt class="docutils literal">form_detail</tt> to <tt class="docutils literal">forms:form_detail</tt> in <tt class="docutils literal">get_absolute_url</tt> of <tt class="docutils literal">AbstractForm</tt> model</li>
+<li>Adding <tt class="docutils literal">submitter</tt> field that links to <tt class="docutils literal">AUTH_USER_MODEL</tt> and a modified <tt class="docutils literal">save</tt>
+method that ensures it's not empty if the linked <tt class="docutils literal">Form</tt> requires login</li>
+</ul>
+</li>
+<li>In <tt class="docutils literal">forms/forms.py</tt>:<ul>
+<li>Many edits in <tt class="docutils literal">EntriesForm</tt> in order to enable showing user data in forms that require login. Namely:<ol class="arabic">
+<li><tt class="docutils literal">__init__</tt>: Add lines <tt class="docutils literal"><span class="pre">266-268</span></tt> and <tt class="docutils literal"><span class="pre">319-329</span></tt></li>
+<li><tt class="docutils literal">__iter__</tt>: Edit line <tt class="docutils literal">335</tt></li>
+<li><tt class="docutils literal">columns</tt>: Add lines <tt class="docutils literal"><span class="pre">359-363</span></tt></li>
+<li><tt class="docutils literal">rows</tt>: Add lines <tt class="docutils literal"><span class="pre">388-392</span></tt> and <tt class="docutils literal"><span class="pre">425-457</span></tt></li>
+</ol>
+</li>
+<li>Also in <tt class="docutils literal">EntriesForm</tt>: edit URL name from <tt class="docutils literal">admin:form_file</tt> to <tt class="docutils literal">forms:form_file</tt> at line <tt class="docutils literal">491</tt></li>
+</ul>
+</li>
+<li>In <tt class="docutils literal">forms/templates/forms/includes/built_form.html</tt>:<ul>
+<li>Removing <tt class="docutils literal"><span class="pre">action=&quot;{{</span> form.get_absolute_url }}&quot;</tt> from the <tt class="docutils literal">&lt;form&gt;</tt> tag</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="known-issues">
+<h1>Known issues</h1>
+<ol class="arabic simple">
+<li>Django-pluggable-forms is designed to allow multiple instances of the app to exist at the same time. So the URLconf
+takes this fact into account and requires specification of a <tt class="docutils literal">namespace</tt> for each different instance. To make use of
+the namespaces and return the correct URL that belongs to the current instance, <tt class="docutils literal">reverse</tt> and <tt class="docutils literal">{% url %}</tt> require
+the <tt class="docutils literal">current_app</tt> to be specified (as an argument in case of <tt class="docutils literal">reverse</tt> or as a context attribute in case of <tt class="docutils literal">{% url %}</tt>),
+the value of which is obtained from <tt class="docutils literal">request.resolver_match.instance</tt>. The issue is that some <tt class="docutils literal">reverse</tt> statements in the
+original <tt class="docutils literal">forms</tt> code are located a bit deep below the <tt class="docutils literal">view</tt> level, where <tt class="docutils literal">request</tt> cannot be easily obtained.
+(Namely in <tt class="docutils literal">forms.py</tt> and <tt class="docutils literal">models.py</tt>) Due to this:<ol class="loweralpha">
+<li>The <tt class="docutils literal">AbstractForm.get_absolute_url</tt> method, which uses <tt class="docutils literal">models.permalink</tt> decorator is ignored in all views and templates
+of django-pluggable-forms and replaced by a normal <tt class="docutils literal">{% url %}</tt> tag</li>
+<li>The <tt class="docutils literal">View on site</tt> link in the admin, which is based on <tt class="docutils literal">get_absolute_url</tt>,
+doesn't work with model-linked forms</li>
+<li>The <tt class="docutils literal">form_file</tt> view, which allows downloading of user uploaded files,
+allows downloading of any file through any instance of the app. For example, a the same file can be
+downloaded from <tt class="docutils literal">forms/file/33/</tt> and <tt class="docutils literal">someotherapp/3/forms/file/33/</tt>, where <tt class="docutils literal">forms/</tt> and
+<tt class="docutils literal"><span class="pre">someotherapp/&lt;object_id/forms/</span></tt> are instances of the forms app.</li>
+</ol>
+</li>
+<li>Django-pluggable-forms allows forms to optionally be linked to any model instance, while still keeping the option
+of non-model-linked forms. The way the <tt class="docutils literal">URLconf</tt> is designed specifies an optional argument (<tt class="docutils literal">object_id</tt>) to identify
+the linked model instance (For example, <tt class="docutils literal"><span class="pre">example.com/app1/[object_id]/forms/</span></tt>). The views are compatible with the fact
+that this parameter is optional (they default <tt class="docutils literal">object_id</tt> to <tt class="docutils literal">None</tt> if it's not passed). However, URL reversing via
+<tt class="docutils literal">reverse</tt> and <tt class="docutils literal">{% url %}</tt> doesn't take &quot;optional&quot; arguments, raising <tt class="docutils literal">NoReverseMatch</tt> if these arguments
+aren't passed. Model-linked forms aren't affected by this; but installing instances of the app that use non-model-linked
+forms isn't recommended so far due to this issue.</li>
+</ol>
+</div>
+</div>
+</body>
+</html>

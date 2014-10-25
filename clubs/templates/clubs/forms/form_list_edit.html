@@ -1,0 +1,97 @@
+{% extends 'clubs_base.html' %}{% load staticfiles %}{% load i18n %}{% load url from future %}
+{% block title %}{% trans "Forms" %}{% endblock %}
+{% block content %}
+
+<style>
+    .errorlist {color:#f00;}
+</style>
+<div class="row">
+<div class="panel panel-default panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+
+    <!-- panel head -->
+    <div class="panel-heading">
+        <div class="panel-title">
+            {% include 'clubs/forms/breadcrumb.html' %}
+        </div>
+
+        <div class="panel-options">
+            <a class="btn btn-default" href="{% url 'forms:create_form' object_id %}"><i class="entypo-plus"></i> {% trans "Add Form" %}</a>
+        </div>
+    </div>
+
+    <!-- panel body -->
+    <div class="panel-body">
+    <div class="row">
+    <hr>
+    <table class="table datatable">
+        <thead>
+            <th>{% trans "Title" %}</th>
+            <th>{% trans "Status" %}</th>
+            <th>{% trans "Published from" %}</th>
+            <th>{% trans "Expires on" %}</th>
+            <th>{% trans "Primary form?" %}</th>
+            <th>{% trans "Total entries" %}</th>
+            <th></th>
+        </thead>
+        <tbody>
+        {% for form in forms %}
+            <tr>
+                <td>
+                    <a href="{% url 'forms:form_detail' object_id form.get_url_attr %}">
+                    {{ form.title }}
+                    </a>
+                </td>
+                <td>{{ form.get_status_display }}</td>
+                <td data-order="{{ form.publish_date|date:'U' }}">{{ form.publish_date|date }}</td>
+                <td data-order="{{ form.expiry_date|date:'U' }}">{{ form.expiry_date|date }}</td>
+                <td>
+                    {% if form.is_primary %}
+                        <span class="badge badge-success">
+                            <i class="entypo-check"></i>
+                        </span>
+                    {% else %}
+                        <span class="badge badge-default">
+                            <i class="entypo-cancel"></i>
+                        </span>
+                    {% endif %}
+                </td>
+                <td>{{ form.total_entries }}</td>
+                <td>
+                    <a class="btn btn-xs btn-icon btn-gold" href="{% url 'forms:edit_form' object_id form.pk %}">
+                        <i class="entypo-pencil"></i>
+                        {% trans "Edit form" %}
+                    </a><br>
+                    <a class="btn btn-xs btn-icon btn-default" href="{% url 'forms:form_entries' object_id form.pk %}">
+                        <i class="entypo-search"></i>
+                        {% trans "Filter entries" %}
+                    </a><br>
+                    <a class="btn btn-xs btn-icon btn-default" href="{% url 'forms:form_entries_show' object_id form.pk %}">
+                        <i class="entypo-list"></i>
+                        {% trans "View all entries" %}
+                    </a><br>
+                    <a class="btn btn-xs btn-icon btn-default" href="{% url 'forms:form_entries_export' object_id form.pk %}">
+                        <i class="entypo-download"></i>
+                        {% trans "Export all entries" %}
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+{% block customscript %}
+    <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+    <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript">
+    $('.datatable').dataTable({
+        "order": [[ 0, "asc" ]],
+        "language": {
+            "url": "{% static 'js/dataTables-arabic.json' %}"
+        }
+    });
+    </script>
+{% endblock %}

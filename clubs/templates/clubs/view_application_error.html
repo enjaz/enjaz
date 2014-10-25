@@ -1,0 +1,33 @@
+{% extends "clubs_base.html" %}{% load staticfiles %}
+{% block title %}مشاهدة طلبات الانضمام إلى {{ club.name }}{% endblock %}
+
+{% block content %}
+
+<div class="page-error-404">
+
+
+	<div class="error-symbol">
+		<i class="entypo-docs"></i>
+	</div>
+
+	<div class="error-text">
+		<h2></h2>
+		<p>لم يتم تحديد نموذج التسجيل.</p>
+	</div>
+
+	<hr />
+
+	<div class="error-text">
+
+        <p>
+                        يرجى تحديد أو إنشاء نموذج رئيسي في
+            <a href="{% url 'forms:form_list' club.id %}">
+                <i class="entypo-export"></i>
+                        صفحة النماذج.
+            </a>
+        </p>
+
+	</div>
+
+</div>
+{% endblock %}

@@ -1,4 +1,5 @@
 """Utility functions related to the clubs app."""
+from clubs.models import Club
 from .models import Club
 
 # TODO: all() is memory expensive, more specific calls should
@@ -81,3 +82,10 @@ def is_coordinator_or_deputy_of_any_club(user):
     """Return whether the user is a coordinator of any club."""
     coordination_and_deputyships = get_user_coordination_and_deputyships(user).all()
     return bool(coordination_and_deputyships)
+
+def forms_editor_check(user, object):
+    """A function to evaluate if user is eligible to create/edit forms for clubs."""
+    # Confirm that the passed object is a ``Club`` instance
+    if not isinstance(object, Club):
+        raise TypeError("Expected a Club object, received %s" % type(object))
+    return is_coordinator(object, user) or user.is_superuser

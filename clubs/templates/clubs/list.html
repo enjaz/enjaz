@@ -16,7 +16,7 @@
         <td><a href="{% url 'clubs:show' club.id %}">{{ club.name }}</a></td>
         <td>{% if club.members.all|length %}{{ club.members.all|length }}{% else %}لا يوجد{% endif %}</td>
         <td>{% if club.coordinator %} {{ club.coordinator.student_profile.get_ar_full_name|default:club.coordinator.username }} {% else %} لا يوجد {% endif %}</td>
-        <td>{% if club.open_membership %} <a href="{% url 'clubs:join' club.id %}">مفتوح</a> {% else %} مغلق {% endif %}</td>
+        <td>{% if club.registration_is_open %} <a href="{% url 'clubs:join' club.id %}">مفتوح</a> {% else %} مغلق {% endif %}</td>
     </tr>
     {% endfor %}
   </tbody>

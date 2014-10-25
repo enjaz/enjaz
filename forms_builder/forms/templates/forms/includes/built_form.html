@@ -1,0 +1,13 @@
+    <h1>{{ form.title }}</h1>
+    {% if form.intro %}
+    <p>{{ form.intro|linebreaksbr }}</p>
+    {% endif %}
+    {{ form_for_form.media }}
+    <form method="post"
+        {% if form_for_form.is_multipart %}enctype="multipart/form-data"{% endif %}>
+        {% csrf_token %}
+        {% load bootstrap3 %}
+        {% bootstrap_form form_for_form %}
+        <div style="clear:left;">&nbsp;</div>
+        <button type="submit" class="btn btn-primary btn-block">{{ form.button_text }}</button>
+    </form>

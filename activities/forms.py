@@ -29,8 +29,7 @@ class ActivityForm(ModelForm):
                   'name', 'category', 'description', 'public_description',
                   'organizers', 'participants',
                   'secondary_clubs', 'inside_collaborators',
-                  'outside_collaborators', 'requirements',
-                  'collect_participants', 'participant_colleges']
+                  'outside_collaborators', 'requirements',]
 
     def __init__(self, *args, **kwargs):
         """

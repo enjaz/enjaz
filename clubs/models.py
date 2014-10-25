@@ -1,6 +1,8 @@
 # -*- coding: utf-8  -*-
+from django.contrib.contenttypes.generic import GenericRelation
 from django.db import models
 from django.contrib.auth.models import User
+from forms_builder.forms.models import Form
 
 section_choices = (
     ('NG', u'الحرس الوطني'),
@@ -67,8 +69,6 @@ class Club(models.Model):
                                  on_delete=models.SET_NULL,
                                  default=None,
                                  verbose_name=u"الكلية",)
-    open_membership = models.BooleanField(default=False,
-                                               verbose_name=u"اسمح بالتسجيل؟")
     creation_date = models.DateTimeField(u'تاريخ الإنشاء',
                                          auto_now_add=True)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
@@ -76,6 +76,30 @@ class Club(models.Model):
                                   verbose_name=u"نادي مميز؟") # To allow more flexible exceptions with
                                                          # presidency, media club and arshidny
     city = models.CharField(max_length=1, choices=city_choices, verbose_name=u"المدينة")
+    forms = GenericRelation(Form)
+
+    def registration_is_open(self):
+        """
+        Return ``True`` if there is 1 published form marked as primary. Return ``False`` if there isn't or,
+        by any chance, there is more than one
+        """
+        return self.forms.published().filter(is_primary=True).count() == 1
+
+    def has_registration_form(self):
+        """
+        A memory-efficient method to check for the presence of 1 (an only 1) primary form for a club.
+        """
+        return self.forms.filter(is_primary=True).count() == 1
+
+    def get_registration_form(self):
+        """
+        If registration is open, return the registration form; otherwise return ``None``.
+        """
+        if self.has_registration_form():
+            return self.forms.get(is_primary=True)
+        else:
+            return None
+
     def get_due_report_count(self):
         "Get the number of due follow-up reports."
         # The following import is not very neat, but importing it at the beginning of
@@ -116,22 +140,6 @@ class Club(models.Model):
 
     def __unicode__(self):
         return self.name
-
-class MembershipApplication(models.Model):
-    club = models.ForeignKey(Club, related_name='club')
-    user = models.ForeignKey(User, related_name='user')
-    note = models.TextField(verbose_name=u"لماذا تريد الانضمام؟",
-           help_text=u"هل لديك مهارات مخصوصة؟ هل لديك أفكار لنشاطات؟")
-    submission_date = models.DateTimeField(u'تاريخ الإرسال',
-                                           auto_now_add=True)
-
-    class Meta:
-        permissions = (
-            ("view_application", "Can view all available applications."),
-        )
-
-    def __unicode__(self):
-        return "%s" % (self.user)
 
 class College(models.Model):
     section = models.CharField(max_length=2, choices=section_choices, verbose_name=u"القسم")

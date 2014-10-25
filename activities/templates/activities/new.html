@@ -53,25 +53,6 @@
 <script>
 $(document).ready(function () {
 
-// Hide the list of colleges if the participation checkbox is not
-// chosen.
-{% if not activity.collect_participants %}
-$("#id_participant_colleges").siblings().hide();
-$("#id_participant_colleges").hide();
-{% endif %}{% comment %}
-// FIXME: the collect_participants checkbox is not 'readonly', it can be modified.
-{% endcomment %}
-// Check if it's readonly, if not, hide list when unchecked.
-$('#id_collect_participants').click(function() {
-    if( $(this).is(':checked') && !($(this).is('[readonly]'))) {
-        $("#id_participant_colleges").siblings().show("slow");
-        $("#id_participant_colleges").show("slow");
-    } else if  (!($(this).is(':checked')) && !($(this).is('[readonly]'))) {
-        $("#id_participant_colleges").siblings().hide("slow");
-        $("#id_participant_colleges").hide("slow");
-    }
-});
-
 // Move the episode panel to the 6th position in the form
 // (after the description field)
 $('#episode_panel').insertAfter('form .form-group:nth-child(6)');

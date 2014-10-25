@@ -44,7 +44,6 @@ def create_groups(sender, **kwargs):
     # The 'view_activity' permission indicates that thie user can view
     # activities regardless of whether or not they have been approved.
     view_activity = Permission.objects.get(codename='view_activity')
-    view_participation = Permission.objects.get(codename='view_participation')
     add_club = Permission.objects.get(codename='add_club')
     change_club = Permission.objects.get(codename='change_club')
     # change_book = Permission.objects.get(codename='change_book')
@@ -54,7 +53,7 @@ def create_groups(sender, **kwargs):
     presidency_group.permissions.add(add_activity,
                                      directly_add_activity,
                                      change_activity, view_activity,
-                                     view_participation, add_club,
+                                     add_club,
                                      change_club, #change_book,
                                      view_presidency_review,
                                      view_deanship_review,

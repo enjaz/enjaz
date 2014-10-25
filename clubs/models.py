@@ -63,8 +63,6 @@ class Club(models.Model):
                                  on_delete=models.SET_NULL,
                                  default=None,
                                  verbose_name=u"الكلية",)
-    open_membership = models.BooleanField(default=False,
-                                               verbose_name=u"اسمح بالتسجيل؟")
     creation_date = models.DateTimeField(u'تاريخ الإنشاء',
                                          auto_now_add=True)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
@@ -136,23 +134,6 @@ class Club(models.Model):
 
     def __unicode__(self):
         return self.name
-
-# TODO: remove as no longer needed
-class MembershipApplication(models.Model):
-    club = models.ForeignKey(Club, related_name='club')
-    user = models.ForeignKey(User, related_name='user')
-    note = models.TextField(verbose_name=u"لماذا تريد الانضمام؟",
-           help_text=u"هل لديك مهارات مخصوصة؟ هل لديك أفكار لنشاطات؟")
-    submission_date = models.DateTimeField(u'تاريخ الإرسال',
-                                           auto_now_add=True)
-
-    class Meta:
-        permissions = (
-            ("view_application", "Can view all available applications."),
-        )
-
-    def __unicode__(self):
-        return "%s" % (self.user)
 
 class College(models.Model):
     section = models.CharField(max_length=2, choices=section_choices, verbose_name=u"القسم")

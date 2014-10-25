@@ -11,11 +11,6 @@ from media.utils import REPORT_DUE_AFTER
 
 
 class Activity(models.Model):
-    # For now, we will follow the current practice: only one club will
-    # be considered the primary orginzier.  Others will be cosidered
-    # secondary.
-    #clubs = models.ManyToManyField('clubs.Club',
-    #                               verbose_name=u"الأندية")
     primary_club = models.ForeignKey('clubs.Club', null=True,
                                      on_delete=models.SET_NULL,
                                      related_name='primary_activity',
@@ -36,11 +31,6 @@ class Activity(models.Model):
                                            auto_now_add=True)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
     is_editable = models.BooleanField(default=True, verbose_name=u"هل يمكن تعديله؟")
-    collect_participants = models.BooleanField(default=False,
-                                               verbose_name=u"افتح التسجيل؟")
-    participant_colleges = models.ManyToManyField(College,
-                                                  verbose_name=u"الكليات المستهدفة",
-                                                  null=True, blank=True)
     inside_collaborators = models.TextField(blank=True,
                                             verbose_name=u"المتعاونون من داخل الجامعة")
     outside_collaborators = models.TextField(blank=True,
@@ -260,21 +250,6 @@ class Review(models.Model):
 
     def __unicode__(self):
         return str(self.id)
-
-
-class Participation(models.Model):
-    activity = models.ForeignKey(Activity, verbose_name=u"النشاط")
-    user = models.ForeignKey(User, null=True,
-                             on_delete=models.SET_NULL)
-    submission_date = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        permissions = (
-            ("view_participation", "Can view all available participations."),
-        )
-        # For the admin interface.
-        verbose_name = u"مشاركة"
-        verbose_name_plural = u"المشاركات"
 
 class Episode(models.Model):
     """

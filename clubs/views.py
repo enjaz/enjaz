@@ -194,27 +194,6 @@ def approve_application(request, club_id):
                                         args=(club.id, club.get_registration_form().id),
                                         current_app=FORMS_CURRENT_APP))
 
-
-# TODO: remove as no longer needed + remove url
-# @login_required
-@csrf.csrf_exempt
-@decorators.ajax_only
-@decorators.post_only
-def ignore_application(request, club_id):
-    """
-    Basically delete the application.
-    """
-    application = get_object_or_404("", pk=request.POST['application_pk'])
-    # --- Permission Checks ---
-    # The user should be the application's club coordinator
-    if not is_coordinator(application.club, request.user) and \
-       not request.user.has_perm('clubs.view_application'):
-        raise Exception(u"ليس لديك الصلاحيات الكافية للقيام بذلك.")
-
-    application.delete()
-
-    # return {}
-
 @login_required
 def view_members(request, club_id):
     """
@@ -225,28 +204,3 @@ def view_members(request, club_id):
        not request.user.has_perm('clubs.view_members'):
         raise PermissionDenied
     return render(request, 'clubs/members.html', {'club': club})
-
-# TODO: remove as no longer needed + remove url
-# TODO: remove this view and the associated url since its function is now done by datatables
-@login_required
-def download_application(request, club_id):
-    club = get_object_or_404(Club, pk=club_id)
-    if not club in request.user.coordination.all() and \
-       not request.user.has_perm('clubs.view_application'):
-        raise PermissionDenied
-
-    applications = "".objects.filter(club=club)
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="Applications for Club %s.csv"' % club_id
-
-    writer = unicodecsv.writer(response, encoding='utf-8')
-    writer.writerow([u"الاسم", u"البريد", u"ملاحظة"])
-    for application in applications:
-        if application.user.first_name:
-            name = u"%s %s" % (application.user.first_name, application.user.last_name)
-        else:
-            name = application.user.username
-        email = application.user.email
-        note = application.note
-        writer.writerow([name, email, note])
-    return response

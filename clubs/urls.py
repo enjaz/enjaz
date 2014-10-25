@@ -16,8 +16,6 @@ urlpatterns = patterns('',
     url(r'^(?P<club_id>\d+)/members/$', views.view_members, name='view_members'),
     url(r'^(?P<club_id>\d+)/applications/$', views.view_application, name='view_application'),
     url(r'^(?P<club_id>\d+)/applications/approve/$', views.approve_application, name='approve_application'),
-    url(r'^(?P<club_id>\d+)/applications/ignore/$', views.ignore_application, name='ignore_application'),
-    url(r'^(?P<club_id>\d+)/applications/download$', views.download_application, name='download_application'),
 )
 
 # Club Forms URLS

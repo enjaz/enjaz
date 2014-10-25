@@ -142,28 +142,6 @@ class ShowActivityViewTests(TestCase):
         self.assertNotContains(response, u'مراجعة رئاسة نادي الطلاب')
         self.assertNotContains(response, u'مراجعة عمادة شؤون الطلاب')
 
-    def test_show_view_with_a_normal_user_and_collect_participants(self):
-        """
-        Test whether the user can see participate button.
-        """
-        # Setup the database
-        normal_user = create_user('normal_user')
-        club = create_club()
-        activity = create_activity(submitter=normal_user,
-                                   collect_participants=True)
-        add_presidency_review(activity, True)
-        add_deanship_review(activity, True)
-
-        # Login
-        logged_in = self.client.login(username=normal_user.username, password='12345678')
-        self.assertEqual(logged_in, True)
-
-        response = self.client.get(reverse('activities:show',
-                                   args=(activity.pk, )))
-        self.assertContains(response, 'href="' + reverse('activities:participate',
-                                                         args=(activity.pk, )) + '"'
-                            )
-
     def test_show_view_with_a_privileged_user(self):
         privileged_user = create_user('user2')
 

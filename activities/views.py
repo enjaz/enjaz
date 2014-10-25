@@ -8,7 +8,7 @@ from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
 from post_office import mail
 
-from activities.models import Activity, Review, Participation, Episode
+from activities.models import Activity, Review, Episode
 from activities.forms import ActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm
 from accounts.models import get_gender
 from activities.utils import get_pending_activities, get_approved_activities, get_rejected_activities, has_submitted_any_activity

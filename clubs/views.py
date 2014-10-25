@@ -12,8 +12,8 @@ from activities.utils import get_approved_activities
 from clubs.utils import is_coordinator, is_coordinator_or_member, is_member
 
 from core import decorators
-from clubs.forms import MembershipForm, DisabledClubForm, ClubForm
-from clubs.models import Club, MembershipApplication
+from clubs.forms import DisabledClubForm, ClubForm
+from clubs.models import Club
 from forms_builder.forms.models import FormEntry
 
 FORMS_CURRENT_APP = "club_forms"
@@ -204,7 +204,7 @@ def ignore_application(request, club_id):
     """
     Basically delete the application.
     """
-    application = get_object_or_404(MembershipApplication, pk=request.POST['application_pk'])
+    application = get_object_or_404("", pk=request.POST['application_pk'])
     # --- Permission Checks ---
     # The user should be the application's club coordinator
     if not is_coordinator(application.club, request.user) and \
@@ -235,7 +235,7 @@ def download_application(request, club_id):
        not request.user.has_perm('clubs.view_application'):
         raise PermissionDenied
 
-    applications = MembershipApplication.objects.filter(club=club)
+    applications = "".objects.filter(club=club)
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="Applications for Club %s.csv"' % club_id
 

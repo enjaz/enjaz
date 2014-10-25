@@ -2,7 +2,7 @@
 Utility functions for the activities app.
 """
 from activities.models import Activity
-from clubs.utils import is_coordinator
+from clubs.utils import is_coordinator_or_deputy
 
 
 def get_approved_activities():
@@ -71,4 +71,4 @@ def forms_editor_check(user, object):
     # Confirm that the passed object is an ``Activity`` instance
     if not isinstance(object, Activity):
         raise TypeError("Expected an Activity object, received %s" % type(object))
-    return is_coordinator(object.primary_club, user) or user.is_superuser
+    return is_coordinator_or_deputy(object.primary_club, user) or user.is_superuser

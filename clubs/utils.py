@@ -88,4 +88,4 @@ def forms_editor_check(user, object):
     # Confirm that the passed object is a ``Club`` instance
     if not isinstance(object, Club):
         raise TypeError("Expected a Club object, received %s" % type(object))
-    return is_coordinator(object, user) or user.is_superuser
+    return is_coordinator_or_deputy(object, user) or user.is_superuser

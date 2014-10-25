@@ -36,7 +36,7 @@ msgstr "احذف النموذج"
 
 #: templates/forms/form_delete.html:17
 msgid "Are you sure you want to <strong>delete</strong> the form"
-msgstr "هل أنت متأكد من أنك تريد <strong>حذف</strong> النموذج؟"
+msgstr "هل أنت متأكد من أنك تريد <strong>حذف</strong> النموذج"
 
 #: templates/forms/form_delete.html:17
 msgid "?"

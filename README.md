@@ -58,16 +58,16 @@ from accounts.admin import deanship_admin
 from arshidni.admin import arshidni_admin
 from accounts.forms import StudentSignupForm, NonStudentSignupForm, ModifiedAuthenticationForm
 from core.views import visit_announcement
-from activities.urls import activity_form_urls
-from clubs.urls import club_form_urls
+from activities.urls import activity_forms_urls
+from clubs.urls import club_forms_urls
 # [...]
     url(r'^$', 'core.views.portal_home', name='home'),
     url(r'^visit/(?P<pk>\d+)/$', visit_announcement, name='visit_announcement'),
     url(r'^about/$', TemplateView.as_view(template_name='about.html'), name='about'),
     url(r'^aboutsc/$', TemplateView.as_view(template_name='about_sc.html'), name='about_sc'),
-    activity_form_urls,
+    activity_forms_urls,
     url(r'^activities/', include('activities.urls', namespace="activities")),
-    club_form_urls,
+    club_forms_urls,
     url(r'^clubs/', include('clubs.urls', namespace="clubs")),
     url(r'^books/', include('books.urls', namespace="books")),
     url(r'^niqati/', include('niqati.urls', namespace="niqati")),

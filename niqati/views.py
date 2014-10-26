@@ -347,5 +347,5 @@ def approve_codes(request):
 @permission_required('niqati.view_general_report', raise_exception=True)
 def general_report(request):
     users = Niqati_User.objects.all()
-
+    users = sorted(users, key=lambda user: -user.total_points())  # sort users according to their points
     return render(request, 'niqati/general_report.html', {'users': users})

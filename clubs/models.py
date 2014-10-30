@@ -46,10 +46,16 @@ class Club(models.Model):
                                     on_delete=models.SET_NULL,
                                     # To exclude AnonymousUser
                                     limit_choices_to={'pk__gt': -1})
+    deputies = models.ManyToManyField(User, null=True,
+                                     verbose_name=u"النواب",
+                                     blank=True,
+                                     related_name="deputyships",
+                                     limit_choices_to={'student_profile__isnull': False})
     members = models.ManyToManyField(User, null=True,
                                      verbose_name=u"الأعضاء",
                                      blank=True,
-                                     related_name="memberships")
+                                     related_name="memberships",
+                                     limit_choices_to={'student_profile__isnull': False})
     employee = models.ForeignKey(User, null=True, blank=True,
                                  related_name="employee",
                                  on_delete=models.SET_NULL,

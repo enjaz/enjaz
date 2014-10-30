@@ -1,0 +1,66 @@
+{% extends "clubs_base.html" %}{% load staticfiles %}
+{% block title %}نواب {{ club.name }}{% endblock %}
+
+{% block content %}
+<h2>نواب <a href="{% url 'clubs:show' club.pk %}">{{ club.name }}</a></h2>
+
+<table id="members_table" class="display">
+	<thead>
+		<th>الاسم</th>
+		<th>الحالة</th>
+		<th>الخيارات</th>
+	</thead>
+	<tbody>
+	{% for member in club.members.all %}
+	<tr>
+		<td>{% if member.student_profile %}{{ member.student_profile.get_ar_full_name }} (<span class="english-field">{{ member.username }}</span>){% else %}{{ member.username }}{% endif %}</td>
+		<td>{% if member in club.deputies.all %}نائب{% else %}عضو{% endif %}</td>
+		<td>
+			{% if member in club.deputies.all %}
+			<button class="btn btn-danger btn-xs btn-deputy" data-username="{{ member.username }}" data-action="unset">ألغِ النيابة</button>
+			{% else %}
+			<button class="btn btn-success btn-xs btn-deputy" data-username="{{ member.username }}" data-action="set">عيّن نائبا</button>
+			{% endif %}
+		</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block customscript %}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+	<script src="{% static 'js/dataTables.tableTools.min.js' %}"></script>
+<script>
+$(function () {
+    $('.btn-deputy').click(function(){
+        var btn = this;
+        var data = {'username': $(this).data('username'), 'action': $(this).data('action')};
+        $.ajax({
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            url: '{% url 'clubs:control_deputies' club.pk %}',
+            cache: false,
+            success: function(data){
+                if (data['success'] == true){
+                    $(btn).html('تم!');
+                    $(btn).attr('disabled','disabled');
+                } else {
+                    alert(data['message']);
+                }
+            }
+        });
+    });
+
+
+	// Initialize the datatable
+	$('#members_table').DataTable({
+		"language": {
+			"url": "{% static 'js/dataTables-arabic.json' %}"
+		},
+	});
+});
+</script>
+{% endblock %}

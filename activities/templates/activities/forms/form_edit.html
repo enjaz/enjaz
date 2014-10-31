@@ -56,13 +56,6 @@
             popoverText += "يمكن كذلك تحديد موعد تلقائي لنشر النموذج و إغلاقه عن طريق اختيار تاريخ و وقت مخصص لذلك. (يشترط ذلك أن يتم اختيار 'منشور' في حالة النموذج)."
             $("#status-help-popover").attr("data-content", popoverText);
 
-            var helpButton = '<a id="btn-txt-help-popover" tabindex="0" data-toggle="popover" data-trigger="click" data-placement="left" title="مساعدة"';
-            helpButton += ' data-html="true"><i class="entypo-help-circled"></i></a>'
-            $("#id_button_text").parent().find("label").append(helpButton);
-            var popoverText = "خصص زر إرسال النموذج، مثلاً:"
-            popoverText += '<br>"سجّل"، "شارك"، "أرسل"، ...';
-            $("#btn-txt-help-popover").attr("data-content", popoverText);
-
             var helpButton = '<a id="response-help-popover" tabindex="0" data-toggle="popover" data-trigger="click" data-placement="left" title="مساعدة"';
             helpButton += ' data-html="true"><i class="entypo-help-circled"></i></a>'
             $("#id_response").parent().find("label").append(helpButton);
@@ -103,13 +96,9 @@
             popoverText += "<div class='col-xs-4'><div class='radio'><label><input type='radio' name='color' value='green'>أخضر</label></div></div>";
             popoverText += "<div class='col-xs-4'><div class='radio'><label><input type='radio' name='color' value='blue'>أزرق</label></div></div>";
             popoverText += "</div>اعتمادًا على نوع السؤال.</td></tr>";
-            popoverText += "<tr><th>النص الافتراضي</th>";
-            popoverText += "<td>نص شفاف يظهر في الفراغ للأسئلة النصية. (Placeholder)<br>إذا لم يتم اختيار نص افتراضي، يتم وضع نص السؤال مكانه تلقائيًا.</td>";
-            popoverText += "<td><input class='form-control' placeholder='نص افتراضي'></td>";
-            popoverText += "</tr>";
             popoverText += "</tbody></table></div>";
-            popoverText += "<div style='text-align: center;' class='alert alert-warning'>يرجى عدم إضافة حقول ";
-            popoverText += "للسؤال عن بيانات المستخدم (الاسم، الرقم الجامعي، ...)، حيث سيتم حفظها و توفيرها تلقائيًا.</div>";
+            popoverText += "<div style='text-align: center;' class='alert alert-warning'>سيتم حفظ و توفير بيانات المستخدم (الاسم، الرقم الجامعي، البريد الإلكتروني، ...) ";
+            popoverText += "تلقائيًا، لذلك ليس هناك داعٍ لإضافة حقول للسؤال عن هذه البيانات.</div>";
             $("#field-help-popover").attr("data-content", popoverText);
         </script>
         <br>

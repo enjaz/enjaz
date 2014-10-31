@@ -67,7 +67,14 @@
 <div class="row">
 <div class="panel panel-default panel-shadow" data-collapsed="0">
     <div class="panel-heading">
-        <div class="panel-title">{% include "clubs/forms/breadcrumb.html" %}</div>
+        <div class="panel-title">{% trans "Entries" %}
+            <a id="entries-help-popover" tabindex="0" data-toggle="popover" data-trigger="click" data-placement="left" title="مساعدة"
+           data-html="true"><i class="entypo-help-circled"></i></a>
+        </div>
+        <script>
+            var popoverText = 'اختر الحقول التي تريد عرضها (اشمل) و معايير البحث في الحقول (رشح حسب) ثم اضغط "اعرض المدخلات" أو "احفظ"'
+            $("#entries-help-popover").attr("data-content", popoverText);
+        </script>
     </div>
 	<!-- panel body -->
 	<div class="panel-body">

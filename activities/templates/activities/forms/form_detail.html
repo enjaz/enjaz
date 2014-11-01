@@ -1,11 +1,14 @@
-{% extends 'activities/show.html' %}{% load staticfiles %}
+{% extends 'activities_base.html' %}{% load staticfiles %}
 {% load forms_builder_tags %}
 {% block title %}{{ form.title }}{% endblock %}
-{% block review_content %}
+{% block content %}
     <style>
         .errorlist {color:#f00;}
     </style>
     <div class="panel panel-default panel-shadow" data-collapsed="0">
+    <div class="panel-heading">
+        <div class="panel-title">{% include "activities/forms/breadcrumb.html" %}</div>
+    </div>
 	<!-- panel body -->
 	<div class="panel-body">
         <div class="col-md-12">

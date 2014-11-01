@@ -48,7 +48,8 @@ class FormDetail(TemplateView):
     def get_context_data(self, content_type=None, object_id=None, **kwargs):
         context = super(FormDetail, self).get_context_data(**kwargs)
         self.object = get_object_or_404(content_type.model_class(), id=object_id) if content_type is not None else None
-        published = Form.objects.published(for_user=self.request.user)
+        published = Form.objects.published(for_user=self.request.user, for_object=self.object,
+                                           editor_check=kwargs.get("edit_perm_check"))
         kw = {"slug": kwargs["slug"]} if wrapper_settings.USE_SLUGS else {"id": kwargs["form_id"]}
         context["form"] = get_object_or_404(published,
                                             content_type=content_type, object_id=object_id,
@@ -73,7 +74,8 @@ class FormDetail(TemplateView):
              form_detail_template="forms/form_detail.html",
              *args, **kwargs):
         self.object = get_object_or_404(content_type.model_class(), id=object_id) if content_type is not None else None
-        published = Form.objects.published(for_user=request.user)
+        published = Form.objects.published(for_user=request.user, for_object=self.object,
+                                           editor_check=kwargs.get("edit_perm_check"))
         kw = {"slug": kwargs["slug"]} if wrapper_settings.USE_SLUGS else {"id": kwargs["form_id"]}
         form = get_object_or_404(published,
                                  content_type=content_type, object_id=object_id,
@@ -157,7 +159,8 @@ def form_sent(request, content_type=None, object_id=None,
     Show the response message.
     """
     object = get_object_or_404(content_type.model_class(), id=object_id) if content_type is not None else None
-    published = Form.objects.published(for_user=request.user)
+    published = Form.objects.published(for_user=request.user, for_object=object,
+                                       editor_check=kwargs.get("edit_perm_check"))
     kw = {"slug": kwargs["slug"]} if wrapper_settings.USE_SLUGS else {"id": kwargs["form_id"]}
     context = {"form": get_object_or_404(published, content_type=content_type, object_id=object_id, **kw),
                "object_id": object_id}
@@ -189,7 +192,8 @@ def form_list(request, content_type=None, object_id=None,
         forms = Form.objects.filter(content_type=content_type, object_id=object_id)
         template = form_list_edit_template
     else:
-        forms = Form.objects.published(for_user=request.user).filter(content_type=content_type, object_id=object_id)
+        forms = Form.objects.published(for_user=request.user, for_object=object,
+                                       editor_check=list_perm_check).filter(content_type=content_type, object_id=object_id)
         template = form_list_template
     context = {"forms": forms.annotate(total_entries=Count("entries")), "object_id": object_id}
     context[kwargs.pop("object_context_name", "object")] = object

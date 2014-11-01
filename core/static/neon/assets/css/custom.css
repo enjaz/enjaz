@@ -420,3 +420,9 @@ ul.navbar-left li a {
 body.login-page .login-content .alert-warning a {
 	color: #000;
 }
+
+/*RTL fixes*/
+.popover-content{
+	text-align: right;
+}
+

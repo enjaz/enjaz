@@ -93,13 +93,13 @@
 					<li>
 						<a href="#">
 							<i class="entypo-info-circled"></i>
-							{{ activity.description }}
+							{{ activity.description|linebreaksbr }}
 						</a>
 					</li>{% endif %}
 					<li>
 						<a href="#">
 							<i class="entypo-info-circled"></i>
-							{{ activity.public_description }}
+							{{ activity.public_description|linebreaksbr }}
 						</a>
 					</li>
 					{% for episode in activity.episode_set.all %}

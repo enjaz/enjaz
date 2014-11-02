@@ -22,13 +22,13 @@
 		<tbody>
 			<tr>
 				<th>اسم النشاط</th>
-				<td>{{ activity.name }}</td>
+				<td>{{ activity.name|linebreaksbr }}</td>
 				<td>{{ review.name_notes }}</td>
 			</tr>
 			
 			<tr>
 				<th>وصف النشاط</th>
-				<td>{{ activity.description }}</td>
+				<td>{{ activity.description|linebreaksbr }}</td>
 				<td>{{ review.description_notes }}</td>
 			</tr>
 			
@@ -93,7 +93,7 @@
 				<th>الجهات المشاركة من داخل الجامعة</th>
 				<td>
 					{% if activity.inside_collaborators %}
-						{{ activity.inside_collaborators }}
+						{{ activity.inside_collaborators|linebreaksbr }}
 					{% else %}
 						لا يوجد.
 					{% endif %}
@@ -104,7 +104,7 @@
 				<th>الجهات المشاركة من خارج الجامعة</th>
 				<td>
 					{% if activity.outside_collaborators %}
-						{{ activity.outside_collaborators }}
+						{{ activity.outside_collaborators|linebreaksbr }}
 					{% else %}
 						لا يوجد.
 					{% endif %}
@@ -125,7 +125,7 @@
                 <th>متطلبات النشاط</th>
                 <td>
                     {% if activity.requirements %}
-                        {{ activity.requirements }}
+                        {{ activity.requirements|linebreaksbr }}
                     {% else %}
                         لا يوجد.
                     {% endif %}

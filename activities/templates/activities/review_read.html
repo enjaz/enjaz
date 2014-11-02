@@ -35,7 +35,7 @@
 				<td>{{ activity.name }}</td>
 				<td>
 					{% if review.name_notes %}
-						{{ review.name_notes }}
+						{{ review.name_notes|linebreaksbr }}
 					{% else %}
 						لا يوجد.
 					{% endif %}
@@ -44,10 +44,10 @@
 			
 			<tr>
 				<th>وصف النشاط</th>
-				<td>{{ activity.description }}</td>
+				<td>{{ activity.description|linebreaksbr }}</td>
 				<td>
 					{% if review.description_notes %}
-						{{ review.description_notes }}
+						{{ review.description_notes|linebreaksbr }}
 					{% else %}
 						لا يوجد.
 					{% endif %}
@@ -63,7 +63,7 @@
 				</td>
 				<td rowspan="2">
 					{% if review.clubs_notes %}
-						{{ review.clubs_notes }}
+						{{ review.clubs_notes|linebreaksbr }}
 					{% else %}
 						لا يوجد.
 					{% endif %}
@@ -115,7 +115,7 @@
 				</td>
 				<td>
 					{% if review.datetime_notes %}
-						{{ review.datetime_notes }}
+						{{ review.datetime_notes|linebreaksbr }}
 					{% else %}
 						لا يوجد.
 					{% endif %}
@@ -125,14 +125,14 @@
 				<th>الجهات المشاركة من داخل الجامعة</th>
 				<td>
 					{% if activity.inside_collaborators %}
-						{{ activity.inside_collaborators }}
+						{{ activity.inside_collaborators|linebreaksbr }}
 					{% else %}
 						لا يوجد.
 					{% endif %}
 				</td>
 				<td>
 					{% if review.inside_notes %}
-						{{ review.inside_notes }}
+						{{ review.inside_notes|linebreaksbr }}
 					{% else %}
 						لا يوجد.
 					{% endif %}
@@ -142,14 +142,14 @@
 				<th>الجهات المشاركة من خارج الجامعة</th>
 				<td>
 					{% if activity.outside_collaborators %}
-						{{ activity.outside_collaborators }}
+						{{ activity.outside_collaborators|linebreaksbr }}
 					{% else %}
 						لا يوجد.
 					{% endif %}
 				</td>
 				<td>
 					{% if review.outside_notes %}
-						{{ review.outside_notes }}
+						{{ review.outside_notes|linebreaksbr }}
 					{% else %}
 						لا يوجد.
 					{% endif %}
@@ -160,7 +160,7 @@
 				<td>{{ activity.organizers }}</td>
 				<td>
 					{% if review.organizers_notes %}
-						{{ review.organizers_notes }}
+						{{ review.organizers_notes|linebreaksbr }}
 					{% else %}
 						لا يوجد.
 					{% endif %}
@@ -171,7 +171,7 @@
 				<td>{{ activity.participants }}</td>
 				<td>
 					{% if review.participants_notes %}
-						{{ review.participants_notes }}
+						{{ review.participants_notes|linebreaksbr }}
 					{% else %}
 						لا يوجد.
 					{% endif %}
@@ -181,14 +181,14 @@
                 <th>متطلبات النشاط</th>
                     <td>
                         {% if activity.requirements %}
-                            {{ activity.requirements }}
+                            {{ activity.requirements|linebreaksbr }}
                         {% else %}
                             لا يوجد.
                         {% endif %}
                     </td>
                     <td>
                         {% if review.requirement_notes %}
-                            {{ review.requirement_notes }}
+                            {{ review.requirement_notes|linebreaksbr }}
                         {% else %}
                             لا يوجد.
                         {% endif %}
@@ -199,7 +199,7 @@
 				<td>{{ activity.submission_date }}</td>
 				<td>
 					{% if review.submission_date_notes %}
-						{{ review.submission_date_notes }}
+						{{ review.submission_date_notes|linebreaksbr }}
 					{% else %}
 						لا يوجد.
 					{% endif %}

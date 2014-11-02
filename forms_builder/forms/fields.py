@@ -35,14 +35,14 @@ NAMES = (
     (URL, _("URL")),
     (CHECKBOX, _("Check box")),
     (CHECKBOX_MULTIPLE, _("Check boxes")),
-    (SELECT, _("Drop down")),
-    (SELECT_MULTIPLE, _("Multi select")),
+    # (SELECT, _("Drop down")),
+    # (SELECT_MULTIPLE, _("Multi select")),
     (RADIO_MULTIPLE, _("Radio buttons")),
     (FILE, _("File upload")),
     (DATE, _("Date")),
     (DATE_TIME, _("Date/time")),
-    (DOB, _("Date of birth")),
-    (HIDDEN, _("Hidden")),
+    # (DOB, _("Date of birth")),
+    # (HIDDEN, _("Hidden")),
 )
 
 # Field classes for all available field types.

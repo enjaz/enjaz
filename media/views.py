@@ -578,6 +578,19 @@ def add_comment(request, pk):
 # polls_home view is the only interface with which users interact (at least non-media-center members).
 # All the other views are AJAXy, except the ones with which editors interact.
 
+# The idea is as follows:
+# polls home returns only an empty page (probably only contains basic stuff) yet contains ajax code
+# The ajax code then communicates with polls_list (probably better via 3 urls eg /polls/active/,
+# /past/, /upcoming/ [all ajax]). These urls will return the html to show the lists (which is rendered in some
+# intermediate template)
+# As for past and upcoming (for privileged users) polls, the list shows collapsed polls; when triggered, they will
+# ajaxly communicate with show_poll to get the full title, text, choices of a form
+# another call to poll_comment will bring up the list of comments for that poll as well as the commenting form
+# As for the active form(s), ajax code will bring up the poll details, as well as the voting form (if any)
+# The ajax voting
+# code could be either loaded initially or via this ajax request
+# Successful submission -> ajax call to poll_results
+
 
 def polls_home(request, poll_type):
     pass
@@ -586,8 +599,9 @@ def polls_home(request, poll_type):
 @decorators.ajax_only
 def polls_list(request, poll_type):
     """
-    For media center coordinator, deputies, or members: show the full list of polls corresponding to the poll_type.
-    For normal users, show current and past polls corresponding to the poll_type.
+    For media center coordinator, deputies, or members: return the full list of polls corresponding to the poll_type.
+    For normal users, return current and past polls corresponding to the poll_type.
+    The list should be classified into previous, active, and upcoming.
     """
     pass
 

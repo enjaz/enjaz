@@ -1,8 +1,9 @@
 """
 Utility functions for the activities app.
 """
-from django.contrib.auth.models import User
 from activities.models import Activity
+from clubs.utils import is_coordinator_or_deputy
+
 
 def get_approved_activities():
     """
@@ -65,3 +66,9 @@ def get_club_notification_cc(activity):
         addresses.append(secondary_club.coordinator.email)
     return addresses
         
+def forms_editor_check(user, object):
+    """A function to evaluate if user is eligible to create/edit forms for activities."""
+    # Confirm that the passed object is an ``Activity`` instance
+    if not isinstance(object, Activity):
+        raise TypeError("Expected an Activity object, received %s" % type(object))
+    return is_coordinator_or_deputy(object.primary_club, user) or user.is_superuser

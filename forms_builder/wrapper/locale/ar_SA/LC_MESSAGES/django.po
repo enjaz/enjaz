@@ -1,0 +1,186 @@
+# Arabic translation for django-pluggable-forms wrapper.
+# Copyright (C) 2014 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# SAEED ARABI <msarabi95@gmail.com>, 2014.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-10-31 11:29+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: forms.py:23
+msgid "The form should contain at least 1 field"
+msgstr "يجب أن يحتوي النموذج على حقل واحد على الأقل"
+
+#: views.py:382
+#, python-format
+msgid "1 entry deleted"
+msgid_plural "%(count)s entries deleted"
+msgstr[0] "تم حذف مدخل واحد"
+msgstr[1] "تم حذف %(count)s مدخلات"
+
+#: views.py:385
+msgid "View Entries"
+msgstr "اعرض المدخلات"
+
+#: templates/forms/form_delete.html:5 templates/forms/form_delete.html:16
+#: templates/forms/form_edit.html:21
+msgid "Delete form"
+msgstr "احذف النموذج"
+
+#: templates/forms/form_delete.html:17
+msgid "Are you sure you want to <strong>delete</strong> the form"
+msgstr "هل أنت متأكد من أنك تريد <strong>حذف</strong> النموذج"
+
+#: templates/forms/form_delete.html:17
+msgid "?"
+msgstr "؟"
+
+#: templates/forms/form_delete.html:20
+msgid "Yes"
+msgstr "نعم"
+
+#: templates/forms/form_delete.html:21
+msgid "No"
+msgstr "لا"
+
+#: templates/forms/form_edit.html:5 templates/forms/form_edit.html.py:17
+msgid "Edit Form"
+msgstr "عدل النموذج"
+
+#: templates/forms/form_edit.html:5 templates/forms/form_edit.html.py:23
+msgid "Add Form"
+msgstr "أضف نموذجًا"
+
+#: templates/forms/form_edit.html:18
+msgid "View on site"
+msgstr "استعرض على الموقع"
+
+#: templates/forms/form_edit.html:19 templates/forms/form_entries.html:104
+msgid "View entries"
+msgstr "اعرض المدخلات"
+
+#: templates/forms/form_edit.html:57
+msgid "Submit"
+msgstr "أرسل"
+
+#: templates/forms/form_edit.html:69
+msgid "Add field"
+msgstr "أضف حقلاً"
+
+#: templates/forms/form_edit.html:70
+#, fuzzy
+msgid "Delete"
+msgstr "احذف"
+
+#: templates/forms/form_entries.html:60
+msgid "No entries selected"
+msgstr "لم يتم تحديد مدخلات"
+
+#: templates/forms/form_entries.html:63
+msgid "Delete selected entries?"
+msgstr "احذف المدخلات المحددة؟"
+
+#: templates/forms/form_entries.html:75
+msgid "Field"
+msgstr "حقل"
+
+#: templates/forms/form_entries.html:76
+msgid "Include"
+msgstr "اشمل"
+
+#: templates/forms/form_entries.html:77
+msgid "Filter by"
+msgstr "رشح حسب"
+
+#: templates/forms/form_entries.html:95
+msgid "All"
+msgstr "الجميع"
+
+#: templates/forms/form_entries.html:103 templates/forms/form_entries.html:144
+msgid "Back to form"
+msgstr "عد للنموذج"
+
+#: templates/forms/form_entries.html:105
+msgid "Export CSV"
+msgstr "صدر كملف CSV"
+
+#: templates/forms/form_entries.html:107
+msgid "Export XLS"
+msgstr "صدر كملف XLS"
+
+#: templates/forms/form_entries.html:111
+msgid "Entries"
+msgstr "المدخلات"
+
+#: templates/forms/form_entries.html:145
+msgid "Delete selected"
+msgstr "احذف المحدد"
+
+#: templates/forms/form_entries.html:149
+msgid "No entries to display"
+msgstr "ليست هناك مدخلات"
+
+#: templates/forms/form_list.html:4 templates/forms/form_list.html.py:13
+#: templates/forms/form_list_edit.html:5
+#: templates/forms/form_list_edit.html:16
+msgid "Forms"
+msgstr "النماذج"
+
+#: templates/forms/form_list.html:18
+msgid "No forms to display."
+msgstr "ليست هناك نماذج."
+
+#: templates/forms/form_list_edit.html:17
+msgid "+ Add Form"
+msgstr "+ أضف نموذجًا"
+
+#: templates/forms/form_list_edit.html:21
+msgid "Title"
+msgstr "العنوان"
+
+#: templates/forms/form_list_edit.html:22
+msgid "Status"
+msgstr "الحالة"
+
+#: templates/forms/form_list_edit.html:23
+msgid "Send copies to"
+msgstr "أرسل نسخًا إلى"
+
+#: templates/forms/form_list_edit.html:24
+msgid "Published from"
+msgstr "منشور ابتداء من"
+
+#: templates/forms/form_list_edit.html:25
+msgid "Expires on"
+msgstr "منشور حتى"
+
+#: templates/forms/form_list_edit.html:26
+msgid "Total entries"
+msgstr "مجموع المدخلات"
+
+#: templates/forms/form_list_edit.html:43
+msgid "Edit form"
+msgstr "عدل النموذج"
+
+#: templates/forms/form_list_edit.html:44
+msgid "Filter entries"
+msgstr "رشح المدخلات"
+
+#: templates/forms/form_list_edit.html:45
+msgid "View all entries"
+msgstr "اعرض جميع المدخلات"
+
+#: templates/forms/form_list_edit.html:46
+msgid "Export all entries"
+msgstr "صدر جميع المدخلات"

@@ -10,11 +10,14 @@ from django.views.decorators import csrf
 from post_office import mail
 import unicodecsv
 from activities.utils import get_approved_activities
-from clubs.utils import is_coordinator, is_coordinator_or_member, is_coordinator_or_deputy
 
+from clubs.utils import is_coordinator, is_coordinator_or_member, is_member, is_coordinator_or_deputy
 from core import decorators
-from clubs.forms import MembershipForm, DisabledClubForm, ClubForm
-from clubs.models import Club, MembershipApplication
+from clubs.forms import DisabledClubForm, ClubForm
+from clubs.models import Club
+from forms_builder.forms.models import FormEntry
+
+FORMS_CURRENT_APP = "club_forms"
 
 # TODO:
 #   * After applying  the data  table with  the new  membership action
@@ -65,15 +68,15 @@ def show(request, club_id):
     can_view_members = is_coordinator_or_deputy(club, request.user) or \
                        request.user.has_perm('clubs.view_members')
     can_view_deputies = is_coordinator(club, request.user) or \
-               request.user.has_perm('clubs.view_deputies')
+                        request.user.has_perm('clubs.view_deputies')
     can_view_applications = is_coordinator_or_deputy(club, request.user) or \
-                            request.user.has_perm('clubs.view_application')
+                            request.user.is_superuser
     context = {'club': club, 'can_edit': can_edit,
                'can_view_members': can_view_members,
                'can_view_applications': can_view_applications,
                'can_view_deputies': can_view_deputies,
                'activities': activities}
-    return render(request, 'clubs/show.html', context)
+    return render(request, 'clubs/show.html', context, current_app='club_forms')
 
 @login_required
 @permission_required('clubs.add_club', raise_exception=True)
@@ -126,102 +129,73 @@ def edit(request, club_id):
 def join(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
     context = {'club': club}
-    if not club.open_membership:
-        context = {'error_message': 'closed_membership'}
-        return render(request, 'clubs/join.html', context)
-
-    # Make sure that the user hasn't already applied!
-    existing_application = MembershipApplication.objects.filter(club=club,
-                                                       user=request.user)
-    if existing_application:
-        context['error_message'] = 'already_applied'
-        return render(request, 'clubs/join.html', context)
 
     # Make sure the user isn't already a member!
-    if club in request.user.memberships.all() or\
-       club in request.user.coordination.all():
+    # NOTE: This is only a superficial protection as the user can simply navigate to the form via the form list or URL
+    if is_coordinator_or_member(club, request.user):
         context['error_message'] = 'already_in'
-        return render(request, 'clubs/join.html', context)        
-
-    if request.method == 'POST':
-        application = MembershipApplication(club=club, user=request.user)
-        form = MembershipForm(request.POST, instance=application)
-        if form.is_valid():
-            form.save()
-            view_application_url = reverse('clubs:view_application', args=(club_id,))
-            full_url = request.build_absolute_uri(view_application_url)
-            email_context = {'club': club, 'user': request.user,
-                             'full_url': full_url}
-            mail.send([club.coordinator.email],
-                      template="club_membership_applied",
-                      context=email_context)
-            return HttpResponseRedirect(reverse('clubs:join_done',
-                                                args=(club_id,)))
-        else:
-            context['form'] = form
-            return render(request, 'clubs/join.html', context)
-    else:
-        form = MembershipForm()
-        context['form'] = form
         return render(request, 'clubs/join.html', context)
+
+    # If the club's registration is open, then redirect to the registration form
+    # Otherwise, return a message that registration is closed
+    if club.registration_is_open():
+        reg_form = club.get_registration_form()
+        return HttpResponseRedirect(reverse("forms:form_detail",
+                                            args=(club.id, reg_form.id),
+                                            current_app=FORMS_CURRENT_APP))
+    else:
+        context['error_message'] = 'closed_membership'
+        return render(request, 'clubs/join.html', context)
+
 
 @login_required
 def view_application(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
     if not is_coordinator_or_deputy(club, request.user) and \
-       not request.user.has_perm('clubs.view_application'):
+       not request.user.is_superuser:
         raise PermissionDenied
 
-    applications = MembershipApplication.objects.filter(club=club)
-    context = {'applications': applications, 'club': club}
-    return render(request, 'clubs/view_application.html', context)
+    if club.has_registration_form():
+        reg_form = club.get_registration_form()
+        return HttpResponseRedirect(reverse("forms:form_entries_show",
+                                            args=(club.id, reg_form.id),
+                                            current_app=FORMS_CURRENT_APP))
+    else:
+        return render(request, "clubs/view_application_error.html", {"club": club}, current_app=FORMS_CURRENT_APP)
 
 # @login_required
-@csrf.csrf_exempt
-@decorators.ajax_only
+# @csrf.csrf_exempt
+# @decorators.ajax_only
 @decorators.post_only
 def approve_application(request, club_id):
     """
     Add the application's applicant to the application's club.
     Then, delete the application.
     """
-    print request.user
-    application = get_object_or_404(MembershipApplication, pk=request.POST['application_pk'])
+    club = get_object_or_404(Club, pk=club_id)
     # --- Permission Checks ---
     # The user should be the application's club coordinator
-    if not is_coordinator(application.club, request.user) and \
-       not request.user.has_perm('clubs.view_application'):
+    if not is_coordinator(club, request.user) and \
+       not request.user.is_superuser:
         raise Exception(u"ليس لديك الصلاحيات الكافية للقيام بذلك.")
 
-    # Check that the application's applicant isn't a member of
-    # the application's club
-    if application.user in application.club.members.all():
-        # Now this shouldn't happen since the join view already prevents
-        # members from accessing the view
-        raise Exception(u"هذا المستخدم عضو في النادي أصلًا")
+    # Get the list of selected form entries (list of pk's)
+    selected = request.POST.getlist("selected")
+    if selected:
+        # if request.POST.get("approve"):
+        entries = FormEntry.objects.filter(id__in=selected)
 
-    # If all went OK, add the user to the club and delete the application
-    application.club.members.add(application.user)
-    application.delete()
+        for entry in entries:
+            user = entry.submitter
+            # Add user to club members, in they're not already in
+            if not is_member(club, user):
+                club.members.add(user)
 
-    # return {}
-
-# @login_required
-@csrf.csrf_exempt
-@decorators.ajax_only
-@decorators.post_only
-def ignore_application(request, club_id):
-    """
-    Basically delete the application.
-    """
-    application = get_object_or_404(MembershipApplication, pk=request.POST['application_pk'])
-    # --- Permission Checks ---
-    # The user should be the application's club coordinator
-    if not is_coordinator(application.club, request.user) and \
-       not request.user.has_perm('clubs.view_application'):
-        raise Exception(u"ليس لديك الصلاحيات الكافية للقيام بذلك.")
-
-    application.delete()
+        if request.POST.get("approve_and_delete"):
+            entries.delete()
+    return HttpResponseRedirect(reverse("forms:form_entries_show",
+                                        args=(club.id, club.get_registration_form().id),
+                                        current_app=FORMS_CURRENT_APP))
 
 @login_required
 @csrf.csrf_exempt
@@ -273,27 +247,3 @@ def view_deputies(request, club_id):
        not request.user.has_perm('clubs.view_deputies'):
         raise PermissionDenied
     return render(request, 'clubs/deputies.html', {'club': club})
-
-# TODO: remove this view and the associated url since its function is now done by datatables
-@login_required
-def download_application(request, club_id):
-    club = get_object_or_404(Club, pk=club_id)
-    if not club in request.user.coordination.all() and \
-       not request.user.has_perm('clubs.view_application'):
-        raise PermissionDenied
-
-    applications = MembershipApplication.objects.filter(club=club)
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="Applications for Club %s.csv"' % club_id
-
-    writer = unicodecsv.writer(response, encoding='utf-8')
-    writer.writerow([u"الاسم", u"البريد", u"ملاحظة"])
-    for application in applications:
-        if application.user.first_name:
-            name = u"%s %s" % (application.user.first_name, application.user.last_name)
-        else:
-            name = application.user.username
-        email = application.user.email
-        note = application.note
-        writer.writerow([name, email, note])
-    return response

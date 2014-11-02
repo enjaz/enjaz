@@ -7,10 +7,8 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
 from post_office import mail
-import unicodecsv
 
-
-from activities.models import Activity, Review, Participation, Episode
+from activities.models import Activity, Review, Episode
 from activities.forms import ActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm
 from accounts.models import get_gender
 from activities.utils import get_pending_activities, get_approved_activities, get_rejected_activities, \
@@ -22,6 +20,8 @@ from clubs.utils import get_presidency, is_coordinator_or_member, is_coordinator
     get_user_coordination_and_deputyships, has_coordination_to_activity
 from core.utilities import FVP_EMAIL, MVP_EMAIL, DHA_EMAIL
 from media.utils import MAX_OVERDUE_REPORTS
+
+FORMS_CURRENT_APP = "activity_forms"
 
 # A Note on Activity Permissions
 #
@@ -128,21 +128,9 @@ def show(request, activity_id):
         user_clubs = get_user_clubs(request.user)
         coordination_status = has_coordination_to_activity(request.user, activity)
 
-#        By definition, the coordinator should have all the below-mentioned
-#        permissions; all we need is use {{ perms }} from within the template
-#        [Saeed, 17 Jun 2014]
-
-#        {{ perms }} cannot figure out whether or not someone is a
-#        coordinator of this specific club.  In addition, Django
-#        templates are limited when dealing with combined and/or
-#        conditions. [Osama, 27 Jun 2014]
-
         if request.user.has_perm('activities.change_activity') or \
             coordination_status:
             context['can_edit'] = True
-        if request.user.has_perm('activities.view_participation') or \
-            coordination_status:
-            context['can_view_participation'] = True
         if request.user.has_perm('activities.view_deanship_review') or \
             coordination_status:
             context['can_view_deanship_review'] = True
@@ -155,6 +143,10 @@ def show(request, activity_id):
         if request.user.has_perm('niqati.view_order') or \
             coordination_status:
             context['can_view_niqati_orders'] = True
+        # Anyone can view forms; yet due to URL reversing issues it has to be restricted to this view only
+        # Otherwise, we'll end up having to specify the `current_app` attribute for every view that contains a link
+        # to the forms
+        context['can_view_forms'] = True
 
     else:
         user_clubs = Club.objects.none()
@@ -180,7 +172,7 @@ def show(request, activity_id):
         if not activity.is_approved():
             raise PermissionDenied
 
-    return render(request, 'activities/show.html', context)
+    return render(request, 'activities/show.html', context, current_app=FORMS_CURRENT_APP)
 
 @login_required
 def create(request):
@@ -497,9 +489,6 @@ def review(request, activity_id, lower_review_type=None):
     if request.user.has_perm('activities.change_activity') or \
         coordination_status:
         context['can_edit'] = True
-    if request.user.has_perm('activities.view_participation') or \
-        coordination_status:
-        context['can_view_participation'] = True
     if request.user.has_perm('activities.view_deanship_review') or \
         coordination_status:
         context['can_view_deanship_review'] = True
@@ -512,61 +501,15 @@ def review(request, activity_id, lower_review_type=None):
 @login_required
 def participate(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id)
-    colleges = activity.participant_colleges.all()
-    if colleges:
-        request.user
-    existing_participation = Participation.objects.filter(activity=activity,
-                                                       user=request.user)
-    context = {'activity': activity}
+    context = {"activity": activity}
 
-    if existing_participation:
-        context['error_message'] = 'already_applied'
-        return render(request, 'activities/participate.html', context)
-        
-    if request.method == 'POST':
-        if request.POST['status'] == '1':
-            Participation.objects.create(activity=activity,
-                                         user=request.user)
-            return HttpResponseRedirect(reverse('activities:participate_done',
-                                                args=(activity_id,)))
-        else:
-            context['error_message'] = 'unknown'
-            return render(request, 'activities/participate.html', context)
+    # If the activity's registration is open, then redirect to the registration form
+    # Otherwise, return a message that registration is closed
+    if activity.registration_is_open():
+        reg_form = activity.get_registration_form()
+        return HttpResponseRedirect(reverse("forms:form_detail",
+                                            args=(activity.id, reg_form.id),
+                                            current_app=FORMS_CURRENT_APP))
     else:
+        context['error_message'] = 'closed'
         return render(request, 'activities/participate.html', context)
-
-@login_required
-def view_participation(request, activity_id):
-    activity = get_object_or_404(Activity, pk=activity_id)
-    coordination_status = has_coordination_to_activity(request.user, activity)
-    if not coordination_status and \
-       not request.user.has_perm('activities.view_participation'):
-        raise PermissionDenied
-
-    participations = Participation.objects.filter(activity=activity)
-    context = {'participations': participations, 'activity': activity,
-               'active_tab': 'view_participation'}
-    return render(request, 'activities/view_participations.html', context)
-
-# TODO: remove this view and the associated url since its function is now done by datatables
-@login_required
-def download_participation(request, activity_id):
-    activity = get_object_or_404(Activity, pk=activity_id)
-    if not activity.primary_club in request.user.coordination.all() and \
-       not request.user.has_perm('activities.view_participation'):
-        raise PermissionDenied
-
-    participations = Participation.objects.filter(activity=activity)
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="Participants in Activity %s.csv"' % activity_id
-
-    writer = unicodecsv.writer(response, encoding='utf-8')
-    writer.writerow([u"الاسم", u"البريد"])
-    for participantion in participations:
-        if participantion.user.first_name:
-            name = u"%s %s" % (participantion.user.first_name, participantion.user.last_name)
-        else:
-            name = participantion.user.username
-        email = participantion.user.email
-        writer.writerow([name, email])
-    return response

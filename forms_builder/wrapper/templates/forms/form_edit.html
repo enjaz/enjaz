@@ -1,0 +1,73 @@
+<!DOCTYPE html>{% load i18n %}
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>{% if builder_form.instance.pk %}{% trans "Edit Form" %}{% else %}{% trans "Add Form" %}{% endif %}</title>
+    <style>
+        body {font-family:sans-serif; padding:1em 2em;}
+        p {width:50em; clear:both;}
+        label {display:block; float:left; width:8em; margin:0 1.2em 1.2em 0;}
+        li {list-style-type:none;}
+        li label {width:auto; cursor:pointer;}
+        .errorlist {color:#f00;}
+    </style>
+</head>
+<body>
+    {% if builder_form.instance.pk %}
+    <h1>{% trans "Edit Form" %}</h1>
+    <a href="{% url 'forms:form_detail' object_id builder_form.instance.get_url_attr %}">{% trans "View on site" %}</a>
+    <a href="{% url 'forms:form_entries' object_id builder_form.instance.pk %}">{% trans "View entries" %}</a>
+    <br>
+    <a style="color:#f00" href="{% url 'forms:delete_form' object_id builder_form.instance.pk %}">{% trans "Delete form" %}</a>
+    {% else %}
+    <h1>{% trans "Add Form" %}</h1>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ builder_form.as_p }}
+
+        {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
+        {{ formset.management_form }}
+        {{ formset.non_form_errors.as_ul }}
+        <table id="formset" class="form">
+        {% for form in formset.forms %}
+          {% if forloop.first %}
+          <thead><tr>
+            {% for field in form.visible_fields %}
+            <th>{{ field.label|capfirst }}</th>
+            {% endfor %}
+          </tr></thead>
+          {% endif %}
+          <tr class="form-container {% cycle row1,row2 %}">
+          {% for field in form.visible_fields %}
+            <td>
+            {# Include the hidden fields in the form #}
+            {% if forloop.first %}
+              {% for hidden in form.hidden_fields %}
+              {{ hidden }}
+              {% endfor %}
+            {% endif %}
+              {{ field.errors.as_ul }}
+              {{ field }}
+            </td>
+          {% endfor %}
+          </tr>
+        {% endfor %}
+        </table>
+        <button type="submit">{% trans "Submit" %}</button>
+    </form>
+</body>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.formset/1.2/jquery.formset.min.js"></script>
+<script type="text/javascript">
+    $(".form-container").formset({
+        prefix: '{{ formset.prefix }}',
+        added: function (row) {
+            // Set default values for `required` and `visible` fields
+            row.find("[type=checkbox]").prop("checked", true);
+        },
+        addText: '{% trans "Add field" %}',
+        deleteText: '{% trans "Delete" %}',
+    });
+</script>
+</html>

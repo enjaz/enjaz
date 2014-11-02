@@ -1,19 +1,16 @@
 # -*- coding: utf-8  -*-
+from django.contrib.contenttypes.generic import GenericRelation
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime, timedelta
 
 from clubs.models import College
+from forms_builder.forms.models import Form
 from media.utils import REPORT_DUE_AFTER
 
 
 class Activity(models.Model):
-    # For now, we will follow the current practice: only one club will
-    # be considered the primary orginzier.  Others will be cosidered
-    # secondary.
-    #clubs = models.ManyToManyField('clubs.Club',
-    #                               verbose_name=u"الأندية")
     primary_club = models.ForeignKey('clubs.Club', null=True,
                                      on_delete=models.SET_NULL,
                                      related_name='primary_activity',
@@ -34,11 +31,6 @@ class Activity(models.Model):
                                            auto_now_add=True)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
     is_editable = models.BooleanField(default=True, verbose_name=u"هل يمكن تعديله؟")
-    collect_participants = models.BooleanField(default=False,
-                                               verbose_name=u"افتح التسجيل؟")
-    participant_colleges = models.ManyToManyField(College,
-                                                  verbose_name=u"الكليات المستهدفة",
-                                                  null=True, blank=True)
     inside_collaborators = models.TextField(blank=True,
                                             verbose_name=u"المتعاونون من داخل الجامعة")
     outside_collaborators = models.TextField(blank=True,
@@ -52,6 +44,29 @@ class Activity(models.Model):
                                  limit_choices_to={'category__isnull': True})
     organizers = models.IntegerField(verbose_name=u"عدد المنظمين",
                                        help_text=u"عدد الطلاب الذين سينظمون النشاط")
+    forms = GenericRelation(Form)
+
+    def registration_is_open(self):
+        """
+        Return ``True`` if there is 1 published form marked as primary. Return ``False`` if there isn't or,
+        by any chance, there is more than one
+        """
+        return self.forms.published().filter(is_primary=True).count() == 1
+
+    def has_registration_form(self):
+        """
+        A memory-efficient method to check for the presence of 1 (an only 1) primary form for a club.
+        """
+        return self.forms.filter(is_primary=True).count() == 1
+
+    def get_registration_form(self):
+        """
+        If registration is open, return the registration form; otherwise return ``None``.
+        """
+        if self.has_registration_form():
+            return self.forms.get(is_primary=True)
+        else:
+            return None
 
     def is_approved_by_deanship(self):
         try:
@@ -235,21 +250,6 @@ class Review(models.Model):
 
     def __unicode__(self):
         return str(self.id)
-
-
-class Participation(models.Model):
-    activity = models.ForeignKey(Activity, verbose_name=u"النشاط")
-    user = models.ForeignKey(User, null=True,
-                             on_delete=models.SET_NULL)
-    submission_date = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        permissions = (
-            ("view_participation", "Can view all available participations."),
-        )
-        # For the admin interface.
-        verbose_name = u"مشاركة"
-        verbose_name_plural = u"المشاركات"
 
 class Episode(models.Model):
     """

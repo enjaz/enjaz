@@ -322,6 +322,9 @@ class Poll(models.Model):
 
     objects = PollManager()
 
+    def is_active(self):
+        return self.open_date <= timezone.now() < self.close_date
+
     def __unicode__(self):
         return self.title
 
@@ -357,7 +360,7 @@ class PollResponse(models.Model):
         unique_together = (('poll', 'user'), )  # No user can submit more that one response
 
 
-class PollComment(models.Model):
+class PollComment(models.Model):  # TODO: is commenting allowed on inactive forms?
     """
     A comment on a poll
     """

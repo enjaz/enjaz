@@ -40,18 +40,16 @@ def create_poll(poll_type,
                 close_date=(timezone.now() + datetime.timedelta(days=7)),
                 creator=create_user()):
 
-    if poll_type == HUNDRED_SAYS:
-        choices = POLL_CHOICE_SEPARATOR.join(choices)
-    elif poll_type == WHAT_IF:
-        choices = ""
-
-    return Poll.objects.create(poll_type=poll_type,
+    poll =  Poll.objects.create(poll_type=poll_type,
                                 title=title,
                                 text=text,
                                 choices=choices,
                                 open_date=open_date,
                                 close_date=close_date,
                                 creator=creator)
+    for choice in choices:
+        poll.choices.create(value=choice)
+    return poll
 
 
 def create_poll_response(poll=create_poll(HUNDRED_SAYS),

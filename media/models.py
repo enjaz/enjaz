@@ -314,7 +314,6 @@ class Poll(models.Model):
     poll_type = models.IntegerField(choices=POLL_TYPE_CHOICES, verbose_name=u"النوع")
     title = models.CharField(max_length=128, verbose_name=u"العنوان")
     text = models.TextField(verbose_name=u"النص")
-    choices = models.CharField(blank=True, max_length=POLL_CHOICE_MAX_LENGTH)
     date_created = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(upload_to="media/pollimages/", null=True, blank=True)
     open_date = models.DateTimeField(verbose_name=u"موعد الفتح")
@@ -322,38 +321,6 @@ class Poll(models.Model):
     creator = models.ForeignKey(User)
 
     objects = PollManager()
-
-    def clean(self):
-        # A hundred-says poll must have choices
-        # A what-if poll should not have choices
-        if self.poll_type == HUNDRED_SAYS and not self.choices.exists():
-            raise ValidationError(u"يجب أن تكون هناك خيارات في المئة تقول.")
-        elif self.poll_type == WHAT_IF and self.choices.exists():
-            raise ValidationError(u"لا يمكن إضافة خيارات في استفتاءات ماذا لو.")
-
-    def get_choices(self):
-        if self.choices == "":
-            return []
-        else:
-            return self.choices.split(POLL_CHOICE_SEPARATOR)
-
-    def save(self, *args, **kwargs):
-        # If choices are updated, then update all corresponding responses to match the new choices
-        choices_changed = False
-        if self.pk is not None:
-            # Fetch original data from db
-            original = self.__class__.objects.get(pk=self.pk)
-            if original.choices != self.choices:
-                choices_changed = True
-
-        super(Poll, self).save(*args, **kwargs)
-
-        if choices_changed:
-            # Get each choice in the original choices and update all responses that have that choice
-            for idx in range(len(original.get_choices())):
-                original_choice = original.get_choices()[idx]
-                new_choice = self.get_choices()[idx]
-                self.responses.filter(choice=original_choice).update(choice=new_choice)
 
     def __unicode__(self):
         return self.title
@@ -363,38 +330,41 @@ class Poll(models.Model):
         verbose_name_plural = u"التصويتات"
 
 
-# class PollChoice(models.Model):
-#     poll = models.ForeignKey(Poll, related_name="choices")
-#     value = models.CharField(max_length=POLL_CHOICE_MAX_LENGTH)
-#     color = models.CharField(max_length=128)  # stores bootstrap color values e.g. blue, green, success, warning, etc.
-#
-#     class Meta:
-#         verbose_name = u"خيار"
-#         verbose_name_plural = u"الخيارات"
+class PollChoice(models.Model):
+    poll = models.ForeignKey(Poll, related_name="choices")
+    value = models.CharField(max_length=POLL_CHOICE_MAX_LENGTH)
+    color = models.CharField(max_length=128, default="default")  # stores bootstrap color values e.g. blue,
+                                                                 # green, success, warning, etc.
+
+    class Meta:
+        verbose_name = u"خيار"
+        verbose_name_plural = u"الخيارات"
 
 
 class PollResponse(models.Model):
-    poll = models.ForeignKey(Poll, related_name="responses")
+    """
+    A response to a poll that has choices (Hundred-says poll)
+    """
     user = models.ForeignKey(User)
-    choice = models.CharField(max_length=POLL_CHOICE_MAX_LENGTH)
-    # choice = models.ForeignKey(PollChoice)
-    comment = models.TextField()
+    poll = models.ForeignKey(Poll, related_name="responses")
     date = models.DateTimeField(auto_now_add=True)
+    choice = models.ForeignKey(PollChoice)
 
     def __unicode__(self):
-        return self.poll.title #+ " - " + self.user
+        return self.poll.title + " - response by:  " + self.user
 
-    def clean(self, *args, **kwargs):
-        # If the poll type is hundred-says, then make sure a choice is selected
-        # if self.poll.type == HUNDRED_SAYS and
-        #     pass
-        pass
+    class Meta:
+        unique_together = (('poll', 'user'), )  # No user can submit more that one response
 
-    # class Meta:
-        # unique_together = (('poll', 'user'), ) # what about comments?
-#
-# class PollComment(models.Model):
-#     author = models.ForeignKey(User)
-#     poll = models.ForeignKey(Poll, related_name="comments")
-#     date = models.DateTimeField(auto_now_add=True)
-#     body = models.TextField()
+
+class PollComment(models.Model):
+    """
+    A comment on a poll
+    """
+    author = models.ForeignKey(User)
+    poll = models.ForeignKey(Poll, related_name="comments")
+    date = models.DateTimeField(auto_now_add=True)
+    body = models.TextField()
+
+    def __unicode__(self):
+        return self.poll.title + " - comment by: " + self.user

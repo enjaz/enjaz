@@ -574,24 +574,63 @@ def add_comment(request, pk):
     return HttpResponseRedirect(reverse('media:show_task',
                                         args=(pk, )))
 
-def poll_list(request, poll_type):
+# AJAXy challenge!!!
+# polls_home view is the only interface with which users interact (at least non-media-center members).
+# All the other views are AJAXy, except the ones with which editors interact.
+
+
+def polls_home(request, poll_type):
     pass
+
+
+@decorators.ajax_only
+def polls_list(request, poll_type):
+    """
+    For media center coordinator, deputies, or members: show the full list of polls corresponding to the poll_type.
+    For normal users, show current and past polls corresponding to the poll_type.
+    """
+    pass
+
 
 def add_poll(request, poll_type):
+    """
+    Add a poll corresponding to the poll_type.
+    If the poll_type is HUNDRED_SAYS, allow addition of choices.
+    """
     pass
+
 
 def edit_poll(request, poll_type, poll_id):
+    """
+    Edit a given poll.
+    If the poll_type is HUNDRED_SAYS, allow editing of choices.
+    """
     pass
 
+
 def delete_poll(request, poll_type, poll_id):
+    """
+    GET: show confirmation message.
+    POST: delete given poll.
+    """
     pass
+
 
 def show_poll(request, poll_type, poll_id):
     """
-    GET: show poll and voting/commenting form
-    POST: respond to poll (vote/comment)
+    GET: return poll contents (title, text, choices (if any), and image, in addition to voting form (for HUNDRED_SAYS).
+    POST: respond to poll (vote on a choice)
     """
     pass
 
+@decorators.ajax_only
+def poll_comment(request, poll_type, poll_id):
+    """
+    GET: return list of comments and commenting form for poll.
+    POST: comment on a poll.
+    """
+    pass
+
+@decorators.ajax_only
 def poll_results(request, poll_type, poll_id):
     pass

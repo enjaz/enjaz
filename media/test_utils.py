@@ -1,7 +1,9 @@
 """
 Utility functions for automated testing.
 """
-from .models import Article
+import datetime
+from django.utils import timezone
+from media.models import Article, Poll, POLL_CHOICE_SEPARATOR, HUNDRED_SAYS, WHAT_IF, PollResponse
 
 from clubs.utils import get_media_center
 from clubs.test_utils import set_club_coordinator, add_club_member
@@ -28,3 +30,35 @@ def create_article(author=create_user(),
 def create_articles(count):
     for i in range(count):
         create_article()
+
+
+def create_poll(poll_type,
+                title=("Test Poll Title " + str(Poll.objects.count() + 1)),
+                text="Test Poll Text",
+                choices=("Choice 1", "Choice 2", "Choice 3"),
+                open_date=timezone.now(),
+                close_date=(timezone.now() + datetime.timedelta(days=7)),
+                creator=create_user()):
+
+    if poll_type == HUNDRED_SAYS:
+        choices = POLL_CHOICE_SEPARATOR.join(choices)
+    elif poll_type == WHAT_IF:
+        choices = ""
+
+    return Poll.objects.create(poll_type=poll_type,
+                                title=title,
+                                text=text,
+                                choices=choices,
+                                open_date=open_date,
+                                close_date=close_date,
+                                creator=creator)
+
+
+def create_poll_response(poll=create_poll(HUNDRED_SAYS),
+                         user=create_user(),
+                         choice="",
+                         comment="COMMENT"):
+    return PollResponse.objects.create(poll=poll,
+                                       user=user,
+                                       choice=choice,
+                                       comment=comment)

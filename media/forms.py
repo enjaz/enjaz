@@ -5,7 +5,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.forms import ModelForm
 from clubs.utils import get_media_center
 
-from media.models import FollowUpReport, Story, StoryReview, Article, ArticleReview, CustomTask, TaskComment
+from media.models import FollowUpReport, Story, StoryReview, Article, ArticleReview, CustomTask, TaskComment, Poll, \
+    PollResponse, WHAT_IF, HUNDRED_SAYS
 
 # A nice trick to display full names instead of usernames
 # Check: http://stackoverflow.com/questions/16369403/foreign-key-and-select-field-value-in-admin-interface
@@ -85,3 +86,30 @@ class TaskCommentForm(ModelForm):
     class Meta:
         model = TaskComment
         fields = ['body']
+
+
+class PollForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        if kwargs.get("poll_type") == WHAT_IF:
+            self.choices = forms.HiddenInput()
+        super(PollForm, self).__init__(*args, **kwargs)
+
+    poll_type = forms.HiddenInput()
+
+    class Meta:
+        model = Poll
+        exclude = ('date_created', 'creator')
+
+
+class PollResponseForm(ModelForm):
+    def __init__(self, poll_type=None, *args, **kwargs):
+        if poll_type:
+            if poll_type == WHAT_IF:
+                self.choice = forms.HiddenInput()
+        else:
+            raise ValueError("Please specify the poll type.")
+        super(PollResponseForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = PollResponse
+        exclude = ('poll', 'user', 'date')

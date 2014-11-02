@@ -573,3 +573,25 @@ def add_comment(request, pk):
         print recipients
     return HttpResponseRedirect(reverse('media:show_task',
                                         args=(pk, )))
+
+def poll_list(request, poll_type):
+    pass
+
+def add_poll(request, poll_type):
+    pass
+
+def edit_poll(request, poll_type, poll_id):
+    pass
+
+def delete_poll(request, poll_type, poll_id):
+    pass
+
+def show_poll(request, poll_type, poll_id):
+    """
+    GET: show poll and voting/commenting form
+    POST: respond to poll (vote/comment)
+    """
+    pass
+
+def poll_results(request, poll_type, poll_id):
+    pass

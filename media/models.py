@@ -1,10 +1,24 @@
 # -*- coding: utf-8  -*-
 import datetime
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from django.contrib.auth.models import User
+from django.utils import timezone
 from activities.models import Activity, Episode
 
+# Constants for media poll types
+
+WHAT_IF = 0
+HUNDRED_SAYS = 1
+
+POLL_TYPE_CHOICES = (
+    (WHAT_IF, u"ماذا لو؟"),
+    (HUNDRED_SAYS, u"المئة تقول"),
+)
+
+POLL_CHOICE_SEPARATOR = "/"
+POLL_CHOICE_MAX_LENGTH = 128
 
 class FollowUpReport(models.Model):
     """
@@ -268,3 +282,119 @@ class TaskComment(models.Model):
     class Meta:
         verbose_name = u"تعليق على مهمة"
         verbose_name_plural = u"التعليقات على المهام"
+
+class PollManager(models.Manager):
+    """
+    A custom manager for polls.
+    """
+    def hundred_says(self):
+        return self.filter(poll_type=HUNDRED_SAYS)
+
+    def what_if(self):
+        return self.filter(poll_type=WHAT_IF)
+
+    def active(self):
+        """
+        Return objects whose open date is before or equal to now, and whose close date is still ahead.
+        """
+        return self.filter(open_date__lte=timezone.now(), close_date__gt=timezone.now())
+
+    def previous(self):
+        """
+        Return objects whose close date is before ``now``.
+        """
+        return self.filter(close_date__lte=timezone.now())
+
+class Poll(models.Model):
+    """
+    Poll class that has 2 types:
+    * What-if: an open-ended question which expects comments on a hypothetical scenario.
+    * Hundred-says: a vote with several choices
+    """
+    poll_type = models.IntegerField(choices=POLL_TYPE_CHOICES, verbose_name=u"النوع")
+    title = models.CharField(max_length=128, verbose_name=u"العنوان")
+    text = models.TextField(verbose_name=u"النص")
+    choices = models.CharField(blank=True, max_length=POLL_CHOICE_MAX_LENGTH)
+    date_created = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to="media/pollimages/", null=True, blank=True)
+    open_date = models.DateTimeField(verbose_name=u"موعد الفتح")
+    close_date = models.DateTimeField(verbose_name=u"موعد الإغلاق")
+    creator = models.ForeignKey(User)
+
+    objects = PollManager()
+
+    def clean(self):
+        # A hundred-says poll must have choices
+        # A what-if poll should not have choices
+        if self.poll_type == HUNDRED_SAYS and not self.choices.exists():
+            raise ValidationError(u"يجب أن تكون هناك خيارات في المئة تقول.")
+        elif self.poll_type == WHAT_IF and self.choices.exists():
+            raise ValidationError(u"لا يمكن إضافة خيارات في استفتاءات ماذا لو.")
+
+    def get_choices(self):
+        if self.choices == "":
+            return []
+        else:
+            return self.choices.split(POLL_CHOICE_SEPARATOR)
+
+    def save(self, *args, **kwargs):
+        # If choices are updated, then update all corresponding responses to match the new choices
+        choices_changed = False
+        if self.pk is not None:
+            # Fetch original data from db
+            original = self.__class__.objects.get(pk=self.pk)
+            if original.choices != self.choices:
+                choices_changed = True
+
+        super(Poll, self).save(*args, **kwargs)
+
+        if choices_changed:
+            # Get each choice in the original choices and update all responses that have that choice
+            for idx in range(len(original.get_choices())):
+                original_choice = original.get_choices()[idx]
+                new_choice = self.get_choices()[idx]
+                self.responses.filter(choice=original_choice).update(choice=new_choice)
+
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = u"تصويت"
+        verbose_name_plural = u"التصويتات"
+
+
+# class PollChoice(models.Model):
+#     poll = models.ForeignKey(Poll, related_name="choices")
+#     value = models.CharField(max_length=POLL_CHOICE_MAX_LENGTH)
+#     color = models.CharField(max_length=128)  # stores bootstrap color values e.g. blue, green, success, warning, etc.
+#
+#     class Meta:
+#         verbose_name = u"خيار"
+#         verbose_name_plural = u"الخيارات"
+
+
+class PollResponse(models.Model):
+    poll = models.ForeignKey(Poll, related_name="responses")
+    user = models.ForeignKey(User)
+    choice = models.CharField(max_length=POLL_CHOICE_MAX_LENGTH)
+    # choice = models.ForeignKey(PollChoice)
+    comment = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return self.poll.title #+ " - " + self.user
+
+    def clean(self, *args, **kwargs):
+        # If the poll type is hundred-says, then make sure a choice is selected
+        # if self.poll.type == HUNDRED_SAYS and
+        #     pass
+        pass
+
+    # class Meta:
+        # unique_together = (('poll', 'user'), ) # what about comments?
+#
+# class PollComment(models.Model):
+#     author = models.ForeignKey(User)
+#     poll = models.ForeignKey(Poll, related_name="comments")
+#     date = models.DateTimeField(auto_now_add=True)
+#     body = models.TextField()

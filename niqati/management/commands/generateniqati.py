@@ -13,6 +13,7 @@ from niqati.models import Code_Order
 @contextmanager
 def lockfile(path):
     if os.path.exists(path):
+        print timezone.now()
         print "Another procces is already running.  Abort this one."
         sys.exit(-1)
     else:
@@ -28,8 +29,6 @@ class Command(BaseCommand):
     help = 'Process approved niqati code orders'
 
     def handle(self, *args, **options):
-        print timezone.now()
-
         # Since the currently used API does not support simultaneous
         # API, we need to ensure that if another proccess is already
         # running, it needs to be aborted.
@@ -40,6 +39,7 @@ class Command(BaseCommand):
             domain = Site.objects.get_current().domain
             submit_link = "http://" + domain + reverse('niqati:submit')
             for order in orders:
+                print timezone.now()
                 if order.get_delivery_type() == '0':  # Coupon
                     # Check if the order is currently being processed; if so, abort
                     if not any([os.path.isfile('codes_' + str(collec.pk) + '.pdf') for collec in order.code_collection_set.all()]):

@@ -89,9 +89,7 @@
     <script type="text/javascript">
     $('.datatable').dataTable({
         "order": [[ 0, "asc" ]],
-        "language": {
-            "url": "{% static 'js/dataTables-arabic.json' %}"
-        }
+        "language": {% include 'js/dataTables-arabic.json' %}
     });
     </script>
 {% endblock %}

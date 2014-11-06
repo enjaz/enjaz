@@ -51,8 +51,7 @@
 $(function () {
 	$('#group-table').dataTable({
 		"order": [[ 3, "desc" ]],
-		"language": {
-			"url": "{% static 'js/dataTables-arabic.json' %}"}
+		"language": {% include 'js/dataTables-arabic.json' %}
 	});
 });
 </script>

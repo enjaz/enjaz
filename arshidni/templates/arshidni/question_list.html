@@ -28,7 +28,7 @@
 	{% for question in page_questions %}
 	<div class="single-question panel panel-default">
 	  <a href="{% url 'arshidni:show_question' question.pk %}" class="panel-body">
-		<p>{{ question.text }}</p>
+		<p>{{ question.text|linebreaksbr }}</p>
 	  </a>
 	</div>
 	{% endfor %}

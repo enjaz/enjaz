@@ -114,6 +114,36 @@
 	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
 	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 	<script>
+    $(function(){
+        $('.datatable').dataTable({
+            "order": [[ 2, "asc" ]],
+            "language": {
+                "url": "{% static 'js/dataTables-arabic.json' %}"
+            }
+        });
+        // For approved and rejected activities, jump to the page where
+        // the closest upcoming event is listed.
+        var unix_seconds = Math.round(+new Date()/1000);
+        var approved_table = $('.datatable:first').DataTable();
+        var approved_table_noeds = approved_table.column(2, {order: 'current'}).nodes();
+        for (i=0; i < approved_table_noeds.length; i++) {
+           if ($(approved_table_noeds[i]).data('order') > unix_seconds) {
+                var page_number = Math.floor( i / approved_table.page.info().length );
+                approved_table.page(page_number).draw(false);
+                break
+           }
+        }
+        var rejected_table = $('.datatable:last').DataTable();
+        var rejected_table_noeds = rejected_table.column(2, {order: 'current'}).nodes();
+        for (i=0; i < rejected_table_noeds.length; i++) {
+           if ($(rejected_table_noeds[i]).data('order') > unix_seconds) {
+                var page_number = Math.floor( i / rejected_table.page.info().length );
+                rejected_table.page(page_number).draw(false);
+                break
+           }
+        }
+    });
+
     var approved = [
         {% with activities=approved %}
             {% include 'activities/components/activities_array_for_calendar.html' %}
@@ -170,36 +200,6 @@
 
     $('#collapseFour-2').on('shown.bs.collapse', function (e) {
         calendar.fullCalendar('render');
-    });
-
-    $(function(){
-        $('.datatable').dataTable({
-            "order": [[ 2, "asc" ]],
-            "language": {
-                "url": "{% static 'js/dataTables-arabic.json' %}"
-            }
-        });
-        // For approved and rejected activities, jump to the page where
-        // the closest upcoming event is listed.
-        var unix_seconds = Math.round(+new Date()/1000);
-        var approved_table = $('.datatable:first').DataTable();
-        var approved_table_noeds = approved_table.column(2, {order: 'current'}).nodes();
-        for (i=0; i < approved_table_noeds.length; i++) {
-           if ($(approved_table_noeds[i]).data('order') > unix_seconds) {
-                var page_number = Math.floor( i / approved_table.page.info().length );
-                approved_table.page(page_number).draw(false);
-                break
-           }
-        }
-        var rejected_table = $('.datatable:last').DataTable();
-        var rejected_table_noeds = rejected_table.column(2, {order: 'current'}).nodes();
-        for (i=0; i < rejected_table_noeds.length; i++) {
-           if ($(rejected_table_noeds[i]).data('order') > unix_seconds) {
-                var page_number = Math.floor( i / rejected_table.page.info().length );
-                rejected_table.page(page_number).draw(false);
-                break
-           }
-        }
     });
 	</script>
 {% endblock %}

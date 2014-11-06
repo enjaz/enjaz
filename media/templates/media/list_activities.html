@@ -150,9 +150,7 @@ $(function () {
 	attach_assign_task_to_click_event();
 	$('#activity_list').dataTable({
 		"order": [[ 3, "desc" ]],
-		"language": {
-			"url": "{% static 'js/dataTables-arabic.json' %}"
-		},
+		"language": {% include 'js/dataTables-arabic.json' %}
 	});
 });
 function attach_assign_task_to_click_event() {

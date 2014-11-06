@@ -117,9 +117,8 @@
     $(function(){
         $('.datatable').dataTable({
             "order": [[ 2, "asc" ]],
-            "language": {
-                "url": "{% static 'js/dataTables-arabic.json' %}"
-            }
+            "language": 
+                {% include 'js/dataTables-arabic.json' %}
         });
         // For approved and rejected activities, jump to the page where
         // the closest upcoming event is listed.

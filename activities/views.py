@@ -59,16 +59,15 @@ def list_activities(request):
       visible.
     """
     # Show approved activites for everybody.
-    context = {'approved': get_approved_activities()}
-    template = 'activities/list_privileged.html'
-
+    #
     # By default (i.e. for students, employees and anonymous users),
     # no pending or rejected activities should be shown.
-    context['pending'] = Activity.objects.none()
-    context['rejected'] = Activity.objects.none()
+    context = {'approved': get_approved_activities(),
+               'pending': Activity.objects.none(),
+               'rejected': Activity.objects.none()}
 
     if request.user.is_authenticated():
-        template = 'activities/list_normal.html'
+        template = 'activities/list_privileged.html'
         if request.user.is_superuser or is_coordinator_or_member(get_presidency(), request.user)\
                 or request.user.has_perm('activities.add_presidency_review'):
             # If the user is a super user or part of the presidency,
@@ -112,6 +111,8 @@ def list_activities(request):
             context['club_approved'] = get_approved_activities().filter(primary_club__in=request.user.employee.all())
 
             template = 'activities/list_employee.html'
+        else: # For students and other normal users.
+            template = 'activities/list_normal.html'
     else: # For anonymous users
         template = 'activities/front/list.html'
 

@@ -34,7 +34,7 @@ class Command(BaseCommand):
         # API, we need to ensure that if another proccess is already
         # running, it needs to be aborted.
         lockfile_path = os.getcwd() + '/niqati.lock'
-        with localfile(lockfile_path):
+        with lockfile(lockfile_path):
             # Get all approved and unprocessed orders
             orders = filter(lambda order: order.is_approved() and order.is_processed() == False, Code_Order.objects.all())
             domain = Site.objects.get_current().domain

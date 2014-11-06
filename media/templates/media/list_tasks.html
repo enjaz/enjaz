@@ -79,9 +79,7 @@
 $(function () {
 	$("#task_list").dataTable({
 		"order": [[ 4, "asc" ]],
-		"language": {
-			"url": "{% static 'js/dataTables-arabic.json' %}"
-		},
+		"language": {% include 'js/dataTables-arabic.json' %}
 	});
 	$("input[name=due_date]").datepicker({isRTL: true});
 });

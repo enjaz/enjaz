@@ -18,7 +18,7 @@
 <br>
 <div class="row">
 	<div class="col-md-12">
-		<p>{{ story.text }}</p>
+		<p>{{ story.text|linebreaksbr }}</p>
 	</div>
 </div>
 {% if review %}
@@ -29,7 +29,7 @@
 		<strong>الملاحظات</strong>
 	</p>
 	<p>
-		{{ review.notes }}
+		{{ review.notes|linebreaksbr }}
 	</p>
 </blockquote>
 

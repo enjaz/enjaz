@@ -3,7 +3,9 @@
         <tr>
             <th>الاسم</th>
             <th>النادي المنظم</th>
-            <th>تاريخ الانعقاد</th>
+            {# In privileged view, show the submission date. #}{% if privileged %}
+            <th>تاريخ الإرسال</th>
+            {% endif %}<th>تاريخ الانعقاد</th>
             {# In normal view, no need to show the status nor the options. #}{% if not normal %}
             <th>الحالة</th>
             <th>الخيارات</th>{% endif %}
@@ -13,7 +15,9 @@
     {% for activity in activities %}
         <tr>
             <td><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}</a></td>
-            <td><a href="{% url 'clubs:show' activity.primary_club.id %}">{{ activity.primary_club.name }}</a></td>
+            <td><a href="{% url 'clubs:show' activity.primary_club.id %}">{{ activity.primary_club.name }}</a></td>{% if privileged %}
+            <td data-order="{{ activity.submission_date|date:"U" }}">{{ activity.submission_date|date:"j F" }}</td>
+            {% endif %}
             <td data-order="{{ activity.get_first_date|date:"U" }}">{{ activity.get_first_date|date:"j F" }}</td>
             {% if not normal %}
             <td>{{ activity.get_approval_status_message }}</td>

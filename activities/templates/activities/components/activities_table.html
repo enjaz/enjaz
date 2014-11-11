@@ -6,9 +6,11 @@
             {# In privileged view, show the submission date. #}{% if privileged %}
             <th>تاريخ الإرسال</th>
             {% endif %}<th>تاريخ الانعقاد</th>
-            {# In normal view, no need to show the status nor the options. #}{% if not normal %}
+            {# In approved, no need to show the status nor the options. #}{% if not approved_table %}
             <th>الحالة</th>
-            <th>الخيارات</th>{% endif %}
+            <th>الخيارات</th>{% endif %}{# For privileged non-coordinators users and in approved activities, show the scores.  We use MAX_OVERDUE_REPORTS, which is only passed for coordinators. #}{% if not MAX_OVERDUE_REPORTS and approved_table and privileged %}
+            <th>تقييم الملائمة</th>
+            <th>تقييم الجودة</th>{% endif %}
         </tr>
     </thead>
     <tbody>
@@ -19,7 +21,7 @@
             <td data-order="{{ activity.submission_date|date:"U" }}">{{ activity.submission_date|date:"j F" }}</td>
             {% endif %}
             <td data-order="{{ activity.get_first_date|date:"U" }}">{{ activity.get_first_date|date:"j F" }}</td>
-            {% if not normal %}
+            {% if not approved_table %}
             <td>{{ activity.get_approval_status_message }}</td>
             <td>
                 {% with status=activity.get_approval_status %}
@@ -41,7 +43,9 @@
                         </a>
                     {% endif %}
                 {% endwith %}
-            </td>{% endif %}
+            </td>{% endif %}{% if not MAX_OVERDUE_REPORTS and approved_table and privileged %}
+            <td>{{ activity.get_relevance_score_average }}</td>
+            <td>{{ activity.get_quality_score_average }}</td>{% endif %}
         </tr>
     {% endfor %}
     </tbody>

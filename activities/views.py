@@ -99,6 +99,12 @@ def list_activities(request):
             if is_coordinator_or_deputy_of_any_club(request.user):
                 context['due_report_count'] = user_coordination.all()[0].get_due_report_count()
                 context['overdue_report_count'] = user_coordination.all()[0].get_overdue_report_count()
+                # In activity templates, the MAX_OVERDUE_REPORTS
+                # variable is used to check whether the current user
+                # is a coordinator or a deputy.  This is to aviod
+                # passing duplicated variables.  In case the following
+                # variable is changed, the templates need to be
+                # changed as well.
                 context['MAX_OVERDUE_REPORTS'] = MAX_OVERDUE_REPORTS
 
         elif is_employee_of_any_club(request.user):

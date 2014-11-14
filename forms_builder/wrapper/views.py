@@ -324,7 +324,7 @@ def entries_view(request, form_id, show=False, export=False,
     kw = {"submitter_fields": submitter_fields}
     entries_form = EntriesForm(*args, **kw)
     delete = "%s.delete_formentry" % formentry_model._meta.app_label
-    can_delete_entries = request.user.has_perm(delete) # TODO: change to be based on delete_perm_check (at least add it)
+    can_delete_entries = request.user.has_perm(delete) or perm_check(request.user, object)
     submitted = entries_form.is_valid() or show or export or export_xls
     export = export or request.POST.get("export")
     export_xls = export_xls or request.POST.get("export_xls")

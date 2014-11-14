@@ -30,4 +30,11 @@ urlpatterns = patterns('',
     url(r'^tasks/(?P<pk>\d+)/edit/$', views.edit_task, name="edit_task"),
     url(r'^tasks/(?P<pk>\d+)/complete/$', views.mark_task_complete, name="mark_task_complete"),
     url(r'^tasks/(?P<pk>\d+)/comment/$', views.add_comment, name="add_comment"),
+
+    # Polls
+    url(r'^(?P<poll_type>\w+)/$', views.polls_home, name="polls_home"),
+    url(r'^(?P<poll_type>\w+)/list/active/$', views.polls_list, {"filter": views.ACTIVE}, name="polls_list_active"),
+    url(r'^(?P<poll_type>\w+)/list/upcoming/$', views.polls_list, {"filter": views.UPCOMING}, name="polls_list_upcoming"),
+    url(r'^(?P<poll_type>\w+)/list/past/$', views.polls_list, {"filter": views.PAST}, name="polls_list_past"),
+    url(r'^(?P<poll_type>\w+)/(?P<poll_id>\d+)/$', views.show_poll, name="show_poll"),
 )

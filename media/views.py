@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+import functools
 import random
 
 from django.contrib.auth.decorators import permission_required, login_required, user_passes_test
@@ -17,9 +18,45 @@ from clubs.utils import get_media_center, is_coordinator_or_member, is_coordinat
 from core import decorators
 from clubs.models import Club
 from activities.models import Activity, Episode
-from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment
+from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment, \
+    WHAT_IF, HUNDRED_SAYS, Poll
 from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
     TaskCommentForm
+
+# --- Constants and wrapper for polls
+
+WHAT_IF_URL = "whatif"
+HUNDRED_SAYS_URL = "100says"
+
+# Keywords
+ACTIVE = "active"
+UPCOMING = "upcoming"
+PAST = "past"
+
+def proper_poll_type(view_func):
+    """
+    A wrapper to ensure the passed ``poll_type`` is valid, then convert that from a url
+    to a poll_type easily understood by the view.
+    """
+    @functools.wraps(view_func)
+    def wrapper(request, poll_type, *args, **kwargs):
+        if poll_type == WHAT_IF_URL:
+            simple_poll_type = WHAT_IF
+        elif poll_type == HUNDRED_SAYS_URL:
+            simple_poll_type = HUNDRED_SAYS
+        else:
+            raise Http404
+        return view_func(request, poll_type=simple_poll_type, *args, **kwargs)
+    return wrapper
+
+def get_poll_type_url(poll_type):
+    """
+    Return the appropriate url keyword for the passed poll type.
+    """
+    if poll_type == WHAT_IF:
+        return WHAT_IF_URL
+    elif poll_type == HUNDRED_SAYS:
+        return HUNDRED_SAYS_URL
 
 # --- Helper functions
 
@@ -592,20 +629,60 @@ def add_comment(request, pk):
 # Successful submission -> ajax call to poll_results
 
 
+@proper_poll_type
+@login_required
 def polls_home(request, poll_type):
-    pass
+    """
+    Return the polls home depending on the poll type.
+    The poll home consists of the current active poll, and a list of previous polls.
+    If the user is an editor, also show unpublished polls and editing options.
+    """
+    # The poll home page consists of "boxes" for its different parts, which are loaded
+    # via ajax on page load
+    if poll_type == HUNDRED_SAYS:
+        intro = "media/polls/100says_intro.html"
+    elif poll_type == WHAT_IF:
+        intro = "media/polls/what_if_intro.html"
+    else:
+        raise Http404
+
+    is_editor = is_coordinator_or_member(get_media_center(), request.user) or request.user.is_superuser
+
+    context = {"intro": intro,
+               "is_editor": is_editor,
+               "poll_type_url": get_poll_type_url(poll_type),
+               }
+    return render(request, "media/polls/home.html", context)
 
 
 @decorators.ajax_only
-def polls_list(request, poll_type):
+@proper_poll_type
+@login_required
+def polls_list(request, poll_type, filter):
     """
     For media center coordinator, deputies, or members: return the full list of polls corresponding to the poll_type.
     For normal users, return current and past polls corresponding to the poll_type.
     The list should be classified into previous, active, and upcoming.
     """
-    pass
+    if filter == PAST:
+        polls = Poll.objects.previous().filter(poll_type=poll_type)
+        template = "media/polls/list_past.html"
+    elif filter == ACTIVE:
+        polls = Poll.objects.active().filter(poll_type=poll_type)
+        template = "media/polls/list_active.html"
+    elif filter == UPCOMING:
+        polls = Poll.objects.none().filter(poll_type=poll_type)
+        template = "media/polls/list_upcoming.html"
+    else:
+        raise Http404
+    context = {'polls': polls,
+               'poll_type_url': get_poll_type_url(poll_type)}
+    return render(request, template, context)
 
 
+@decorators.ajax_only
+@proper_poll_type
+@login_required
 def add_poll(request, poll_type):
     """
     Add a poll corresponding to the poll_type.
@@ -614,6 +691,9 @@ def add_poll(request, poll_type):
     pass
 
 
+@decorators.ajax_only
+@proper_poll_type
+@login_required
 def edit_poll(request, poll_type, poll_id):
     """
     Edit a given poll.
@@ -622,6 +702,9 @@ def edit_poll(request, poll_type, poll_id):
     pass
 
 
+@decorators.ajax_only
+@proper_poll_type
+@login_required
 def delete_poll(request, poll_type, poll_id):
     """
     GET: show confirmation message.
@@ -630,14 +713,21 @@ def delete_poll(request, poll_type, poll_id):
     pass
 
 
+@decorators.ajax_only
+@proper_poll_type
+@login_required
 def show_poll(request, poll_type, poll_id):
     """
     GET: return poll contents (title, text, choices (if any), and image, in addition to voting form (for HUNDRED_SAYS).
     POST: respond to poll (vote on a choice)
     """
-    pass
+    poll = get_object_or_404(Poll, id=poll_id)
+    return render(request, "media/polls/show_active.html", {'poll': poll})
+
 
 @decorators.ajax_only
+@proper_poll_type
+@login_required
 def poll_comment(request, poll_type, poll_id):
     """
     GET: return list of comments and commenting form for poll.
@@ -645,6 +735,24 @@ def poll_comment(request, poll_type, poll_id):
     """
     pass
 
+
 @decorators.ajax_only
+@proper_poll_type
+@login_required
 def poll_results(request, poll_type, poll_id):
+    """
+    For hundred-says polls, return a results page as a pie chart of votes.
+    For non-media center members, this shouldn't be accessible unless the user has already voted.
+    """
+    pass
+
+
+@decorators.ajax_only
+@proper_poll_type
+@login_required
+def suggest_poll(request, poll_type):
+    """
+    GET: return poll suggestion form.
+    POST: send suggested poll as an email to media center.
+    """
     pass

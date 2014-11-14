@@ -1,0 +1,88 @@
+{% extends "media_base.html" %}{% load staticfiles %}
+{% block title %}{% endblock %}
+{% block content %}
+    <div class="row">
+    {% include intro %}
+
+    {% if is_editor %}
+        <!-- TODO: New poll button -->
+
+        <!-- upcoming polls -->
+
+        <div class="panel panel-info panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+
+            <!-- panel body -->
+            <div class="panel-body">
+
+            <div id="upcoming-polls">
+                <div style="text-align: center;">
+                    <img src="{% static 'img/ajax-loader.gif' %}">
+                </div>
+            </div>
+
+            </div>
+
+        </div>
+
+        <br>
+    {% endif %}
+
+    <!-- active poll(s) -->
+
+    <div class="panel panel-success panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+
+        <!-- panel body -->
+        <div class="panel-body">
+
+        <div id="active-polls">
+            <div style="text-align: center;">
+                <img src="{% static 'img/ajax-loader.gif' %}">
+            </div>
+        </div>
+
+        </div>
+
+    </div>
+
+    <!--<br>-->
+
+    <!-- TODO: suggest button -->
+    <div style="text-align: left;">
+        <a href="" class="btn btn-icon btn-success">
+            <i class="entypo-pencil"></i>
+            اقترح
+        </a>
+    </div>
+    <br>
+
+    <!-- past polls -->
+
+    <div class="panel panel-warning panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+
+        <!-- panel body -->
+        <div class="panel-body">
+
+        <div id="past-polls">
+            <div style="text-align: center;">
+                <img src="{% static 'img/ajax-loader.gif' %}">
+            </div>
+        </div>
+
+        </div>
+
+    </div>
+
+    </div>
+{% endblock %}
+
+{% block customscript %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        {% if is_editor %}
+            $("#upcoming-polls").load("{% url 'media:polls_list_upcoming' poll_type_url %}");
+        {% endif %}
+        $("#active-polls").load("{% url 'media:polls_list_active' poll_type_url %}");
+        $("#past-polls").load("{% url 'media:polls_list_past' poll_type_url %}");
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% for poll in polls %}
+    {% if forloop.first %}
+    <div class="panel-group joined" id="accordion-past-polls">
+    {% endif %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion-past-polls" href="#past-poll-{{ forloop.counter }}" class="collapsed">
+                    {{ poll.title }}
+                    {# a little hack to avoid using a link because it would mess up the styles #}
+
+                    <button type="button" style="float:left;" onclick="" class="btn btn-xs btn-default">
+                        <i class="entypo-link"></i>
+                    </button>
+                </a>
+            </h4>
+        </div>
+        <div id="past-poll-{{ forloop.counter }}" class="panel-collapse collapse">
+            <div class="panel-body">
+                {{ poll.text }}
+            </div>
+        </div>
+    </div>
+    {% if forloop.last %}
+    </div>
+    {% endif %}
+{% empty %}
+    <p>لا توجد تصويتات قادمة.</p>
+{% endfor %}

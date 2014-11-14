@@ -3,7 +3,7 @@ Utility functions for automated testing.
 """
 import datetime
 from django.utils import timezone
-from media.models import Article, Poll, POLL_CHOICE_SEPARATOR, HUNDRED_SAYS, WHAT_IF, PollResponse
+from media.models import Article, Poll, HUNDRED_SAYS, WHAT_IF, PollResponse
 
 from clubs.utils import get_media_center
 from clubs.test_utils import set_club_coordinator, add_club_member

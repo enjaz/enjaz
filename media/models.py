@@ -17,7 +17,6 @@ POLL_TYPE_CHOICES = (
     (HUNDRED_SAYS, u"المئة تقول"),
 )
 
-POLL_CHOICE_SEPARATOR = "/"
 POLL_CHOICE_MAX_LENGTH = 128
 
 class FollowUpReport(models.Model):

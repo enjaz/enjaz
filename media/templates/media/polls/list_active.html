@@ -1,0 +1,21 @@
+{% for poll in polls %}{% load staticfiles %}
+    {% if forloop.first %}
+    {% endif %}
+    <div id="active-poll-{{ poll.id }}" class="active-poll" data-poll-id="{{ poll.id }}">
+        <div style="text-align: center;">
+            <img src="{% static 'img/ajax-loader.gif' %}">
+        </div>
+    </div>
+    {% if not forloop.last %}
+        <hr>
+    {% endif %}
+    <script>
+        $(document).ready(function () {
+            $("#active-poll-{{ poll.id }}").load("{% url 'media:show_poll' poll_type_url poll.id %}");
+        });
+    </script>
+    {% if forloop.last %}
+    {% endif %}
+{% empty %}
+    <p>لا توجد تصويتات حالية.</p>
+{% endfor %}

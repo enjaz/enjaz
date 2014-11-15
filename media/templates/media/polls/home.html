@@ -1,5 +1,5 @@
-{% extends "media_base.html" %}{% load staticfiles %}
-{% block title %}{% endblock %}
+{% extends "media_base.html" %}
+{% block title %}{{ title }}{% endblock %}
 {% block content %}
     <div class="row">
     {% include intro %}
@@ -15,9 +15,7 @@
             <div class="panel-body">
 
             <div id="upcoming-polls">
-                <div style="text-align: center;">
-                    <img src="{% static 'img/ajax-loader.gif' %}">
-                </div>
+                {% include "media/polls/ajax-loader.html" %}
             </div>
 
             </div>
@@ -35,9 +33,7 @@
         <div class="panel-body">
 
         <div id="active-polls">
-            <div style="text-align: center;">
-                <img src="{% static 'img/ajax-loader.gif' %}">
-            </div>
+            {% include "media/polls/ajax-loader.html" %}
         </div>
 
         </div>
@@ -63,9 +59,7 @@
         <div class="panel-body">
 
         <div id="past-polls">
-            <div style="text-align: center;">
-                <img src="{% static 'img/ajax-loader.gif' %}">
-            </div>
+            {% include "media/polls/ajax-loader.html" %}
         </div>
 
         </div>

@@ -1,14 +1,13 @@
-{% for poll in polls %}{% load staticfiles %}
+{% for poll in polls %}
     {% if forloop.first %}
     {% endif %}
     <div id="active-poll-{{ poll.id }}" class="active-poll" data-poll-id="{{ poll.id }}">
-        <div style="text-align: center;">
-            <img src="{% static 'img/ajax-loader.gif' %}">
-        </div>
+        {% include "media/polls/ajax-loader.html" %}
     </div>
     {% if not forloop.last %}
         <hr>
     {% endif %}
+    {# <!-- FIXME: This will load a script for EACH poll --> #}
     <script>
         $(document).ready(function () {
             $("#active-poll-{{ poll.id }}").load("{% url 'media:show_poll' poll_type_url poll.id %}");

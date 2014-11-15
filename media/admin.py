@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from media.models import FollowUpReport, Story, StoryReview, StoryTask, Article, ArticleReview, Poll
+from media.models import FollowUpReport, Story, StoryReview, StoryTask, Article, ArticleReview, Poll, PollChoice
 
 admin.site.register(FollowUpReport)
 
@@ -11,4 +11,12 @@ admin.site.register(StoryTask)
 admin.site.register(Article)
 admin.site.register(ArticleReview)
 
-admin.site.register(Poll)
+
+class PollChoiceAdmin(admin.TabularInline):
+    model = PollChoice
+
+
+class PollAdmin(admin.ModelAdmin):
+    inlines = (PollChoiceAdmin, )
+
+admin.site.register(Poll, PollAdmin)

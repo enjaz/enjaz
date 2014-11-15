@@ -282,6 +282,7 @@ class TaskComment(models.Model):
         verbose_name = u"تعليق على مهمة"
         verbose_name_plural = u"التعليقات على المهام"
 
+
 class PollManager(models.Manager):
     """
     A custom manager for polls.
@@ -309,6 +310,7 @@ class PollManager(models.Manager):
         Return objects whose open date is to come yet.
         """
         return self.filter(open_date__gt=timezone.now())
+
 
 class Poll(models.Model):
     """
@@ -350,6 +352,9 @@ class PollChoice(models.Model):
     color = models.CharField(max_length=128, default="default")  # stores bootstrap color values e.g. blue,
                                                                  # green, success, warning, etc.
                                                                  # TODO: add choices
+
+    def __unicode__(self):
+        return self.value
 
     class Meta:
         verbose_name = u"خيار"

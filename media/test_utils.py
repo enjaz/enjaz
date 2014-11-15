@@ -43,7 +43,6 @@ def create_poll(poll_type,
     poll =  Poll.objects.create(poll_type=poll_type,
                                 title=title,
                                 text=text,
-                                choices=choices,
                                 open_date=open_date,
                                 close_date=close_date,
                                 creator=creator)
@@ -58,5 +57,5 @@ def create_poll_response(poll=create_poll(HUNDRED_SAYS),
                          comment="COMMENT"):
     return PollResponse.objects.create(poll=poll,
                                        user=user,
-                                       choice=choice,
+                                       value=choice,
                                        comment=comment)

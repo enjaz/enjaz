@@ -330,6 +330,12 @@ class Poll(models.Model):
     def is_active(self):
         return self.open_date <= timezone.now() < self.close_date
 
+    def is_past(self):
+        return self.close_date <= timezone.now()
+
+    def is_upcoming(self):
+        return timezone.now() < self.open_date
+
     def __unicode__(self):
         return self.title
 
@@ -343,6 +349,7 @@ class PollChoice(models.Model):
     value = models.CharField(max_length=POLL_CHOICE_MAX_LENGTH)
     color = models.CharField(max_length=128, default="default")  # stores bootstrap color values e.g. blue,
                                                                  # green, success, warning, etc.
+                                                                 # TODO: add choices
 
     class Meta:
         verbose_name = u"خيار"

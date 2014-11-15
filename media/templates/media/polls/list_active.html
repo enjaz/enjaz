@@ -1,5 +1,7 @@
 {% for poll in polls %}
     {% if forloop.first %}
+        <h2>التصويتات الحالية</h2>
+        <hr>
     {% endif %}
     <div id="active-poll-{{ poll.id }}" class="active-poll" data-poll-id="{{ poll.id }}">
         {% include "media/polls/ajax-loader.html" %}

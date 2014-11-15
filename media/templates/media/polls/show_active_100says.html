@@ -1,0 +1,79 @@
+<div class="row">
+    {% if poll.image %}
+    <div class="col-md-3">
+        <div class="screenshot">
+            <div style="text-align: center; border-left: solid 1px #eee;">
+                <style>
+                    #poll-{{ poll.id }}-img {
+                        width:90%;
+                        padding-bottom:90%;
+                        border:solid 2px #ddd;
+                        margin:10px;
+                        background:url('{{ poll.image.url }}') center center no-repeat;
+                        background-size: auto 100%;
+                    }
+                </style>
+                <div id="poll-{{ poll.id }}-img" class="img-circle" style="max-width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9">
+    {% else %}
+    <div class="col-md-12">
+    {% endif %}
+    <h2>{{ poll.title }}</h2>
+    <p>
+        {{ poll.text }}
+    </p>
+    <form id="vote-form" method="post">
+        {% csrf_token %}
+        {{ response_form.as_p }}
+        <button class="btn btn-primary btn-block" type="submit">
+            <i class="entypo-pencil"></i>
+            صوِّت
+        </button>
+    </form>
+    </div>
+</div>
+
+{# <!-- TODO: load comments and commenting form --> #}
+
+<script type="text/javascript">
+    $("#vote-form").submit(function(event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var $form = $(this),
+            data = $form.serialize(),
+            url = "{% url 'media:show_poll' poll_type_url poll.id %}";
+
+        /* Send the data using post */
+        var posting = $.post(url, data);
+
+        posting.done(function (data) {
+            var $messageBar = $("#vote-form-alert");
+            // if there are messages already, remove them
+            $messageBar.slideUp(function () {
+                $(this).remove();
+            });
+
+            $("#active-poll-{{ poll.id }}").prepend("<div id='vote-form-alert' style='display: none;' class='alert'></div>");
+
+            var $messageBar = $("#vote-form-alert"); // refresh the selector
+
+            if (data.message == "success") {
+                $messageBar.addClass("alert-success");
+                $messageBar.html("شكرًا لك. تم التصويت بنجاح!");
+            } else if (data.message == "already_voted") {
+                $messageBar.addClass("alert-danger");
+                $messageBar.html("لقد قمت بالتصويت من قبل!");
+            } else if (data.message == "invalid_form") {
+                $messageBar.addClass("alert-warning");
+                $messageBar.html("يرجى اختيار أحد الخيارات!");
+            }
+            $("#vote-form-alert").slideDown();
+        });
+    });
+</script>

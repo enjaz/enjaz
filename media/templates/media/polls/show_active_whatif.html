@@ -1,0 +1,31 @@
+<div class="row">
+    {% if poll.image %}
+    <div class="col-md-3">
+        <div class="screenshot">
+            <div style="text-align: center; border-left: solid 1px #eee;">
+                <style>
+                    #poll-{{ poll.id }}-img {
+                        width:90%;
+                        padding-bottom:90%;
+                        border:solid 2px #ddd;
+                        margin:10px;
+                        background:url('{{ poll.image.url }}') center center no-repeat;
+                        background-size: auto 100%;
+                    }
+                </style>
+                <div id="poll-{{ poll.id }}-img" class="img-circle" style="max-width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9">
+    {% else %}
+    <div class="col-md-12">
+    {% endif %}
+    <h2>{{ poll.title }}</h2>
+    <p>
+        {{ poll.text }}
+    </p>
+    </div>
+</div>
+
+{# <!-- TODO: load comments and commenting form --> #}

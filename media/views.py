@@ -5,6 +5,7 @@ import random
 from django.contrib.auth.decorators import permission_required, login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.core import mail
+from django.db import IntegrityError
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
@@ -19,9 +20,9 @@ from core import decorators
 from clubs.models import Club
 from activities.models import Activity, Episode
 from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment, \
-    WHAT_IF, HUNDRED_SAYS, Poll
+    WHAT_IF, HUNDRED_SAYS, Poll, PollResponse
 from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
-    TaskCommentForm
+    TaskCommentForm, PollForm, PollResponseForm
 
 # --- Constants and wrapper for polls
 
@@ -637,6 +638,7 @@ def polls_home(request, poll_type):
     The poll home consists of the current active poll, and a list of past polls.
     If the user is an editor, also show unpublished polls and editing options.
     """
+    # TODO: show editing options for editors
     # The poll home page consists of "boxes" for its different parts, which are loaded
     # via ajax on page load
     if poll_type == HUNDRED_SAYS:
@@ -667,6 +669,7 @@ def polls_list(request, poll_type, filter):
     For normal users, return current and past polls corresponding to the poll_type.
     The list should be classified into past, active, and upcoming.
     """
+    # TODO: show editing options for editors
     if filter == PAST:
         polls = Poll.objects.past().filter(poll_type=poll_type)
         template = "media/polls/list_past.html"
@@ -677,7 +680,7 @@ def polls_list(request, poll_type, filter):
         polls = Poll.objects.upcoming().filter(poll_type=poll_type)
         template = "media/polls/list_upcoming.html"
     else:
-        raise Http404
+        raise Http404  # Actually this is already taken care of by the proper_poll_type decorator
     context = {'polls': polls,
                'poll_type_url': get_poll_type_url(poll_type)}
     return render(request, template, context)
@@ -724,8 +727,33 @@ def show_poll(request, poll_type, poll_id):
     GET: return poll contents (title, text, choices (if any), and image, in addition to voting form (for HUNDRED_SAYS).
     POST: respond to poll (vote on a choice)
     """
-    poll = get_object_or_404(Poll, id=poll_id)
-    return render(request, "media/polls/show_active.html", {'poll': poll})
+    poll = get_object_or_404(Poll, poll_type=poll_type, id=poll_id)
+    if request.method == "POST":
+        form = PollResponseForm(request.POST, instance=PollResponse(poll=poll, user=request.user))
+        if form.is_valid():
+            try:
+                form.save()
+                return {"message": "success"}
+            except IntegrityError:
+                # An IntegrityError will be raised when a user attempts to vote twice
+                # (This constraint is specified in Meta of the PollResponse model)
+                return {"message": "already_voted"}
+        else:
+            return {"message": "invalid_form"}
+    else:
+        # For hundred-says polls, return the poll & choices in an HTML form for voting
+        # For what-if polls, return the poll only
+        # In both cases load the comments and commenting form as well
+        context = {'poll': poll, 'poll_type_url': get_poll_type_url(poll_type)}
+
+        suffix = "100says" if poll.poll_type == HUNDRED_SAYS else "whatif" if poll.poll_type == WHAT_IF else ""
+        status = "active" if poll.is_active() else "inactive"
+
+        # If the poll is a hundred-says poll and is active, then pass the voting form to the context
+        if poll.poll_type == HUNDRED_SAYS and poll.is_active():
+            context['response_form'] = PollResponseForm(instance=PollResponse(poll=poll))
+
+        return render(request, "media/polls/show_%s_%s.html" % (status, suffix), context)
 
 
 @decorators.ajax_only

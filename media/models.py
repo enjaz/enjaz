@@ -298,11 +298,17 @@ class PollManager(models.Manager):
         """
         return self.filter(open_date__lte=timezone.now(), close_date__gt=timezone.now())
 
-    def previous(self):
+    def past(self):
         """
         Return objects whose close date is before ``now``.
         """
         return self.filter(close_date__lte=timezone.now())
+
+    def upcoming(self):
+        """
+        Return objects whose open date is to come yet.
+        """
+        return self.filter(open_date__gt=timezone.now())
 
 class Poll(models.Model):
     """

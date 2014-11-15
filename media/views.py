@@ -634,21 +634,24 @@ def add_comment(request, pk):
 def polls_home(request, poll_type):
     """
     Return the polls home depending on the poll type.
-    The poll home consists of the current active poll, and a list of previous polls.
+    The poll home consists of the current active poll, and a list of past polls.
     If the user is an editor, also show unpublished polls and editing options.
     """
     # The poll home page consists of "boxes" for its different parts, which are loaded
     # via ajax on page load
     if poll_type == HUNDRED_SAYS:
+        title = u"المئة تقول"
         intro = "media/polls/100says_intro.html"
     elif poll_type == WHAT_IF:
+        title = u"ماذا لو ...؟"
         intro = "media/polls/what_if_intro.html"
     else:
         raise Http404
 
     is_editor = is_coordinator_or_member(get_media_center(), request.user) or request.user.is_superuser
 
-    context = {"intro": intro,
+    context = {"title": title,
+               "intro": intro,
                "is_editor": is_editor,
                "poll_type_url": get_poll_type_url(poll_type),
                }
@@ -662,16 +665,16 @@ def polls_list(request, poll_type, filter):
     """
     For media center coordinator, deputies, or members: return the full list of polls corresponding to the poll_type.
     For normal users, return current and past polls corresponding to the poll_type.
-    The list should be classified into previous, active, and upcoming.
+    The list should be classified into past, active, and upcoming.
     """
     if filter == PAST:
-        polls = Poll.objects.previous().filter(poll_type=poll_type)
+        polls = Poll.objects.past().filter(poll_type=poll_type)
         template = "media/polls/list_past.html"
     elif filter == ACTIVE:
         polls = Poll.objects.active().filter(poll_type=poll_type)
         template = "media/polls/list_active.html"
     elif filter == UPCOMING:
-        polls = Poll.objects.none().filter(poll_type=poll_type)
+        polls = Poll.objects.upcoming().filter(poll_type=poll_type)
         template = "media/polls/list_upcoming.html"
     else:
         raise Http404

@@ -22,7 +22,7 @@ from activities.models import Activity, Episode
 from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment, \
     WHAT_IF, HUNDRED_SAYS, Poll, PollResponse
 from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
-    TaskCommentForm, PollForm, PollResponseForm
+    TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet
 
 # --- Constants and wrapper for polls
 
@@ -691,10 +691,31 @@ def polls_list(request, poll_type, filter):
 @login_required
 def add_poll(request, poll_type):
     """
-    Add a poll corresponding to the poll_type.
-    If the poll_type is HUNDRED_SAYS, allow addition of choices.
+    GET: return the poll addition form. If the poll_type is HUNDRED_SAYS, allow addition of choices.
+    POST: add a new poll corresponding to the poll_type.
     """
-    pass
+    context = {'poll_type_url': get_poll_type_url(poll_type)}
+    if request.method == "POST":
+        form = PollForm(request.POST, request.FILES, instance=Poll(poll_type=poll_type, creator=request.user))
+        if poll_type == HUNDRED_SAYS:
+            choices_formset = PollChoiceFormSet(request.POST)
+
+        if form.is_valid() and (choices_formset.is_valid() if poll_type == HUNDRED_SAYS else True):
+            print "Dadadadaa"
+            poll = form.save()
+            if poll_type == HUNDRED_SAYS:
+                choices_formset.instance = poll
+                choices_formset.save()
+
+            return {"message": "success"}
+        else:
+            context['form'] = form
+            if poll_type == HUNDRED_SAYS: context['choices_formset'] = choices_formset
+            return render(request, "media/polls/edit_poll.html", context)
+    else:
+        context['form'] = PollForm()
+        if poll_type == HUNDRED_SAYS: context['choices_formset'] = PollChoiceFormSet()
+        return render(request, "media/polls/edit_poll.html", context)
 
 
 @decorators.ajax_only
@@ -744,6 +765,7 @@ def show_poll(request, poll_type, poll_id):
         # For hundred-says polls, return the poll & choices in an HTML form for voting
         # For what-if polls, return the poll only
         # In both cases load the comments and commenting form as well
+        # TODO: instead of 4 templates, could be reduced to simply 1 (think of it)
         context = {'poll': poll, 'poll_type_url': get_poll_type_url(poll_type)}
 
         suffix = "100says" if poll.poll_type == HUNDRED_SAYS else "whatif" if poll.poll_type == WHAT_IF else ""

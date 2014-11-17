@@ -36,5 +36,6 @@ urlpatterns = patterns('',
     url(r'^(?P<poll_type>\w+)/list/active/$', views.polls_list, {"filter": views.ACTIVE}, name="polls_list_active"),
     url(r'^(?P<poll_type>\w+)/list/upcoming/$', views.polls_list, {"filter": views.UPCOMING}, name="polls_list_upcoming"),
     url(r'^(?P<poll_type>\w+)/list/past/$', views.polls_list, {"filter": views.PAST}, name="polls_list_past"),
+    url(r'^(?P<poll_type>\w+)/add/$', views.add_poll, name="add_poll"),
     url(r'^(?P<poll_type>\w+)/(?P<poll_id>\d+)/$', views.show_poll, name="show_poll"),
 )

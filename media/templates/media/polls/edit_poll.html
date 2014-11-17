@@ -1,0 +1,109 @@
+{% load bootstrap3 %}{% load staticfiles %}
+<form id="edit-poll-form" action="post">
+{% csrf_token %}
+{% bootstrap_form form %}
+{% if choices_formset %}
+    <hr>
+    <h3>الخيارات</h3>
+    {# {% bootstrap_formset choices_formset %} #}
+    {# -------- #}
+    {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
+    {{ choices_formset.management_form }}
+    {{ choices_formset.non_form_errors.as_ul }}
+    <table id="choices-formset" class="form" style="width: 100%;">
+    {% for form in choices_formset.forms %}
+      {% if forloop.first %}
+        <colgroup>
+            <col class="col-xs-7">
+            <col class="col-xs-3">
+            <col class="col-xs-2">
+        </colgroup>
+      <thead><tr>
+        {% for field in form.visible_fields %}
+        <th>{{ field.label|capfirst }}</th>
+        {% endfor %}
+      </tr></thead>
+      {% endif %}
+      <tr class="form-container">
+      {% for field in form.visible_fields %}
+        <td>
+        {# Include the hidden fields in the form #}
+        {% if forloop.first %}
+          {% for hidden in form.hidden_fields %}
+          {{ hidden }}
+          {% endfor %}
+        {% endif %}
+            <div class="form-group">
+          {{ field.errors.as_ul }}
+          {{ field }}
+            </div>
+        </td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+    </table>
+    {# ------- #}
+{% endif %}
+</form>
+
+{# <!-- TODO: scripts for date/time-picker, formset, and colorpicker? --> #}
+<script src="{% static 'js/jquery.formset.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'css/jquery.datetimepicker.css' %}"/>
+<script src="{% static 'js/jquery.datetimepicker.js' %}"></script>
+
+<script type="text/javascript">
+$(document).ready(function () {
+
+    // style the formset fields
+    $("#choices-formset").find("input").addClass("form-control");
+
+    // add formset controls
+    $("#choices-formset .form-container").formset({
+        prefix: '{{ formset.prefix }}',
+        addText: 'أضف خيارًا',
+        deleteText: 'احذف',
+        addCssClass: 'add-row btn btn-xs btn-primary',
+        deleteCssClass: 'delete-row btn btn-xs btn-default',
+    });
+
+    // initialize date/time pickers
+    var $datetimeFields = $("input[name=open_date], input[name=close_date]");
+    $datetimeFields.addClass("english-field").datetimepicker({
+        format: 'Y-m-d H:i',
+    });
+
+    // modify form submission behaviour to be ajaxy
+    $("form#edit-poll-form").submit(function (event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var $form = $(this),
+            data = $form.serialize(),
+            url = "{% url 'media:add_poll' poll_type_url %}";
+
+        /* Send the data using post */
+        var posting = $.post(url, data);
+
+        posting.done(function (data) {
+            if (data.message == "success") {
+
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                toastr.success("تم إنشاء تصويت جديد بنجاح.");
+
+                // hide modal
+                var $modal = $("#edit-poll-modal")
+                $modal.modal('hide');
+
+                // refresh poll lists
+                loadPolls()
+
+            } else {
+                $("#edit-poll-modal .modal-body").html(data);
+            }
+        });
+    });
+});
+</script>

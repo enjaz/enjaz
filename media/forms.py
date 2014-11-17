@@ -94,7 +94,7 @@ class PollForm(ModelForm):
 
     class Meta:
         model = Poll
-        exclude = ('date_created', 'creator')
+        exclude = ('poll_type', 'date_created', 'creator')
 
 
 PollChoiceFormSet = inlineformset_factory(Poll, PollChoice)

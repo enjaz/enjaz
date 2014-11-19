@@ -38,4 +38,5 @@ urlpatterns = patterns('',
     url(r'^(?P<poll_type>\w+)/list/past/$', views.polls_list, {"filter": views.PAST}, name="polls_list_past"),
     url(r'^(?P<poll_type>\w+)/add/$', views.add_poll, name="add_poll"),
     url(r'^(?P<poll_type>\w+)/(?P<poll_id>\d+)/$', views.show_poll, name="show_poll"),
+    url(r'^(?P<poll_type>\w+)/(?P<poll_id>\d+)/edit/$', views.edit_poll, name="edit_poll"),
 )

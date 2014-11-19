@@ -81,7 +81,11 @@ $(document).ready(function () {
         /* get some values from elements on the page: */
         var $form = $(this),
             data = $form.serialize(),
+            {% if poll %}{# if a poll is passed, then post to edit_poll url, otherwise to add_poll #}
+            url = "{% url 'media:edit_poll' poll_type_url poll.id %}";
+            {% else %}
             url = "{% url 'media:add_poll' poll_type_url %}";
+            {% endif %}
 
         /* Send the data using post */
         var posting = $.post(url, data);
@@ -91,7 +95,11 @@ $(document).ready(function () {
 
                 // show success message (using toastr)
                 toastr.options.positionClass = "toast-top-left";
+                {% if poll %}
+                toastr.success("تم تعديل {{ poll.title }} بنجاح.");
+                {% else %}
                 toastr.success("تم إنشاء تصويت جديد بنجاح.");
+                {% endif %}
 
                 // hide modal
                 var $modal = $("#edit-poll-modal")

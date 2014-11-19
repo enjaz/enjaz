@@ -21,9 +21,21 @@
     {% else %}
     <div class="col-md-12">
     {% endif %}
-    <h2>{{ poll.title }}</h2>
+    <h2>
+        {{ poll.title }}
+
+        {% if is_editor %}
+        <span style="float: left;">
+            <button id="edit-poll-{{ poll.id }}" class="btn btn-xs btn-icon btn-gold">
+                <i class="entypo-pencil"></i>
+                عدل
+            </button>
+        </span>
+        {% endif %}
+
+    </h2>
     <p>
-        {{ poll.text }}
+        {{ poll.text|linebreaksbr }}
     </p>
     <form id="vote-form" method="post">
         {% csrf_token %}
@@ -76,4 +88,22 @@
             $("#vote-form-alert").slideDown();
         });
     });
+    {% if is_editor %}
+        // attach function to add poll button
+        $("button#edit-poll-{{ poll.id }}").click(function () {
+            // show the edit poll modal {# you can find it in media/polls/home.html #}
+            $("#edit-poll-modal").modal('show');
+
+            $("#edit-poll-modal .modal-title").html("عدّل {{ poll.title }}");
+            $("#edit-poll-modal .modal-body").load("{% url 'media:edit_poll' poll_type_url poll.id %}");
+
+            var $submitButton = $("#edit-poll-modal button#submit-button");
+            // Unbind any handlers previously attached to the submit button
+            // This is necessary to avoid multiple submissions of the form
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-poll-form").submit();
+            });
+        });
+    {% endif %}
 </script>

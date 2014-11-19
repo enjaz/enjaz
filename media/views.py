@@ -629,6 +629,7 @@ def add_comment(request, pk):
 # code could be either loaded initially or via this ajax request
 # Successful submission -> ajax call to poll_results
 
+# TODO: add permission checks to views
 
 @proper_poll_type
 @login_required
@@ -701,7 +702,6 @@ def add_poll(request, poll_type):
             choices_formset = PollChoiceFormSet(request.POST)
 
         if form.is_valid() and (choices_formset.is_valid() if poll_type == HUNDRED_SAYS else True):
-            print "Dadadadaa"
             poll = form.save()
             if poll_type == HUNDRED_SAYS:
                 choices_formset.instance = poll
@@ -723,10 +723,31 @@ def add_poll(request, poll_type):
 @login_required
 def edit_poll(request, poll_type, poll_id):
     """
-    Edit a given poll.
-    If the poll_type is HUNDRED_SAYS, allow editing of choices.
+    GET: return the poll editing form. If the poll_type is HUNDRED_SAYS, allow editing of choices.
+    POST: edit the passed poll.
     """
-    pass
+    poll = get_object_or_404(Poll, poll_type=poll_type, pk=poll_id)
+    context = {'poll_type_url': get_poll_type_url(poll_type), 'poll': poll}
+    if request.method == "POST":
+        form = PollForm(request.POST, request.FILES, instance=poll)
+        if poll_type == HUNDRED_SAYS:
+            choices_formset = PollChoiceFormSet(request.POST, instance=poll)
+
+        if form.is_valid() and (choices_formset.is_valid() if poll_type == HUNDRED_SAYS else True):
+            form.save()
+            if poll_type == HUNDRED_SAYS:
+                choices_formset.save()
+
+            return {"message": "success"}
+        else:
+            context['form'] = form
+            if poll_type == HUNDRED_SAYS: context['choices_formset'] = choices_formset
+            return render(request, "media/polls/edit_poll.html", context)
+    else:
+        context['form'] = PollForm(instance=poll)
+        if poll_type == HUNDRED_SAYS: context['choices_formset'] = PollChoiceFormSet(instance=poll)
+        return render(request, "media/polls/edit_poll.html", context)
+
 
 
 @decorators.ajax_only
@@ -770,6 +791,8 @@ def show_poll(request, poll_type, poll_id):
 
         suffix = "100says" if poll.poll_type == HUNDRED_SAYS else "whatif" if poll.poll_type == WHAT_IF else ""
         status = "active" if poll.is_active() else "inactive"
+
+        context['is_editor'] = is_coordinator_or_member(get_media_center(), request.user) or request.user.is_superuser
 
         # If the poll is a hundred-says poll and is active, then pass the voting form to the context
         if poll.poll_type == HUNDRED_SAYS and poll.is_active():

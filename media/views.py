@@ -671,6 +671,7 @@ def polls_list(request, poll_type, filter):
     The list should be classified into past, active, and upcoming.
     """
     # TODO: show editing options for editors
+    # TODO: reduce templates into list_active and list_inactive
     if filter == PAST:
         polls = Poll.objects.past().filter(poll_type=poll_type)
         template = "media/polls/list_past.html"
@@ -786,19 +787,17 @@ def show_poll(request, poll_type, poll_id):
         # For hundred-says polls, return the poll & choices in an HTML form for voting
         # For what-if polls, return the poll only
         # In both cases load the comments and commenting form as well
-        # TODO: instead of 4 templates, could be reduced to simply 1 (think of it)
         context = {'poll': poll, 'poll_type_url': get_poll_type_url(poll_type)}
 
-        suffix = "100says" if poll.poll_type == HUNDRED_SAYS else "whatif" if poll.poll_type == WHAT_IF else ""
-        status = "active" if poll.is_active() else "inactive"
-
+        context['is_active'] = poll.is_active()
+        context['has_choices'] = poll.poll_type == HUNDRED_SAYS
         context['is_editor'] = is_coordinator_or_member(get_media_center(), request.user) or request.user.is_superuser
 
         # If the poll is a hundred-says poll and is active, then pass the voting form to the context
         if poll.poll_type == HUNDRED_SAYS and poll.is_active():
             context['response_form'] = PollResponseForm(instance=PollResponse(poll=poll))
 
-        return render(request, "media/polls/show_%s_%s.html" % (status, suffix), context)
+        return render(request, "media/polls/show_poll.html", context)
 
 
 @decorators.ajax_only

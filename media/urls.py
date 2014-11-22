@@ -40,4 +40,5 @@ urlpatterns = patterns('',
     url(r'^(?P<poll_type>\w+)/(?P<poll_id>\d+)/$', views.show_poll, name="show_poll"),
     url(r'^(?P<poll_type>\w+)/(?P<poll_id>\d+)/edit/$', views.edit_poll, name="edit_poll"),
     url(r'^(?P<poll_type>\w+)/(?P<poll_id>\d+)/delete/$', views.delete_poll, name="delete_poll"),
+    url(r'^(?P<poll_type>\w+)/(?P<poll_id>\d+)/comment/$', views.poll_comment, name="poll_comment"),
 )

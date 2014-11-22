@@ -371,7 +371,7 @@ class PollResponse(models.Model):
     choice = models.ForeignKey(PollChoice)
 
     def __unicode__(self):
-        return self.poll.title + " - response by:  " + self.user
+        return self.poll.title + " - response by:  " + self.user.__unicode__()
 
     class Meta:
         unique_together = (('poll', 'user'), )  # No user can submit more that one response
@@ -387,4 +387,4 @@ class PollComment(models.Model):  # TODO: is commenting allowed on inactive form
     body = models.TextField()
 
     def __unicode__(self):
-        return self.poll.title + " - comment by: " + self.user
+        return self.poll.title + " - comment by: " + self.author.__unicode__()

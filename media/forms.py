@@ -120,6 +120,10 @@ class PollResponseForm(ModelForm):
 
 
 class PollCommentForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(PollCommentForm, self).__init__(*args, **kwargs)
+        self.fields['body'].widget.attrs = {'class': 'form-control autogrow', 'placeholder': u"أضف تعليقًا..."}
+
     class Meta:
         model = PollComment
         fields = ('body', )

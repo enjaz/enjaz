@@ -74,7 +74,20 @@ Basically it goes like this:
 </div>
 
 {# <!-- TODO: load comments and commenting form --> #}
+<br>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <div class="panel-title">
+            <h4>
+                التعليقات
+            </h4>
+        </div>
+    </div>
 
+    <div  id="poll-{{ poll.id }}-comments" class="panel-body no-padding">
+    {% include "media/polls/ajax-loader.html" %}
+    </div>
+</div>
 
 {% if has_choices and is_active %}
 <script type="text/javascript">
@@ -137,3 +150,8 @@ $("#vote-form-{{ poll.id }}").submit(function(event) {
     });
 </script>
 {% endif %}
+<script>
+    $(document).ready(function () {
+        $("div#poll-{{ poll.id }}-comments").load("{% url 'media:poll_comment' poll_type_url poll.id %}");
+    });
+</script>

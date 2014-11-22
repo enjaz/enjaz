@@ -20,9 +20,9 @@ from core import decorators
 from clubs.models import Club
 from activities.models import Activity, Episode
 from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment, \
-    WHAT_IF, HUNDRED_SAYS, Poll, PollResponse
+    WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment
 from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
-    TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet
+    TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm
 
 # --- Constants and wrapper for polls
 
@@ -811,8 +811,24 @@ def poll_comment(request, poll_type, poll_id):
     GET: return list of comments and commenting form for poll.
     POST: comment on a poll.
     """
-    pass
-
+    poll = get_object_or_404(Poll, poll_type=poll_type, pk=poll_id)
+    context = {"poll": poll,
+               "poll_type_url": get_poll_type_url(poll_type),
+               'comments': poll.comments.all()}
+    if request.method == "POST":
+        comment_form = PollCommentForm(request.POST, instance=PollComment(poll=poll, author=request.user))
+        if comment_form.is_valid():
+            comment_form.save()
+            return {"message": "success"}
+        else:
+            context["comment_form"] = comment_form
+            return render(request, "media/polls/comments.html", context)
+    else:
+        context['comment_form'] = PollCommentForm()
+        return render(request, "media/polls/comments.html", context)
+    # TODO: enable/disable commenting when poll is active/inactive, respectively
+    # TODO: enable editors to delete comments
+    # TODO: only show part (1st 3) of the comments list at first
 
 @decorators.ajax_only
 @proper_poll_type
@@ -822,6 +838,7 @@ def poll_results(request, poll_type, poll_id):
     For hundred-says polls, return a results page as a pie chart of votes.
     For non-media center members, this shouldn't be accessible unless the user has already voted.
     """
+    # The user should either be an editor or has voted in order to be allowed to see the results
     pass
 
 

@@ -5,9 +5,9 @@
 {% if choices_formset %}
     <hr>
     <h3>الخيارات</h3>
-    {# {% bootstrap_formset choices_formset %} #}
     {# -------- #}
     {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
+    {# <!-- FIXME: delete buttons don't appear properly --> #}
     {{ choices_formset.management_form }}
     {{ choices_formset.non_form_errors.as_ul }}
     <table id="choices-formset" class="form" style="width: 100%;">
@@ -45,8 +45,24 @@
     {# ------- #}
 {% endif %}
 </form>
+{% if form.instance.pk %}
+<hr>
+<div class="col-md-3">
+<button id="delete-poll" class="btn btn-xs btn-danger btn-icon">
+    <i class="entypo-cancel"></i>
+    احذف التصويت
+</button>
+</div>
+<div class="col-md-9">
+<form style="display: none;" id="confirm-delete-form" class="form form-inline">
+    {% csrf_token %}
+    <label>هل أنت متأكد؟ سيتم حذف كل المعلومات المتعلقة بالتصويت.</label>
+    <button class="btn btn-xs btn-danger" type="submit">نعم</button>
+    <button id="abort-delete" class="btn btn-xs btn-default">لا</button>
+</form>
+</div>
+{% endif %}
 
-{# <!-- TODO: scripts for date/time-picker, formset, and colorpicker? --> #}
 <script src="{% static 'js/jquery.formset.js' %}"></script>
 <link rel="stylesheet" type="text/css" href="{% static 'css/jquery.datetimepicker.css' %}"/>
 <script src="{% static 'js/jquery.datetimepicker.js' %}"></script>
@@ -113,5 +129,45 @@ $(document).ready(function () {
             }
         });
     });
+
+    {% if form.instance.pk %}
+    $deleteForm = $('#confirm-delete-form');
+    $("button#delete-poll").click(function () {
+        $deleteForm.slideDown();
+    });
+    $("button#abort-delete").click(function (event) {
+        event.preventDefault();
+        $deleteForm.slideUp();
+    });
+    $deleteForm.submit(function (event) {
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var $form = $(this),
+            data = $form.serialize(),
+            url = "{% url 'media:delete_poll' poll_type_url poll.id %}";
+
+        /* Send the data using post */
+        var posting = $.post(url, data);
+
+        posting.done(function (data) {
+            if (data.message == "success") {
+
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                toastr.info("تم حذف {{ poll.title }} بنجاح.");
+
+                // hide modal
+                var $modal = $("#edit-poll-modal")
+                $modal.modal('hide');
+
+                // refresh poll lists
+                loadPolls()
+
+            }
+        });
+    });
+    {% endif %}
 });
 </script>

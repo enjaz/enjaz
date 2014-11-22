@@ -752,6 +752,7 @@ def edit_poll(request, poll_type, poll_id):
 
 
 @decorators.ajax_only
+@decorators.post_only
 @proper_poll_type
 @login_required
 def delete_poll(request, poll_type, poll_id):
@@ -759,7 +760,9 @@ def delete_poll(request, poll_type, poll_id):
     GET: show confirmation message.
     POST: delete given poll.
     """
-    pass
+    poll = get_object_or_404(Poll, poll_type=poll_type, pk=poll_id)
+    poll.delete()
+    return {"message": "success"}
 
 
 @decorators.ajax_only

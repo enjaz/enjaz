@@ -814,6 +814,7 @@ def poll_comment(request, poll_type, poll_id):
     poll = get_object_or_404(Poll, poll_type=poll_type, pk=poll_id)
     context = {"poll": poll,
                "poll_type_url": get_poll_type_url(poll_type),
+               "is_editor": is_coordinator_or_member(get_media_center(), request.user) or request.user.is_superuser,
                'comments': poll.comments.all()}
     if request.method == "POST":
         comment_form = PollCommentForm(request.POST, instance=PollComment(poll=poll, author=request.user))
@@ -824,11 +825,24 @@ def poll_comment(request, poll_type, poll_id):
             context["comment_form"] = comment_form
             return render(request, "media/polls/comments.html", context)
     else:
-        context['comment_form'] = PollCommentForm()
+        if poll.is_active():
+            context['comment_form'] = PollCommentForm()
         return render(request, "media/polls/comments.html", context)
-    # TODO: enable/disable commenting when poll is active/inactive, respectively
-    # TODO: enable editors to delete comments
     # TODO: only show part (1st 3) of the comments list at first
+
+
+@decorators.ajax_only
+@decorators.post_only
+@proper_poll_type
+@user_passes_test(is_media_coordinator_or_member)
+@login_required
+def delete_poll_comment(request, poll_type, poll_id):
+    poll = get_object_or_404(Poll, poll_type=poll_type, pk=poll_id)
+    comment_id = request.POST['comment_id']
+    comment = get_object_or_404(PollComment, poll=poll, pk=comment_id)
+    comment.delete()
+    return {"message": "success"}
+
 
 @decorators.ajax_only
 @proper_poll_type

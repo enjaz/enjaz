@@ -353,6 +353,26 @@ class PollChoice(models.Model):
                                                                  # green, success, warning, etc.
                                                                  # TODO: add choices
 
+    def get_response_count(self):
+        """
+        If the poll has responses, return the number of responses that chose the current response.
+        """
+        response_count = self.poll.responses.count()
+        if response_count > 0:
+            return self.poll.responses.filter(choice=self).count()
+        else:
+            return 0
+
+    def get_response_percent(self):
+        """
+        If the poll has responses, return the percentage of responses that chose the current response.
+        """
+        response_count = self.poll.responses.count()
+        if response_count > 0:
+            return float(self.poll.responses.filter(choice=self).count()) * 100 / response_count
+        else:
+            return 0.0
+
     def __unicode__(self):
         return self.value
 

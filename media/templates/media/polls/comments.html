@@ -107,7 +107,7 @@
         });
 
         {% if is_editor %}
-
+        {# FIXME: The selectors conflict with other polls. #}
         $(".delete-comment-button").click(function () {
             var commentId = $(this).attr("data-comment-id");
 

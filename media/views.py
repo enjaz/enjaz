@@ -858,9 +858,10 @@ def poll_results(request, poll_type, poll_id):
     # Make sure it's a HUNDRED_SAYS poll
     assert poll.poll_type == HUNDRED_SAYS
 
-    # The user should either be an editor or has voted in order to be allowed to see the results
+    # The poll should be inactive or the
+    # user should either be an editor or has voted in order to be allowed to see the results
     has_voted = poll.responses.filter(user=request.user).exists()
-    if not has_voted and not (request.user.is_superuser or is_coordinator_or_member(get_media_center(), request.user)):
+    if poll.is_active() and not has_voted and not (request.user.is_superuser or is_coordinator_or_member(get_media_center(), request.user)):
         raise PermissionDenied
 
     return render(request, "media/polls/results.html", {"poll": poll, "poll_type_url": get_poll_type_url(poll_type)})

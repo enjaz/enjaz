@@ -1,1 +1,58 @@
-<h1>RESULTS</h1>
+<div class="panel panel-gray" data-collapsed="0">
+    <!-- panel body -->
+    <div class="panel-body">
+{% if poll.responses.all %}
+<div class="col-md-4">
+    <div class="legend">
+        <div class="panel panel-default" data-collapsed="0">
+            <!-- panel body -->
+            <div class="panel-body with-table">
+            <table class="table">
+                <thead>
+                    <th>
+                        الخيار
+                    </th>
+                    <th>
+                        عدد الأصوات
+                    </th>
+                </thead>
+                <tbody>
+            {% for choice in poll.choices.all %}
+                <tr>
+                <td class="">
+                    {{ choice.value }}
+                </td>
+                <td class="">
+                    {{ choice.get_response_count }}
+                </td>
+                </tr>
+            {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-8">
+    <div id="poll-{{ poll.id }}-chart" style="width: 70%; margin-left: auto; margin-right: auto;">
+
+    </div>
+</div>
+<script>
+    Morris.Donut({
+        element: 'poll-{{ poll.id }}-chart',
+        data: [
+            {% for choice in poll.choices.all %}
+                {label: "{{ choice.value }}", value: {{ choice.get_response_count }}, percent: "{{ choice.get_response_percent }}" },
+            {% endfor %}
+        ],
+        formatter: function (key, data) { return data.value + " - " + data.percent + "%" },
+    });
+</script>
+{% else %}
+<p style="text-align: center;">
+    لا توجد تصويتات.
+</p>
+{% endif %}
+    </div>
+</div>

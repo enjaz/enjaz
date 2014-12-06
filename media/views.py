@@ -795,6 +795,7 @@ def show_poll(request, poll_type, poll_id):
         context['is_active'] = poll.is_active()
         context['has_choices'] = poll.poll_type == HUNDRED_SAYS
         context['is_editor'] = is_coordinator_or_member(get_media_center(), request.user) or request.user.is_superuser
+        context['has_voted'] = poll.responses.filter(user=request.user).exists()
 
         # If the poll is a hundred-says poll and is active, then pass the voting form to the context
         if poll.poll_type == HUNDRED_SAYS and poll.is_active():
@@ -852,8 +853,17 @@ def poll_results(request, poll_type, poll_id):
     For hundred-says polls, return a results page as a pie chart of votes.
     For non-media center members, this shouldn't be accessible unless the user has already voted.
     """
+    poll = get_object_or_404(Poll, poll_type=poll_type, pk=poll_id)
+
+    # Make sure it's a HUNDRED_SAYS poll
+    assert poll.poll_type == HUNDRED_SAYS
+
     # The user should either be an editor or has voted in order to be allowed to see the results
-    pass
+    has_voted = poll.responses.filter(user=request.user).exists()
+    if not has_voted and not (request.user.is_superuser or is_coordinator_or_member(get_media_center(), request.user)):
+        raise PermissionDenied
+
+    return render(request, "media/polls/results.html", {"poll": poll, "poll_type_url": get_poll_type_url(poll_type)})
 
 
 @decorators.ajax_only

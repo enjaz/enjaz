@@ -47,6 +47,13 @@ Basically it goes like this:
                 <i class="entypo-pencil"></i>
                 عدل
             </button>
+            {% if has_choices and is_active and not has_voted %}
+                {# With a HUNDRED_SAYS poll, the editor should be able to view the results even if they haven't voted #}
+                <button id="show-poll-{{ poll.id }}-results" class="btn btn-xs btn-icon btn-info">
+                    <i class="entypo-chart-pie"></i>
+                    استعرض نتائج التصويت
+                </button>
+            {% endif %}
         </span>
         {% endif %}
 
@@ -54,21 +61,30 @@ Basically it goes like this:
     <p>
         {{ poll.text|linebreaksbr }}
     </p>
-    {% if has_choices and is_active %}
-    <form id="vote-form-{{ poll.id }}" method="post">
-        {% csrf_token %}
-        {{ response_form.as_p }}
-        <button class="btn btn-primary btn-block" type="submit">
-            <i class="entypo-pencil"></i>
-            صوِّت
-        </button>
-    </form>
-    {% elif has_choices and not is_active %}
-        <ul>
-            {% for choice in poll.choices.all %}
-                <li>{{ choice }}</li>
-            {% endfor %}
-        </ul>
+    {% comment %}
+        If the poll is a HUNDRED_SAYS poll, then load the voting form if the poll is active and the user hasn't voted,
+        or load the results page if otherwise (inactive or has voted or both).
+        If the poll is a WHAT_IF poll, do nothing.
+    {% endcomment %}
+    {% if has_choices %}
+    <div id="poll-{{ poll.id }}-choice-panel">
+        {% if is_active and not has_voted %}
+                <form id="vote-form-{{ poll.id }}" method="post">
+                    {% csrf_token %}
+                    {{ response_form.as_p }}
+                    <button class="btn btn-primary btn-block" type="submit">
+                        <i class="entypo-pencil"></i>
+                        صوِّت
+                    </button>
+                </form>
+        {% else %}
+            {# show the results #}
+            {% include "media/polls/ajax-loader.html" %}
+            <script>
+                $("#poll-{{ poll.id }}-choice-panel").load("{% url 'media:poll_results' poll_type_url poll.id %}");
+            </script>
+        {% endif %}
+    </div>
     {% endif %}
     </div>
 </div>
@@ -89,7 +105,7 @@ Basically it goes like this:
     </div>
 </div>
 
-{% if has_choices and is_active %}
+{% if has_choices and is_active and not has_voted %}
 <script type="text/javascript">
 $("#vote-form-{{ poll.id }}").submit(function(event) {
 
@@ -118,6 +134,18 @@ $("#vote-form-{{ poll.id }}").submit(function(event) {
         if (data.message == "success") {
             $messageBar.addClass("alert-success");
             $messageBar.html("شكرًا لك. تم التصويت بنجاح!");
+
+            // load the poll results
+            var $choicesPanel = $("#poll-{{ poll.id }}-choice-panel");
+             $choicesPanel.slideUp(function () {
+                $choicesPanel.load("{% url 'media:poll_results' poll_type_url poll.id %}", function () {
+                    $choicesPanel.slideDown();
+                });
+             });
+             {% if is_editor %}
+             $("button#show-poll-{{ poll.id }}-results").slideUp();
+             {% endif %}
+
         } else if (data.message == "already_voted") {
             $messageBar.addClass("alert-danger");
             $messageBar.html("لقد قمت بالتصويت من قبل!");
@@ -148,6 +176,18 @@ $("#vote-form-{{ poll.id }}").submit(function(event) {
             $("form#edit-poll-form").submit();
         });
     });
+    {% if has_choices and is_active and not has_voted %}
+    // attach function to show results button
+     $("button#show-poll-{{ poll.id }}-results").click(function () {
+         var $choicesPanel = $("#poll-{{ poll.id }}-choice-panel");
+         $choicesPanel.slideUp(function () {
+            $choicesPanel.load("{% url 'media:poll_results' poll_type_url poll.id %}", function () {
+                $choicesPanel.slideDown();
+            });
+         });
+         $(this).slideUp();
+     });
+    {% endif %}
 </script>
 {% endif %}
 <script>

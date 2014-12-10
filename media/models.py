@@ -17,6 +17,28 @@ POLL_TYPE_CHOICES = (
     (HUNDRED_SAYS, u"المئة تقول"),
 )
 
+RED = "red"
+GREEN = "green"
+BLUE = "blue"
+AERO = "aero"
+GREY = "grey"
+ORANGE = "orange"
+YELLOW = "yellow"
+PINK = "pink"
+PURPLE = "purple"
+
+POLL_CHOICE_COLORS = (
+    (RED, u"أحمر"),
+    (GREEN, u"أخضر"),
+    (BLUE, u"أزرق"),
+    (AERO, u"سماوي"),
+    (GREY, u"رمادي"),
+    (ORANGE, u"برتقالي"),
+    (YELLOW, u"أصفر"),
+    (PINK, u"زهري"),
+    (PURPLE, u"بنفسجي"),
+)
+
 POLL_CHOICE_MAX_LENGTH = 128
 
 class FollowUpReport(models.Model):
@@ -349,9 +371,10 @@ class Poll(models.Model):
 class PollChoice(models.Model):
     poll = models.ForeignKey(Poll, related_name="choices")
     value = models.CharField(max_length=POLL_CHOICE_MAX_LENGTH)
-    color = models.CharField(max_length=128, default="default")  # stores bootstrap color values e.g. blue,
-                                                                 # green, success, warning, etc.
-                                                                 # TODO: add choices
+    color = models.CharField(max_length=128, choices=POLL_CHOICE_COLORS,
+                             default=GREEN)  # stores bootstrap color values e.g. blue,
+                                             # green, success, warning, etc.
+                                             # TODO: add choices
 
     def get_response_count(self):
         """

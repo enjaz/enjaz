@@ -107,6 +107,38 @@ Basically it goes like this:
 
 {% if has_choices and is_active and not has_voted %}
 <script type="text/javascript">
+// Style the choices
+
+// Style the choice list
+$("#vote-form-{{ poll.id }} ul").addClass("icheck-list");
+
+// Store the colors of the buttons in this temporary list, then iterate over the choices and initiate an iCheck
+// button for each. The buttons and the color list elements are in the same order, so -while iterating- use the
+// first element to determine its color then delete it and move to the next.
+var colorList{{ poll.id }} = [{% for choice in poll.choices.all %}"{{ choice.color }}",{% endfor %}]
+
+// Style the radio buttons as iCheck
+$("#vote-form-{{ poll.id }} input[type=radio]").each(function () {
+    var $self = $(this);
+    var $label = $self.parent();
+    var labelText = $label.text();
+    var color = colorList{{ poll.id }}.shift(); // shift() returns and deletes the first item (similar to .pop() in python)
+
+    // Remove the text label
+    $label.contents().filter(function(){
+        return (this.nodeType == 3); // Text Node
+    }).remove();
+
+    // Remove the <label> element
+    $self.unwrap();
+
+    $self.iCheck({
+      radioClass: 'iradio_line-' + color,
+      insert: '<div class="icheck_line-icon"></div>' + labelText
+    });
+});
+
+// Attach proper behavior to form submission
 $("#vote-form-{{ poll.id }}").submit(function(event) {
 
     /* stop form from submitting normally */

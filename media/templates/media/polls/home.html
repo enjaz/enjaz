@@ -77,8 +77,17 @@
 {% endblock %}
 
 {% block customscript %}
+{# <!-- FIXME: load only the relevant assets based on the different parameters (is_editor, poll type, etc) --> #}
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/minimal/_all.css' %}">
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/square/_all.css' %}">
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/flat/_all.css' %}">
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/futurico/futurico.css' %}">
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/polaris/polaris.css' %}">
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/line/_all.css' %}">
+
 <script src="{% static 'neon/assets/js/raphael-min.js' %}"></script>
 <script src="{% static 'neon/assets/js/morris.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/icheck/icheck.min.js' %}"></script>
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
 <script type="text/javascript">
     $(document).ready(function () {

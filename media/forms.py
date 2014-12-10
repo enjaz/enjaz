@@ -110,8 +110,9 @@ class PollResponseForm(ModelForm):
         assert getattr(kwargs['instance'], 'poll') is not None
         super(PollResponseForm, self).__init__(*args, **kwargs)
         # Limit the available choices to the attached poll's choices
-        self.fields['choice'] = CustomModelChoiceField(queryset=self.instance.poll.choices.all(),
-                                                       widget=CustomRadioSelect(),
+        self.fields['choice'] = forms.ModelChoiceField(queryset=self.instance.poll.choices.all(),
+                                                       widget=forms.RadioSelect(),
+                                                       label="",
                                                        empty_label=None)  # Remove Django's default "--------" option
 
     class Meta:
@@ -127,35 +128,3 @@ class PollCommentForm(ModelForm):
     class Meta:
         model = PollComment
         fields = ('body', )
-
-
-# Leave this for later now; there are more important things to do
-
-class CustomRadioSelect(forms.RadioSelect):
-    """
-    Override the default RadioSelect to add custom classes for each choice.
-    """
-    # renderer = SomeCustomRendered # This is where intervention is needed
-
-
-class CustomModelChoiceField(forms.ModelChoiceField):
-    """
-    Override the default ModelChoiceField to use the CustomModelChoiceIterator.
-    """
-    def _get_choices(self):
-        if hasattr(self, '_choices'):
-            return self._choices
-
-        return CustomModelChoiceIterator(self)
-
-    choices = property(_get_choices, forms.ChoiceField._set_choices)
-
-
-class CustomModelChoiceIterator(forms.models.ModelChoiceIterator):
-    """
-    Override the default ModelChoiceIterator to include the color property for each choice.
-    """
-    def choice(self, obj):
-        original = super(CustomModelChoiceIterator, self).choice(obj)
-        # Append color to the orignial tuple
-        return original + (obj.color, )

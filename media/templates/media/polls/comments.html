@@ -1,0 +1,144 @@
+<!-- List of Comments --><ul class="comments-list">
+<style type="text/css">
+    .comments-list .comment-details {
+        width: 100% !important;
+    }
+</style>
+{% for comment in comments %}
+    <!-- Comment Entry -->						<li>
+        <div class="comment-details">
+
+            <div class="comment-head">
+                {{ comment.author.student_profile.get_ar_full_name }}
+            </div>
+
+            <p class="comment-text">
+                {{ comment.body }}
+            </p>
+
+            <div class="comment-footer">
+
+                <div class="comment-time">
+                    {{ comment.date }} {# humanise #}
+                </div>
+
+            {% if is_editor %}
+                <div class="action-links" style="float: left; font-size: 12px;">
+                    <button class="btn btn-xs btn-danger delete-comment-button" data-toggle="tooltip"
+                            data-placement="right" data-original-title="احذف التعليق" data-comment-id="{{ comment.id }}">
+                        <i class="entypo-cancel"></i>
+                    </button>
+
+                    <form style="display: none;" class="form form-inline confirm-delete-comment-form"
+                          data-comment-id="{{ comment.id }}">
+                        {% csrf_token %}
+                        <label>هل أنت متأكد من أنك تريد <strong>حذف</strong> التعليق؟</label>
+                        <input type="hidden" name="comment_id" value="{{ comment.id }}" />
+                        <button class="btn btn-xs btn-danger" type="submit">نعم</button>
+                        <button class="btn btn-xs btn-default abort-delete-comment">لا</button>
+                    </form>
+                </div>
+            {% endif %}
+
+            </div>
+
+        </div>
+    </li>
+{% empty %}
+    {% if not comment_form %}
+    <br>
+    <p style="text-align: center;">
+        لا توجد تعليقات.
+    </p>
+    <br>
+    {% endif %}
+{% endfor %}
+</ul>
+
+{% if comment_form %}
+<div class="col-md-12">
+    {% if comments.count > 0 %}<hr>{% else %}<br>{% endif %}
+    <!-- Add comment form --><form id="poll-{{ poll.id }}-comment-form"
+                                   action="{% url 'media:poll_comment' poll_type_url poll.id %}" method="post">
+    {% csrf_token %}
+    <div class="col-md-11">
+        <div class="form-group{% if comment_form.body.errors %} has-error{% endif %}">
+            {{ comment_form.body }}
+        </div>
+    </div>
+    <div class="col-md-1">
+        <div class="row">
+            <button type="submit" class="btn btn-block btn-default">
+                <i class="entypo-feather"></i>
+                علّق
+            </button>
+        </div>
+    </div>
+    <br>
+</form>
+</div>
+{% endif %}
+
+<script>
+    $(document).ready(function(){
+        $commentForm = $('#poll-{{ poll.id }}-comment-form');
+
+        // activate autogrow for the commenting field
+        $commentForm.find("textarea").autosize();
+
+        $commentForm.submit(function (event) {
+            event.preventDefault();
+
+            /* get some values from elements on the page: */
+            var $form = $(this),
+                data = $form.serialize(),
+                url = "{% url 'media:poll_comment' poll_type_url poll.id %}";
+
+            /* Send the data using post */
+            var posting = $.post(url, data);
+
+            posting.done(function (data) {
+                if (data.message == "success") {
+                    loadPolls();
+                } else {
+                    $("#poll-{{ poll.id }}-comments").html(data);
+                }
+            });
+        });
+
+        {% if is_editor %}
+        {# FIXME: The selectors conflict with other polls. #}
+        $(".delete-comment-button").click(function () {
+            var commentId = $(this).attr("data-comment-id");
+
+            $("form[data-comment-id=" + commentId + "]").slideDown();
+        });
+
+        $(".confirm-delete-comment-form").submit(function (event) {
+            event.preventDefault();
+            var $form = $(this),
+                data = $form.serialize(),
+                url = "{% url 'media:delete_poll_comment' poll_type_url poll.id %}";
+
+            /* Send the data using post */
+            var posting = $.post(url, data);
+
+            posting.done(function (data) {
+                if (data.message == "success") {
+                    loadPolls();
+                } else {
+                    alert(data.message);
+                }
+            });
+
+        });
+
+        $(".abort-delete-comment").click(function (event) {
+            event.preventDefault();
+
+            $(this).parent().slideUp();
+        });
+
+        {% endif %}
+    });
+</script>

@@ -1,0 +1,191 @@
+{% load bootstrap3 %}{% load staticfiles %}
+<form id="edit-poll-form" action="post">
+{% csrf_token %}
+{% bootstrap_form form %}
+{% if choices_formset %}
+    <hr>
+    <h3>الخيارات</h3>
+    {# -------- #}
+    {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
+    {# <!-- FIXME: delete buttons don't appear properly --> #}
+    {{ choices_formset.management_form }}
+    {{ choices_formset.non_form_errors.as_ul }}
+    <table id="choices-formset" class="form" style="width: 100%;">
+    {% for form in choices_formset.forms %}
+      {% if forloop.first %}
+        <colgroup>
+            <col class="col-xs-7">
+            <col class="col-xs-3">
+            <col class="col-xs-2">
+        </colgroup>
+      <thead><tr>
+        {% for field in form.visible_fields %}
+        <th>{{ field.label|capfirst }}</th>
+        {% endfor %}
+      </tr></thead>
+      {% endif %}
+      <tr class="form-container">
+      {% for field in form.visible_fields %}
+        <td>
+        {# Include the hidden fields in the form #}
+        {% if forloop.first %}
+          {% for hidden in form.hidden_fields %}
+          {{ hidden }}
+          {% endfor %}
+        {% endif %}
+            <div class="form-group">
+          {{ field.errors.as_ul }}
+          {{ field }}
+            </div>
+        </td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+    </table>
+    {# ------- #}
+{% endif %}
+</form>
+{% if form.instance.pk %}
+<hr>
+<div class="col-md-3">
+<button id="delete-poll" class="btn btn-xs btn-danger btn-icon">
+    <i class="entypo-cancel"></i>
+    احذف التصويت
+</button>
+</div>
+<div class="col-md-9">
+<form style="display: none;" id="confirm-delete-form" class="form form-inline">
+    {% csrf_token %}
+    <label>هل أنت متأكد؟ سيتم حذف كل المعلومات المتعلقة بالتصويت.</label>
+    <button class="btn btn-xs btn-danger" type="submit">نعم</button>
+    <button id="abort-delete" class="btn btn-xs btn-default">لا</button>
+</form>
+</div>
+{% endif %}
+
+<script src="{% static 'js/jquery.formset.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'css/jquery.datetimepicker.css' %}"/>
+<script src="{% static 'js/jquery.datetimepicker.js' %}"></script>
+
+<script type="text/javascript">
+$(document).ready(function () {
+
+    // style the formset fields
+    $("#choices-formset").find("input").addClass("form-control");
+
+    // add formset controls
+    $("#choices-formset .form-container").formset({
+        prefix: '{{ formset.prefix }}',
+        addText: 'أضف خيارًا',
+        deleteText: 'احذف',
+        addCssClass: 'add-row btn btn-xs btn-primary',
+        deleteCssClass: 'delete-row btn btn-xs btn-default',
+    });
+
+    // For some reason, the formset plugin sometimes doesn't show the delete buttons (especially when creating a new
+    // poll), so here is a little workaround
+    // Check each of the forms of the formset; if it doesn't have a delete button, then add one
+
+    // TODO: do the same when adding a new choice
+
+    $(".dynamic-form").each(function () {
+        var deleteColumn = $(this).find("td:last-child");
+        console.log(deleteColumn.find(".delete-row"));
+        console.log(deleteColumn.find(".delete-row").length == 0);
+        if (deleteColumn.find(".delete-row").length == 0) {
+            // insert a delete button
+            var button = '<a class="delete-row btn btn-xs btn-default" href="javascript:void(0)">احذف</a>';
+            deleteColumn.append(button);
+            console.log("appended a button");
+        };
+    });
+
+    // initialize date/time pickers
+    var $datetimeFields = $("input[name=open_date], input[name=close_date]");
+    $datetimeFields.addClass("english-field").datetimepicker({
+        format: 'Y-m-d H:i',
+    });
+
+    // modify form submission behaviour to be ajaxy
+    $("form#edit-poll-form").submit(function (event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var $form = $(this),
+            data = $form.serialize(),
+            {% if poll %}{# if a poll is passed, then post to edit_poll url, otherwise to add_poll #}
+            url = "{% url 'media:edit_poll' poll_type_url poll.id %}";
+            {% else %}
+            url = "{% url 'media:add_poll' poll_type_url %}";
+            {% endif %}
+
+        /* Send the data using post */
+        var posting = $.post(url, data);
+
+        posting.done(function (data) {
+            if (data.message == "success") {
+
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                {% if poll %}
+                toastr.success("تم تعديل {{ poll.title }} بنجاح.");
+                {% else %}
+                toastr.success("تم إنشاء تصويت جديد بنجاح.");
+                {% endif %}
+
+                // hide modal
+                var $modal = $("#edit-poll-modal")
+                $modal.modal('hide');
+
+                // refresh poll lists
+                loadPolls()
+
+            } else {
+                $("#edit-poll-modal .modal-body").html(data);
+            }
+        });
+    });
+
+    {% if form.instance.pk %}
+    $deleteForm = $('#confirm-delete-form');
+    $("button#delete-poll").click(function () {
+        $deleteForm.slideDown();
+    });
+    $("button#abort-delete").click(function (event) {
+        event.preventDefault();
+        $deleteForm.slideUp();
+    });
+    $deleteForm.submit(function (event) {
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var $form = $(this),
+            data = $form.serialize(),
+            url = "{% url 'media:delete_poll' poll_type_url poll.id %}";
+
+        /* Send the data using post */
+        var posting = $.post(url, data);
+
+        posting.done(function (data) {
+            if (data.message == "success") {
+
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                toastr.info("تم حذف {{ poll.title }} بنجاح.");
+
+                // hide modal
+                var $modal = $("#edit-poll-modal")
+                $modal.modal('hide');
+
+                // refresh poll lists
+                loadPolls()
+
+            }
+        });
+    });
+    {% endif %}
+});
+</script>

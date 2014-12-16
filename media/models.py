@@ -1,10 +1,47 @@
 # -*- coding: utf-8  -*-
 import datetime
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from django.contrib.auth.models import User
+from django.utils import timezone
 from activities.models import Activity, Episode
 
+# Constants for media poll types
+
+WHAT_IF = 0
+HUNDRED_SAYS = 1
+
+POLL_TYPE_CHOICES = (
+    (WHAT_IF, u"ماذا لو؟"),
+    (HUNDRED_SAYS, u"المئة تقول"),
+)
+
+# iCheck-plugin colors
+
+RED = "red"
+GREEN = "green"
+BLUE = "blue"
+AERO = "aero"
+GREY = "grey"
+ORANGE = "orange"
+YELLOW = "yellow"
+PINK = "pink"
+PURPLE = "purple"
+
+POLL_CHOICE_COLORS = (
+    (RED, u"أحمر"),
+    (GREEN, u"أخضر"),
+    (BLUE, u"أزرق"),
+    (AERO, u"رصاصي"),
+    (GREY, u"رمادي"),
+    (ORANGE, u"برتقالي"),
+    (YELLOW, u"أصفر"),
+    (PINK, u"زهري"),
+    (PURPLE, u"بنفسجي"),
+)
+
+POLL_CHOICE_MAX_LENGTH = 128
 
 class FollowUpReport(models.Model):
     """
@@ -268,3 +305,130 @@ class TaskComment(models.Model):
     class Meta:
         verbose_name = u"تعليق على مهمة"
         verbose_name_plural = u"التعليقات على المهام"
+
+
+class PollManager(models.Manager):
+    """
+    A custom manager for polls.
+    """
+    def hundred_says(self):
+        return self.filter(poll_type=HUNDRED_SAYS)
+
+    def what_if(self):
+        return self.filter(poll_type=WHAT_IF)
+
+    def active(self):
+        """
+        Return objects whose open date is before or equal to now, and whose close date is still ahead.
+        """
+        return self.filter(open_date__lte=timezone.now(), close_date__gt=timezone.now())
+
+    def past(self):
+        """
+        Return objects whose close date is before ``now``.
+        """
+        return self.filter(close_date__lte=timezone.now())
+
+    def upcoming(self):
+        """
+        Return objects whose open date is to come yet.
+        """
+        return self.filter(open_date__gt=timezone.now())
+
+
+class Poll(models.Model):
+    """
+    Poll class that has 2 types:
+    * What-if: an open-ended question which expects comments on a hypothetical scenario.
+    * Hundred-says: a vote with several choices
+    """
+    poll_type = models.IntegerField(choices=POLL_TYPE_CHOICES, verbose_name=u"النوع")
+    title = models.CharField(max_length=128, verbose_name=u"العنوان")
+    text = models.TextField(verbose_name=u"النص")
+    date_created = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to="media/pollimages/", null=True, blank=True)
+    open_date = models.DateTimeField(verbose_name=u"موعد الفتح")
+    close_date = models.DateTimeField(verbose_name=u"موعد الإغلاق")
+    creator = models.ForeignKey(User)
+
+    objects = PollManager()
+
+    def is_active(self):
+        return self.open_date <= timezone.now() < self.close_date
+
+    def is_past(self):
+        return self.close_date <= timezone.now()
+
+    def is_upcoming(self):
+        return timezone.now() < self.open_date
+
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = u"تصويت"
+        verbose_name_plural = u"التصويتات"
+
+
+class PollChoice(models.Model):
+    poll = models.ForeignKey(Poll, related_name="choices")
+    value = models.CharField(verbose_name= u"النص", max_length=POLL_CHOICE_MAX_LENGTH)
+    color = models.CharField(verbose_name= u"اللون", max_length=128, choices=POLL_CHOICE_COLORS,
+                             default=GREEN)  # stores iCheck-plugin color values e.g. blue,
+                                             # green, red, grey, aero, etc.
+
+    def get_response_count(self):
+        """
+        If the poll has responses, return the number of responses that chose the current response.
+        """
+        response_count = self.poll.responses.count()
+        if response_count > 0:
+            return self.poll.responses.filter(choice=self).count()
+        else:
+            return 0
+
+    def get_response_percent(self):
+        """
+        If the poll has responses, return the percentage of responses that chose the current response.
+        """
+        response_count = self.poll.responses.count()
+        if response_count > 0:
+            return float(self.poll.responses.filter(choice=self).count()) * 100 / response_count
+        else:
+            return 0.0
+
+    def __unicode__(self):
+        return self.value
+
+    class Meta:
+        verbose_name = u"خيار"
+        verbose_name_plural = u"الخيارات"
+
+
+class PollResponse(models.Model):
+    """
+    A response to a poll that has choices (Hundred-says poll)
+    """
+    user = models.ForeignKey(User)
+    poll = models.ForeignKey(Poll, related_name="responses")
+    date = models.DateTimeField(auto_now_add=True)
+    choice = models.ForeignKey(PollChoice)
+
+    def __unicode__(self):
+        return self.poll.title + " - response by:  " + self.user.__unicode__()
+
+    class Meta:
+        unique_together = (('poll', 'user'), )  # No user can submit more that one response
+
+
+class PollComment(models.Model):
+    """
+    A comment on a poll
+    """
+    author = models.ForeignKey(User)
+    poll = models.ForeignKey(Poll, related_name="comments")
+    date = models.DateTimeField(auto_now_add=True)
+    body = models.TextField()
+
+    def __unicode__(self):
+        return self.poll.title + " - comment by: " + self.author.__unicode__()

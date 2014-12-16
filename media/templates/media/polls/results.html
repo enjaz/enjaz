@@ -1,0 +1,64 @@
+<div class="panel panel-gray" data-collapsed="0">{% load media_tags %}
+    <!-- panel body -->
+    <div class="panel-body">
+<div class="col-md-4">
+    <div class="legend">
+        <div class="panel panel-default" data-collapsed="0">
+            <!-- panel body -->
+            <div class="panel-body with-table">
+            <table class="table">
+                <thead>
+                    <th>
+                        الخيار
+                    </th>
+                    <th>
+                        عدد الأصوات
+                    </th>
+                </thead>
+                <tbody>
+            {% for choice in poll.choices.all %}
+                <tr>
+                <td class="">
+                    {{ choice.value }}
+                </td>
+                <td class="">
+                    {{ choice.get_response_count }}
+                </td>
+                </tr>
+            {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-8">
+    {% if poll.responses.all %}
+    <div id="poll-{{ poll.id }}-chart" style="width: 70%; margin-left: auto; margin-right: auto;">
+
+    </div>
+    {% else %}
+    <p style="text-align: center;">
+        لا توجد تصويتات.
+    </p>
+    {% endif %}
+</div>
+{% if poll.responses.all %}
+<script>
+    $(document).ready(function () {
+        Morris.Donut({
+            element: 'poll-{{ poll.id }}-chart',
+            data: [
+                {% for choice in poll.choices.all %}
+                    {label: "{{ choice.value }}", value: {{ choice.get_response_count }}, percent: "{{ choice.get_response_percent }}" },
+                {% endfor %}
+            ],
+            colors: [{% for choice in poll.choices.all %} "{% convert_to_hex choice.color %}", {% endfor %}],
+            formatter: function (key, data) { return data.value + " - " + data.percent + "%" },
+        });
+    });
+</script>
+{% endif %}
+
+    </div>
+</div>

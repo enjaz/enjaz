@@ -1,0 +1,177 @@
+{% extends "media_base.html" %}{% load staticfiles %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+    <div class="row">
+    {% include intro %}
+
+
+        <div style="text-align: left;">
+            {# If the user is an editor, show the add poll button; else, show the suggest poll button #}
+            {% if is_editor %}
+            <button id="add-poll" class="btn btn-icon btn-info">
+                <i class="entypo-plus"></i>
+                أضف تصويتًا
+            </button>
+            {% else %}
+            <button id="suggest-poll" class="btn btn-icon btn-info">
+                <i class="entypo-feather"></i>
+                اقترح تصويتًا
+            </button>
+            {% endif %}
+        </div>
+        <br>
+
+    {% if is_editor %}
+        {# If the user is an editor, show them the upcoming polls. #}
+        <!-- upcoming polls -->
+
+        <div class="panel panel-info panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+
+            <!-- panel body -->
+            <div class="panel-body">
+
+            <div id="upcoming-polls">
+                {% include "media/polls/ajax-loader.html" %}
+            </div>
+
+            </div>
+
+        </div>
+
+        <br>
+    {% endif %}
+
+    <!-- active poll(s) -->
+
+    <div class="panel panel-success panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+
+        <!-- panel body -->
+        <div class="panel-body">
+
+        <div id="active-polls">
+            {% include "media/polls/ajax-loader.html" %}
+        </div>
+
+        </div>
+
+    </div>
+
+    <!--<br>-->
+
+    <!-- past polls -->
+
+    <div class="panel panel-warning panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+
+        <!-- panel body -->
+        <div class="panel-body">
+
+        <div id="past-polls">
+            {% include "media/polls/ajax-loader.html" %}
+        </div>
+
+        </div>
+
+    </div>
+
+    </div>
+{% endblock %}
+
+{% block customscript %}
+{# <!-- FIXME: load only the relevant assets based on the different parameters (is_editor, poll type, etc) --> #}
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/minimal/_all.css' %}">
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/square/_all.css' %}">
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/flat/_all.css' %}">
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/futurico/futurico.css' %}">
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/polaris/polaris.css' %}">
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/line/_all.css' %}">
+
+<script src="{% static 'neon/assets/js/raphael-min.js' %}"></script>
+<script src="{% static 'neon/assets/js/morris.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/icheck/icheck.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        // initialize poll edit modal
+        $('#edit-poll-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        })
+        {% if is_editor %}
+            // For editors:
+            // attach function to add poll button
+            $("button#add-poll").click(function () {
+                $("#edit-poll-modal").modal('show');
+
+                $("#edit-poll-modal .modal-title").html("أضف تصويتًا");
+                $("#edit-poll-modal .modal-body").load("{% url 'media:add_poll' poll_type_url %}");
+
+                var $submitButton = $("#edit-poll-modal button#submit-button");
+                // Unbind any handlers previously attached to the submit button
+                // This is necessary to avoid multiple submissions of the form
+                $submitButton.off('click');
+                $submitButton.click(function () {
+                    $("form#edit-poll-form").submit();
+                });
+            });
+        {% else %}
+            // Attach function to suggest poll button
+            // This will use the same poll edit modal
+            $("button#suggest-poll").click(function () {
+                $("#edit-poll-modal").modal('show');
+
+                $("#edit-poll-modal .modal-title").html("اقترح تصويتًا");
+                $("#edit-poll-modal .modal-body").load("{% url 'media:suggest_poll' poll_type_url %}");
+
+                var $submitButton = $("#edit-poll-modal button#submit-button");
+                // Unbind any handlers previously attached to the submit button
+                // This is necessary to avoid multiple submissions of the form
+                $submitButton.off('click');
+                $submitButton.click(function () {
+                    $("form#edit-poll-form").submit();
+                });
+            });
+        {% endif %}
+        // load polls
+        loadPolls();
+    });
+    function loadPolls() {
+        // Load past, active, and -for editors- upcoming polls
+        {% if is_editor %}
+            $("#upcoming-polls").load("{% url 'media:polls_list_upcoming' poll_type_url %}");
+        {% endif %}
+        $("#active-polls").load("{% url 'media:polls_list_active' poll_type_url %}");
+        $("#past-polls").load("{% url 'media:polls_list_past' poll_type_url %}");
+    }
+
+  // ----
+  // enable scrolling in modal body due to its length
+  // script source: http://stackoverflow.com/a/20765540/4249696
+  $(document).ready(ajustamodal);
+  $(window).resize(ajustamodal);
+  function ajustamodal() {
+    var altura = $(window).height() - 155; //value corresponding to the modal heading + footer
+    $(".ativa-scroll").css({"height":altura,"overflow-y":"auto"});
+  }
+  // ----
+</script>
+
+<!-- poll adding/editing modal -->
+<div class="modal fade" id="edit-poll-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">أغلق</span></button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body ativa-scroll">
+        {% include "media/polls/ajax-loader.html" %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">أغلق</button>
+        <button type="button" class="btn btn-primary" id="submit-button">احفظ</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+{% endblock %}

@@ -374,7 +374,6 @@ class PollChoice(models.Model):
     color = models.CharField(max_length=128, choices=POLL_CHOICE_COLORS,
                              default=GREEN)  # stores bootstrap color values e.g. blue,
                                              # green, success, warning, etc.
-                                             # TODO: add choices
 
     def get_response_count(self):
         """
@@ -420,7 +419,7 @@ class PollResponse(models.Model):
         unique_together = (('poll', 'user'), )  # No user can submit more that one response
 
 
-class PollComment(models.Model):  # TODO: is commenting allowed on inactive forms?
+class PollComment(models.Model):
     """
     A comment on a poll
     """

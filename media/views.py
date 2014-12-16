@@ -629,7 +629,6 @@ def add_comment(request, pk):
 # code could be either loaded initially or via this ajax request
 # Successful submission -> ajax call to poll_results
 
-# TODO: add permission checks to views
 
 @proper_poll_type
 @login_required
@@ -639,7 +638,6 @@ def polls_home(request, poll_type):
     The poll home consists of the current active poll, and a list of past polls.
     If the user is an editor, also show unpublished polls and editing options.
     """
-    # TODO: show editing options for editors
     # The poll home page consists of "boxes" for its different parts, which are loaded
     # via ajax on page load
     if poll_type == HUNDRED_SAYS:
@@ -670,7 +668,6 @@ def polls_list(request, poll_type, filter):
     For normal users, return current and past polls corresponding to the poll_type.
     The list should be classified into past, active, and upcoming.
     """
-    # TODO: show editing options for editors
     # TODO: reduce templates into list_active and list_inactive
     if filter == PAST:
         polls = Poll.objects.past().filter(poll_type=poll_type)

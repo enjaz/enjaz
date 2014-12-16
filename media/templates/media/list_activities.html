@@ -6,138 +6,166 @@
 		height: 30px;
 	}
 </style>
-<h3>الأنشطة المعتمدة
+<h2>التقارير و التغطيات
 <a href="{% url 'media:list_reports' %}" class="btn btn-xs btn-default">
 	استعرض جميع التقارير 
 	<i class="entypo-left-bold"></i>
 </a>
-</h3>
-<table id="activity_list" class="display">
-	<thead>
-        <tr>
-            <th>اسم النشاط</th>
-            <th>الجهة المنظمة</th>
-            <th>الموعد</th>
-            <th>تاريخ الاعتماد</th>
-            <th>الخيارات</th>
-        </tr>
-    </thead>
-    <tbody>
-    	{% for activity in activities %}
-    	{% for episode in activity.episode_set.all %}
-        <tr>
-            <td><a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a></td>
-            <td><a href="{% url 'clubs:show' activity.primary_club.pk %}">{{ activity.primary_club.name }}</a></td>
-            <td>
-            	<div class="row">
-						<div>
-							{# }<i class="entypo-calendar"></i> #}
-							{{ episode.start_date|date:"j F" }}
-							-
-							{{ episode.end_date|date:"j F" }}
-						</div>
-						{% comment %}
-						<div>
-							<i class="entypo-clock"></i>
-							{{ episode.start_time }}
-							-
-							{{ episode.end_time }}
-						</div>
-						<div>
-							<i class="entypo-location"></i>
-							{{ episode.location }}
-						</div>
-						{% endcomment %}
-				</div>
-            </td>
-            <td>{{ activity.submission_date|date:"j F" }}</td>{# FIXME: replace with approval date #}
-            <td>{# options #}
-            	<div class="row">
-            	{# first, the follow-up report #}
-            	<div class="col-md-6">
-	            	{% if episode.followupreport %}
-	            		<a href="{% url 'media:show_report' episode.pk %}"
-	            		class="btn btn-green btn-xs">استعرض التقرير</a>
-	            	{% elif episode.report_is_due %}
-	            		<a class="btn btn-gold btn-xs disabled">بانتظار رفع التقرير</a>
-	            	{% elif episode.report_is_overdue %}
-	            		<a class="btn btn-red btn-xs disabled">بانتظار رفع التقرير</a>
-	            	{% else %}
-	            		<a class="btn btn-default btn-xs disabled">بانتظار انتهاء النشاط</a>
-	            	{% endif %}
-            	</div>
-            	
-            	{# second, the story #}
-            	<div class="col-md-6" id="episode-{{ episode.pk }}-story-container">
-            		{% if not episode.story %}
-            			{# if there is no story, then the button should point to the create story view #}
-            			{% if not episode.storytask %}
-            				{% if media_center.coordinator == user or user.is_superuser %}
-	            				<div class="btn-group left-dropdown">
-									<a href="{% url 'media:create_story' episode.pk %}" class="btn btn-xs btn-default btn-create-story">اكتب تغطية</a>
-									<button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown">
-										<span class="caret"></span>
-									</button>
-									
-									<ul class="dropdown-menu dropdown-default assign_story_task_menu" role="menu">
-										<li>عيّن:</li>
-										<li class="divider"></li>
-										{% for member in media_center.members.all %}
-											<li>
-												<a data-episode-pk="{{ episode.pk }}"
-												data-mc-member-pk="{{ member.pk }}" href="#">
-												{{ member.student_profile.ar_first_name }} 
-												{{ member.student_profile.ar_last_name }}
-												</a>
-											</li>
-										{% endfor %}
-										<li class="divider"></li>
-										<li>
-											<a data-episode-pk="{{ episode.pk }}"
-											data-mc-member-pk="random" href="#">عشوائي</a>
-										</li>
-									</ul>
-								</div>
-							{% else %}
-								<a href="{% url 'media:create_story' episode.pk %}"
-	            				class="btn btn-default btn-xs">اكتب تغطية</a>
-	            			{% endif %}
-            			{% else %}
-            				{# when there is no story, the only task that could be there will be at index 0 #}
-            				{% if episode.storytask.assignee == user %}
-            					<a href="{% url 'media:create_story' episode.pk %}"
-								class="btn btn-orange btn-xs">اكتب تغطية</a>
-            				{% else %}
-            					<a href="{% url 'media:create_story' episode.pk %}" class="btn btn-gold btn-xs">
-            						معيَّن ل{{ episode.storytask.assignee.student_profile.ar_first_name }} 
-            						{{ episode.storytask.assignee.student_profile.ar_last_name }}            						
-        						</a>
-            				{% endif %}
-            			{% endif %}
-            		{% else %}
-            			{# if there is a story, the button should point to the show story view #}
-            			{% if not episode.story.storyreview or episode.story.storyreview and not episode.story.storyreview.approve %}
-            				{# if assigned to user, show in different color #}
-            				{% if episode.storytask.assignee == user %}
-	            				<a href="{% url 'media:show_story' episode.pk %}"
-	            				class="btn btn-orange btn-xs">استعرض التغطية (توجد ملاحظات)</a>
-	            			{% else %}
-            					<a href="{% url 'media:show_story' episode.pk %}"
-	            				class="btn btn-gold btn-xs">استعرض التغطية</a>
-	            			{% endif %}
-            			{% else %}
-            				<a href="{% url 'media:show_story' episode.pk %}"
-            				class="btn btn-blue btn-xs">استعرض التغطية</a>
-            			{% endif %}
-            		{% endif %}
-            	</div>
-            	</div>
-            </td>
-        </tr>
-        {% endfor %}
-        {% endfor %}
-    </tbody>
-</table>
+</h2>
+
+<hr>
+
+    {% comment %}
+        <!-- TODO: add special table for new activities -->
+        (those not considered as new are ones who already have a person to write a story or ones that have been marked
+        for "no story" -- basically the ones that have been seen)
+
+        <!-- TODO: add special table for activities with pending reports -->
+        <hr>
+    {% endcomment %}
+
+<!--<h3>حسب النادي</h3>-->
+<!--<br>-->
+<div class="panel-group" id="accordion-test">
+
+{% for club in clubs %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a data-toggle="collapse" data-target="#collapse{{ club.pk }}" class="collapsed">
+                {{ club.name }}
+            </a>
+        </h4>
+    </div>
+    <div id="collapse{{ club.pk }}" class="panel-collapse collapse in">
+        <div class="panel-body"><div class="row">
+            <table class="display activity_list">
+                <thead>
+                    <tr>
+                        <th>اسم النشاط</th>
+                        {#<th>الجهة المنظمة</th>#}
+                        <th>تاريخ البداية</th>
+                        <th>تاريخ النهاية</th>
+                        {#<th>الموعد</th>#}
+                        {#<th>تاريخ الاعتماد</th>#}
+                        <th>التقرير</th>
+                        <th>التغطية</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for activity in club.primary_activity.approved %}
+                    {% for episode in activity.episode_set.all %}
+                    <tr>
+                        <td><a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a></td>
+                        {#<td><a href="{% url 'clubs:show' activity.primary_club.pk %}">{{ activity.primary_club.name }}</a></td>#}
+                        <td data-order='{{ episode.start_date|date:"U" }}'>{{ episode.start_date|date:"j F" }}</td>
+                        <td data-order='{{ episode.end_date|date:"U" }}'>{{ episode.end_date|date:"j F" }}</td>
+                        {% comment %}
+                        <td>
+                            <div class="row">
+                                    <div>
+                                        {{ episode.start_date|date:"j F" }}
+                                        -
+                                        {{ episode.end_date|date:"j F" }}
+                                    </div>
+                            </div>
+                        </td>
+                        {% endcomment %}
+                        {#<td>{{ activity.submission_date|date:"j F" }}</td><!-- FIXME: replace with approval date--> #}
+                        <td>{# options #}
+
+                                {# first, the follow-up report #}
+
+                                {% if episode.followupreport %}
+                                    <a href="{% url 'media:show_report' episode.pk %}"
+                                    class="btn btn-green btn-xs">استعرض التقرير</a>
+                                {% elif episode.report_is_due %}
+                                    <a class="btn btn-gold btn-xs disabled">بانتظار رفع التقرير</a>
+                                {% elif episode.report_is_overdue %}
+                                    <a class="btn btn-red btn-xs disabled">بانتظار رفع التقرير</a>
+                                {% else %}
+                                    <a class="btn btn-default btn-xs disabled">بانتظار انتهاء النشاط</a>
+                                {% endif %}
+                        </td>
+                        <td>
+                            {# second, the story #}
+                            <div id="episode-{{ episode.pk }}-story-container">
+                                {% if not episode.story %}
+                                    {# if there is no story, then the button should point to the create story view #}
+                                    {% if not episode.storytask %}
+                                        {% if media_center.coordinator == user or user.is_superuser %}
+                                            <div class="btn-group left-dropdown">
+                                                <a href="{% url 'media:create_story' episode.pk %}" class="btn btn-xs btn-default btn-create-story">اكتب تغطية</a>
+                                                <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown">
+                                                    <span class="caret"></span>
+                                                </button>
+
+                                                <ul class="dropdown-menu dropdown-default assign_story_task_menu" role="menu">
+                                                    <li>عيّن:</li>
+                                                    <li class="divider"></li>
+                                                    {% for member in media_center.members.all %}
+                                                        <li>
+                                                            <a data-episode-pk="{{ episode.pk }}"
+                                                            data-mc-member-pk="{{ member.pk }}" href="#">
+                                                            {{ member.student_profile.ar_first_name }}
+                                                            {{ member.student_profile.ar_last_name }}
+                                                            </a>
+                                                        </li>
+                                                    {% endfor %}
+                                                    <li class="divider"></li>
+                                                    <li>
+                                                        <a data-episode-pk="{{ episode.pk }}"
+                                                        data-mc-member-pk="random" href="#">عشوائي</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        {% else %}
+                                            <a href="{% url 'media:create_story' episode.pk %}"
+                                            class="btn btn-default btn-xs">اكتب تغطية</a>
+                                        {% endif %}
+                                    {% else %}
+                                        {# when there is no story, the only task that could be there will be at index 0 #}
+                                        {% if episode.storytask.assignee == user %}
+                                            <a href="{% url 'media:create_story' episode.pk %}"
+                                            class="btn btn-orange btn-xs">اكتب تغطية</a>
+                                        {% else %}
+                                            <a href="{% url 'media:create_story' episode.pk %}" class="btn btn-gold btn-xs">
+                                                معيَّن ل{{ episode.storytask.assignee.student_profile.ar_first_name }}
+                                                {{ episode.storytask.assignee.student_profile.ar_last_name }}
+                                            </a>
+                                        {% endif %}
+                                    {% endif %}
+                                {% else %}
+                                    {# if there is a story, the button should point to the show story view #}
+                                    {% if not episode.story.storyreview or episode.story.storyreview and not episode.story.storyreview.approve %}
+                                        {# if assigned to user, show in different color #}
+                                        {% if episode.storytask.assignee == user %}
+                                            <a href="{% url 'media:show_story' episode.pk %}"
+                                            class="btn btn-orange btn-xs">استعرض التغطية (توجد ملاحظات)</a>
+                                        {% else %}
+                                            <a href="{% url 'media:show_story' episode.pk %}"
+                                            class="btn btn-gold btn-xs">استعرض التغطية</a>
+                                        {% endif %}
+                                    {% else %}
+                                        <a href="{% url 'media:show_story' episode.pk %}"
+                                        class="btn btn-blue btn-xs">استعرض التغطية</a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+</div>
+{% endfor %}
+</div>
+
 <link rel="stylesheet" href="{% static 'neon/assets/js/datatables/responsive/css/datatables.responsive.css' %}">
 {% endblock %}
 
@@ -148,7 +176,7 @@
 <script>
 $(function () {
 	attach_assign_task_to_click_event();
-	$('#activity_list').dataTable({
+	$('.activity_list').dataTable({
 		"order": [[ 3, "desc" ]],
 		"language": {% include 'js/dataTables-arabic.json' %}
 	});

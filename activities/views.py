@@ -11,8 +11,7 @@ from post_office import mail
 from activities.models import Activity, Review, Episode
 from activities.forms import ActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm
 from accounts.models import get_gender
-from activities.utils import get_pending_activities, get_approved_activities, get_rejected_activities, \
-    get_club_notification_to, get_club_notification_cc
+from activities.utils import get_club_notification_to, get_club_notification_cc
 from clubs.models import Club
 from clubs.utils import get_presidency, is_coordinator_or_member, is_coordinator_or_deputy_of_any_club, \
     is_coordinator_of_any_club, get_media_center, \
@@ -62,7 +61,7 @@ def list_activities(request):
     #
     # By default (i.e. for students, employees and anonymous users),
     # no pending or rejected activities should be shown.
-    context = {'approved': get_approved_activities(),
+    context = {'approved': Activity.objects.approved(),
                'pending': Activity.objects.none(),
                'rejected': Activity.objects.none()}
 
@@ -72,14 +71,14 @@ def list_activities(request):
                 or request.user.has_perm('activities.add_presidency_review'):
             # If the user is a super user or part of the presidency,
             # then show all activities
-            context['pending'] = get_pending_activities()
-            context['rejected'] = get_rejected_activities()
+            context['pending'] = Activity.objects.pending()
+            context['rejected'] = Activity.objects.rejected()
 
         elif request.user.has_perm('activities.add_deanship_review'):
             # If the user is part of the deanship of student affairs,
             # only show activities approved by presidency
-            context['pending'] = get_pending_activities().filter(review__review_type="P", review__is_approved=True)
-            context['rejected'] = get_rejected_activities().filter(review__review_type="P", review__is_approved=True)
+            context['pending'] = Activity.objects.pending().filter(review__review_type="P", review__is_approved=True)
+            context['rejected'] = Activity.objects.rejected().filter(review__review_type="P", review__is_approved=True)
 
         elif (is_coordinator_or_deputy_of_any_club(request.user) or is_member_of_any_club(request.user)) and \
              not is_coordinator_or_member(get_presidency(), request.user) and \
@@ -89,10 +88,10 @@ def list_activities(request):
             # activities.
             user_coordination = get_user_coordination_and_deputyships(request.user)
             user_clubs = user_coordination | request.user.memberships.all()
-            context['pending'] = get_pending_activities().filter(primary_club__in=user_clubs) | \
-                                 get_pending_activities().filter(secondary_clubs__in=user_clubs)
-            context['rejected'] = get_rejected_activities().filter(primary_club__in=user_clubs) | \
-                                  get_rejected_activities().filter(secondary_clubs__in=user_clubs)
+            context['pending'] = Activity.objects.pending().filter(primary_club__in=user_clubs) | \
+                                 Activity.objects.pending().filter(secondary_clubs__in=user_clubs)
+            context['rejected'] = Activity.objects.rejected().filter(primary_club__in=user_clubs) | \
+                                  Activity.objects.rejected().filter(secondary_clubs__in=user_clubs)
 
             # Media-related
             # Only display to coordinators and deputies
@@ -114,7 +113,7 @@ def list_activities(request):
             # An employee is basically similar to a normal user, the
             # only difference is having another table that includes
             # the employee's relevant activities
-            context['club_approved'] = get_approved_activities().filter(primary_club__in=request.user.employee.all())
+            context['club_approved'] = Activity.objects.approved().filter(primary_club__in=request.user.employee.all())
 
             template = 'activities/list_employee.html'
         else: # For students and other normal users.

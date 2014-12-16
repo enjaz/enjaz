@@ -4,15 +4,25 @@
     <div class="row">
     {% include intro %}
 
-    {% if is_editor %}
+
         <div style="text-align: left;">
+            {# If the user is an editor, show the add poll button; else, show the suggest poll button #}
+            {% if is_editor %}
             <button id="add-poll" class="btn btn-icon btn-info">
                 <i class="entypo-plus"></i>
                 أضف تصويتًا
             </button>
+            {% else %}
+            <button id="suggest-poll" class="btn btn-icon btn-info">
+                <i class="entypo-feather"></i>
+                اقترح تصويتًا
+            </button>
+            {% endif %}
         </div>
         <br>
 
+    {% if is_editor %}
+        {# If the user is an editor, show them the upcoming polls. #}
         <!-- upcoming polls -->
 
         <div class="panel panel-info panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
@@ -48,16 +58,6 @@
 
     <!--<br>-->
 
-    <!-- TODO: suggest button -->
-    <!-- FIXME: perhaps it's better to move this button next to add poll as it's not really visible here -->
-    <div style="text-align: left;">
-        <a href="" class="btn btn-icon btn-info">
-            <i class="entypo-pencil"></i>
-            اقترح
-        </a>
-    </div>
-    <br>
-
     <!-- past polls -->
 
     <div class="panel panel-warning panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
@@ -91,21 +91,37 @@
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
 <script type="text/javascript">
     $(document).ready(function () {
+        // initialize poll edit modal
+        $('#edit-poll-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        })
         {% if is_editor %}
             // For editors:
-            // initialize poll edit modal
-            $('#edit-poll-modal').modal({
-              keyboard: false,
-              backdrop: 'static',
-              show    : false,
-            })
-
             // attach function to add poll button
             $("button#add-poll").click(function () {
                 $("#edit-poll-modal").modal('show');
 
                 $("#edit-poll-modal .modal-title").html("أضف تصويتًا");
                 $("#edit-poll-modal .modal-body").load("{% url 'media:add_poll' poll_type_url %}");
+
+                var $submitButton = $("#edit-poll-modal button#submit-button");
+                // Unbind any handlers previously attached to the submit button
+                // This is necessary to avoid multiple submissions of the form
+                $submitButton.off('click');
+                $submitButton.click(function () {
+                    $("form#edit-poll-form").submit();
+                });
+            });
+        {% else %}
+            // Attach function to suggest poll button
+            // This will use the same poll edit modal
+            $("button#suggest-poll").click(function () {
+                $("#edit-poll-modal").modal('show');
+
+                $("#edit-poll-modal .modal-title").html("اقترح تصويتًا");
+                $("#edit-poll-modal .modal-body").load("{% url 'media:suggest_poll' poll_type_url %}");
 
                 var $submitButton = $("#edit-poll-modal button#submit-button");
                 // Unbind any handlers previously attached to the submit button

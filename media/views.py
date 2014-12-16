@@ -20,9 +20,9 @@ from core import decorators
 from clubs.models import Club
 from activities.models import Activity, Episode
 from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment, \
-    WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment
+    WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment, POLL_TYPE_CHOICES
 from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
-    TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm
+    TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm
 
 # --- Constants and wrapper for polls
 
@@ -875,4 +875,32 @@ def suggest_poll(request, poll_type):
     GET: return poll suggestion form.
     POST: send suggested poll as an email to media center.
     """
-    pass
+    poll_type_url = get_poll_type_url(poll_type)
+    poll_type_name = dict(POLL_TYPE_CHOICES)[poll_type]
+    if request.method == "POST":
+        form = PollSuggestForm(poll_type, request.POST)
+        if form.is_valid():
+            context = dict()
+            # extract the fields and prepare the context
+            context['title'] = form.cleaned_data['title']
+            context['text'] = form.cleaned_data['text']
+            if poll_type == HUNDRED_SAYS:
+                context['choices'] = form.cleaned_data['choices']
+
+            context['poll_type_name'] = poll_type_name
+
+            # email the suggestion
+            mail.send([get_media_center().email],
+                      template="media_poll_suggestion",
+                      context=context)
+            return {"message": "success"}
+        else:
+            return render(request, "media/polls/suggest.html", {"form": form,
+                                                                "poll_type_url": poll_type_url,
+                                                                "poll_type_name": poll_type_name})
+
+    else:
+        form = PollSuggestForm(poll_type)
+        return render(request, "media/polls/suggest.html", {"form": form,
+                                                            "poll_type_url": poll_type_url,
+                                                            "poll_type_name": poll_type_name})

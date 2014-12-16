@@ -128,3 +128,13 @@ class PollCommentForm(ModelForm):
     class Meta:
         model = PollComment
         fields = ('body', )
+
+
+class PollSuggestForm(forms.Form):
+    def __init__(self, poll_type, *args, **kwargs):
+        super(PollSuggestForm, self).__init__(*args, **kwargs)
+        if poll_type == HUNDRED_SAYS:
+            self.fields['choices'] = forms.CharField(label=u"الخيارات", widget=forms.Textarea(), required=False)
+
+    title = forms.CharField(label=u"العنوان", required=False)
+    text = forms.CharField(widget=forms.Textarea(), label=u"النص")

@@ -31,7 +31,7 @@ POLL_CHOICE_COLORS = (
     (RED, u"أحمر"),
     (GREEN, u"أخضر"),
     (BLUE, u"أزرق"),
-    (AERO, u"سماوي"),
+    (AERO, u"رصاصي"),
     (GREY, u"رمادي"),
     (ORANGE, u"برتقالي"),
     (YELLOW, u"أصفر"),

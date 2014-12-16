@@ -1,7 +1,6 @@
-<div class="panel panel-gray" data-collapsed="0">
+<div class="panel panel-gray" data-collapsed="0">{% load media_tags %}
     <!-- panel body -->
     <div class="panel-body">
-{% if poll.responses.all %}
 <div class="col-md-4">
     <div class="legend">
         <div class="panel panel-default" data-collapsed="0">
@@ -34,12 +33,18 @@
     </div>
 </div>
 <div class="col-md-8">
+    {% if poll.responses.all %}
     <div id="poll-{{ poll.id }}-chart" style="width: 70%; margin-left: auto; margin-right: auto;">
 
     </div>
+    {% else %}
+    <p style="text-align: center;">
+        لا توجد تصويتات.
+    </p>
+    {% endif %}
 </div>
+{% if poll.responses.all %}
 <script>
-    {# TODO: Color the chart based on the choice colors #}
     Morris.Donut({
         element: 'poll-{{ poll.id }}-chart',
         data: [
@@ -47,13 +52,11 @@
                 {label: "{{ choice.value }}", value: {{ choice.get_response_count }}, percent: "{{ choice.get_response_percent }}" },
             {% endfor %}
         ],
+        colors: [{% for choice in poll.choices.all %} "{% convert_to_hex choice.color %}", {% endfor %}],
         formatter: function (key, data) { return data.value + " - " + data.percent + "%" },
     });
 </script>
-{% else %}
-<p style="text-align: center;">
-    لا توجد تصويتات.
-</p>
 {% endif %}
+
     </div>
 </div>

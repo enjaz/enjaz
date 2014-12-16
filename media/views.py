@@ -12,7 +12,6 @@ from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
 from post_office import mail
-from activities.utils import get_approved_activities
 from clubs.utils import get_media_center, is_coordinator_or_member, is_coordinator_of_any_club, is_member_of_any_club, \
     is_coordinator
 
@@ -98,7 +97,7 @@ def list_activities(request):
     the available options of FollowUpReports and Stories.
     """
     # Get all approved activities
-    activities = get_approved_activities()
+    activities = Activity.objects.approved()
     media_center = get_media_center()
     return render(request, 'media/list_activities.html', {'activities': activities,
                                                           'media_center': media_center})

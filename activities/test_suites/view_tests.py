@@ -3,9 +3,8 @@ from django.contrib.auth.models import Permission, User, Group
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from accounts.test_utils import create_user
-from activities.models import Review
+from activities.models import Activity, Review
 from activities.test_utils import create_activity, add_presidency_review, add_deanship_review
-from activities.utils import get_approved_activities, get_pending_activities, get_rejected_activities
 from clubs.models import Club
 from clubs.test_utils import add_club_member, set_club_coordinator
 from clubs.utils import get_presidency
@@ -587,7 +586,7 @@ class ListActivityViewTests(TestCase):
         response = self.client.get(reverse('activities:list'))
         self.assertEqual(response.status_code, 200)
 
-        self.assertEqual(sorted(list(response.context['approved'])), sorted(list(get_approved_activities())))
+        self.assertEqual(sorted(list(response.context['approved'])), sorted(list(Activity.objects.approved())))
         # self.assertEqual(sorted(list(response.context['pending'])), sorted(list(get_pending_activities())))
         # self.assertEqual(sorted(list(response.context['rejected'])), sorted(list(get_rejected_activities())))
 

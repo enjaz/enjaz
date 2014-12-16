@@ -105,10 +105,10 @@ class Club(models.Model):
         # The following import is not very neat, but importing it at the beginning of
         # the file causes an ImportError because components of the other files use
         # parts of this file that are only loaded later
-        from activities.utils import get_approved_activities
+
         # Get all club's episodes
         episodes = []
-        for activity in get_approved_activities().filter(primary_club=self): #self.primary_activity.all():
+        for activity in self.primary_activity.approved():
             episodes.extend(activity.episode_set.all())
         # Get all club's episodes whose report is due
         due_episodes = filter(lambda x: x.report_is_due(),
@@ -120,10 +120,10 @@ class Club(models.Model):
         # The following import is not very neat, but importing it at the beginning of
         # the file causes an ImportError because components of the other files use
         # parts of this file that are only loaded later
-        from activities.utils import get_approved_activities
+
         # Get all club's episodes
         episodes = []
-        for activity in get_approved_activities().filter(primary_club=self): #self.primary_activity.all():
+        for activity in self.primary_activity.approved():
             episodes.extend(activity.episode_set.all())
         # Get all club's episodes whose report is overdue
         overdue_episodes = filter(lambda x: x.report_is_overdue(),

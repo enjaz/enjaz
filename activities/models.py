@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime, timedelta
+from activities.managers import ActivityManager
 
 from clubs.models import College
 from forms_builder.forms.models import Form
@@ -45,6 +46,9 @@ class Activity(models.Model):
     organizers = models.IntegerField(verbose_name=u"عدد المنظمين",
                                        help_text=u"عدد الطلاب الذين سينظمون النشاط")
     forms = GenericRelation(Form)
+
+    # Override the default manager with the activity custom manager
+    objects = ActivityManager()
 
     def registration_is_open(self):
         """

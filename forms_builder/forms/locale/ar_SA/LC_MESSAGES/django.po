@@ -59,23 +59,23 @@ msgstr "رابط"
 
 #: fields.py:36
 msgid "Check box"
-msgstr ""
+msgstr "تأشير مفرد"
 
 #: fields.py:37
 msgid "Check boxes"
-msgstr ""
+msgstr "تأشير متعدد"
 
 #: fields.py:38
 msgid "Drop down"
-msgstr ""
+msgstr "قائمة منسدلة"
 
 #: fields.py:39
 msgid "Multi select"
-msgstr ""
+msgstr "اختيار متعدد من قائمة"
 
 #: fields.py:40
 msgid "Radio buttons"
-msgstr ""
+msgstr "زر انتقاء"
 
 #: fields.py:41
 msgid "File upload"
@@ -183,7 +183,7 @@ msgstr "أرسل"
 
 #: models.py:67
 msgid "Response"
-msgstr "رسالة الرد"
+msgstr "رسالة التأكيد"
 
 #: models.py:68
 msgid "Redirect url"

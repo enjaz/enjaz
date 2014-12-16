@@ -85,9 +85,7 @@
 	<script>
     var table = $('#books').dataTable({
         "order": [[ 2, "desc" ]],
-        "language": {
-            "url": "{% static 'js/dataTables-arabic.json' %}"
-        }
+        "language": {% include 'js/dataTables-arabic.json' %}
     });
 
     {% if user.is_authenticated %}

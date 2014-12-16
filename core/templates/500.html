@@ -27,3 +27,6 @@
 
 </div>
 {% endblock %}
+{% block customtracking %}
+	  _paq.push(['setDocumentTitle',  '500/URL = ' +  encodeURIComponent(document.location.pathname+document.location.search) + '/From = ' + encodeURIComponent(document.referrer)]);
+{% endblock %}

@@ -1,0 +1,47 @@
+{% load bootstrap3 %}
+<div class="alert alert-info">
+    <p>لديك فكرة أو اقتراح لتصويت جديد في برنامج
+        <strong>{{ poll_type_name }}</strong>؟
+    <br>
+        يرجى تعبئة النموذج التالي بتفاصيل التصويت المقترح لتصل فكرتك إلى المركز الإعلامي.
+    </p>
+</div>
+<hr>
+
+<form id="edit-poll-form" action="post">
+{% csrf_token %}
+{% bootstrap_form form %}
+</form>
+
+<script type="text/javascript">
+    // modify form submission behaviour to be ajaxy
+    $("form#edit-poll-form").submit(function (event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var $form = $(this),
+            data = $form.serialize(),
+            url = "{% url 'media:suggest_poll' poll_type_url %}";
+
+        /* Send the data using post */
+        var posting = $.post(url, data);
+
+        posting.done(function (data) {
+            if (data.message == "success") {
+
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                toastr.info("تم إرسال اقتراحك للمركز الإعلامي بنجاح. نشكرك على وقتك!");
+
+                // hide modal
+                var $modal = $("#edit-poll-modal")
+                $modal.modal('hide');
+
+            } else {
+                $("#edit-poll-modal .modal-body").html(data);
+            }
+        });
+    });
+</script>

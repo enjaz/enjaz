@@ -1,0 +1,45 @@
+<h2>التصويتات السابقة</h2>
+<hr>
+
+{% for poll in polls %}
+    {% if forloop.first %}
+    <div class="panel-group joined" id="accordion-past-polls">
+    {% endif %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion-past-polls" href="#past-poll-{{ forloop.counter }}" class="collapsed">
+                    {{ poll.title }}
+                    {# a little hack to avoid using a link because it would mess up the styles #}
+
+                    <p style="float:left;" class="btn btn-xs btn-default disabled">
+                        أُغلق في
+                        {{ poll.close_date }}
+                    </p>
+                </a>
+            </h4>
+        </div>
+        <div id="past-poll-{{ forloop.counter }}" class="panel-collapse collapse">
+            <div class="panel-body">
+                {% include "media/polls/ajax-loader.html" %}
+            </div>
+        </div>
+    {# <!-- FIXME: This will load a script for EACH poll --> #}
+    {# If you're going to edit this script, make sure to edit the corresponding one in `list_upcoming.html` #}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#past-poll-{{ forloop.counter }}").on("show.bs.collapse", function () {
+                if ( $(this).prop("loaded") == undefined ) {
+                    $(this).find(".panel-body").load("{% url 'media:show_poll' poll_type_url poll.id %}");
+                    $(this).prop("loaded", true); // set to true so that content is not downloaded every time the panel is opened
+                } // else do nothing
+            });
+        });
+    </script>
+    </div>
+    {% if forloop.last %}
+    </div>
+    {% endif %}
+{% empty %}
+    <p>لا توجد تصويتات سابقة.</p>
+{% endfor %}

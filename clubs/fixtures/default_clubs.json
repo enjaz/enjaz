@@ -1,425 +1,442 @@
 [
 {
-  "pk": 1, 
-  "model": "clubs.club", 
-  "fields": {
-    "name": "\u0631\u0626\u0627\u0633\u0629 \u0646\u0627\u062f\u064a \u0627\u0644\u0637\u0644\u0627\u0628", 
-    "parent": null, 
-    "open_membership": false, 
-    "creation_date": "2014-04-08T04:23:04.240Z", 
-    "edit_date": "2014-07-08T08:00:22.025Z", 
-    "coordinator": null, 
-    "college": null, 
-    "english_name": "Presidency", 
-    "employee": null, 
-    "members": [], 
-    "email": "studentsclub@ksua-hs.edu.sa", 
-    "special": true, 
-    "description": "\u0631\u0626\u0627\u0633\u0629 \u0646\u0627\u062f\u064a \u0627\u0644\u0637\u0644\u0627\u0628"
-  }
+    "pk": 1, 
+    "model": "clubs.club", 
+    "fields": {
+        "city": "", 
+        "name": "\u0631\u0626\u0627\u0633\u0629 \u0646\u0627\u062f\u064a \u0627\u0644\u0637\u0644\u0627\u0628", 
+        "parent": null, 
+        "creation_date": "2014-04-08T04:23:04.240Z", 
+        "edit_date": "2014-07-08T08:00:22.025Z", 
+        "coordinator": null, 
+        "college": null, 
+        "english_name": "Presidency", 
+        "employee": null, 
+        "deputies": [], 
+        "members": [], 
+        "email": "studentsclub@ksua-hs.edu.sa", 
+        "special": true, 
+        "description": "\u0631\u0626\u0627\u0633\u0629 \u0646\u0627\u062f\u064a \u0627\u0644\u0637\u0644\u0627\u0628"
+    }
 },
 {
-  "pk": 2, 
-  "model": "clubs.club", 
-  "fields": {
-    "name": "\u0627\u0644\u0645\u0631\u0643\u0632 \u0627\u0644\u0625\u0639\u0644\u0627\u0645\u064a", 
-    "parent": null, 
-    "open_membership": false, 
-    "creation_date": "2014-07-08T07:56:08.540Z", 
-    "edit_date": "2014-07-08T08:00:16.208Z", 
-    "coordinator": null, 
-    "college": null, 
-    "english_name": "Media Center", 
-    "employee": null, 
-    "members": [], 
-    "email": "sc-media@ksau-hs.edu.sa", 
-    "special": true, 
-    "description": "-"
-  }
+    "pk": 2, 
+    "model": "clubs.club", 
+    "fields": {
+        "city": "R", 
+        "name": "\u0627\u0644\u0645\u0631\u0643\u0632 \u0627\u0644\u0625\u0639\u0644\u0627\u0645\u064a", 
+        "parent": null, 
+        "creation_date": "2014-07-08T07:56:08.540Z", 
+        "edit_date": "2014-09-02T19:04:36.294Z", 
+        "coordinator": null,
+        "college": null, 
+        "english_name": "Media Center", 
+        "employee": null, 
+        "deputies": [], 
+        "members": [],
+        "email": "sc-media@ksau-hs.edu.sa", 
+        "special": true, 
+        "description": "-"
+    }
 },
 {
-  "pk": 3, 
-  "model": "clubs.club", 
-  "fields": {
-    "name": "\u0643\u0644\u064a\u0629 \u0627\u0644\u0639\u0644\u0648\u0645 \u0648 \u0627\u0644\u0645\u0647\u0646 \u0627\u0644\u0635\u062d\u064a\u0629 - \u0637\u0644\u0627\u0628", 
-    "parent": null, 
-    "open_membership": false, 
-    "creation_date": "2014-05-06T20:19:34.060Z", 
-    "edit_date": "2014-06-20T12:41:20.568Z", 
-    "coordinator": null, 
-    "college": 4, 
-    "english_name": "College of Science and Health Professions - Male", 
-    "employee": null, 
-    "members": [], 
-    "email": "sc-coshp@ksau-hs.edu.sa", 
-    "special": false, 
-    "description": "-"
-  }
+    "pk": 3, 
+    "model": "clubs.club", 
+    "fields": {
+        "city": "", 
+        "name": "\u0643\u0644\u064a\u0629 \u0627\u0644\u0639\u0644\u0648\u0645 \u0648 \u0627\u0644\u0645\u0647\u0646 \u0627\u0644\u0635\u062d\u064a\u0629 - \u0637\u0644\u0627\u0628", 
+        "parent": null, 
+        "creation_date": "2014-05-06T20:19:34.060Z", 
+        "edit_date": "2014-10-25T21:40:53.901Z", 
+        "coordinator": null,
+        "college": 4, 
+        "english_name": "College of Science and Health Professions - Male", 
+        "employee": null, 
+        "deputies": [],
+        "members": [],
+        "email": "sc-coshp@ksau-hs.edu.sa", 
+        "special": false, 
+        "description": "-"
+    }
 },
 {
-  "pk": 4, 
-  "model": "clubs.club", 
-  "fields": {
-    "name": "\u0643\u0644\u064a\u0629 \u0627\u0644\u0639\u0644\u0648\u0645 \u0648 \u0627\u0644\u0645\u0647\u0646 \u0627\u0644\u0635\u062d\u064a\u0629 - \u0637\u0627\u0644\u0628\u0627\u062a", 
-    "parent": null, 
-    "open_membership": false, 
-    "creation_date": "2014-05-09T21:09:34.253Z", 
-    "edit_date": "2014-06-20T12:42:20.378Z", 
-    "coordinator": null, 
-    "college": 5, 
-    "english_name": "College of Science and Health Professions - Female", 
-    "employee": null, 
-    "members": [], 
-    "email": "sc-coshpf@ksau-hs.edu.sa", 
-    "special": false, 
-    "description": "-"
-  }
+    "pk": 4, 
+    "model": "clubs.club", 
+    "fields": {
+        "city": "", 
+        "name": "\u0643\u0644\u064a\u0629 \u0627\u0644\u0639\u0644\u0648\u0645 \u0648 \u0627\u0644\u0645\u0647\u0646 \u0627\u0644\u0635\u062d\u064a\u0629 - \u0637\u0627\u0644\u0628\u0627\u062a", 
+        "parent": null, 
+        "creation_date": "2014-05-09T21:09:34.253Z", 
+        "edit_date": "2014-06-20T12:42:20.378Z", 
+        "coordinator": null, 
+        "college": 5, 
+        "english_name": "College of Science and Health Professions - Female", 
+        "employee": null, 
+        "deputies": [], 
+        "members": [], 
+        "email": "sc-coshpf@ksau-hs.edu.sa", 
+        "special": false, 
+        "description": "-"
+    }
 },
 {
-  "pk": 5, 
-  "model": "clubs.club", 
-  "fields": {
-    "name": "\u0643\u0644\u064a\u0629 \u0627\u0644\u0637\u0628 - \u0637\u0644\u0627\u0628", 
-    "parent": null, 
-    "open_membership": false, 
-    "creation_date": "2014-05-09T21:10:09.955Z", 
-    "edit_date": "2014-06-20T12:38:07.418Z", 
-    "coordinator": null, 
-    "college": 1, 
-    "english_name": "College of Medicine - Male", 
-    "employee": null, 
-    "members": [], 
-    "email": "sc-com@ksau-hs.edu.sa", 
-    "special": false, 
-    "description": "-"
-  }
+    "pk": 5, 
+    "model": "clubs.club", 
+    "fields": {
+        "city": "R", 
+        "name": "\u0643\u0644\u064a\u0629 \u0627\u0644\u0637\u0628 - \u0637\u0644\u0627\u0628", 
+        "parent": null, 
+        "creation_date": "2014-05-09T21:10:09.955Z", 
+        "edit_date": "2014-08-15T15:12:26.299Z", 
+        "coordinator": null,
+        "college": 1, 
+        "english_name": "College of Medicine - Male", 
+        "employee": null, 
+        "deputies": [], 
+        "members": [], 
+        "email": "sc-com@ksau-hs.edu.sa", 
+        "special": false, 
+        "description": "-"
+    }
 },
 {
-  "pk": 6, 
-  "model": "clubs.club", 
-  "fields": {
-    "name": "\u0643\u0644\u064a\u0629 \u0627\u0644\u0637\u0628 - \u0637\u0627\u0644\u0628\u0627\u062a", 
-    "parent": null, 
-    "open_membership": false, 
-    "creation_date": "2014-05-09T21:10:32.848Z", 
-    "edit_date": "2014-06-20T12:38:33.786Z", 
-    "coordinator": null, 
-    "college": 2, 
-    "english_name": "College of Medicine - Female", 
-    "employee": null, 
-    "members": [], 
-    "email": "sc-comf@ksau-hs.edu.sa", 
-    "special": false, 
-    "description": "-"
-  }
+    "pk": 6, 
+    "model": "clubs.club", 
+    "fields": {
+        "city": "", 
+        "name": "\u0643\u0644\u064a\u0629 \u0627\u0644\u0637\u0628 - \u0637\u0627\u0644\u0628\u0627\u062a", 
+        "parent": null, 
+        "creation_date": "2014-05-09T21:10:32.848Z", 
+        "edit_date": "2014-06-20T12:38:33.786Z", 
+        "coordinator": null, 
+        "college": 2, 
+        "english_name": "College of Medicine - Female", 
+        "employee": null, 
+        "deputies": [], 
+        "members": [], 
+        "email": "sc-comf@ksau-hs.edu.sa", 
+        "special": false, 
+        "description": "-"
+    }
 },
 {
-  "pk": 7, 
-  "model": "clubs.club", 
-  "fields": {
-    "name": "\u0643\u0644\u064a\u0629 \u0637\u0628 \u0627\u0644\u0623\u0633\u0646\u0627\u0646 - \u0637\u0644\u0627\u0628", 
-    "parent": null, 
-    "open_membership": false, 
-    "creation_date": "2014-05-09T21:11:17.267Z", 
-    "edit_date": "2014-06-20T12:38:41.713Z", 
-    "coordinator": null, 
-    "college": 3, 
-    "english_name": "College of Dentistry - Male", 
-    "employee": null, 
-    "members": [], 
-    "email": "sc-cod@ksau-hs.edu.sa", 
-    "special": false, 
-    "description": "-"
-  }
+    "pk": 7, 
+    "model": "clubs.club", 
+    "fields": {
+        "city": "R", 
+        "name": "\u0643\u0644\u064a\u0629 \u0637\u0628 \u0627\u0644\u0623\u0633\u0646\u0627\u0646 - \u0637\u0644\u0627\u0628", 
+        "parent": null, 
+        "creation_date": "2014-05-09T21:11:17.267Z", 
+        "edit_date": "2014-09-02T02:43:52.903Z", 
+        "coordinator": null,
+        "college": 3, 
+        "english_name": "College of Dentistry - Male", 
+        "employee": null, 
+        "deputies": [], 
+        "members": [], 
+        "email": "sc-cod@ksau-hs.edu.sa", 
+        "special": false, 
+        "description": "-"
+    }
 },
 {
-  "pk": 8, 
-  "model": "clubs.club", 
-  "fields": {
-    "name": "\u0643\u0644\u064a\u0629 \u0637\u0628 \u0627\u0644\u0623\u0633\u0646\u0627\u0646 - \u0637\u0627\u0644\u0628\u0627\u062a", 
-    "parent": null, 
-    "open_membership": false, 
-    "creation_date": "2014-05-09T21:11:45.774Z", 
-    "edit_date": "2014-06-20T13:56:04.413Z", 
-    "coordinator": null, 
-    "college": 3, 
-    "english_name": "College of Dentistry - Female", 
-    "employee": null, 
-    "members": [], 
-    "email": "sc-codf@ksau-hs.edu.sa", 
-    "special": false, 
-    "description": "-"
-  }
+    "pk": 8, 
+    "model": "clubs.club", 
+    "fields": {
+        "city": "", 
+        "name": "\u0643\u0644\u064a\u0629 \u0637\u0628 \u0627\u0644\u0623\u0633\u0646\u0627\u0646 - \u0637\u0627\u0644\u0628\u0627\u062a", 
+        "parent": null, 
+        "creation_date": "2014-05-09T21:11:45.774Z", 
+        "edit_date": "2014-06-20T13:56:04.413Z", 
+        "coordinator": null, 
+        "college": 3, 
+        "english_name": "College of Dentistry - Female", 
+        "employee": null, 
+        "deputies": [], 
+        "members": [], 
+        "email": "sc-codf@ksau-hs.edu.sa", 
+        "special": false, 
+        "description": "-"
+    }
 },
 {
-  "pk": 9, 
-  "model": "clubs.club", 
-  "fields": {
-    "name": "\u0643\u0644\u064a\u0629 \u0627\u0644\u0639\u0644\u0648\u0645 \u0627\u0644\u0637\u0628\u064a\u0629 \u0627\u0644\u062a\u0637\u0628\u064a\u0642\u064a\u0629", 
-    "parent": null, 
-    "open_membership": false, 
-    "creation_date": "2014-05-09T21:12:28.743Z", 
-    "edit_date": "2014-06-20T12:38:57.853Z", 
-    "coordinator": null, 
-    "college": 5, 
-    "english_name": "College of Applied Medical Sciences", 
-    "employee": null, 
-    "members": [], 
-    "email": "sc-cams@ksau-hs.edu.sa", 
-    "special": false, 
-    "description": "-"
-  }
+    "pk": 9, 
+    "model": "clubs.club", 
+    "fields": {
+        "city": "", 
+        "name": "\u0643\u0644\u064a\u0629 \u0627\u0644\u0639\u0644\u0648\u0645 \u0627\u0644\u0637\u0628\u064a\u0629 \u0627\u0644\u062a\u0637\u0628\u064a\u0642\u064a\u0629", 
+        "parent": null, 
+        "creation_date": "2014-05-09T21:12:28.743Z", 
+        "edit_date": "2014-06-20T12:38:57.853Z", 
+        "coordinator": null, 
+        "college": 5, 
+        "english_name": "College of Applied Medical Sciences", 
+        "employee": null, 
+        "deputies": [], 
+        "members": [], 
+        "email": "sc-cams@ksau-hs.edu.sa", 
+        "special": false, 
+        "description": "-"
+    }
 },
 {
-  "pk": 10, 
-  "model": "clubs.club", 
-  "fields": {
-    "name": "\u0643\u0644\u064a\u0629 \u0627\u0644\u0635\u064a\u062f\u0644\u0629", 
-    "parent": null, 
-    "open_membership": false, 
-    "creation_date": "2014-05-09T21:13:14.539Z", 
-    "edit_date": "2014-06-20T12:39:56.557Z", 
-    "coordinator": null, 
-    "college": 2, 
-    "english_name": "College of Pharmacy", 
-    "employee": null, 
-    "members": [], 
-    "email": "sc-cop@ksau-hs.edu.sa", 
-    "special": false, 
-    "description": "-"
-  }
+    "pk": 10, 
+    "model": "clubs.club", 
+    "fields": {
+        "city": "", 
+        "name": "\u0643\u0644\u064a\u0629 \u0627\u0644\u0635\u064a\u062f\u0644\u0629", 
+        "parent": null, 
+        "creation_date": "2014-05-09T21:13:14.539Z", 
+        "edit_date": "2014-06-20T12:39:56.557Z", 
+        "coordinator": null, 
+        "college": 2, 
+        "english_name": "College of Pharmacy", 
+        "employee": null, 
+        "deputies": [], 
+        "members": [], 
+        "email": "sc-cop@ksau-hs.edu.sa", 
+        "special": false, 
+        "description": "-"
+    }
 },
 {
-  "pk": 11, 
-  "model": "clubs.club", 
-  "fields": {
-    "name": "\u0643\u0644\u064a\u0629 \u0627\u0644\u062a\u0645\u0631\u064a\u0636", 
-    "parent": null, 
-    "open_membership": false, 
-    "creation_date": "2014-05-09T21:13:49.649Z", 
-    "edit_date": "2014-06-20T12:40:57.777Z", 
-    "coordinator": null, 
-    "college": 7, 
-    "english_name": "College of Nursing", 
-    "employee": null, 
-    "members": [], 
-    "email": "sc-conr@ksau-hs.edu.sa", 
-    "special": false, 
-    "description": "-"
-  }
+    "pk": 11, 
+    "model": "clubs.club", 
+    "fields": {
+        "city": "R", 
+        "name": "\u0643\u0644\u064a\u0629 \u0627\u0644\u062a\u0645\u0631\u064a\u0636", 
+        "parent": null, 
+        "creation_date": "2014-05-09T21:13:49.649Z", 
+        "edit_date": "2014-08-15T15:12:15.125Z", 
+        "coordinator": null, 
+        "college": 7, 
+        "english_name": "College of Nursing", 
+        "employee": null, 
+        "deputies": [], 
+        "members": [], 
+        "email": "sc-conr@ksau-hs.edu.sa", 
+        "special": false, 
+        "description": "-"
+    }
 },
 {
-  "pk": 12, 
-  "model": "clubs.club", 
-  "fields": {
-    "name": "\u0646\u0627\u062f\u064a \u0627\u0644\u0642\u0631\u0627\u0621\u0629", 
-    "parent": null, 
-    "open_membership": false, 
-    "creation_date": "2014-05-09T21:14:12.519Z", 
-    "edit_date": "2014-05-09T21:14:12.519Z", 
-    "coordinator": null, 
-    "college": null, 
-    "english_name": "Reading Club", 
-    "employee": null, 
-    "members": [], 
-    "email": "readingclub@ksau-hs.edu.sa", 
-    "special": false, 
-    "description": "-"
-  }
+    "pk": 12, 
+    "model": "clubs.club", 
+    "fields": {
+        "city": "", 
+        "name": "\u0646\u0627\u062f\u064a \u0627\u0644\u0642\u0631\u0627\u0621\u0629", 
+        "parent": null, 
+        "creation_date": "2014-05-09T21:14:12.519Z", 
+        "edit_date": "2014-05-09T21:14:12.519Z", 
+        "coordinator": null, 
+        "college": null, 
+        "english_name": "Reading Club", 
+        "employee": null, 
+        "deputies": [], 
+        "members": [], 
+        "email": "reading.club@ksau-hs.edu.sa", 
+        "special": false, 
+        "description": "-"
+    }
 },
 {
-  "pk": 13, 
-  "model": "clubs.club", 
-  "fields": {
-    "name": "\u0646\u0627\u062f\u064a \u0627\u0644\u062a\u0635\u0648\u064a\u0631 \u0627\u0644\u0641\u0648\u062a\u0648\u063a\u0631\u0627\u0641\u064a", 
-    "parent": null, 
-    "open_membership": false, 
-    "creation_date": "2014-05-09T21:14:43.640Z", 
-    "edit_date": "2014-05-09T21:14:43.640Z", 
-    "coordinator": null, 
-    "college": null, 
-    "english_name": "Photography Club", 
-    "employee": null, 
-    "members": [], 
-    "email": "photo.club@ksau-hs.edu.sa", 
-    "special": false, 
-    "description": "-"
-  }
+    "pk": 13, 
+    "model": "clubs.club", 
+    "fields": {
+        "city": "R", 
+        "name": "\u0646\u0627\u062f\u064a \u0627\u0644\u062a\u0635\u0648\u064a\u0631 \u0627\u0644\u0641\u0648\u062a\u0648\u063a\u0631\u0627\u0641\u064a", 
+        "parent": null, 
+        "creation_date": "2014-05-09T21:14:43.640Z", 
+        "edit_date": "2014-08-19T14:29:38.234Z", 
+        "coordinator": null, 
+        "college": null, 
+        "english_name": "Photography Club", 
+        "employee": null,
+        "deputies": [], 
+        "members": [], 
+        "email": "photo.club@ksau-hs.edu.sa", 
+        "special": false, 
+        "description": "-"
+    }
 },
 {
-  "pk": 14, 
-  "model": "clubs.club", 
-  "fields": {
-    "name": "\u0646\u0627\u062f\u064a \u0627\u0644\u0628\u062d\u062b \u0627\u0644\u0639\u0644\u0645\u064a", 
-    "parent": null, 
-    "open_membership": false, 
-    "creation_date": "2014-05-09T21:15:07.094Z", 
-    "edit_date": "2014-05-09T21:15:07.094Z", 
-    "coordinator": null, 
-    "college": null, 
-    "english_name": "Research Club", 
-    "employee": null, 
-    "members": [], 
-    "email": "research.club@ksau-hs.edu.sa", 
-    "special": false, 
-    "description": "-"
-  }
+    "pk": 14, 
+    "model": "clubs.club", 
+    "fields": {
+        "city": "", 
+        "name": "\u0646\u0627\u062f\u064a \u0627\u0644\u0628\u062d\u062b \u0627\u0644\u0639\u0644\u0645\u064a", 
+        "parent": null, 
+        "creation_date": "2014-05-09T21:15:07.094Z", 
+        "edit_date": "2014-05-09T21:15:07.094Z", 
+        "coordinator": null, 
+        "college": null, 
+        "english_name": "Research Club", 
+        "employee": null, 
+        "deputies": [], 
+        "members": [], 
+        "email": "research.club@ksau-hs.edu.sa", 
+        "special": false, 
+        "description": "-"
+    }
 },
 {
-  "pk": 15, 
-  "model": "clubs.club", 
-  "fields": {
-    "name": "\u0646\u0627\u062f\u064a \u062e\u064a\u0631 \u0623\u0645\u0629", 
-    "parent": null, 
-    "open_membership": false, 
-    "creation_date": "2014-05-09T21:16:00.732Z", 
-    "edit_date": "2014-05-09T21:16:00.732Z", 
-    "coordinator": null, 
-    "college": null, 
-    "english_name": "Best Nation Club", 
-    "employee": null, 
-    "members": [], 
-    "email": "bestnation.club@ksau-hs.edu.sa", 
-    "special": false, 
-    "description": "-"
-  }
+    "pk": 15, 
+    "model": "clubs.club", 
+    "fields": {
+        "city": "", 
+        "name": "\u0646\u0627\u062f\u064a \u062e\u064a\u0631 \u0623\u0645\u0629", 
+        "parent": null, 
+        "creation_date": "2014-05-09T21:16:00.732Z", 
+        "edit_date": "2014-05-09T21:16:00.732Z", 
+        "coordinator": null, 
+        "college": null, 
+        "english_name": "Best Nation Club", 
+        "employee": null, 
+        "deputies": [], 
+        "members": [], 
+        "email": "bestnation.club@ksau-hs.edu.sa", 
+        "special": false, 
+        "description": "-"
+    }
 },
 {
-  "pk": 16, 
-  "model": "clubs.club", 
-  "fields": {
-    "name": "\u0646\u0627\u062f\u064a \u0627\u0644\u0641\u0646\u0648\u0646", 
-    "parent": null, 
-    "open_membership": false, 
-    "creation_date": "2014-05-09T21:16:21.769Z", 
-    "edit_date": "2014-05-09T21:16:21.769Z", 
-    "coordinator": null, 
-    "college": null, 
-    "english_name": "Arts Club", 
-    "employee": null, 
-    "members": [], 
-    "email": "arts.club@ksau-hs.edu.sa", 
-    "special": false, 
-    "description": "-"
-  }
+    "pk": 16, 
+    "model": "clubs.club", 
+    "fields": {
+        "city": "", 
+        "name": "\u0646\u0627\u062f\u064a \u0627\u0644\u0641\u0646\u0648\u0646", 
+        "parent": null, 
+        "creation_date": "2014-05-09T21:16:21.769Z", 
+        "edit_date": "2014-05-09T21:16:21.769Z", 
+        "coordinator": null, 
+        "college": null, 
+        "english_name": "Arts Club", 
+        "employee": null, 
+        "deputies": [], 
+        "members": [], 
+        "email": "arts.club@ksau-hs.edu.sa", 
+        "special": false, 
+        "description": "-"
+    }
 },
 {
-  "pk": 17, 
-  "model": "clubs.club", 
-  "fields": {
-    "name": "\u0646\u0627\u062f\u064a \u0627\u0644\u062d\u0648\u0627\u0633\u064a\u0628", 
-    "parent": null, 
-    "open_membership": false, 
-    "creation_date": "2014-05-09T21:16:46.486Z", 
-    "edit_date": "2014-05-09T21:16:46.486Z", 
-    "coordinator": null, 
-    "college": null, 
-    "english_name": "Computers Club", 
-    "employee": null, 
-    "members": [], 
-    "email": "computers.club@ksau-hs.edu.sa", 
-    "special": false, 
-    "description": "-"
-  }
+    "pk": 17, 
+    "model": "clubs.club", 
+    "fields": {
+        "city": "", 
+        "name": "\u0646\u0627\u062f\u064a \u0627\u0644\u062d\u0648\u0627\u0633\u064a\u0628", 
+        "parent": null, 
+        "creation_date": "2014-05-09T21:16:46.486Z", 
+        "edit_date": "2014-05-09T21:16:46.486Z", 
+        "coordinator": null, 
+        "college": null, 
+        "english_name": "Computers Club", 
+        "employee": null, 
+        "deputies": [], 
+        "members": [], 
+        "email": "computers.club@ksau-hs.edu.sa", 
+        "special": false, 
+        "description": "-"
+    }
 },
 {
-  "pk": 1, 
-  "model": "clubs.college", 
-  "fields": {
-    "gender": "M", 
-    "section": "NG",
-    "city": "R", 
-    "name": "M"
-  }
+    "pk": 1, 
+    "model": "clubs.college", 
+    "fields": {
+        "city": "R", 
+        "section": "NG", 
+        "name": "M", 
+        "gender": "M"
+    }
 },
 {
-  "pk": 2, 
-  "model": "clubs.college", 
-  "fields": {
-    "gender": "M", 
-    "section": "NG", 
-    "city": "R", 
-    "name": "P"
-  }
+    "pk": 2, 
+    "model": "clubs.college", 
+    "fields": {
+        "city": "R", 
+        "section": "NG", 
+        "name": "P", 
+        "gender": "M"
+    }
 },
 {
-  "pk": 3, 
-  "model": "clubs.college", 
-  "fields": {
-    "gender": "M", 
-    "section": "NG", 
-    "city": "R", 
-    "name": "D"
-  }
+    "pk": 3, 
+    "model": "clubs.college", 
+    "fields": {
+        "city": "R", 
+        "section": "NG", 
+        "name": "D", 
+        "gender": "M"
+    }
 },
 {
-  "pk": 4, 
-  "model": "clubs.college", 
-  "fields": {
-    "gender": "M", 
-    "section": "NG", 
-    "city": "R", 
-    "name": "B"
-  }
+    "pk": 4, 
+    "model": "clubs.college", 
+    "fields": {
+        "city": "R", 
+        "section": "NG", 
+        "name": "B", 
+        "gender": "M"
+    }
 },
 {
-  "pk": 5, 
-  "model": "clubs.college", 
-  "fields": {
-    "gender": "M", 
-    "section": "NG", 
-    "city": "R", 
-    "name": "A"
-  }
+    "pk": 5, 
+    "model": "clubs.college", 
+    "fields": {
+        "city": "R", 
+        "section": "NG", 
+        "name": "A", 
+        "gender": "M"
+    }
 },
 {
-  "pk": 6, 
-  "model": "clubs.college", 
-  "fields": {
-    "gender": "F", 
-    "section": "NG", 
-    "city": "R", 
-    "name": "M"
-  }
+    "pk": 6, 
+    "model": "clubs.college", 
+    "fields": {
+        "city": "R", 
+        "section": "NG", 
+        "name": "M", 
+        "gender": "F"
+    }
 },
 {
-  "pk": 7, 
-  "model": "clubs.college", 
-  "fields": {
-    "gender": "F", 
-    "section": "NG", 
-    "city": "R", 
-    "name": "N"
-  }
+    "pk": 7, 
+    "model": "clubs.college", 
+    "fields": {
+        "city": "R", 
+        "section": "NG", 
+        "name": "N", 
+        "gender": "F"
+    }
 },
 {
-  "pk": 8, 
-  "model": "clubs.college", 
-  "fields": {
-    "gender": "M", 
-    "section": "KF", 
-    "city": "R", 
-    "name": "M"
-  }
+    "pk": 8, 
+    "model": "clubs.college", 
+    "fields": {
+        "city": "R", 
+        "section": "KF", 
+        "name": "M", 
+        "gender": "M"
+    }
 },
 {
-  "pk": 9, 
-  "model": "clubs.college", 
-  "fields": {
-    "gender": "F", 
-    "section": "NG", 
-    "city": "R", 
-    "name": "B"
-  }
+    "pk": 9, 
+    "model": "clubs.college", 
+    "fields": {
+        "city": "R", 
+        "section": "NG", 
+        "name": "B", 
+        "gender": "F"
+    }
 },
 {
-  "pk": 10, 
-  "model": "clubs.college", 
-  "fields": {
-    "gender": "F", 
-    "section": "NG", 
-    "city": "R", 
-    "name": "D"
-  }
+    "pk": 10, 
+    "model": "clubs.college", 
+    "fields": {
+        "city": "R", 
+        "section": "NG", 
+        "name": "D", 
+        "gender": "F"
+    }
 }
 ]

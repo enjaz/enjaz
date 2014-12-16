@@ -9,7 +9,6 @@ from django.views.decorators import csrf
 
 from post_office import mail
 import unicodecsv
-from activities.utils import get_approved_activities
 
 from clubs.utils import is_coordinator, is_coordinator_or_member, is_member, is_coordinator_or_deputy
 from core import decorators
@@ -48,7 +47,7 @@ def show(request, club_id):
         activities = club.primary_activity.filter(review__review_type="P", review__is_approved=True)
 
     else:
-        activities = get_approved_activities().filter(primary_club=club)
+        activities = club.primary_activity.approved()
 
     # If the user has the view_activity permission, is a member or is
     # the coordinator of the given club, they will be able to see all

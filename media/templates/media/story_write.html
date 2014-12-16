@@ -19,7 +19,7 @@
 		<tbody>
 			<tr>
 				<th class="text-center">الوصف</th>
-				<td colspan="3">{{ report.description }}</td>
+				<td colspan="3">{{ report.description|linebreaksbr }}</td>
 			</tr>
 			
 			<tr>
@@ -45,12 +45,12 @@
 
             <tr>
                 <th class="text-center">أماكن النشر و الإعلان</th>
-                <td colspan="3">{{ report.announcement_sites }}</td>
+                <td colspan="3">{{ report.announcement_sites|linebreaksbr }}</td>
             </tr>
 
             <tr>
                 <th class="text-center">ملاحظات</th>
-                <td colspan="3">{{ report.notes }}</td>
+                <td colspan="3">{{ report.notes|linebreaksbr }}</td>
             </tr>
 		</tbody>
 	</table>

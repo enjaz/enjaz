@@ -5,7 +5,6 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 
 from activities.models import Activity
-from activities.utils import get_approved_activities
 from books.models import Book
 from .models import Announcement
 
@@ -17,12 +16,12 @@ def portal_home(request):
         # --- activities ---
         current_year_activities = Activity.objects.all()
         # count only approved activites
-        approved_activities = get_approved_activities()
+        approved_activities = Activity.objects.approved()
         context['activity_count'] = approved_activities.count()
         
         today = date.today()
         next_week = today + timedelta(weeks=1)
-        upcoming_activities = filter(lambda a: a.get_next_episode() is not None, get_approved_activities())
+        upcoming_activities = filter(lambda a: a.get_next_episode() is not None, Activity.objects.approved())
         next_week_activities = filter(lambda a: a.get_next_episode().start_date <= next_week, upcoming_activities)
         context['upcoming_activities'] = next_week_activities[::-1]
         

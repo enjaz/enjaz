@@ -29,7 +29,7 @@
 				{% for r in page_requests %}
 				<tr>
 					<td><a href="{% url 'arshidni:show_group' r.pk %}">{{ r.user.student_profile.get_ar_full_name }}</a></td>
-					<td>{{ r.interests }}</td>
+					<td>{{ r.interests|linebreaksbr }}</td>
 					<td>{{ r.batch }}</td>
 					<td id="contacts-{{ r.pk }}">{% if r.status == 'A' or r.status == 'WC' %}{{ r.contacts }}{% else %}-{% endif %}</td>
 					<td data-order="{{ r.submission_date|date:"U" }}">{{ r.submission_date|date:"j F Y" }}</td>
@@ -87,8 +87,7 @@ $(function() {
 $(function () {
 	$('#request-table').dataTable({
 		"order": [[ 4, "desc" ]],
-		"language": {
-			"url": "{% static 'js/dataTables-arabic.json' %}"}
+		"language": {% include 'js/dataTables-arabic.json' %}
 	});
 });
 </script>

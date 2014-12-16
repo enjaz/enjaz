@@ -38,9 +38,7 @@
 $(document).ready(function () {
 	// Initialize the datatable
 	$('#members_table').DataTable({
-		"language": {
-			"url": "{% static 'js/dataTables-arabic.json' %}"
-		},
+		"language": {% include 'js/dataTables-arabic.json' %},
 		"dom": "<'row'<'col-xs-6 col-left'l><'col-xs-6 col-right'<'export-data btn-group'T>f>r>t<'row'<'col-xs-6 col-left'i><'col-xs-6 col-right'p>>",
 		"oTableTools": {
 			"sSwfPath": "{% static 'js/copy_csv_xls_pdf.swf' %}",

@@ -36,8 +36,71 @@
         {% load bootstrap3 %}
         {% bootstrap_form builder_form %}
 
+        <script>
+            // Add the help buttons and popover contents to the form
+            var helpButton = '<a id="is-primary-help-popover" tabindex="0" data-toggle="popover" data-trigger="click" data-placement="left" title="مساعدة"';
+            helpButton += ' data-html="true"><i class="entypo-help-circled"></i></a>'
+            $("#id_is_primary").parent().parent().append(helpButton);
+            var popoverText = "يسمح باختيار نموذج رئيسي واحد لكل نشاط، بحيث يكون هذا النموذج هو نموذج التسجيل في هذا النشاط و الذي يمكن الوصول إليه مباشرة من صفحة النشاط في حال فتح التسجيل."
+            popoverText += "<br>"
+            popoverText += "فتح التسجيل يكون عن طريق اختيار أحد نماذج النشاط كنموذج رئيسي، في حين يتم إغلاق التسجيل تلقائيًا إذا لم يكن هناك أي نموذج رئيسي منشور للنشاط."
+            popoverText += "<br>"
+            popoverText += "عند تحديد نموذج ما كنموذج رئيسي، يمكن كذلك تحديد موعد تلقائي لفتح و إغلاق التسجيل في النشاط، و ذلك عن طريق تحديد تاريخ و وقت نشر النموذج."
+            $("#is-primary-help-popover").attr("data-content", popoverText);
+
+            var helpButton = '<a id="status-help-popover" tabindex="0" data-toggle="popover" data-trigger="click" data-placement="left" title="مساعدة"';
+            helpButton += ' data-html="true"><i class="entypo-help-circled"></i></a>'
+            $("#id_status").parent().find("label").append(helpButton);
+            var popoverText = "يمكن إظهار أو إخفاء النموذج عن المستخدمين عن طريق تحديد حالة النشر. إذا كان النموذج مسودة فيمكن رؤيته فقط من ممثل النادي و نوابه. "
+            popoverText += "<br>"
+            popoverText += "يمكن كذلك تحديد موعد تلقائي لنشر النموذج و إغلاقه عن طريق اختيار تاريخ و وقت مخصص لذلك. (يشترط ذلك أن يتم اختيار 'منشور' في حالة النموذج)."
+            $("#status-help-popover").attr("data-content", popoverText);
+
+            var helpButton = '<a id="response-help-popover" tabindex="0" data-toggle="popover" data-trigger="click" data-placement="left" title="مساعدة"';
+            helpButton += ' data-html="true"><i class="entypo-help-circled"></i></a>'
+            $("#id_response").parent().find("label").append(helpButton);
+            var popoverText = "النص الذي يظهر للمستخدم بعد تعبئة و إرسال النموذج."
+            $("#response-help-popover").attr("data-content", popoverText);
+        </script>
+
         <hr>
-        <h4>{% trans "Fields" %}</h4>
+        <h4>{% trans "Fields" %}
+        <a id="field-help-popover" tabindex="0" data-toggle="popover" data-trigger="click" data-placement="left" title="مساعدة"
+           data-html="true"><i class="entypo-help-circled"></i></a>
+        </h4>
+
+        <script>
+            var popoverText = "<div dir='rtl' class=''><table class='table table-bordered'>";
+            popoverText += "<style>.table td {font-weight: lighter;} .popover {max-width: 550px; direction: rtl; text-align: right;}</style>";
+            popoverText += "<colgroup><col class='col-md-2'><col class='col-md-5'><col class='col-md-5'></colgroup>";
+            popoverText += "<thead><tr><td></td><td>توضيح</td><td>مثال</td></tr></thead>";
+            popoverText += "<tbody><tr><th>الخيارات</th>";
+            popoverText += "<td>إذا كان السؤال يتطلب خيارات، تتم كتابتها هنا. <br>";
+            popoverText += "تكتب الخيارات مفصولة بعلامة <code>/</code>.</td>";
+            popoverText += "<td><code>أحمر/أخضر/أزرق</code><br>";
+            popoverText += "تظهر للمستخدم مثلاً:<br>";
+            popoverText += "<div class='col-xs-12'>";
+            popoverText += "<div class='col-xs-4'><div class='radio'><label><input type='radio' name='color' value='red'>أحمر</label></div></div>";
+            popoverText += "<div class='col-xs-4'><div class='radio'><label><input type='radio' name='color' value='green'>أخضر</label></div></div>";
+            popoverText += "<div class='col-xs-4'><div class='radio'><label><input type='radio' name='color' value='blue'>أزرق</label></div></div>";
+            popoverText += "</div></td></tr>";
+
+            popoverText += "<tr><th>القيمة الافتراضية</th>";
+            popoverText += "<td>عند تحديد قيمة افتراضية، يتم ملؤها تلقائيًا للمستخدم عند فتح النموذج. <br>إذا كان السؤال يحتوي خيارات ";
+            popoverText += "يجب أن تكون القيمة الافتراضية من ضمن الخيارات.</td>";
+            popoverText += "<td><code>أحمر</code> تظهر للمستخدم مثلاً:";
+            popoverText += "<div class='row'><div class='col-xs-12'><input class='form-control' value='أحمر'></div></div>";
+            popoverText += "أو (تم اختيار جواب تلقائيًا):";
+            popoverText += "<div class='col-xs-12'>";
+            popoverText += "<div class='col-xs-4'><div class='radio'><label><input type='radio' name='color' value='red' checked=''>أحمر</label></div></div>";
+            popoverText += "<div class='col-xs-4'><div class='radio'><label><input type='radio' name='color' value='green'>أخضر</label></div></div>";
+            popoverText += "<div class='col-xs-4'><div class='radio'><label><input type='radio' name='color' value='blue'>أزرق</label></div></div>";
+            popoverText += "</div>اعتمادًا على نوع السؤال.</td></tr>";
+            popoverText += "</tbody></table></div>";
+            popoverText += "<div style='text-align: center;' class='alert alert-warning'>سيتم حفظ و توفير بيانات المستخدم (الاسم، الرقم الجامعي، البريد الإلكتروني، ...) ";
+            popoverText += "تلقائيًا، لذلك ليس هناك داعٍ لإضافة حقول للسؤال عن هذه البيانات.</div>";
+            $("#field-help-popover").attr("data-content", popoverText);
+        </script>
         <br>
         {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
         {{ formset.management_form }}
@@ -100,5 +163,7 @@
     $("input[name=publish_date], input[name=expiry_date]").datetimepicker({
         format: 'Y-m-d H:i',
     });
+
+{% include 'activities/forms/hide_choices.js' %}
 </script>
 {% endblock %}

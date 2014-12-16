@@ -45,15 +45,17 @@
 </div>
 {% if poll.responses.all %}
 <script>
-    Morris.Donut({
-        element: 'poll-{{ poll.id }}-chart',
-        data: [
-            {% for choice in poll.choices.all %}
-                {label: "{{ choice.value }}", value: {{ choice.get_response_count }}, percent: "{{ choice.get_response_percent }}" },
-            {% endfor %}
-        ],
-        colors: [{% for choice in poll.choices.all %} "{% convert_to_hex choice.color %}", {% endfor %}],
-        formatter: function (key, data) { return data.value + " - " + data.percent + "%" },
+    $(document).ready(function () {
+        Morris.Donut({
+            element: 'poll-{{ poll.id }}-chart',
+            data: [
+                {% for choice in poll.choices.all %}
+                    {label: "{{ choice.value }}", value: {{ choice.get_response_count }}, percent: "{{ choice.get_response_percent }}" },
+                {% endfor %}
+            ],
+            colors: [{% for choice in poll.choices.all %} "{% convert_to_hex choice.color %}", {% endfor %}],
+            formatter: function (key, data) { return data.value + " - " + data.percent + "%" },
+        });
     });
 </script>
 {% endif %}

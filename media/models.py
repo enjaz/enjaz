@@ -17,6 +17,8 @@ POLL_TYPE_CHOICES = (
     (HUNDRED_SAYS, u"المئة تقول"),
 )
 
+# iCheck-plugin colors
+
 RED = "red"
 GREEN = "green"
 BLUE = "blue"
@@ -370,10 +372,10 @@ class Poll(models.Model):
 
 class PollChoice(models.Model):
     poll = models.ForeignKey(Poll, related_name="choices")
-    value = models.CharField(max_length=POLL_CHOICE_MAX_LENGTH)
-    color = models.CharField(max_length=128, choices=POLL_CHOICE_COLORS,
-                             default=GREEN)  # stores bootstrap color values e.g. blue,
-                                             # green, success, warning, etc.
+    value = models.CharField(verbose_name= u"النص", max_length=POLL_CHOICE_MAX_LENGTH)
+    color = models.CharField(verbose_name= u"اللون", max_length=128, choices=POLL_CHOICE_COLORS,
+                             default=GREEN)  # stores iCheck-plugin color values e.g. blue,
+                                             # green, red, grey, aero, etc.
 
     def get_response_count(self):
         """

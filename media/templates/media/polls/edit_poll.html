@@ -82,6 +82,24 @@ $(document).ready(function () {
         deleteCssClass: 'delete-row btn btn-xs btn-default',
     });
 
+    // For some reason, the formset plugin sometimes doesn't show the delete buttons (especially when creating a new
+    // poll), so here is a little workaround
+    // Check each of the forms of the formset; if it doesn't have a delete button, then add one
+
+    // TODO: do the same when adding a new choice
+
+    $(".dynamic-form").each(function () {
+        var deleteColumn = $(this).find("td:last-child");
+        console.log(deleteColumn.find(".delete-row"));
+        console.log(deleteColumn.find(".delete-row").length == 0);
+        if (deleteColumn.find(".delete-row").length == 0) {
+            // insert a delete button
+            var button = '<a class="delete-row btn btn-xs btn-default" href="javascript:void(0)">احذف</a>';
+            deleteColumn.append(button);
+            console.log("appended a button");
+        };
+    });
+
     // initialize date/time pickers
     var $datetimeFields = $("input[name=open_date], input[name=close_date]");
     $datetimeFields.addClass("english-field").datetimepicker({

@@ -168,11 +168,16 @@ $("#vote-form-{{ poll.id }}").submit(function(event) {
 
             // load the poll results
             var $choicesPanel = $("#poll-{{ poll.id }}-choice-panel");
-             $choicesPanel.slideUp(function () {
-                $choicesPanel.load("{% url 'media:poll_results' poll_type_url poll.id %}", function () {
-                    $choicesPanel.slideDown();
-                });
-             });
+
+             // The slideUp/slideDown animation is causing the chart not to appear normally; just load the page simply
+             // $choicesPanel.slideUp(function () {
+             //   $choicesPanel.load("{% url 'media:poll_results' poll_type_url poll.id %}", function () {
+             //     $choicesPanel.slideDown();
+             // });
+             //});
+
+             $choicesPanel.load("{% url 'media:poll_results' poll_type_url poll.id %}");
+             
              {% if is_editor %}
              $("button#show-poll-{{ poll.id }}-results").slideUp();
              {% endif %}
@@ -211,11 +216,16 @@ $("#vote-form-{{ poll.id }}").submit(function(event) {
     // attach function to show results button
      $("button#show-poll-{{ poll.id }}-results").click(function () {
          var $choicesPanel = $("#poll-{{ poll.id }}-choice-panel");
-         $choicesPanel.slideUp(function () {
-            $choicesPanel.load("{% url 'media:poll_results' poll_type_url poll.id %}", function () {
-                $choicesPanel.slideDown();
-            });
-         });
+
+         // The slideUp/slideDown animation is causing the chart not to appear normally; just load the page simply
+         // $choicesPanel.slideUp(function () {
+         //   $choicesPanel.load("{% url 'media:poll_results' poll_type_url poll.id %}", function () {
+         //     $choicesPanel.slideDown();
+         // });
+         //});
+
+         $choicesPanel.load("{% url 'media:poll_results' poll_type_url poll.id %}");
+
          $(this).slideUp();
      });
     {% endif %}

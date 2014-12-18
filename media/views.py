@@ -21,7 +21,8 @@ from activities.models import Activity, Episode
 from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment, \
     WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment, POLL_TYPE_CHOICES
 from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
-    TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm
+    TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm, \
+    FollowUpReportImageFormset
 
 # --- Constants and wrapper for polls
 
@@ -138,14 +139,16 @@ def submit_report(request, episode_pk):
     
     if request.method == 'POST':
         form = FollowUpReportForm(request.POST,
-                                  request.FILES,
                                   instance=FollowUpReport(pk=episode.pk, # make pk equal to episode pk
                                                                          # to keep things synchronized
                                                           episode=episode,
                                                           submitter=request.user)
                                   )
-        if form.is_valid():
-            form.save()
+        image_formset = FollowUpReportImageFormset(request.POST, request.FILES)
+        if form.is_valid() and image_formset.is_valid():
+            instance = form.save()
+            image_formset.instance = instance
+            image_formset.save()
             return HttpResponseRedirect(reverse('activities:show',
                                                 args=(episode.activity.pk, )
                                                 ))
@@ -163,7 +166,9 @@ def submit_report(request, episode_pk):
                                            'organizer_count': episode.activity.organizers,
                                            'participant_count': episode.activity.participants,
                                            })
+        image_formset = FollowUpReportImageFormset()
     return render(request, 'media/report_write.html', {'form': form,
+                                                       'image_formset': image_formset,
                                                        'episode': episode})
 
 @login_required

@@ -1,19 +1,17 @@
 # -*- coding: utf-8  -*-
+from django.contrib.contenttypes.generic import GenericRelation
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime, timedelta
+from activities.managers import ActivityManager
 
 from clubs.models import College
+from forms_builder.forms.models import Form
 from media.utils import REPORT_DUE_AFTER
 
 
 class Activity(models.Model):
-    # For now, we will follow the current practice: only one club will
-    # be considered the primary orginzier.  Others will be cosidered
-    # secondary.
-    #clubs = models.ManyToManyField('clubs.Club',
-    #                               verbose_name=u"الأندية")
     primary_club = models.ForeignKey('clubs.Club', null=True,
                                      on_delete=models.SET_NULL,
                                      related_name='primary_activity',
@@ -34,11 +32,6 @@ class Activity(models.Model):
                                            auto_now_add=True)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
     is_editable = models.BooleanField(default=True, verbose_name=u"هل يمكن تعديله؟")
-    collect_participants = models.BooleanField(default=False,
-                                               verbose_name=u"افتح التسجيل للمنظمين؟")
-    participant_colleges = models.ManyToManyField(College,
-                                                  verbose_name=u"الكليات المستهدفة",
-                                                  null=True, blank=True)
     inside_collaborators = models.TextField(blank=True,
                                             verbose_name=u"المتعاونون من داخل الجامعة")
     outside_collaborators = models.TextField(blank=True,
@@ -52,6 +45,32 @@ class Activity(models.Model):
                                  limit_choices_to={'category__isnull': True})
     organizers = models.IntegerField(verbose_name=u"عدد المنظمين",
                                        help_text=u"عدد الطلاب الذين سينظمون النشاط")
+    forms = GenericRelation(Form)
+
+    # Override the default manager with the activity custom manager
+    objects = ActivityManager()
+
+    def registration_is_open(self):
+        """
+        Return ``True`` if there is 1 published form marked as primary. Return ``False`` if there isn't or,
+        by any chance, there is more than one
+        """
+        return self.forms.published().filter(is_primary=True).count() == 1
+
+    def has_registration_form(self):
+        """
+        A memory-efficient method to check for the presence of 1 (an only 1) primary form for a club.
+        """
+        return self.forms.filter(is_primary=True).count() == 1
+
+    def get_registration_form(self):
+        """
+        If registration is open, return the registration form; otherwise return ``None``.
+        """
+        if self.has_registration_form():
+            return self.forms.get(is_primary=True)
+        else:
+            return None
 
     def is_approved_by_deanship(self):
         try:
@@ -236,21 +255,6 @@ class Review(models.Model):
     def __unicode__(self):
         return str(self.id)
 
-
-class Participation(models.Model):
-    activity = models.ForeignKey(Activity, verbose_name=u"النشاط")
-    user = models.ForeignKey(User, null=True,
-                             on_delete=models.SET_NULL)
-    submission_date = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        permissions = (
-            ("view_participation", "Can view all available participations."),
-        )
-        # For the admin interface.
-        verbose_name = u"مشاركة"
-        verbose_name_plural = u"المشاركات"
-
 class Episode(models.Model):
     """
     Enjaz activities are usually simple a date + a start and end time. Yet this is not always the case;
@@ -263,6 +267,7 @@ class Episode(models.Model):
     activities, however, will only require one episode, as they only consist of a single date and time.
     The more complex activites are what really take advantage of this system.
     """
+    ### Fields ###
     activity = models.ForeignKey(Activity)
     
     start_date = models.DateField()
@@ -294,7 +299,15 @@ class Episode(models.Model):
     # In the future, as we add Google Calendar features, the calendar events will
     # be linked here
     # google_event = models.URLField()
-    
+
+    # Media-related fields
+
+    requires_report = models.BooleanField(default=True)
+    can_report_early = models.BooleanField(default=False)
+    requires_story = models.BooleanField(default=True)
+
+    ### Methods ###
+
     def __unicode__(self):
         return self.activity.name + " #" + str(self.get_index())
     
@@ -327,32 +340,32 @@ class Episode(models.Model):
         days of the end of the corresponding episode.
         """
         return self.end_datetime() + timedelta(days=REPORT_DUE_AFTER)
-    
+
+    def report_is_submitted(self):
+        """
+        Return whether or not a report has been submitted for this episode.
+        """
+        try:
+            report = self.followupreport
+            return True
+        except ObjectDoesNotExist:
+            return False
+
     def report_is_due(self):
         """
         Return whether the report is due.
         The report is due when the episode has ended, the due date hasn't passed,
         and the report hasn't been submitted.
         """
-        try:
-            report = self.followupreport
-            report_not_submitted = False
-        except ObjectDoesNotExist:
-            report_not_submitted = True
-        return self.end_datetime() < datetime.now() < self.report_due_date() and report_not_submitted
-    
+        return self.requires_report and self.end_datetime() < datetime.now() < self.report_due_date() and not self.report_is_submitted()
+
     def report_is_overdue(self):
         """
         Return whether the report is overdue.
         The report is overdue when the episode has ended, the due date has passed,
         and the report hasn't been submitted.
         """
-        try:
-            report = self.followupreport
-            report_not_submitted = False
-        except ObjectDoesNotExist:
-            report_not_submitted = True
-        return datetime.now() > self.report_due_date() and report_not_submitted
+        return self.requires_report and datetime.now() > self.report_due_date() and not self.report_is_submitted()
 
 class Category(models.Model):
     ar_name = models.CharField(max_length=50,

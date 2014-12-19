@@ -78,7 +78,7 @@
 		<tbody>
 			<tr>
 				<th class="text-center">الوصف</th>
-				<td colspan="3">{{ report.description }}</td>
+				<td colspan="3">{{ report.description|linebreaksbr }}</td>
 			</tr>
 			
 			<tr>
@@ -104,12 +104,12 @@
 
             <tr>
                 <th class="text-center">أماكن النشر و الإعلان</th>
-                <td colspan="3">{{ report.announcement_sites }}</td>
+                <td colspan="3">{{ report.announcement_sites|linebreaksbr }}</td>
             </tr>
 
             <tr>
                 <th class="text-center">ملاحظات</th>
-                <td colspan="3">{{ report.notes }}</td>
+                <td colspan="3">{{ report.notes|linebreaksbr }}</td>
             </tr>
 		</tbody>
 	</table>
@@ -118,25 +118,44 @@
 
 	<div class="row">
 		
-		<div class="col-sm-12">
-			
+		<div class="col-sm-6">
+
+            <div class="invoice-left">
+                <h4>مرفقات التقرير</h4>
+
+                {% for image in report.images.all %}
+                    {% if forloop.first %}<ul>{% endif %}
+                        <li>
+                        <a href="{{ image.image.url }}" class="">
+                            <i class="entypo-picture"></i>
+                            {{ image.image.name }}
+                        </a>
+                        </li>
+                    {% if forloop.last %}</ul>{% endif %}
+                {% empty %}
+                    <p>لا يوجد.</p>
+                {% endfor %}
+            </div>
+
+        </div>
+
+        <div class="col-sm-6">
+
+
 			<div class="invoice-right">
-				
+
 				<a href="javascript:window.print();" class="btn btn-primary btn-icon icon-left hidden-print">
 					طباعة التقرير
 					<i class="entypo-doc-text"></i>
 				</a>
-                {% if report.images.name %}
-                <a href="{{ report.images.url }}" class="btn btn-primary btn-icon icon-left">
-					تحميل المرفقات
-					<i class="entypo-down-bold"></i>
-				</a>
-                {% endif %}
+
 			</div>
 			
 		</div>
 		
 	</div>
+
+    <br>
 
 </div>
 {% endblock %}

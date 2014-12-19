@@ -10,7 +10,6 @@ from clubs.models import Club
 
 def create_activity(club=Club.objects.get(pk=1),
                     submitter=User.objects.get(pk=1),
-                    collect_participants=False,
                     episode_count=1):
     """ Create an activity with the given parameters. """
     activity = Activity.objects.create(primary_club=club,
@@ -19,7 +18,7 @@ def create_activity(club=Club.objects.get(pk=1),
                                        participants=1,
                                        organizers=1,
                                        submitter=submitter,
-                                       collect_participants=collect_participants)
+                                       )
     for i in range(episode_count):
         Episode.objects.create(activity=activity,
                                start_date=date.today(),

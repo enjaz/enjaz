@@ -135,9 +135,10 @@ some-votes
             {% endif %}
         </div>
     </div>
-    <h2>{% if not voice.is_published %}<span class="unpublished">[غير منشور]</span> {% endif %}<a href="{% url 'studentvoice:show' voice.pk %}">{{ voice.title|escape }}</a></h2>
-    {% comment %}{{ tag_list_widget(thread.get_tag_names(), search_state=search_state) }}{% endcomment %}
+    <h2><a href="{% url 'studentvoice:show' voice.pk %}">{{ voice.title|escape }}</a> {% if not voice.is_published %}<span class="badge"><span class="glyphicon glyphicon-asterisk"></span> غير منشور</span>{% elif voice.response %}<span class="badge"><span class="glyphicon glyphicon-ok"></span> أجيب عنه!</span>{% elif voice.was_sent %}<span class="badge"><span class="glyphicon glyphicon-time"></span> أرسل</span>{% endif %}</h2>
 </div>
+
+
 
 
     {% endfor %}

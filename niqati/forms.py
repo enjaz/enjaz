@@ -9,7 +9,14 @@ class OrderForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(OrderForm, self).__init__(*args, **kwargs)
         for field in self.fields:
-            self.fields[field].widget.attrs['class'] = 'form-control'
+            self.fields[field].widget.attrs['class'] = 'form-control popover-default'
+            if isinstance(self.fields[field], forms.IntegerField):
+                self.fields[field].widget.attrs['data-toggle'] = 'popover'
+                self.fields[field].widget.attrs['data-trigger'] = 'focus'
+                self.fields[field].widget.attrs['data-placement'] = 'left'
+                self.fields[field].widget.attrs['data-original-title'] = u"ملاحظة"
+                self.fields[field].widget.attrs['data-content'] = u"لأفضل نتائج عند طلب كوبونات نقاطي، يرجى مراعاة ألا يزيد مجموع الكوبونات في الطلب عن ١٠٠-١٥٠ كوبون. " + \
+                                                                  u"في حال كون الطلب يتجاوز ذلك، يرجى تقسيمه على أكثر من طلب."
 
     idea = forms.IntegerField(label=u"الفكرة", help_text=u"عدد نقاط الفكرة", required=False, initial=0,
                               min_value=0)

@@ -1,25 +1,63 @@
 # -*- coding: utf-8  -*-
+import functools
 import random
 
 from django.contrib.auth.decorators import permission_required, login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.core import mail
+from django.db import IntegrityError
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
 from post_office import mail
-from activities.utils import get_approved_activities
 from clubs.utils import get_media_center, is_coordinator_or_member, is_coordinator_of_any_club, is_member_of_any_club, \
-    is_coordinator
+    is_coordinator, is_coordinator_or_deputy
 
 from core import decorators
 from clubs.models import Club
 from activities.models import Activity, Episode
-from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment
+from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment, \
+    WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment, POLL_TYPE_CHOICES
 from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
-    TaskCommentForm
+    TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm, \
+    FollowUpReportImageFormset
+
+# --- Constants and wrapper for polls
+
+WHAT_IF_URL = "whatif"
+HUNDRED_SAYS_URL = "100says"
+
+# Keywords
+ACTIVE = "active"
+UPCOMING = "upcoming"
+PAST = "past"
+
+def proper_poll_type(view_func):
+    """
+    A wrapper to ensure the passed ``poll_type`` is valid, then convert that from a url
+    to a poll_type easily understood by the view.
+    """
+    @functools.wraps(view_func)
+    def wrapper(request, poll_type, *args, **kwargs):
+        if poll_type == WHAT_IF_URL:
+            simple_poll_type = WHAT_IF
+        elif poll_type == HUNDRED_SAYS_URL:
+            simple_poll_type = HUNDRED_SAYS
+        else:
+            raise Http404
+        return view_func(request, poll_type=simple_poll_type, *args, **kwargs)
+    return wrapper
+
+def get_poll_type_url(poll_type):
+    """
+    Return the appropriate url keyword for the passed poll type.
+    """
+    if poll_type == WHAT_IF:
+        return WHAT_IF_URL
+    elif poll_type == HUNDRED_SAYS:
+        return HUNDRED_SAYS_URL
 
 # --- Helper functions
 
@@ -60,9 +98,11 @@ def list_activities(request):
     the available options of FollowUpReports and Stories.
     """
     # Get all approved activities
-    activities = get_approved_activities()
+    clubs = Club.objects.all()
+    activities = Activity.objects.approved()
     media_center = get_media_center()
-    return render(request, 'media/list_activities.html', {'activities': activities,
+    return render(request, 'media/list_activities.html', {'clubs': clubs,
+                                                          'activities': activities,
                                                           'media_center': media_center})
 
 # --- Follow-up Reports ---
@@ -101,14 +141,16 @@ def submit_report(request, episode_pk):
     
     if request.method == 'POST':
         form = FollowUpReportForm(request.POST,
-                                  request.FILES,
                                   instance=FollowUpReport(pk=episode.pk, # make pk equal to episode pk
                                                                          # to keep things synchronized
                                                           episode=episode,
                                                           submitter=request.user)
                                   )
-        if form.is_valid():
-            form.save()
+        image_formset = FollowUpReportImageFormset(request.POST, request.FILES)
+        if form.is_valid() and image_formset.is_valid():
+            instance = form.save()
+            image_formset.instance = instance
+            image_formset.save()
             return HttpResponseRedirect(reverse('activities:show',
                                                 args=(episode.activity.pk, )
                                                 ))
@@ -126,8 +168,71 @@ def submit_report(request, episode_pk):
                                            'organizer_count': episode.activity.organizers,
                                            'participant_count': episode.activity.participants,
                                            })
+        image_formset = FollowUpReportImageFormset()
     return render(request, 'media/report_write.html', {'form': form,
+                                                       'image_formset': image_formset,
                                                        'episode': episode})
+
+@csrf.csrf_exempt
+@decorators.ajax_only
+@decorators.post_only
+@login_required
+def update_report_options(request):
+    """
+    Update report options for a particular episode.
+    There 2 options: whether a report is required, and whether a report can be submitted early.
+    """
+    media_center = get_media_center()
+    # Permission checks
+    # The user should be the coordinator or deputy of the media center
+    if not is_coordinator_or_deputy(media_center, request.user) and not request.user.is_superuser:
+        raise PermissionDenied
+
+    episode = get_object_or_404(Episode, pk=request.POST['episode_pk'])
+
+    # Update option
+    action = request.POST['action']
+    if action == "exempt-report":
+        episode.requires_report = False
+        episode.save()
+
+        mail.send([episode.activity.primary_club.coordinator.email],
+                  cc=[media_center.email],
+                  template="media_report_exempted",
+                  context={"episode": episode})
+
+    elif action == "cancel-exempt-report":
+        episode.requires_report = True
+        episode.save()
+
+        mail.send([episode.activity.primary_club.coordinator.email],
+                  cc=[media_center.email],
+                  template="media_report_exempt_cancel",
+                  context={"episode": episode})
+
+    elif action == "allow-early-report":
+        episode.can_report_early = True
+        episode.save()
+
+        mail.send([episode.activity.primary_club.coordinator.email],
+                  cc=[media_center.email],
+                  template="media_early_report_allowed",
+                  context={"episode": episode})
+
+    elif action == "cancel-allow-early-report":
+        episode.can_report_early = False
+        episode.save()
+
+        mail.send([episode.activity.primary_club.coordinator.email],
+                  cc=[media_center.email],
+                  template="media_early_report_cancel",
+                  context={"episode": episode})
+
+    # Email notifications
+
+    # Return updated button
+    return render(request, "media/components/report_options.html", {"episode": episode,
+                                                                    "media_center": media_center})
 
 @login_required
 @user_passes_test(is_media_or_club_coordinator_or_member)
@@ -280,7 +385,8 @@ def assign_story_task(request):
     # The user should be the head of the Media Center
     media_center = get_media_center()
     if request.user != media_center.coordinator and not request.user.is_superuser:
-        raise PermissionDenied   
+        raise PermissionDenied
+    # FIXME: coordinator or deputy
     
     episode = Episode.objects.get(pk=request.POST['episode_pk'])
     if request.POST['assignee'] == 'random':
@@ -573,3 +679,293 @@ def add_comment(request, pk):
         print recipients
     return HttpResponseRedirect(reverse('media:show_task',
                                         args=(pk, )))
+
+# AJAXy challenge!!!
+# polls_home view is the only interface with which users interact (at least non-media-center members).
+# All the other views are AJAXy, except the ones with which editors interact.
+
+# The idea is as follows:
+# polls home returns only an empty page (probably only contains basic stuff) yet contains ajax code
+# The ajax code then communicates with polls_list (probably better via 3 urls eg /polls/active/,
+# /past/, /upcoming/ [all ajax]). These urls will return the html to show the lists (which is rendered in some
+# intermediate template)
+# As for past and upcoming (for privileged users) polls, the list shows collapsed polls; when triggered, they will
+# ajaxly communicate with show_poll to get the full title, text, choices of a form
+# another call to poll_comment will bring up the list of comments for that poll as well as the commenting form
+# As for the active form(s), ajax code will bring up the poll details, as well as the voting form (if any)
+# The ajax voting
+# code could be either loaded initially or via this ajax request
+# Successful submission -> ajax call to poll_results
+
+
+@proper_poll_type
+@login_required
+def polls_home(request, poll_type):
+    """
+    Return the polls home depending on the poll type.
+    The poll home consists of the current active poll, and a list of past polls.
+    If the user is an editor, also show unpublished polls and editing options.
+    """
+    # The poll home page consists of "boxes" for its different parts, which are loaded
+    # via ajax on page load
+    if poll_type == HUNDRED_SAYS:
+        title = u"المئة تقول"
+        intro = "media/polls/100says_intro.html"
+    elif poll_type == WHAT_IF:
+        title = u"ماذا لو ...؟"
+        intro = "media/polls/what_if_intro.html"
+    else:
+        raise Http404
+
+    is_editor = is_coordinator_or_member(get_media_center(), request.user) or request.user.is_superuser
+
+    context = {"title": title,
+               "intro": intro,
+               "is_editor": is_editor,
+               "poll_type_url": get_poll_type_url(poll_type),
+               }
+    return render(request, "media/polls/home.html", context)
+
+
+@decorators.ajax_only
+@proper_poll_type
+@login_required
+def polls_list(request, poll_type, filter):
+    """
+    For media center coordinator, deputies, or members: return the full list of polls corresponding to the poll_type.
+    For normal users, return current and past polls corresponding to the poll_type.
+    The list should be classified into past, active, and upcoming.
+    """
+    # TODO: reduce templates into list_active and list_inactive
+    if filter == PAST:
+        polls = Poll.objects.past().filter(poll_type=poll_type)
+        template = "media/polls/list_past.html"
+    elif filter == ACTIVE:
+        polls = Poll.objects.active().filter(poll_type=poll_type)
+        template = "media/polls/list_active.html"
+    elif filter == UPCOMING:
+        polls = Poll.objects.upcoming().filter(poll_type=poll_type)
+        template = "media/polls/list_upcoming.html"
+    else:
+        raise Http404  # Actually this is already taken care of by the proper_poll_type decorator
+    context = {'polls': polls,
+               'poll_type_url': get_poll_type_url(poll_type)}
+    return render(request, template, context)
+
+
+@decorators.ajax_only
+@proper_poll_type
+@login_required
+def add_poll(request, poll_type):
+    """
+    GET: return the poll addition form. If the poll_type is HUNDRED_SAYS, allow addition of choices.
+    POST: add a new poll corresponding to the poll_type.
+    """
+    context = {'poll_type_url': get_poll_type_url(poll_type)}
+    if request.method == "POST":
+        form = PollForm(request.POST, request.FILES, instance=Poll(poll_type=poll_type, creator=request.user))
+        if poll_type == HUNDRED_SAYS:
+            choices_formset = PollChoiceFormSet(request.POST)
+
+        if form.is_valid() and (choices_formset.is_valid() if poll_type == HUNDRED_SAYS else True):
+            poll = form.save()
+            if poll_type == HUNDRED_SAYS:
+                choices_formset.instance = poll
+                choices_formset.save()
+
+            return {"message": "success"}
+        else:
+            context['form'] = form
+            if poll_type == HUNDRED_SAYS: context['choices_formset'] = choices_formset
+            return render(request, "media/polls/edit_poll.html", context)
+    else:
+        context['form'] = PollForm()
+        if poll_type == HUNDRED_SAYS: context['choices_formset'] = PollChoiceFormSet()
+        return render(request, "media/polls/edit_poll.html", context)
+
+
+@decorators.ajax_only
+@proper_poll_type
+@login_required
+def edit_poll(request, poll_type, poll_id):
+    """
+    GET: return the poll editing form. If the poll_type is HUNDRED_SAYS, allow editing of choices.
+    POST: edit the passed poll.
+    """
+    poll = get_object_or_404(Poll, poll_type=poll_type, pk=poll_id)
+    context = {'poll_type_url': get_poll_type_url(poll_type), 'poll': poll}
+    if request.method == "POST":
+        form = PollForm(request.POST, request.FILES, instance=poll)
+        if poll_type == HUNDRED_SAYS:
+            choices_formset = PollChoiceFormSet(request.POST, instance=poll)
+
+        if form.is_valid() and (choices_formset.is_valid() if poll_type == HUNDRED_SAYS else True):
+            form.save()
+            if poll_type == HUNDRED_SAYS:
+                choices_formset.save()
+
+            return {"message": "success"}
+        else:
+            context['form'] = form
+            if poll_type == HUNDRED_SAYS: context['choices_formset'] = choices_formset
+            return render(request, "media/polls/edit_poll.html", context)
+    else:
+        context['form'] = PollForm(instance=poll)
+        if poll_type == HUNDRED_SAYS: context['choices_formset'] = PollChoiceFormSet(instance=poll)
+        return render(request, "media/polls/edit_poll.html", context)
+
+
+
+@decorators.ajax_only
+@decorators.post_only
+@proper_poll_type
+@login_required
+def delete_poll(request, poll_type, poll_id):
+    """
+    GET: show confirmation message.
+    POST: delete given poll.
+    """
+    poll = get_object_or_404(Poll, poll_type=poll_type, pk=poll_id)
+    poll.delete()
+    return {"message": "success"}
+
+
+@decorators.ajax_only
+@proper_poll_type
+@login_required
+def show_poll(request, poll_type, poll_id):
+    """
+    GET: return poll contents (title, text, choices (if any), and image, in addition to voting form (for HUNDRED_SAYS).
+    POST: respond to poll (vote on a choice)
+    """
+    poll = get_object_or_404(Poll, poll_type=poll_type, id=poll_id)
+    if request.method == "POST":
+        form = PollResponseForm(request.POST, instance=PollResponse(poll=poll, user=request.user))
+        if form.is_valid():
+            try:
+                form.save()
+                return {"message": "success"}
+            except IntegrityError:
+                # An IntegrityError will be raised when a user attempts to vote twice
+                # (This constraint is specified in Meta of the PollResponse model)
+                return {"message": "already_voted"}
+        else:
+            return {"message": "invalid_form"}
+    else:
+        # For hundred-says polls, return the poll & choices in an HTML form for voting
+        # For what-if polls, return the poll only
+        # In both cases load the comments and commenting form as well
+        context = {'poll': poll, 'poll_type_url': get_poll_type_url(poll_type)}
+
+        context['is_active'] = poll.is_active()
+        context['has_choices'] = poll.poll_type == HUNDRED_SAYS
+        context['is_editor'] = is_coordinator_or_member(get_media_center(), request.user) or request.user.is_superuser
+        context['has_voted'] = poll.responses.filter(user=request.user).exists()
+
+        # If the poll is a hundred-says poll and is active, then pass the voting form to the context
+        if poll.poll_type == HUNDRED_SAYS and poll.is_active():
+            context['response_form'] = PollResponseForm(instance=PollResponse(poll=poll))
+
+        return render(request, "media/polls/show_poll.html", context)
+
+
+@decorators.ajax_only
+@proper_poll_type
+@login_required
+def poll_comment(request, poll_type, poll_id):
+    """
+    GET: return list of comments and commenting form for poll.
+    POST: comment on a poll.
+    """
+    poll = get_object_or_404(Poll, poll_type=poll_type, pk=poll_id)
+    context = {"poll": poll,
+               "poll_type_url": get_poll_type_url(poll_type),
+               "is_editor": is_coordinator_or_member(get_media_center(), request.user) or request.user.is_superuser,
+               'comments': poll.comments.all()}
+    if request.method == "POST":
+        comment_form = PollCommentForm(request.POST, instance=PollComment(poll=poll, author=request.user))
+        if comment_form.is_valid():
+            comment_form.save()
+            return {"message": "success"}
+        else:
+            context["comment_form"] = comment_form
+            return render(request, "media/polls/comments.html", context)
+    else:
+        if poll.is_active():
+            context['comment_form'] = PollCommentForm()
+        return render(request, "media/polls/comments.html", context)
+    # TODO: only show part (1st 3) of the comments list at first
+
+
+@decorators.ajax_only
+@decorators.post_only
+@proper_poll_type
+@user_passes_test(is_media_coordinator_or_member)
+@login_required
+def delete_poll_comment(request, poll_type, poll_id):
+    poll = get_object_or_404(Poll, poll_type=poll_type, pk=poll_id)
+    comment_id = request.POST['comment_id']
+    comment = get_object_or_404(PollComment, poll=poll, pk=comment_id)
+    comment.delete()
+    return {"message": "success"}
+
+
+@decorators.ajax_only
+@proper_poll_type
+@login_required
+def poll_results(request, poll_type, poll_id):
+    """
+    For hundred-says polls, return a results page as a pie chart of votes.
+    For non-media center members, this shouldn't be accessible unless the user has already voted.
+    """
+    poll = get_object_or_404(Poll, poll_type=poll_type, pk=poll_id)
+
+    # Make sure it's a HUNDRED_SAYS poll
+    assert poll.poll_type == HUNDRED_SAYS
+
+    # The poll should be inactive or the
+    # user should either be an editor or has voted in order to be allowed to see the results
+    has_voted = poll.responses.filter(user=request.user).exists()
+    if poll.is_active() and not has_voted and not (request.user.is_superuser or is_coordinator_or_member(get_media_center(), request.user)):
+        raise PermissionDenied
+
+    return render(request, "media/polls/results.html", {"poll": poll, "poll_type_url": get_poll_type_url(poll_type)})
+
+
+@decorators.ajax_only
+@proper_poll_type
+@login_required
+def suggest_poll(request, poll_type):
+    """
+    GET: return poll suggestion form.
+    POST: send suggested poll as an email to media center.
+    """
+    poll_type_url = get_poll_type_url(poll_type)
+    poll_type_name = dict(POLL_TYPE_CHOICES)[poll_type]
+    if request.method == "POST":
+        form = PollSuggestForm(poll_type, request.POST)
+        if form.is_valid():
+            context = dict()
+            # extract the fields and prepare the context
+            context['title'] = form.cleaned_data['title']
+            context['text'] = form.cleaned_data['text']
+            if poll_type == HUNDRED_SAYS:
+                context['choices'] = form.cleaned_data['choices']
+
+            context['poll_type_name'] = poll_type_name
+
+            # email the suggestion
+            mail.send([get_media_center().email],
+                      template="media_poll_suggestion",
+                      context=context)
+            return {"message": "success"}
+        else:
+            return render(request, "media/polls/suggest.html", {"form": form,
+                                                                "poll_type_url": poll_type_url,
+                                                                "poll_type_name": poll_type_name})
+
+    else:
+        form = PollSuggestForm(poll_type)
+        return render(request, "media/polls/suggest.html", {"form": form,
+                                                            "poll_type_url": poll_type_url,
+                                                            "poll_type_name": poll_type_name})

@@ -3,15 +3,112 @@ from django.contrib.auth.models import Permission, User, Group
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from accounts.test_utils import create_user
-from activities.models import Review
+from activities.models import Activity, Review
 from activities.test_utils import create_activity, add_presidency_review, add_deanship_review
-from activities.utils import get_approved_activities, get_pending_activities, get_rejected_activities
 from clubs.models import Club
 from clubs.test_utils import add_club_member, set_club_coordinator
 from clubs.utils import get_presidency
 
 
 class ShowActivityViewTests(TestCase):
+    fixtures = ['default_clubs.json']
+    def setUp(self):
+        self.submitter = create_user()
+        self.user = create_user()
+        self.activity1 = create_activity(submitter=self.submitter)
+        self.activity2 = create_activity(submitter=self.submitter)
+
+        self.client.login(username=self.user.username, password="12345678")
+
+    def test_with_superuser(self):
+        self.user.is_superuser = True
+        self.user.save()
+        self.util_no_restriction_users()
+
+    def test_with_presidency(self):
+        add_p_review = Permission.objects.get(codename="add_presidency_review")
+        self.user.user_permissions.add(add_p_review)
+        # sanity check
+        self.assertTrue(self.user.has_perm('activities.add_presidency_review'))
+        self.util_no_restriction_users()
+
+    def test_with_primary_coodinator(self):
+        club = self.activity1.primary_club
+        club.coordinator = self.user
+        club.save()
+        self.util_no_restriction_users()
+
+    def test_with_secondary_coordinator(self):
+        pass
+
+    def util_no_restriction_users(self):
+        # Test with pending activity
+        response = self.client.get(reverse('activities:show', args=(self.activity1.pk, )))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.activity1.name)  # sanity check
+
+        # Test with rejected activity
+        add_presidency_review(self.activity1, False)
+        response = self.client.get(reverse('activities:show', args=(self.activity1.pk, )))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.activity1.name)  # sanity check
+
+        # Test with approved activity
+        add_presidency_review(self.activity2, True)
+        add_deanship_review(self.activity2, True)
+        response = self.client.get(reverse('activities:show', args=(self.activity2.pk, )))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.activity2.name)  # sanity check
+
+    def test_with_deanship_reviewer(self):
+        add_d_review = Permission.objects.get(codename="add_deanship_review")
+        self.user.user_permissions.add(add_d_review)
+
+        # Test with pending activity
+        response = self.client.get(reverse('activities:show', args=(self.activity1.pk, )))
+        self.assertEqual(response.status_code, 403)
+
+        # Test with activity approved by presidency
+        add_presidency_review(self.activity1, True)
+        response = self.client.get(reverse('activities:show', args=(self.activity1.pk, )))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.activity1.name)  # sanity check
+
+        # Test with rejected activity
+        add_deanship_review(self.activity1, False)
+        response = self.client.get(reverse('activities:show', args=(self.activity1.pk, )))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.activity1.name)  # sanity check
+
+        # Test with approved activity
+        add_presidency_review(self.activity2, True)
+        add_deanship_review(self.activity2, True)
+        response = self.client.get(reverse('activities:show', args=(self.activity2.pk, )))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.activity2.name)  # sanity check
+
+    def test_with_normal_user(self):
+        # Test with pending activity
+        response = self.client.get(reverse('activities:show', args=(self.activity1.pk, )))
+        self.assertEqual(response.status_code, 403)
+
+        # Test with activity approved by presidency
+        add_presidency_review(self.activity1, True)
+        response = self.client.get(reverse('activities:show', args=(self.activity1.pk, )))
+        self.assertEqual(response.status_code, 403)
+
+        # Test with rejected activity
+        add_deanship_review(self.activity1, False)
+        response = self.client.get(reverse('activities:show', args=(self.activity1.pk, )))
+        self.assertEqual(response.status_code, 403)
+
+        # Test with approved activity
+        add_presidency_review(self.activity2, True)
+        add_deanship_review(self.activity2, True)
+        response = self.client.get(reverse('activities:show', args=(self.activity2.pk, )))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.activity2.name)  # sanity check
+
     def test_show_view_with_a_normal_user(self):
         """
         Test the show activity view with a user with no permissions.
@@ -20,6 +117,8 @@ class ShowActivityViewTests(TestCase):
         normal_user = create_user('normal_user')
         club = create_club()
         activity = create_activity(submitter=normal_user, club=club)
+        add_presidency_review(activity, True)
+        add_deanship_review(activity, True)
 
         # Login
         logged_in = self.client.login(username=normal_user.username, password='12345678')
@@ -41,26 +140,6 @@ class ShowActivityViewTests(TestCase):
         # Normal user should not see review buttons
         self.assertNotContains(response, u'مراجعة رئاسة نادي الطلاب')
         self.assertNotContains(response, u'مراجعة عمادة شؤون الطلاب')
-
-    def test_show_view_with_a_normal_user_and_collect_participants(self):
-        """
-        Test whether the user can see participate button.
-        """
-        # Setup the database
-        normal_user = create_user('normal_user')
-        club = create_club()
-        activity = create_activity(submitter=normal_user,
-                                   collect_participants=True)
-
-        # Login
-        logged_in = self.client.login(username=normal_user.username, password='12345678')
-        self.assertEqual(logged_in, True)
-
-        response = self.client.get(reverse('activities:show',
-                                   args=(activity.pk, )))
-        self.assertContains(response, 'href="' + reverse('activities:participate',
-                                                         args=(activity.pk, )) + '"'
-                            )
 
     def test_show_view_with_a_privileged_user(self):
         privileged_user = create_user('user2')
@@ -507,7 +586,7 @@ class ListActivityViewTests(TestCase):
         response = self.client.get(reverse('activities:list'))
         self.assertEqual(response.status_code, 200)
 
-        self.assertEqual(sorted(list(response.context['approved'])), sorted(list(get_approved_activities())))
+        self.assertEqual(sorted(list(response.context['approved'])), sorted(list(Activity.objects.approved())))
         # self.assertEqual(sorted(list(response.context['pending'])), sorted(list(get_pending_activities())))
         # self.assertEqual(sorted(list(response.context['rejected'])), sorted(list(get_rejected_activities())))
 

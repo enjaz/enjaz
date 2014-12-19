@@ -13,7 +13,7 @@
 	</div>
 	 <div class="panel-body">
 	{% if user.colleague_profile %}
-		<table id="request-table" class="table table-bordered datatable">
+		<table id="request-table" class="display">
 			<thead>
 				<tr>
 					<th>الاسم</th>
@@ -29,10 +29,10 @@
 				{% for r in page_requests %}
 				<tr>
 					<td><a href="{% url 'arshidni:show_group' r.pk %}">{{ r.user.student_profile.get_ar_full_name }}</a></td>
-					<td>{{ r.interests }}</td>
+					<td>{{ r.interests|linebreaksbr }}</td>
 					<td>{{ r.batch }}</td>
 					<td id="contacts-{{ r.pk }}">{% if r.status == 'A' or r.status == 'WC' %}{{ r.contacts }}{% else %}-{% endif %}</td>
-					<td>{{ r.submission_date|date:"j F Y" }}</td>
+					<td data-order="{{ r.submission_date|date:"U" }}">{{ r.submission_date|date:"j F Y" }}</td>
 					<td id="status-{{ r.pk }}">{{ r.get_status_display }}</td>
 					<td id="actions-{{ r.pk }}">{% if r.status == 'P' %}<i title="اقبل" data-id="{{ r.pk }}" data-action="accept" class="accept-request glyphicon glyphicon-ok"></i>{% endif %} {% if r.status == 'P' or r.status == 'A' %}<i title="ارفض" data-id="{{ r.pk }}" data-action="reject" class="delete-request glyphicon glyphicon-remove"></i>{% endif %}{% if r.status == 'WN' or r.status == 'WC' or r.status == 'R' %}-{% endif %}</td>
 				</tr>
@@ -81,11 +81,14 @@ $(function() {
 {% endblock %}
 
 {% block customscript %}
-<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 <script>
-$(document).ready(function () {
-	$('#request-table').DataTable();
+$(function () {
+	$('#request-table').dataTable({
+		"order": [[ 4, "desc" ]],
+		"language": {% include 'js/dataTables-arabic.json' %}
+	});
 });
 </script>
 {% endblock %}

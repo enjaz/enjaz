@@ -7,13 +7,20 @@ from django.utils import timezone
 
 from django.core.exceptions import PermissionDenied
 
+from post_office import mail
+from accounts.models import get_gender
 from core.decorators import post_only
+from core.utilities import MVP_EMAIL, FVP_EMAIL
 from activities.models import Activity, Evaluation
 from activities.forms import EvaluationForm
+from clubs.utils import has_coordination_to_activity
 from niqati.models import Niqati_User, Category, Code, Code_Order, Code_Collection
-from niqati.forms import OrderForm  #, SubmissionForm
+from niqati.forms import OrderForm
 
-# from django.db.models import Q
+# TODO: The Core_Order model should have a submitter field, and the
+# notifications should be sent to the person who requested the codes.
+# This is espically important with the introduction of deputies and
+# notifications to secondary clubs.
 
 
 @login_required
@@ -161,7 +168,8 @@ def create_codes(request, activity_id):
 
     # --- Permission checks ---
     # The user must be the coordinator of the club that owns the activity.
-    if not activity.primary_club.coordinator == request.user and not request.user.is_superuser:
+    if not has_coordination_to_activity(request.user, activity) \
+       and not request.user.is_superuser:
         raise PermissionDenied
 
     form = OrderForm(request.POST)
@@ -187,19 +195,23 @@ def create_codes(request, activity_id):
                         x.approved = True
                     x.save()
 
-            # create the codes
-            # TODO: the url should always point to enjazportal.com. (use sites framework)
-            # With this configuration, it can point to local host
-            host = request.build_absolute_uri(reverse('niqati:submit'))
-            print "host: " + host
-            o.process(host)
+            # TODO: send email to presidency for approval
+            email_context = {'order': o}
+            if get_gender(activity.primary_club.coordinator) == 'M':
+                mail.send([MVP_EMAIL],
+                          template="niqati_order_submit",
+                          context=email_context)
+            elif get_gender(activity.primary_club.coordinator) == 'F':
+                mail.send([FVP_EMAIL],
+                          template="niqati_order_submit",
+                          context=email_context)
+            
             msg = u"تم إرسال الطلب؛ و سيتم إنشاء النقاط فور الموافقة عليه"
         else:
             pass
             msg = u"لم تطلب أية أكواد!"
         form = OrderForm()
     else:
-        print "INvalid form"
         msg = u"الرجاء تصحيح الأخطاء أدناه"
     # return HttpResponseRedirect(reverse('activities:niqati_orders',
     #                                     args=(activity_id, )))
@@ -231,7 +243,8 @@ def view_orders(request, activity_id):
     # --- Permission checks ---
     # Only the club coordinator has the permission to view
     # niqati orders
-    if not activity.primary_club.coordinator == request.user and not request.user.is_superuser:
+    if not has_coordination_to_activity(request.user, activity) \
+       and not request.user.is_superuser:
         raise PermissionDenied
 
     orders = Code_Order.objects.filter(activity=activity)
@@ -254,7 +267,7 @@ def coordinator_view(request, activity_id):
 
 
 @login_required
-@permission_required('niqati.view_order', raise_exception=True)
+#@permission_required('niqati.view_order', raise_exception=True)
 def view_collection(request, pk):
     collec = get_object_or_404(Code_Collection, pk=pk)
     try:
@@ -290,14 +303,24 @@ def approve_codes(request):
                 collec.approved = True
                 collec.save()
 
-            host = request.build_absolute_uri(reverse('niqati:submit'))
-            order.process(host)
+            # host = request.build_absolute_uri(reverse('niqati:submit'))
+            # order.process(host)
 
         elif request.POST['action'] == "reject_order":
             order = Code_Order.objects.get(pk=pk)
             for collec in order.code_collection_set.filter(approved=None):
                 collec.approved = False
                 collec.save()
+
+                # Send email notification after code generation
+                email_context = {'order': order}
+                if order.activity.primary_club.coordinator:
+                    recipient = order.activity.primary_club.coordinator.email
+                else:
+                    recipient = order.activity.submitter.email
+                mail.send([recipient],
+                          template="niqati_order_reject",
+                          context=email_context)
 
         elif request.POST['action'] == "approve_collec":
             collec = Code_Collection.objects.get(pk=pk)

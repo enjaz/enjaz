@@ -12,7 +12,7 @@ from django.views.decorators import csrf
 
 
 from core import decorators
-from studentvoice.models import Voice, Vote, View
+from studentvoice.models import Recipient, Response, Voice, Vote, View
 
 # As a general design decision, the user interface (which can also be
 # used by admins), will disply both published and pending-revision
@@ -24,16 +24,23 @@ class VoiceForm(forms.ModelForm):
     # Redefine the fields for them to be required.
     title = forms.CharField(max_length=Voice._meta.get_field('title').max_length,
                             label=Voice._meta.get_field('title').verbose_name)
-    recipient = forms.CharField(max_length=Voice._meta.get_field('recipient').max_length,
-                            label=Voice._meta.get_field('recipient').verbose_name)
+    recipients = Recipient.objects.all()
+    recipient = forms.ModelChoiceField(queryset=recipients,
+                                       label=Voice._meta.get_field('recipient').verbose_name)
     class Meta:
         model = Voice
-        fields = ['title', 'text', 'recipient']
+        fields = ['title', 'text', 'solution', 'recipient']
 
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Voice
         fields = ['text']
+
+class ResponseForm(forms.ModelForm):
+    class Meta:
+        model = Response
+        fields = ['text']
+
 
 @login_required
 def home(request):
@@ -213,16 +220,20 @@ def edit(request, voice_id):
     context = {'voice': voice, 'greatest_parent': greatest_parent,
                'edit': True, 'is_comment': is_comment}
 
-    # If the user is the submitter of the voice, make sure that it is
-    # editable and that is it in a thread that is editable.
-    # Otherwise, if the user has change_voice, they can edit the voice
-    # whatever its status is.
-    if not (voice.submitter == request.user and \
-       voice.is_editable and greatest_parent.is_editable) \
-       and not request.user.has_perm('studentvoice.change_voice'):
+    # If the user is not the submitter of the voice, and does not have
+    # change_voice permission, forbid them.
+    if voice.submitter != request.user and \
+       not request.user.has_perm('studentvoice.change_voice'):
         raise PermissionDenied
 
     if request.method == 'POST':
+        # At this point, we only have the submitter and those with
+        # change_voice.  If is_ediable==False, forbid the submitter,
+        # while allow those with change_voice to edit regardless of
+        # the state of is_editable.
+        if not (voice.submitter == request.user and \
+           voice.is_editable and greatest_parent.is_editable):
+            raise PermissionDenied
         form = Form(request.POST, instance=voice)
         if is_comment:
             after_url = reverse('studentvoice:show', args=(greatest_parent.pk,))+'#comment-' + voice_id
@@ -309,6 +320,19 @@ def create(request):
             return render(request, 'studentvoice/edit.html', context)
     elif request.method == 'GET':
         form = VoiceForm()
+        try:
+            student_profile = request.user.student_profile
+        except ObjectDoesNotExist: # not student
+            pass
+
+        if student_profile:
+            try:
+                recipient = Recipient.objects.get(college=request.user.student_profile.college)
+                voice = Voice(recipient=recipient)
+                form = VoiceForm(instance=voice)
+            except ObjectDoesNotExist: # college has no recipient
+                pass
+
         context = {'form': form, 'template': template}
         return render(request, 'studentvoice/edit.html', context)
 
@@ -365,3 +389,54 @@ def search(request):
         
         context['template'] = template
         return render(request, 'studentvoice/search.html', context)
+
+
+@login_required
+def respond(request, voice_id):
+    voice = get_object_or_404(Voice, pk=voice_id, parent__isnull=True,
+                              is_published=True)
+    context = {'voice': voice}
+    if not request.user in voice.recipient.users.all() and \
+       not request.user.has_perm('voices.add_response'):
+        raise PermissionDenied        
+
+
+    if request.method == 'POST':
+        response = Response(submitter=request.user, voice=voice)        
+        form = ResponseForm(request.POST, instance=response)
+        if form.is_valid():
+            form.save()
+            after_url = reverse('studentvoice:show', args=(voice.pk,))
+            return HttpResponseRedirect(after_url)
+            pass
+        else:
+            context['form'] = form
+    elif request.method == 'GET':
+        form = ResponseForm()
+        context['form'] = form
+    return render(request, 'studentvoice/respond.html', context)
+
+
+@login_required
+def edit_response(request, voice_id):
+    voice = get_object_or_404(Voice, pk=voice_id, parent__isnull=True,
+                              is_published=True,
+                              response__isnull=False)
+    context = {'voice': voice, 'edit': True}
+    if not request.user in voice.recipient.users.all() and \
+       not request.user.has_perm('voices.add_response'):
+        raise PermissionDenied
+
+    if request.method == 'POST':
+        form = ResponseForm(request.POST, instance=voice.response)
+        if form.is_valid():
+            form.save()
+            after_url = reverse('studentvoice:show', args=(voice.pk,))
+            return HttpResponseRedirect(after_url)
+            pass
+        else:
+            context['form'] = form
+    elif request.method == 'GET':
+        form = ResponseForm(instance=voice.response)
+        context['form'] = form
+    return render(request, 'studentvoice/respond.html', context)

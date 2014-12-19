@@ -1,6 +1,8 @@
 # -*- coding: utf-8  -*-
+from django.contrib.contenttypes.generic import GenericRelation
 from django.db import models
 from django.contrib.auth.models import User
+from forms_builder.forms.models import Form
 
 section_choices = (
     ('NG', u'الحرس الوطني'),
@@ -19,6 +21,7 @@ college_choices = (
     ('D', u'كلية طب الأسنان'),
     ('B', u'كلية العلوم و المهن الصحية'),
     ('N', u'كلية التمريض'),
+    ('I', u' كلية الصحة العامة والمعلوماتية الصحية'),
 )
 
 city_choices = (
@@ -43,10 +46,16 @@ class Club(models.Model):
                                     on_delete=models.SET_NULL,
                                     # To exclude AnonymousUser
                                     limit_choices_to={'pk__gt': -1})
+    deputies = models.ManyToManyField(User, null=True,
+                                     verbose_name=u"النواب",
+                                     blank=True,
+                                     related_name="deputyships",
+                                     limit_choices_to={'student_profile__isnull': False})
     members = models.ManyToManyField(User, null=True,
                                      verbose_name=u"الأعضاء",
                                      blank=True,
-                                     related_name="memberships")
+                                     related_name="memberships",
+                                     limit_choices_to={'student_profile__isnull': False})
     employee = models.ForeignKey(User, null=True, blank=True,
                                  related_name="employee",
                                  on_delete=models.SET_NULL,
@@ -60,8 +69,6 @@ class Club(models.Model):
                                  on_delete=models.SET_NULL,
                                  default=None,
                                  verbose_name=u"الكلية",)
-    open_membership = models.BooleanField(default=False,
-                                               verbose_name=u"اسمح بالتسجيل؟")
     creation_date = models.DateTimeField(u'تاريخ الإنشاء',
                                          auto_now_add=True)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
@@ -69,15 +76,35 @@ class Club(models.Model):
                                   verbose_name=u"نادي مميز؟") # To allow more flexible exceptions with
                                                          # presidency, media club and arshidny
     city = models.CharField(max_length=1, choices=city_choices, verbose_name=u"المدينة")
+    forms = GenericRelation(Form)
+
+    def registration_is_open(self):
+        """
+        Return ``True`` if there is 1 published form marked as primary. Return ``False`` if there isn't or,
+        by any chance, there is more than one
+        """
+        return self.forms.published().filter(is_primary=True).count() == 1
+
+    def has_registration_form(self):
+        """
+        A memory-efficient method to check for the presence of 1 (an only 1) primary form for a club.
+        """
+        return self.forms.filter(is_primary=True).count() == 1
+
+    def get_registration_form(self):
+        """
+        If registration is open, return the registration form; otherwise return ``None``.
+        """
+        if self.has_registration_form():
+            return self.forms.get(is_primary=True)
+        else:
+            return None
+
     def get_due_report_count(self):
         "Get the number of due follow-up reports."
-        # The following import is not very neat, but importing it at the beginning of
-        # the file causes an ImportError because components of the other files use
-        # parts of this file that are only loaded later
-        from activities.utils import get_approved_activities
         # Get all club's episodes
         episodes = []
-        for activity in get_approved_activities().filter(primary_club=self): #self.primary_activity.all():
+        for activity in self.primary_activity.approved():
             episodes.extend(activity.episode_set.all())
         # Get all club's episodes whose report is due
         due_episodes = filter(lambda x: x.report_is_due(),
@@ -86,13 +113,9 @@ class Club(models.Model):
     
     def get_overdue_report_count(self):
         "Get the number of overdue follow-up reports."
-        # The following import is not very neat, but importing it at the beginning of
-        # the file causes an ImportError because components of the other files use
-        # parts of this file that are only loaded later
-        from activities.utils import get_approved_activities
         # Get all club's episodes
         episodes = []
-        for activity in get_approved_activities().filter(primary_club=self): #self.primary_activity.all():
+        for activity in self.primary_activity.approved():
             episodes.extend(activity.episode_set.all())
         # Get all club's episodes whose report is overdue
         overdue_episodes = filter(lambda x: x.report_is_overdue(),
@@ -103,24 +126,12 @@ class Club(models.Model):
         # For the admin interface.
         verbose_name = u"نادي"
         verbose_name_plural = u"الأندية"
-    def __unicode__(self):
-        return self.name
-
-class MembershipApplication(models.Model):
-    club = models.ForeignKey(Club, related_name='club')
-    user = models.ForeignKey(User, related_name='user')
-    note = models.TextField(verbose_name=u"لماذا تريد الانضمام؟",
-           help_text=u"هل لديك مهارات مخصوصة؟ هل لديك أفكار لنشاطات؟")
-    submission_date = models.DateTimeField(u'تاريخ الإرسال',
-                                           auto_now_add=True)
-
-    class Meta:
         permissions = (
-            ("view_application", "Can view all available applications."),
+            ("view_members", "Can view club members list."),
         )
 
     def __unicode__(self):
-        return "%s" % (self.user)
+        return self.name
 
 class College(models.Model):
     section = models.CharField(max_length=2, choices=section_choices, verbose_name=u"القسم")

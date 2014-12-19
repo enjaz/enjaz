@@ -67,7 +67,18 @@ class ReportDueAndOverdueDateTests(TestCase):
 #         print Activity.objects.all(), "<- hello!"
 #         print Episode.objects.all()
 #         print FollowUpReport.objects.all()
-    
+
+    def test_report_is_submitted(self):
+        "Test whehter the function returns True when there is a FollowUpReport and False otherwise"
+        for episode in Episode.objects.all():
+            try:
+                r = episode.followupreport
+                submitted = True
+            except ObjectDoesNotExist:
+                submitted = False
+            self.assertEqual(episode.report_is_submitted(), submitted)
+
+
     def test_report_due_date(self):
         "Test the report_due_date method of the episode model"
         # Report due date should be REPORT_DUE_AFTER days

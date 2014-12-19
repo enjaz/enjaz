@@ -12,12 +12,17 @@
  	{% endif %}
 {% endblock %}
 {% block content %}
+<div class="row">
+	<div class="col-md-10 col-md-offset-1">
+		<p class="alert alert-info arshidni-intro">هذه حلقة التواصل بين الطلاب المستجدين والطلاب الأقدم في الجامعة. يقدم الزميل الطلابي المشورة للطالب المستجد بناء على تجربته الشخصية، كإعانته على الانتقال من النظام الدراسي المدرسي إلى النظام الدراسي الجامعي، ونقل خبراته في طرق الاستذكار المثلى لمختلف المواد والمواضيع، والمساعدة في حل الصعوبات الأكاديمية التي قد يواجهها الطالب المستجد.</p>
+	</div>
+</div>
 <div class="panel panel-primary">
 	<div class="panel-heading">
 		<h3 class="panel-title">الزملاء الطلابيون</h3>
 	</div>
 	 <div class="panel-body">
-		<table id="colleague-table" class="table table-hover table-bordered datatable">
+		<table id="colleague-table" class="display">
 			<thead>
 				<tr>
 					<th>الزميل</th>
@@ -33,7 +38,7 @@
 					<td><a href="{% url 'arshidni:show_colleague_profile' c.pk %}">{{ c.user.student_profile.get_ar_full_name|default:c.user.username }}</a></td>
 					<td>{{ c.user.student_profile.college }}</a></td>
 					<td>{{ c.batch }}</td>
-                       			<td>{{ c.submission_date|date:"j F Y" }}</td>
+                       			<td data-order="{{ c.submission_date|date:"U" }}">{{ c.submission_date|date:"j F Y" }}</td>
                        			<td>{% if user.colleague_profile != c %}<a href="{% url 'arshidni:submit_supervision_request' c.pk %}">اختر</a>{% endif %}</td>
 				</tr>
 				{% endfor %}
@@ -44,11 +49,14 @@
 {% endblock %}
 
 {% block customscript %}
-<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 <script>
 $(document).ready(function () {
-	$('#colleague-table').DataTable();
+	$('#colleague-table').dataTable({
+		"order": [[ 3, "desc" ]],
+		"language": {% include 'js/dataTables-arabic.json' %}
+	});
 });
 </script>
 {% endblock %}

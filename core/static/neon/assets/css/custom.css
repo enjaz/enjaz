@@ -51,7 +51,7 @@ h1, h2, h3, h4, h5, h6, h7, .site-header .site-nav .main-menu > li.active > a, .
 .english-field {
     direction: ltr;
     text-algin: left;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Roboto', "GE Dinar One", sans-serif;
 }
 
 .login-page .login-form .form-group .english-field.input-group.validate-has-error .error {
@@ -237,7 +237,7 @@ p.bg-warning {
 }
 .voice-update-info p {
   line-height: 13px;
-  font-size: 11px;
+  font-size: 12px;
   margin: 0 0 2px 1px;
   padding: 0;
 }
@@ -318,6 +318,13 @@ p.bg-warning {
    padding-top: 10px;
 }
 
+
+.studentvoice-response {
+    background-color: #F7FECC;
+    border-bottom-color: #9BD59B;
+    padding: 15px;
+}
+
 .short-summary.unpublished, .single-comment.unpublished {
    background-color: rgb(200, 197, 197);
 }
@@ -366,3 +373,56 @@ span.unpublished {
 .book-description {
     text-align: justify;
 }
+
+.arshidni-intro {
+	font-size: 1.3em;
+	text-align: justify;
+}
+
+/* Override neon customization to DataTables.*/
+.dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter {
+	border-width: none;
+	border-style: none;
+	border-color: none;
+}
+
+.dataTables_wrapper .dataTables_info.dataTables_paginate, .dataTables_wrapper .dataTables_paginate.dataTables_paginate {
+	border-right: none;
+	border-width: none;
+	border-style: none;
+	border-color: none;
+}
+
+.dataTables_wrapper .dataTables_info.dataTables_info, .dataTables_wrapper .dataTables_paginate.dataTables_info {
+    border-right: none;
+    border-radius: none;
+    background-clip: none;
+}
+.dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_paginate {
+    border-right: none;
+    border-width: none;
+    border-style: none;
+    border-color: none;
+}
+
+body.login-page .login-content .form-register-success a {
+	background-color: rgba(4, 113, 57, 1);
+}
+
+ul.navbar-left li a {
+	display: table-cell;
+}
+
+.remove_learningobjective {
+	color: #D42020;
+}
+
+body.login-page .login-content .alert-warning a {
+	color: #000;
+}
+
+/*RTL fixes*/
+.popover-content{
+	text-align: right;
+}
+

@@ -1,18 +1,12 @@
 from django.forms import ModelForm
-from clubs.models import MembershipApplication, Club
-
-
-class MembershipForm(ModelForm):
-    class Meta:
-        model = MembershipApplication
-        fields = ['note']
+from clubs.models import Club
 
 
 class ClubForm(ModelForm):
     class Meta:
         model = Club
         fields = ['name','english_name','description', 'email',
-                  'parent', 'coordinator', 'open_membership']
+                  'parent', 'coordinator']
     def clean(self):
         # Remove spaces at the start and end of all text fields.
         cleaned_data = super(ClubForm, self).clean()
@@ -25,7 +19,7 @@ class ClubForm(ModelForm):
 class DisabledClubForm(ClubForm):
     def __init__(self, *args, **kwargs):
         # Fields to keep enabled.
-        self.enabled_fields = ['description', 'open_membership']
+        self.enabled_fields = ['description']
         # If an instance is passed, then store it in the instance variable.
         # This will be used to disable the fields.
         self.instance = kwargs.get('instance', None)
@@ -54,4 +48,4 @@ class ModifyClubForm(ModelForm):
     class Meta:
         model = Club
         fields = ['description', 'email',
-                  'parent', 'coordinator', 'open_membership']
+                  'parent', 'coordinator']

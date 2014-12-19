@@ -1,0 +1,24 @@
+<!DOCTYPE html>{% load i18n %}
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>{% trans "Delete form" %}</title>
+    <style>
+        body {font-family:sans-serif; padding:1em 2em;}
+        p {width:50em; clear:both;}
+        label {display:block; float:left; width:8em; margin:0 1.2em 1.2em 0;}
+        li {list-style-type:none;}
+        li label {width:auto; cursor:pointer;}
+        .errorlist {color:#f00;}
+    </style>
+</head>
+<body>
+    <h1>{% trans "Delete form" %} {{ form.title }}?</h1>
+    <p>{% trans "Are you sure you want to <strong>delete</strong> the form" %} {{ form.title }}{% trans "?" %}</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" name="action" value="delete">{% trans "Yes" %}</button>
+        <button type="submit" name="action" value="keep">{% trans "No" %}</button>
+    </form>
+</body>
+</html>

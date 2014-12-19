@@ -4,7 +4,7 @@
 
 {% block content %}
 <h3>المقالات</h3>
-<table id="article_list" class="table table-bordered datatable">
+<table id="article_list" class="display">
 	<thead>
 		<!-- <th>#</th> -->
 		<th>عنوان المقال</th>
@@ -44,9 +44,14 @@
 	</tbody>
 </table>
 <!-- bottom scripts -->
-<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 <script>
-	$("#article_list").DataTable()
+$(function () {
+	$("#article_list").dataTable({
+		"order": [[ 2, "desc" ]],
+		"language": {% include 'js/dataTables-arabic.json' %}
+	});
+});
 </script>
 {% endblock %}

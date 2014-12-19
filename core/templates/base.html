@@ -114,12 +114,14 @@
 					<span>أرشدني</span>
 				</a>
 			</li>
+{% comment %}
 			<li>
 				<a href="{% url 'media:index' %}">
 					<i class="entypo-megaphone"></i>
 					<span>المركز الإعلامي</span>
 				</a>
 			</li>
+{% endcomment %}
 		</ul>
 				
 	</div>	
@@ -145,10 +147,11 @@
 		<ul class="nav navbar-nav navbar-left">
 			<li>
                                 {% if user.is_authenticated %}
+				<a href="{% url 'userena_password_change' user.username %}">غيّر كلمة السر</a>
 				<a href="{% url 'userena_signout' %}">اخرج</a>
                                 {% else %}
-                                <a style="display: table-cell;" href="{% url 'userena_signin' %}">ادخل</a>
-                                <a style="display: table-cell;" href="{% url 'userena_signup' %}">سجّل</a>
+                                <a href="{% url 'userena_signin' %}">ادخل</a>
+                                <a href="{% url 'userena_signup' %}">سجّل</a>
                                 {% endif %}
 			</li>
 		</ul>
@@ -164,7 +167,7 @@
 	</div>
 
     <div class="clearfix">
-        <footer class="main">
+        <footer>
 
         تطوير نادي الطلاب بجامعة الملك سعود بن عبد العزيز للعلوم الصحية
         <i class="entypo-dot"></i>

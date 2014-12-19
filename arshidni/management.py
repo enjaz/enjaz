@@ -1,4 +1,5 @@
 from django.contrib.auth.models import Permission, User, Group
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_syncdb
 
@@ -7,7 +8,11 @@ import arshidni.models
 def create_groups(sender, **kwargs):
     # In order for the coordinator to be able to use the Arshindi
     # Admin interface, we create a group for them.
-    arshidni_group = Group.objects.create(name='arshidni')
+    try:
+        arshidni_group = Group.objects.get(name='arshidni')
+    except ObjectDoesNotExist:
+        arshidni_group = Group.objects.create(name='arshidni')
+
     change_studygroup = Permission.objects.get(codename='change_studygroup')
     change_question = Permission.objects.get(codename='change_question')
     change_answer = Permission.objects.get(codename='change_answer')

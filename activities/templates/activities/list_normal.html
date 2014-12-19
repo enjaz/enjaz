@@ -15,7 +15,7 @@
         <div id="collapseOne-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
                 <div class="row">
-                {% with activities=approved %}
+                {% with activities=approved approved_table=1 %}
                     {% include 'activities/components/activities_table.html' %}
                 {% endwith %}
                 </div>
@@ -57,8 +57,8 @@
 {% endblock %}
 {% block customscript %}
 	<script src="{% static 'neon/assets/js/fullcalendar/fullcalendar.min.js' %}"></script>
-    <script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
-    <script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 	<script>
     var approved = [
 		{% with activities=approved %}
@@ -101,7 +101,21 @@
         calendar.fullCalendar('render');
     });
 
-    $('.datatable').DataTable();
+    // For approved, jump to the page where the closest upcoming
+    // event is listed.
+    var unix_seconds = Math.round(+new Date()/1000);
+    var approved_table = $('.datatable:first').DataTable({
+        "order": [[ 2, "asc" ]],
+        "language": {% include 'js/dataTables-arabic.json' %}
+    });
+    var approved_table_nodes = approved_table.column(2, {order: 'current'}).nodes();
+    for (i=0; i < approved_table_nodes.length; i++) {
+       if ($(approved_table_nodes[i]).data('order') > unix_seconds) {
+            var page_number = Math.floor( i / approved_table.page.info().length );
+            approved_table.page(page_number).draw(false);
+            break
+       }
+    }
 	</script>
 {% endblock %}
 

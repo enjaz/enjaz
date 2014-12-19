@@ -1,0 +1,21 @@
+{% extends 'activities_base.html' %}
+{% block title %}{{ form.title }}{% endblock %}
+{% block navbar %}
+<li><a href="{% url 'activities:show' form.content_object.pk %}">{{ form.content_object.name }}</a><li>
+{% endblock %}
+{% block content %}
+    <style>
+        .errorlist {color:#f00;}
+    </style>
+<div class="panel panel-default panel-shadow" data-collapsed="0">
+    <div class="panel-heading">
+        <div class="panel-title">{% include "activities/forms/breadcrumb.html" %}</div>
+    </div>
+	<!-- panel body -->
+	<div class="panel-body">
+    {% if form.response %}
+    <p class="alert alert-success">{{ form.response|linebreaksbr }}</p>
+    {% endif %}
+    </div>
+</div>
+{% endblock %}

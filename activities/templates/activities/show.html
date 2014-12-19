@@ -1,4 +1,4 @@
-{% extends 'activities_base.html' %}{% load staticfiles %}{% load clubs_utils %}
+{% extends 'activities_base.html' %}{% load staticfiles %}
 {% block title %}{{ activity.name }}{% endblock %}
 {% block content %}
 {% if error_message %}
@@ -65,14 +65,14 @@
 		<div class="col-sm-3">
 			
 			<div class="profile-buttons">
-				{% if activity.collect_participants %}
+				{% if activity.registration_is_open %}
 				<a href="{% url 'activities:participate' activity.pk %}" class="btn btn-default">
 					<i class="entypo-user-add"></i>
 					شارك
 				</a>
 				{% endif %}
 				
-				{% if user|is_coordinator:activity.primary_club and activity.is_editable or perms.activities.change_activity %}
+				{% if can_edit %}
 				<a href="{% url 'activities:edit' activity.pk %}" class="btn btn-default">
 					<i class="entypo-pencil"></i>
 					عدّل
@@ -89,24 +89,23 @@
 			
 			<div class="col-sm-offset-2 col-sm-10">
 
-				<ul class="user-details">{# if the user is privileged, show them the internal description #}
-                    {% if user|is_coordinator:activity.primary_club or perms.view_deanship_review or perms.activities.add_deanship_review or user|is_coordinator:activity.primary_club or perms.view_presidency_review or perms.activities.add_presidency_review %}
+				<ul class="user-details">{# if the user is privileged, show them the internal description #}{% if can_view_deanship_review or perms.activities.add_deanship_review or can_view_presidency_review or perms.activities.add_presidency_review %}
 					<li>
 						<a href="#">
 							<i class="entypo-info-circled"></i>
-							{{ activity.description }}
+							{{ activity.description|linebreaksbr }}
 						</a>
 					</li>{% endif %}
 					<li>
 						<a href="#">
 							<i class="entypo-info-circled"></i>
-							{{ activity.public_description }}
+							{{ activity.public_description|linebreaksbr }}
 						</a>
 					</li>
 					{% for episode in activity.episode_set.all %}
 					<li>
 						<div class="row">
-						{% if user|is_coordinator:activity.primary_club or perms.media.add_followupreport %}
+						{% if can_add_followupreport %}
 						{# group the activity info in a div to make #}
 						{# space for the report button #}
 						<div class="col-md-10">
@@ -129,23 +128,35 @@
 								{{ episode.location }}
 							</div>
 						</a>
-						{% if user|is_coordinator:activity.primary_club or perms.media.add_followupreport %}
+						{% if can_add_followupreport %}
 						</div>
 						<div class="followupreport_zone col-md-2">
-			            	{% if episode.followupreport %}
+                            {# The particular logic for the following is described here: https://github.com/osamak/student-portal/issues/81 #}
+			            	{% if episode.report_is_submitted %}
 			            		<a href="{% url 'media:show_report' episode.pk %}"
 			            		class="btn btn-block btn-green btn-xs">استعرض التقرير</a>
 
-			            	{% elif episode.report_is_due %}
-			            		<a href="{% url 'media:submit_report' episode.pk %}"
-			            		class="btn btn-block btn-gold btn-xs">ارفع التقرير</a>
+                            {% elif episode.requires_report %}
 
-			            	{% elif episode.report_is_overdue %}
-			            		<a href="{% url 'media:submit_report' episode.pk %}"
-			            		class="btn btn-block btn-red btn-xs">ارفع التقرير</a>
+                                {% if episode.report_is_due %}
+                                    <a href="{% url 'media:submit_report' episode.pk %}"
+                                    class="btn btn-block btn-gold btn-xs">ارفع التقرير</a>
 
-			            	{% else %}
-			            		<a class="btn btn-block btn-primary btn-xs disabled">بانتظار انتهاء النشاط</a>
+                                {% elif episode.report_is_overdue %}
+                                    <a href="{% url 'media:submit_report' episode.pk %}"
+                                    class="btn btn-block btn-red btn-xs">ارفع التقرير</a>
+
+                                {% else %}
+                                    {% if episode.can_report_early %}
+                                        <a href="{% url 'media:submit_report' episode.pk %}"
+                                        class="btn btn-block btn-info btn-xs">ارفع التقرير</a>
+                                    {% else %}
+                                        <a class="btn btn-block btn-primary btn-xs disabled">بانتظار انتهاء النشاط</a>
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                                <a href="{% url 'media:submit_report' episode.pk %}"
+                                class="btn btn-block btn-info btn-xs">ارفع التقرير (اختياري)</a>
 			            	{% endif %}
 						</div>
 						{% endif %}
@@ -156,24 +167,32 @@
 
 				<!-- tabs for the profile links -->
 				<ul class="nav nav-tabs">
-					{% if user|is_coordinator:activity.primary_club or perms.activities.add_presidency_review %}
+					{% if can_view_presidency_review or perms.activities.add_presidency_review %}
 					<li{% if active_tab == 'presidency' %} class="active"{% endif %}>
 						<a href="{% url 'activities:review_with_type' activity.pk 'p' %}">مراجعة رئاسة نادي الطلاب</a>
 					</li>
 					{% endif %}
-					{% if user|is_coordinator:activity.primary_club or perms.activities.add_deanship_review %}
+					{% if can_view_deanship_review or perms.activities.add_deanship_review %}
 					<li{% if active_tab == 'deanship' %} class="active"{% endif %}>
 						<a href="{% url 'activities:review_with_type' activity.pk 'd' %}">مراجعة عمادة شؤون الطلاب</a>
 					</li>
 					{% endif %}
-                    {% if user|is_coordinator:activity.primary_club or perms.activities.view_participation %}
-					<li{% if active_tab == 'view_participation' %} class="active"{% endif %}>
-						<a href="{% url 'activities:view_participation' activity.pk %}">عرض المشاركات</a>
-					</li>
-					{% endif %}
-                    {% if user|is_coordinator:activity.primary_club or perms.niqati.view_order %}
+                    {% if can_view_niqati_orders %}
 					<li{% if active_tab == 'niqati' %} class="active"{% endif %}>
 						<a href="{% url 'activities:niqati_orders' activity.pk %}">نقاطي</a>
+					</li>
+					{% endif %}
+                    {% comment %}
+                    In order to avoid URL reversing issues, the forms button has to be (at least temporarily) restricted
+                    to the `show` view and the very views of the forms app. The `show` view will pass a `can_view_forms`
+                    attribute to the context. All django-pluggable-forms views pass a context variable `object_id` to
+                    their templates. That's how we can know the request is coming from any of these 2.
+                    {% endcomment %}
+                    {% if can_view_forms or object_id %}
+					<li{% if active_tab == 'forms' %} class="active"{% endif %}>
+                    {% with current_app='activity_forms' %}
+						<a href="{% url 'forms:form_list' activity.pk %}">النماذج</a>
+                    {% endwith %}
 					</li>
 					{% endif %}
 				</ul>

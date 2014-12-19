@@ -1,0 +1,17 @@
+{% extends 'userena/base_userena.html' %}{% load staticfiles %}
+{% block title %}راجع بريدك{% endblock %}
+
+{% block description %}.راجع بريدك{% endblock %}
+
+{% block content %}
+<div class="form-register-success visible dinar-light">
+	<i class="entypo-lock"></i>
+	<h3 class="dinar-medium">أرسلنا لك رسالة تأكيد جديدة.</h3>
+	<p>سوف تتمكن من استخدامها خلال 30 يومًا، وفي حال عدم العثور عليها، نأمل البحث عنها في صندوق الرسائل المزعجة.</p>
+	<p>ويمكنك دائما <a href="mailto:hello@enjazportal.com">الاتصال بنا</a> في حال ظننت أن إشكالا وقع.</p>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+{% endblock %}

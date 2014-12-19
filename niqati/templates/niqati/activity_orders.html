@@ -31,14 +31,16 @@
 			        {% for collec in order.code_collection_set.all %}
 			            <li class="list-group-item">
 			 				<span class="badge">{{ collec.code_count }} أكواد</span>
-                            {% if collec.approved == True %}
+                            {% if collec.approved == True and collec.date_created %}
                             <span class="badge badge-success">تمت الموافقة</span>
+                            {% elif collec.approved == True and not collec.date_created %}
+                            <span class="badge badge-warning">تمت الموافقة و يجري إنشاء النقاط</span>
                             {% elif collec.approved == False %}
                             <span class="badge badge-danger">تم الرفض</span>
                             {% else %}
                             <span class="badge badge-warning">معلق</span>
                             {% endif %}
-			                <a href="{% if collec.approved == True %}{% url 'niqati:view_collec' collec.pk %}{% else %}#{% endif %}">{{ collec.code_category.ar_label }}</a>
+			                <a href="{% if collec.approved == True and collec.date_created %}{% url 'niqati:view_collec' collec.pk %}{% else %}#{% endif %}">{{ collec.code_category.ar_label }}</a>
 			            </li>
 			        {% endfor %}   
 			        </ul>

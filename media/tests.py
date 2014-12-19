@@ -11,5 +11,5 @@ Tests for the Media Center app.
 # them seperately and just import them here.
 
 from media.test_suites.followupreport_tests import *
-
 from media.test_suites.views import *
+from media.test_suites.models import *

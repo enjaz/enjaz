@@ -1,9 +1,47 @@
 # -*- coding: utf-8  -*-
 import datetime
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from django.contrib.auth.models import User
+from django.utils import timezone
 from activities.models import Activity, Episode
+
+# Constants for media poll types
+
+WHAT_IF = 0
+HUNDRED_SAYS = 1
+
+POLL_TYPE_CHOICES = (
+    (WHAT_IF, u"ماذا لو؟"),
+    (HUNDRED_SAYS, u"المئة تقول"),
+)
+
+# iCheck-plugin colors
+
+RED = "red"
+GREEN = "green"
+BLUE = "blue"
+AERO = "aero"
+GREY = "grey"
+ORANGE = "orange"
+YELLOW = "yellow"
+PINK = "pink"
+PURPLE = "purple"
+
+POLL_CHOICE_COLORS = (
+    (RED, u"أحمر"),
+    (GREEN, u"أخضر"),
+    (BLUE, u"أزرق"),
+    (AERO, u"رصاصي"),
+    (GREY, u"رمادي"),
+    (ORANGE, u"برتقالي"),
+    (YELLOW, u"أصفر"),
+    (PINK, u"زهري"),
+    (PURPLE, u"بنفسجي"),
+)
+
+POLL_CHOICE_MAX_LENGTH = 128
 
 
 class FollowUpReport(models.Model):
@@ -29,13 +67,11 @@ class FollowUpReport(models.Model):
     participant_count = models.IntegerField(verbose_name=u"عدد المشاركين")
 
     announcement_sites = models.TextField(verbose_name=u"أماكن النشر و الإعلان")
-    images = models.FileField(verbose_name=u"الصور", null=True, blank=True,
-                              upload_to="media/images/", help_text=u"في حال وجود أكثر من صورة، يرجى رفعها كملف مضغوط.")
     notes = models.TextField(verbose_name=u"ملاحظات", null=True, blank=True)
     
     def __unicode__(self):
         "Return the name of the parent activity followed by the number of the episode"
-        return self.episode.activity.name + " #" + str(list(self.episode.activity.episode_set.all()).index(self.episode) + 1)
+        return self.episode.activity.name + " #" + str(self.episode.get_index())
     
     class Meta:
         permissions = (
@@ -45,6 +81,12 @@ class FollowUpReport(models.Model):
         verbose_name = u"تقرير"
         verbose_name_plural = u"التقارير"
 #         app_label = u"المركز الإعلامي"
+
+
+class FollowUpReportImage(models.Model):
+    report = models.ForeignKey(FollowUpReport, related_name='images')
+    image = models.FileField(verbose_name=u"الصورة", upload_to="media/images/")
+
 
 class Story(models.Model):
     """
@@ -75,6 +117,7 @@ class Story(models.Model):
         verbose_name = u"تغطية"
         verbose_name_plural = u"التغطيات"
 #         app_label = u"المركز الإعلامي"
+
 
 class Article(models.Model):
     """
@@ -129,6 +172,7 @@ class Article(models.Model):
         verbose_name_plural = u"المقالات"
 #         app_label = u"المركز الإعلامي"
 
+
 class Review(models.Model):
     """
     An abstract review model.
@@ -143,7 +187,8 @@ class Review(models.Model):
     class Meta:
         abstract = True # This means this model won't have a table in the db
                         # but other models can inherit its fields
-    
+
+
 class StoryReview(Review):
     """
     A review for a story.
@@ -154,7 +199,8 @@ class StoryReview(Review):
         verbose_name = u"مراجعة تغطية"
         verbose_name_plural = u"مراجعات التغطيات"
 #         app_label = u"المركز الإعلامي"
-    
+
+
 class ArticleReview(Review):
     """
     A review for an article.
@@ -165,7 +211,8 @@ class ArticleReview(Review):
         verbose_name = u"مراجعة مقال"
         verbose_name_plural = u"مراجعات المقالات"
 #         app_label = u"المركز الإعلامي"
-    
+
+
 class Task(models.Model):
     """
     An abstract task class.
@@ -178,7 +225,8 @@ class Task(models.Model):
     
     class Meta:
         abstract = True
-        
+
+
 class StoryTask(Task):
     """
     A task to write a story.
@@ -196,7 +244,8 @@ class StoryTask(Task):
         verbose_name = u"مهمة تغطية"
         verbose_name_plural = u"مهمات التغطيات"
 #         app_label = u"المركز الإعلامي"
-    
+
+
 # class ArticleTask(Task):
 #     """
 #     A task to review or edit a task.
@@ -210,6 +259,7 @@ class StoryTask(Task):
 # members
 # Based partially on models from django-todo app:
 # Check: https://github.com/shacker/django-todo/
+
 
 class CustomTask(Task):
     ## list = models.ForeignKey(List)
@@ -248,6 +298,7 @@ class CustomTask(Task):
         verbose_name = u"مهمة"
         verbose_name_plural = u"المهام"
 
+
 class TaskComment(models.Model):
     """
     Not using Django's built-in comments because we want to be able to save
@@ -268,3 +319,130 @@ class TaskComment(models.Model):
     class Meta:
         verbose_name = u"تعليق على مهمة"
         verbose_name_plural = u"التعليقات على المهام"
+
+
+class PollManager(models.Manager):
+    """
+    A custom manager for polls.
+    """
+    def hundred_says(self):
+        return self.filter(poll_type=HUNDRED_SAYS)
+
+    def what_if(self):
+        return self.filter(poll_type=WHAT_IF)
+
+    def active(self):
+        """
+        Return objects whose open date is before or equal to now, and whose close date is still ahead.
+        """
+        return self.filter(open_date__lte=timezone.now(), close_date__gt=timezone.now())
+
+    def past(self):
+        """
+        Return objects whose close date is before ``now``.
+        """
+        return self.filter(close_date__lte=timezone.now())
+
+    def upcoming(self):
+        """
+        Return objects whose open date is to come yet.
+        """
+        return self.filter(open_date__gt=timezone.now())
+
+
+class Poll(models.Model):
+    """
+    Poll class that has 2 types:
+    * What-if: an open-ended question which expects comments on a hypothetical scenario.
+    * Hundred-says: a vote with several choices
+    """
+    poll_type = models.IntegerField(choices=POLL_TYPE_CHOICES, verbose_name=u"النوع")
+    title = models.CharField(max_length=128, verbose_name=u"العنوان")
+    text = models.TextField(verbose_name=u"النص")
+    date_created = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to="media/pollimages/", null=True, blank=True)
+    open_date = models.DateTimeField(verbose_name=u"موعد الفتح")
+    close_date = models.DateTimeField(verbose_name=u"موعد الإغلاق")
+    creator = models.ForeignKey(User)
+
+    objects = PollManager()
+
+    def is_active(self):
+        return self.open_date <= timezone.now() < self.close_date
+
+    def is_past(self):
+        return self.close_date <= timezone.now()
+
+    def is_upcoming(self):
+        return timezone.now() < self.open_date
+
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = u"تصويت"
+        verbose_name_plural = u"التصويتات"
+
+
+class PollChoice(models.Model):
+    poll = models.ForeignKey(Poll, related_name="choices")
+    value = models.CharField(verbose_name= u"النص", max_length=POLL_CHOICE_MAX_LENGTH)
+    color = models.CharField(verbose_name= u"اللون", max_length=128, choices=POLL_CHOICE_COLORS,
+                             default=GREEN)  # stores iCheck-plugin color values e.g. blue,
+                                             # green, red, grey, aero, etc.
+
+    def get_response_count(self):
+        """
+        If the poll has responses, return the number of responses that chose the current response.
+        """
+        response_count = self.poll.responses.count()
+        if response_count > 0:
+            return self.poll.responses.filter(choice=self).count()
+        else:
+            return 0
+
+    def get_response_percent(self):
+        """
+        If the poll has responses, return the percentage of responses that chose the current response.
+        """
+        response_count = self.poll.responses.count()
+        if response_count > 0:
+            return float(self.poll.responses.filter(choice=self).count()) * 100 / response_count
+        else:
+            return 0.0
+
+    def __unicode__(self):
+        return self.value
+
+    class Meta:
+        verbose_name = u"خيار"
+        verbose_name_plural = u"الخيارات"
+
+
+class PollResponse(models.Model):
+    """
+    A response to a poll that has choices (Hundred-says poll)
+    """
+    user = models.ForeignKey(User)
+    poll = models.ForeignKey(Poll, related_name="responses")
+    date = models.DateTimeField(auto_now_add=True)
+    choice = models.ForeignKey(PollChoice)
+
+    def __unicode__(self):
+        return self.poll.title + " - response by:  " + self.user.__unicode__()
+
+    class Meta:
+        unique_together = (('poll', 'user'), )  # No user can submit more that one response
+
+
+class PollComment(models.Model):
+    """
+    A comment on a poll
+    """
+    author = models.ForeignKey(User)
+    poll = models.ForeignKey(Poll, related_name="comments")
+    date = models.DateTimeField(auto_now_add=True)
+    body = models.TextField()
+
+    def __unicode__(self):
+        return self.poll.title + " - comment by: " + self.author.__unicode__()

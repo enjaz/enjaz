@@ -4,7 +4,7 @@
 
 {% block content %}
 <h3>تقارير الأنشطة</h3>
-<table id="report_list" class="table table-bordered datatable">
+<table id="report_list" class="display">
 	<thead>
 		<th>#</th>
 		<th>اسم النشاط</th>
@@ -48,33 +48,33 @@
 		{% endfor %}
 	</tbody>
 </table>
-<link type="text/css" rel="stylesheet" href="{% static 'neon/assets/js/datatables/ColVis/dataTables.colVis.min.css' %}">
-{#<link type="text/css" rel="stylesheet" href="{% static 'neon/assets/js/datatables/ColRec/dataTables.colReorder.min.css' %}">#}
 {% endblock %}
 
 {% block customscript %}
-<script src="{% static 'neon/assets/js/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'neon/assets/js/dataTables.bootstrap.js' %}"></script>
-<script src="{% static 'neon/assets/js/datatables/TableTools.min.js' %}"></script>
-<script src="{% static 'neon/assets/js/datatables/ColVis/dataTables.colVis.min.js' %}"></script>
-{#<script src="{% static 'neon/assets/js/datatables/ColRec/dataTables.colReorder.min.js' %}"></script>#}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<link rel="stylesheet" href="{% static 'css/dataTables.colVis.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+	<script src="{% static 'js/dataTables.tableTools.min.js' %}"></script>
+	<script src="{% static 'js/dataTables.colVis.min.js' %}"></script>
 <script>
-$(document).ready(function () {
-	$('#report_list').DataTable({
-		"sDom": "R<'row'<'col-xs-12'C>><'row'<'col-xs-6 col-left'l><'col-xs-6 col-right'<'export-data'T>f>r>t<'row'<'col-xs-6 col-left'i><'col-xs-6 col-right'p>>",
+$(function () {
+	$('#report_list').dataTable({
+		"language": {% include 'js/dataTables-arabic.json' %},
+		"dom": "R<'row'<'col-xs-12'C>><'row'<'col-xs-6 col-left'l><'col-xs-6 col-right'<'export-data'T>f>r>t<'row'<'col-xs-6 col-left'i><'col-xs-6 col-right'p>>",
 		"oTableTools": {
-		    "sSwfPath": "{% static 'neon/assets/js/datatables/copy_csv_xls_pdf.swf' %}",
-		    "aButtons": [
-                {
-                    "sExtends":     "print",
-                    "sButtonClass": "btn btn-default btn-xs"
-                },
-                {
-                    "sExtends":     "xls",
-                    "sButtonText":  "Download",
-                    "sButtonClass": "btn btn-white btn-xs"
-                }
-            ]
+			"sSwfPath": "{% static 'js/copy_csv_xls_pdf.swf' %}",
+			"aButtons": [
+			{
+				"sExtends":     "print",
+				"sButtonText":  "اطبع",
+				"sButtonClass": "btn btn-default btn-xs"
+			},
+			{
+				"sExtends":     "xls",
+				"sButtonText":  "نزّل",
+				"sButtonClass": "btn btn-white btn-xs"
+			}
+			]
 		}
 	});
 });

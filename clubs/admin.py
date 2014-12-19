@@ -24,6 +24,7 @@ class ClubFilter(admin.SimpleListFilter):
 class ClubAdmin(admin.ModelAdmin):
     list_display = ('name', 'english_name', 'email', 'coordinator', 'number_of_members')
     list_filter = (ClubFilter,)
+    filter_horizontal = ('members', 'deputies')
 
     def number_of_members(self, obj):
         return obj.members.count()

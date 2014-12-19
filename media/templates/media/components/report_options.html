@@ -1,0 +1,10 @@
+{% if episode.followupreport %}
+    <a href="{% url 'media:show_report' episode.pk %}"
+    class="btn btn-green btn-xs">استعرض التقرير</a>
+{% elif episode.report_is_due %}
+    <a class="btn btn-gold btn-xs disabled">بانتظار رفع التقرير</a>
+{% elif episode.report_is_overdue %}
+    <a class="btn btn-red btn-xs disabled">بانتظار رفع التقرير</a>
+{% else %}
+    <a class="btn btn-default btn-xs disabled">بانتظار انتهاء النشاط</a>
+{% endif %}

@@ -1,0 +1,63 @@
+<div id="episode-{{ episode.pk }}-story-container">
+    {% if not episode.story %}
+        {# if there is no story, then the button should point to the create story view #}
+        {% if not episode.storytask %}
+            {% if media_center.coordinator == user or user.is_superuser %}
+                <div class="btn-group left-dropdown">
+                    <a href="{% url 'media:create_story' episode.pk %}" class="btn btn-xs btn-default btn-create-story">اكتب تغطية</a>
+                    <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown">
+                        <span class="caret"></span>
+                    </button>
+
+                    <ul class="dropdown-menu dropdown-default assign_story_task_menu" role="menu">
+                        <li>عيّن:</li>
+                        <li class="divider"></li>
+                        {% for member in media_center.members.all %}
+                            <li>
+                                <a data-episode-pk="{{ episode.pk }}"
+                                data-mc-member-pk="{{ member.pk }}" href="#">
+                                {{ member.student_profile.ar_first_name }}
+                                {{ member.student_profile.ar_last_name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                        <li class="divider"></li>
+                        <li>
+                            <a data-episode-pk="{{ episode.pk }}"
+                            data-mc-member-pk="random" href="#">عشوائي</a>
+                        </li>
+                    </ul>
+                </div>
+            {% else %}
+                <a href="{% url 'media:create_story' episode.pk %}"
+                class="btn btn-default btn-xs">اكتب تغطية</a>
+            {% endif %}
+        {% else %}
+            {# when there is no story, the only task that could be there will be at index 0 #}
+            {% if episode.storytask.assignee == user %}
+                <a href="{% url 'media:create_story' episode.pk %}"
+                class="btn btn-orange btn-xs">اكتب تغطية</a>
+            {% else %}
+                <a href="{% url 'media:create_story' episode.pk %}" class="btn btn-gold btn-xs">
+                    معيَّن ل{{ episode.storytask.assignee.student_profile.ar_first_name }}
+                    {{ episode.storytask.assignee.student_profile.ar_last_name }}
+                </a>
+            {% endif %}
+        {% endif %}
+    {% else %}
+        {# if there is a story, the button should point to the show story view #}
+        {% if not episode.story.storyreview or episode.story.storyreview and not episode.story.storyreview.approve %}
+            {# if assigned to user, show in different color #}
+            {% if episode.storytask.assignee == user %}
+                <a href="{% url 'media:show_story' episode.pk %}"
+                class="btn btn-orange btn-xs">استعرض التغطية (توجد ملاحظات)</a>
+            {% else %}
+                <a href="{% url 'media:show_story' episode.pk %}"
+                class="btn btn-gold btn-xs">استعرض التغطية</a>
+            {% endif %}
+        {% else %}
+            <a href="{% url 'media:show_story' episode.pk %}"
+            class="btn btn-blue btn-xs">استعرض التغطية</a>
+        {% endif %}
+    {% endif %}
+</div>

@@ -98,9 +98,11 @@ def list_activities(request):
     the available options of FollowUpReports and Stories.
     """
     # Get all approved activities
+    clubs = Club.objects.all()
     activities = Activity.objects.approved()
     media_center = get_media_center()
-    return render(request, 'media/list_activities.html', {'activities': activities,
+    return render(request, 'media/list_activities.html', {'clubs': clubs,
+                                                          'activities': activities,
                                                           'media_center': media_center})
 
 # --- Follow-up Reports ---

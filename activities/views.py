@@ -390,6 +390,12 @@ def review(request, activity_id, lower_review_type=None):
         review = ReviewForm(request.POST, instance=review_object)
         if review.is_valid():
             review.save()
+            # Once the activity is approved (or partially approved), lock it from being edited.
+            # This is very critical as to prevent manipulations (ie, editing the request after
+            # the approval of the presidency and before it's reviewed by DSA)
+            # Only when an edit is requested by the reviewer should editing be allowed
+            activity.is_editable = False
+            activity.save()
             deanship_review_url = reverse('activities:review_with_type', args=(activity_id, 'd'))
             deanship_full_url =  request.build_absolute_uri(deanship_review_url)
             presidency_review_url = reverse('activities:review_with_type', args=(activity_id, 'p'))
@@ -404,8 +410,6 @@ def review(request, activity_id, lower_review_type=None):
                               template="activity_presidency_approved",
                               context=email_context)
                 elif review_type == 'D':
-                    activity.is_editable = False
-                    activity.save()
                     if activity.primary_club.coordinator:
                         email_context['full_url'] = activity_full_url
                         mail.send(get_club_notification_to(activity),

@@ -2,6 +2,7 @@
     {% if not episode.story %}
         {# if there is no story, then the button should point to the create story view #}
         {% if not episode.storytask %}
+            {# <!-- FIXME: coordinator or deputy --> #}
             {% if media_center.coordinator == user or user.is_superuser %}
                 <div class="btn-group left-dropdown">
                     <a href="{% url 'media:create_story' episode.pk %}" class="btn btn-xs btn-default btn-create-story">اكتب تغطية</a>

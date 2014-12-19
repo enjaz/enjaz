@@ -57,7 +57,7 @@
                         <td><a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a></td>
                         <td data-order='{{ episode.start_date|date:"U" }}'>{{ episode.start_date|date:"j F" }}</td>
                         <td data-order='{{ episode.end_date|date:"U" }}'>{{ episode.end_date|date:"j F" }}</td>
-                        <td>
+                        <td id="episode-{{ episode.pk }}-report-container">
                             {% include 'media/components/report_options.html' %}
                         </td>
                         <td>
@@ -83,6 +83,7 @@
 	<script src="{% static 'js/dataTables.tableTools.min.js' %}"></script>
 <script>
 $(function () {
+    attach_report_option_handler();
 	attach_assign_task_to_click_event();
 	$('.activity_list').dataTable({
 		"order": [[ 3, "desc" ]],
@@ -91,7 +92,6 @@ $(function () {
 });
 function attach_assign_task_to_click_event() {
 	$(".assign_story_task_menu li a").click(function () {
-		console.log("hello")
 		var data = {'assignee': $(this).attr('data-mc-member-pk'),
 					'episode_pk': $(this).attr('data-episode-pk')};
         $.ajax({
@@ -118,5 +118,44 @@ function attach_assign_task_to_click_event() {
         });
 	});
 };
+function attach_report_option_handler() {
+    var $reportButton = $("a.btn-report-option");
+
+    // first turn off all already attached handlers
+    // this is important because this function will be called after each ajax call to update report options
+    // the ajax call will return a button that needs handlers to be attached, so we have to avoid attaching multiple
+    // handlers to the already existing buttons
+    $reportButton.off('click');
+
+    $reportButton.click(function (event) {
+
+        event.preventDefault();
+
+        var episode_pk = $(this).attr('data-episode-pk');
+        var data = {'episode_pk': episode_pk,
+                    'action'    : $(this).attr('data-action')};
+
+        $.ajax({
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            url: "{% url 'media:update_report_options' %}",
+            cache: false,
+            // for some reason the request is being regarded as failed (although status is 200),
+            // that's why `complete` is used instead of `success`
+            complete: function (data) {
+                console.log("complete")
+                if (data.status == 200) {
+                    var container = $("td#episode-" + episode_pk + "-report-container");
+                    container.html(data.responseText);
+                    attach_report_option_handler();
+                } else {
+                    alert(data.statusText + "\n" + data.responseText);
+                }
+
+            },
+        });
+    });
+}
 </script>
 {% endblock %}

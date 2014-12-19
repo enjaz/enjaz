@@ -13,7 +13,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
 from post_office import mail
 from clubs.utils import get_media_center, is_coordinator_or_member, is_coordinator_of_any_club, is_member_of_any_club, \
-    is_coordinator
+    is_coordinator, is_coordinator_or_deputy
 
 from core import decorators
 from clubs.models import Club
@@ -173,6 +173,49 @@ def submit_report(request, episode_pk):
                                                        'image_formset': image_formset,
                                                        'episode': episode})
 
+@csrf.csrf_exempt
+@decorators.ajax_only
+@decorators.post_only
+@login_required
+def update_report_options(request):
+    """
+    Update report options for a particular episode.
+    There 2 options: whether a report is required, and whether a report can be submitted early.
+    """
+    print "RECEIVED"
+
+    media_center = get_media_center()
+    # Permission checks
+    # The user should be the coordinator or deputy of the media center
+    if not is_coordinator_or_deputy(media_center, request.user) and not request.user.is_superuser:
+        raise PermissionDenied
+
+    episode = get_object_or_404(Episode, pk=request.POST['episode_pk'])
+
+    # Update option
+    action = request.POST['action']
+    if action == "exempt-report":
+        episode.requires_report = False
+        episode.save()
+
+    elif action == "cancel-exempt-report":
+        episode.requires_report = True
+        episode.save()
+
+    elif action == "allow-early-report":
+        episode.can_report_early = True
+        episode.save()
+
+    elif action == "cancel-allow-early-report":
+        episode.can_report_early = False
+        episode.save()
+
+    # Email notifications
+
+    # Return updated button
+    return render(request, "media/components/report_options.html", {"episode": episode,
+                                                                    "media_center": media_center})
+
 @login_required
 @user_passes_test(is_media_or_club_coordinator_or_member)
 def show_report(request, episode_pk):
@@ -324,7 +367,8 @@ def assign_story_task(request):
     # The user should be the head of the Media Center
     media_center = get_media_center()
     if request.user != media_center.coordinator and not request.user.is_superuser:
-        raise PermissionDenied   
+        raise PermissionDenied
+    # FIXME: coordinator or deputy
     
     episode = Episode.objects.get(pk=request.POST['episode_pk'])
     if request.POST['assignee'] == 'random':

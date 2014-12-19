@@ -219,7 +219,12 @@ def create(request):
             # automatically approved by the deanship.  Otherwise,
             # email the vice president.
             if form_object.primary_club == presidency:
-                review_object = Review.objects.create(
+                # If the user has enough privileges, mark the activity as approved directly by creating
+                # presidency and deanship reviews
+                Review.objects.create(
+                    activity=form_object, reviewer=request.user,
+                    is_approved=True, review_type='P')
+                Review.objects.create(
                     activity=form_object, reviewer=request.user,
                     is_approved=True, review_type='D')
             else:

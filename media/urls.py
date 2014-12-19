@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     url(r'^activities/reports/$', views.list_reports, name="list_reports"),
     url(r'^activities/reports/(?P<episode_pk>\d+)/submit/$', views.submit_report, name="submit_report"),
     url(r'^activities/reports/(?P<episode_pk>\d+)/$', views.show_report, name="show_report"),
+    url(r'^activities/reports/options/$', views.update_report_options, name="update_report_options"),
 
     # Stories
     url(r'^activities/stories/(?P<episode_pk>\d+)/create/$', views.create_story, name="create_story"),

@@ -131,20 +131,32 @@
 						{% if can_add_followupreport %}
 						</div>
 						<div class="followupreport_zone col-md-2">
-			            	{% if episode.followupreport %}
+                            {# The particular logic for the following is described here: https://github.com/osamak/student-portal/issues/81 #}
+			            	{% if episode.report_is_submitted %}
 			            		<a href="{% url 'media:show_report' episode.pk %}"
 			            		class="btn btn-block btn-green btn-xs">استعرض التقرير</a>
 
-			            	{% elif episode.report_is_due %}
-			            		<a href="{% url 'media:submit_report' episode.pk %}"
-			            		class="btn btn-block btn-gold btn-xs">ارفع التقرير</a>
+                            {% elif episode.requires_report %}
 
-			            	{% elif episode.report_is_overdue %}
-			            		<a href="{% url 'media:submit_report' episode.pk %}"
-			            		class="btn btn-block btn-red btn-xs">ارفع التقرير</a>
+                                {% if episode.report_is_due %}
+                                    <a href="{% url 'media:submit_report' episode.pk %}"
+                                    class="btn btn-block btn-gold btn-xs">ارفع التقرير</a>
 
-			            	{% else %}
-			            		<a class="btn btn-block btn-primary btn-xs disabled">بانتظار انتهاء النشاط</a>
+                                {% elif episode.report_is_overdue %}
+                                    <a href="{% url 'media:submit_report' episode.pk %}"
+                                    class="btn btn-block btn-red btn-xs">ارفع التقرير</a>
+
+                                {% else %}
+                                    {% if episode.can_report_early %}
+                                        <a href="{% url 'media:submit_report' episode.pk %}"
+                                        class="btn btn-block btn-info btn-xs">ارفع التقرير</a>
+                                    {% else %}
+                                        <a class="btn btn-block btn-primary btn-xs disabled">بانتظار انتهاء النشاط</a>
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                                <a href="{% url 'media:submit_report' episode.pk %}"
+                                class="btn btn-block btn-info btn-xs">ارفع التقرير (اختياري)</a>
 			            	{% endif %}
 						</div>
 						{% endif %}

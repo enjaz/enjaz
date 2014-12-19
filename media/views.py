@@ -13,7 +13,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
 from post_office import mail
 from clubs.utils import get_media_center, is_coordinator_or_member, is_coordinator_of_any_club, is_member_of_any_club, \
-    is_coordinator
+    is_coordinator, is_coordinator_or_deputy
 
 from core import decorators
 from clubs.models import Club
@@ -21,7 +21,8 @@ from activities.models import Activity, Episode
 from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment, \
     WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment, POLL_TYPE_CHOICES
 from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
-    TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm
+    TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm, \
+    FollowUpReportImageFormset
 
 # --- Constants and wrapper for polls
 
@@ -97,9 +98,11 @@ def list_activities(request):
     the available options of FollowUpReports and Stories.
     """
     # Get all approved activities
+    clubs = Club.objects.all()
     activities = Activity.objects.approved()
     media_center = get_media_center()
-    return render(request, 'media/list_activities.html', {'activities': activities,
+    return render(request, 'media/list_activities.html', {'clubs': clubs,
+                                                          'activities': activities,
                                                           'media_center': media_center})
 
 # --- Follow-up Reports ---
@@ -138,14 +141,16 @@ def submit_report(request, episode_pk):
     
     if request.method == 'POST':
         form = FollowUpReportForm(request.POST,
-                                  request.FILES,
                                   instance=FollowUpReport(pk=episode.pk, # make pk equal to episode pk
                                                                          # to keep things synchronized
                                                           episode=episode,
                                                           submitter=request.user)
                                   )
-        if form.is_valid():
-            form.save()
+        image_formset = FollowUpReportImageFormset(request.POST, request.FILES)
+        if form.is_valid() and image_formset.is_valid():
+            instance = form.save()
+            image_formset.instance = instance
+            image_formset.save()
             return HttpResponseRedirect(reverse('activities:show',
                                                 args=(episode.activity.pk, )
                                                 ))
@@ -163,8 +168,71 @@ def submit_report(request, episode_pk):
                                            'organizer_count': episode.activity.organizers,
                                            'participant_count': episode.activity.participants,
                                            })
+        image_formset = FollowUpReportImageFormset()
     return render(request, 'media/report_write.html', {'form': form,
+                                                       'image_formset': image_formset,
                                                        'episode': episode})
+
+@csrf.csrf_exempt
+@decorators.ajax_only
+@decorators.post_only
+@login_required
+def update_report_options(request):
+    """
+    Update report options for a particular episode.
+    There 2 options: whether a report is required, and whether a report can be submitted early.
+    """
+    media_center = get_media_center()
+    # Permission checks
+    # The user should be the coordinator or deputy of the media center
+    if not is_coordinator_or_deputy(media_center, request.user) and not request.user.is_superuser:
+        raise PermissionDenied
+
+    episode = get_object_or_404(Episode, pk=request.POST['episode_pk'])
+
+    # Update option
+    action = request.POST['action']
+    if action == "exempt-report":
+        episode.requires_report = False
+        episode.save()
+
+        mail.send([episode.activity.primary_club.coordinator.email],
+                  cc=[media_center.email],
+                  template="media_report_exempted",
+                  context={"episode": episode})
+
+    elif action == "cancel-exempt-report":
+        episode.requires_report = True
+        episode.save()
+
+        mail.send([episode.activity.primary_club.coordinator.email],
+                  cc=[media_center.email],
+                  template="media_report_exempt_cancel",
+                  context={"episode": episode})
+
+    elif action == "allow-early-report":
+        episode.can_report_early = True
+        episode.save()
+
+        mail.send([episode.activity.primary_club.coordinator.email],
+                  cc=[media_center.email],
+                  template="media_early_report_allowed",
+                  context={"episode": episode})
+
+    elif action == "cancel-allow-early-report":
+        episode.can_report_early = False
+        episode.save()
+
+        mail.send([episode.activity.primary_club.coordinator.email],
+                  cc=[media_center.email],
+                  template="media_early_report_cancel",
+                  context={"episode": episode})
+
+    # Email notifications
+
+    # Return updated button
+    return render(request, "media/components/report_options.html", {"episode": episode,
+                                                                    "media_center": media_center})
 
 @login_required
 @user_passes_test(is_media_or_club_coordinator_or_member)
@@ -317,7 +385,8 @@ def assign_story_task(request):
     # The user should be the head of the Media Center
     media_center = get_media_center()
     if request.user != media_center.coordinator and not request.user.is_superuser:
-        raise PermissionDenied   
+        raise PermissionDenied
+    # FIXME: coordinator or deputy
     
     episode = Episode.objects.get(pk=request.POST['episode_pk'])
     if request.POST['assignee'] == 'random':

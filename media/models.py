@@ -43,6 +43,7 @@ POLL_CHOICE_COLORS = (
 
 POLL_CHOICE_MAX_LENGTH = 128
 
+
 class FollowUpReport(models.Model):
     """
     A follow-up report, submitted after REPORT_DUE_AFTER days of an activity episode.
@@ -66,13 +67,11 @@ class FollowUpReport(models.Model):
     participant_count = models.IntegerField(verbose_name=u"عدد المشاركين")
 
     announcement_sites = models.TextField(verbose_name=u"أماكن النشر و الإعلان")
-    images = models.FileField(verbose_name=u"الصور", null=True, blank=True,
-                              upload_to="media/images/", help_text=u"في حال وجود أكثر من صورة، يرجى رفعها كملف مضغوط.")
     notes = models.TextField(verbose_name=u"ملاحظات", null=True, blank=True)
     
     def __unicode__(self):
         "Return the name of the parent activity followed by the number of the episode"
-        return self.episode.activity.name + " #" + str(list(self.episode.activity.episode_set.all()).index(self.episode) + 1)
+        return self.episode.activity.name + " #" + str(self.episode.get_index())
     
     class Meta:
         permissions = (
@@ -82,6 +81,12 @@ class FollowUpReport(models.Model):
         verbose_name = u"تقرير"
         verbose_name_plural = u"التقارير"
 #         app_label = u"المركز الإعلامي"
+
+
+class FollowUpReportImage(models.Model):
+    report = models.ForeignKey(FollowUpReport, related_name='images')
+    image = models.FileField(verbose_name=u"الصورة", upload_to="media/images/")
+
 
 class Story(models.Model):
     """
@@ -112,6 +117,7 @@ class Story(models.Model):
         verbose_name = u"تغطية"
         verbose_name_plural = u"التغطيات"
 #         app_label = u"المركز الإعلامي"
+
 
 class Article(models.Model):
     """
@@ -166,6 +172,7 @@ class Article(models.Model):
         verbose_name_plural = u"المقالات"
 #         app_label = u"المركز الإعلامي"
 
+
 class Review(models.Model):
     """
     An abstract review model.
@@ -180,7 +187,8 @@ class Review(models.Model):
     class Meta:
         abstract = True # This means this model won't have a table in the db
                         # but other models can inherit its fields
-    
+
+
 class StoryReview(Review):
     """
     A review for a story.
@@ -191,7 +199,8 @@ class StoryReview(Review):
         verbose_name = u"مراجعة تغطية"
         verbose_name_plural = u"مراجعات التغطيات"
 #         app_label = u"المركز الإعلامي"
-    
+
+
 class ArticleReview(Review):
     """
     A review for an article.
@@ -202,7 +211,8 @@ class ArticleReview(Review):
         verbose_name = u"مراجعة مقال"
         verbose_name_plural = u"مراجعات المقالات"
 #         app_label = u"المركز الإعلامي"
-    
+
+
 class Task(models.Model):
     """
     An abstract task class.
@@ -215,7 +225,8 @@ class Task(models.Model):
     
     class Meta:
         abstract = True
-        
+
+
 class StoryTask(Task):
     """
     A task to write a story.
@@ -233,7 +244,8 @@ class StoryTask(Task):
         verbose_name = u"مهمة تغطية"
         verbose_name_plural = u"مهمات التغطيات"
 #         app_label = u"المركز الإعلامي"
-    
+
+
 # class ArticleTask(Task):
 #     """
 #     A task to review or edit a task.
@@ -247,6 +259,7 @@ class StoryTask(Task):
 # members
 # Based partially on models from django-todo app:
 # Check: https://github.com/shacker/django-todo/
+
 
 class CustomTask(Task):
     ## list = models.ForeignKey(List)
@@ -284,6 +297,7 @@ class CustomTask(Task):
     class Meta:
         verbose_name = u"مهمة"
         verbose_name_plural = u"المهام"
+
 
 class TaskComment(models.Model):
     """

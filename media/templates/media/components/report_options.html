@@ -1,0 +1,51 @@
+{% if episode.report_is_submitted %}
+    <a href="{% url 'media:show_report' episode.pk %}"
+    class="btn btn-green btn-xs">استعرض التقرير</a>
+{% else %}
+    {# show these options only for coordinators and deputies #}
+    <div class="btn-group left-dropdown">
+        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+        </button>
+    {# ---- #}
+
+    {% if episode.requires_report %}
+
+        {% if episode.report_is_due %}
+            <a class="btn btn-gold btn-xs disabled">بانتظار رفع التقرير</a>
+        {% elif episode.report_is_overdue %}
+            <a class="btn btn-red btn-xs disabled">بانتظار رفع التقرير</a>
+        {% else %}
+            {% if episode.can_report_early %}
+            <a class="btn btn-info btn-xs disabled">بانتظار رفع التقرير</a>
+            {% else %}
+            <a class="btn btn-default btn-xs disabled">بانتظار انتهاء النشاط</a>
+            {% endif%}
+        {% endif %}
+
+    {% else %}
+        <a class="btn btn-default btn-xs disabled">لا يتطلب تقريرًا</a>
+    {% endif %}
+
+    {# show these options only for coordinators and deputies #}
+        <ul class="dropdown-menu dropdown-default" role="menu">
+            {% if episode.requires_report %}
+            <li><a href="#" class="btn-report-option" data-action="exempt-report" data-episode-pk="{{ episode.pk }}">أعفِ من التقرير</a>
+            </li>
+            {% else %}
+            <li><a href="#" class="btn-report-option" data-action="cancel-exempt-report" data-episode-pk="{{ episode.pk }}">ألغِ إعفاء التقرير</a>
+            </li>
+            {% endif %}
+
+            {% if not episode.can_report_early %}
+            <li><a href="#" class="btn-report-option" data-action="allow-early-report" data-episode-pk="{{ episode.pk }}">اسمح برفع التقرير مبكرًا</a>
+            </li>
+            {% else %}
+            <li><a href="#" class="btn-report-option" data-action="cancel-allow-early-report" data-episode-pk="{{ episode.pk }}">ألغِ السماح برفع التقرير مبكرًا</a>
+            </li>
+            {% endif %}
+        </ul>
+
+    </div>
+    {# ---- #}
+{% endif %}

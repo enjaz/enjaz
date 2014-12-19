@@ -331,19 +331,24 @@ class Episode(models.Model):
         days of the end of the corresponding episode.
         """
         return self.end_datetime() + timedelta(days=REPORT_DUE_AFTER)
-    
+
+    def report_is_submitted(self):
+        """
+        Return whether or not a report has been submitted for this episode.
+        """
+        try:
+            report = self.followupreport
+            return True
+        except ObjectDoesNotExist:
+            return False
+
     def report_is_due(self):
         """
         Return whether the report is due.
         The report is due when the episode has ended, the due date hasn't passed,
         and the report hasn't been submitted.
         """
-        try:
-            report = self.followupreport
-            report_not_submitted = False
-        except ObjectDoesNotExist:
-            report_not_submitted = True
-        return self.end_datetime() < datetime.now() < self.report_due_date() and report_not_submitted
+        return self.end_datetime() < datetime.now() < self.report_due_date() and not self.report_is_submitted()
     
     def report_is_overdue(self):
         """
@@ -351,12 +356,7 @@ class Episode(models.Model):
         The report is overdue when the episode has ended, the due date has passed,
         and the report hasn't been submitted.
         """
-        try:
-            report = self.followupreport
-            report_not_submitted = False
-        except ObjectDoesNotExist:
-            report_not_submitted = True
-        return datetime.now() > self.report_due_date() and report_not_submitted
+        return datetime.now() > self.report_due_date() and not self.report_is_submitted()
 
 class Category(models.Model):
     ar_name = models.CharField(max_length=50,

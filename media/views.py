@@ -182,8 +182,6 @@ def update_report_options(request):
     Update report options for a particular episode.
     There 2 options: whether a report is required, and whether a report can be submitted early.
     """
-    print "RECEIVED"
-
     media_center = get_media_center()
     # Permission checks
     # The user should be the coordinator or deputy of the media center
@@ -198,17 +196,37 @@ def update_report_options(request):
         episode.requires_report = False
         episode.save()
 
+        mail.send([episode.activity.primary_club.coordinator.email],
+                  cc=[media_center.email],
+                  template="media_report_exempted",
+                  context={"episode": episode})
+
     elif action == "cancel-exempt-report":
         episode.requires_report = True
         episode.save()
+
+        mail.send([episode.activity.primary_club.coordinator.email],
+                  cc=[media_center.email],
+                  template="media_report_exempt_cancel",
+                  context={"episode": episode})
 
     elif action == "allow-early-report":
         episode.can_report_early = True
         episode.save()
 
+        mail.send([episode.activity.primary_club.coordinator.email],
+                  cc=[media_center.email],
+                  template="media_early_report_allowed",
+                  context={"episode": episode})
+
     elif action == "cancel-allow-early-report":
         episode.can_report_early = False
         episode.save()
+
+        mail.send([episode.activity.primary_club.coordinator.email],
+                  cc=[media_center.email],
+                  template="media_early_report_cancel",
+                  context={"episode": episode})
 
     # Email notifications
 

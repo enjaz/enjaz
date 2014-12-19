@@ -71,7 +71,7 @@ class FollowUpReport(models.Model):
     
     def __unicode__(self):
         "Return the name of the parent activity followed by the number of the episode"
-        return self.episode.activity.name + " #" + str(list(self.episode.activity.episode_set.all()).index(self.episode) + 1)
+        return self.episode.activity.name + " #" + str(self.episode.get_index())
     
     class Meta:
         permissions = (

@@ -102,10 +102,6 @@ class Club(models.Model):
 
     def get_due_report_count(self):
         "Get the number of due follow-up reports."
-        # The following import is not very neat, but importing it at the beginning of
-        # the file causes an ImportError because components of the other files use
-        # parts of this file that are only loaded later
-
         # Get all club's episodes
         episodes = []
         for activity in self.primary_activity.approved():
@@ -117,10 +113,6 @@ class Club(models.Model):
     
     def get_overdue_report_count(self):
         "Get the number of overdue follow-up reports."
-        # The following import is not very neat, but importing it at the beginning of
-        # the file causes an ImportError because components of the other files use
-        # parts of this file that are only loaded later
-
         # Get all club's episodes
         episodes = []
         for activity in self.primary_activity.approved():

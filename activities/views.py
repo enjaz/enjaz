@@ -135,23 +135,7 @@ def show(request, activity_id):
     # of the related clubs and the person who submitted it can see it.    
     if request.user.is_authenticated():
         user_clubs = get_user_clubs(request.user)
-        coordination_status = has_coordination_to_activity(request.user, activity)
 
-        if request.user.has_perm('activities.change_activity') or \
-            coordination_status:
-            context['can_edit'] = True
-        if request.user.has_perm('activities.view_deanship_review') or \
-            coordination_status:
-            context['can_view_deanship_review'] = True
-        if request.user.has_perm('activities.view_presidency_review') or \
-            coordination_status:
-            context['can_view_presidency_review'] = True
-        if request.user.has_perm('media.add_followupreport') or \
-            coordination_status:
-            context['can_add_followupreport'] = True
-        if request.user.has_perm('niqati.view_order') or \
-            coordination_status:
-            context['can_view_niqati_orders'] = True
         # Anyone can view forms; yet due to URL reversing issues it has to be restricted to this view only
         # Otherwise, we'll end up having to specify the `current_app` attribute for every view that contains a link
         # to the forms
@@ -503,16 +487,6 @@ def review(request, activity_id, lower_review_type=None):
         
     context = {'activity': activity, 'active_tab': rt_full,
                'review': review, 'review_type': review_type}
-
-    if request.user.has_perm('activities.change_activity') or \
-        coordination_status:
-        context['can_edit'] = True
-    if request.user.has_perm('activities.view_deanship_review') or \
-        coordination_status:
-        context['can_view_deanship_review'] = True
-    if request.user.has_perm('activities.view_presidency_review') or \
-        coordination_status:
-        context['can_view_presidency_review'] = True
 
     return render(request, template, context)
 

@@ -1,4 +1,4 @@
-{% extends 'activities_base.html' %}{% load staticfiles %}
+{% extends 'activities_base.html' %}{% load staticfiles %}{% load clubs_utils %}
 {% block title %}{{ activity.name }}{% endblock %}
 {% block content %}
 {% if error_message %}
@@ -71,8 +71,9 @@
 					شارك
 				</a>
 				{% endif %}
-				
-				{% if can_edit %}
+
+                {# if the user can edit the activity... #}
+				{% if perms.activities.change_activity or request.user|has_coordination_to_activity:activity %}
 				<a href="{% url 'activities:edit' activity.pk %}" class="btn btn-default">
 					<i class="entypo-pencil"></i>
 					عدّل
@@ -89,7 +90,8 @@
 			
 			<div class="col-sm-offset-2 col-sm-10">
 
-				<ul class="user-details">{# if the user is privileged, show them the internal description #}{% if can_view_deanship_review or perms.activities.add_deanship_review or can_view_presidency_review or perms.activities.add_presidency_review %}
+				<ul class="user-details">{# if the user is privileged, show them the internal description #}
+                    {% if request.user|has_coordination_to_activity:activity or perms.activities.add_deanship_review or perms.activities.add_presidency_review or perms.activities.view_deanship_review or perms.activities.view_presidency_review %}
 					<li>
 						<a href="#">
 							<i class="entypo-info-circled"></i>
@@ -105,7 +107,8 @@
 					{% for episode in activity.episode_set.all %}
 					<li>
 						<div class="row">
-						{% if can_add_followupreport %}
+                        {# if the user has privileges to add a follow-up report... #}
+						{% if request.user|has_coordination_to_activity:activity or perms.media.add_followupreport %}
 						{# group the activity info in a div to make #}
 						{# space for the report button #}
 						<div class="col-md-10">
@@ -128,7 +131,8 @@
 								{{ episode.location }}
 							</div>
 						</a>
-						{% if can_add_followupreport %}
+                        {# if the user has privileges to add a follow-up report... #}
+						{% if request.user|has_coordination_to_activity:activity or perms.media.add_followupreport %}
 						</div>
 						<div class="followupreport_zone col-md-2">
                             {# The particular logic for the following is described here: https://github.com/osamak/student-portal/issues/81 #}
@@ -167,17 +171,17 @@
 
 				<!-- tabs for the profile links -->
 				<ul class="nav nav-tabs">
-					{% if can_view_presidency_review or perms.activities.add_presidency_review %}
+					{% if request.user|has_coordination_to_activity:activity or perms.activities.view_presidency_review or perms.activities.add_presidency_review %}
 					<li{% if active_tab == 'presidency' %} class="active"{% endif %}>
 						<a href="{% url 'activities:review_with_type' activity.pk 'p' %}">مراجعة رئاسة نادي الطلاب</a>
 					</li>
 					{% endif %}
-					{% if can_view_deanship_review or perms.activities.add_deanship_review %}
+					{% if request.user|has_coordination_to_activity:activity or perms.activities.view_deanship_review or perms.activities.add_deanship_review %}
 					<li{% if active_tab == 'deanship' %} class="active"{% endif %}>
 						<a href="{% url 'activities:review_with_type' activity.pk 'd' %}">مراجعة عمادة شؤون الطلاب</a>
 					</li>
 					{% endif %}
-                    {% if can_view_niqati_orders %}
+                    {% if request.user|has_coordination_to_activity:activity or perms.niqati.view_order %}
 					<li{% if active_tab == 'niqati' %} class="active"{% endif %}>
 						<a href="{% url 'activities:niqati_orders' activity.pk %}">نقاطي</a>
 					</li>

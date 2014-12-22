@@ -1,10 +1,12 @@
 {% extends 'media_base.html' %}{% load bootstrap3 %}{% load staticfiles %}
-{% block title %}رفع تقرير {{ episode.activity.name }}{% endblock %}
+{% block title %}تقرير {{ episode.activity.name }}{% endblock %}
 {% block content %}
-<h2>تقرير {{ episode.activity.name }}</h2>
+<h2>{% if edit %}تعديل {% endif %}تقرير {{ episode.activity.name }}</h2>
+{% if not edit %}
 <p>التقرير التالي يحتوي معلومات النشاط الافتراضية كما تم رفعها في طلب النشاط؛ نرجو تحديث البيانات أو تعديلها حسب المعلومات و الإحصائيات الحقيقية.</p>
+{% endif %}
 <hr>
-<form action="{% url 'media:submit_report' episode.pk %}" enctype="multipart/form-data" method="post">
+<form action="{% if edit %}{% url 'media:edit_report' episode.pk %}{% else %}{% url 'media:submit_report' episode.pk %}{% endif %}" enctype="multipart/form-data" method="post">
     {# The enctype="multipart/form-data" attribute is required for uploading files via html forms in django. #}
     {# Also make sure you pass request.FILES to the django form. #}
     {# See: https://docs.djangoproject.com/en/dev/topics/http/file-uploads/#basic-file-uploads #}

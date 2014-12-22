@@ -13,7 +13,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
 from post_office import mail
 from clubs.utils import get_media_center, is_coordinator_or_member, is_coordinator_of_any_club, is_member_of_any_club, \
-    is_coordinator, is_coordinator_or_deputy
+    is_coordinator, is_coordinator_or_deputy, has_coordination_to_activity
 
 from core import decorators
 from clubs.models import Club
@@ -127,9 +127,8 @@ def submit_report(request, episode_pk):
     episode = get_object_or_404(Episode, pk=episode_pk)
     
     # Permission checks
-    # (1) The passed episode should be owned by the user's club
-    user_clubs = get_user_clubs(request.user)
-    if episode.activity.primary_club not in user_clubs and not request.user.is_superuser:
+    # (1) The user should be part of the primary or secondary club(s) owning the activity
+    if not has_coordination_to_activity(request.user, episode.activity) and not request.user.is_superuser:
         raise PermissionDenied
     # (2) The passed episode shouldn't already have a report.
     #     Overriding a previous submission shouldn't be allowed
@@ -242,7 +241,53 @@ def show_report(request, episode_pk):
     """
     episode = get_object_or_404(Episode, pk=episode_pk)
     report = get_object_or_404(FollowUpReport, episode=episode)
+
+    # Permission checks
+    # The passed episode should be owned by the user's club or the user should be a member of the media center
+    # This is more specific than the test of ``user_passes_test`` above.
+    if not has_coordination_to_activity(request.user, episode.activity)\
+            and not is_coordinator_or_member(get_media_center(), request.user) \
+            and not request.user.is_superuser:
+        raise PermissionDenied
+
     return render(request, 'media/report_read.html', {'report': report})
+
+@login_required
+@user_passes_test(is_media_or_club_coordinator_or_member)
+def edit_report(request, episode_pk):
+    episode = get_object_or_404(Episode, pk=episode_pk)
+    report = get_object_or_404(FollowUpReport, episode=episode)
+
+    # Permission checks
+    # The passed episode should be owned by the user's club or the user should be a member of the media center
+    # This is more specific than the test of ``user_passes_test`` above.
+    if not has_coordination_to_activity(request.user, episode.activity)\
+            and not is_coordinator_or_member(get_media_center(), request.user) \
+            and not request.user.is_superuser:
+        raise PermissionDenied
+
+    if request.method == 'POST':
+        form = FollowUpReportForm(request.POST, instance=report)
+        image_formset = FollowUpReportImageFormset(request.POST, request.FILES, instance=report)
+        if form.is_valid() and image_formset.is_valid():
+            form.save()
+            image_formset.save()
+
+            # Send notification to media center
+            mail.send([get_media_center().email],
+                      template="media_edit_report",
+                      context={"report": report})
+
+            return HttpResponseRedirect(reverse('media:show_report',
+                                                args=(episode.pk, )
+                                                ))
+    else:
+        form = FollowUpReportForm(instance=report)
+        image_formset = FollowUpReportImageFormset(instance=report)
+        return render(request, "media/report_write.html", {'form': form,
+                                                           'image_formset': image_formset,
+                                                           'episode': episode,
+                                                           'edit': True})
 
 # --- Stories ---
 

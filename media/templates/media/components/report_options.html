@@ -1,12 +1,15 @@
+{% load clubs_utils %}
 {% if episode.report_is_submitted %}
     <a href="{% url 'media:show_report' episode.pk %}"
     class="btn btn-green btn-xs">استعرض التقرير</a>
 {% else %}
     {# show these options only for coordinators and deputies #}
+    {% if request.user|is_coordinator_or_deputy:media_center or request.user.is_superuser %}
     <div class="btn-group left-dropdown">
         <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
         </button>
+    {% endif %}
     {# ---- #}
 
     {% if episode.requires_report %}
@@ -28,6 +31,7 @@
     {% endif %}
 
     {# show these options only for coordinators and deputies #}
+    {% if request.user|is_coordinator_or_deputy:media_center or request.user.is_superuser  %}
         <ul class="dropdown-menu dropdown-default" role="menu">
             {% if episode.requires_report %}
             <li><a href="#" class="btn-report-option" data-action="exempt-report" data-episode-pk="{{ episode.pk }}">أعفِ من التقرير</a>
@@ -45,6 +49,7 @@
             </li>
             {% endif %}
         </ul>
+    {% endif %}
 
     </div>
     {# ---- #}

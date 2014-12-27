@@ -1,4 +1,4 @@
-{% extends 'media_base.html' %}{% load staticfiles %}
+{% extends 'media_base.html' %}{% load staticfiles %}{% load clubs_utils %}{% load media_tags %}
 {% block title %}
 تقرير {{ report.episode.activity.name }}
 {% endblock %}
@@ -148,7 +148,12 @@
 					طباعة التقرير
 					<i class="entypo-doc-text"></i>
 				</a>
-
+                {% if request.user|has_coordination_to_activity:report.episode.activity or request.user|is_media_coordinator_or_member or request.user.is_superuser %}
+                <a class="btn btn-gold btn-icon icon-left" href="{% url 'media:edit_report' report.pk %}">
+                    <i class="entypo-pencil"></i>
+                    عدّل التقرير
+                </a>
+                {% endif %}
 			</div>
 			
 		</div>

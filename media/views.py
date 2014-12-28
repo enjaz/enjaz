@@ -19,10 +19,10 @@ from core import decorators
 from clubs.models import Club
 from activities.models import Activity, Episode
 from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment, \
-    WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment, POLL_TYPE_CHOICES
+    WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment, POLL_TYPE_CHOICES, ReportComment
 from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
     TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm, \
-    FollowUpReportImageFormset
+    FollowUpReportImageFormset, ReportCommentForm
 
 # --- Constants and wrapper for polls
 
@@ -250,7 +250,7 @@ def show_report(request, episode_pk):
             and not request.user.is_superuser:
         raise PermissionDenied
 
-    return render(request, 'media/report_read.html', {'report': report})
+    return render(request, 'media/report_read.html', {'report': report, 'comment_form': ReportCommentForm()})
 
 @login_required
 @user_passes_test(is_media_or_club_coordinator_or_member)
@@ -288,6 +288,44 @@ def edit_report(request, episode_pk):
                                                            'image_formset': image_formset,
                                                            'episode': episode,
                                                            'edit': True})
+
+@decorators.post_only
+@login_required
+@user_passes_test(is_media_or_club_coordinator_or_member)
+def report_comment(request, episode_pk):
+    episode = get_object_or_404(Episode, pk=episode_pk)
+    report = get_object_or_404(FollowUpReport, episode=episode)
+
+    # Permission checks
+    # The passed episode should be owned by the user's club or the user should be a member of the media center
+    # This is more specific than the test of ``user_passes_test`` above.
+    if not has_coordination_to_activity(request.user, episode.activity)\
+            and not is_coordinator_or_member(get_media_center(), request.user) \
+            and not request.user.is_superuser:
+        raise PermissionDenied
+
+    comment_form = ReportCommentForm(request.POST, instance=ReportComment(report=report, author=request.user))
+
+    if comment_form.is_valid():
+        comment = comment_form.save()
+
+        # Send email notifications to the report submitter (& the coordinator if they are different),
+        # in addition to the media center email plus all participants in the thread.
+        # In any case, of course, the author is excluded.
+        coordinator = report.episode.activity.primary_club.coordinator
+        recipients = list(set(
+            list(report.comments.exclude(author=request.user).values_list('author__email', flat=True))
+            + ([report.submitter.email] if not request.user == report.submitter else [])
+            + ([coordinator.email] if (report.submitter != coordinator and request.user != coordinator) else [])
+            + ([get_media_center().email])
+        ))
+
+        for recipient in recipients:
+            mail.send([recipient],
+                      template="media_report_comment",
+                      context={"report": report, "comment": comment})
+
+    return HttpResponseRedirect(reverse("media:show_report", args=(episode.pk, )))
 
 # --- Stories ---
 

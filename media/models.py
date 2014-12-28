@@ -44,6 +44,17 @@ POLL_CHOICE_COLORS = (
 POLL_CHOICE_MAX_LENGTH = 128
 
 
+class BaseComment(models.Model):
+    """
+    An abstract model for comments on different models of the media center.
+    """
+    date = models.DateTimeField(auto_now_add=True, verbose_name=u"التاريخ")
+    body = models.TextField(blank=True, verbose_name=u"النص")
+
+    class Meta:
+        abstract = True
+
+
 class FollowUpReport(models.Model):
     """
     A follow-up report, submitted after REPORT_DUE_AFTER days of an activity episode.
@@ -86,6 +97,14 @@ class FollowUpReport(models.Model):
 class FollowUpReportImage(models.Model):
     report = models.ForeignKey(FollowUpReport, related_name='images')
     image = models.FileField(verbose_name=u"الصورة", upload_to="media/images/")
+
+
+class ReportComment(BaseComment):
+    author = models.ForeignKey(User, verbose_name=u"المعلِّق")
+    report = models.ForeignKey(FollowUpReport, related_name="comments")
+
+    def __unicode__(self):
+        return self.report.__unicode__() + " - comment by: " + self.author.__unicode__()
 
 
 class Story(models.Model):
@@ -299,15 +318,13 @@ class CustomTask(Task):
         verbose_name_plural = u"المهام"
 
 
-class TaskComment(models.Model):
+class TaskComment(BaseComment):
     """
     Not using Django's built-in comments because we want to be able to save
     a comment and change task details at the same time. Rolling our own since it's easy.
     """
     author = models.ForeignKey(User, verbose_name=u"المعلق")
     task = models.ForeignKey(CustomTask, verbose_name=u"المهمة")
-    date = models.DateTimeField(auto_now_add=True, verbose_name=u"التاريخ")
-    body = models.TextField(blank=True, verbose_name=u"النص")
 
     def __unicode__(self):
         return '%s, %s - %s' % (
@@ -435,14 +452,12 @@ class PollResponse(models.Model):
         unique_together = (('poll', 'user'), )  # No user can submit more that one response
 
 
-class PollComment(models.Model):
+class PollComment(BaseComment):
     """
     A comment on a poll
     """
     author = models.ForeignKey(User)
     poll = models.ForeignKey(Poll, related_name="comments")
-    date = models.DateTimeField(auto_now_add=True)
-    body = models.TextField()
 
     def __unicode__(self):
         return self.poll.title + " - comment by: " + self.author.__unicode__()

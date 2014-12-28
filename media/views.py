@@ -150,6 +150,18 @@ def submit_report(request, episode_pk):
             instance = form.save()
             image_formset.instance = instance
             image_formset.save()
+
+            # If there is an MC member assigned to write a story for the passed episode, notify them that
+            # the report has been submitted
+            try:
+                task = episode.storytask
+
+                mail.send([task.assignee.email],
+                          template="media_report_submit",
+                          context={"report": instance, "task": task})
+            except ObjectDoesNotExist:
+                pass
+
             return HttpResponseRedirect(reverse('activities:show',
                                                 args=(episode.activity.pk, )
                                                 ))
@@ -368,8 +380,14 @@ def create_story(request, episode_pk):
                                                              # who edits it later on.
                          )
         if form.is_valid():
-            form.save()
+            story = form.save()
             # TODO: resolve task
+
+            # Send a notification to the media center email
+            mail.send([get_media_center().email],
+                      template="media_story_created",
+                      context={"story": story})
+
             return HttpResponseRedirect(reverse('media:show_story',
                                                 args=(episode.pk, )))
     else:

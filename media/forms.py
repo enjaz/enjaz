@@ -7,7 +7,7 @@ from django.forms.models import inlineformset_factory
 from clubs.utils import get_media_center
 
 from media.models import FollowUpReport, Story, StoryReview, Article, ArticleReview, CustomTask, TaskComment, Poll, \
-    PollResponse, WHAT_IF, HUNDRED_SAYS, PollComment, PollChoice, FollowUpReportImage
+    PollResponse, WHAT_IF, HUNDRED_SAYS, PollComment, PollChoice, FollowUpReportImage, ReportComment
 
 # A nice trick to display full names instead of usernames
 # Check: http://stackoverflow.com/questions/16369403/foreign-key-and-select-field-value-in-admin-interface
@@ -27,6 +27,15 @@ class FollowUpReportForm(ModelForm):
                   'announcement_sites', 'notes']
 
 FollowUpReportImageFormset = inlineformset_factory(FollowUpReport, FollowUpReportImage)
+
+class ReportCommentForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(ReportCommentForm, self).__init__(*args, **kwargs)
+        self.fields['body'].widget.attrs = {'class': 'form-control autogrow', 'placeholder': u"أضف تعليقًا..."}
+        
+    class Meta:
+        model = ReportComment
+        fields = ['body']
 
 class StoryForm(ModelForm):
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control input-lg', 'placeholder': u'العنوان'}))

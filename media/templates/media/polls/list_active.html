@@ -1,0 +1,23 @@
+<h2>التصويتات الحالية</h2>
+<hr>
+
+{% for poll in polls %}
+    {% if forloop.first %}
+    {% endif %}
+    <div id="active-poll-{{ poll.id }}" class="active-poll" data-poll-id="{{ poll.id }}">
+        {% include "media/polls/ajax-loader.html" %}
+    </div>
+    {% if not forloop.last %}
+        <hr>
+    {% endif %}
+    {# <!-- FIXME: This will load a script for EACH poll --> #}
+    <script>
+        $(document).ready(function () {
+            $("#active-poll-{{ poll.id }}").load("{% url 'media:show_poll' poll_type_url poll.id %}");
+        });
+    </script>
+    {% if forloop.last %}
+    {% endif %}
+{% empty %}
+    <p>لا توجد تصويتات حالية.</p>
+{% endfor %}

@@ -9,6 +9,9 @@ urlpatterns = patterns('',
     url(r'^activities/reports/$', views.list_reports, name="list_reports"),
     url(r'^activities/reports/(?P<episode_pk>\d+)/submit/$', views.submit_report, name="submit_report"),
     url(r'^activities/reports/(?P<episode_pk>\d+)/$', views.show_report, name="show_report"),
+    url(r'^activities/reports/(?P<episode_pk>\d+)/edit/$', views.edit_report, name="edit_report"),
+    url(r'^activities/reports/(?P<episode_pk>\d+)/comment/$', views.report_comment, name="report_comment"),
+    url(r'^activities/reports/options/$', views.update_report_options, name="update_report_options"),
 
     # Stories
     url(r'^activities/stories/(?P<episode_pk>\d+)/create/$', views.create_story, name="create_story"),
@@ -30,4 +33,18 @@ urlpatterns = patterns('',
     url(r'^tasks/(?P<pk>\d+)/edit/$', views.edit_task, name="edit_task"),
     url(r'^tasks/(?P<pk>\d+)/complete/$', views.mark_task_complete, name="mark_task_complete"),
     url(r'^tasks/(?P<pk>\d+)/comment/$', views.add_comment, name="add_comment"),
+
+    # Polls
+    url(r'^(?P<poll_type>\w+)/$', views.polls_home, name="polls_home"),
+    url(r'^(?P<poll_type>\w+)/list/active/$', views.polls_list, {"filter": views.ACTIVE}, name="polls_list_active"),
+    url(r'^(?P<poll_type>\w+)/list/upcoming/$', views.polls_list, {"filter": views.UPCOMING}, name="polls_list_upcoming"),
+    url(r'^(?P<poll_type>\w+)/list/past/$', views.polls_list, {"filter": views.PAST}, name="polls_list_past"),
+    url(r'^(?P<poll_type>\w+)/add/$', views.add_poll, name="add_poll"),
+    url(r'^(?P<poll_type>\w+)/(?P<poll_id>\d+)/$', views.show_poll, name="show_poll"),
+    url(r'^(?P<poll_type>\w+)/(?P<poll_id>\d+)/edit/$', views.edit_poll, name="edit_poll"),
+    url(r'^(?P<poll_type>\w+)/(?P<poll_id>\d+)/delete/$', views.delete_poll, name="delete_poll"),
+    url(r'^(?P<poll_type>\w+)/(?P<poll_id>\d+)/comment/$', views.poll_comment, name="poll_comment"),
+    url(r'^(?P<poll_type>\w+)/(?P<poll_id>\d+)/deletecomment/$', views.delete_poll_comment, name="delete_poll_comment"),
+    url(r'^(?P<poll_type>\w+)/(?P<poll_id>\d+)/results/$', views.poll_results, name="poll_results"),
+    url(r'^(?P<poll_type>\w+)/suggest/$', views.suggest_poll, name="suggest_poll"),
 )

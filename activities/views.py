@@ -11,8 +11,7 @@ from post_office import mail
 from activities.models import Activity, Review, Episode
 from activities.forms import ActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm
 from accounts.models import get_gender
-from activities.utils import get_pending_activities, get_approved_activities, get_rejected_activities, \
-    get_club_notification_to, get_club_notification_cc
+from activities.utils import get_club_notification_to, get_club_notification_cc
 from clubs.models import Club
 from clubs.utils import get_presidency, is_coordinator_or_member, is_coordinator_or_deputy_of_any_club, \
     is_coordinator_of_any_club, get_media_center, \
@@ -59,58 +58,68 @@ def list_activities(request):
       visible.
     """
     # Show approved activites for everybody.
-    context = {'approved': get_approved_activities()}
-    template = 'activities/list_privileged.html'
+    #
+    # By default (i.e. for students, employees and anonymous users),
+    # no pending or rejected activities should be shown.
+    context = {'approved': Activity.objects.approved(),
+               'pending': Activity.objects.none(),
+               'rejected': Activity.objects.none()}
 
-    if request.user.is_superuser or is_coordinator_or_member(get_presidency(), request.user)\
-            or request.user.has_perm('activities.add_presidency_review'):
-        # If the user is a super user or part of the presidency, then show all activities
-        context['pending'] = get_pending_activities()
-        context['rejected'] = get_rejected_activities()
+    if request.user.is_authenticated():
+        template = 'activities/list_privileged.html'
+        if request.user.is_superuser or is_coordinator_or_member(get_presidency(), request.user)\
+                or request.user.has_perm('activities.add_presidency_review'):
+            # If the user is a super user or part of the presidency,
+            # then show all activities
+            context['pending'] = Activity.objects.pending()
+            context['rejected'] = Activity.objects.rejected()
 
-    elif request.user.has_perm('activities.add_deanship_review'):
-        # If the user is part of the deanship of student affairs, only show activities approved by presidency
-        context['pending'] = get_pending_activities().filter(review__review_type="P", review__is_approved=True)
-        context['rejected'] = get_rejected_activities().filter(review__review_type="P", review__is_approved=True)
+        elif request.user.has_perm('activities.add_deanship_review'):
+            # If the user is part of the deanship of student affairs,
+            # only show activities approved by presidency
+            context['pending'] = Activity.objects.pending().filter(review__review_type="P", review__is_approved=True)
+            context['rejected'] = Activity.objects.rejected().filter(review__review_type="P", review__is_approved=True)
 
-    elif (is_coordinator_or_deputy_of_any_club(request.user) or is_member_of_any_club(request.user)) and \
-         not is_coordinator_or_member(get_presidency(), request.user) and \
-         not is_coordinator_or_member(get_media_center(), request.user):
-        # For club coordinators, deputies, and members, show approved
-        # activities as well as their own club's pending and rejected
-        # activities.
-        user_coordination = get_user_coordination_and_deputyships(request.user)
-        user_clubs = user_coordination | request.user.memberships.all()
-        context['pending'] = get_pending_activities().filter(primary_club__in=user_clubs) | \
-                             get_pending_activities().filter(secondary_clubs__in=user_clubs)
-        context['rejected'] = get_rejected_activities().filter(primary_club__in=user_clubs) | \
-                              get_rejected_activities().filter(secondary_clubs__in=user_clubs)
+        elif (is_coordinator_or_deputy_of_any_club(request.user) or is_member_of_any_club(request.user)) and \
+             not is_coordinator_or_member(get_presidency(), request.user) and \
+             not is_coordinator_or_member(get_media_center(), request.user):
+            # For club coordinators, deputies, and members, show approved
+            # activities as well as their own club's pending and rejected
+            # activities.
+            user_coordination = get_user_coordination_and_deputyships(request.user)
+            user_clubs = user_coordination | request.user.memberships.all()
+            context['pending'] = Activity.objects.pending().filter(primary_club__in=user_clubs) | \
+                                 Activity.objects.pending().filter(secondary_clubs__in=user_clubs)
+            context['rejected'] = Activity.objects.rejected().filter(primary_club__in=user_clubs) | \
+                                  Activity.objects.rejected().filter(secondary_clubs__in=user_clubs)
 
-        # Media-related
-        # Only display to coordinators and deputies
-        if is_coordinator_or_deputy_of_any_club(request.user):
-            context['due_report_count'] = user_coordination.all()[0].get_due_report_count()
-            context['overdue_report_count'] = user_coordination.all()[0].get_overdue_report_count()
-            context['MAX_OVERDUE_REPORTS'] = MAX_OVERDUE_REPORTS
+            # Media-related
+            # Only display to coordinators and deputies
+            if is_coordinator_or_deputy_of_any_club(request.user):
+                context['due_report_count'] = user_coordination.all()[0].get_due_report_count()
+                context['overdue_report_count'] = user_coordination.all()[0].get_overdue_report_count()
+                # In activity templates, the MAX_OVERDUE_REPORTS
+                # variable is used to check whether the current user
+                # is a coordinator or a deputy.  This is to aviod
+                # passing duplicated variables.  In case the following
+                # variable is changed, the templates need to be
+                # changed as well.
+                context['MAX_OVERDUE_REPORTS'] = MAX_OVERDUE_REPORTS
 
-    elif is_employee_of_any_club(request.user):
-        # For employees, display all approved activities, as well as their clubs' approved activities in
-        # a separate table
-        # An employee is basically similar to a normal user, the only difference is having another table that
-        # includes the employee's relevant activities
-        context['pending'] = Activity.objects.none()
-        context['rejected'] = Activity.objects.none()
-        context['club_approved'] = get_approved_activities().filter(primary_club__in=request.user.employee.all())
+        elif is_employee_of_any_club(request.user):
+            # For employees, display all approved activities, as well
+            # as their clubs' approved activities in a separate table.
+            #
+            # An employee is basically similar to a normal user, the
+            # only difference is having another table that includes
+            # the employee's relevant activities
+            context['club_approved'] = Activity.objects.approved().filter(primary_club__in=request.user.employee.all())
 
-        template = 'activities/list_employee.html'
-    else:
-        context['pending'] = Activity.objects.none()
-        context['rejected'] = Activity.objects.none()
-
-        if request.user.is_authenticated():
+            template = 'activities/list_employee.html'
+        else: # For students and other normal users.
             template = 'activities/list_normal.html'
-        else:
-            template = 'activities/front/list.html'
+    else: # For anonymous users
+        template = 'activities/front/list.html'
 
     return render(request, template, context)
 
@@ -126,23 +135,7 @@ def show(request, activity_id):
     # of the related clubs and the person who submitted it can see it.    
     if request.user.is_authenticated():
         user_clubs = get_user_clubs(request.user)
-        coordination_status = has_coordination_to_activity(request.user, activity)
 
-        if request.user.has_perm('activities.change_activity') or \
-            coordination_status:
-            context['can_edit'] = True
-        if request.user.has_perm('activities.view_deanship_review') or \
-            coordination_status:
-            context['can_view_deanship_review'] = True
-        if request.user.has_perm('activities.view_presidency_review') or \
-            coordination_status:
-            context['can_view_presidency_review'] = True
-        if request.user.has_perm('media.add_followupreport') or \
-            coordination_status:
-            context['can_add_followupreport'] = True
-        if request.user.has_perm('niqati.view_order') or \
-            coordination_status:
-            context['can_view_niqati_orders'] = True
         # Anyone can view forms; yet due to URL reversing issues it has to be restricted to this view only
         # Otherwise, we'll end up having to specify the `current_app` attribute for every view that contains a link
         # to the forms
@@ -210,7 +203,12 @@ def create(request):
             # automatically approved by the deanship.  Otherwise,
             # email the vice president.
             if form_object.primary_club == presidency:
-                review_object = Review.objects.create(
+                # If the user has enough privileges, mark the activity as approved directly by creating
+                # presidency and deanship reviews
+                Review.objects.create(
+                    activity=form_object, reviewer=request.user,
+                    is_approved=True, review_type='P')
+                Review.objects.create(
                     activity=form_object, reviewer=request.user,
                     is_approved=True, review_type='D')
             else:
@@ -376,6 +374,12 @@ def review(request, activity_id, lower_review_type=None):
         review = ReviewForm(request.POST, instance=review_object)
         if review.is_valid():
             review.save()
+            # Once the activity is approved (or partially approved), lock it from being edited.
+            # This is very critical as to prevent manipulations (ie, editing the request after
+            # the approval of the presidency and before it's reviewed by DSA)
+            # Only when an edit is requested by the reviewer should editing be allowed
+            activity.is_editable = False
+            activity.save()
             deanship_review_url = reverse('activities:review_with_type', args=(activity_id, 'd'))
             deanship_full_url =  request.build_absolute_uri(deanship_review_url)
             presidency_review_url = reverse('activities:review_with_type', args=(activity_id, 'p'))
@@ -390,8 +394,6 @@ def review(request, activity_id, lower_review_type=None):
                               template="activity_presidency_approved",
                               context=email_context)
                 elif review_type == 'D':
-                    activity.is_editable = False
-                    activity.save()
                     if activity.primary_club.coordinator:
                         email_context['full_url'] = activity_full_url
                         mail.send(get_club_notification_to(activity),
@@ -485,16 +487,6 @@ def review(request, activity_id, lower_review_type=None):
         
     context = {'activity': activity, 'active_tab': rt_full,
                'review': review, 'review_type': review_type}
-
-    if request.user.has_perm('activities.change_activity') or \
-        coordination_status:
-        context['can_edit'] = True
-    if request.user.has_perm('activities.view_deanship_review') or \
-        coordination_status:
-        context['can_view_deanship_review'] = True
-    if request.user.has_perm('activities.view_presidency_review') or \
-        coordination_status:
-        context['can_view_presidency_review'] = True
 
     return render(request, template, context)
 

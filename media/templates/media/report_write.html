@@ -1,15 +1,58 @@
 {% extends 'media_base.html' %}{% load bootstrap3 %}{% load staticfiles %}
-{% block title %}رفع تقرير {{ episode.activity.name }}{% endblock %}
+{% block title %}تقرير {{ episode.activity.name }}{% endblock %}
 {% block content %}
-<h2>تقرير {{ episode.activity.name }}</h2>
+<h2>{% if edit %}تعديل {% endif %}تقرير {{ episode.activity.name }}</h2>
+{% if not edit %}
 <p>التقرير التالي يحتوي معلومات النشاط الافتراضية كما تم رفعها في طلب النشاط؛ نرجو تحديث البيانات أو تعديلها حسب المعلومات و الإحصائيات الحقيقية.</p>
+{% endif %}
 <hr>
-<form action="{% url 'media:submit_report' episode.pk %}" enctype="multipart/form-data" method="post">
+<form action="{% if edit %}{% url 'media:edit_report' episode.pk %}{% else %}{% url 'media:submit_report' episode.pk %}{% endif %}" enctype="multipart/form-data" method="post">
     {# The enctype="multipart/form-data" attribute is required for uploading files via html forms in django. #}
     {# Also make sure you pass request.FILES to the django form. #}
     {# See: https://docs.djangoproject.com/en/dev/topics/http/file-uploads/#basic-file-uploads #}
 {% csrf_token %}
 {% bootstrap_form form %}
+
+    <h4>الصور المرفقة</h4>
+    {# -------- #}
+    {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
+    {{ image_formset.management_form }}
+    {{ image_formset.non_form_errors.as_ul }}
+    <table id="images-formset" class="form" style="width: 100%;">
+    {% for form in image_formset.forms %}
+      {% if forloop.first %}
+        <colgroup>
+            <col class="col-xs-8">
+            <col class="col-xs-4">
+        </colgroup>
+      <thead><tr>
+        {% for field in form.visible_fields %}
+        <th>{{ field.label|capfirst }}</th>
+        {% endfor %}
+      </tr></thead>
+      {% endif %}
+      <tr class="form-container">
+      {% for field in form.visible_fields %}
+        <td>
+        {# Include the hidden fields in the form #}
+        {% if forloop.first %}
+          {% for hidden in form.hidden_fields %}
+          {{ hidden }}
+          {% endfor %}
+        {% endif %}
+            <div class="form-group">
+          {{ field.errors.as_ul }}
+          {{ field }}
+            </div>
+        </td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+    </table>
+    {# ------- #}
+
+<hr>
+
 <button class="btn btn-block btn-green" type="submit">
 	<i class="glyphicon glyphicon-ok-sign"></i> 
 	أرسل
@@ -18,8 +61,21 @@
 {% endblock %}
 
 {% block customscript %}
+<script src="{% static 'js/jquery.formset.js' %}"></script>
 <script src="{% static 'neon/assets/js/bootstrap-timepicker.min.js' %}"></script>
 <script>
+    // style the formset fields
+    // $("#images-formset").find("input").addClass("form-control");
+
+    // add formset controls
+    $("#images-formset .form-container").formset({
+        prefix: '{{ formset.prefix }}',
+        addText: 'أضف صورة',
+        deleteText: 'احذف',
+        addCssClass: 'add-row btn btn-xs btn-primary',
+        deleteCssClass: 'delete-row btn btn-xs btn-default',
+    });
+
 	// Initialize date and time pickers
 	$("input[name=start_date]").datepicker({isRTL: true});
 	$("input[name=end_date]").datepicker({isRTL: true});

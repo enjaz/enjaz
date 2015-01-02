@@ -1,0 +1,238 @@
+{% comment %}
+Show a poll.
+There are 3 variables to consider and upon which the template will return different results:
+    (1) whether the poll is HUNDRED_SAYS or WHAT_IF (has_choices)
+    (2) whether the poll is active (is_active)
+    (3) whether the user is an editor (is_editor)
+If we ignore the 3rd variable, 4 outcomes are possible based on the different combinations (2 * 2).
+Basically it goes like this:
+    (1) is_active will determine 2 things:
+        * column sizes (inactive polls have a narrower image column (col-md-2 vs. col-md-3)
+        * whether the voting form and script are loaded. This is only for HUNDRED_SAYS polls; WHAT_IF polls don't involve
+          voting so they're not affected with this regard.
+    (2) has_choices, together with is_active, will determine whether to load the voting form and script. If the poll
+        isn't active, a list of choices will be simply loaded. Again this is only for HUNDRED_SAYS polls as WHAT_IF polls
+        don't involve voting.
+    (3) is_editor simply adds an "edit-poll" button and loads the associated script
+{% endcomment %}
+<div class="row">
+    {% if poll.image %}
+        {% if is_active %}<div class="col-md-3">{% else %}<div class="col-md-2">{% endif %}
+            <div class="screenshot">
+                <div style="text-align: center; border-left: solid 1px #eee;">
+                    <style>
+                        #poll-{{ poll.id }}-img {
+                            width:90%;
+                            padding-bottom:90%;
+                            border:solid 2px #ddd;
+                            margin:10px;
+                            background:url('{{ poll.image.url }}') center center no-repeat;
+                            background-size: auto 100%;
+                        }
+                    </style>
+                    <div id="poll-{{ poll.id }}-img" class="img-circle" style="max-width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+        {% if is_active %}<div class="col-md-9">{% else %}<div class="col-md-10">{% endif %}
+    {% else %}
+    <div class="col-md-12">
+    {% endif %}
+    <h2>
+        {{ poll.title }}
+
+        {% if is_editor %}
+        <span style="float: left;">
+            <button id="edit-poll-{{ poll.id }}" class="btn btn-xs btn-icon btn-gold">
+                <i class="entypo-pencil"></i>
+                عدل
+            </button>
+            {% if has_choices and is_active and not has_voted %}
+                {# With a HUNDRED_SAYS poll, the editor should be able to view the results even if they haven't voted #}
+                <button id="show-poll-{{ poll.id }}-results" class="btn btn-xs btn-icon btn-info">
+                    <i class="entypo-chart-pie"></i>
+                    استعرض نتائج التصويت
+                </button>
+            {% endif %}
+        </span>
+        {% endif %}
+
+    </h2>
+    <p>
+        {{ poll.text|linebreaksbr }}
+    </p>
+    {% comment %}
+        If the poll is a HUNDRED_SAYS poll, then load the voting form if the poll is active and the user hasn't voted,
+        or load the results page if otherwise (inactive or has voted or both).
+        If the poll is a WHAT_IF poll, do nothing.
+    {% endcomment %}
+    {% if has_choices %}
+    <div id="poll-{{ poll.id }}-choice-panel">
+        {% if is_active and not has_voted %}
+                <form id="vote-form-{{ poll.id }}" method="post">
+                    {% csrf_token %}
+                    {{ response_form.as_p }}
+                    <button class="btn btn-primary btn-block" type="submit">
+                        <i class="entypo-pencil"></i>
+                        صوِّت
+                    </button>
+                </form>
+        {% else %}
+            {# show the results #}
+            {% include "media/polls/ajax-loader.html" %}
+            <script>
+                $("#poll-{{ poll.id }}-choice-panel").load("{% url 'media:poll_results' poll_type_url poll.id %}");
+            </script>
+        {% endif %}
+    </div>
+    {% endif %}
+    </div>
+</div>
+
+<br>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <div class="panel-title">
+            <h4>
+                التعليقات
+            </h4>
+        </div>
+    </div>
+
+    <div  id="poll-{{ poll.id }}-comments" class="panel-body no-padding">
+    {% include "media/polls/ajax-loader.html" %}
+    </div>
+</div>
+
+{% if has_choices and is_active and not has_voted %}
+<script type="text/javascript">
+// Style the choices
+
+// Style the choice list
+$("#vote-form-{{ poll.id }} ul").addClass("icheck-list");
+
+// Store the colors of the buttons in this temporary list, then iterate over the choices and initiate an iCheck
+// button for each. The buttons and the color list elements are in the same order, so -while iterating- use the
+// first element to determine its color then delete it and move to the next.
+var colorList{{ poll.id }} = [{% for choice in poll.choices.all %}"{{ choice.color }}",{% endfor %}]
+
+// Style the radio buttons as iCheck
+$("#vote-form-{{ poll.id }} input[type=radio]").each(function () {
+    var $self = $(this);
+    var $label = $self.parent();
+    var labelText = $label.text();
+    var color = colorList{{ poll.id }}.shift(); // shift() returns and deletes the first item (similar to .pop() in python)
+
+    // Remove the text label
+    $label.contents().filter(function(){
+        return (this.nodeType == 3); // Text Node
+    }).remove();
+
+    // Remove the <label> element
+    $self.unwrap();
+
+    $self.iCheck({
+      radioClass: 'iradio_line-' + color,
+      insert: '<div class="icheck_line-icon"></div>' + labelText
+    });
+});
+
+// Attach proper behavior to form submission
+$("#vote-form-{{ poll.id }}").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault();
+
+    /* get some values from elements on the page: */
+    var $form = $(this),
+        data = $form.serialize(),
+        url = "{% url 'media:show_poll' poll_type_url poll.id %}";
+
+    /* Send the data using post */
+    var posting = $.post(url, data);
+
+    posting.done(function (data) {
+        var $messageBar = $("#vote-form-alert-{{ poll.id }}");
+        // if there are messages already, remove them
+        $messageBar.slideUp(function () {
+            $(this).remove();
+        });
+
+        $("#active-poll-{{ poll.id }}").prepend("<div id='vote-form-alert-{{ poll.id }}' style='display: none;' class='alert'></div>");
+
+        var $messageBar = $("#vote-form-alert-{{ poll.id }}"); // refresh the selector
+
+        if (data.message == "success") {
+            $messageBar.addClass("alert-success");
+            $messageBar.html("شكرًا لك. تم التصويت بنجاح!");
+
+            // load the poll results
+            var $choicesPanel = $("#poll-{{ poll.id }}-choice-panel");
+
+             // The slideUp/slideDown animation is causing the chart not to appear normally; just load the page simply
+             // $choicesPanel.slideUp(function () {
+             //   $choicesPanel.load("{% url 'media:poll_results' poll_type_url poll.id %}", function () {
+             //     $choicesPanel.slideDown();
+             // });
+             //});
+
+             $choicesPanel.load("{% url 'media:poll_results' poll_type_url poll.id %}");
+             
+             {% if is_editor %}
+             $("button#show-poll-{{ poll.id }}-results").slideUp();
+             {% endif %}
+
+        } else if (data.message == "already_voted") {
+            $messageBar.addClass("alert-danger");
+            $messageBar.html("لقد قمت بالتصويت من قبل!");
+        } else if (data.message == "invalid_form") {
+            $messageBar.addClass("alert-warning");
+            $messageBar.html("يرجى اختيار أحد الخيارات!");
+        }
+        $messageBar.slideDown();
+    });
+});
+</script>
+{% endif %}
+{% if is_editor %}
+<script type="text/javascript">
+    // attach function to edit poll button
+    $("button#edit-poll-{{ poll.id }}").click(function () {
+        // show the edit poll modal {# you can find it in media/polls/home.html #}
+        $("#edit-poll-modal").modal('show');
+
+        $("#edit-poll-modal .modal-title").html("عدّل {{ poll.title }}");
+        $("#edit-poll-modal .modal-body").load("{% url 'media:edit_poll' poll_type_url poll.id %}");
+
+        var $submitButton = $("#edit-poll-modal button#submit-button");
+        // Unbind any handlers previously attached to the submit button
+        // This is necessary to avoid multiple submissions of the form
+        $submitButton.off('click');
+        $submitButton.click(function () {
+            $("form#edit-poll-form").submit();
+        });
+    });
+    {% if has_choices and is_active and not has_voted %}
+    // attach function to show results button
+     $("button#show-poll-{{ poll.id }}-results").click(function () {
+         var $choicesPanel = $("#poll-{{ poll.id }}-choice-panel");
+
+         // The slideUp/slideDown animation is causing the chart not to appear normally; just load the page simply
+         // $choicesPanel.slideUp(function () {
+         //   $choicesPanel.load("{% url 'media:poll_results' poll_type_url poll.id %}", function () {
+         //     $choicesPanel.slideDown();
+         // });
+         //});
+
+         $choicesPanel.load("{% url 'media:poll_results' poll_type_url poll.id %}");
+
+         $(this).slideUp();
+     });
+    {% endif %}
+</script>
+{% endif %}
+<script>
+    $(document).ready(function () {
+        $("div#poll-{{ poll.id }}-comments").load("{% url 'media:poll_comment' poll_type_url poll.id %}");
+    });
+</script>

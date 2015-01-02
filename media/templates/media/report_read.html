@@ -1,4 +1,4 @@
-{% extends 'media_base.html' %}{% load staticfiles %}
+{% extends 'media_base.html' %}{% load staticfiles %}{% load clubs_utils %}{% load media_tags %}
 {% block title %}
 تقرير {{ report.episode.activity.name }}
 {% endblock %}
@@ -78,7 +78,7 @@
 		<tbody>
 			<tr>
 				<th class="text-center">الوصف</th>
-				<td colspan="3">{{ report.description }}</td>
+				<td colspan="3">{{ report.description|linebreaksbr }}</td>
 			</tr>
 			
 			<tr>
@@ -104,12 +104,12 @@
 
             <tr>
                 <th class="text-center">أماكن النشر و الإعلان</th>
-                <td colspan="3">{{ report.announcement_sites }}</td>
+                <td colspan="3">{{ report.announcement_sites|linebreaksbr }}</td>
             </tr>
 
             <tr>
                 <th class="text-center">ملاحظات</th>
-                <td colspan="3">{{ report.notes }}</td>
+                <td colspan="3">{{ report.notes|linebreaksbr }}</td>
             </tr>
 		</tbody>
 	</table>
@@ -118,19 +118,41 @@
 
 	<div class="row">
 		
-		<div class="col-sm-12">
-			
+		<div class="col-sm-6">
+
+            <div class="invoice-left">
+                <h4>مرفقات التقرير</h4>
+
+                {% for image in report.images.all %}
+                    {% if forloop.first %}<ul>{% endif %}
+                        <li>
+                        <a href="{{ image.image.url }}" class="">
+                            <i class="entypo-picture"></i>
+                            {{ image.image.name }}
+                        </a>
+                        </li>
+                    {% if forloop.last %}</ul>{% endif %}
+                {% empty %}
+                    <p>لا يوجد.</p>
+                {% endfor %}
+            </div>
+
+        </div>
+
+        <div class="col-sm-6">
+
+
 			<div class="invoice-right">
-				
+
 				<a href="javascript:window.print();" class="btn btn-primary btn-icon icon-left hidden-print">
 					طباعة التقرير
 					<i class="entypo-doc-text"></i>
 				</a>
-                {% if report.images.name %}
-                <a href="{{ report.images.url }}" class="btn btn-primary btn-icon icon-left">
-					تحميل المرفقات
-					<i class="entypo-down-bold"></i>
-				</a>
+                {% if request.user|has_coordination_to_activity:report.episode.activity or request.user|is_media_coordinator_or_member or request.user.is_superuser %}
+                <a class="btn btn-gold btn-icon icon-left" href="{% url 'media:edit_report' report.pk %}">
+                    <i class="entypo-pencil"></i>
+                    عدّل التقرير
+                </a>
                 {% endif %}
 			</div>
 			
@@ -138,5 +160,78 @@
 		
 	</div>
 
+    <br>
+
 </div>
+
+<br>
+<hr>
+<br>
+
+<!-- Comments --><div class="panel panel-primary panel-shadow">
+<div class="panel-heading">
+    <h4 class="panel-title">
+    التعليقات
+    </h4>
+</div>
+<div class="panel-body no-padding">
+
+        <!-- List of Comments --><ul class="comments-list">
+        <style type="text/css">
+            .comments-list .comment-details {
+                width: 100% !important;
+            }
+        </style>
+        {% for comment in report.comments.all %}
+            <!-- Comment Entry --><li>
+                <div class="comment-details">
+
+                    <div class="comment-head">
+                        {{ comment.author.student_profile.get_ar_full_name }}
+                    </div>
+
+                    <p class="comment-text">
+                        {{ comment.body }}
+                    </p>
+
+                    <div class="comment-footer">
+
+                        <div class="comment-time">
+                            {{ comment.date }} {# humanise #}
+                        </div>
+
+                    </div>
+
+                </div>
+            </li>
+        {% endfor %}
+        </ul>
+
+        {% if comment_form %}
+        <div class="col-md-12">
+            {% if report.comments.count > 0 %}<hr>{% else %}<br>{% endif %}
+            <!-- Add comment form --><form id="comment-form"
+                                           action="{% url 'media:report_comment' report.episode.pk %}" method="post">
+            {% csrf_token %}
+            <div class="col-md-11">
+                <div class="form-group{% if comment_form.body.errors %} has-error{% endif %}">
+                    {{ comment_form.body }}
+                </div>
+            </div>
+            <div class="col-md-1">
+                <div class="row">
+                    <button type="submit" class="btn btn-block btn-default">
+                        <i class="entypo-feather"></i>
+                        علّق
+                    </button>
+                </div>
+            </div>
+            <br>
+        </form>
+        </div>
+        {% endif %}
+
+
+
+ </div></div>
 {% endblock %}

@@ -29,13 +29,16 @@ class FormManager(models.Manager):
     """
     Only show published forms for non-staff users.
     """
-    def published(self, for_user=None):
-        if for_user is not None and for_user.is_staff:
-            return self.all()
+    def published(self, for_user=None, for_object=None, editor_check=None):
+        if for_user is not None and for_object is not None and editor_check is not None\
+                and editor_check(for_user, for_object):  # User has permissions to edit forms
+            return self.filter(content_type=ContentType.objects.get_for_model(for_object.__class__),
+                               object_id=for_object.id)  # Return all forms related to the passed object
         filters = [
             Q(publish_date__lte=now()) | Q(publish_date__isnull=True),
             Q(expiry_date__gte=now()) | Q(expiry_date__isnull=True),
             Q(status=STATUS_PUBLISHED),
+            # Q(content_type="", object_id=""), # TODO
         ]
         if settings.USE_SITES:
             filters.append(Q(sites=Site.objects.get_current()))

@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime, timedelta
+from activities.managers import ActivityManager
 
 from clubs.models import College
 from forms_builder.forms.models import Form
@@ -45,6 +46,9 @@ class Activity(models.Model):
     organizers = models.IntegerField(verbose_name=u"عدد المنظمين",
                                        help_text=u"عدد الطلاب الذين سينظمون النشاط")
     forms = GenericRelation(Form)
+
+    # Override the default manager with the activity custom manager
+    objects = ActivityManager()
 
     def registration_is_open(self):
         """
@@ -263,6 +267,7 @@ class Episode(models.Model):
     activities, however, will only require one episode, as they only consist of a single date and time.
     The more complex activites are what really take advantage of this system.
     """
+    ### Fields ###
     activity = models.ForeignKey(Activity)
     
     start_date = models.DateField()
@@ -294,7 +299,15 @@ class Episode(models.Model):
     # In the future, as we add Google Calendar features, the calendar events will
     # be linked here
     # google_event = models.URLField()
-    
+
+    # Media-related fields
+
+    requires_report = models.BooleanField(default=True)
+    can_report_early = models.BooleanField(default=False)
+    requires_story = models.BooleanField(default=True)
+
+    ### Methods ###
+
     def __unicode__(self):
         return self.activity.name + " #" + str(self.get_index())
     
@@ -327,32 +340,32 @@ class Episode(models.Model):
         days of the end of the corresponding episode.
         """
         return self.end_datetime() + timedelta(days=REPORT_DUE_AFTER)
-    
+
+    def report_is_submitted(self):
+        """
+        Return whether or not a report has been submitted for this episode.
+        """
+        try:
+            report = self.followupreport
+            return True
+        except ObjectDoesNotExist:
+            return False
+
     def report_is_due(self):
         """
         Return whether the report is due.
         The report is due when the episode has ended, the due date hasn't passed,
         and the report hasn't been submitted.
         """
-        try:
-            report = self.followupreport
-            report_not_submitted = False
-        except ObjectDoesNotExist:
-            report_not_submitted = True
-        return self.end_datetime() < datetime.now() < self.report_due_date() and report_not_submitted
-    
+        return self.requires_report and self.end_datetime() < datetime.now() < self.report_due_date() and not self.report_is_submitted()
+
     def report_is_overdue(self):
         """
         Return whether the report is overdue.
         The report is overdue when the episode has ended, the due date has passed,
         and the report hasn't been submitted.
         """
-        try:
-            report = self.followupreport
-            report_not_submitted = False
-        except ObjectDoesNotExist:
-            report_not_submitted = True
-        return datetime.now() > self.report_due_date() and report_not_submitted
+        return self.requires_report and datetime.now() > self.report_due_date() and not self.report_is_submitted()
 
 class Category(models.Model):
     ar_name = models.CharField(max_length=50,

@@ -3,9 +3,11 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import ModelForm
+from django.forms.models import inlineformset_factory
 from clubs.utils import get_media_center
 
-from media.models import FollowUpReport, Story, StoryReview, Article, ArticleReview, CustomTask, TaskComment
+from media.models import FollowUpReport, Story, StoryReview, Article, ArticleReview, CustomTask, TaskComment, Poll, \
+    PollResponse, WHAT_IF, HUNDRED_SAYS, PollComment, PollChoice, FollowUpReportImage, ReportComment
 
 # A nice trick to display full names instead of usernames
 # Check: http://stackoverflow.com/questions/16369403/foreign-key-and-select-field-value-in-admin-interface
@@ -22,7 +24,18 @@ class FollowUpReportForm(ModelForm):
         fields = ['description', 'start_date', 'end_date',
                   'start_time', 'end_time', 'location',
                   'organizer_count', 'participant_count',
-                  'announcement_sites', 'images', 'notes']
+                  'announcement_sites', 'notes']
+
+FollowUpReportImageFormset = inlineformset_factory(FollowUpReport, FollowUpReportImage)
+
+class ReportCommentForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(ReportCommentForm, self).__init__(*args, **kwargs)
+        self.fields['body'].widget.attrs = {'class': 'form-control autogrow', 'placeholder': u"أضف تعليقًا..."}
+        
+    class Meta:
+        model = ReportComment
+        fields = ['body']
 
 class StoryForm(ModelForm):
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control input-lg', 'placeholder': u'العنوان'}))
@@ -85,3 +98,54 @@ class TaskCommentForm(ModelForm):
     class Meta:
         model = TaskComment
         fields = ['body']
+
+
+class PollForm(ModelForm):
+    poll_type = forms.HiddenInput()
+
+    class Meta:
+        model = Poll
+        exclude = ('poll_type', 'date_created', 'creator')
+
+
+PollChoiceFormSet = inlineformset_factory(Poll, PollChoice)
+
+
+class PollResponseForm(ModelForm):
+    """
+    A form that handles responses to a poll with choices (hundred-says)
+    """
+    def __init__(self, *args, **kwargs):
+        # Make sure an instance is passed and it has a poll specified
+        assert 'instance' in kwargs
+        assert getattr(kwargs['instance'], 'poll') is not None
+        super(PollResponseForm, self).__init__(*args, **kwargs)
+        # Limit the available choices to the attached poll's choices
+        self.fields['choice'] = forms.ModelChoiceField(queryset=self.instance.poll.choices.all(),
+                                                       widget=forms.RadioSelect(),
+                                                       label="",
+                                                       empty_label=None)  # Remove Django's default "--------" option
+
+    class Meta:
+        model = PollResponse
+        exclude = ('poll', 'user', 'date')
+
+
+class PollCommentForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(PollCommentForm, self).__init__(*args, **kwargs)
+        self.fields['body'].widget.attrs = {'class': 'form-control autogrow', 'placeholder': u"أضف تعليقًا..."}
+
+    class Meta:
+        model = PollComment
+        fields = ('body', )
+
+
+class PollSuggestForm(forms.Form):
+    def __init__(self, poll_type, *args, **kwargs):
+        super(PollSuggestForm, self).__init__(*args, **kwargs)
+        if poll_type == HUNDRED_SAYS:
+            self.fields['choices'] = forms.CharField(label=u"الخيارات", widget=forms.Textarea(), required=False)
+
+    title = forms.CharField(label=u"العنوان", required=False)
+    text = forms.CharField(widget=forms.Textarea(), label=u"النص")

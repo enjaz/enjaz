@@ -1,6 +1,7 @@
 """
 Utility functions for the activities app.
 """
+import warnings
 from activities.models import Activity
 from clubs.utils import is_coordinator_or_deputy
 
@@ -9,6 +10,8 @@ def get_approved_activities():
     """
     Return a queryset of the current year's approved activities.
     """
+    warnings.warn("This utility function will be removed soon. Use Activity.objects.approved() instead.",
+                  DeprecationWarning)
     # Approved activities are those that have an approved presidency review
     # and an approved deanship review
     # return Activity.objects.filter(approved_by_d, approved_by_p)
@@ -22,6 +25,8 @@ def get_rejected_activities():
     """
     Return a queryset of the current year's rejected activities.
     """
+    warnings.warn("This utility function will be removed soon. Use Activity.objects.rejected() instead.",
+                  DeprecationWarning)
     # Rejected activities are those that have a rejected presidency review
     # or a rejected deanship review
     return Activity.objects.filter(review__is_approved=False)
@@ -31,6 +36,8 @@ def get_pending_activities():
     """
     Return a queryset of the current year's pending activities.
     """
+    warnings.warn("This utility function will be removed soon. Use Activity.objects.pending() instead.",
+                  DeprecationWarning)
     # Pending activities are those that are neither approved nor rejected.
     return Activity.objects.filter(review__review_type="P", review__is_approved=None).filter(review__review_type="D",
                                                                                              review__is_approved=None)\

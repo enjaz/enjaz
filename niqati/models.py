@@ -52,8 +52,8 @@ class Code(models.Model):
     # Basic Properties
     code_string = models.CharField(max_length=16, unique=True) # a 16-digit string, unique throughout all the db
     category = models.ForeignKey(Category)
-    activity = models.ForeignKey(Activity)
-    episode = models.ForeignKey(Episode, null=True, blank=True)
+    activity = models.ForeignKey(Activity, null=True, blank=True)
+    episode = models.ForeignKey(Episode)
 
     # Generation-related
     collection = models.ForeignKey('Code_Collection')
@@ -223,8 +223,8 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 
 
 class Code_Order(models.Model): # consists of one Code_Collection or more
-    activity = models.ForeignKey(Activity, verbose_name=u"النشاط")
-    episode = models.ForeignKey(Episode, verbose_name=u"الموعد", null=True, blank=True)
+    activity = models.ForeignKey(Activity, verbose_name=u"النشاط", null=True, blank=True)
+    episode = models.ForeignKey(Episode, verbose_name=u"الموعد")
     date_ordered = models.DateTimeField(auto_now_add=True)
 
     def process(self, host):

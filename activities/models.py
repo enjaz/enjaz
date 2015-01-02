@@ -389,8 +389,8 @@ class Category(models.Model):
 
 class Evaluation(models.Model):
     """ An activity evaluation filled by students upon Niqati code submission. """
-    activity = models.ForeignKey(Activity)  # TODO: change to episode (when niqati.models.Code has been changed)
-    episode = models.ForeignKey(Episode, null=True, blank=True)
+    activity = models.ForeignKey(Activity, null=True, blank=True)
+    episode = models.ForeignKey(Episode)
     evaluator = models.ForeignKey(User)
 
     # Evaluation criteria, where evaluation is on a scale from 1 (lowest) to 5 (highest)

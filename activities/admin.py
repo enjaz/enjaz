@@ -69,7 +69,7 @@ class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'primary_club', 'category',
                     'submission_date', 'is_approved_by_presidency',
                     'is_approved_by_deanship', 'get_relevance_score_average',
-                    'get_quality_score_average')
+                    'get_quality_score_average', 'get_evaluation_count')
     list_filter = [CategoryFilter, SubmissionFilter, StatusFilter]
     readonly_fields = ('get_relevance_score_average', 'get_quality_score_average', )
     inlines = [EpisodeInline, ReviewInline]

@@ -10,7 +10,8 @@
             <th>الحالة</th>
             <th>الخيارات</th>{% endif %}{# For privileged non-coordinators users and in approved activities, show the scores.  We use MAX_OVERDUE_REPORTS, which is only passed for coordinators. #}{% if not MAX_OVERDUE_REPORTS and approved_table and privileged %}
             <th>تقييم الملائمة</th>
-            <th>تقييم الجودة</th>{% endif %}
+            <th>تقييم الجودة</th>
+            <th>عدد التقييمات</th>{% endif %}
         </tr>
     </thead>
     <tbody>
@@ -45,7 +46,9 @@
                 {% endwith %}
             </td>{% endif %}{% if not MAX_OVERDUE_REPORTS and approved_table and privileged %}
             <td>{{ activity.get_relevance_score_average|stringformat:".2f" }}</td>
-            <td>{{ activity.get_quality_score_average|stringformat:".2f" }}</td>{% endif %}
+            <td>{{ activity.get_quality_score_average|stringformat:".2f" }}</td>
+            <td>{{ activity.get_evaluation_count }}</td>
+            {% endif %}
         </tr>
     {% endfor %}
     </tbody>

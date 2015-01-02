@@ -23,7 +23,7 @@
     {% for code in user.code_set.all %}
         <tr>
             <td>{{ forloop.counter }}</td>
-            <td>{{ code.activity.name }}</td>
+            <td>{{ code.episode }}</td>
             <td>{{ code.category.ar_label }}</td>
             <td>{{ code.category.points }}</td>
             <td>{{ code.redeem_date }}</td>

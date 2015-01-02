@@ -41,28 +41,6 @@ def index(request):
 @login_required
 def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code submission requests
     if request.method == "POST":
-        # print request.POST
-        # form = SubmissionForm(instance=Code(code_string=request.POST['code_string'], user=request.user))
-        # form = SubmissionForm({'code_string':'XXX'})
-        # if form.is_valid():
-        #     pass
-        #     # form.save()
-        # else:
-        #     pass
-        # print form.error_class
-        # print type(form.error_class)
-        # for error in form.error_class:
-        #     print error
-        # # elif form.errors.code_string:
-        # #     pass
-        # # print form.errors
-        # # print form['code_string'].errors
-        # message = ""
-        # message_type = "-danger"
-        # eval_form = EvaluationForm()
-
-        # ----
-
         # format code first i.e. make upper case & remove spaces or dashes
         code = request.POST['code'].upper().replace(" ", "").replace("-", "")
 
@@ -72,18 +50,18 @@ def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code s
             # If the code exists, then initialize and check the evaluation form
             # Only if the code is actually saved, the evaluation will be saved, too.
             eval_form = EvaluationForm(request.POST,
-                                       instance=Evaluation(activity=c.activity,
+                                       instance=Evaluation(episode=c.episode,
                                                            evaluator=request.user))
             eval_form_valid = eval_form.is_valid()
 
             if not c.user:  # code isn't associated with any user -- free to use
-                try:  # assume user already has a code in the same activity
-                    a = request.user.code_set.get(activity=c.activity)
+                try:  # assume user already has a code in the same episode
+                    a = request.user.code_set.get(episode=c.episode)
                     if c.category.points > a.category.points:  # new code has more points than existing one
 
                         # Since the user already has an evaluation (submitted a code previously),
                         # we'll get that evaluation and update it rather than create a new one.
-                        evaluation = Evaluation.objects.get(evaluator=request.user, activity=c.activity)
+                        evaluation = Evaluation.objects.get(evaluator=request.user, episode=c.episode)
                         eval_form = EvaluationForm(request.POST, instance=evaluation)
                         if eval_form.is_valid():
 
@@ -104,10 +82,10 @@ def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code s
                             message = u"يرجى التأكد من تعبئة تقييم النشاط بشكل صحيح."
 
                     else:  # new code has equal or less points than existing one
-                        # show message: you have codes in the same activity
+                        # show message: you have codes in the same episode
                         message_type = "-danger"
                         message = u"لا يمكن إدخال هذا الرمز؛ لديك رمز نقاطي آخر في نفس النشاط ذو قيمة مساوية أو أكبر."
-                except (KeyError, Code.DoesNotExist):  # no codes in the same activity
+                except (KeyError, Code.DoesNotExist):  # no codes in the same episode
                     # redeem & show success message --- default behavior
                     if eval_form.is_valid():
                         c.user = request.user

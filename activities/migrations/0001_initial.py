@@ -1,21 +1,119 @@
 # -*- coding: utf-8 -*-
 from south.utils import datetime_utils as datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
 
-class Migration(DataMigration):
+
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        "Write your forwards methods here."
-        # Note: Don't use "from appname.models import ModelName". 
-        # Use orm.ModelName to refer to models in this application,
-        # and orm['appname.ModelName'] for models in other applications.
-        orm.Episode.objects.update(requires_report=True, requires_story=True)
+        # Adding model 'Activity'
+        db.create_table(u'activities_activity', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('primary_club', self.gf('django.db.models.fields.related.ForeignKey')(related_name='primary_activity', null=True, on_delete=models.SET_NULL, to=orm['clubs.Club'])),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=200)),
+            ('description', self.gf('django.db.models.fields.TextField')()),
+            ('public_description', self.gf('django.db.models.fields.TextField')()),
+            ('requirements', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('submitter', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.SET_NULL)),
+            ('submission_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('edit_date', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+            ('is_editable', self.gf('django.db.models.fields.BooleanField')(default=True)),
+            ('inside_collaborators', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('outside_collaborators', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('participants', self.gf('django.db.models.fields.IntegerField')()),
+            ('category', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['activities.Category'], null=True, on_delete=models.SET_NULL)),
+            ('organizers', self.gf('django.db.models.fields.IntegerField')()),
+        ))
+        db.send_create_signal(u'activities', ['Activity'])
+
+        # Adding M2M table for field secondary_clubs on 'Activity'
+        m2m_table_name = db.shorten_name(u'activities_activity_secondary_clubs')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('activity', models.ForeignKey(orm[u'activities.activity'], null=False)),
+            ('club', models.ForeignKey(orm[u'clubs.club'], null=False))
+        ))
+        db.create_unique(m2m_table_name, ['activity_id', 'club_id'])
+
+        # Adding model 'Review'
+        db.create_table(u'activities_review', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('activity', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['activities.Activity'])),
+            ('reviewer', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.SET_NULL)),
+            ('review_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('edit_date', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, null=True, blank=True)),
+            ('clubs_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('name_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('datetime_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('description_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('requirement_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('inside_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('outside_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('participants_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('organizers_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('submission_date_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('review_type', self.gf('django.db.models.fields.CharField')(default='P', max_length=1)),
+            ('is_approved', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
+        ))
+        db.send_create_signal(u'activities', ['Review'])
+
+        # Adding model 'Episode'
+        db.create_table(u'activities_episode', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('activity', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['activities.Activity'])),
+            ('start_date', self.gf('django.db.models.fields.DateField')()),
+            ('end_date', self.gf('django.db.models.fields.DateField')()),
+            ('start_time', self.gf('django.db.models.fields.TimeField')()),
+            ('end_time', self.gf('django.db.models.fields.TimeField')()),
+            ('location', self.gf('django.db.models.fields.CharField')(max_length=128)),
+            ('requires_report', self.gf('django.db.models.fields.BooleanField')(default=True)),
+            ('can_report_early', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('requires_story', self.gf('django.db.models.fields.BooleanField')(default=True)),
+        ))
+        db.send_create_signal(u'activities', ['Episode'])
+
+        # Adding model 'Category'
+        db.create_table(u'activities_category', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('ar_name', self.gf('django.db.models.fields.CharField')(max_length=50)),
+            ('en_name', self.gf('django.db.models.fields.CharField')(max_length=50)),
+            ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('parent', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['activities.Category'], null=True, on_delete=models.SET_NULL, blank=True)),
+        ))
+        db.send_create_signal(u'activities', ['Category'])
+
+        # Adding model 'Evaluation'
+        db.create_table(u'activities_evaluation', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('activity', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['activities.Activity'])),
+            ('evaluator', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('quality', self.gf('django.db.models.fields.PositiveIntegerField')()),
+            ('relevance', self.gf('django.db.models.fields.PositiveIntegerField')()),
+        ))
+        db.send_create_signal(u'activities', ['Evaluation'])
+
 
     def backwards(self, orm):
-        "Write your backwards methods here."
-        raise RuntimeError("This migration is irreversible.")
+        # Deleting model 'Activity'
+        db.delete_table(u'activities_activity')
+
+        # Removing M2M table for field secondary_clubs on 'Activity'
+        db.delete_table(db.shorten_name(u'activities_activity_secondary_clubs'))
+
+        # Deleting model 'Review'
+        db.delete_table(u'activities_review')
+
+        # Deleting model 'Episode'
+        db.delete_table(u'activities_episode')
+
+        # Deleting model 'Category'
+        db.delete_table(u'activities_category')
+
+        # Deleting model 'Evaluation'
+        db.delete_table(u'activities_evaluation')
+
 
     models = {
         u'activities.activity': {
@@ -151,4 +249,3 @@ class Migration(DataMigration):
     }
 
     complete_apps = ['activities']
-    symmetrical = True

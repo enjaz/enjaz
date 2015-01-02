@@ -1,23 +1,226 @@
 # -*- coding: utf-8 -*-
 from south.utils import datetime_utils as datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
 
-class Migration(DataMigration):
+
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        "Write your forwards methods here."
-        # Note: Don't use "from appname.models import ModelName". 
-        # Use orm.ModelName to refer to models in this application,
-        # and orm['appname.ModelName'] for models in other applications.
-        for report in orm.FollowUpReport.objects.all():
-            if report.images:
-                report.followupreportimage_set.create(image=report.images)
+        # Adding model 'FollowUpReport'
+        db.create_table(u'media_followupreport', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('episode', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['activities.Episode'], unique=True)),
+            ('submitter', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('date_submitted', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('description', self.gf('django.db.models.fields.TextField')()),
+            ('start_date', self.gf('django.db.models.fields.DateField')()),
+            ('end_date', self.gf('django.db.models.fields.DateField')()),
+            ('start_time', self.gf('django.db.models.fields.TimeField')()),
+            ('end_time', self.gf('django.db.models.fields.TimeField')()),
+            ('location', self.gf('django.db.models.fields.CharField')(max_length=128)),
+            ('organizer_count', self.gf('django.db.models.fields.IntegerField')()),
+            ('participant_count', self.gf('django.db.models.fields.IntegerField')()),
+            ('announcement_sites', self.gf('django.db.models.fields.TextField')()),
+            ('notes', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+        ))
+        db.send_create_signal(u'media', ['FollowUpReport'])
+
+        # Adding model 'FollowUpReportImage'
+        db.create_table(u'media_followupreportimage', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('report', self.gf('django.db.models.fields.related.ForeignKey')(related_name='images', to=orm['media.FollowUpReport'])),
+            ('image', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
+        ))
+        db.send_create_signal(u'media', ['FollowUpReportImage'])
+
+        # Adding model 'ReportComment'
+        db.create_table(u'media_reportcomment', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('body', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('author', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('report', self.gf('django.db.models.fields.related.ForeignKey')(related_name='comments', to=orm['media.FollowUpReport'])),
+        ))
+        db.send_create_signal(u'media', ['ReportComment'])
+
+        # Adding model 'Story'
+        db.create_table(u'media_story', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('episode', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['activities.Episode'], unique=True)),
+            ('writer', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('date_submitted', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=128)),
+            ('text', self.gf('django.db.models.fields.TextField')()),
+        ))
+        db.send_create_signal(u'media', ['Story'])
+
+        # Adding model 'Article'
+        db.create_table(u'media_article', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('author', self.gf('django.db.models.fields.related.ForeignKey')(related_name=u'authored_articles', to=orm['auth.User'])),
+            ('author_photo', self.gf('django.db.models.fields.files.ImageField')(max_length=100)),
+            ('date_submitted', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=128)),
+            ('text', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+            ('attachment', self.gf('django.db.models.fields.files.FileField')(max_length=100, null=True, blank=True)),
+            ('status', self.gf('django.db.models.fields.CharField')(default='P', max_length=1)),
+            ('assignee', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, blank=True)),
+        ))
+        db.send_create_signal(u'media', ['Article'])
+
+        # Adding model 'StoryReview'
+        db.create_table(u'media_storyreview', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('reviewer', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('date_reviewed', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('notes', self.gf('django.db.models.fields.TextField')()),
+            ('approve', self.gf('django.db.models.fields.BooleanField')()),
+            ('story', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['media.Story'], unique=True)),
+        ))
+        db.send_create_signal(u'media', ['StoryReview'])
+
+        # Adding model 'ArticleReview'
+        db.create_table(u'media_articlereview', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('reviewer', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('date_reviewed', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('notes', self.gf('django.db.models.fields.TextField')()),
+            ('approve', self.gf('django.db.models.fields.BooleanField')()),
+            ('article', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['media.Article'])),
+        ))
+        db.send_create_signal(u'media', ['ArticleReview'])
+
+        # Adding model 'StoryTask'
+        db.create_table(u'media_storytask', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('assigner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('date_assigned', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('completed', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('episode', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['activities.Episode'], unique=True)),
+            ('assignee', self.gf('django.db.models.fields.related.ForeignKey')(related_name='assigned_storytasks', to=orm['auth.User'])),
+            ('story', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['media.Story'], unique=True, null=True, blank=True)),
+        ))
+        db.send_create_signal(u'media', ['StoryTask'])
+
+        # Adding model 'CustomTask'
+        db.create_table(u'media_customtask', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('assigner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('date_assigned', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('completed', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('assignee', self.gf('django.db.models.fields.related.ForeignKey')(related_name='assigned_tasks', to=orm['auth.User'])),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=140)),
+            ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+            ('due_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
+            ('completed_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
+        ))
+        db.send_create_signal(u'media', ['CustomTask'])
+
+        # Adding model 'TaskComment'
+        db.create_table(u'media_taskcomment', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('body', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('author', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('task', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['media.CustomTask'])),
+        ))
+        db.send_create_signal(u'media', ['TaskComment'])
+
+        # Adding model 'Poll'
+        db.create_table(u'media_poll', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('poll_type', self.gf('django.db.models.fields.IntegerField')()),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=128)),
+            ('text', self.gf('django.db.models.fields.TextField')()),
+            ('date_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('image', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
+            ('open_date', self.gf('django.db.models.fields.DateTimeField')()),
+            ('close_date', self.gf('django.db.models.fields.DateTimeField')()),
+            ('creator', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+        ))
+        db.send_create_signal(u'media', ['Poll'])
+
+        # Adding model 'PollChoice'
+        db.create_table(u'media_pollchoice', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('poll', self.gf('django.db.models.fields.related.ForeignKey')(related_name='choices', to=orm['media.Poll'])),
+            ('value', self.gf('django.db.models.fields.CharField')(max_length=128)),
+            ('color', self.gf('django.db.models.fields.CharField')(default='green', max_length=128)),
+        ))
+        db.send_create_signal(u'media', ['PollChoice'])
+
+        # Adding model 'PollResponse'
+        db.create_table(u'media_pollresponse', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('poll', self.gf('django.db.models.fields.related.ForeignKey')(related_name='responses', to=orm['media.Poll'])),
+            ('date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('choice', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['media.PollChoice'])),
+        ))
+        db.send_create_signal(u'media', ['PollResponse'])
+
+        # Adding unique constraint on 'PollResponse', fields ['poll', 'user']
+        db.create_unique(u'media_pollresponse', ['poll_id', 'user_id'])
+
+        # Adding model 'PollComment'
+        db.create_table(u'media_pollcomment', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('body', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('author', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('poll', self.gf('django.db.models.fields.related.ForeignKey')(related_name='comments', to=orm['media.Poll'])),
+        ))
+        db.send_create_signal(u'media', ['PollComment'])
+
 
     def backwards(self, orm):
-        "Write your backwards methods here."
-        raise RuntimeError("This migration is irreversible.")
+        # Removing unique constraint on 'PollResponse', fields ['poll', 'user']
+        db.delete_unique(u'media_pollresponse', ['poll_id', 'user_id'])
+
+        # Deleting model 'FollowUpReport'
+        db.delete_table(u'media_followupreport')
+
+        # Deleting model 'FollowUpReportImage'
+        db.delete_table(u'media_followupreportimage')
+
+        # Deleting model 'ReportComment'
+        db.delete_table(u'media_reportcomment')
+
+        # Deleting model 'Story'
+        db.delete_table(u'media_story')
+
+        # Deleting model 'Article'
+        db.delete_table(u'media_article')
+
+        # Deleting model 'StoryReview'
+        db.delete_table(u'media_storyreview')
+
+        # Deleting model 'ArticleReview'
+        db.delete_table(u'media_articlereview')
+
+        # Deleting model 'StoryTask'
+        db.delete_table(u'media_storytask')
+
+        # Deleting model 'CustomTask'
+        db.delete_table(u'media_customtask')
+
+        # Deleting model 'TaskComment'
+        db.delete_table(u'media_taskcomment')
+
+        # Deleting model 'Poll'
+        db.delete_table(u'media_poll')
+
+        # Deleting model 'PollChoice'
+        db.delete_table(u'media_pollchoice')
+
+        # Deleting model 'PollResponse'
+        db.delete_table(u'media_pollresponse')
+
+        # Deleting model 'PollComment'
+        db.delete_table(u'media_pollcomment')
+
 
     models = {
         u'activities.activity': {
@@ -50,10 +253,13 @@ class Migration(DataMigration):
         u'activities.episode': {
             'Meta': {'object_name': 'Episode'},
             'activity': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['activities.Activity']"}),
+            'can_report_early': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'end_date': ('django.db.models.fields.DateField', [], {}),
             'end_time': ('django.db.models.fields.TimeField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'location': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
+            'requires_report': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'requires_story': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'start_date': ('django.db.models.fields.DateField', [], {}),
             'start_time': ('django.db.models.fields.TimeField', [], {})
         },
@@ -161,7 +367,6 @@ class Migration(DataMigration):
             'end_time': ('django.db.models.fields.TimeField', [], {}),
             'episode': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['activities.Episode']", 'unique': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'images': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'location': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'notes': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'organizer_count': ('django.db.models.fields.IntegerField', [], {}),
@@ -174,7 +379,7 @@ class Migration(DataMigration):
             'Meta': {'object_name': 'FollowUpReportImage'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'image': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
-            'report': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['media.FollowUpReport']"})
+            'report': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'images'", 'to': u"orm['media.FollowUpReport']"})
         },
         u'media.poll': {
             'Meta': {'object_name': 'Poll'},
@@ -198,7 +403,7 @@ class Migration(DataMigration):
         u'media.pollcomment': {
             'Meta': {'object_name': 'PollComment'},
             'author': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            'body': ('django.db.models.fields.TextField', [], {}),
+            'body': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'poll': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'comments'", 'to': u"orm['media.Poll']"})
@@ -210,6 +415,14 @@ class Migration(DataMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'poll': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'responses'", 'to': u"orm['media.Poll']"}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
+        },
+        u'media.reportcomment': {
+            'Meta': {'object_name': 'ReportComment'},
+            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
+            'body': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'report': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'comments'", 'to': u"orm['media.FollowUpReport']"})
         },
         u'media.story': {
             'Meta': {'object_name': 'Story'},
@@ -250,4 +463,3 @@ class Migration(DataMigration):
     }
 
     complete_apps = ['media']
-    symmetrical = True

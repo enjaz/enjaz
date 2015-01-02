@@ -18,7 +18,8 @@
 		<th>محتوى الطلب</th>
 		<th><!-- التصرف: قبول أو رفض الطلب كاملاً --></th>
 	</tr>
-	{% for order in activity.code_order_set.all %}
+	{% for episode in activity.episode_set.all %}
+    {% for order in episode.code_order_set.all %}
 	{% if not order.is_reviewed %}
 		<tr>
 			<td>{{ order.date_ordered }}</td>
@@ -51,6 +52,7 @@
 		</tr>
 	{% endif %}
 	{% endfor %}
+    {% endfor %}
 </table>
 {% endfor %}
 {% else %}

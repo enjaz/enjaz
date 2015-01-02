@@ -76,7 +76,7 @@ class ActivityAdmin(admin.ModelAdmin):
 
 class EvaluationAdmin(admin.ModelAdmin):
     readonly_fields = ('relevance', 'quality')
-    list_display = ('activity', 'evaluator', 'relevance', 'quality')
+    list_display = ('episode', 'evaluator', 'relevance', 'quality')
 
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(Category)

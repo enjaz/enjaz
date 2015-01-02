@@ -236,7 +236,7 @@ def view_orders(request, activity_id):
                                                            'form': OrderForm(activity=activity),
                                                            'active_tab': 'niqati'})
 
-# TODO: make neater; change url name from activities:niqati_orders to activities:niqati
+
 @login_required
 def coordinator_view(request, activity_id):
     """
@@ -297,10 +297,10 @@ def approve_codes(request):
 
                 # Send email notification after code generation
                 email_context = {'order': order}
-                if order.activity.primary_club.coordinator:
-                    recipient = order.activity.primary_club.coordinator.email
+                if order.episode.activity.primary_club.coordinator:
+                    recipient = order.episode.activity.primary_club.coordinator.email
                 else:
-                    recipient = order.activity.submitter.email
+                    recipient = order.episode.activity.submitter.email
                 mail.send([recipient],
                           template="niqati_order_reject",
                           context=email_context)
@@ -321,8 +321,8 @@ def approve_codes(request):
     unapproved_collec = Code_Collection.objects.filter(approved=None)
     activities = []
     for collec in unapproved_collec:
-        if not collec.parent_order.activity in activities:
-            activities.append(collec.parent_order.activity)
+        if not collec.parent_order.episode.activity in activities:
+            activities.append(collec.parent_order.episode.activity)
     context = {'unapproved_collec': unapproved_collec, 'activities': activities}
     return render(request, 'niqati/approve.html', context)
 

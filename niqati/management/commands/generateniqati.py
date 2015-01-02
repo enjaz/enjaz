@@ -43,7 +43,7 @@ class Command(BaseCommand):
                 if order.get_delivery_type() == '0':  # Coupon
                     # Check if the order is currently being processed; if so, abort
                     if not any([os.path.isfile('codes_' + str(collec.pk) + '.pdf') for collec in order.code_collection_set.all()]):
-                        print "  Processing order number ", order.pk, " for the activity ", order.activity
+                        print "  Processing order number ", order.pk, " for the episode ", order.episode
                         try:
                             order.process(submit_link)
                             print "  ", timezone.now()
@@ -59,7 +59,7 @@ class Command(BaseCommand):
                     # Check if the order is currently being processed; if so, abort
                     if not any([os.path.isfile('links_' + str(collec.pk) + '.html') for collec in order.code_collection_set.all()]):
                         print "  Order not currently being processed."
-                        print "  Processing order number ", order.pk, " for the activity ", order.activity
+                        print "  Processing order number ", order.pk, " for the episode ", order.episode
                         try:
                             order.process(submit_link)
                             print "  ", timezone.now()

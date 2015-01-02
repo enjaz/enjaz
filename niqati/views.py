@@ -172,8 +172,9 @@ def create_codes(request, activity_id):
        and not request.user.is_superuser:
         raise PermissionDenied
 
-    form = OrderForm(request.POST)
+    form = OrderForm(request.POST, activity=activity)
     if form.is_valid():
+        episode = form.cleaned_data['episode']
         idea_c = form.cleaned_data['idea']  # idea count
         org_c = form.cleaned_data['organizer']  # org count
         par_c = form.cleaned_data['participant']  # participant count
@@ -182,7 +183,7 @@ def create_codes(request, activity_id):
 
         # create the Code_Order
         if idea_c > 0 or org_c > 0 or par_c > 0:  # if code count > 0
-            o = Code_Order.objects.create(activity=activity)
+            o = Code_Order.objects.create(episode=episode)
 
             # create the Code_Collections
             for cat in Category.objects.all():
@@ -195,13 +196,13 @@ def create_codes(request, activity_id):
                         x.approved = True
                     x.save()
 
-            # TODO: send email to presidency for approval
+            # send email to presidency for approval
             email_context = {'order': o}
-            if get_gender(activity.primary_club.coordinator) == 'M':
+            if get_gender(episode.activity.primary_club.coordinator) == 'M':
                 mail.send([MVP_EMAIL],
                           template="niqati_order_submit",
                           context=email_context)
-            elif get_gender(activity.primary_club.coordinator) == 'F':
+            elif get_gender(episode.activity.primary_club.coordinator) == 'F':
                 mail.send([FVP_EMAIL],
                           template="niqati_order_submit",
                           context=email_context)
@@ -210,28 +211,12 @@ def create_codes(request, activity_id):
         else:
             pass
             msg = u"لم تطلب أية أكواد!"
-        form = OrderForm()
+        form = OrderForm(activity=activity)
     else:
         msg = u"الرجاء تصحيح الأخطاء أدناه"
-    # return HttpResponseRedirect(reverse('activities:niqati_orders',
-    #                                     args=(activity_id, )))
     return render(request, 'niqati/activity_orders.html', {'activity': activity,
-                                                           'orders': activity.code_order_set.all(),
                                                            'form': form,
                                                            'msg': msg})
-
-# --- Deprecated ---
-# @login_required
-# @permission_required('niqati.view_order', raise_exception=True)
-# def view_orders(request):
-#     activities = Activity.objects.filter(
-#         Q(primary_club__coordinator=request.user),  # | Q(primary_club__members__contains=request.user),
-#
-#     )
-#
-#     context = {'activities': activities}
-#     return render(request, 'niqati/orders.html', context)
-# ---
 
 @login_required
 def view_orders(request, activity_id):
@@ -247,10 +232,8 @@ def view_orders(request, activity_id):
        and not request.user.is_superuser:
         raise PermissionDenied
 
-    orders = Code_Order.objects.filter(activity=activity)
     return render(request, 'niqati/activity_orders.html', {'activity': activity,
-                                                           'orders': orders,
-                                                           'form': OrderForm(),
+                                                           'form': OrderForm(activity=activity),
                                                            'active_tab': 'niqati'})
 
 # TODO: make neater; change url name from activities:niqati_orders to activities:niqati

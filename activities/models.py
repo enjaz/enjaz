@@ -419,7 +419,6 @@ class Category(models.Model):
 
 class Evaluation(models.Model):
     """ An activity evaluation filled by students upon Niqati code submission. """
-    activity = models.ForeignKey(Activity, null=True, blank=True)
     episode = models.ForeignKey(Episode)
     evaluator = models.ForeignKey(User)
 

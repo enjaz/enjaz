@@ -47,7 +47,7 @@ activity_forms_urls = url(r'^activities/(?P<object_id>\d+)/forms/',
          ### Submitter fields ###
          'submitter_fields': ('user.student_profile.get_ar_full_name|default:user.username',
                               'user.student_profile.get_en_full_name|default:user.username',
-                              'user.student_profile.student_number',
+                              'user.student_profile.student_id',
                               'user.student_profile.badge_number',
                               'user.student_profile.college',
                               'user.email',

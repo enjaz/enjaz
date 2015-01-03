@@ -5,6 +5,7 @@ from studentvoice import views
 
 urlpatterns = patterns('',
     url(r'^$', views.home, name='home'),
+   url(r'^about/$', views.about, name='about'),
     url(r'^create/$', views.create, name='create'),
     url(r'^search/', views.search, name='search'),
     url(r'^(?P<voice_id>\d+)/$', views.show, name='show'),

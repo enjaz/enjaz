@@ -42,9 +42,13 @@ FORMS_CURRENT_APP = "activity_forms"
 # * view participants in any activity of their club,
 # * receive notifications for activities they have submitted, [if vice, cc coordinator]
 # * submit media reports about any activity of their club,
+# * delete activities, as long as they are is_editable=True
 #
 # Members in general can:
 # * view pending and rejected activities of their club,
+#
+# Vice presidents can:
+# * delete activities regardless of their is_editable status.
 
 def list_activities(request):
     """
@@ -125,7 +129,7 @@ def list_activities(request):
 
 @login_required
 def show(request, activity_id):
-    activity = get_object_or_404(Activity, pk=activity_id)
+    activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
 
     # The activity object is the only thing that should be in the context  [Saeed, 17 Jun 2014]    
     context = {'activity': activity}
@@ -254,7 +258,7 @@ def create(request):
 
 @login_required
 def edit(request, activity_id):
-    activity = get_object_or_404(Activity, pk=activity_id)
+    activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
     coordination_status = has_coordination_to_activity(request.user, activity)
 
     # If the user is neither the submitter, nor has the permission to
@@ -328,8 +332,38 @@ def edit(request, activity_id):
         return render(request, 'activities/new.html', context)
 
 @login_required
+def delete(request,activity_id):
+    activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
+    coordination_status = has_coordination_to_activity(request.user, activity)
+    context = {'activity': activity}
+    # If the user is neither the submitter, nor has the permission to
+    # change activities (i.e. not part of the head of the Student
+    # Club, or the Media Team), nor a coordinator or deputy of any of
+    # the organizing clubs, raise a PermissionDenied error.
+    if not request.user == activity.submitter and \
+       not request.user.has_perm('activities.change_activity') and \
+       not coordination_status:
+        raise PermissionDenied
+    # If we are dealing with the coordinator or their deputies, we
+    # shouldn't allow them to delete unless the activity is editable.
+    # This also means that vice presidents can delte activities
+    # regardless of their is_editable status.
+    if (request.user == activity.submitter or coordination_status) \
+       and not activity.is_editable:
+        raise PermissionDenied
+    if request.method == 'POST':
+        if 'confirm' in request.POST:
+            activity.is_deleted = True
+            activity.is_editable = False
+            activity.save()
+            return HttpResponseRedirect(reverse('activities:list'))
+        else:
+            context['erorr_message'] = 'not_confirmed'
+    return render(request, 'activities/delete.html', context)
+
+@login_required
 def review(request, activity_id, lower_review_type=None):
-    activity = get_object_or_404(Activity, pk=activity_id)
+    activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
     # Check if the user is a coordinator or deputy of any of the
     # activity's primary or secondary clubs.
     coordination_status = has_coordination_to_activity(request.user, activity)
@@ -492,7 +526,7 @@ def review(request, activity_id, lower_review_type=None):
 
 @login_required
 def participate(request, activity_id):
-    activity = get_object_or_404(Activity, pk=activity_id)
+    activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
     context = {"activity": activity}
 
     # If the activity's registration is open, then redirect to the registration form

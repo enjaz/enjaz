@@ -73,10 +73,14 @@
 				{% endif %}
 
                 {# if the user can edit the activity... #}
-				{% if perms.activities.change_activity or request.user|has_coordination_to_activity:activity %}
+				{% if perms.activities.change_activity or request.user|has_coordination_to_activity:activity and activity.is_editable %}
 				<a href="{% url 'activities:edit' activity.pk %}" class="btn btn-default">
 					<i class="entypo-pencil"></i>
 					عدّل
+				</a>
+				<a href="{% url 'activities:delete' activity.pk %}" class="btn btn-default btn-red">
+					<i class="entypo-trash"></i>
+					احذف
 				</a>
 				{% endif %}
 			</div>

@@ -1,0 +1,21 @@
+{% extends 'activities_base.html' %}{% load bootstrap3 %}
+{% block title %}حذف {{ activity.name }}{% endblock %}
+{% block content %}
+<h2>حذف <a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a></h2>
+
+{% if error_message and error_message == 'not_conrifmed' %}<p class="alert alert-danger">لم تؤكد الحذف.</p>{% endif %}
+
+<p>هل أنت متأكد أنك تريد حذف <a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a>؟</p>
+
+<form action="{% url 'activities:delete' activity.pk %}" method="post" class="form">
+{% csrf_token %}
+    <input type="hidden" name="confirm" value="1"/>
+    {% buttons %}
+        <button type="submit" class="btn btn-red">
+            <i class="entypo-trash"></i> احذف
+        </button>
+    {% endbuttons %}
+</form>
+{% endblock %}
+
+

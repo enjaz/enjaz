@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.utils import timezone
@@ -41,28 +42,6 @@ def index(request):
 @login_required
 def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code submission requests
     if request.method == "POST":
-        # print request.POST
-        # form = SubmissionForm(instance=Code(code_string=request.POST['code_string'], user=request.user))
-        # form = SubmissionForm({'code_string':'XXX'})
-        # if form.is_valid():
-        #     pass
-        #     # form.save()
-        # else:
-        #     pass
-        # print form.error_class
-        # print type(form.error_class)
-        # for error in form.error_class:
-        #     print error
-        # # elif form.errors.code_string:
-        # #     pass
-        # # print form.errors
-        # # print form['code_string'].errors
-        # message = ""
-        # message_type = "-danger"
-        # eval_form = EvaluationForm()
-
-        # ----
-
         # format code first i.e. make upper case & remove spaces or dashes
         code = request.POST['code'].upper().replace(" ", "").replace("-", "")
 
@@ -72,18 +51,18 @@ def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code s
             # If the code exists, then initialize and check the evaluation form
             # Only if the code is actually saved, the evaluation will be saved, too.
             eval_form = EvaluationForm(request.POST,
-                                       instance=Evaluation(activity=c.activity,
+                                       instance=Evaluation(episode=c.episode,
                                                            evaluator=request.user))
             eval_form_valid = eval_form.is_valid()
 
             if not c.user:  # code isn't associated with any user -- free to use
-                try:  # assume user already has a code in the same activity
-                    a = request.user.code_set.get(activity=c.activity)
+                try:  # assume user already has a code in the same episode
+                    a = request.user.code_set.get(episode=c.episode)
                     if c.category.points > a.category.points:  # new code has more points than existing one
 
                         # Since the user already has an evaluation (submitted a code previously),
                         # we'll get that evaluation and update it rather than create a new one.
-                        evaluation = Evaluation.objects.get(evaluator=request.user, activity=c.activity)
+                        evaluation = Evaluation.objects.get(evaluator=request.user, episode=c.episode)
                         eval_form = EvaluationForm(request.POST, instance=evaluation)
                         if eval_form.is_valid():
 
@@ -94,20 +73,21 @@ def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code s
                             c.user = request.user
                             c.redeem_date = timezone.now()
                             c.save()
-                            message_type = "-info"
                             message = u"تم إدخال الرمز بنجاح و استبدال الرمز السابق لك في هذا النشاط."
+                            messages.add_message(request, messages.INFO, message)
 
                             eval_form.save()
                             eval_form = EvaluationForm()
                         else:
-                            message_type = "-danger"
                             message = u"يرجى التأكد من تعبئة تقييم النشاط بشكل صحيح."
+                            messages.add_message(request, messages.ERROR, message)
 
                     else:  # new code has equal or less points than existing one
-                        # show message: you have codes in the same activity
-                        message_type = "-danger"
+                        # show message: you have codes in the same episode
                         message = u"لا يمكن إدخال هذا الرمز؛ لديك رمز نقاطي آخر في نفس النشاط ذو قيمة مساوية أو أكبر."
-                except (KeyError, Code.DoesNotExist):  # no codes in the same activity
+                        messages.add_message(request, messages.ERROR, message)
+
+                except (KeyError, Code.DoesNotExist):  # no codes in the same episode
                     # redeem & show success message --- default behavior
                     if eval_form.is_valid():
                         c.user = request.user
@@ -115,31 +95,31 @@ def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code s
                         c.save()
 
                         eval_form.save()
-                        eval_form = EvaluationForm()
 
-                        message_type = "-success"
                         message = u"تم تسجيل الرمز بنجاح."
+                        messages.add_message(request, messages.SUCCESS, message)
+
                     else:
-                        message_type = "-danger"
                         message = u"يرجى التأكد من تعبئة تقييم النشاط بشكل صحيح."
+                        messages.add_message(request, messages.ERROR, message)
 
             elif c.user == request.user:  # user has used the same code before
                 # show message: you have used this code before
-                message_type = "-danger"
                 message = u"لقد استخدمت هذا الرمز من قبل؛ لا يمكنك استخدامه مرة أخرى"
+                messages.add_message(request, messages.ERROR, message)
+
             else:  # code is used by another user
                 # show message: code not available (used by other)
-                message_type = "-danger"
                 message = u"هذا الرمز غير متوفر."
+                messages.add_message(request, messages.ERROR, message)
+
         except (KeyError, Code.DoesNotExist):  # code does not exist
             # show message: code doesn't exist
-            message_type = "-danger"
             message = u"هذا الرمز غير صحيح."
-            eval_form = EvaluationForm()
-        return render(request, 'niqati/submit.html', {'message_type': message_type,
-                                                      'message': message,
-                                                      # 'form': form,
-                                                      'eval_form': eval_form})
+            messages.add_message(request, messages.ERROR, message)
+
+        return HttpResponseRedirect(reverse("niqati:submit"))
+
     else:  # request method is not POST
         return render(request, 'niqati/submit.html', {'code_to_redeem': code,
                                                       'eval_form': EvaluationForm()})
@@ -172,8 +152,9 @@ def create_codes(request, activity_id):
        and not request.user.is_superuser:
         raise PermissionDenied
 
-    form = OrderForm(request.POST)
+    form = OrderForm(request.POST, activity=activity)
     if form.is_valid():
+        episode = form.cleaned_data['episode']
         idea_c = form.cleaned_data['idea']  # idea count
         org_c = form.cleaned_data['organizer']  # org count
         par_c = form.cleaned_data['participant']  # participant count
@@ -182,7 +163,7 @@ def create_codes(request, activity_id):
 
         # create the Code_Order
         if idea_c > 0 or org_c > 0 or par_c > 0:  # if code count > 0
-            o = Code_Order.objects.create(activity=activity)
+            o = Code_Order.objects.create(episode=episode)
 
             # create the Code_Collections
             for cat in Category.objects.all():
@@ -195,43 +176,30 @@ def create_codes(request, activity_id):
                         x.approved = True
                     x.save()
 
-            # TODO: send email to presidency for approval
+            # send email to presidency for approval
             email_context = {'order': o}
-            if get_gender(activity.primary_club.coordinator) == 'M':
+            if get_gender(episode.activity.primary_club.coordinator) == 'M':
                 mail.send([MVP_EMAIL],
                           template="niqati_order_submit",
                           context=email_context)
-            elif get_gender(activity.primary_club.coordinator) == 'F':
+            elif get_gender(episode.activity.primary_club.coordinator) == 'F':
                 mail.send([FVP_EMAIL],
                           template="niqati_order_submit",
                           context=email_context)
             
             msg = u"تم إرسال الطلب؛ و سيتم إنشاء النقاط فور الموافقة عليه"
+            messages.add_message(request, messages.SUCCESS, msg)
         else:
-            pass
             msg = u"لم تطلب أية أكواد!"
-        form = OrderForm()
+            messages.add_message(request, messages.WARNING, msg)
+        form = OrderForm(activity=activity)
     else:
-        msg = u"الرجاء تصحيح الأخطاء أدناه"
-    # return HttpResponseRedirect(reverse('activities:niqati_orders',
-    #                                     args=(activity_id, )))
-    return render(request, 'niqati/activity_orders.html', {'activity': activity,
-                                                           'orders': activity.code_order_set.all(),
-                                                           'form': form,
-                                                           'msg': msg})
-
-# --- Deprecated ---
-# @login_required
-# @permission_required('niqati.view_order', raise_exception=True)
-# def view_orders(request):
-#     activities = Activity.objects.filter(
-#         Q(primary_club__coordinator=request.user),  # | Q(primary_club__members__contains=request.user),
-#
-#     )
-#
-#     context = {'activities': activities}
-#     return render(request, 'niqati/orders.html', context)
-# ---
+        msg = u"الرجاء ملء النموذج بشكل صحيح."
+        messages.add_message(request, messages.ERROR, msg)
+    return HttpResponseRedirect(reverse("activities:niqati_orders", args=(activity.id, )))
+    # return render(request, 'niqati/activity_orders.html', {'activity': activity,
+    #                                                        'form': form,
+    #                                                        'msg': msg})
 
 @login_required
 def view_orders(request, activity_id):
@@ -247,13 +215,11 @@ def view_orders(request, activity_id):
        and not request.user.is_superuser:
         raise PermissionDenied
 
-    orders = Code_Order.objects.filter(activity=activity)
     return render(request, 'niqati/activity_orders.html', {'activity': activity,
-                                                           'orders': orders,
-                                                           'form': OrderForm(),
+                                                           'form': OrderForm(activity=activity),
                                                            'active_tab': 'niqati'})
 
-# TODO: make neater; change url name from activities:niqati_orders to activities:niqati
+
 @login_required
 def coordinator_view(request, activity_id):
     """
@@ -314,10 +280,10 @@ def approve_codes(request):
 
                 # Send email notification after code generation
                 email_context = {'order': order}
-                if order.activity.primary_club.coordinator:
-                    recipient = order.activity.primary_club.coordinator.email
+                if order.episode.activity.primary_club.coordinator:
+                    recipient = order.episode.activity.primary_club.coordinator.email
                 else:
-                    recipient = order.activity.submitter.email
+                    recipient = order.episode.activity.submitter.email
                 mail.send([recipient],
                           template="niqati_order_reject",
                           context=email_context)
@@ -335,11 +301,13 @@ def approve_codes(request):
             collec.approved = False
             collec.save()
 
+        return HttpResponseRedirect(reverse("niqati:approve"))
+
     unapproved_collec = Code_Collection.objects.filter(approved=None)
     activities = []
     for collec in unapproved_collec:
-        if not collec.parent_order.activity in activities:
-            activities.append(collec.parent_order.activity)
+        if not collec.parent_order.episode.activity in activities:
+            activities.append(collec.parent_order.episode.activity)
     context = {'unapproved_collec': unapproved_collec, 'activities': activities}
     return render(request, 'niqati/approve.html', context)
 
@@ -348,5 +316,5 @@ def approve_codes(request):
 @permission_required('niqati.view_general_report', raise_exception=True)
 def general_report(request):
     users = Niqati_User.objects.all()
-
+    users = sorted(users, key=lambda user: -user.total_points())  # sort users according to their points
     return render(request, 'niqati/general_report.html', {'users': users})

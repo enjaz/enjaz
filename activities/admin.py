@@ -69,14 +69,14 @@ class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'primary_club', 'category',
                     'submission_date', 'is_approved_by_presidency',
                     'is_approved_by_deanship', 'get_relevance_score_average',
-                    'get_quality_score_average')
+                    'get_quality_score_average', 'get_evaluation_count')
     list_filter = [CategoryFilter, SubmissionFilter, StatusFilter]
     readonly_fields = ('get_relevance_score_average', 'get_quality_score_average', )
     inlines = [EpisodeInline, ReviewInline]
 
 class EvaluationAdmin(admin.ModelAdmin):
     readonly_fields = ('relevance', 'quality')
-    list_display = ('activity', 'evaluator', 'relevance', 'quality')
+    list_display = ('episode', 'evaluator', 'relevance', 'quality')
 
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(Category)

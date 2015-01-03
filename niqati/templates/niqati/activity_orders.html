@@ -4,6 +4,8 @@
 
 {% block review_content %}
 
+{% for episode in activity.episode_set.all %}
+
 <div class="panel panel-primary panel-shadow" data-collapsed="0">		
 	<!-- panel body -->
 	<div class="panel-body with-table">
@@ -16,15 +18,17 @@
 		<thead>
 			<tr>
 				<th colspan="2">
-                    <h4>طلبات نقاطي</h4>
+                    <h4>{{ episode }}<br>
+                        {{ episode.start_date|date:"j F" }} - {{ episode.end_date|date:"j F" }} | {{ episode.start_time|time }} - {{ episode.end_time|time }} | {{ episode.location }}</h4>
 				</th>
 			</tr>
 		</thead>
 		
 		<tbody>
-			{% for order in orders %}
+			{% for order in episode.code_order_set.all %}
 			<tr>
-				<th>{{ order.date_ordered|date:"j F Y" }}</th>
+				<th>تاريخ الطلب:
+                    {{ order.date_ordered|date:"j F Y" }}</th>
 			    <td>
 			        <ul class="list-group">
 			        {# collections #}
@@ -48,7 +52,7 @@
 			</tr>
 			{% empty %}
 			<th colspan="2">
-				لا توجد طلبات نقاط لهذا النشاط.
+				لا توجد طلبات نقاط لهذا الموعد.
 			</th>
 			{% endfor %}
 		</tbody>
@@ -57,17 +61,36 @@
 	</div>
 </div>
 
+{% endfor %}
+
+{% if messages %}
+    {# <!-- FIXME: Ideally this kind of configuration should be in the base template, as to display any messages --> #}
+    {# <!-- passed through the messages framework. --> #}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        <p>{{ message }}</p>
+    </div>
+    {% endfor %}
+{% endif %}
+
 <div class="panel panel-primary panel-shadow" data-collapsed="0">
 	<!-- panel body -->
 	<div class="panel-body with-table">
           <table class="table table-bordered table-responsive">
-              <thead>
+            <thead>
 			<tr>
 				<th colspan="2">
-					{% include 'niqati/create_form.html' %}
+                    <h4>اطلب نقاطًا</h4>
 				</th>
 			</tr>
-		</thead>
+		    </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        {% include 'niqati/create_form.html' %}
+                    </td>
+                </tr>
+            </tbody>
           </table>
     </div>
 </div>

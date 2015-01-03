@@ -15,7 +15,7 @@ from django.core.files import File
 from django.conf import settings
 
 from post_office import mail
-from activities.models import Activity
+from activities.models import Activity, Episode
 from clubs.models import Club
 
 def generate_code(length):
@@ -52,7 +52,7 @@ class Code(models.Model):
     # Basic Properties
     code_string = models.CharField(max_length=16, unique=True) # a 16-digit string, unique throughout all the db
     category = models.ForeignKey(Category)
-    activity = models.ForeignKey(Activity)
+    episode = models.ForeignKey(Episode)
 
     # Generation-related
     collection = models.ForeignKey('Code_Collection')
@@ -222,7 +222,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 
 
 class Code_Order(models.Model): # consists of one Code_Collection or more
-    activity = models.ForeignKey(Activity, verbose_name=u"النشاط")
+    episode = models.ForeignKey(Episode, verbose_name=u"الموعد")
     date_ordered = models.DateTimeField(auto_now_add=True)
 
     def process(self, host):
@@ -232,10 +232,10 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
 
         # Send email notification after code generation
         email_context = {'order': self}
-        if self.activity.primary_club.coordinator:
-            recipient = self.activity.primary_club.coordinator.email
+        if self.episode.activity.primary_club.coordinator:
+            recipient = self.episode.activity.primary_club.coordinator.email
         else:
-            recipient = self.activity.submitter.email
+            recipient = self.episode.activity.submitter.email
         mail.send([recipient],
                   template="niqati_order_approve",
                   context=email_context)
@@ -268,7 +268,7 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
                 collec.save()
 
     def __unicode__(self):
-        return self.activity.name
+        return self.episode.__unicode__()
 
     class Meta:
         permissions = (

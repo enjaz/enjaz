@@ -1,4 +1,4 @@
-<!doctype html>
+<!doctype html>{% load staticfiles %}
 <html>
 <head>
 <meta charset="UTF-8">
@@ -93,7 +93,7 @@
           <div id="left">
             <div id="qr"><img src="{{ code.asset }}" width="180" height="180" alt=""/></div>
             <div dir="rtl" id="activity">
-              <div id="title">{{ code.collection.parent_order.activity.name }}</div>
+              <div id="title">{{ code.collection.parent_order.episode }}</div>
               <div id="role">{{ code.category.ar_label }}<!-- change to ar_label --></div>
             </div>
           </div>

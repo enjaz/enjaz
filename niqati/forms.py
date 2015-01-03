@@ -7,7 +7,10 @@ from niqati.models import Code_Collection  #, Code
 
 class OrderForm(forms.Form):
     def __init__(self, *args, **kwargs):
+        assert "activity" in kwargs, "Kwarg 'activity' is required."
+        activity = kwargs.pop("activity", None)
         super(OrderForm, self).__init__(*args, **kwargs)
+        self.fields['episode'] = forms.ModelChoiceField(activity.episode_set.all(), empty_label=u"اختر موعدًا ")
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control popover-default'
             if isinstance(self.fields[field], forms.IntegerField):

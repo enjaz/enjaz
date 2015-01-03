@@ -1,29 +1,56 @@
-{% extends "niqati_base.html" %}
+{% extends "niqati_base.html" %}{% load staticfiles %}
 {% block title %}التقرير العام{% endblock %}
 
 {% block content %}
 <style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;border-color:#ccc;}
-.tg td{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;}
-.tg th{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
-</style>
+    .points {
+        font-weight: bold !important;
+        color: #0088ff !important;
+        background-color: #eeeeee;
 
+    }
+</style>
 <div class="page-header">
-  <h3>نقاطي <small>التقرير العام</small></h3>
+  <h2>التقرير العام</h2>
 </div>
 
-<table class="table">
-  <tr>
-    <th>#</th>
-    <th>الاسم</th>
-    <th>عدد النقاط</th>
-  </tr>
+<table class="table datatable">
+    <thead>
+      <tr>
+        <th>الاسم بالعربية</th>
+        <th>الاسم بالإنجليزية</th>
+        <th>الكلية</th>
+        <th>الرقم الجامعي</th>
+        <th>البريد الإلكتروني</th>
+        <th>الجوال</th>
+        <th>عدد النقاط</th>
+      </tr>
+    </thead>
+    <tbody>
     {% for user in users %}
         <tr>
-            <td>{{ forloop.counter }}</td>
             <td>{{ user.student_profile.get_ar_full_name|default:user }}</td>
-            <td>{{ user.total_points }}</td>
+            <td>{{ user.student_profile.get_en_full_name|default:user }}</td>
+            <td>{{ user.student_profile.college }}</td>
+            <td>{{ user.student_profile.student_id }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.student_profile.mobile_number }}</td>
+            <td class="points">{{ user.total_points }}</td>
         </tr>
     {% endfor %}
+    </tbody>
 </table>
+{% endblock %}
+
+{% block customscript %}
+    <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript">
+    $(document).ready(function () {
+        $(".datatable").DataTable({
+            "order": [[ 6, "desc" ]],
+            "language": {% include 'js/dataTables-arabic.json' %}
+        });
+    });
+    </script>
 {% endblock %}

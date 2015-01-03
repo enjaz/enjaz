@@ -7,9 +7,7 @@
     {% csrf_token %}
 <div class="row">
     <div class="col-md-2">
-        <h4>
-        اطلب نقاطًا
-        </h4>
+        {{ form.episode }}
     </div>
     <div class="col-md-2">
         <div class="form-group{% if form.idea.errors %} has-error{% endif %}">

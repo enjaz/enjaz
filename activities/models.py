@@ -169,11 +169,24 @@ class Activity(models.Model):
         return next_episodes.first()
 
     # Evaluation-related
+    def get_evaluations(self):
+        """
+        Get all the evaluations from all the episodes of the activity
+        """
+        evaluations = []
+        for episode in self.episode_set.all():
+            evaluations.extend(episode.evaluation_set.all())
+        return evaluations
+
+    def get_evaluation_count(self):
+        return len(self.get_evaluations())
+    get_evaluation_count.short_description = u"عدد التقييمات"
+
     def get_relevance_score_average(self):
         """
         Return the average evaluation score for relevance to student needs.
         """
-        relevance_scores = [e.relevance for e in self.evaluation_set.all()]
+        relevance_scores = [e.relevance for e in self.get_evaluations()]
         return float(sum(relevance_scores))/len(relevance_scores) if len(relevance_scores) > 0 else 0
         # NOTE: the conditional is to avoid division by zero
     get_relevance_score_average.short_description = u"معدل تقييم ملاءمة النشاط"
@@ -182,7 +195,7 @@ class Activity(models.Model):
         """
         Return the average evaluation score for quality of the activity.
         """
-        quality_scores = [e.quality for e in self.evaluation_set.all()]
+        quality_scores = [e.quality for e in self.get_evaluations()]
         return float(sum(quality_scores))/len(quality_scores) if len(quality_scores) > 0 else 0
     get_quality_score_average.short_description = u"معدل تقييم جودة النشاط"
 
@@ -331,7 +344,24 @@ class Episode(models.Model):
             return end_datetime + timedelta(seconds=1)
         else:
             return end_datetime
-    
+
+    # Evaluation-related
+    # These functions are only (at least currently) to help calculate avg scores for an activity. Check ``Activity``.
+    def get_relevance_score(self):
+        """
+        Return the average evaluation score for relevance to student needs.
+        """
+        relevance_scores = [e.relevance for e in self.evaluation_set.all()]
+        return float(sum(relevance_scores))/len(relevance_scores) if len(relevance_scores) > 0 else 0
+        # NOTE: the conditional is to avoid division by zero
+
+    def get_quality_score(self):
+        """
+        Return the average evaluation score for quality of the activity.
+        """
+        quality_scores = [e.quality for e in self.evaluation_set.all()]
+        return float(sum(quality_scores))/len(quality_scores) if len(quality_scores) > 0 else 0
+
     # Media-related methods
 
     def report_due_date(self):
@@ -389,7 +419,7 @@ class Category(models.Model):
 
 class Evaluation(models.Model):
     """ An activity evaluation filled by students upon Niqati code submission. """
-    activity = models.ForeignKey(Activity)  # TODO: change to episode (when niqati.models.Code has been changed)
+    episode = models.ForeignKey(Episode)
     evaluator = models.ForeignKey(User)
 
     # Evaluation criteria, where evaluation is on a scale from 1 (lowest) to 5 (highest)

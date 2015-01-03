@@ -14,7 +14,6 @@
 </div>
 <table class="table">
   <tr>
-    <th>#</th>
     <th>النشاط</th>
     <th>دورك في النشاط</th>
     <th>عدد النقاط</th>
@@ -22,8 +21,7 @@
   </tr>
     {% for code in user.code_set.all %}
         <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ code.activity.name }}</td>
+            <td><a href="{% url 'activities:show' code.episode.activity.pk %}">{{ code.episode }}</a></td>
             <td>{{ code.category.ar_label }}</td>
             <td>{{ code.category.points }}</td>
             <td>{{ code.redeem_date }}</td>

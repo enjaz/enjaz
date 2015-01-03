@@ -421,6 +421,11 @@ body.login-page .login-content .alert-warning a {
 	color: #000;
 }
 
+.site-footer {
+	background: none repeat scroll 0% 0% #EEE;
+	padding: 30px;
+}
+
 /*RTL fixes*/
 .popover-content{
 	text-align: right;

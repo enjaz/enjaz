@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.utils import timezone
@@ -72,19 +73,20 @@ def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code s
                             c.user = request.user
                             c.redeem_date = timezone.now()
                             c.save()
-                            message_type = "-info"
                             message = u"تم إدخال الرمز بنجاح و استبدال الرمز السابق لك في هذا النشاط."
+                            messages.add_message(request, messages.INFO, message)
 
                             eval_form.save()
                             eval_form = EvaluationForm()
                         else:
-                            message_type = "-danger"
                             message = u"يرجى التأكد من تعبئة تقييم النشاط بشكل صحيح."
+                            messages.add_message(request, messages.ERROR, message)
 
                     else:  # new code has equal or less points than existing one
                         # show message: you have codes in the same episode
-                        message_type = "-danger"
                         message = u"لا يمكن إدخال هذا الرمز؛ لديك رمز نقاطي آخر في نفس النشاط ذو قيمة مساوية أو أكبر."
+                        messages.add_message(request, messages.ERROR, message)
+
                 except (KeyError, Code.DoesNotExist):  # no codes in the same episode
                     # redeem & show success message --- default behavior
                     if eval_form.is_valid():
@@ -93,31 +95,31 @@ def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code s
                         c.save()
 
                         eval_form.save()
-                        eval_form = EvaluationForm()
 
-                        message_type = "-success"
                         message = u"تم تسجيل الرمز بنجاح."
+                        messages.add_message(request, messages.SUCCESS, message)
+
                     else:
-                        message_type = "-danger"
                         message = u"يرجى التأكد من تعبئة تقييم النشاط بشكل صحيح."
+                        messages.add_message(request, messages.ERROR, message)
 
             elif c.user == request.user:  # user has used the same code before
                 # show message: you have used this code before
-                message_type = "-danger"
                 message = u"لقد استخدمت هذا الرمز من قبل؛ لا يمكنك استخدامه مرة أخرى"
+                messages.add_message(request, messages.ERROR, message)
+
             else:  # code is used by another user
                 # show message: code not available (used by other)
-                message_type = "-danger"
                 message = u"هذا الرمز غير متوفر."
+                messages.add_message(request, messages.ERROR, message)
+
         except (KeyError, Code.DoesNotExist):  # code does not exist
             # show message: code doesn't exist
-            message_type = "-danger"
             message = u"هذا الرمز غير صحيح."
-            eval_form = EvaluationForm()
-        return render(request, 'niqati/submit.html', {'message_type': message_type,
-                                                      'message': message,
-                                                      # 'form': form,
-                                                      'eval_form': eval_form})
+            messages.add_message(request, messages.ERROR, message)
+
+        return HttpResponseRedirect(reverse("niqati:submit"))
+
     else:  # request method is not POST
         return render(request, 'niqati/submit.html', {'code_to_redeem': code,
                                                       'eval_form': EvaluationForm()})
@@ -186,15 +188,18 @@ def create_codes(request, activity_id):
                           context=email_context)
             
             msg = u"تم إرسال الطلب؛ و سيتم إنشاء النقاط فور الموافقة عليه"
+            messages.add_message(request, messages.SUCCESS, msg)
         else:
-            pass
             msg = u"لم تطلب أية أكواد!"
+            messages.add_message(request, messages.WARNING, msg)
         form = OrderForm(activity=activity)
     else:
-        msg = u"الرجاء تصحيح الأخطاء أدناه"
-    return render(request, 'niqati/activity_orders.html', {'activity': activity,
-                                                           'form': form,
-                                                           'msg': msg})
+        msg = u"الرجاء ملء النموذج بشكل صحيح."
+        messages.add_message(request, messages.ERROR, msg)
+    return HttpResponseRedirect(reverse("activities:niqati_orders", args=(activity.id, )))
+    # return render(request, 'niqati/activity_orders.html', {'activity': activity,
+    #                                                        'form': form,
+    #                                                        'msg': msg})
 
 @login_required
 def view_orders(request, activity_id):
@@ -295,6 +300,8 @@ def approve_codes(request):
             collec = Code_Collection.objects.get(pk=pk)
             collec.approved = False
             collec.save()
+
+        return HttpResponseRedirect(reverse("niqati:approve"))
 
     unapproved_collec = Code_Collection.objects.filter(approved=None)
     activities = []

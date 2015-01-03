@@ -4,18 +4,12 @@
 
 <h2>إدخال النقاط</h2>
 
-{% comment %}
-{% for error in form.errors.code_string %}
-<div class="alert alert-danger">
-  {{ error }}
-</div>
-{% endfor %}
-{% endcomment %}
-
-{% if message %}
-<div class="alert alert{{ message_type }}">
-  {{ message }}
-</div>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          {{ message }}
+        </div>
+    {% endfor %}
 {% endif %}
 
 <div class="">

@@ -3,6 +3,7 @@ import datetime
 
 from django import forms
 from django.http import HttpResponseRedirect, Http404
+from constance import config
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
@@ -41,6 +42,14 @@ class ResponseForm(forms.ModelForm):
         model = Response
         fields = ['text']
 
+def about(request):
+    if request.user.is_authenticated():
+        template = 'studentvoice_base.html'
+    else:
+        template = 'front/front_base.html'
+
+    context = {'threshold': config.STUDENTVOICE_THRESHOLD, 'template': template}
+    return render(request, 'studentvoice/about.html', context)
 
 @login_required
 def home(request):

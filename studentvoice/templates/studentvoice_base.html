@@ -5,6 +5,7 @@
 
 {% block navbar %}
 	{% if perms.studentvoice.add_voice %}
+		<li><a href="{% url 'studentvoice:about' %}"><span class="glyphicon glyphicon-info-sign"></span> عن صوتك مسموع</a></li>
 		<li><a href="{% url 'studentvoice:create' %}"><span class="glyphicon glyphicon-plus"></span> أسمعنا صوتك!</a></li>
 	{% endif %}
 {% endblock %}

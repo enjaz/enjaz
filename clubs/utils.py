@@ -60,6 +60,9 @@ def has_coordination_to_activity(user, activity):
     # Return a Boolean 
     return bool(coordination_clubs.all())
 
+def get_deanship():
+    return Club.objects.get(english_name="Deanship of Student Affairs")
+
 def get_presidency():
     return Club.objects.get(english_name="Presidency")
 

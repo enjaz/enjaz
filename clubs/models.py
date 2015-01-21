@@ -126,6 +126,19 @@ class Club(models.Model):
         overdue_episodes = filter(lambda x: x.report_is_overdue(),
                                   episodes)
         return len(overdue_episodes)
+
+    def get_reviewer_parents(self):
+        """
+        Return the parents of this club that can write activity reviews, in order from the buttom-up.
+        """
+        if not self.parent:
+            return []
+        else:
+            parents = [self.parent]
+            while parents[-1].parent is not None:
+                parents.append(parents[-1].parent)
+            reviewing_parents = filter(lambda club: club.can_review, parents)
+            return reviewing_parents
         
     class Meta:
         # For the admin interface.

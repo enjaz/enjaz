@@ -73,7 +73,11 @@ class Activity(models.Model):
         else:
             return None
 
+    # TODO: remove
     def is_approved_by_deanship(self):
+        import warnings
+        warnings.warn("This utility function is no longer in use. It's so fixed!",
+                     DeprecationWarning)
         try:
             d_review = self.review_set.get(reviewer_club=get_deanship())
             return d_review.is_approved
@@ -82,7 +86,11 @@ class Activity(models.Model):
     is_approved_by_deanship.boolean = True
     is_approved_by_deanship.short_description = u"اعتمدته العمادة؟"
 
+    # TODO: remove
     def is_approved_by_presidency(self):
+        import warnings
+        warnings.warn("This utility function is no longer in use. It's so fixed!",
+                     DeprecationWarning)
         try:
             p_review = self.review_set.get(reviewer_club=get_presidency())
             return p_review.is_approved
@@ -92,14 +100,38 @@ class Activity(models.Model):
     is_approved_by_presidency.short_description = u"اعتمدته الرئاسة؟"
 
     def is_approved(self):
+        reviewer_parents = self.primary_club.get_reviewer_parents()
+        # If the club has no parents, activity is approved automatically
+        if len(reviewer_parents) == 0:
+            return True
+
+        # If the number of reviews is equal to the number of reviewing parents
+        # and all reviews are approved, then activity is approved
+        elif len(reviewer_parents) <= self.review_set.count() and \
+            all([review.is_approved for review in self.review_set.all()]):
+            return True
+
+        # If there is at least one review and there is any rejected review, then activity is rejected
+        elif len(reviewer_parents) > 0 and any([review.is_approved is False for review in self.review_set.all()]):
+            return False
+
+        # In all other cases, activity is pending
+        else:
+            return None
+
+    # TODO: remove
+    def is_approved_old(self):
+        import warnings
+        warnings.warn("This utility function is no longer in use. It's kept for archiving and testing purposes only!",
+                     DeprecationWarning)
         if self.get_approval_status() == 6:
             return True
         elif self.get_approval_status() == 2 or self.get_approval_status() == 5:
             return False
         else:
             return None
-        # return self.is_approved_by_deanship()
 
+    # TODO: remove
     def get_approval_status(self):
         """
         Returns the approval status of the activity as a number within the range 0 to 6, where 6 is approved.
@@ -130,15 +162,24 @@ class Activity(models.Model):
         """
         Return a verbose version of the approval status.
         """
-        return {0: u"لم تتم مراجعته بعد.",
-                1: u"ينتظر تعديلاً.",
-                2: u"رفضته رئاسة نادي الطلاب.",
-                3: u"ينتظر مراجعة عمادة شؤون الطلاب.",
-                4: u"ينتظر تعديلًا.",
-                5: u"رفضته عمادة شؤون الطلاب.",
-                6: u"تمت الموافقة على النشاط.",
-                None: u"غير معروف",
-                }[self.get_approval_status()]
+        approved = self.is_approved()
+        if approved:
+            return u"تمت الموافقة على النشاط."
+        elif approved is False:
+            return u"رُفض من قبل %s." % self.review_set.filter(is_approved=False).first().reviewer_club.name
+        elif approved is None:
+            # Either there is a pending review wating for edits...
+            if self.review_set.filter(is_approved=None).exists():
+                return u"ينتظر تعديلاً."
+            else:  # ... or we're waiting for the next club up the hierarchy to review activity
+                reviewer_parents = self.primary_club.get_reviewer_parents()
+                # Loop over the reviewer parents (remember they are in order, from bottom-up)
+                for parent in reviewer_parents:
+                    # The first parent that doesn't have a review for this activity will be the one
+                    # whose review is pending
+                    if not parent.reviews.filter(activity=self).exists():
+                        return u"ينتظر مراجعة %s." % parent.name
+                return u"غير معروف"
 
     def is_single_episode(self):
         return self.episode_set.count() == 1

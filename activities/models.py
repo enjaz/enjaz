@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from activities.managers import ActivityManager
 
 from clubs.models import College
+from clubs.utils import get_deanship, get_presidency
 from forms_builder.forms.models import Form
 from media.utils import REPORT_DUE_AFTER
 
@@ -74,7 +75,7 @@ class Activity(models.Model):
 
     def is_approved_by_deanship(self):
         try:
-            d_review = self.review_set.get(review_type='D')
+            d_review = self.review_set.get(reviewer_club=get_deanship())
             return d_review.is_approved
         except (KeyError, Review.DoesNotExist): # deanship review does not exist
             return None
@@ -83,7 +84,7 @@ class Activity(models.Model):
 
     def is_approved_by_presidency(self):
         try:
-            p_review = self.review_set.get(review_type='P')
+            p_review = self.review_set.get(reviewer_club=get_presidency())
             return p_review.is_approved
         except (KeyError, Review.DoesNotExist): # presidency review does not exist
             return None
@@ -106,23 +107,23 @@ class Activity(models.Model):
         reviews = self.review_set.all()
         if not reviews.exists():
             return 0
-        elif reviews.filter(review_type="P", is_approved=None).exists() and \
-            not reviews.filter(review_type="D").exists():
+        elif reviews.filter(reviewer_club=get_presidency(), is_approved=None).exists() and \
+            not reviews.filter(reviewer_club=get_deanship()).exists():
             return 1
-        elif reviews.filter(review_type="P", is_approved=False).exists() and \
-            not reviews.filter(review_type="D").exists():
+        elif reviews.filter(reviewer_club=get_presidency(), is_approved=False).exists() and \
+            not reviews.filter(reviewer_club=get_deanship()).exists():
             return 2
-        elif reviews.filter(review_type="P", is_approved=True).exists() and \
-            not reviews.filter(review_type="D").exists():
+        elif reviews.filter(reviewer_club=get_presidency(), is_approved=True).exists() and \
+            not reviews.filter(reviewer_club=get_deanship()).exists():
             return 3
-        elif reviews.filter(review_type="P", is_approved=True).exists() and \
-            reviews.filter(review_type="D", is_approved=None).exists():
+        elif reviews.filter(reviewer_club=get_presidency(), is_approved=True).exists() and \
+            reviews.filter(reviewer_club=get_deanship(), is_approved=None).exists():
             return 4
-        elif reviews.filter(review_type="P", is_approved=True).exists() and \
-            reviews.filter(review_type="D", is_approved=False).exists():
+        elif reviews.filter(reviewer_club=get_presidency(), is_approved=True).exists() and \
+            reviews.filter(reviewer_club=get_deanship(), is_approved=False).exists():
             return 5
-        elif reviews.filter(review_type="P", is_approved=True).exists() and \
-            reviews.filter(review_type="D", is_approved=True).exists():
+        elif reviews.filter(reviewer_club=get_presidency(), is_approved=True).exists() and \
+            reviews.filter(reviewer_club=get_deanship(), is_approved=True).exists():
             return 6
 
     def get_approval_status_message(self):

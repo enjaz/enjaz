@@ -1,4 +1,5 @@
 from django.db import models
+from clubs.utils import get_presidency, get_deanship
 
 
 class ActivityManager(models.Manager):
@@ -12,9 +13,9 @@ class ActivityManager(models.Manager):
         """
         # Approved activities are those that have an approved presidency review
         # and an approved deanship review
-        return self.filter(review__review_type="P",
+        return self.filter(review__reviewer_club=get_presidency(),
                            review__is_approved=True)\
-                   .filter(review__review_type="D",
+                   .filter(review__reviewer_club=get_deanship(),
                            review__is_approved=True)
 
     def pending(self):
@@ -22,16 +23,16 @@ class ActivityManager(models.Manager):
         Return a queryset of the current year's pending activities.
         """
         # Pending activities are those that are neither approved nor rejected.
-        return self.filter(review__review_type="P", review__is_approved=None).filter(review__review_type="D",
-                                                                                     review__is_approved=None)\
-            | self.filter(review__review_type="P", review__is_approved=True).filter(review__review_type="D",
-                                                                                    review__is_approved=None)\
-            | self.filter(review__review_type="P", review__is_approved=None).filter(review__review_type="D",
-                                                                                    review__is_approved=True)\
-            | self.filter(review__review_type="D").exclude(review__review_type=
-                                                           "P").exclude(review__is_approved=False)\
-            | self.filter(review__review_type="P").exclude(review__review_type=
-                                                           "D").exclude(review__is_approved=False)\
+        return self.filter(review__reviewer_club=get_presidency(), review__is_approved=None)\
+                     .filter(review__reviewer_club=get_deanship(), review__is_approved=None)\
+            | self.filter(review__reviewer_club=get_presidency(), review__is_approved=True)\
+                    .filter(review__reviewer_club=get_deanship(), review__is_approved=None)\
+            | self.filter(review__reviewer_club=get_presidency(), review__is_approved=None)\
+                    .filter(review__reviewer_club=get_deanship(), review__is_approved=True)\
+            | self.filter(review__reviewer_club=get_deanship())\
+                    .exclude(review__reviewer_club=get_presidency(),).exclude(review__is_approved=False)\
+            | self.filter(review__reviewer_club=get_presidency())\
+                    .exclude(review__reviewer_club=get_deanship(),).exclude(review__is_approved=False)\
             | self.filter(review__isnull=True)
 
     def rejected(self):

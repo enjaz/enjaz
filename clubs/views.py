@@ -10,7 +10,7 @@ from django.views.decorators import csrf
 from post_office import mail
 import unicodecsv
 
-from clubs.utils import is_coordinator, is_coordinator_or_member, is_member, is_coordinator_or_deputy
+from clubs.utils import is_coordinator, is_coordinator_or_member, is_member, is_coordinator_or_deputy, get_presidency
 from core import decorators
 from clubs.forms import DisabledClubForm, ClubForm
 from clubs.models import Club
@@ -44,7 +44,7 @@ def show(request, club_id):
         activities = club.primary_activity.all()
 
     elif request.user.has_perm('activities.add_deanship_review'):
-        activities = club.primary_activity.filter(review__review_type="P", review__is_approved=True)
+        activities = club.primary_activity.filter(review__reviewer_club=get_presidency(), review__is_approved=True)
 
     else:
         activities = club.primary_activity.approved()

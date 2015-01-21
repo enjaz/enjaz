@@ -3,7 +3,7 @@ Utility functions for the activities app.
 """
 import warnings
 from activities.models import Activity
-from clubs.utils import is_coordinator_or_deputy
+from clubs.utils import is_coordinator_or_deputy, get_deanship, get_presidency
 
 
 def get_approved_activities():
@@ -15,9 +15,9 @@ def get_approved_activities():
     # Approved activities are those that have an approved presidency review
     # and an approved deanship review
     # return Activity.objects.filter(approved_by_d, approved_by_p)
-    return Activity.objects.filter(review__review_type="P",
+    return Activity.objects.filter(review__reviewer_club=get_presidency(),
                                    review__is_approved=True)\
-                           .filter(review__review_type="D",
+                           .filter(review__reviewer_club=get_deanship(),
                                    review__is_approved=True)
 
 
@@ -39,16 +39,16 @@ def get_pending_activities():
     warnings.warn("This utility function will be removed soon. Use Activity.objects.pending() instead.",
                   DeprecationWarning)
     # Pending activities are those that are neither approved nor rejected.
-    return Activity.objects.filter(review__review_type="P", review__is_approved=None).filter(review__review_type="D",
-                                                                                             review__is_approved=None)\
-        |  Activity.objects.filter(review__review_type="P", review__is_approved=True).filter(review__review_type="D",
-                                                                                             review__is_approved=None)\
-        |  Activity.objects.filter(review__review_type="P", review__is_approved=None).filter(review__review_type="D",
-                                                                                             review__is_approved=True)\
-        |  Activity.objects.filter(review__review_type="D").exclude(review__review_type=
-                                                                    "P").exclude(review__is_approved=False)\
-        |  Activity.objects.filter(review__review_type="P").exclude(review__review_type=
-                                                                    "D").exclude(review__is_approved=False)\
+    return Activity.objects.filter(review__reviewer_club=get_presidency(), review__is_approved=None)\
+               .filter(review__reviewer_club=get_deanship(), review__is_approved=None)\
+        |  Activity.objects.filter(review__reviewer_club=get_presidency(), review__is_approved=True)\
+               .filter(review__reviewer_club=get_deanship(), review__is_approved=None)\
+        |  Activity.objects.filter(review__reviewer_club=get_presidency(), review__is_approved=None)\
+               .filter(review__reviewer_club=get_deanship(), review__is_approved=True)\
+        |  Activity.objects.filter(review__reviewer_club=get_deanship())\
+               .exclude(review__reviewer_club=get_presidency()).exclude(review__is_approved=False)\
+        |  Activity.objects.filter(review__reviewer_club=get_presidency())\
+               .exclude(review__reviewer_club=get_deanship()).exclude(review__is_approved=False)\
         |  Activity.objects.filter(review__isnull=True)
 
 

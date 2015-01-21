@@ -8,6 +8,9 @@ from activities.test_utils import create_activity
 
 
 # TODO: modify documentation to include get_rejected and get_pending
+from clubs.utils import get_presidency, get_deanship
+
+
 class ActivityGetterTests(TestCase):
     """
     Test suite for the get approved activities function.
@@ -67,9 +70,9 @@ class ActivityGetterTests(TestCase):
         Activity.objects.approved() nor Activity.objects.rejected() but in Activity.objects.pending()
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='P',
+                                                        reviewer_club=get_presidency(),
                                                         is_approved=None)
-        self.assertIn(self.p_review, self.activity.review_set.filter(review_type='P'))
+        self.assertIn(self.p_review, self.activity.review_set.filter(reviewer_club=get_presidency()))
         self.assertNotIn(self.activity, Activity.objects.approved())
         self.assertNotIn(self.activity, Activity.objects.rejected())
         self.assertIn(self.activity, Activity.objects.pending())
@@ -81,9 +84,9 @@ class ActivityGetterTests(TestCase):
         Activity.objects.approved() nor Activity.objects.pending() but in Activity.objects.rejected()
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='P',
+                                                        reviewer_club=get_presidency(),
                                                         is_approved=False)
-        self.assertIn(self.p_review, self.activity.review_set.filter(review_type='P'))
+        self.assertIn(self.p_review, self.activity.review_set.filter(reviewer_club=get_presidency()))
         self.assertNotIn(self.activity, Activity.objects.approved())
         self.assertIn(self.activity, Activity.objects.rejected())
         self.assertNotIn(self.activity, Activity.objects.pending())
@@ -95,10 +98,10 @@ class ActivityGetterTests(TestCase):
         Activity.objects.approved() nor rejected but in pending.
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='P',
+                                                        reviewer_club=get_presidency(),
                                                         is_approved=True)
-        self.assertIn(self.p_review, self.activity.review_set.filter(review_type='P'))
-        self.assertQuerysetEqual(self.activity.review_set.filter(review_type='D'),
+        self.assertIn(self.p_review, self.activity.review_set.filter(reviewer_club=get_presidency()))
+        self.assertQuerysetEqual(self.activity.review_set.filter(reviewer_club=get_deanship()),
                                  Review.objects.none())
         self.assertNotIn(self.activity, Activity.objects.approved())
         self.assertNotIn(self.activity, Activity.objects.rejected())
@@ -111,14 +114,14 @@ class ActivityGetterTests(TestCase):
         doesn't appear in Activity.objects.approved() nor rejected but in pending.
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='P',
+                                                        reviewer_club=get_presidency(),
                                                         is_approved=True)
-        self.assertIn(self.p_review, self.activity.review_set.filter(review_type='P'))
+        self.assertIn(self.p_review, self.activity.review_set.filter(reviewer_club=get_presidency()))
 
         self.d_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='D',
+                                                        reviewer_club=get_deanship(),
                                                         is_approved=None)
-        self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
+        self.assertIn(self.d_review, self.activity.review_set.filter(reviewer_club=get_deanship()))
         self.assertNotIn(self.activity, Activity.objects.approved())
         self.assertNotIn(self.activity, Activity.objects.rejected())
         self.assertIn(self.activity, Activity.objects.pending())
@@ -130,14 +133,14 @@ class ActivityGetterTests(TestCase):
         doesn't appear in Activity.objects.approved() nor pending but rejected.
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='P',
+                                                        reviewer_club=get_presidency(),
                                                         is_approved=True)
-        self.assertIn(self.p_review, self.activity.review_set.filter(review_type='P'))
+        self.assertIn(self.p_review, self.activity.review_set.filter(reviewer_club=get_presidency()))
 
         self.d_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='D',
+                                                        reviewer_club=get_deanship(),
                                                         is_approved=False)
-        self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
+        self.assertIn(self.d_review, self.activity.review_set.filter(reviewer_club=get_deanship()))
         self.assertNotIn(self.activity, Activity.objects.approved())
         self.assertIn(self.activity, Activity.objects.rejected())
         self.assertNotIn(self.activity, Activity.objects.pending())
@@ -150,14 +153,14 @@ class ActivityGetterTests(TestCase):
         This is the ONLY case in which the activity is considered to be approved.
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='P',
+                                                        reviewer_club=get_presidency(),
                                                         is_approved=True)
-        self.assertIn(self.p_review, self.activity.review_set.filter(review_type='P'))
+        self.assertIn(self.p_review, self.activity.review_set.filter(reviewer_club=get_presidency()))
 
         self.d_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='D',
+                                                        reviewer_club=get_deanship(),
                                                         is_approved=True)
-        self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
+        self.assertIn(self.d_review, self.activity.review_set.filter(reviewer_club=get_deanship()))
         self.assertIn(self.activity, Activity.objects.approved())
         self.assertNotIn(self.activity, Activity.objects.rejected())
         self.assertNotIn(self.activity, Activity.objects.pending())
@@ -174,9 +177,9 @@ class ActivityGetterTests(TestCase):
         doesn't appear in Activity.objects.approved()
         """
         self.d_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='D',
+                                                        reviewer_club=get_deanship(),
                                                         is_approved=None)
-        self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
+        self.assertIn(self.d_review, self.activity.review_set.filter(reviewer_club=get_deanship()))
         self.assertNotIn(self.activity, Activity.objects.approved())
         self.assertNotIn(self.activity, Activity.objects.rejected())
         self.assertIn(self.activity, Activity.objects.pending())
@@ -188,9 +191,9 @@ class ActivityGetterTests(TestCase):
         doesn't appear in Activity.objects.approved()
         """
         self.d_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='D',
+                                                        reviewer_club=get_deanship(),
                                                         is_approved=False)
-        self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
+        self.assertIn(self.d_review, self.activity.review_set.filter(reviewer_club=get_deanship()))
         self.assertNotIn(self.activity, Activity.objects.approved())
         self.assertIn(self.activity, Activity.objects.rejected())
         self.assertNotIn(self.activity, Activity.objects.pending())
@@ -202,9 +205,9 @@ class ActivityGetterTests(TestCase):
         doesn't appear in Activity.objects.approved()
         """
         self.d_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='D',
+                                                        reviewer_club=get_deanship(),
                                                         is_approved=True)
-        self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
+        self.assertIn(self.d_review, self.activity.review_set.filter(reviewer_club=get_deanship()))
         self.assertNotIn(self.activity, Activity.objects.approved())
         self.assertNotIn(self.activity, Activity.objects.rejected())
         self.assertIn(self.activity, Activity.objects.pending())
@@ -216,14 +219,14 @@ class ActivityGetterTests(TestCase):
         doesn't appear in Activity.objects.approved()
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='P',
+                                                        reviewer_club=get_presidency(),
                                                         is_approved=None)
-        self.assertIn(self.p_review, self.activity.review_set.filter(review_type='P'))
+        self.assertIn(self.p_review, self.activity.review_set.filter(reviewer_club=get_presidency()))
 
         self.d_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='D',
+                                                        reviewer_club=get_deanship(),
                                                         is_approved=None)
-        self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
+        self.assertIn(self.d_review, self.activity.review_set.filter(reviewer_club=get_deanship()))
         self.assertNotIn(self.activity, Activity.objects.approved())
         self.assertNotIn(self.activity, Activity.objects.rejected())
         self.assertIn(self.activity, Activity.objects.pending())
@@ -235,14 +238,14 @@ class ActivityGetterTests(TestCase):
         doesn't appear in Activity.objects.approved()
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='P',
+                                                        reviewer_club=get_presidency(),
                                                         is_approved=None)
-        self.assertIn(self.p_review, self.activity.review_set.filter(review_type='P'))
+        self.assertIn(self.p_review, self.activity.review_set.filter(reviewer_club=get_presidency()))
 
         self.d_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='D',
+                                                        reviewer_club=get_deanship(),
                                                         is_approved=False)
-        self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
+        self.assertIn(self.d_review, self.activity.review_set.filter(reviewer_club=get_deanship()))
         self.assertNotIn(self.activity, Activity.objects.approved())
         self.assertIn(self.activity, Activity.objects.rejected())
         self.assertNotIn(self.activity, Activity.objects.pending())
@@ -254,14 +257,14 @@ class ActivityGetterTests(TestCase):
         doesn't appear in Activity.objects.approved()
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='P',
+                                                        reviewer_club=get_presidency(),
                                                         is_approved=None)
-        self.assertIn(self.p_review, self.activity.review_set.filter(review_type='P'))
+        self.assertIn(self.p_review, self.activity.review_set.filter(reviewer_club=get_presidency()))
 
         self.d_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='D',
+                                                        reviewer_club=get_deanship(),
                                                         is_approved=True)
-        self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
+        self.assertIn(self.d_review, self.activity.review_set.filter(reviewer_club=get_deanship()))
         self.assertNotIn(self.activity, Activity.objects.approved())
         self.assertNotIn(self.activity, Activity.objects.rejected())
         self.assertIn(self.activity, Activity.objects.pending())
@@ -273,14 +276,14 @@ class ActivityGetterTests(TestCase):
         doesn't appear in Activity.objects.approved()
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='P',
+                                                        reviewer_club=get_presidency(),
                                                         is_approved=False)
-        self.assertIn(self.p_review, self.activity.review_set.filter(review_type='P'))
+        self.assertIn(self.p_review, self.activity.review_set.filter(reviewer_club=get_presidency()))
 
         self.d_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='D',
+                                                        reviewer_club=get_deanship(),
                                                         is_approved=None)
-        self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
+        self.assertIn(self.d_review, self.activity.review_set.filter(reviewer_club=get_deanship()))
         self.assertNotIn(self.activity, Activity.objects.approved())
         self.assertIn(self.activity, Activity.objects.rejected())
         self.assertNotIn(self.activity, Activity.objects.pending())
@@ -292,14 +295,14 @@ class ActivityGetterTests(TestCase):
         doesn't appear in Activity.objects.approved()
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='P',
+                                                        reviewer_club=get_presidency(),
                                                         is_approved=False)
-        self.assertIn(self.p_review, self.activity.review_set.filter(review_type='P'))
+        self.assertIn(self.p_review, self.activity.review_set.filter(reviewer_club=get_presidency()))
 
         self.d_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='D',
+                                                        reviewer_club=get_deanship(),
                                                         is_approved=False)
-        self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
+        self.assertIn(self.d_review, self.activity.review_set.filter(reviewer_club=get_deanship()))
         self.assertNotIn(self.activity, Activity.objects.approved())
         self.assertIn(self.activity, Activity.objects.rejected())
         self.assertNotIn(self.activity, Activity.objects.pending())
@@ -312,14 +315,14 @@ class ActivityGetterTests(TestCase):
         doesn't appear in Activity.objects.approved()
         """
         self.p_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='P',
+                                                        reviewer_club=get_presidency(),
                                                         is_approved=False)
-        self.assertIn(self.p_review, self.activity.review_set.filter(review_type='P'))
+        self.assertIn(self.p_review, self.activity.review_set.filter(reviewer_club=get_presidency()))
 
         self.d_review = self.activity.review_set.create(reviewer=self.user,
-                                                        review_type='D',
+                                                        reviewer_club=get_deanship(),
                                                         is_approved=True)
-        self.assertIn(self.d_review, self.activity.review_set.filter(review_type='D'))
+        self.assertIn(self.d_review, self.activity.review_set.filter(reviewer_club=get_deanship()))
         self.assertNotIn(self.activity, Activity.objects.approved())
         self.assertIn(self.activity, Activity.objects.rejected())
         self.assertNotIn(self.activity, Activity.objects.pending())

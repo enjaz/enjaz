@@ -7,7 +7,7 @@ from activities.models import Activity, Review
 from activities.test_utils import create_activity, add_presidency_review, add_deanship_review
 from clubs.models import Club
 from clubs.test_utils import add_club_member, set_club_coordinator
-from clubs.utils import get_presidency
+from clubs.utils import get_presidency, get_deanship
 
 
 class ShowActivityViewTests(TestCase):
@@ -261,7 +261,7 @@ class ReviewViewTests(TestCase):
         activity = create_activity(submitter=user, club=club)
         review = Review.objects.create(activity=activity,
                                        name_notes="Test Name Notes",
-                                       review_type="P")
+                                       reviewer_club=get_presidency())
 
         view_presidency_review = Permission.objects.get(codename='view_presidency_review')
         user.user_permissions.add(view_presidency_review)
@@ -353,7 +353,7 @@ class ReviewViewTests(TestCase):
         activity = create_activity(submitter=user, club=club)
         review = Review.objects.create(activity=activity,
                                        name_notes="Test Name Notes",
-                                       review_type="D")
+                                       reviewer_club=get_deanship())
 
         view_deanship_review = Permission.objects.get(codename='view_deanship_review')
         user.user_permissions.add(view_deanship_review)
@@ -433,7 +433,7 @@ class ReviewViewTests(TestCase):
         activity = create_activity(submitter=user, club=club)
         review = Review.objects.create(activity=activity,
                                        name_notes="Test Name Notes",
-                                       review_type="P")
+                                       reviewer_club=get_presidency())
 
         add_presidency_review = Permission.objects.get(codename='add_presidency_review')
         user.user_permissions.add(add_presidency_review)
@@ -507,7 +507,7 @@ class ReviewViewTests(TestCase):
         activity = create_activity(submitter=user, club=club)
         review = Review.objects.create(activity=activity,
                                        name_notes="Test Name Notes",
-                                       review_type="D")
+                                       reviewer_club=get_deanship())
 
         add_deanship_review = Permission.objects.get(codename='add_deanship_review')
         user.user_permissions.add(add_deanship_review)

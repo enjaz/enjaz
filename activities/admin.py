@@ -4,6 +4,8 @@ import datetime
 from django.contrib import admin
 from activities.models import Activity, Episode, Category, Evaluation, Review
 from clubs.models import section_choices
+from clubs.utils import get_presidency, get_deanship
+
 
 class EpisodeInline(admin.TabularInline):
     model = Episode
@@ -57,13 +59,13 @@ class StatusFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value():
             if self.value() == 'w':
-                return queryset.exclude(review__review_type='P')
+                return queryset.exclude(review__reviewer_club=get_presidency())
             elif self.value() == 'p':
-                presidency_reviewed = queryset.filter(review__review_type='P')
-                deanship_unreviewed = presidency_reviewed.exclude(review__review_type='D')
+                presidency_reviewed = queryset.filter(review__reviewer_club=get_presidency())
+                deanship_unreviewed = presidency_reviewed.exclude(review__reviewer_club=get_deanship())
                 return deanship_unreviewed
             elif self.value() == 'd':
-                return queryset.filter(review__review_type='D')
+                return queryset.filter(review__reviewer_club=get_deanship())
 
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'primary_club', 'category',

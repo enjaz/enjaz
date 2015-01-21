@@ -16,7 +16,7 @@ from clubs.models import Club
 from clubs.utils import get_presidency, is_coordinator_or_member, is_coordinator_or_deputy_of_any_club, \
     is_coordinator_of_any_club, get_media_center, \
     is_member_of_any_club, is_employee_of_any_club, is_coordinator, is_coordinator_or_deputy, get_user_clubs, \
-    get_user_coordination_and_deputyships, has_coordination_to_activity
+    get_user_coordination_and_deputyships, has_coordination_to_activity, get_deanship
 from core.utilities import FVP_EMAIL, MVP_EMAIL, DHA_EMAIL
 from media.utils import MAX_OVERDUE_REPORTS
 
@@ -77,8 +77,8 @@ def list_activities(request):
         elif request.user.has_perm('activities.add_deanship_review'):
             # If the user is part of the deanship of student affairs,
             # only show activities approved by presidency
-            context['pending'] = Activity.objects.pending().filter(review__review_type="P", review__is_approved=True)
-            context['rejected'] = Activity.objects.rejected().filter(review__review_type="P", review__is_approved=True)
+            context['pending'] = Activity.objects.pending().filter(review__reviewer_club=get_presidency(), review__is_approved=True)
+            context['rejected'] = Activity.objects.rejected().filter(review__reviewer_club=get_presidency(), review__is_approved=True)
 
         elif (is_coordinator_or_deputy_of_any_club(request.user) or is_member_of_any_club(request.user)) and \
              not is_coordinator_or_member(get_presidency(), request.user) and \
@@ -207,10 +207,10 @@ def create(request):
                 # presidency and deanship reviews
                 Review.objects.create(
                     activity=form_object, reviewer=request.user,
-                    is_approved=True, review_type='P')
+                    is_approved=True, reviewer_club=get_presidency())
                 Review.objects.create(
                     activity=form_object, reviewer=request.user,
-                    is_approved=True, review_type='D')
+                    is_approved=True, reviewer_club=get_deanship())
             else:
                 show_activity_url = reverse('activities:show', args=(form_object.pk,))
                 full_url = request.build_absolute_uri(show_activity_url)
@@ -286,7 +286,7 @@ def edit(request, activity_id):
                 pending_review = activity.review_set.get(is_approved=None)
 
                 email_context = {'activity': activity}
-                if pending_review.review_type == 'P':
+                if pending_review.reviewer_club == get_presidency():
                     if get_gender(activity.primary_club.coordinator) == 'M':
                         mail.send([MVP_EMAIL],
                                   template="activity_presidency_edited",
@@ -295,7 +295,7 @@ def edit(request, activity_id):
                         mail.send([FVP_EMAIL],
                                   template="activity_presidency_edited",
                                   context=email_context)
-                elif pending_review.review_type == 'D':
+                elif pending_review.reviewer_club == get_deanship():
                     mail.send([DHA_EMAIL],
                               template="activity_deanship_edited",
                               context=email_context)
@@ -358,6 +358,7 @@ def review(request, activity_id, lower_review_type=None):
     
     # Review Type Full
     rt_full = {'P': 'presidency', 'D': 'deanship'}[review_type]
+    reviewer_club = {'P': get_presidency(), 'D': get_deanship()}[review_type]
     
     # Permission checks moved down (GET requests).
     # As for POST, it's not necessary because the permission check will already have
@@ -366,11 +367,11 @@ def review(request, activity_id, lower_review_type=None):
     if request.method == 'POST':
         try: # If the review is already there, edit it.
             review_object = Review.objects.get(activity=activity,
-                                               review_type=review_type)
+                                               reviewer_club=reviewer_club)
         except ObjectDoesNotExist:
             review_object = Review(activity=activity,
                                    reviewer=request.user,
-                                   review_type=review_type)
+                                   reviewer_club=reviewer_club)
         review = ReviewForm(request.POST, instance=review_object)
         if review.is_valid():
             review.save()
@@ -388,12 +389,12 @@ def review(request, activity_id, lower_review_type=None):
             activity_full_url = request.build_absolute_uri(activity_url)
             email_context = {'activity': activity}
             if review.cleaned_data['is_approved']:
-                if review_type == 'P':
+                if reviewer_club == get_presidency():
                     email_context['full_url'] = presidency_full_url
                     mail.send([DHA_EMAIL],
                               template="activity_presidency_approved",
                               context=email_context)
-                elif review_type == 'D':
+                elif reviewer_club == get_deanship():
                     if activity.primary_club.coordinator:
                         email_context['full_url'] = activity_full_url
                         mail.send(get_club_notification_to(activity),
@@ -428,13 +429,13 @@ def review(request, activity_id, lower_review_type=None):
                                   context=email_context)
             elif review.cleaned_data['is_approved'] == False:
                 # if the activity is rejected.
-                if review_type == 'P':
+                if reviewer_club == get_presidency():
                     email_context['full_url'] = presidency_full_url
                     mail.send(get_club_notification_to(activity),
                               cc=get_club_notification_cc(activity),
                               template="activity_presidency_rejected",
                               context=email_context)
-                elif review_type == 'D':
+                elif reviewer_club == get_deanship():
                     email_context['full_url'] = deanship_full_url
                     mail.send(get_club_notification_to(activity),
                               cc=get_club_notification_cc(activity),
@@ -445,12 +446,12 @@ def review(request, activity_id, lower_review_type=None):
                 # Enable coordinators to edit the activity request in correspondence to the review
                 activity.is_editable = True
                 activity.save()
-                if review_type == 'P':
+                if reviewer_club == get_presidency():
                     mail.send(get_club_notification_to(activity),
                               cc=get_club_notification_cc(activity),
                               template="activity_presidency_holded",
                               context=email_context)
-                elif review_type == 'D':
+                elif reviewer_club == get_deanship():
                     mail.send(get_club_notification_to(activity),
                               cc=get_club_notification_cc(activity),
                               template="activity_deanship_holded",
@@ -467,7 +468,7 @@ def review(request, activity_id, lower_review_type=None):
             template = 'activities/review_write.html'
             try: # If the review is already there, edit it.
                 review_object = Review.objects.get(activity=activity,
-                                                   review_type=review_type)
+                                                   reviewer_club=reviewer_club)
                 review = ReviewForm(instance=review_object)
             except ObjectDoesNotExist:
                 review = ReviewForm()
@@ -478,7 +479,7 @@ def review(request, activity_id, lower_review_type=None):
             template = 'activities/review_read.html'
             try:
                 review = Review.objects.get(activity=activity,
-                                            review_type=review_type)
+                                            reviewer_club=reviewer_club)
                 # Note 2: Here, review is a Review object, because we just want to read
             except ObjectDoesNotExist:
                 review = None

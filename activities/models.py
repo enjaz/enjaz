@@ -119,44 +119,20 @@ class Activity(models.Model):
         else:
             return None
 
-    # TODO: remove
-    def is_approved_old(self):
-        import warnings
-        warnings.warn("This utility function is no longer in use. It's kept for archiving and testing purposes only!",
-                     DeprecationWarning)
-        if self.get_approval_status() == 6:
-            return True
-        elif self.get_approval_status() == 2 or self.get_approval_status() == 5:
-            return False
+    def get_list_activity_action(self):
+        """
+        Return an appropriate HTML button to be displayed in the activity list based on the activity's status.
+        """
+        if self.is_approved() is None:
+            # Either there is a pending review waiting for edits...
+            if self.review_set.filter(is_approved=None).exists():
+                message = u"اقرأ مراجعة %s" % self.review_set.filter(is_approved=None).first().reviewer_club.name
+                url = ""
+                return "<a class='btn btn-xs btn-green' href='%s'>%s</a>" % (url, message)
+            else:  # ... or we're waiting for the next club up the hierarchy to review activity
+                return ""
         else:
-            return None
-
-    # TODO: remove
-    def get_approval_status(self):
-        """
-        Returns the approval status of the activity as a number within the range 0 to 6, where 6 is approved.
-        """
-        reviews = self.review_set.all()
-        if not reviews.exists():
-            return 0
-        elif reviews.filter(reviewer_club=get_presidency(), is_approved=None).exists() and \
-            not reviews.filter(reviewer_club=get_deanship()).exists():
-            return 1
-        elif reviews.filter(reviewer_club=get_presidency(), is_approved=False).exists() and \
-            not reviews.filter(reviewer_club=get_deanship()).exists():
-            return 2
-        elif reviews.filter(reviewer_club=get_presidency(), is_approved=True).exists() and \
-            not reviews.filter(reviewer_club=get_deanship()).exists():
-            return 3
-        elif reviews.filter(reviewer_club=get_presidency(), is_approved=True).exists() and \
-            reviews.filter(reviewer_club=get_deanship(), is_approved=None).exists():
-            return 4
-        elif reviews.filter(reviewer_club=get_presidency(), is_approved=True).exists() and \
-            reviews.filter(reviewer_club=get_deanship(), is_approved=False).exists():
-            return 5
-        elif reviews.filter(reviewer_club=get_presidency(), is_approved=True).exists() and \
-            reviews.filter(reviewer_club=get_deanship(), is_approved=True).exists():
-            return 6
+            return ""
 
     def get_approval_status_message(self):
         """
@@ -168,7 +144,7 @@ class Activity(models.Model):
         elif approved is False:
             return u"رُفض من قبل %s." % self.review_set.filter(is_approved=False).first().reviewer_club.name
         elif approved is None:
-            # Either there is a pending review wating for edits...
+            # Either there is a pending review waiting for edits...
             if self.review_set.filter(is_approved=None).exists():
                 return u"ينتظر تعديلاً."
             else:  # ... or we're waiting for the next club up the hierarchy to review activity

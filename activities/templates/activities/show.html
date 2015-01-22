@@ -51,7 +51,7 @@
 							{% if perms.activities.view_activity %}
 							<a href="#" class="user-status {% if activity.is_approved %}is-online{% elif activity.is_approved == None %}is-idle{% else %}is-busy{% endif %} tooltip-primary"
 							data-toggle="tooltip" data-placement="top"
-							data-original-title="{% if activity.is_approved %}تمت الموافقة على النشاط{% elif activity.is_approved == None %}بانتظار مراجعة الطلب{% else %}لم تتم الموافقة على النشاط{% endif %}"></a>
+							data-original-title="{{ activity.get_approval_status_message }}"></a>
 							<!-- User statuses available classes "is-online", "is-offline", "is-idle", "is-busy" -->	
 							{% endif %}
 						</strong>

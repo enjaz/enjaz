@@ -118,21 +118,8 @@ class Activity(models.Model):
         # In all other cases, activity is pending
         else:
             return None
-
-    def get_list_activity_action(self):
-        """
-        Return an appropriate HTML button to be displayed in the activity list based on the activity's status.
-        """
-        if self.is_approved() is None:
-            # Either there is a pending review waiting for edits...
-            if self.review_set.filter(is_approved=None).exists():
-                message = u"اقرأ مراجعة %s" % self.review_set.filter(is_approved=None).first().reviewer_club.name
-                url = ""
-                return "<a class='btn btn-xs btn-green' href='%s'>%s</a>" % (url, message)
-            else:  # ... or we're waiting for the next club up the hierarchy to review activity
-                return ""
-        else:
-            return ""
+    is_approved.boolean = True
+    is_approved.short_description = u"تمت الموافقة على النشاط؟"
 
     def get_approval_status_message(self):
         """
@@ -156,6 +143,22 @@ class Activity(models.Model):
                     if not parent.reviews.filter(activity=self).exists():
                         return u"ينتظر مراجعة %s." % parent.name
                 return u"غير معروف"
+    get_approval_status_message.short_description = u"حالة النشاط"
+
+    def get_list_activity_action(self):
+        """
+        Return an appropriate HTML button to be displayed in the activity list based on the activity's status.
+        """
+        if self.is_approved() is None:
+            # Either there is a pending review waiting for edits...
+            if self.review_set.filter(is_approved=None).exists():
+                message = u"اقرأ مراجعة %s" % self.review_set.filter(is_approved=None).first().reviewer_club.name
+                url = ""
+                return "<a class='btn btn-xs btn-green' href='%s'>%s</a>" % (url, message)
+            else:  # ... or we're waiting for the next club up the hierarchy to review activity
+                return ""
+        else:
+            return ""
 
     def is_single_episode(self):
         return self.episode_set.count() == 1

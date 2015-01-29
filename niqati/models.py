@@ -157,7 +157,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
         if self.approved and (self.date_created is None):
             for i in range(self.code_count):
                 c = Code(category=self.code_category,
-                         activity=self.parent_order.episode.activity,
+                         episode=self.parent_order.episode.activity,
                          collection=self)
                 c.generate_unique()
                 c.save()

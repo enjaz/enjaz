@@ -13,7 +13,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
 from post_office import mail
 from clubs.utils import get_media_center, is_coordinator_or_member, is_coordinator_of_any_club, is_member_of_any_club, \
-    is_coordinator, is_coordinator_or_deputy, has_coordination_to_activity
+    is_coordinator, is_coordinator_or_deputy, has_coordination_to_activity, is_employee_of_any_club
 
 from core import decorators
 from clubs.models import Club
@@ -246,7 +246,6 @@ def update_report_options(request):
                                                                     "media_center": media_center})
 
 @login_required
-@user_passes_test(is_media_or_club_coordinator_or_member)
 def show_report(request, episode_pk):
     """
     Show a FollowUpReport.
@@ -255,11 +254,14 @@ def show_report(request, episode_pk):
     report = get_object_or_404(FollowUpReport, episode=episode)
 
     # Permission checks
-    # The passed episode should be owned by the user's club or the user should be a member of the media center
-    # This is more specific than the test of ``user_passes_test`` above.
-    if not has_coordination_to_activity(request.user, episode.activity)\
-            and not is_coordinator_or_member(get_media_center(), request.user) \
-            and not request.user.is_superuser:
+
+    # The passed episode should be owned by the user's club, the user
+    # should be a member of the media center, or the user needs to be
+    # an employee.
+    if not has_coordination_to_activity(request.user, episode.activity) \
+       and not is_coordinator_or_member(get_media_center(), request.user) \
+       and not request.user.is_superuser \
+       and not is_employee_of_any_club(request.user):
         raise PermissionDenied
 
     return render(request, 'media/report_read.html', {'report': report, 'comment_form': ReportCommentForm()})

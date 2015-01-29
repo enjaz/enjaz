@@ -37,6 +37,7 @@ Licensed under the General Public License version 3 of the License, or
 # Installation 
 
 Current dependencies:
+* django-constance
 * django-email_extras
 * django-taggit
 * django-templated-email
@@ -95,10 +96,6 @@ Current required settings:
 * `PDFCROWD_USERNAME`: a pdfcrowd username
 * `PDFCROWD_KEY`: a pdfcrowd api key
 * `BITLY_KEY`: a bit.ly api key
-* `FVP_USERNAME = 'username'` for the female vice president.
-* `MVP_USERNAME = 'username'` for the male vice president.
-* `DHA_USERNAME = 'username'` for the Deanship Head of Activities
-* `STUDENTVOICE_THRESHOLD = 30`, adjustable threshold for sending notifications.
 * `AUTH_PROFILE_MODULE = 'accounts.EnjazProfile'`
 * `USERENA_WITHOUT_USERNAMES = True`
 * `USERENA_ACTIVATION_RETRY = True`
@@ -107,6 +104,15 @@ Current required settings:
 * `FORMS_BUILDER_USE_SITES = False`
 * `FORMS_BUILDER_CHOICES_SEPARATOR = '/'` or any character of your choice
 * Add `"django.core.context_processors.request"` to the [default TEMPLATE_CONTEXT_PROCESSORS](https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATE_CONTEXT_PROCESSORS)
+* For django-constance dynamic settings:
+```
+CONSTANCE_CONFIG = {
+    'FVP_USERNAME': ('', 'What is the username of the female vice president?'),
+    'MVP_USERNAME': ('', 'What is the username of the male vice president?'),
+    'DHA_USERNAME': ('', 'What is the username of the Deanship Head of Activities?'),
+    'STUDENTVOICE_THRESHOLD': (30, 'What is the point threshold on which voices should be sent to their recipients?'),
+    }
+```
 
 # First run
 

@@ -16,7 +16,7 @@ from clubs.models import Club
 from clubs.utils import get_presidency, is_coordinator_or_member, is_coordinator_or_deputy_of_any_club, \
     is_coordinator_of_any_club, get_media_center, \
     is_member_of_any_club, is_employee_of_any_club, is_coordinator, is_coordinator_or_deputy, get_user_clubs, \
-    get_user_coordination_and_deputyships, has_coordination_to_activity, get_deanship
+    get_user_coordination_and_deputyships, has_coordination_to_activity, get_deanship, is_employee
 from core.utilities import FVP_EMAIL, MVP_EMAIL, DHA_EMAIL
 from media.utils import MAX_OVERDUE_REPORTS
 
@@ -283,6 +283,7 @@ def edit(request, activity_id):
 
             # If the edit has been done in response to a review, send a notification email
             try:
+                # FIXME: edit to become dynamic (not fixed by p & d)
                 pending_review = activity.review_set.get(is_approved=None)
 
                 email_context = {'activity': activity}
@@ -328,11 +329,131 @@ def edit(request, activity_id):
         return render(request, 'activities/new.html', context)
 
 @login_required
-def review(request, activity_id, lower_review_type=None):
+def review(request, activity_id, reviewer_id):
+    activity = get_object_or_404(Activity, pk=activity_id)
+    reviewer_club = get_object_or_404(Club, pk=reviewer_id)
+
+    # --- Permission checks ---
+    # The reviewer club should actually be one of the activity owner's reviewing parents.
+    # The user should either be a(n):
+    # (1) Coordinator or deputy of the club that owns the activity (primary or secondary);
+    #     in this case the user can only READ.
+    # (2) Coordinator or deputy of a reviewer club; there are 2 cases here as well:
+    #     a- either the reviewer is accessing "their" review; here they can WRITE.
+    #     b- or the reviewer is accessing a review of another reviewer; here they can only READ.
+    # (3) Employee responsible for the club that owns the activity. (READ)
+    # (4) Superuser. (WRITE)
+
+    reviewer_parents = activity.primary_club.get_reviewer_parents()
+
+    # Is the passed reviewer club a member of the activity owner's reviewer parents? If not, raise a 404 error.
+    if not reviewer_club in reviewer_parents:
+        raise Http404
+
+    # Is the current user a coordinator/deputy of any of the reviewing parents?
+    user_is_any_reviewer = any([club in reviewer_parents for club in get_user_clubs(request.user)])
+
+    # Is the current user a coordinator/deputy of the reviewer club?
+    user_is_current_reviewer = is_coordinator_or_deputy(reviewer_club, request.user)
+
+    # The user can WRITE if they are the coordinator or deputy of the reviewer club; or a superuser
+    can_write = user_is_current_reviewer or request.user.is_superuser
+
+    # The user can READ if they are the coordinator or deputy of the activity owning club (primary or secondary);
+    #       the coordinator or deputy of a parent reviewer other than the ``reviewer_club``;
+    #       or an employee responsible for the activity owning club.
+    can_read = has_coordination_to_activity(request.user, activity) or user_is_any_reviewer or \
+               is_employee(activity.primary_club, request.user)
+
+    # If the user has no read or write permissions, then they can't access the view.
+    if not can_read and not can_write:
+        raise PermissionDenied
+
+    # --- End of Permission Checks ---
+
+    if request.method == "POST":
+        try:  # If the review is already there, edit it.
+            review_object = Review.objects.get(activity=activity,
+                                               reviewer_club=reviewer_club)
+        except ObjectDoesNotExist:
+            review_object = Review(activity=activity,
+                                   reviewer=request.user,
+                                   reviewer_club=reviewer_club)
+        review = ReviewForm(request.POST, instance=review_object)
+
+        if review.is_valid():
+            review.save()
+            # Once the activity is approved (or partially approved), lock it from being edited.
+            # This is very critical as to prevent manipulations (ie, editing the request after
+            # the approval of the presidency and before it's reviewed by DSA)
+            # Only when an edit is requested by the reviewer should editing be allowed
+            activity.is_editable = False
+            activity.save()
+            if review.cleaned_data['is_approved']:
+
+                try:
+                    next_reviewer = reviewer_club.get_reviewer_parents()[0]
+
+                    # TODO: Send notification to the reviewer next up in the hierarchy (if present)
+                    # DID TEMPLATE FOR THIS
+
+                except IndexError:  # Reached the top of the review hierarchy => activity approved
+                    if activity.is_approved():  # sanity check
+                        # TODO: If activity is approved:
+                        # -- send notification to coordinator  # DID TEMPLATE FOR THIS
+                        # -- schedule report reminders  # HAVE TEMPLATE FOR THIS
+                        # -- send to employee  # DID TEMPLATE FOR THIS
+                        pass
+
+            elif review.cleaned_data['is_approved'] == False:
+
+                # TODO: Send notification to coordinator
+                pass
+
+            else:  # If changes are requested (review.is_approved == None)
+                # TODO: If the review is being edited, only do the following if an actual change has been made
+                # Enable coordinators to edit the activity request in correspondence to the review
+                activity.is_editable = True
+                activity.save()
+
+                # TODO: Send a notification to coordinator
+
+            return HttpResponseRedirect(reverse('activities:show', args=(activity.pk, )))
+        # TODO: if not valid, show the error messages.
+
+    else:
+        # If the user has the permission to write then return the review form page to add or edit the review.
+        # Else, if they can read, then return the review read page.
+        if can_write:
+            template = 'activities/review_write.html'
+            try: # If the review is already there, edit it.
+                review_object = Review.objects.get(activity=activity,
+                                                   reviewer_club=reviewer_club)
+                review = ReviewForm(instance=review_object)
+            except ObjectDoesNotExist:
+                review = ReviewForm()
+                # Note 1: Here, review is a ReviewForm object, because we want to write
+
+        elif can_read:  # If the user has read permissions, show the review read page.
+            template = 'activities/review_read.html'
+            try:
+                review = Review.objects.get(activity=activity,
+                                            reviewer_club=reviewer_club)
+                # Note 2: Here, review is a Review object, because we just want to read
+            except ObjectDoesNotExist:
+                review = None
+
+    context = {'activity': activity, 'review': review, 'active_tab': reviewer_club.pk}
+
+    return render(request, template, context)
+
+@login_required
+def review_old(request, activity_id, lower_review_type=None):
+
     activity = get_object_or_404(Activity, pk=activity_id)
     # Check if the user is a coordinator or deputy of any of the
     # activity's primary or secondary clubs.
-    coordination_status = has_coordination_to_activity(request.user, activity)
+    coordination_status = has_coordination_to_activity(request.user, activity)  # TODO: REMOVE
 
     if lower_review_type == None:
         # If the user has any permission (read or write) related to
@@ -344,7 +465,7 @@ def review(request, activity_id, lower_review_type=None):
            request.user.has_perm('activities.view_deanship_review'):
             return HttpResponseRedirect(reverse('activities:review_with_type',
                                                 args=(activity_id, 'd')))
-            
+
         elif request.user.has_perm('activities.add_presidency_review') or \
              request.user.has_perm('activities.view_presidency_review'):
             return HttpResponseRedirect(reverse('activities:review_with_type',
@@ -360,10 +481,6 @@ def review(request, activity_id, lower_review_type=None):
     rt_full = {'P': 'presidency', 'D': 'deanship'}[review_type]
     reviewer_club = {'P': get_presidency(), 'D': get_deanship()}[review_type]
     
-    # Permission checks moved down (GET requests).
-    # As for POST, it's not necessary because the permission check will already have
-    # been done before serving the form page; in addition, CSRF token will prevent any
-    # spam. [Saeed 18 Jun 2014]
     if request.method == 'POST':
         try: # If the review is already there, edit it.
             review_object = Review.objects.get(activity=activity,

@@ -5,7 +5,7 @@
 	<div class="panel-body with-table">
 		
 		<table class="table table-bordered table-responsive">
-		<form action="{% url 'activities:review_with_type' activity.pk review_type|lower %}" method="post">
+		<form method="post">
 		{% csrf_token %}
 		<colgroup>
 			<col class="col-md-2">

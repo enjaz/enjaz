@@ -47,6 +47,8 @@ class SubmissionFilter(admin.SimpleListFilter):
                 time_ago = datetime.datetime.now()
             return queryset.filter(submission_date__gte=time_ago)
 
+
+# FIXME: Edit or remove this filter (it's fixed!)
 class StatusFilter(admin.SimpleListFilter):
     title = u"الحالة"
     parameter_name = 'status'

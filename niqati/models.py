@@ -147,7 +147,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
     admin_asset_link.allow_tags = True
 
     def __unicode__(self):
-        return self.parent_order.activity.name + " - " + self.code_category.ar_label
+        return self.parent_order.episode.__unicode__() + " - " + self.code_category.ar_label
 
     class Meta:
         verbose_name = u"مجموعة نقاط"
@@ -157,7 +157,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
         if self.approved and (self.date_created is None):
             for i in range(self.code_count):
                 c = Code(category=self.code_category,
-                         activity=self.parent_order.activity,
+                         episode=self.parent_order.episode,
                          collection=self)
                 c.generate_unique()
                 c.save()
@@ -183,7 +183,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                     output_file = open('codes_' + str(self.pk) + '.pdf', 'wb')
                     client.convertHtml(html_file.encode('utf-8'), output_file)
                     output_file = open('codes_' + str(self.pk) + '.pdf', 'r+')
-                    self.asset.save(self.parent_order.activity.name + " - " + self.code_category.ar_label, File(output_file))
+                    self.asset.save(self.parent_order.episode.__unicode__() + " - " + self.code_category.ar_label, File(output_file))
                     self.save()
                     
                     output_file.close()
@@ -209,7 +209,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
                 output_file = open('links_' + str(self.pk) + '.html', 'wb')
                 output_file.write(html_file.encode('utf-16'))
                 output_file = open('links_' + str(self.pk) + '.html', "r+")
-                self.asset.save(self.parent_order.activity.name + " - " + self.code_category.ar_label, File(output_file))
+                self.asset.save(self.parent_order.episode.__unicode__() + " - " + self.code_category.ar_label, File(output_file))
                 output_file.close()
                 
                 os.remove('links_' + str(self.pk) + '.html')

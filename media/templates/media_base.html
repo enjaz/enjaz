@@ -1,16 +1,29 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %}{% load media_tags %}
 
 {% block title %}المركز الإعلامي{% endblock %}
 
-{% block pageheaderurl %}{% url 'media:index' %}{% endblock %}
+{% block pageheaderurl %}
+    {% if request.user|is_media_coordinator_or_member or request.user.is_superuser %}{% url 'media:index' %}{% else %}#{% endif %}
+{% endblock %}
 {% block pageheader %}المركز الإعلامي{% endblock %}
 
 {% block navbar %}
 
+    {% if request.user|is_media_coordinator_or_member or request.user.is_superuser %}
 	<li><a href="{% url 'media:list_activities' %}"><i class="entypo-flag"></i> التقارير و التغطيات</a></li>
-	<li><a href="{% url 'media:list_articles' %}"><i class="entypo-newspaper"></i> المقالات</a></li>
+    <li><a href="{% url 'media:list_articles' %}"><i class="entypo-newspaper"></i> المقالات</a></li>
+    {% else %}
+    <li><a href="{% url 'media:submit_article' %}"><i class="entypo-feather"></i> أرسل مقالًا</a></li>
+    <li><a href="{% url 'media:list_articles' %}"><i class="entypo-newspaper"></i> مقالاتي</a></li>
+    {% endif %}
+
+    <li><a href="{% url 'media:polls_home' 'whatif' %}"><i class="glyphicon glyphicon-question-sign"></i> ماذا لو... ؟</a></li>
+    <li><a href="{% url 'media:polls_home' '100says' %}"><i class="entypo-chart-pie"></i> المئة تقول</a></li>
+
+    {% if request.user|is_media_coordinator_or_member or request.user.is_superuser %}
     <li><a href="{% url 'media:list_tasks' %}"><i class="glyphicon glyphicon-ok-circle"></i> المهام</a></li>
-    
+    {% endif %}
+
 {% endblock %}
 
 {% block content %}{% endblock %}

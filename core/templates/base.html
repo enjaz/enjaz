@@ -114,14 +114,49 @@
 					<span>أرشدني</span>
 				</a>
 			</li>
-{% comment %}
 			<li>
 				<a href="{% url 'media:index' %}">
 					<i class="entypo-megaphone"></i>
 					<span>المركز الإعلامي</span>
 				</a>
+                <ul>
+                    {% load media_tags %}
+                    {% if request.user|is_media_coordinator_or_member or request.user.is_superuser %}
+                    <li>
+                        <a href="{% url 'media:list_activities' %}">
+                            <i class="entypo-flag"></i>
+                            <span>التقارير و التغطيات</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{% url 'media:list_articles' %}">
+                            <i class="entypo-newspaper"></i>
+                            <span>المقالات</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'media:polls_home' 'whatif' %}">
+                            <i class="glyphicon glyphicon-question-sign"></i>
+                            <span>ماذا لو... ؟</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'media:polls_home' '100says' %}">
+                            <i class="entypo-chart-pie"></i>
+                            <span>المئة تقول</span>
+                        </a>
+                    </li>
+                    {% if request.user|is_media_coordinator_or_member or request.user.is_superuser %}
+                    <li>
+                        <a href="{% url 'media:list_tasks' %}">
+                            <i class="glyphicon glyphicon-ok-circle"></i>
+                            <span>المهام</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
 			</li>
-{% endcomment %}
 		</ul>
 				
 	</div>	

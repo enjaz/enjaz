@@ -15,14 +15,15 @@ class ActivityManager(models.Manager):
         return self.filter(review__review_type="P",
                            review__is_approved=True)\
                    .filter(review__review_type="D",
-                           review__is_approved=True)
+                           review__is_approved=True)\
+                   .filter(is_deleted=False)
 
     def pending(self):
         """
         Return a queryset of the current year's pending activities.
         """
         # Pending activities are those that are neither approved nor rejected.
-        return self.filter(review__review_type="P", review__is_approved=None).filter(review__review_type="D",
+        pending_activities = self.filter(review__review_type="P", review__is_approved=None).filter(review__review_type="D",
                                                                                      review__is_approved=None)\
             | self.filter(review__review_type="P", review__is_approved=True).filter(review__review_type="D",
                                                                                     review__is_approved=None)\
@@ -33,6 +34,7 @@ class ActivityManager(models.Manager):
             | self.filter(review__review_type="P").exclude(review__review_type=
                                                            "D").exclude(review__is_approved=False)\
             | self.filter(review__isnull=True)
+        return pending_activities.filter(is_deleted=False)
 
     def rejected(self):
         """
@@ -40,4 +42,4 @@ class ActivityManager(models.Manager):
         """
         # Rejected activities are those that have a rejected presidency review
         # or a rejected deanship review
-        return self.filter(review__is_approved=False)
+        return self.filter(review__is_approved=False, is_deleted=False)

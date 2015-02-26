@@ -4,7 +4,7 @@ if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "studentportal.settings")
 
 from django.core.urlresolvers import reverse
-from django.conf import settings
+from constance import config
 
 from post_office import mail
 from studentvoice.models import Voice
@@ -12,7 +12,7 @@ from studentvoice.models import Voice
 for voice in Voice.objects.filter(was_sent=False, parent__isnull=True,
                                   is_published=True,
                                   response__isnull=True,
-                                  score__gte=settings.STUDENTVOICE_THRESHOLD):
+                                  score__gte=config.STUDENTVOICE_THRESHOLD):
     url = reverse('studentvoice:show', args=(voice.pk,))
     email_context = {'voice': voice, 'url': url}
 

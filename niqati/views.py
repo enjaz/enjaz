@@ -41,6 +41,10 @@ def index(request):
 # TODO: fix redeem_date issue
 @login_required
 def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code submission requests
+
+    if timezone.now() > timezone.datetime(2015, 4, 21, 0, 0, 0, tzinfo=timezone.get_default_timezone()):
+        return render(request, "niqati/submit_closed.html")
+
     if request.method == "POST":
         # format code first i.e. make upper case & remove spaces or dashes
         code = request.POST['code'].upper().replace(" ", "").replace("-", "")

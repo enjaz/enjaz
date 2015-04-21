@@ -62,7 +62,25 @@ def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code s
             if not c.user:  # code isn't associated with any user -- free to use
                 try:  # assume user already has a code in the same episode
                     a = request.user.code_set.get(episode=c.episode)
-                    if c.category.points > a.category.points:  # new code has more points than existing one
+                    if c.episode.allow_multiple_niqati:  # the episode accepts multiple code submissions
+
+                        # Since the user already has an evaluation (submitted a code previously),
+                        # we'll get that evaluation and update it rather than create a new one.
+                        evaluation = Evaluation.objects.get(evaluator=request.user, episode=c.episode)
+                        eval_form = EvaluationForm(request.POST, instance=evaluation)
+                        if eval_form.is_valid():
+
+                            # Save new code to user
+                            c.user = request.user
+                            c.redeem_date = timezone.now()
+                            c.save()
+                            message = u"تم تسجيل الرمز بنجاح."
+                            messages.add_message(request, messages.SUCCESS, message)
+
+                            eval_form.save()
+                            eval_form = EvaluationForm()
+
+                    elif c.category.points > a.category.points:  # new code has more points than existing one
 
                         # Since the user already has an evaluation (submitted a code previously),
                         # we'll get that evaluation and update it rather than create a new one.

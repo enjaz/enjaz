@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 from django.db import models
 
+# TODO: Announcements should be moved to media
 class Announcement(models.Model):
     """
     An announcement.
@@ -22,6 +23,7 @@ class Announcement(models.Model):
                                          verbose_name=u"عدد الزيارات")
     date_created = models.DateTimeField(auto_now_add=True,
                                         verbose_name=u"تاريخ الإنشاء")
+    # TODO: announcements should be flexible as to who can see them (eg, different announcements for different campuses)
     
     def __unicode__(self):
         return self.title
@@ -29,3 +31,19 @@ class Announcement(models.Model):
     class Meta:
         verbose_name = u"إعلان"
         verbose_name_plural = u"الإعلانات"
+
+
+class Publication(models.Model):
+    """
+    A publication by the students club, to be displayed in the 'About Students Club' page.
+    """
+    file = models.FileField(u"الملف", upload_to="sc-publications/")
+    label = models.CharField(u"العنوان", max_length=128)
+    date_added = models.DateTimeField(u"تاريخ الإضافة", auto_now_add=True)
+
+    def __unicode__(self):
+        return self.label
+
+    class Meta:
+        verbose_name = u"إصدار"
+        verbose_name_plural = u"الإصدارات"

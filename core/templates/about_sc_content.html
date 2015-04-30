@@ -585,16 +585,17 @@
                     إصدارات نادي الطلاب
                 </h3>
                 <ul>
+                    {% for pub in publications %}
                     <li>
-                        <a href="{% static 'sc-publications/Booklet-2013-2014.pdf' %}">
-                            دليل الأنشطة الطلابية للعام ٢٠١٣-٢٠١٤
+                        <a href="{{ pub.file.url }}">
+                            {{ pub.label }}
                         </a>
                     </li>
+                    {% empty %}
                     <li>
-                        <a href="{% static 'sc-publications/Autism.png' %}">
-التوحد
-                        </a>
+                        قريبًا...
                     </li>
+                    {% endfor %}
                 </ul>
             </div>
         </div>

@@ -201,7 +201,7 @@ class Review(models.Model):
     date_reviewed = models.DateTimeField(auto_now_add=True,
                                      verbose_name=u"تاريخ المراجعة")
     notes = models.TextField(verbose_name=u"الملاحظات")
-    approve = models.BooleanField()
+    approve = models.BooleanField(default=False)
     
     class Meta:
         abstract = True # This means this model won't have a table in the db

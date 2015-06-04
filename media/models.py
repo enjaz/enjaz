@@ -131,7 +131,7 @@ class Story(models.Model):
             ("view_story", "Can view all available stories."),
             ("edit_story", "Can edit any available story."),
             ("review_story", "Can review any available story."),
-            ("assign_review_story", "Can assign any Media Center member to review a story.")
+            ("assign_review_story", "Can assign members to review stories.")
         )
         verbose_name = u"تغطية"
         verbose_name_plural = u"التغطيات"

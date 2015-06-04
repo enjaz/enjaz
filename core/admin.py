@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 from django.contrib import admin
-from core.models import Announcement
+from core.models import Announcement, Publication
+
 
 class AnnouncementAdmin(admin.ModelAdmin):
     readonly_fields = ('visits', 'date_created')
@@ -15,4 +16,9 @@ class AnnouncementAdmin(admin.ModelAdmin):
             return obj.description[0:60] + "..."
     description_summary.short_description = u"الوصف"
 
+class PublicationAdmin(admin.ModelAdmin):
+    readonly_fields = ('date_added', )
+    list_display = ('label', 'file', 'date_added')
+
 admin.site.register(Announcement, AnnouncementAdmin)
+admin.site.register(Publication, PublicationAdmin)

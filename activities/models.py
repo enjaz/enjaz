@@ -314,6 +314,9 @@ class Episode(models.Model):
     # be linked here
     # google_event = models.URLField()
 
+    # Niqati-related fields
+    allow_multiple_niqati = models.BooleanField(default=False, verbose_name=u"اسمح بإدخال أكثر من رمز نقاطي؟")
+
     # Media-related fields
 
     requires_report = models.BooleanField(default=True)

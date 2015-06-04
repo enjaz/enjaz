@@ -585,12 +585,17 @@
                     إصدارات نادي الطلاب
                 </h3>
                 <ul>
+                    {% for pub in publications %}
                     <li>
-                        <a href="https://www.dropbox.com/sh/b6scgxt5edc0jsz/AABqqyLyvAah3YcWidmKf2BJa/Booklet%202013-2014.pdf?dl=0">
-                            <i class="entypo-export"></i>
-                            دليل الأنشطة الطلابية للعام ٢٠١٣-٢٠١٤
+                        <a href="{{ pub.file.url }}">
+                            {{ pub.label }}
                         </a>
                     </li>
+                    {% empty %}
+                    <li>
+                        قريبًا...
+                    </li>
+                    {% endfor %}
                 </ul>
             </div>
         </div>

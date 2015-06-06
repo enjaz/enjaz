@@ -4,6 +4,8 @@ import datetime
 from django.contrib import admin
 from activities.models import Activity, Episode, Category, Evaluation, Review
 from clubs.models import section_choices
+from clubs.utils import get_presidency, get_deanship
+
 
 class EpisodeInline(admin.TabularInline):
     model = Episode
@@ -45,6 +47,8 @@ class SubmissionFilter(admin.SimpleListFilter):
                 time_ago = datetime.datetime.now()
             return queryset.filter(submission_date__gte=time_ago)
 
+
+# FIXME: Edit or remove this filter (it's fixed!)
 class StatusFilter(admin.SimpleListFilter):
     title = u"الحالة"
     parameter_name = 'status'
@@ -57,18 +61,18 @@ class StatusFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value():
             if self.value() == 'w':
-                return queryset.exclude(review__review_type='P')
+                return queryset.exclude(review__reviewer_club=get_presidency())
             elif self.value() == 'p':
-                presidency_reviewed = queryset.filter(review__review_type='P')
-                deanship_unreviewed = presidency_reviewed.exclude(review__review_type='D')
+                presidency_reviewed = queryset.filter(review__reviewer_club=get_presidency())
+                deanship_unreviewed = presidency_reviewed.exclude(review__reviewer_club=get_deanship())
                 return deanship_unreviewed
             elif self.value() == 'd':
-                return queryset.filter(review__review_type='D')
+                return queryset.filter(review__reviewer_club=get_deanship())
 
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'primary_club', 'category',
-                    'submission_date', 'is_approved_by_presidency',
-                    'is_approved_by_deanship', 'get_relevance_score_average',
+                    'submission_date', 'is_approved',
+                    'get_approval_status_message', 'get_relevance_score_average',
                     'get_quality_score_average', 'get_evaluation_count')
     list_filter = [CategoryFilter, SubmissionFilter, StatusFilter]
     readonly_fields = ('get_relevance_score_average', 'get_quality_score_average', )

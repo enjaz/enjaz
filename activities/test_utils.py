@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from accounts.test_utils import create_user
 from activities.models import Activity, Episode
 from clubs.models import Club
+from clubs.utils import get_presidency, get_deanship
+
 
 def create_activity(club=Club.objects.get(pk=1),
                     submitter=User.objects.get(pk=1),
@@ -36,12 +38,12 @@ def create_activities(count):
 
 def add_presidency_review(activity, status, reviewer=create_user()):
     activity.review_set.create(reviewer=reviewer,
-                               review_type="P",
+                               reviewer_club=get_presidency(),
                                is_approved=status)
     return activity
 
 def add_deanship_review(activity, status, reviewer=create_user()):
     activity.review_set.create(reviewer=reviewer,
-                               review_type="D",
+                               reviewer_club=get_deanship(),
                                is_approved=status)
     return activity

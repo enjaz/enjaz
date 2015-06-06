@@ -25,25 +25,7 @@
             {% if not approved_table %}
             <td>{{ activity.get_approval_status_message }}</td>
             <td>
-                {% with status=activity.get_approval_status %}
-                    {% if status == 0 and perms.activities.add_presidency_review %}
-                        <a class="btn btn-xs btn-green" href="{% url 'activities:review' activity.pk %}">
-                            راجع النشاط
-                        </a>
-                    {% elif status == 1 %}
-                        <a class="btn btn-xs btn-green" href="{% url 'activities:review_with_type' activity.pk 'p' %}">
- اقرأ مراجعة رئاسة نادي الطلاب
-                        </a>
-                    {% elif status == 3 and perms.activities.add_deanship_review %}
-                        <a class="btn btn-xs btn-green" href="{% url 'activities:review_with_type' activity.pk 'd' %}">
-راجع النشاط
-                        </a>
-                    {% elif status == 4 %}
-                        <a class="btn btn-xs btn-green" href="{% url 'activities:review_with_type' activity.pk 'd' %}">
-اقرأ مراجعة عمادة شؤون الطلاب
-                        </a>
-                    {% endif %}
-                {% endwith %}
+                {{ activity.get_list_activity_action|safe }}
             </td>{% endif %}{% if not MAX_OVERDUE_REPORTS and approved_table and privileged %}
             <td>{{ activity.get_relevance_score_average|stringformat:".2f" }}</td>
             <td>{{ activity.get_quality_score_average|stringformat:".2f" }}</td>

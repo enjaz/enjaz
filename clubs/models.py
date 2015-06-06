@@ -36,7 +36,7 @@ class Club(models.Model):
     description = models.TextField(verbose_name=u"الوصف")
     email = models.EmailField(max_length=254, verbose_name=u"البريد الإلكتروني")
     parent = models.ForeignKey('self', null=True, blank=True,
-                               related_name="parenthood",
+                               related_name="children",
                                on_delete=models.SET_NULL,
                                default=None, verbose_name=u"النادي الأب")
     coordinator = models.ForeignKey(User, null=True,
@@ -62,6 +62,7 @@ class Club(models.Model):
                                  default=None,
                                  verbose_name=u"الموظف المسؤول",
                                  limit_choices_to={'user_permissions__codename': 'deanship_employee'})
+
     # To make it easy to make it specific to a certain college
     # (e.g. for membership), let's add this field.  That's also one
     # way to filter sub-clubs and college clubs.
@@ -72,10 +73,14 @@ class Club(models.Model):
     creation_date = models.DateTimeField(u'تاريخ الإنشاء',
                                          auto_now_add=True)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
-    special = models.BooleanField(default=False,
-                                  verbose_name=u"نادي مميز؟") # To allow more flexible exceptions with
-                                                         # presidency, media club and arshidny
     city = models.CharField(max_length=1, choices=city_choices, verbose_name=u"المدينة")
+
+    # Special ``Club`` objects (eg, Deanship of Student Affairs) should be hidden from the clubs list
+    visible = models.BooleanField(default=True,
+                                  verbose_name=u"مرئي؟")
+    can_review = models.BooleanField(default=False,
+                                     verbose_name=u"يستطيع المراجعة؟")
+
     forms = GenericRelation(Form)
 
     def registration_is_open(self):
@@ -121,6 +126,19 @@ class Club(models.Model):
         overdue_episodes = filter(lambda x: x.report_is_overdue(),
                                   episodes)
         return len(overdue_episodes)
+
+    def get_reviewer_parents(self):
+        """
+        Return the parents of this club that can write activity reviews, in order from the buttom-up.
+        """
+        if not self.parent:
+            return []
+        else:
+            parents = [self.parent]
+            while parents[-1].parent is not None:
+                parents.append(parents[-1].parent)
+            reviewing_parents = filter(lambda club: club.can_review, parents)
+            return reviewing_parents
         
     class Meta:
         # For the admin interface.

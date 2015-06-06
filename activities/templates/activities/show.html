@@ -25,7 +25,7 @@
 	}
 </style>
 <div class="profile-env">
-	
+
 	<header class="row">
 		
 		<div class="col-sm-2">
@@ -51,7 +51,7 @@
 							{% if perms.activities.view_activity %}
 							<a href="#" class="user-status {% if activity.is_approved %}is-online{% elif activity.is_approved == None %}is-idle{% else %}is-busy{% endif %} tooltip-primary"
 							data-toggle="tooltip" data-placement="top"
-							data-original-title="{% if activity.is_approved %}تمت الموافقة على النشاط{% elif activity.is_approved == None %}بانتظار مراجعة الطلب{% else %}لم تتم الموافقة على النشاط{% endif %}"></a>
+							data-original-title="{{ activity.get_approval_status_message }}"></a>
 							<!-- User statuses available classes "is-online", "is-offline", "is-idle", "is-busy" -->	
 							{% endif %}
 						</strong>
@@ -180,6 +180,13 @@
 
 				<!-- tabs for the profile links -->
 				<ul class="nav nav-tabs">
+                    {# <!-- TODO: permissions! --> #}
+                    {% for reviewer in activity.primary_club.get_reviewer_parents %}
+                        <li{% if active_tab == reviewer.pk %} class="active"{% endif %}>
+                            <a href="{% url 'activities:review' activity.id reviewer.id %}">مراجعة {{ reviewer.name }}</a>
+                        </li>
+                    {% endfor %}
+
 					{% if request.user|has_coordination_to_activity:activity or perms.activities.view_presidency_review or perms.activities.add_presidency_review %}
 					<li{% if active_tab == 'presidency' %} class="active"{% endif %}>
 						<a href="{% url 'activities:review_with_type' activity.pk 'p' %}">مراجعة رئاسة نادي الطلاب</a>

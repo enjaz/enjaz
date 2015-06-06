@@ -1,5 +1,4 @@
 """Utility functions related to the clubs app."""
-from clubs.models import Club
 from .models import Club
 
 # TODO: all() is memory expensive, more specific calls should
@@ -7,17 +6,21 @@ from .models import Club
 
 def is_coordinator_of_any_club(user):
     """Return whether the user is a coordinator of any club."""
-    return bool(Club.objects.filter(coordinator=user).all())
+    return Club.objects.filter(coordinator=user).exists()
+
+def is_deputy_of_any_club(user):
+    """Return whether the user is a deputy of any club."""
+    return Club.objects.filter(deputies=user).exists()
 
 def is_member_of_any_club(user):
     """Return whether the user is a member of any club."""
     user_clubs = Club.objects.filter(members=user)
-    return bool(user_clubs.all())
+    return user_clubs.exists()
 
 def is_employee_of_any_club(user):
     """Return whether the user is an employee of any club."""
     employee_clubs = Club.objects.filter(employee=user)
-    return bool(employee_clubs.all())
+    return employee_clubs.exists()
 
 def is_coordinator(club, user):
     """Return whether the user is the coordinator of a given club."""
@@ -58,7 +61,10 @@ def has_coordination_to_activity(user, activity):
     coordination_clubs = activity_clubs.filter(coordinator=user) | \
                          activity_clubs.filter(deputies=user)
     # Return a Boolean 
-    return bool(coordination_clubs.all())
+    return coordination_clubs.exists()
+
+def get_deanship():
+    return Club.objects.get(english_name="Deanship of Student Affairs")
 
 def get_presidency():
     return Club.objects.get(english_name="Presidency")
@@ -80,8 +86,8 @@ def get_user_coordination_and_deputyships(user):
 
 def is_coordinator_or_deputy_of_any_club(user):
     """Return whether the user is a coordinator of any club."""
-    coordination_and_deputyships = get_user_coordination_and_deputyships(user).all()
-    return bool(coordination_and_deputyships)
+    coordination_and_deputyships = get_user_coordination_and_deputyships(user)
+    return coordination_and_deputyships.exists()
 
 def forms_editor_check(user, object):
     """A function to evaluate if user is eligible to create/edit forms for clubs."""

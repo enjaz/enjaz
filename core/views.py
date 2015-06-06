@@ -22,7 +22,7 @@ def portal_home(request):
         
         today = date.today()
         next_week = today + timedelta(weeks=1)
-        upcoming_activities = filter(lambda a: a.get_next_episode() is not None, Activity.objects.approved())
+        upcoming_activities = filter(lambda a: a.get_next_episode() is not None, approved_activities)
         next_week_activities = filter(lambda a: a.get_next_episode().start_date <= next_week, upcoming_activities)
         context['upcoming_activities'] = next_week_activities[::-1]
         

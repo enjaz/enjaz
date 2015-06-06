@@ -29,7 +29,7 @@ class ActivityManager(models.Manager):
 
         # WARNING: lengthy run-time; not lazy
 
-        activities = self.all()
+        activities = self.filter(is_deleted=False)
         approved_activities = filter(lambda activity: activity.is_approved(), activities)
         approved_pks = [activity.pk for activity in approved_activities]
 
@@ -42,7 +42,7 @@ class ActivityManager(models.Manager):
         # A rejected activity is one which:
         # (1) has at least 1 review
         # (2) has any of its reviews rejected
-        return self.annotate(review_count=Count("review")).filter(review_count__gte=1, review__is_approved=False)
+        return self.filter(is_deleted=False).annotate(review_count=Count("review")).filter(review_count__gte=1, review__is_approved=False)
 
     def pending(self):
         """
@@ -55,7 +55,7 @@ class ActivityManager(models.Manager):
 
         # WARNING: lengthy run-time; not lazy
 
-        pending_activities = filter(lambda activity: activity.is_approved() is None, self.all())
+        pending_activities = filter(lambda activity: activity.is_approved() is None, self.filter(is_deleted=False))
         pending_pks = [activity.pk for activity in pending_activities]
 
         return self.filter(pk__in=pending_pks)
@@ -124,7 +124,7 @@ class ActivityManager(models.Manager):
 
             d = self.approved()
 
-            return (a | b | c | d).distinct()
+            return (a | b | c | d).filter(is_deleted=False).distinct()
 
         else:
             return self.approved()

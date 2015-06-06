@@ -1,0 +1,51 @@
+{% extends template %}{% load staticfiles %}
+{% block title %}عن صوتك مسموع{% endblock %}
+
+{% block content %}
+<style>
+.about-page p {
+	font-size: 18px;
+	text-align: justify;
+}
+</style>
+{% if not user.is_authenticated %}
+<section class="breadcrumb">
+        
+        <div class="container">
+                
+                <div class="row">
+                        
+                        <div class="col-sm-12">
+                                
+                                <h1 class="dinar-medium">صوتك مسموع</h1>
+                                                        
+                        </div>
+                        
+                </div>
+                
+        </div>
+        
+</section>
+
+        <div class="container dinar-light">
+{% endif %}
+<div class="row about-page">
+
+	<div class="row">
+		<div class="col-md-7"">
+<p><strong>هل خطر ببالك مقترح؟  هل تود تقديم شكوى؟</strong> برنامج صوتك مسموع نافذة أعدّها نادي الطلاب لتقديم المقترحات والشكاوى الطلابية ومناقشتها وإيصالها إلى إدارة الجامعة.</p>
+
+<p>من خلال الواجهة الإلكترونية التي طوّرناها خصيصا لهذا البرنامج، يمكن للطلاب اختيار إدارة جامعية محدّدة (كعمادة كلية الصيدلة أو إدارة الأمن والسلامة) ليوجهوا لها مقترحاتهم وشكاويهم،  لتعرض بعد ذلك مباشرة على أقرانهم من الطلاب والطالبات ليناقشوها ويصوّتوا عليها: إما تأييدا أو معارضة.  بعد أن تحظى المقترحات على الحد الأدنى من نقاط التأييد ({{ threshold }} نقطة)، ترسل تلقائيا إلى الإدارة المعنية، التي ستجيب في صفحة المقترح ذاته.</p>
+
+<p>نريد من خلال هذا البرنامج أن نتيح قناة سهلة ومباشرة للتواصل بين الطلاب أنفسهم أولا ثم بينهم وبين إدارة الجامعة للرقي بالبيئة الجامعية وتذليل الصعاب.</p>
+            </div>
+            <div class="col-md-5">
+                <img class="img-responsive" src="{% static 'logo/studentvoice.png' %}">
+            </div>
+        </div>
+
+
+{% if not user.is_authenticated %}
+</div>
+{% endif %}
+{% endblock %}

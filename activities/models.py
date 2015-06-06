@@ -33,6 +33,7 @@ class Activity(models.Model):
                                            auto_now_add=True)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
     is_editable = models.BooleanField(default=True, verbose_name=u"هل يمكن تعديله؟")
+    is_deleted = models.BooleanField(default=False, verbose_name=u"محذوف؟")
     inside_collaborators = models.TextField(blank=True,
                                             verbose_name=u"المتعاونون من داخل الجامعة")
     outside_collaborators = models.TextField(blank=True,
@@ -336,6 +337,9 @@ class Episode(models.Model):
     # In the future, as we add Google Calendar features, the calendar events will
     # be linked here
     # google_event = models.URLField()
+
+    # Niqati-related fields
+    allow_multiple_niqati = models.BooleanField(default=False, verbose_name=u"اسمح بإدخال أكثر من رمز نقاطي؟")
 
     # Media-related fields
 

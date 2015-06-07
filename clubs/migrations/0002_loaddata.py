@@ -8,6 +8,12 @@ def load_default_clubs(apps, shema_editor):
     Club = apps.get_model('clubs', 'Club')
     College = apps.get_model('clubs', 'College')
 
+    # If Presidency exists as a Club, we can be faily sure that the
+    # database already contains data and we shouldn't import our clubs
+    # again.
+    if Club.objects.filter(english_name="Presidency"):
+        return
+
     ng_male_medicine = College.objects.create(
       city="R", 
       section="NG", 

@@ -236,7 +236,8 @@ class Review(models.Model):
     activity = models.ForeignKey(Activity, verbose_name=u" النشاط")
     reviewer_club = models.ForeignKey('clubs.Club', related_name="reviews",
                                       limit_choices_to={'can_review': True},
-                                      verbose_name=u"النادي المراجِع")
+                                      verbose_name=u"النادي المراجِع",
+                                      null=True)
     reviewer = models.ForeignKey(User, null=True,
                                  on_delete=models.SET_NULL)
     review_date = models.DateTimeField(u'تاريخ المراجعة', auto_now_add=True)

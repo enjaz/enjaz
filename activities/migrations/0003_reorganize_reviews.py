@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('activities', '0002_review_reviewer_club'),
-        ('clubs', '0003_add_dsa'),
+        ('clubs', '0004_add_dsa'),
     ]
 
     operations = [

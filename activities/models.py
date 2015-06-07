@@ -18,7 +18,6 @@ class Activity(models.Model):
                                      related_name='primary_activity',
                                      verbose_name=u"النادي المنظم")
     secondary_clubs = models.ManyToManyField('clubs.Club', blank=True,
-                                            null=True,
                                             related_name="secondary_activity",
                                             verbose_name=u"الأندية المتعاونة")
     name = models.CharField(max_length=200, verbose_name=u"اسم النشاط")

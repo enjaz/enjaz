@@ -8,7 +8,7 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('clubs', '0004_reorganize_clubs'),
+        ('clubs', '0005_reorganize_clubs'),
     ]
 
     operations = [

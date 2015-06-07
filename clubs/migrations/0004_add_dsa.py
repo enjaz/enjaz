@@ -23,7 +23,7 @@ def delete_dsa(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('clubs', '0002_auto_20150606_1327'),
+        ('clubs', '0003_auto_20150606_1327'),
     ]
 
     operations = [

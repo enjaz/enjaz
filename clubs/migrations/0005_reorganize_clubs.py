@@ -57,7 +57,7 @@ def downgrade_clubs(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('clubs', '0003_add_dsa'),
+        ('clubs', '0004_add_dsa'),
     ]
 
     operations = [

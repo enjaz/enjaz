@@ -71,7 +71,7 @@ class FormAdmin(admin.ModelAdmin):
     radio_fields = {"status": admin.HORIZONTAL}
     fieldsets = form_admin_fieldsets
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         """
         Annotate the queryset with the entries count for use in the
         admin list view.

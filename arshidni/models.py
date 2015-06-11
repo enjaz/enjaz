@@ -147,8 +147,7 @@ class StudyGroup(models.Model):
     ending_date = models.DateField(u'تاريخ الانتهاء')
     max_members = models.PositiveSmallIntegerField(verbose_name=u"العدد الأقصى للأعضاء",
                                                    help_text=u"يجب أن يكون بين 3 و 8.")
-    members = models.ManyToManyField(User, null=True,
-                                     verbose_name=u"الأعضاء",
+    members = models.ManyToManyField(User, verbose_name=u"الأعضاء",
                                      blank=True,
                                      related_name="studygroup_memberships")
     is_published = models.NullBooleanField(verbose_name=u"منشور؟",

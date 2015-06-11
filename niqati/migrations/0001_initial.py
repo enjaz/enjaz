@@ -1,202 +1,112 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+from django.conf import settings
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Category'
-        db.create_table(u'niqati_category', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('label', self.gf('django.db.models.fields.CharField')(max_length=20)),
-            ('ar_label', self.gf('django.db.models.fields.CharField')(max_length=20)),
-            ('points', self.gf('django.db.models.fields.IntegerField')()),
-            ('requires_approval', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal(u'niqati', ['Category'])
+    dependencies = [
+        ('auth', '0001_initial'),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('activities', '0001_initial'),
+    ]
 
-        # Adding model 'Code'
-        db.create_table(u'niqati_code', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('code_string', self.gf('django.db.models.fields.CharField')(unique=True, max_length=16)),
-            ('category', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['niqati.Category'])),
-            ('activity', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['activities.Activity'])),
-            ('collection', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['niqati.Code_Collection'])),
-            ('generation_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('asset', self.gf('django.db.models.fields.CharField')(max_length=300, blank=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, blank=True)),
-            ('redeem_date', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'niqati', ['Code'])
-
-        # Adding model 'Code_Collection'
-        db.create_table(u'niqati_code_collection', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('date_ordered', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('code_category', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['niqati.Category'])),
-            ('code_count', self.gf('django.db.models.fields.IntegerField')()),
-            ('parent_order', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['niqati.Code_Order'])),
-            ('approved', self.gf('django.db.models.fields.NullBooleanField')(default=None, null=True, blank=True)),
-            ('delivery_type', self.gf('django.db.models.fields.CharField')(max_length=1)),
-            ('date_created', self.gf('django.db.models.fields.DateTimeField')(default=None, null=True, blank=True)),
-            ('asset', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
-        ))
-        db.send_create_signal(u'niqati', ['Code_Collection'])
-
-        # Adding model 'Code_Order'
-        db.create_table(u'niqati_code_order', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('activity', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['activities.Activity'])),
-            ('date_ordered', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal(u'niqati', ['Code_Order'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'Category'
-        db.delete_table(u'niqati_category')
-
-        # Deleting model 'Code'
-        db.delete_table(u'niqati_code')
-
-        # Deleting model 'Code_Collection'
-        db.delete_table(u'niqati_code_collection')
-
-        # Deleting model 'Code_Order'
-        db.delete_table(u'niqati_code_order')
-
-
-    models = {
-        u'activities.activity': {
-            'Meta': {'object_name': 'Activity'},
-            'category': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['activities.Category']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'edit_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'inside_collaborators': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'is_editable': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'organizers': ('django.db.models.fields.IntegerField', [], {}),
-            'outside_collaborators': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'participants': ('django.db.models.fields.IntegerField', [], {}),
-            'primary_club': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'primary_activity'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['clubs.Club']"}),
-            'public_description': ('django.db.models.fields.TextField', [], {}),
-            'requirements': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'secondary_clubs': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'secondary_activity'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['clubs.Club']"}),
-            'submission_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'submitter': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL'})
-        },
-        u'activities.category': {
-            'Meta': {'object_name': 'Category'},
-            'ar_name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'en_name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['activities.Category']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'})
-        },
-        u'auth.group': {
-            'Meta': {'object_name': 'Group'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        u'auth.permission': {
-            'Meta': {'ordering': "(u'content_type__app_label', u'content_type__model', u'codename')", 'unique_together': "((u'content_type', u'codename'),)", 'object_name': 'Permission'},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        u'auth.user': {
-            'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Group']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Permission']"}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
-        },
-        u'clubs.club': {
-            'Meta': {'object_name': 'Club'},
-            'city': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'college': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['clubs.College']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
-            'coordinator': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'coordination'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['auth.User']"}),
-            'creation_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'deputies': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'deputyships'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['auth.User']"}),
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'edit_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '254'}),
-            'employee': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'employee'", 'on_delete': 'models.SET_NULL', 'default': 'None', 'to': u"orm['auth.User']", 'blank': 'True', 'null': 'True'}),
-            'english_name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'members': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'memberships'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['auth.User']"}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'parent': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'parenthood'", 'on_delete': 'models.SET_NULL', 'default': 'None', 'to': u"orm['clubs.Club']", 'blank': 'True', 'null': 'True'}),
-            'special': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        u'clubs.college': {
-            'Meta': {'object_name': 'College'},
-            'city': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'gender': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'section': ('django.db.models.fields.CharField', [], {'max_length': '2'})
-        },
-        u'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        u'niqati.category': {
-            'Meta': {'object_name': 'Category'},
-            'ar_label': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'label': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
-            'points': ('django.db.models.fields.IntegerField', [], {}),
-            'requires_approval': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        u'niqati.code': {
-            'Meta': {'object_name': 'Code'},
-            'activity': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['activities.Activity']"}),
-            'asset': ('django.db.models.fields.CharField', [], {'max_length': '300', 'blank': 'True'}),
-            'category': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['niqati.Category']"}),
-            'code_string': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '16'}),
-            'collection': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['niqati.Code_Collection']"}),
-            'generation_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'redeem_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'})
-        },
-        u'niqati.code_collection': {
-            'Meta': {'object_name': 'Code_Collection'},
-            'approved': ('django.db.models.fields.NullBooleanField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
-            'asset': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
-            'code_category': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['niqati.Category']"}),
-            'code_count': ('django.db.models.fields.IntegerField', [], {}),
-            'date_created': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
-            'date_ordered': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'delivery_type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'parent_order': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['niqati.Code_Order']"})
-        },
-        u'niqati.code_order': {
-            'Meta': {'object_name': 'Code_Order'},
-            'activity': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['activities.Activity']"}),
-            'date_ordered': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
-        }
-    }
-
-    complete_apps = ['niqati']
+    operations = [
+        migrations.CreateModel(
+            name='Category',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('label', models.CharField(max_length=20)),
+                ('ar_label', models.CharField(max_length=20)),
+                ('points', models.IntegerField()),
+                ('requires_approval', models.BooleanField(default=False)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Code',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('code_string', models.CharField(unique=True, max_length=16)),
+                ('generation_date', models.DateTimeField(auto_now_add=True)),
+                ('asset', models.CharField(max_length=300, blank=True)),
+                ('redeem_date', models.DateTimeField(null=True, blank=True)),
+                ('category', models.ForeignKey(to='niqati.Category')),
+            ],
+            options={
+                'verbose_name': '\u0646\u0642\u0637\u0629',
+                'verbose_name_plural': '\u0627\u0644\u0646\u0642\u0627\u0637',
+                'permissions': (('submit_code', 'Can submit a code.'), ('view_student_report', "Can view a report of own's codes."), ('view_general_report', 'Can view a report of all students.')),
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Code_Collection',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('date_ordered', models.DateTimeField(auto_now_add=True)),
+                ('code_count', models.IntegerField()),
+                ('approved', models.NullBooleanField(default=None)),
+                ('delivery_type', models.CharField(max_length=1, choices=[(b'0', '\u0643\u0648\u0628\u0648\u0646\u0627\u062a'), (b'1', '\u0631\u0648\u0627\u0628\u0637 \u0642\u0635\u064a\u0631\u0629')])),
+                ('date_created', models.DateTimeField(default=None, null=True, blank=True)),
+                ('asset', models.FileField(upload_to=b'niqati/codes/')),
+                ('code_category', models.ForeignKey(to='niqati.Category')),
+            ],
+            options={
+                'verbose_name': '\u0645\u062c\u0645\u0648\u0639\u0629 \u0646\u0642\u0627\u0637',
+                'verbose_name_plural': '\u0645\u062c\u0645\u0648\u0639\u0627\u062a \u0627\u0644\u0646\u0642\u0627\u0637',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Code_Order',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('date_ordered', models.DateTimeField(auto_now_add=True)),
+                ('episode', models.ForeignKey(verbose_name='\u0627\u0644\u0645\u0648\u0639\u062f', to='activities.Episode')),
+            ],
+            options={
+                'verbose_name': '\u0637\u0644\u0628 \u0646\u0642\u0627\u0637',
+                'verbose_name_plural': '\u0637\u0644\u0628\u0627\u062a \u0627\u0644\u0646\u0642\u0627\u0637',
+                'permissions': (('request_order', 'Can place a request for a code order.'), ('view_order', 'Can view existing code orders.'), ('approve_order', 'Can approve order requests.')),
+            },
+            bases=(models.Model,),
+        ),
+        migrations.AddField(
+            model_name='code_collection',
+            name='parent_order',
+            field=models.ForeignKey(to='niqati.Code_Order'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='code',
+            name='collection',
+            field=models.ForeignKey(to='niqati.Code_Collection'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='code',
+            name='episode',
+            field=models.ForeignKey(to='activities.Episode'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='code',
+            name='user',
+            field=models.ForeignKey(blank=True, to=settings.AUTH_USER_MODEL, null=True),
+            preserve_default=True,
+        ),
+        migrations.CreateModel(
+            name='Niqati_User',
+            fields=[
+            ],
+            options={
+                'proxy': True,
+            },
+            bases=('auth.user',),
+        ),
+    ]

@@ -1,224 +1,120 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+import django.db.models.deletion
+from django.conf import settings
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Voice'
-        db.create_table(u'studentvoice_voice', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('submitter', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.SET_NULL, blank=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=100, blank=True)),
-            ('text', self.gf('django.db.models.fields.TextField')()),
-            ('solution', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('recipient', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['studentvoice.Recipient'], null=True, on_delete=models.SET_NULL, blank=True)),
-            ('was_sent', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('is_published', self.gf('django.db.models.fields.NullBooleanField')(default=True, null=True, blank=True)),
-            ('is_editable', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('score', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('number_of_views', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('number_of_comments', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('parent', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='replies', null=True, on_delete=models.SET_NULL, to=orm['studentvoice.Voice'])),
-            ('submission_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('edit_date', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-        ))
-        db.send_create_signal(u'studentvoice', ['Voice'])
+    dependencies = [
+        ('clubs', '0001_initial'),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
 
-        # Adding model 'Vote'
-        db.create_table(u'studentvoice_vote', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('submitter', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.SET_NULL)),
-            ('voice', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['studentvoice.Voice'], null=True, on_delete=models.SET_NULL)),
-            ('is_counted', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('vote_type', self.gf('django.db.models.fields.CharField')(max_length=1)),
-            ('submission_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('edit_date', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-        ))
-        db.send_create_signal(u'studentvoice', ['Vote'])
-
-        # Adding model 'Response'
-        db.create_table(u'studentvoice_response', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('submitter', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.SET_NULL)),
-            ('voice', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['studentvoice.Voice'], unique=True, null=True, on_delete=models.SET_NULL)),
-            ('text', self.gf('django.db.models.fields.TextField')()),
-            ('is_published', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('is_editable', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('submission_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('edit_date', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-        ))
-        db.send_create_signal(u'studentvoice', ['Response'])
-
-        # Adding model 'View'
-        db.create_table(u'studentvoice_view', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('viewer', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.SET_NULL)),
-            ('is_counted', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('voice', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['studentvoice.Voice'], null=True, on_delete=models.SET_NULL)),
-            ('view_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal(u'studentvoice', ['View'])
-
-        # Adding model 'Recipient'
-        db.create_table(u'studentvoice_recipient', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('english_name', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('email', self.gf('django.db.models.fields.EmailField')(max_length=254)),
-            ('secondary_email', self.gf('django.db.models.fields.EmailField')(max_length=254, blank=True)),
-            ('creation_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal(u'studentvoice', ['Recipient'])
-
-        # Adding M2M table for field college on 'Recipient'
-        m2m_table_name = db.shorten_name(u'studentvoice_recipient_college')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('recipient', models.ForeignKey(orm[u'studentvoice.recipient'], null=False)),
-            ('college', models.ForeignKey(orm[u'clubs.college'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['recipient_id', 'college_id'])
-
-        # Adding M2M table for field users on 'Recipient'
-        m2m_table_name = db.shorten_name(u'studentvoice_recipient_users')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('recipient', models.ForeignKey(orm[u'studentvoice.recipient'], null=False)),
-            ('user', models.ForeignKey(orm[u'auth.user'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['recipient_id', 'user_id'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'Voice'
-        db.delete_table(u'studentvoice_voice')
-
-        # Deleting model 'Vote'
-        db.delete_table(u'studentvoice_vote')
-
-        # Deleting model 'Response'
-        db.delete_table(u'studentvoice_response')
-
-        # Deleting model 'View'
-        db.delete_table(u'studentvoice_view')
-
-        # Deleting model 'Recipient'
-        db.delete_table(u'studentvoice_recipient')
-
-        # Removing M2M table for field college on 'Recipient'
-        db.delete_table(db.shorten_name(u'studentvoice_recipient_college'))
-
-        # Removing M2M table for field users on 'Recipient'
-        db.delete_table(db.shorten_name(u'studentvoice_recipient_users'))
-
-
-    models = {
-        u'auth.group': {
-            'Meta': {'object_name': 'Group'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        u'auth.permission': {
-            'Meta': {'ordering': "(u'content_type__app_label', u'content_type__model', u'codename')", 'unique_together': "((u'content_type', u'codename'),)", 'object_name': 'Permission'},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        u'auth.user': {
-            'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Group']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Permission']"}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
-        },
-        u'clubs.college': {
-            'Meta': {'object_name': 'College'},
-            'city': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'gender': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'section': ('django.db.models.fields.CharField', [], {'max_length': '2'})
-        },
-        u'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        u'studentvoice.recipient': {
-            'Meta': {'object_name': 'Recipient'},
-            'college': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': u"orm['clubs.College']", 'null': 'True', 'blank': 'True'}),
-            'creation_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '254'}),
-            'english_name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'secondary_email': ('django.db.models.fields.EmailField', [], {'max_length': '254', 'blank': 'True'}),
-            'users': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'})
-        },
-        u'studentvoice.response': {
-            'Meta': {'object_name': 'Response'},
-            'edit_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_editable': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_published': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'submission_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'submitter': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
-            'text': ('django.db.models.fields.TextField', [], {}),
-            'voice': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['studentvoice.Voice']", 'unique': 'True', 'null': 'True', 'on_delete': 'models.SET_NULL'})
-        },
-        u'studentvoice.view': {
-            'Meta': {'object_name': 'View'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_counted': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'view_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'viewer': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
-            'voice': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['studentvoice.Voice']", 'null': 'True', 'on_delete': 'models.SET_NULL'})
-        },
-        u'studentvoice.voice': {
-            'Meta': {'object_name': 'Voice'},
-            'edit_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_editable': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_published': ('django.db.models.fields.NullBooleanField', [], {'default': 'True', 'null': 'True', 'blank': 'True'}),
-            'number_of_comments': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'number_of_views': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'parent': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'replies'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['studentvoice.Voice']"}),
-            'recipient': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['studentvoice.Recipient']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
-            'score': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'solution': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'submission_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'submitter': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
-            'text': ('django.db.models.fields.TextField', [], {}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
-            'was_sent': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        u'studentvoice.vote': {
-            'Meta': {'object_name': 'Vote'},
-            'edit_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_counted': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'submission_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'submitter': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
-            'voice': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['studentvoice.Voice']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
-            'vote_type': ('django.db.models.fields.CharField', [], {'max_length': '1'})
-        }
-    }
-
-    complete_apps = ['studentvoice']
+    operations = [
+        migrations.CreateModel(
+            name='Recipient',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=200, verbose_name='\u0627\u0644\u0627\u0633\u0645')),
+                ('english_name', models.CharField(max_length=200, verbose_name='\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0625\u0646\u062c\u0644\u064a\u0632\u064a')),
+                ('email', models.EmailField(max_length=254, verbose_name='\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a')),
+                ('secondary_email', models.EmailField(max_length=254, verbose_name='\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a', blank=True)),
+                ('creation_date', models.DateTimeField(auto_now_add=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0625\u0631\u0633\u0627\u0644')),
+                ('college', models.ManyToManyField(to='clubs.College', null=True, verbose_name='\u0627\u0644\u0643\u0644\u064a\u0629', blank=True)),
+                ('users', models.ManyToManyField(to=settings.AUTH_USER_MODEL, null=True, verbose_name='\u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645\u0648\u0646', blank=True)),
+            ],
+            options={
+                'verbose_name': '\u0645\u0633\u062a\u0642\u0628\u0644',
+                'verbose_name_plural': '\u0627\u0644\u0645\u0633\u062a\u0642\u0628\u0644\u0648\u0646',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Response',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('text', models.TextField(verbose_name='\u0627\u0644\u0646\u0635')),
+                ('is_published', models.BooleanField(default=True, verbose_name='\u0645\u0646\u0634\u0648\u0631\u061f')),
+                ('is_editable', models.BooleanField(default=True, verbose_name='\u064a\u0645\u0643\u0646 \u062a\u0639\u062f\u064a\u0644\u0647\u061f')),
+                ('submission_date', models.DateTimeField(auto_now_add=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0625\u0631\u0633\u0627\u0644')),
+                ('edit_date', models.DateTimeField(auto_now=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0639\u062f\u064a\u0644')),
+                ('submitter', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, verbose_name='\u0627\u0644\u0645\u062c\u064a\u0628', to=settings.AUTH_USER_MODEL, null=True)),
+            ],
+            options={
+                'verbose_name': '\u0627\u0633\u062a\u062c\u0627\u0628\u0629',
+                'verbose_name_plural': '\u0627\u0644\u0627\u0633\u062a\u062c\u0627\u0628\u0627\u062a',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='View',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('is_counted', models.BooleanField(default=True, verbose_name='\u0645\u062d\u0633\u0648\u0628\u0629\u061f')),
+                ('view_date', models.DateTimeField(auto_now_add=True, verbose_name=b'date viewed')),
+                ('viewer', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, verbose_name='\u0627\u0644\u0645\u0634\u0627\u0647\u062f', to=settings.AUTH_USER_MODEL, null=True)),
+            ],
+            options={
+                'verbose_name': '\u0645\u0634\u0627\u0647\u062f\u0629',
+                'verbose_name_plural': '\u0627\u0644\u0645\u0634\u0627\u0647\u062f\u0627\u062a',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Voice',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('title', models.CharField(help_text='\u0644\u062e\u0635 \u0635\u0648\u062a\u0643 \u0641\u064a \u0639\u0634\u0631 \u0643\u0644\u0645\u0627\u062a \u0623\u0648 \u0623\u0642\u0644', max_length=100, verbose_name='\u0645\u0644\u062e\u0635', blank=True)),
+                ('text', models.TextField(verbose_name='\u0627\u0644\u0646\u0635')),
+                ('solution', models.TextField(verbose_name='\u0627\u0644\u062d\u0644 \u0627\u0644\u0645\u0642\u062a\u0631\u062d', blank=True)),
+                ('was_sent', models.BooleanField(default=False, verbose_name='\u0623\u0631\u0633\u0644\u061f')),
+                ('is_published', models.NullBooleanField(default=True, verbose_name='\u0645\u0646\u0634\u0648\u0631\u061f', choices=[(None, '\u0644\u0645 \u064a\u0631\u0627\u062c\u0639 \u0628\u0639\u062f'), (True, '\u0645\u0646\u0634\u0648\u0631'), (False, '\u0645\u062d\u0630\u0648\u0641')])),
+                ('is_editable', models.BooleanField(default=True, verbose_name='\u064a\u0645\u0643\u0646 \u062a\u0639\u062f\u064a\u0644\u0647\u061f')),
+                ('score', models.IntegerField(default=0, verbose_name='\u0627\u0644\u062f\u0631\u062c\u0629')),
+                ('number_of_views', models.IntegerField(default=0, verbose_name='\u0627\u0644\u0645\u0634\u0627\u0647\u062f\u0627\u062a')),
+                ('number_of_comments', models.IntegerField(default=0, verbose_name='\u0627\u0644\u062a\u0639\u0644\u064a\u0642\u0627\u062a')),
+                ('submission_date', models.DateTimeField(auto_now_add=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0646\u0634\u0631')),
+                ('edit_date', models.DateTimeField(auto_now=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0639\u062f\u064a\u0644')),
+                ('parent', models.ForeignKey(related_name='replies', on_delete=django.db.models.deletion.SET_NULL, verbose_name='\u0631\u062f \u0639\u0644\u0649', blank=True, to='studentvoice.Voice', null=True)),
+                ('recipient', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, verbose_name='\u0627\u0644\u0645\u0633\u062a\u0642\u0628\u0644', blank=True, to='studentvoice.Recipient', null=True)),
+                ('submitter', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, verbose_name='\u0627\u0644\u0645\u0631\u0633\u0644', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
+            ],
+            options={
+                'verbose_name': '\u0635\u0648\u062a',
+                'verbose_name_plural': '\u0627\u0644\u0623\u0635\u0648\u0627\u062a',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Vote',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('is_counted', models.BooleanField(default=True, verbose_name='\u0645\u062d\u0633\u0648\u0628\u061f')),
+                ('vote_type', models.CharField(max_length=1, choices=[(b'U', '\u0645\u0639'), (b'D', '\u0636\u062f'), (b'R', '\u0628\u0644\u0627\u063a')])),
+                ('submission_date', models.DateTimeField(auto_now_add=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0625\u0631\u0633\u0627\u0644')),
+                ('edit_date', models.DateTimeField(auto_now=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0639\u062f\u064a\u0644')),
+                ('submitter', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, verbose_name='\u0627\u0644\u0645\u0635\u0648\u062a', to=settings.AUTH_USER_MODEL, null=True)),
+                ('voice', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, verbose_name='\u0627\u0644\u0635\u0648\u062a', to='studentvoice.Voice', null=True)),
+            ],
+            options={
+                'verbose_name': '\u0627\u0642\u062a\u0631\u0627\u0639',
+                'verbose_name_plural': '\u0627\u0644\u0627\u0642\u062a\u0631\u0627\u0639\u0627\u062a',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.AddField(
+            model_name='view',
+            name='voice',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, verbose_name='\u0627\u0644\u0635\u0648\u062a', to='studentvoice.Voice', null=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='response',
+            name='voice',
+            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.SET_NULL, verbose_name='\u0627\u0644\u0635\u0648\u062a', to='studentvoice.Voice'),
+            preserve_default=True,
+        ),
+    ]

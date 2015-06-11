@@ -26,7 +26,7 @@ class FollowUpReportForm(ModelForm):
                   'organizer_count', 'participant_count',
                   'announcement_sites', 'notes']
 
-FollowUpReportImageFormset = inlineformset_factory(FollowUpReport, FollowUpReportImage)
+FollowUpReportImageFormset = inlineformset_factory(FollowUpReport, FollowUpReportImage, fields=['image'])
 
 class ReportCommentForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -108,7 +108,7 @@ class PollForm(ModelForm):
         exclude = ('poll_type', 'date_created', 'creator')
 
 
-PollChoiceFormSet = inlineformset_factory(Poll, PollChoice)
+PollChoiceFormSet = inlineformset_factory(Poll, PollChoice, fields=['value'])
 
 
 class PollResponseForm(ModelForm):

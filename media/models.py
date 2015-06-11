@@ -131,7 +131,7 @@ class Story(models.Model):
             ("view_story", "Can view all available stories."),
             ("edit_story", "Can edit any available story."),
             ("review_story", "Can review any available story."),
-            ("assign_review_story", "Can assign any Media Center member to review a story.")
+            ("assign_review_story", "Can assign members to review stories.")
         )
         verbose_name = u"تغطية"
         verbose_name_plural = u"التغطيات"
@@ -201,7 +201,7 @@ class Review(models.Model):
     date_reviewed = models.DateTimeField(auto_now_add=True,
                                      verbose_name=u"تاريخ المراجعة")
     notes = models.TextField(verbose_name=u"الملاحظات")
-    approve = models.BooleanField()
+    approve = models.BooleanField(default=False)
     
     class Meta:
         abstract = True # This means this model won't have a table in the db

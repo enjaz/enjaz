@@ -1,251 +1,142 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+import django.db.models.deletion
+from django.conf import settings
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Activity'
-        db.create_table(u'activities_activity', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('primary_club', self.gf('django.db.models.fields.related.ForeignKey')(related_name='primary_activity', null=True, on_delete=models.SET_NULL, to=orm['clubs.Club'])),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('public_description', self.gf('django.db.models.fields.TextField')()),
-            ('requirements', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('submitter', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.SET_NULL)),
-            ('submission_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('edit_date', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('is_editable', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('inside_collaborators', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('outside_collaborators', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('participants', self.gf('django.db.models.fields.IntegerField')()),
-            ('category', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['activities.Category'], null=True, on_delete=models.SET_NULL)),
-            ('organizers', self.gf('django.db.models.fields.IntegerField')()),
-        ))
-        db.send_create_signal(u'activities', ['Activity'])
+    dependencies = [
+        ('clubs', '0001_initial'),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
 
-        # Adding M2M table for field secondary_clubs on 'Activity'
-        m2m_table_name = db.shorten_name(u'activities_activity_secondary_clubs')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('activity', models.ForeignKey(orm[u'activities.activity'], null=False)),
-            ('club', models.ForeignKey(orm[u'clubs.club'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['activity_id', 'club_id'])
-
-        # Adding model 'Review'
-        db.create_table(u'activities_review', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('activity', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['activities.Activity'])),
-            ('reviewer', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.SET_NULL)),
-            ('review_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('edit_date', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, null=True, blank=True)),
-            ('clubs_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('name_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('datetime_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('description_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('requirement_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('inside_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('outside_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('participants_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('organizers_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('submission_date_notes', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('review_type', self.gf('django.db.models.fields.CharField')(default='P', max_length=1)),
-            ('is_approved', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'activities', ['Review'])
-
-        # Adding model 'Episode'
-        db.create_table(u'activities_episode', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('activity', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['activities.Activity'])),
-            ('start_date', self.gf('django.db.models.fields.DateField')()),
-            ('end_date', self.gf('django.db.models.fields.DateField')()),
-            ('start_time', self.gf('django.db.models.fields.TimeField')()),
-            ('end_time', self.gf('django.db.models.fields.TimeField')()),
-            ('location', self.gf('django.db.models.fields.CharField')(max_length=128)),
-            ('requires_report', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('can_report_early', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('requires_story', self.gf('django.db.models.fields.BooleanField')(default=True)),
-        ))
-        db.send_create_signal(u'activities', ['Episode'])
-
-        # Adding model 'Category'
-        db.create_table(u'activities_category', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('ar_name', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('en_name', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('parent', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['activities.Category'], null=True, on_delete=models.SET_NULL, blank=True)),
-        ))
-        db.send_create_signal(u'activities', ['Category'])
-
-        # Adding model 'Evaluation'
-        db.create_table(u'activities_evaluation', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('activity', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['activities.Activity'])),
-            ('evaluator', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('quality', self.gf('django.db.models.fields.PositiveIntegerField')()),
-            ('relevance', self.gf('django.db.models.fields.PositiveIntegerField')()),
-        ))
-        db.send_create_signal(u'activities', ['Evaluation'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'Activity'
-        db.delete_table(u'activities_activity')
-
-        # Removing M2M table for field secondary_clubs on 'Activity'
-        db.delete_table(db.shorten_name(u'activities_activity_secondary_clubs'))
-
-        # Deleting model 'Review'
-        db.delete_table(u'activities_review')
-
-        # Deleting model 'Episode'
-        db.delete_table(u'activities_episode')
-
-        # Deleting model 'Category'
-        db.delete_table(u'activities_category')
-
-        # Deleting model 'Evaluation'
-        db.delete_table(u'activities_evaluation')
-
-
-    models = {
-        u'activities.activity': {
-            'Meta': {'object_name': 'Activity'},
-            'category': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['activities.Category']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'edit_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'inside_collaborators': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'is_editable': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'organizers': ('django.db.models.fields.IntegerField', [], {}),
-            'outside_collaborators': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'participants': ('django.db.models.fields.IntegerField', [], {}),
-            'primary_club': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'primary_activity'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['clubs.Club']"}),
-            'public_description': ('django.db.models.fields.TextField', [], {}),
-            'requirements': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'secondary_clubs': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'secondary_activity'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['clubs.Club']"}),
-            'submission_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'submitter': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL'})
-        },
-        u'activities.category': {
-            'Meta': {'object_name': 'Category'},
-            'ar_name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'en_name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['activities.Category']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'})
-        },
-        u'activities.episode': {
-            'Meta': {'object_name': 'Episode'},
-            'activity': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['activities.Activity']"}),
-            'can_report_early': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'end_date': ('django.db.models.fields.DateField', [], {}),
-            'end_time': ('django.db.models.fields.TimeField', [], {}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'location': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'requires_report': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'requires_story': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'start_date': ('django.db.models.fields.DateField', [], {}),
-            'start_time': ('django.db.models.fields.TimeField', [], {})
-        },
-        u'activities.evaluation': {
-            'Meta': {'object_name': 'Evaluation'},
-            'activity': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['activities.Activity']"}),
-            'evaluator': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'quality': ('django.db.models.fields.PositiveIntegerField', [], {}),
-            'relevance': ('django.db.models.fields.PositiveIntegerField', [], {})
-        },
-        u'activities.review': {
-            'Meta': {'object_name': 'Review'},
-            'activity': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['activities.Activity']"}),
-            'clubs_notes': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'datetime_notes': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'description_notes': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'edit_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'null': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'inside_notes': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'is_approved': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
-            'name_notes': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'organizers_notes': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'outside_notes': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'participants_notes': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'requirement_notes': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'review_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'review_type': ('django.db.models.fields.CharField', [], {'default': "'P'", 'max_length': '1'}),
-            'reviewer': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
-            'submission_date_notes': ('django.db.models.fields.TextField', [], {'blank': 'True'})
-        },
-        u'auth.group': {
-            'Meta': {'object_name': 'Group'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        u'auth.permission': {
-            'Meta': {'ordering': "(u'content_type__app_label', u'content_type__model', u'codename')", 'unique_together': "((u'content_type', u'codename'),)", 'object_name': 'Permission'},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        u'auth.user': {
-            'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Group']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Permission']"}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
-        },
-        u'clubs.club': {
-            'Meta': {'object_name': 'Club'},
-            'city': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'college': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['clubs.College']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
-            'coordinator': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'coordination'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['auth.User']"}),
-            'creation_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'deputies': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'deputyships'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['auth.User']"}),
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'edit_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '254'}),
-            'employee': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'employee'", 'on_delete': 'models.SET_NULL', 'default': 'None', 'to': u"orm['auth.User']", 'blank': 'True', 'null': 'True'}),
-            'english_name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'members': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'memberships'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['auth.User']"}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'parent': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'parenthood'", 'on_delete': 'models.SET_NULL', 'default': 'None', 'to': u"orm['clubs.Club']", 'blank': 'True', 'null': 'True'}),
-            'special': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        u'clubs.college': {
-            'Meta': {'object_name': 'College'},
-            'city': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'gender': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'section': ('django.db.models.fields.CharField', [], {'max_length': '2'})
-        },
-        u'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        }
-    }
-
-    complete_apps = ['activities']
+    operations = [
+        migrations.CreateModel(
+            name='Activity',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=200, verbose_name='\u0627\u0633\u0645 \u0627\u0644\u0646\u0634\u0627\u0637')),
+                ('description', models.TextField(verbose_name='\u0648\u0635\u0641 \u0627\u0644\u0646\u0634\u0627\u0637')),
+                ('public_description', models.TextField(help_text='\u0647\u0630\u0627 \u0647\u0648 \u0627\u0644\u0648\u0635\u0641 \u0627\u0644\u0630\u064a \u0633\u064a\u0639\u0631\u0636 \u0644\u0644\u0637\u0644\u0627\u0628', verbose_name='\u0627\u0644\u0648\u0635\u0641 \u0627\u0644\u0625\u0639\u0644\u0627\u0645\u064a')),
+                ('requirements', models.TextField(verbose_name='\u0645\u062a\u0637\u0644\u0628\u0627\u062a \u0627\u0644\u0646\u0634\u0627\u0637', blank=True)),
+                ('submission_date', models.DateTimeField(auto_now_add=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0625\u0631\u0633\u0627\u0644')),
+                ('edit_date', models.DateTimeField(auto_now=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0639\u062f\u064a\u0644')),
+                ('is_editable', models.BooleanField(default=True, verbose_name='\u0647\u0644 \u064a\u0645\u0643\u0646 \u062a\u0639\u062f\u064a\u0644\u0647\u061f')),
+                ('is_deleted', models.BooleanField(default=False, verbose_name='\u0645\u062d\u0630\u0648\u0641\u061f')),
+                ('inside_collaborators', models.TextField(verbose_name='\u0627\u0644\u0645\u062a\u0639\u0627\u0648\u0646\u0648\u0646 \u0645\u0646 \u062f\u0627\u062e\u0644 \u0627\u0644\u062c\u0627\u0645\u0639\u0629', blank=True)),
+                ('outside_collaborators', models.TextField(verbose_name='\u0627\u0644\u0645\u062a\u0639\u0627\u0648\u0646\u0648\u0646 \u0645\u0646 \u062e\u0627\u0631\u062c \u0627\u0644\u062c\u0627\u0645\u0639\u0629', blank=True)),
+                ('participants', models.IntegerField(help_text='\u0627\u0644\u0639\u062f\u062f \u0627\u0644\u0645\u062a\u0648\u0642\u0639 \u0644\u0644\u0645\u0633\u062a\u0641\u064a\u062f\u064a\u0646 \u0645\u0646 \u0627\u0644\u0646\u0634\u0627\u0637', verbose_name='\u0639\u062f\u062f \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u064a\u0646')),
+                ('organizers', models.IntegerField(help_text='\u0639\u062f\u062f \u0627\u0644\u0637\u0644\u0627\u0628 \u0627\u0644\u0630\u064a\u0646 \u0633\u064a\u0646\u0638\u0645\u0648\u0646 \u0627\u0644\u0646\u0634\u0627\u0637', verbose_name='\u0639\u062f\u062f \u0627\u0644\u0645\u0646\u0638\u0645\u064a\u0646')),
+            ],
+            options={
+                'verbose_name': '\u0646\u0634\u0627\u0637',
+                'verbose_name_plural': '\u0627\u0644\u0646\u0634\u0627\u0637\u0627\u062a',
+                'permissions': (('view_activity', 'Can view all available activities.'), ('directly_add_activity', 'Can add activities directly, without approval.')),
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Category',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('ar_name', models.CharField(max_length=50, verbose_name='\u0627\u0633\u0645 \u0627\u0644\u062a\u0635\u0646\u064a\u0641')),
+                ('en_name', models.CharField(max_length=50, verbose_name='\u0627\u0633\u0645 \u0627\u0644\u0625\u0646\u062c\u0644\u064a\u0632\u064a')),
+                ('description', models.TextField(verbose_name='\u0648\u0635\u0641 \u0627\u0644\u062a\u0635\u0646\u064a\u0641', blank=True)),
+                ('parent', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, verbose_name='\u0627\u0644\u062a\u0635\u0646\u064a\u0641 \u0627\u0644\u0623\u0628', blank=True, to='activities.Category', null=True)),
+            ],
+            options={
+                'verbose_name': '\u062a\u0635\u0646\u064a\u0641',
+                'verbose_name_plural': '\u0627\u0644\u062a\u0635\u0646\u064a\u0641\u0627\u062a',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Episode',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('start_date', models.DateField()),
+                ('end_date', models.DateField()),
+                ('start_time', models.TimeField()),
+                ('end_time', models.TimeField()),
+                ('location', models.CharField(max_length=128)),
+                ('allow_multiple_niqati', models.BooleanField(default=False, verbose_name='\u0627\u0633\u0645\u062d \u0628\u0625\u062f\u062e\u0627\u0644 \u0623\u0643\u062b\u0631 \u0645\u0646 \u0631\u0645\u0632 \u0646\u0642\u0627\u0637\u064a\u061f')),
+                ('requires_report', models.BooleanField(default=True)),
+                ('can_report_early', models.BooleanField(default=False)),
+                ('requires_story', models.BooleanField(default=True)),
+                ('activity', models.ForeignKey(to='activities.Activity')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Evaluation',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('quality', models.PositiveIntegerField(help_text='\u0643\u064a\u0641 \u062a\u0642\u064a\u0645 \u0639\u0645\u0644 \u0627\u0644\u0646\u0627\u062f\u064a \u0641\u064a \u062a\u0646\u0638\u064a\u0645 \u0627\u0644\u0646\u0634\u0627\u0637\u061f', verbose_name='\u062c\u0648\u062f\u0629 \u062a\u0646\u0638\u064a\u0645 \u0627\u0644\u0646\u0634\u0627\u0637')),
+                ('relevance', models.PositiveIntegerField(help_text='\u0645\u0627 \u0645\u062f\u0649 \u0645\u0644\u0627\u0621\u0645\u0629 \u0627\u0644\u0646\u0634\u0627\u0637 \u0644\u0627\u0647\u062a\u0645\u0627\u0645 \u0627\u0644\u0637\u0644\u0627\u0628\u061f', verbose_name='\u0645\u0644\u0627\u0621\u0645\u0629 \u0627\u0644\u0646\u0634\u0627\u0637 \u0644\u0627\u0647\u062a\u0645\u0627\u0645 \u0627\u0644\u0637\u0644\u0627\u0628')),
+                ('episode', models.ForeignKey(to='activities.Episode')),
+                ('evaluator', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'verbose_name': '\u062a\u0642\u064a\u064a\u0645',
+                'verbose_name_plural': '\u0627\u0644\u062a\u0642\u064a\u064a\u0645\u0627\u062a',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Review',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('review_date', models.DateTimeField(auto_now_add=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629')),
+                ('edit_date', models.DateTimeField(auto_now=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0639\u062f\u064a\u0644', null=True)),
+                ('clubs_notes', models.TextField(verbose_name='\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0639\u0644\u0649 \u0627\u0644\u0623\u0646\u062f\u064a\u0629', blank=True)),
+                ('name_notes', models.TextField(verbose_name='\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0639\u0644\u0649 \u0627\u0644\u0627\u0633\u0645', blank=True)),
+                ('datetime_notes', models.TextField(verbose_name='\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0639\u0644\u0649 \u0627\u0644\u062a\u0627\u0631\u064a\u062e \u0648\u0627\u0644\u0648\u0642\u062a', blank=True)),
+                ('description_notes', models.TextField(verbose_name='\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0639\u0644\u0649 \u0627\u0644\u0648\u0635\u0641', blank=True)),
+                ('requirement_notes', models.TextField(verbose_name='\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0639\u0644\u0649 \u0627\u0644\u0645\u062a\u0637\u0644\u0628\u0627\u062a', blank=True)),
+                ('inside_notes', models.TextField(verbose_name='\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0627\u0644\u0645\u062a\u0639\u0627\u0648\u0646\u0648\u0646 \u0645\u0646 \u062f\u0627\u062e\u0644 \u0627\u0644\u062c\u0627\u0645\u0639\u0629', blank=True)),
+                ('outside_notes', models.TextField(verbose_name='\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0627\u0644\u0645\u062a\u0639\u0627\u0648\u0646\u0648\u0646 \u0645\u0646 \u062e\u0627\u0631\u062c \u0627\u0644\u062c\u0627\u0645\u0639\u0629', blank=True)),
+                ('participants_notes', models.TextField(verbose_name='\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0639\u0644\u0649 \u0639\u062f\u062f \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u064a\u0646', blank=True)),
+                ('organizers_notes', models.TextField(verbose_name='\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0639\u0644\u0649 \u0639\u062f\u062f \u0627\u0644\u0645\u0646\u0638\u0645\u064a\u0646', blank=True)),
+                ('submission_date_notes', models.TextField(verbose_name='\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0639\u0644\u0649 \u062a\u0627\u0631\u064a\u062e \u062a\u0642\u062f\u064a\u0645 \u0627\u0644\u0637\u0644\u0628', blank=True)),
+                ('review_type', models.CharField(default=b'P', max_length=1, verbose_name='\u0646\u0648\u0639 \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629', choices=[(b'P', '\u0631\u0626\u0627\u0633\u0629 \u0646\u0627\u062f\u064a \u0627\u0644\u0637\u0644\u0627\u0628'), (b'D', '\u0639\u0645\u0627\u062f\u0629 \u0634\u0624\u0648\u0646 \u0627\u0644\u0637\u0644\u0627\u0628')])),
+                ('is_approved', models.NullBooleanField(verbose_name='\u0627\u0644\u062d\u0627\u0644\u0629', choices=[(None, '\u0623\u0628\u0642\u0650 \u0645\u0639\u0644\u0642\u064b\u0627'), (True, '\u0627\u0642\u0628\u0644'), (False, '\u0627\u0631\u0641\u0636')])),
+                ('activity', models.ForeignKey(verbose_name=' \u0627\u0644\u0646\u0634\u0627\u0637', to='activities.Activity')),
+                ('reviewer', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, null=True)),
+            ],
+            options={
+                'verbose_name': '\u0645\u0631\u0627\u062c\u0639\u0629',
+                'verbose_name_plural': '\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0627\u062a',
+                'permissions': (('view_review', 'Can view all available reviews.'), ('add_deanship_review', 'Can add a review in the name of the deanship.'), ('add_presidency_review', 'Can add a review in the name of the presidency.'), ('view_deanship_review', 'Can view a review in the name of the deanship.'), ('view_presidency_review', 'Can view a review in the name of the presidency.')),
+            },
+            bases=(models.Model,),
+        ),
+        migrations.AddField(
+            model_name='activity',
+            name='category',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, verbose_name='\u0627\u0644\u062a\u0635\u0646\u064a\u0641', to='activities.Category', null=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='activity',
+            name='primary_club',
+            field=models.ForeignKey(related_name='primary_activity', on_delete=django.db.models.deletion.SET_NULL, verbose_name='\u0627\u0644\u0646\u0627\u062f\u064a \u0627\u0644\u0645\u0646\u0638\u0645', to='clubs.Club', null=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='activity',
+            name='secondary_clubs',
+            field=models.ManyToManyField(related_name='secondary_activity', null=True, verbose_name='\u0627\u0644\u0623\u0646\u062f\u064a\u0629 \u0627\u0644\u0645\u062a\u0639\u0627\u0648\u0646\u0629', to='clubs.Club', blank=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='activity',
+            name='submitter',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, null=True),
+            preserve_default=True,
+        ),
+    ]

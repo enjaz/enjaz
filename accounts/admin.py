@@ -6,13 +6,14 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User, Permission, Group
 from django.contrib.auth import authenticate
 from django.contrib.admin.sites import AdminSite
+from django.contrib.admin.forms import AdminAuthenticationForm
 from django.core.exceptions import ObjectDoesNotExist
 from userena.admin import UserenaAdmin
 
 from clubs.models import Club, college_choices, section_choices
 from accounts.models import StudentProfile, NonStudentProfile
 
-class DeanshipAuthenticationForm(admin.forms.AdminAuthenticationForm):
+class DeanshipAuthenticationForm(AdminAuthenticationForm):
     """A custom authentication form used in the admin app.  Based on the
 original Django code."""
     def clean(self):

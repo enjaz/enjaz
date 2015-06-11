@@ -1,465 +1,250 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+from django.conf import settings
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'FollowUpReport'
-        db.create_table(u'media_followupreport', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('episode', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['activities.Episode'], unique=True)),
-            ('submitter', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('date_submitted', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('start_date', self.gf('django.db.models.fields.DateField')()),
-            ('end_date', self.gf('django.db.models.fields.DateField')()),
-            ('start_time', self.gf('django.db.models.fields.TimeField')()),
-            ('end_time', self.gf('django.db.models.fields.TimeField')()),
-            ('location', self.gf('django.db.models.fields.CharField')(max_length=128)),
-            ('organizer_count', self.gf('django.db.models.fields.IntegerField')()),
-            ('participant_count', self.gf('django.db.models.fields.IntegerField')()),
-            ('announcement_sites', self.gf('django.db.models.fields.TextField')()),
-            ('notes', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'media', ['FollowUpReport'])
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('activities', '0001_initial'),
+    ]
 
-        # Adding model 'FollowUpReportImage'
-        db.create_table(u'media_followupreportimage', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('report', self.gf('django.db.models.fields.related.ForeignKey')(related_name='images', to=orm['media.FollowUpReport'])),
-            ('image', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
-        ))
-        db.send_create_signal(u'media', ['FollowUpReportImage'])
-
-        # Adding model 'ReportComment'
-        db.create_table(u'media_reportcomment', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('body', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('author', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('report', self.gf('django.db.models.fields.related.ForeignKey')(related_name='comments', to=orm['media.FollowUpReport'])),
-        ))
-        db.send_create_signal(u'media', ['ReportComment'])
-
-        # Adding model 'Story'
-        db.create_table(u'media_story', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('episode', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['activities.Episode'], unique=True)),
-            ('writer', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('date_submitted', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=128)),
-            ('text', self.gf('django.db.models.fields.TextField')()),
-        ))
-        db.send_create_signal(u'media', ['Story'])
-
-        # Adding model 'Article'
-        db.create_table(u'media_article', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('author', self.gf('django.db.models.fields.related.ForeignKey')(related_name=u'authored_articles', to=orm['auth.User'])),
-            ('author_photo', self.gf('django.db.models.fields.files.ImageField')(max_length=100)),
-            ('date_submitted', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=128)),
-            ('text', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('attachment', self.gf('django.db.models.fields.files.FileField')(max_length=100, null=True, blank=True)),
-            ('status', self.gf('django.db.models.fields.CharField')(default='P', max_length=1)),
-            ('assignee', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, blank=True)),
-        ))
-        db.send_create_signal(u'media', ['Article'])
-
-        # Adding model 'StoryReview'
-        db.create_table(u'media_storyreview', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('reviewer', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('date_reviewed', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('notes', self.gf('django.db.models.fields.TextField')()),
-            ('approve', self.gf('django.db.models.fields.BooleanField')()),
-            ('story', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['media.Story'], unique=True)),
-        ))
-        db.send_create_signal(u'media', ['StoryReview'])
-
-        # Adding model 'ArticleReview'
-        db.create_table(u'media_articlereview', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('reviewer', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('date_reviewed', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('notes', self.gf('django.db.models.fields.TextField')()),
-            ('approve', self.gf('django.db.models.fields.BooleanField')()),
-            ('article', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['media.Article'])),
-        ))
-        db.send_create_signal(u'media', ['ArticleReview'])
-
-        # Adding model 'StoryTask'
-        db.create_table(u'media_storytask', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('assigner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('date_assigned', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('completed', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('episode', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['activities.Episode'], unique=True)),
-            ('assignee', self.gf('django.db.models.fields.related.ForeignKey')(related_name='assigned_storytasks', to=orm['auth.User'])),
-            ('story', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['media.Story'], unique=True, null=True, blank=True)),
-        ))
-        db.send_create_signal(u'media', ['StoryTask'])
-
-        # Adding model 'CustomTask'
-        db.create_table(u'media_customtask', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('assigner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('date_assigned', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('completed', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('assignee', self.gf('django.db.models.fields.related.ForeignKey')(related_name='assigned_tasks', to=orm['auth.User'])),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=140)),
-            ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('due_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('completed_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'media', ['CustomTask'])
-
-        # Adding model 'TaskComment'
-        db.create_table(u'media_taskcomment', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('body', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('author', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('task', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['media.CustomTask'])),
-        ))
-        db.send_create_signal(u'media', ['TaskComment'])
-
-        # Adding model 'Poll'
-        db.create_table(u'media_poll', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('poll_type', self.gf('django.db.models.fields.IntegerField')()),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=128)),
-            ('text', self.gf('django.db.models.fields.TextField')()),
-            ('date_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('image', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('open_date', self.gf('django.db.models.fields.DateTimeField')()),
-            ('close_date', self.gf('django.db.models.fields.DateTimeField')()),
-            ('creator', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-        ))
-        db.send_create_signal(u'media', ['Poll'])
-
-        # Adding model 'PollChoice'
-        db.create_table(u'media_pollchoice', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('poll', self.gf('django.db.models.fields.related.ForeignKey')(related_name='choices', to=orm['media.Poll'])),
-            ('value', self.gf('django.db.models.fields.CharField')(max_length=128)),
-            ('color', self.gf('django.db.models.fields.CharField')(default='green', max_length=128)),
-        ))
-        db.send_create_signal(u'media', ['PollChoice'])
-
-        # Adding model 'PollResponse'
-        db.create_table(u'media_pollresponse', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('poll', self.gf('django.db.models.fields.related.ForeignKey')(related_name='responses', to=orm['media.Poll'])),
-            ('date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('choice', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['media.PollChoice'])),
-        ))
-        db.send_create_signal(u'media', ['PollResponse'])
-
-        # Adding unique constraint on 'PollResponse', fields ['poll', 'user']
-        db.create_unique(u'media_pollresponse', ['poll_id', 'user_id'])
-
-        # Adding model 'PollComment'
-        db.create_table(u'media_pollcomment', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('body', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('author', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('poll', self.gf('django.db.models.fields.related.ForeignKey')(related_name='comments', to=orm['media.Poll'])),
-        ))
-        db.send_create_signal(u'media', ['PollComment'])
-
-
-    def backwards(self, orm):
-        # Removing unique constraint on 'PollResponse', fields ['poll', 'user']
-        db.delete_unique(u'media_pollresponse', ['poll_id', 'user_id'])
-
-        # Deleting model 'FollowUpReport'
-        db.delete_table(u'media_followupreport')
-
-        # Deleting model 'FollowUpReportImage'
-        db.delete_table(u'media_followupreportimage')
-
-        # Deleting model 'ReportComment'
-        db.delete_table(u'media_reportcomment')
-
-        # Deleting model 'Story'
-        db.delete_table(u'media_story')
-
-        # Deleting model 'Article'
-        db.delete_table(u'media_article')
-
-        # Deleting model 'StoryReview'
-        db.delete_table(u'media_storyreview')
-
-        # Deleting model 'ArticleReview'
-        db.delete_table(u'media_articlereview')
-
-        # Deleting model 'StoryTask'
-        db.delete_table(u'media_storytask')
-
-        # Deleting model 'CustomTask'
-        db.delete_table(u'media_customtask')
-
-        # Deleting model 'TaskComment'
-        db.delete_table(u'media_taskcomment')
-
-        # Deleting model 'Poll'
-        db.delete_table(u'media_poll')
-
-        # Deleting model 'PollChoice'
-        db.delete_table(u'media_pollchoice')
-
-        # Deleting model 'PollResponse'
-        db.delete_table(u'media_pollresponse')
-
-        # Deleting model 'PollComment'
-        db.delete_table(u'media_pollcomment')
-
-
-    models = {
-        u'activities.activity': {
-            'Meta': {'object_name': 'Activity'},
-            'category': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['activities.Category']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'edit_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'inside_collaborators': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'is_editable': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'organizers': ('django.db.models.fields.IntegerField', [], {}),
-            'outside_collaborators': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'participants': ('django.db.models.fields.IntegerField', [], {}),
-            'primary_club': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'primary_activity'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['clubs.Club']"}),
-            'public_description': ('django.db.models.fields.TextField', [], {}),
-            'requirements': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'secondary_clubs': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'secondary_activity'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['clubs.Club']"}),
-            'submission_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'submitter': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL'})
-        },
-        u'activities.category': {
-            'Meta': {'object_name': 'Category'},
-            'ar_name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'en_name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['activities.Category']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'})
-        },
-        u'activities.episode': {
-            'Meta': {'object_name': 'Episode'},
-            'activity': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['activities.Activity']"}),
-            'can_report_early': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'end_date': ('django.db.models.fields.DateField', [], {}),
-            'end_time': ('django.db.models.fields.TimeField', [], {}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'location': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'requires_report': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'requires_story': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'start_date': ('django.db.models.fields.DateField', [], {}),
-            'start_time': ('django.db.models.fields.TimeField', [], {})
-        },
-        u'auth.group': {
-            'Meta': {'object_name': 'Group'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        u'auth.permission': {
-            'Meta': {'ordering': "(u'content_type__app_label', u'content_type__model', u'codename')", 'unique_together': "((u'content_type', u'codename'),)", 'object_name': 'Permission'},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        u'auth.user': {
-            'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Group']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Permission']"}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
-        },
-        u'clubs.club': {
-            'Meta': {'object_name': 'Club'},
-            'city': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'college': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['clubs.College']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
-            'coordinator': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'coordination'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['auth.User']"}),
-            'creation_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'deputies': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'deputyships'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['auth.User']"}),
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'edit_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '254'}),
-            'employee': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'employee'", 'on_delete': 'models.SET_NULL', 'default': 'None', 'to': u"orm['auth.User']", 'blank': 'True', 'null': 'True'}),
-            'english_name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'members': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'memberships'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['auth.User']"}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'parent': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'parenthood'", 'on_delete': 'models.SET_NULL', 'default': 'None', 'to': u"orm['clubs.Club']", 'blank': 'True', 'null': 'True'}),
-            'special': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        u'clubs.college': {
-            'Meta': {'object_name': 'College'},
-            'city': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'gender': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'section': ('django.db.models.fields.CharField', [], {'max_length': '2'})
-        },
-        u'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        u'media.article': {
-            'Meta': {'object_name': 'Article'},
-            'assignee': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'}),
-            'attachment': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'author': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'authored_articles'", 'to': u"orm['auth.User']"}),
-            'author_photo': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
-            'date_submitted': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'status': ('django.db.models.fields.CharField', [], {'default': "'P'", 'max_length': '1'}),
-            'text': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '128'})
-        },
-        u'media.articlereview': {
-            'Meta': {'object_name': 'ArticleReview'},
-            'approve': ('django.db.models.fields.BooleanField', [], {}),
-            'article': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['media.Article']"}),
-            'date_reviewed': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'notes': ('django.db.models.fields.TextField', [], {}),
-            'reviewer': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
-        },
-        u'media.customtask': {
-            'Meta': {'object_name': 'CustomTask'},
-            'assignee': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'assigned_tasks'", 'to': u"orm['auth.User']"}),
-            'assigner': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            'completed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'completed_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'date_assigned': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'due_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '140'})
-        },
-        u'media.followupreport': {
-            'Meta': {'object_name': 'FollowUpReport'},
-            'announcement_sites': ('django.db.models.fields.TextField', [], {}),
-            'date_submitted': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'end_date': ('django.db.models.fields.DateField', [], {}),
-            'end_time': ('django.db.models.fields.TimeField', [], {}),
-            'episode': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['activities.Episode']", 'unique': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'location': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'notes': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'organizer_count': ('django.db.models.fields.IntegerField', [], {}),
-            'participant_count': ('django.db.models.fields.IntegerField', [], {}),
-            'start_date': ('django.db.models.fields.DateField', [], {}),
-            'start_time': ('django.db.models.fields.TimeField', [], {}),
-            'submitter': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
-        },
-        u'media.followupreportimage': {
-            'Meta': {'object_name': 'FollowUpReportImage'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'image': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
-            'report': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'images'", 'to': u"orm['media.FollowUpReport']"})
-        },
-        u'media.poll': {
-            'Meta': {'object_name': 'Poll'},
-            'close_date': ('django.db.models.fields.DateTimeField', [], {}),
-            'creator': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'open_date': ('django.db.models.fields.DateTimeField', [], {}),
-            'poll_type': ('django.db.models.fields.IntegerField', [], {}),
-            'text': ('django.db.models.fields.TextField', [], {}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '128'})
-        },
-        u'media.pollchoice': {
-            'Meta': {'object_name': 'PollChoice'},
-            'color': ('django.db.models.fields.CharField', [], {'default': "'green'", 'max_length': '128'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'poll': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'choices'", 'to': u"orm['media.Poll']"}),
-            'value': ('django.db.models.fields.CharField', [], {'max_length': '128'})
-        },
-        u'media.pollcomment': {
-            'Meta': {'object_name': 'PollComment'},
-            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            'body': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'poll': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'comments'", 'to': u"orm['media.Poll']"})
-        },
-        u'media.pollresponse': {
-            'Meta': {'unique_together': "(('poll', 'user'),)", 'object_name': 'PollResponse'},
-            'choice': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['media.PollChoice']"}),
-            'date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'poll': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'responses'", 'to': u"orm['media.Poll']"}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
-        },
-        u'media.reportcomment': {
-            'Meta': {'object_name': 'ReportComment'},
-            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            'body': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'report': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'comments'", 'to': u"orm['media.FollowUpReport']"})
-        },
-        u'media.story': {
-            'Meta': {'object_name': 'Story'},
-            'date_submitted': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'episode': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['activities.Episode']", 'unique': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'text': ('django.db.models.fields.TextField', [], {}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'writer': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
-        },
-        u'media.storyreview': {
-            'Meta': {'object_name': 'StoryReview'},
-            'approve': ('django.db.models.fields.BooleanField', [], {}),
-            'date_reviewed': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'notes': ('django.db.models.fields.TextField', [], {}),
-            'reviewer': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            'story': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['media.Story']", 'unique': 'True'})
-        },
-        u'media.storytask': {
-            'Meta': {'object_name': 'StoryTask'},
-            'assignee': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'assigned_storytasks'", 'to': u"orm['auth.User']"}),
-            'assigner': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            'completed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'date_assigned': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'episode': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['activities.Episode']", 'unique': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'story': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['media.Story']", 'unique': 'True', 'null': 'True', 'blank': 'True'})
-        },
-        u'media.taskcomment': {
-            'Meta': {'object_name': 'TaskComment'},
-            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            'body': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'task': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['media.CustomTask']"})
-        }
-    }
-
-    complete_apps = ['media']
+    operations = [
+        migrations.CreateModel(
+            name='Article',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('author_photo', models.ImageField(upload_to=b'media/author_photos/', verbose_name='\u0635\u0648\u0631\u0629 \u0634\u062e\u0635\u064a\u0629')),
+                ('date_submitted', models.DateTimeField(auto_now_add=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0631\u0641\u0639')),
+                ('title', models.CharField(max_length=128, verbose_name='\u0627\u0644\u0639\u0646\u0648\u0627\u0646')),
+                ('text', models.TextField(null=True, verbose_name='\u0627\u0644\u0646\u0635', blank=True)),
+                ('attachment', models.FileField(upload_to=b'media/articles/', null=True, verbose_name='\u0627\u0644\u0645\u0631\u0641\u0642\u0627\u062a', blank=True)),
+                ('status', models.CharField(default=b'P', max_length=1, verbose_name='\u0627\u0644\u062d\u0627\u0644\u0629', choices=[(b'A', '\u062a\u0645 \u0642\u0628\u0648\u0644\u0647'), (b'P', '\u064a\u0646\u062a\u0638\u0631 \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629'), (b'E', '\u064a\u0646\u062a\u0638\u0631 \u062a\u0639\u062f\u064a\u0644\u064b\u0627'), (b'R', '\u0645\u0631\u0641\u0648\u0636')])),
+                ('assignee', models.ForeignKey(verbose_name='\u0627\u0644\u0645\u0643\u0644\u0641 \u0628\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
+                ('author', models.ForeignKey(related_name='authored_articles', verbose_name='\u0627\u0644\u0643\u0627\u062a\u0628', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'verbose_name': '\u0645\u0642\u0627\u0644',
+                'verbose_name_plural': '\u0627\u0644\u0645\u0642\u0627\u0644\u0627\u062a',
+                'permissions': (('view_article', 'Can view all available articles.'), ('review_article', 'Can review any available article.')),
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='ArticleReview',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('date_reviewed', models.DateTimeField(auto_now_add=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629')),
+                ('notes', models.TextField(verbose_name='\u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0627\u062a')),
+                ('approve', models.BooleanField(default=False)),
+                ('article', models.ForeignKey(verbose_name='\u0627\u0644\u0645\u0642\u0627\u0644', to='media.Article')),
+                ('reviewer', models.ForeignKey(verbose_name='\u0627\u0644\u0645\u064f\u0631\u0627\u062c\u0639', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'verbose_name': '\u0645\u0631\u0627\u062c\u0639\u0629 \u0645\u0642\u0627\u0644',
+                'verbose_name_plural': '\u0645\u0631\u0627\u062c\u0639\u0627\u062a \u0627\u0644\u0645\u0642\u0627\u0644\u0627\u062a',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='CustomTask',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('date_assigned', models.DateTimeField(auto_now_add=True, verbose_name=b'\xd8\xaa\xd8\xa7\xd8\xb1\xd9\x8a\xd8\xae \xd8\xa7\xd9\x84\xd8\xaa\xd8\xb9\xd9\x8a\xd9\x8a\xd9\x86')),
+                ('completed', models.BooleanField(default=False)),
+                ('title', models.CharField(max_length=140, verbose_name='\u0627\u0644\u0639\u0646\u0648\u0627\u0646')),
+                ('description', models.TextField(null=True, verbose_name='\u0627\u0644\u0648\u0635\u0641', blank=True)),
+                ('due_date', models.DateField(null=True, verbose_name='\u0627\u0644\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0645\u0637\u0644\u0648\u0628', blank=True)),
+                ('completed_date', models.DateField(null=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0625\u0646\u0647\u0627\u0621', blank=True)),
+                ('assignee', models.ForeignKey(related_name='assigned_tasks', verbose_name=b'\xd8\xa7\xd9\x84\xd9\x85\xd8\xb9\xd9\x8a\xd9\x91\xd9\x8e\xd9\x86', to=settings.AUTH_USER_MODEL)),
+                ('assigner', models.ForeignKey(verbose_name=b'\xd8\xa7\xd9\x84\xd9\x85\xd8\xb9\xd9\x8a\xd9\x91\xd9\x90\xd9\x86', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'verbose_name': '\u0645\u0647\u0645\u0629',
+                'verbose_name_plural': '\u0627\u0644\u0645\u0647\u0627\u0645',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='FollowUpReport',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('date_submitted', models.DateTimeField(auto_now_add=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0631\u0641\u0639 \u0627\u0644\u062a\u0642\u0631\u064a\u0631')),
+                ('description', models.TextField(verbose_name='\u0627\u0644\u0648\u0635\u0641')),
+                ('start_date', models.DateField(verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0628\u062f\u0627\u064a\u0629')),
+                ('end_date', models.DateField(verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0646\u0647\u0627\u064a\u0629')),
+                ('start_time', models.TimeField(verbose_name='\u0648\u0642\u062a \u0627\u0644\u0628\u062f\u0627\u064a\u0629')),
+                ('end_time', models.TimeField(verbose_name='\u0648\u0642\u062a \u0627\u0644\u0646\u0647\u0627\u064a\u0629')),
+                ('location', models.CharField(max_length=128, verbose_name='\u0627\u0644\u0645\u0643\u0627\u0646')),
+                ('organizer_count', models.IntegerField(verbose_name='\u0639\u062f\u062f \u0627\u0644\u0645\u0646\u0638\u0645\u064a\u0646')),
+                ('participant_count', models.IntegerField(verbose_name='\u0639\u062f\u062f \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u064a\u0646')),
+                ('announcement_sites', models.TextField(verbose_name='\u0623\u0645\u0627\u0643\u0646 \u0627\u0644\u0646\u0634\u0631 \u0648 \u0627\u0644\u0625\u0639\u0644\u0627\u0646')),
+                ('notes', models.TextField(null=True, verbose_name='\u0645\u0644\u0627\u062d\u0638\u0627\u062a', blank=True)),
+                ('episode', models.OneToOneField(verbose_name='\u0627\u0644\u0645\u0648\u0639\u062f', to='activities.Episode')),
+                ('submitter', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'verbose_name': '\u062a\u0642\u0631\u064a\u0631',
+                'verbose_name_plural': '\u0627\u0644\u062a\u0642\u0627\u0631\u064a\u0631',
+                'permissions': (('view_followupreport', 'Can view a follow-up report.'), ('view_all_followupreports', 'Can view all available follow-up reports.')),
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='FollowUpReportImage',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('image', models.FileField(upload_to=b'media/images/', verbose_name='\u0627\u0644\u0635\u0648\u0631\u0629')),
+                ('report', models.ForeignKey(related_name='images', to='media.FollowUpReport')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Poll',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('poll_type', models.IntegerField(verbose_name='\u0627\u0644\u0646\u0648\u0639', choices=[(0, '\u0645\u0627\u0630\u0627 \u0644\u0648\u061f'), (1, '\u0627\u0644\u0645\u0626\u0629 \u062a\u0642\u0648\u0644')])),
+                ('title', models.CharField(max_length=128, verbose_name='\u0627\u0644\u0639\u0646\u0648\u0627\u0646')),
+                ('text', models.TextField(verbose_name='\u0627\u0644\u0646\u0635')),
+                ('date_created', models.DateTimeField(auto_now_add=True)),
+                ('image', models.ImageField(null=True, upload_to=b'media/pollimages/', blank=True)),
+                ('open_date', models.DateTimeField(verbose_name='\u0645\u0648\u0639\u062f \u0627\u0644\u0641\u062a\u062d')),
+                ('close_date', models.DateTimeField(verbose_name='\u0645\u0648\u0639\u062f \u0627\u0644\u0625\u063a\u0644\u0627\u0642')),
+                ('creator', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'verbose_name': '\u062a\u0635\u0648\u064a\u062a',
+                'verbose_name_plural': '\u0627\u0644\u062a\u0635\u0648\u064a\u062a\u0627\u062a',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='PollChoice',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('value', models.CharField(max_length=128, verbose_name='\u0627\u0644\u0646\u0635')),
+                ('color', models.CharField(default=b'green', max_length=128, verbose_name='\u0627\u0644\u0644\u0648\u0646', choices=[(b'red', '\u0623\u062d\u0645\u0631'), (b'green', '\u0623\u062e\u0636\u0631'), (b'blue', '\u0623\u0632\u0631\u0642'), (b'aero', '\u0631\u0635\u0627\u0635\u064a'), (b'grey', '\u0631\u0645\u0627\u062f\u064a'), (b'orange', '\u0628\u0631\u062a\u0642\u0627\u0644\u064a'), (b'yellow', '\u0623\u0635\u0641\u0631'), (b'pink', '\u0632\u0647\u0631\u064a'), (b'purple', '\u0628\u0646\u0641\u0633\u062c\u064a')])),
+                ('poll', models.ForeignKey(related_name='choices', to='media.Poll')),
+            ],
+            options={
+                'verbose_name': '\u062e\u064a\u0627\u0631',
+                'verbose_name_plural': '\u0627\u0644\u062e\u064a\u0627\u0631\u0627\u062a',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='PollComment',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('date', models.DateTimeField(auto_now_add=True, verbose_name='\u0627\u0644\u062a\u0627\u0631\u064a\u062e')),
+                ('body', models.TextField(verbose_name='\u0627\u0644\u0646\u0635', blank=True)),
+                ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('poll', models.ForeignKey(related_name='comments', to='media.Poll')),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='PollResponse',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('date', models.DateTimeField(auto_now_add=True)),
+                ('choice', models.ForeignKey(to='media.PollChoice')),
+                ('poll', models.ForeignKey(related_name='responses', to='media.Poll')),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='ReportComment',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('date', models.DateTimeField(auto_now_add=True, verbose_name='\u0627\u0644\u062a\u0627\u0631\u064a\u062e')),
+                ('body', models.TextField(verbose_name='\u0627\u0644\u0646\u0635', blank=True)),
+                ('author', models.ForeignKey(verbose_name='\u0627\u0644\u0645\u0639\u0644\u0651\u0650\u0642', to=settings.AUTH_USER_MODEL)),
+                ('report', models.ForeignKey(related_name='comments', to='media.FollowUpReport')),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Story',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('date_submitted', models.DateTimeField(auto_now_add=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0631\u0641\u0639 \u0627\u0644\u062a\u063a\u0637\u064a\u0629')),
+                ('title', models.CharField(max_length=128, verbose_name='\u0627\u0644\u0639\u0646\u0648\u0627\u0646')),
+                ('text', models.TextField(verbose_name='\u0627\u0644\u0646\u0635')),
+                ('episode', models.OneToOneField(verbose_name='\u0627\u0644\u0645\u0648\u0639\u062f', to='activities.Episode')),
+                ('writer', models.ForeignKey(verbose_name='\u0627\u0644\u0643\u0627\u062a\u0628', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'verbose_name': '\u062a\u063a\u0637\u064a\u0629',
+                'verbose_name_plural': '\u0627\u0644\u062a\u063a\u0637\u064a\u0627\u062a',
+                'permissions': (('view_story', 'Can view all available stories.'), ('edit_story', 'Can edit any available story.'), ('review_story', 'Can review any available story.'), ('assign_review_story', 'Can assign members to review stories.')),
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='StoryReview',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('date_reviewed', models.DateTimeField(auto_now_add=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629')),
+                ('notes', models.TextField(verbose_name='\u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0627\u062a')),
+                ('approve', models.BooleanField(default=False)),
+                ('reviewer', models.ForeignKey(verbose_name='\u0627\u0644\u0645\u064f\u0631\u0627\u062c\u0639', to=settings.AUTH_USER_MODEL)),
+                ('story', models.OneToOneField(verbose_name='\u0627\u0644\u062a\u063a\u0637\u064a\u0629', to='media.Story')),
+            ],
+            options={
+                'verbose_name': '\u0645\u0631\u0627\u062c\u0639\u0629 \u062a\u063a\u0637\u064a\u0629',
+                'verbose_name_plural': '\u0645\u0631\u0627\u062c\u0639\u0627\u062a \u0627\u0644\u062a\u063a\u0637\u064a\u0627\u062a',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='StoryTask',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('date_assigned', models.DateTimeField(auto_now_add=True, verbose_name=b'\xd8\xaa\xd8\xa7\xd8\xb1\xd9\x8a\xd8\xae \xd8\xa7\xd9\x84\xd8\xaa\xd8\xb9\xd9\x8a\xd9\x8a\xd9\x86')),
+                ('completed', models.BooleanField(default=False)),
+                ('assignee', models.ForeignKey(related_name='assigned_storytasks', verbose_name=b'\xd8\xa7\xd9\x84\xd9\x85\xd8\xb9\xd9\x8a\xd9\x91\xd9\x8e\xd9\x86', to=settings.AUTH_USER_MODEL)),
+                ('assigner', models.ForeignKey(verbose_name=b'\xd8\xa7\xd9\x84\xd9\x85\xd8\xb9\xd9\x8a\xd9\x91\xd9\x90\xd9\x86', to=settings.AUTH_USER_MODEL)),
+                ('episode', models.OneToOneField(to='activities.Episode')),
+                ('story', models.OneToOneField(null=True, blank=True, to='media.Story')),
+            ],
+            options={
+                'verbose_name': '\u0645\u0647\u0645\u0629 \u062a\u063a\u0637\u064a\u0629',
+                'verbose_name_plural': '\u0645\u0647\u0645\u0627\u062a \u0627\u0644\u062a\u063a\u0637\u064a\u0627\u062a',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='TaskComment',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('date', models.DateTimeField(auto_now_add=True, verbose_name='\u0627\u0644\u062a\u0627\u0631\u064a\u062e')),
+                ('body', models.TextField(verbose_name='\u0627\u0644\u0646\u0635', blank=True)),
+                ('author', models.ForeignKey(verbose_name='\u0627\u0644\u0645\u0639\u0644\u0642', to=settings.AUTH_USER_MODEL)),
+                ('task', models.ForeignKey(verbose_name='\u0627\u0644\u0645\u0647\u0645\u0629', to='media.CustomTask')),
+            ],
+            options={
+                'verbose_name': '\u062a\u0639\u0644\u064a\u0642 \u0639\u0644\u0649 \u0645\u0647\u0645\u0629',
+                'verbose_name_plural': '\u0627\u0644\u062a\u0639\u0644\u064a\u0642\u0627\u062a \u0639\u0644\u0649 \u0627\u0644\u0645\u0647\u0627\u0645',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.AlterUniqueTogether(
+            name='pollresponse',
+            unique_together=set([('poll', 'user')]),
+        ),
+    ]

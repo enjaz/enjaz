@@ -1,137 +1,87 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+import django.db.models.deletion
+from django.conf import settings
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Club'
-        db.create_table(u'clubs_club', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('english_name', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('email', self.gf('django.db.models.fields.EmailField')(max_length=254)),
-            ('parent', self.gf('django.db.models.fields.related.ForeignKey')(related_name='parenthood', on_delete=models.SET_NULL, default=None, to=orm['clubs.Club'], blank=True, null=True)),
-            ('coordinator', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='coordination', null=True, on_delete=models.SET_NULL, to=orm['auth.User'])),
-            ('employee', self.gf('django.db.models.fields.related.ForeignKey')(related_name='employee', on_delete=models.SET_NULL, default=None, to=orm['auth.User'], blank=True, null=True)),
-            ('college', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['clubs.College'], null=True, on_delete=models.SET_NULL, blank=True)),
-            ('creation_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('edit_date', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('special', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('city', self.gf('django.db.models.fields.CharField')(max_length=1)),
-        ))
-        db.send_create_signal(u'clubs', ['Club'])
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
 
-        # Adding M2M table for field deputies on 'Club'
-        m2m_table_name = db.shorten_name(u'clubs_club_deputies')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('club', models.ForeignKey(orm[u'clubs.club'], null=False)),
-            ('user', models.ForeignKey(orm[u'auth.user'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['club_id', 'user_id'])
-
-        # Adding M2M table for field members on 'Club'
-        m2m_table_name = db.shorten_name(u'clubs_club_members')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('club', models.ForeignKey(orm[u'clubs.club'], null=False)),
-            ('user', models.ForeignKey(orm[u'auth.user'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['club_id', 'user_id'])
-
-        # Adding model 'College'
-        db.create_table(u'clubs_college', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('section', self.gf('django.db.models.fields.CharField')(max_length=2)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=1)),
-            ('city', self.gf('django.db.models.fields.CharField')(max_length=1)),
-            ('gender', self.gf('django.db.models.fields.CharField')(max_length=1)),
-        ))
-        db.send_create_signal(u'clubs', ['College'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'Club'
-        db.delete_table(u'clubs_club')
-
-        # Removing M2M table for field deputies on 'Club'
-        db.delete_table(db.shorten_name(u'clubs_club_deputies'))
-
-        # Removing M2M table for field members on 'Club'
-        db.delete_table(db.shorten_name(u'clubs_club_members'))
-
-        # Deleting model 'College'
-        db.delete_table(u'clubs_college')
-
-
-    models = {
-        u'auth.group': {
-            'Meta': {'object_name': 'Group'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        u'auth.permission': {
-            'Meta': {'ordering': "(u'content_type__app_label', u'content_type__model', u'codename')", 'unique_together': "((u'content_type', u'codename'),)", 'object_name': 'Permission'},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        u'auth.user': {
-            'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Group']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Permission']"}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
-        },
-        u'clubs.club': {
-            'Meta': {'object_name': 'Club'},
-            'city': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'college': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['clubs.College']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
-            'coordinator': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'coordination'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['auth.User']"}),
-            'creation_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'deputies': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'deputyships'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['auth.User']"}),
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'edit_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '254'}),
-            'employee': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'employee'", 'on_delete': 'models.SET_NULL', 'default': 'None', 'to': u"orm['auth.User']", 'blank': 'True', 'null': 'True'}),
-            'english_name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'members': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'memberships'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['auth.User']"}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'parent': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'parenthood'", 'on_delete': 'models.SET_NULL', 'default': 'None', 'to': u"orm['clubs.Club']", 'blank': 'True', 'null': 'True'}),
-            'special': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        u'clubs.college': {
-            'Meta': {'object_name': 'College'},
-            'city': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'gender': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'section': ('django.db.models.fields.CharField', [], {'max_length': '2'})
-        },
-        u'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        }
-    }
-
-    complete_apps = ['clubs']
+    operations = [
+        migrations.CreateModel(
+            name='Club',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=200, verbose_name='\u0627\u0644\u0627\u0633\u0645')),
+                ('english_name', models.CharField(max_length=200, verbose_name='\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0625\u0646\u062c\u0644\u064a\u0632\u064a')),
+                ('description', models.TextField(verbose_name='\u0627\u0644\u0648\u0635\u0641')),
+                ('email', models.EmailField(max_length=254, verbose_name='\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a')),
+                ('creation_date', models.DateTimeField(auto_now_add=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0625\u0646\u0634\u0627\u0621')),
+                ('edit_date', models.DateTimeField(auto_now=True, verbose_name='\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0639\u062f\u064a\u0644')),
+                ('special', models.BooleanField(default=False, verbose_name='\u0646\u0627\u062f\u064a \u0645\u0645\u064a\u0632\u061f')),
+                ('city', models.CharField(max_length=1, verbose_name='\u0627\u0644\u0645\u062f\u064a\u0646\u0629', choices=[(b'R', '\u0627\u0644\u0631\u064a\u0627\u0636'), (b'J', '\u062c\u062f\u0629'), (b'A', '\u0627\u0644\u0623\u062d\u0633\u0627\u0621')])),
+            ],
+            options={
+                'verbose_name': '\u0646\u0627\u062f\u064a',
+                'verbose_name_plural': '\u0627\u0644\u0623\u0646\u062f\u064a\u0629',
+                'permissions': (('view_members', 'Can view club members list.'),),
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='College',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('section', models.CharField(max_length=2, verbose_name='\u0627\u0644\u0642\u0633\u0645', choices=[(b'NG', '\u0627\u0644\u062d\u0631\u0633 \u0627\u0644\u0648\u0637\u0646\u064a'), (b'KF', '\u0645\u062f\u064a\u0646\u0629 \u0627\u0644\u0645\u0644\u0643 \u0641\u0647\u062f \u0627\u0644\u0637\u0628\u064a\u0629')])),
+                ('name', models.CharField(max_length=1, verbose_name='\u0627\u0644\u0627\u0633\u0645', choices=[(b'M', '\u0643\u0644\u064a\u0629 \u0627\u0644\u0637\u0628'), (b'A', '\u0643\u0644\u064a\u0629 \u0627\u0644\u0639\u0644\u0648\u0645 \u0627\u0644\u0637\u0628\u064a\u0629 \u0627\u0644\u062a\u0637\u0628\u064a\u0642\u064a\u0629'), (b'P', '\u0643\u0644\u064a\u0629 \u0627\u0644\u0635\u064a\u062f\u0644\u0629'), (b'D', '\u0643\u0644\u064a\u0629 \u0637\u0628 \u0627\u0644\u0623\u0633\u0646\u0627\u0646'), (b'B', '\u0643\u0644\u064a\u0629 \u0627\u0644\u0639\u0644\u0648\u0645 \u0648 \u0627\u0644\u0645\u0647\u0646 \u0627\u0644\u0635\u062d\u064a\u0629'), (b'N', '\u0643\u0644\u064a\u0629 \u0627\u0644\u062a\u0645\u0631\u064a\u0636'), (b'I', ' \u0643\u0644\u064a\u0629 \u0627\u0644\u0635\u062d\u0629 \u0627\u0644\u0639\u0627\u0645\u0629 \u0648\u0627\u0644\u0645\u0639\u0644\u0648\u0645\u0627\u062a\u064a\u0629 \u0627\u0644\u0635\u062d\u064a\u0629')])),
+                ('city', models.CharField(max_length=1, verbose_name='\u0627\u0644\u0645\u062f\u064a\u0646\u0629', choices=[(b'R', '\u0627\u0644\u0631\u064a\u0627\u0636'), (b'J', '\u062c\u062f\u0629'), (b'A', '\u0627\u0644\u0623\u062d\u0633\u0627\u0621')])),
+                ('gender', models.CharField(max_length=1, verbose_name='\u0627\u0644\u062c\u0646\u0633', choices=[(b'F', '\u0637\u0627\u0644\u0628\u0627\u062a'), (b'M', '\u0637\u0644\u0627\u0628')])),
+            ],
+            options={
+                'verbose_name': '\u0643\u0644\u064a\u0629',
+                'verbose_name_plural': '\u0627\u0644\u0643\u0644\u064a\u0627\u062a',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.AddField(
+            model_name='club',
+            name='college',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, default=None, blank=True, to='clubs.College', null=True, verbose_name='\u0627\u0644\u0643\u0644\u064a\u0629'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='club',
+            name='coordinator',
+            field=models.ForeignKey(related_name='coordination', on_delete=django.db.models.deletion.SET_NULL, verbose_name='\u0627\u0644\u0645\u0646\u0633\u0642', blank=True, to=settings.AUTH_USER_MODEL, null=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='club',
+            name='deputies',
+            field=models.ManyToManyField(related_name='deputyships', null=True, verbose_name='\u0627\u0644\u0646\u0648\u0627\u0628', to=settings.AUTH_USER_MODEL, blank=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='club',
+            name='employee',
+            field=models.ForeignKey(related_name='employee', on_delete=django.db.models.deletion.SET_NULL, default=None, blank=True, to=settings.AUTH_USER_MODEL, null=True, verbose_name='\u0627\u0644\u0645\u0648\u0638\u0641 \u0627\u0644\u0645\u0633\u0624\u0648\u0644'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='club',
+            name='members',
+            field=models.ManyToManyField(related_name='memberships', null=True, verbose_name='\u0627\u0644\u0623\u0639\u0636\u0627\u0621', to=settings.AUTH_USER_MODEL, blank=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='club',
+            name='parent',
+            field=models.ForeignKey(related_name='parenthood', on_delete=django.db.models.deletion.SET_NULL, default=None, blank=True, to='clubs.Club', null=True, verbose_name='\u0627\u0644\u0646\u0627\u062f\u064a \u0627\u0644\u0623\u0628'),
+            preserve_default=True,
+        ),
+    ]

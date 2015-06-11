@@ -190,12 +190,12 @@ class Recipient(models.Model):
     name = models.CharField(max_length=200, verbose_name=u"الاسم")
     english_name = models.CharField(max_length=200, verbose_name=u"الاسم الإنجليزي")
     email = models.EmailField(max_length=254, verbose_name=u"البريد الإلكتروني")
-    college = models.ManyToManyField(College, null=True,
-                                blank=True,
-                                verbose_name=u"الكلية")
-    users = models.ManyToManyField(User, null=True, blank=True,
+    college = models.ManyToManyField(College, blank=True,
+                                     verbose_name=u"الكلية")
+    users = models.ManyToManyField(User, blank=True,
                                    verbose_name=u"المستخدمون",
-                                   limit_choices_to={'nonstudent_profile__isnull': False})
+                                   limit_choices_to={'nonstudent_profile__isnull':
+                                                     False})
     secondary_email = models.EmailField(max_length=254, verbose_name=u"البريد الإلكتروني", blank=True)
     creation_date = models.DateTimeField(u'تاريخ الإرسال',
                                          auto_now_add=True)

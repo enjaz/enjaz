@@ -1,147 +1,78 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+import easy_thumbnails.fields
+import django.db.models.deletion
+from django.conf import settings
+import userena.models
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'EnjazProfile'
-        db.create_table(u'accounts_enjazprofile', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('mugshot', self.gf('django.db.models.fields.files.ImageField')(max_length=100, blank=True)),
-            ('privacy', self.gf('django.db.models.fields.CharField')(default='registered', max_length=15)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(related_name='enjaz_profile', unique=True, to=orm['auth.User'])),
-        ))
-        db.send_create_signal(u'accounts', ['EnjazProfile'])
+    dependencies = [
+        ('clubs', '0001_initial'),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
 
-        # Adding model 'EnjazBaseProfile'
-        db.create_table(u'accounts_enjazbaseprofile', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('ar_first_name', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('ar_middle_name', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('ar_last_name', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('en_first_name', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('en_middle_name', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('en_last_name', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('badge_number', self.gf('django.db.models.fields.IntegerField')(null=True)),
-        ))
-        db.send_create_signal(u'accounts', ['EnjazBaseProfile'])
-
-        # Adding model 'StudentProfile'
-        db.create_table(u'accounts_studentprofile', (
-            (u'enjazbaseprofile_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['accounts.EnjazBaseProfile'], unique=True, primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(related_name='student_profile', unique=True, to=orm['auth.User'])),
-            ('student_id', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('mobile_number', self.gf('django.db.models.fields.CharField')(max_length=20)),
-            ('college', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['clubs.College'], null=True, on_delete=models.SET_NULL)),
-        ))
-        db.send_create_signal(u'accounts', ['StudentProfile'])
-
-        # Adding model 'NonStudentProfile'
-        db.create_table(u'accounts_nonstudentprofile', (
-            (u'enjazbaseprofile_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['accounts.EnjazBaseProfile'], unique=True, primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(related_name='nonstudent_profile', unique=True, to=orm['auth.User'])),
-            ('mobile_number', self.gf('django.db.models.fields.CharField')(max_length=20, blank=True)),
-            ('job_description', self.gf('django.db.models.fields.CharField')(max_length=50)),
-        ))
-        db.send_create_signal(u'accounts', ['NonStudentProfile'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'EnjazProfile'
-        db.delete_table(u'accounts_enjazprofile')
-
-        # Deleting model 'EnjazBaseProfile'
-        db.delete_table(u'accounts_enjazbaseprofile')
-
-        # Deleting model 'StudentProfile'
-        db.delete_table(u'accounts_studentprofile')
-
-        # Deleting model 'NonStudentProfile'
-        db.delete_table(u'accounts_nonstudentprofile')
-
-
-    models = {
-        u'accounts.enjazbaseprofile': {
-            'Meta': {'object_name': 'EnjazBaseProfile'},
-            'ar_first_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'ar_last_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'ar_middle_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'badge_number': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
-            'en_first_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'en_last_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'en_middle_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
-        },
-        u'accounts.enjazprofile': {
-            'Meta': {'object_name': 'EnjazProfile'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'mugshot': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
-            'privacy': ('django.db.models.fields.CharField', [], {'default': "'registered'", 'max_length': '15'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'enjaz_profile'", 'unique': 'True', 'to': u"orm['auth.User']"})
-        },
-        u'accounts.nonstudentprofile': {
-            'Meta': {'object_name': 'NonStudentProfile', '_ormbases': [u'accounts.EnjazBaseProfile']},
-            u'enjazbaseprofile_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['accounts.EnjazBaseProfile']", 'unique': 'True', 'primary_key': 'True'}),
-            'job_description': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'mobile_number': ('django.db.models.fields.CharField', [], {'max_length': '20', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'nonstudent_profile'", 'unique': 'True', 'to': u"orm['auth.User']"})
-        },
-        u'accounts.studentprofile': {
-            'Meta': {'object_name': 'StudentProfile', '_ormbases': [u'accounts.EnjazBaseProfile']},
-            'college': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['clubs.College']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
-            u'enjazbaseprofile_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['accounts.EnjazBaseProfile']", 'unique': 'True', 'primary_key': 'True'}),
-            'mobile_number': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
-            'student_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'student_profile'", 'unique': 'True', 'to': u"orm['auth.User']"})
-        },
-        u'auth.group': {
-            'Meta': {'object_name': 'Group'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        u'auth.permission': {
-            'Meta': {'ordering': "(u'content_type__app_label', u'content_type__model', u'codename')", 'unique_together': "((u'content_type', u'codename'),)", 'object_name': 'Permission'},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        u'auth.user': {
-            'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Group']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Permission']"}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
-        },
-        u'clubs.college': {
-            'Meta': {'object_name': 'College'},
-            'city': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'gender': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'section': ('django.db.models.fields.CharField', [], {'max_length': '2'})
-        },
-        u'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        }
-    }
-
-    complete_apps = ['accounts']
+    operations = [
+        migrations.CreateModel(
+            name='EnjazBaseProfile',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('ar_first_name', models.CharField(max_length=30, verbose_name='\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0623\u0648\u0644')),
+                ('ar_middle_name', models.CharField(max_length=30, verbose_name='\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0623\u0648\u0633\u0637')),
+                ('ar_last_name', models.CharField(max_length=30, verbose_name='\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0623\u062e\u064a\u0631')),
+                ('en_first_name', models.CharField(max_length=30, verbose_name='\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0623\u0648\u0644')),
+                ('en_middle_name', models.CharField(max_length=30, verbose_name='\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0623\u0648\u0633\u0637')),
+                ('en_last_name', models.CharField(max_length=30, verbose_name='\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0623\u062e\u064a\u0631')),
+                ('badge_number', models.IntegerField(null=True, verbose_name='\u0631\u0642\u0645 \u0627\u0644\u0628\u0637\u0627\u0642\u0629')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='EnjazProfile',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('mugshot', easy_thumbnails.fields.ThumbnailerImageField(help_text='A personal image displayed in your profile.', upload_to=userena.models.upload_to_mugshot, verbose_name='mugshot', blank=True)),
+                ('privacy', models.CharField(default=b'registered', help_text='Designates who can view your profile.', max_length=15, verbose_name='privacy', choices=[(b'open', 'Open'), (b'registered', 'Registered'), (b'closed', 'Closed')])),
+                ('user', models.OneToOneField(related_name='enjaz_profile', verbose_name='\u0645\u0633\u062a\u062e\u062f\u0645', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'abstract': False,
+                'permissions': (('view_profile', 'Can view profile'),),
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='NonStudentProfile',
+            fields=[
+                ('enjazbaseprofile_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='accounts.EnjazBaseProfile')),
+                ('mobile_number', models.CharField(max_length=20, verbose_name='\u0631\u0642\u0645 \u0627\u0644\u062c\u0648\u0627\u0644 (\u0627\u062e\u062a\u064a\u0627\u0631\u064a)', blank=True)),
+                ('job_description', models.CharField(max_length=50, verbose_name='\u0627\u0644\u0645\u0633\u0645\u0649 \u0627\u0644\u0648\u0638\u064a\u0641\u064a')),
+                ('user', models.OneToOneField(related_name='nonstudent_profile', verbose_name='\u0645\u0633\u062a\u062e\u062f\u0645', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'verbose_name': '\u0645\u0644\u0641 \u0645\u0633\u062a\u062e\u062f\u0645 \u0622\u062e\u0631',
+                'verbose_name_plural': '\u0645\u0644\u0641\u0627\u062a \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645\u064a\u0646 \u0627\u0644\u0622\u062e\u0631\u064a\u0646',
+            },
+            bases=('accounts.enjazbaseprofile',),
+        ),
+        migrations.CreateModel(
+            name='StudentProfile',
+            fields=[
+                ('enjazbaseprofile_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='accounts.EnjazBaseProfile')),
+                ('student_id', models.IntegerField(null=True, verbose_name='\u0627\u0644\u0631\u0642\u0645 \u0627\u0644\u062c\u0627\u0645\u0639\u064a', blank=True)),
+                ('mobile_number', models.CharField(max_length=20, verbose_name='\u0631\u0642\u0645 \u0627\u0644\u062c\u0648\u0627\u0644')),
+                ('college', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, verbose_name='\u0627\u0644\u0643\u0644\u064a\u0629', to='clubs.College', null=True)),
+                ('user', models.OneToOneField(related_name='student_profile', verbose_name='\u0645\u0633\u062a\u062e\u062f\u0645', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'verbose_name': '\u0645\u0644\u0641 \u0637\u0627\u0644\u0628',
+                'verbose_name_plural': '\u0645\u0644\u0641\u0627\u062a \u0627\u0644\u0637\u0644\u0627\u0628',
+            },
+            bases=('accounts.enjazbaseprofile',),
+        ),
+    ]

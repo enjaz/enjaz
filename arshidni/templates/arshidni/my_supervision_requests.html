@@ -26,7 +26,7 @@
 			 <tbody>
 				{% for r in page_requests %}
 				<tr id="request-{{ r.pk }}"{% if r.status == 'WN' or r.status == 'WC' or r.status == 'R' or r.status == 'D' %} class="deleted-request"{% endif %}>
-					<td><a href="{% url 'arshidni:show_colleague_profile' r.colleague.pk %}">{{ r.colleague.user.student_profile.get_ar_full_name }}</a></td>
+					<td><a href="{% url 'arshidni:show_colleague_profile' r.colleague.pk %}">{{ r.colleague.user.common_profile.get_ar_full_name }}</a></td>
 					<td>{% if r.status == 'A' or r.status == 'WN' %}{{ colleague_profile.contacts }}{% else %}-{% endif %}</td>
 					<td data-order="{{ r.submission_date|date:"U" }}">{{ r.submission_date|date:"j F Y" }}</td>
 					<td id="status-{{ r.pk }}">{{ r.get_status_display }}</td>

@@ -2,7 +2,7 @@
 {% block title %}الزملاء الطلابيون{% endblock %}
 {% block navbar %}
 	<li><a href="{% url 'arshidni:list_colleagues' %}"><span class="entypo-users"></span> الزملاء الطلابيون</a></li>
- 	{% if user.student_profile and not user.colleague_profile and perms.arshidni.add_colleagueprofile %}
+ 	{% if user.common_profile.is_student and not user.colleague_profile and perms.arshidni.add_colleagueprofile %}
 		<li><a href="{% url 'arshidni:register_colleague_profile' %}"><span class="glyphicon glyphicon-plus"></span> سجّل نفسك زميلا طلابيا</a></li>
 	{% endif %}
 	{% if user.colleague_profile %}
@@ -41,7 +41,7 @@
 		</colgroup>
 		<tr>
 			<th>الاسم</th>
-			<td>{{ colleague_profile.user.student_profile.get_ar_full_name|default:colleague_profile.user.username }}</td>
+			<td>{{ colleague_profile.user.common_profile.get_ar_full_name|default:colleague_profile.user.username }}</td>
 		</tr>
 		<tr>
 			<th>الدفعة</th>
@@ -49,11 +49,11 @@
 		</tr>
 		<tr>
 			<th>الكلية</th>
-			<td>{{ colleague_profile.user.student_profile.college }}</td>
+			<td>{{ colleague_profile.user.common_profile.college }}</td>
 		</tr>
 		<tr>
 			<th>المدينة</th>
-			<td>{{ colleague_profile.user.student_profile.college.get_city_display }}</td>
+			<td>{{ colleague_profile.user.common_profile.college.get_city_display }}</td>
 		</tr>
 		<tr>
 			<th>نبذة</th>

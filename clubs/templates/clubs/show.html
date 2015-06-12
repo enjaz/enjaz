@@ -52,7 +52,7 @@
 {% endif %}
   <tr>
     <th>المنسق</th>
-    <td>{% if club.coordinator %} {{ club.coordinator.student_profile.get_ar_full_name|default:club.coordinator.username }} {% else %} لا يوجد {% endif %}</td>
+    <td>{% if club.coordinator %} {{ club.coordinator.common_profile.get_ar_full_name|default:club.coordinator.username }} {% else %} لا يوجد {% endif %}</td>
   </tr>
   <tr>
     <th>تاريخ الإنشاء</th>

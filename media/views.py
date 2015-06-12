@@ -505,7 +505,7 @@ def assign_story_task(request):
               template="story_task_assigned",
               context={"task": task})
 
-    assignee_name = assignee.student_profile.ar_first_name + " " + assignee.student_profile.ar_last_name
+    assignee_name = assignee.common_profile.ar_first_name + " " + assignee.common_profile.ar_last_name
     return {"episode_pk": episode.pk,
             "assignee_name": assignee_name}
 

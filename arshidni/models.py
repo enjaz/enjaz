@@ -260,7 +260,7 @@ class SupervisionRequest(models.Model):
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
 
     def __unicode__(self):
-        return self.user.student_profile.get_en_full_name()
+        return self.user.common_profile.get_en_full_name()
 
     class Meta:
         verbose_name = u"طلب زمالة"

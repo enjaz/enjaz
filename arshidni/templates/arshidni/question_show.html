@@ -10,7 +10,7 @@
 {% block content %}
 	<div class="single-question panel panel-default">
 		<div class="panel-body">
-			<p class="question-header">سأل {{ question.submitter.student_profile.get_ar_full_name|default:question.submitter.username }} في {{ question.submission_date|date:"j F" }} عند الساعة {{ question.submission_date|date:"h:i" }}:</p>
+			<p class="question-header">سأل {{ question.submitter.common_profile.get_ar_full_name|default:question.submitter.username }} في {{ question.submission_date|date:"j F" }} عند الساعة {{ question.submission_date|date:"h:i" }}:</p>
 			<p class="question-text">{{ question.text|linebreaksbr }}</p>
 			<hr/>
 			{% if published_answers %}
@@ -18,7 +18,7 @@
 				{% for a in published_answers %}
 					<li id="answer-{{ a.pk }}">
 					
-						<p class="question-header">أجاب {{ a.submitter.student_profile.get_ar_full_name|default:a.submitter.username }} في {{ a.submission_date|date:"j F" }} عند الساعة {{ a.submission_date|date:"h:i" }}:</p>
+						<p class="question-header">أجاب {{ a.submitter.common_profile.get_ar_full_name|default:a.submitter.username }} في {{ a.submission_date|date:"j F" }} عند الساعة {{ a.submission_date|date:"h:i" }}:</p>
 						<p class="question-text">{{ a.text|linebreaksbr }}</p>
 					</li>
 				{% endfor %}

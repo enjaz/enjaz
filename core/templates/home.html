@@ -32,12 +32,7 @@
 {% endif %}
 <div class="row">
 	<div class="col-md-12">
-		<h2>مرحبًا 
-		{% if user.student_profile %}
-			{{ user.student_profile.ar_first_name }}!
-		{% else %}
-			{{ user.non_student_profile.ar_first_name }}!
-		{% endif %}
+		<h2>مرحبًا {{ user.common_profile.ar_first_name }}!
 		</h2>
 		<p>فيما يلي ملخص لما يهمك في بوابة إنجاز.</p>
 	</div>
@@ -103,7 +98,7 @@
 	</div>
 	</div>
 </div>
-{% if user.student_profile %}
+{% if user.common_profile.is_student %}
 <div class="panel minimal minimal-gray">
 	<div class="panel-heading">
 		<div class="panel-title">
@@ -210,7 +205,7 @@
 						{% for b in latest_books %}
 						<tr>
 							<td><a href="{% url 'books:show' b.pk %}">{{ b.title }}</a></td>
-							<td>{{ b.submitter.student_profile.get_ar_full_name|default:b.submitter.username }}</td>
+							<td>{{ b.submitter.common_profile.get_ar_full_name|default:b.submitter.username }}</td>
 							<td>{{ b.submission_date }}</td>
 						</tr>
 						{% endfor %}

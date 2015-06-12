@@ -88,7 +88,7 @@
 					<span>أنشطة</span>
 				</a>
 			</li>
-            {% if user.student_profile %}
+            {% if user.common_profile.is_student %}
 			<li>
 				<a href="{% url 'niqati:index' %}">
 					<i class="entypo-chart-bar"></i>

@@ -102,7 +102,7 @@ some-votes
             {% if not voice.submitter %}{# todo: here we need to look at the anonymity of the last edit instead #}
                 <span class="anonymous">مجهول</span>
             {% else %}
-                <a href="https://ar.wikipedia.org">{{ voice.sumbitter.student_profile.get_full_ar_name }}</a>
+                <a href="https://ar.wikipedia.org">{{ voice.sumbitter.common_profile.get_full_ar_name }}</a>
             {% endif %}
         </div>
     </div>

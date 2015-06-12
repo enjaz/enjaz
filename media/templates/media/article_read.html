@@ -6,7 +6,7 @@
 <div class="row">
 	<div class="col-md-12">
 		<h1>{{ article.title }} 
-			<small>{{ article.author.student_profile.get_ar_full_name }}</small>
+			<small>{{ article.author.common_profile.get_ar_full_name }}</small>
 			{% if article.author == user and article.status == 'E' %}
 			<a href="{% url 'media:edit_article' article.pk %}" class="btn btn-xs btn-gold btn-icon">
 				عدّل

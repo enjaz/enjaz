@@ -51,12 +51,12 @@ class Club(models.Model):
     deputies = models.ManyToManyField(User, verbose_name=u"النواب",
                                       blank=True,
                                       related_name="deputyships",
-                                      limit_choices_to={'student_profile__isnull':
+                                      limit_choices_to={'common_profile__is_student':
                                                         False})
     members = models.ManyToManyField(User, verbose_name=u"الأعضاء",
                                      blank=True,
                                      related_name="memberships",
-                                     limit_choices_to={'student_profile__isnull':
+                                     limit_choices_to={'common_profile__is_student':
                                                        False})
     employee = models.ForeignKey(User, null=True, blank=True,
                                  related_name="employee",

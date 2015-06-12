@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate
 from django.core.exceptions import ObjectDoesNotExist
 from userena.forms import SignupForm
 from clubs.models import College, city_choices, college_choices, section_choices, gender_choices
-from accounts.models import StudentProfile, NonStudentProfile
+from accounts.models import CommonProfile
 
 
 class StudentSignupForm(SignupForm):
@@ -14,26 +14,26 @@ class StudentSignupForm(SignupForm):
     A form that includes extra student-related fields.
     """
     # FIXME: Dirty 'verbose_name' hack?
-    ar_first_name = forms.CharField(label=StudentProfile._meta.get_field('ar_first_name').verbose_name,
+    ar_first_name = forms.CharField(label=CommonProfile._meta.get_field('ar_first_name').verbose_name,
                                 max_length=30)
-    ar_middle_name = forms.CharField(label=StudentProfile._meta.get_field('ar_middle_name').verbose_name,
+    ar_middle_name = forms.CharField(label=CommonProfile._meta.get_field('ar_middle_name').verbose_name,
                                 max_length=30)
-    ar_last_name = forms.CharField(label=StudentProfile._meta.get_field('ar_last_name').verbose_name,
+    ar_last_name = forms.CharField(label=CommonProfile._meta.get_field('ar_last_name').verbose_name,
                                 max_length=30)
-    en_first_name = forms.CharField(label=StudentProfile._meta.get_field('en_first_name').verbose_name,
+    en_first_name = forms.CharField(label=CommonProfile._meta.get_field('en_first_name').verbose_name,
                                 max_length=30)
-    en_middle_name = forms.CharField(label=StudentProfile._meta.get_field('en_middle_name').verbose_name,
+    en_middle_name = forms.CharField(label=CommonProfile._meta.get_field('en_middle_name').verbose_name,
                                 max_length=30)
-    en_last_name = forms.CharField(label=StudentProfile._meta.get_field('en_last_name').verbose_name,
+    en_last_name = forms.CharField(label=CommonProfile._meta.get_field('en_last_name').verbose_name,
                                 max_length=30)
-    badge_number = forms.IntegerField(label=StudentProfile._meta.get_field('badge_number').verbose_name)
-    student_id = forms.IntegerField(label=StudentProfile._meta.get_field('student_id').verbose_name)
+    badge_number = forms.IntegerField(label=CommonProfile._meta.get_field('badge_number').verbose_name)
+    student_id = forms.IntegerField(label=CommonProfile._meta.get_field('student_id').verbose_name)
     # Since the mobile number starts with a zero, store it as a
     # string.
-    mobile_number = forms.CharField(label=StudentProfile._meta.get_field('mobile_number').verbose_name)
+    mobile_number = forms.CharField(label=CommonProfile._meta.get_field('mobile_number').verbose_name)
     city = forms.CharField(label=u"المدينة", max_length=1, widget=forms.Select(choices=city_choices))
     section = forms.CharField(label=u"القسم", max_length=2, widget=forms.Select(choices=section_choices), required=False)
-    college = forms.CharField(label=StudentProfile._meta.get_field('college').verbose_name, max_length=1, widget=forms.Select(choices=college_choices))
+    college = forms.CharField(label=CommonProfile._meta.get_field('college').verbose_name, max_length=1, widget=forms.Select(choices=college_choices))
     gender = forms.CharField(label=u"الجنس", max_length=1, widget=forms.Select(choices=gender_choices))
 
     def __init__(self, *args, **kw):
@@ -153,46 +153,48 @@ class StudentSignupForm(SignupForm):
         # Append the extra fields to the Student Profile
         #user_profile = new_user.get_profile()
         student_college = College.objects.get(
-                            name=self.cleaned_data['college'],
-                            section=self.cleaned_data['section'],
-                            gender=self.cleaned_data['gender'])
-        student_profile = StudentProfile.objects.create(user=new_user,
-                   ar_first_name=self.cleaned_data['ar_first_name'],
-                   ar_middle_name=self.cleaned_data['ar_middle_name'],
-                   ar_last_name=self.cleaned_data['ar_last_name'],
-                   en_first_name=self.cleaned_data['en_first_name'],
-                   en_middle_name=self.cleaned_data['en_middle_name'],
-                   en_last_name=self.cleaned_data['en_last_name'],
-                   badge_number=self.cleaned_data['badge_number'],
-                   student_id=self.cleaned_data['student_id'],
-                   mobile_number=self.cleaned_data['mobile_number'],
-                    college=student_college)
+            name=self.cleaned_data['college'],
+            section=self.cleaned_data['section'],
+            gender=self.cleaned_data['gender'])
+        CommonProfile.objects.create(user=new_user,
+                                     is_student=True,
+                                     ar_first_name=self.cleaned_data['ar_first_name'],
+                                     ar_middle_name=self.cleaned_data['ar_middle_name'],
+                                     ar_last_name=self.cleaned_data['ar_last_name'],
+                                     en_first_name=self.cleaned_data['en_first_name'],
+                                     en_middle_name=self.cleaned_data['en_middle_name'],
+                                     en_last_name=self.cleaned_data['en_last_name'],
+                                     badge_number=self.cleaned_data['badge_number'],
+                                     student_id=self.cleaned_data['student_id'],
+                                     mobile_number=self.cleaned_data['mobile_number'],
+                                     college=student_college,
+                                     job_description="")
         return new_user
 
 class NonStudentSignupForm(SignupForm):
     """
     A form that includes extra student-related fields.
     """
-    ar_first_name = forms.CharField(label=NonStudentProfile._meta.get_field('ar_first_name').verbose_name,
+    ar_first_name = forms.CharField(label=CommonProfile._meta.get_field('ar_first_name').verbose_name,
                                 max_length=30)
-    ar_middle_name = forms.CharField(label=NonStudentProfile._meta.get_field('ar_middle_name').verbose_name,
+    ar_middle_name = forms.CharField(label=CommonProfile._meta.get_field('ar_middle_name').verbose_name,
                                 max_length=30)
-    ar_last_name = forms.CharField(label=NonStudentProfile._meta.get_field('ar_last_name').verbose_name,
+    ar_last_name = forms.CharField(label=CommonProfile._meta.get_field('ar_last_name').verbose_name,
                                 max_length=30)
-    en_first_name = forms.CharField(label=NonStudentProfile._meta.get_field('en_first_name').verbose_name,
+    en_first_name = forms.CharField(label=CommonProfile._meta.get_field('en_first_name').verbose_name,
                                 max_length=30)
-    en_middle_name = forms.CharField(label=NonStudentProfile._meta.get_field('en_middle_name').verbose_name,
+    en_middle_name = forms.CharField(label=CommonProfile._meta.get_field('en_middle_name').verbose_name,
                                 max_length=30)
-    en_last_name = forms.CharField(label=NonStudentProfile._meta.get_field('en_last_name').verbose_name,
+    en_last_name = forms.CharField(label=CommonProfile._meta.get_field('en_last_name').verbose_name,
                                 max_length=30)
-    badge_number = forms.IntegerField(label=NonStudentProfile._meta.get_field('badge_number').verbose_name)
+    badge_number = forms.IntegerField(label=CommonProfile._meta.get_field('badge_number').verbose_name)
 
     # Since the mobile number starts with a zero, store it as a
     # string.  For non-students, this field is going to be optional.
-    mobile_number = forms.CharField(label=NonStudentProfile._meta.get_field('mobile_number').verbose_name,
+    mobile_number = forms.CharField(label=CommonProfile._meta.get_field('mobile_number').verbose_name,
                                      required=False)
     city = forms.CharField(label=u"المدينة", max_length=1, widget=forms.Select(choices=city_choices))
-    job_description = forms.CharField(label=NonStudentProfile._meta.get_field('job_description').verbose_name,
+    job_description = forms.CharField(label=CommonProfile._meta.get_field('job_description').verbose_name,
                                 max_length=50)
 
     def __init__(self, *args, **kw):
@@ -261,16 +263,19 @@ class NonStudentSignupForm(SignupForm):
         else:
             mobile_number = ""
 
-        nonstudent_profile = NonStudentProfile.objects.create(user=new_user,
-                   ar_first_name=self.cleaned_data['ar_first_name'],
-                   ar_middle_name=self.cleaned_data['ar_middle_name'],
-                   ar_last_name=self.cleaned_data['ar_last_name'],
-                   en_first_name=self.cleaned_data['en_first_name'],
-                   en_middle_name=self.cleaned_data['en_middle_name'],
-                   en_last_name=self.cleaned_data['en_last_name'],
-                   badge_number=self.cleaned_data['badge_number'],
-                   mobile_number=mobile_number,
-                   job_description=self.cleaned_data['job_description'])
+        CommonProfile.objects.create(user=new_user,
+                                     is_student=False,
+                                     ar_first_name=self.cleaned_data['ar_first_name'],
+                                     ar_middle_name=self.cleaned_data['ar_middle_name'],
+                                     ar_last_name=self.cleaned_data['ar_last_name'],
+                                     en_first_name=self.cleaned_data['en_first_name'],
+                                     en_middle_name=self.cleaned_data['en_middle_name'],
+                                     en_last_name=self.cleaned_data['en_last_name'],
+                                     badge_number=self.cleaned_data['badge_number'],
+                                     mobile_number=mobile_number,
+                                     job_description=self.cleaned_data['job_description'],
+                                     college=None,
+                                     student_id=None)
         return new_user
 
 class ModifiedAuthenticationForm(forms.Form):

@@ -188,10 +188,15 @@ def register_graduate_profile(request):
     elif request.method == 'GET':
         # Allow only students to sign up as graduates.
         try:
-            student_profile = request.user.student_profile
+            common_profile = request.user.common_profile
+            is_student = request.user.common_profile.is_student
+        except ObjectDoesNotExist:
+            is_student = False
+
+        if is_student:
             form = GraduateProfileForm()
             context = {'form': form}
-        except ObjectDoesNotExist:
+        else:
             context = {'error': 'notstudent'}
 
     return render(request, 'arshidni/graduate_edit_profile.html', context)
@@ -714,10 +719,15 @@ def register_colleague_profile(request):
     elif request.method == 'GET':
         # Allow only students to sign up as colleagues.
         try:
-            student_profile = request.user.student_profile
+            common_profile = request.user.common_profile
+            is_student = request.user.common_profile.is_student
+        except ObjectDoesNotExist:
+            is_student = False
+
+        if is_student:
             form = ColleagueProfileForm()
             context = {'form': form}
-        except ObjectDoesNotExist:
+        else:
             context = {'error': 'notstudent'}
 
     return render(request, 'arshidni/colleague_edit_profile.html', context)

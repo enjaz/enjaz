@@ -129,7 +129,40 @@
 					{% endif %}
 				</div>
 			</div>
-					
+			<div class="form-group">
+				<div class="input-group{% if form.city.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-docs"></i>
+					</div>
+					<select {% if form.city.value and not form.city.errors %}value="{{ form.city.value }}" {% endif %}class="form-control" id="city" name="city"  title="{{ form.city.label }}" required="required">
+                                                <option value="">{{ form.city.label }}</option>
+                                                {% for value, label in form.fields.city.widget.choices %}
+                                                <option {% if form.city.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
+					</select>
+					{% if form.city.errors %}
+					    {% for error in form.city.errors %}
+					        <label class='error' for='city' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group" id="section-group">
+				<div class="input-group{% if form.section.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-docs"></i>
+					</div>
+					<select {% if form.section.value and not form.section.errors %}value="{{ form.section.value }}" {% endif %}class="form-control" id="section" name="section"  title="{{ form.section.label }}">
+                                                <option value="">{{ form.section.label }}</option>
+                                                <option value="NG">الحرس الوطني</option>
+                                                <option value="KF">مدينة الملك فهد الطبية</option>
+					</select>
+					{% if form.section.errors %}
+					    {% for error in form.section.errors %}
+					        <label class='error' for='section' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
 			<div class="form-group">
 				<div class="input-group{% if form.college.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
@@ -143,24 +176,6 @@
 					{% if form.college.errors %}
 					    {% for error in form.college.errors %}
 					        <label class='error' for='college' style='display: inline-block'>{{ error|escape }}</label>
-					    {% endfor %}
-					{% endif %}
-				</div>
-			</div>
-		
-			<div class="form-group">
-				<div class="input-group{% if form.section.errors %} validate-has-error{% endif %}">
-					<div class="input-group-addon">
-						<i class="entypo-docs"></i>
-					</div>
-					<select {% if form.section.value and not form.section.errors %}value="{{ form.section.value }}" {% endif %}class="form-control" id="section" name="section"  title="{{ form.section.label }}" required="required">
-                                                <option value="">{{ form.section.label }}</option>
-                                                {% for value, label in form.fields.section.widget.choices %}
-                                                <option {% if form.section.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
-					</select>
-					{% if form.section.errors %}
-					    {% for error in form.section.errors %}
-					        <label class='error' for='section' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 				</div>
@@ -208,4 +223,91 @@
 <script src="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.min.js' %}" id="script-resource-11"></script>
 <script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
 <script src="{% static 'neon/assets/js/jquery.inputmask.bundle.min.js' %}"></script>
+<script>
+$(function(){
+    // Let's start with the college and section fields disabled.
+    $("#section").prop("disabled", true);
+    $("#college").prop("disabled", true);
+    // Then let's change the college and section fields based on the city choice. 
+    $("#city").change(function(){
+        $("#college").prop("disabled", true);
+        $("#college").html("<option value=\"\">الكلية</option>");
+        if ($(this).val() == 'R'){
+            // College choice for Riyadh student shoudl only be done after specifying the section.  Don't enable it now.
+            $("#section-group").show();
+            $("#section").prop("disabled", false);
+            $("#section").prop("required", true);
+        }else if ($(this).val() == 'J'){
+            $("#section-group").hide();
+            $("#section").prop("required", false);
+            $("#section").val("")
+            $("#college").prop("disabled", false);
+            college_choices = {
+                M: "كلية الطب",
+                B: "كلية العلوم والمهن الصحية",
+                N: "كلية التمريض"};
+            $.each(college_choices, function(key, value){
+                $("#college")
+                    .append($("<option></option>")
+                            .attr("value", key)
+                            .text(value));
+            });
+        }else if ($(this).val() == 'A'){
+            $("#section-group").hide();
+            $("#section").prop("required", false);
+            $("#section").val("")
+            $("#college").prop("disabled", false);
+            college_choices = {
+                A: "كلية الطبية التطبيقية",
+                N: "كلية التمريض",
+                B: "كلية العلوم والمهن الصحية",
+            };
+            $.each(college_choices, function(key, value){
+                $("#college")
+                    .append($("<option></option>")
+                            .attr("value", key)
+                            .text(value));
+            });
+        }
+    });
+    $("#section").change(function(){
+        // It should be possible to modify this only when Riyadh is chosen.
+        $("#college").html("");
+        if ($(this).val() == 'NG'){
+            $("#college").prop("disabled", false);
+            college_choices = {
+                "": "الكلية",
+                M: "كلية الطب",
+                A: "كلية الطبية التطبيقية",
+                P: "كلية الصيدلة",
+                D: "كلية الأسنان",
+                B: "كلية العلوم والمهن الصحية",
+                N: "كلية التمريض",
+                I: "كلية الصحة العامة والمعلوماتية الصحية"};
+            $.each(college_choices, function(key, value){
+                $("#college")
+                    .append($("<option></option>")
+                            .attr("value", key)
+                            .text(value));
+            });
+        }else if ($(this).val() == 'KF'){
+            $("#college").prop("disabled", false);
+            college_choices = {
+                "": "الكلية",
+                M: "كلية الطب"};
+            $.each(college_choices, function(key, value){
+                $("#college")
+                    .append($("<option></option>")
+                            .attr("value", key)
+                            .text(value));
+            });
+        }else if ($(this).val() == ''){
+            // If no city was chosen, let's disable the college.
+            $("#college").prop("disabled", true);
+            $("#college").html("<option>الكلية</option>")
+        }
+    });
+
+});
+</script>
 {% endblock %}

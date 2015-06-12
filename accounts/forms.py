@@ -5,7 +5,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth import authenticate
 from django.core.exceptions import ObjectDoesNotExist
 from userena.forms import SignupForm
-from clubs.models import College, college_choices, section_choices, gender_choices
+from clubs.models import College, city_choices, college_choices, section_choices, gender_choices
 from accounts.models import StudentProfile, NonStudentProfile
 
 
@@ -31,6 +31,7 @@ class StudentSignupForm(SignupForm):
     # Since the mobile number starts with a zero, store it as a
     # string.
     mobile_number = forms.CharField(label=StudentProfile._meta.get_field('mobile_number').verbose_name)
+    city = forms.CharField(label=u"المدينة", max_length=1, widget=forms.Select(choices=city_choices))
     section = forms.CharField(label=u"القسم", max_length=2, widget=forms.Select(choices=section_choices))
     college = forms.CharField(label=StudentProfile._meta.get_field('college').verbose_name, max_length=1, widget=forms.Select(choices=college_choices))
     gender = forms.CharField(label=u"الجنس", max_length=1, widget=forms.Select(choices=gender_choices))
@@ -80,6 +81,7 @@ class StudentSignupForm(SignupForm):
         try:
             College.objects.get(
             name=self.cleaned_data['college'],
+            city=self.cleaned_data['city'],
             section=self.cleaned_data['section'],
             gender=self.cleaned_data['gender'])
         except ObjectDoesNotExist:
@@ -183,6 +185,7 @@ class NonStudentSignupForm(SignupForm):
     # string.  For non-students, this field is going to be optional.
     mobile_number = forms.CharField(label=NonStudentProfile._meta.get_field('mobile_number').verbose_name,
                                      required=False)
+    city = forms.CharField(label=u"المدينة", max_length=1, widget=forms.Select(choices=city_choices))
     job_description = forms.CharField(label=NonStudentProfile._meta.get_field('job_description').verbose_name,
                                 max_length=50)
 

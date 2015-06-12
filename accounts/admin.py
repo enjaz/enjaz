@@ -11,7 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from userena.admin import UserenaAdmin
 
 from clubs.models import Club, college_choices, section_choices
-from accounts.models import StudentProfile, NonStudentProfile
+from accounts.models import StudentProfile, NonStudentProfile, CommonProfile
 
 class DeanshipAuthenticationForm(AdminAuthenticationForm):
     """A custom authentication form used in the admin app.  Based on the
@@ -76,6 +76,11 @@ class NonStudentProfileInline(admin.StackedInline):
     max_num = 1
     extra = 0
 
+class CommonProfileInline(admin.StackedInline):
+    model = CommonProfile
+    max_num = 1
+    extra = 0
+    
 class EmployeeFilter(admin.SimpleListFilter):
     title = u"عمادة شؤون الطلاب"
     parameter_name = 'is_employee'
@@ -155,7 +160,8 @@ ones) deal with the User model."""
                     'nonstudent_profile__ar_last_name',
                     'nonstudent_profile__badge_number',
                     'nonstudent_profile__job_description')
-    inlines = [StudentProfileInline, NonStudentProfileInline]
+    inlines = [StudentProfileInline, NonStudentProfileInline,
+               CommonProfileInline]
 
     def is_coordinator(self, obj):
         if obj.coordination.all():

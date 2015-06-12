@@ -218,7 +218,7 @@ class JoinStudyGroupRequest(models.Model):
         verbose_name_plural = u"طلبات الانضمام لمجموعة دراسية"
 
 
-# Studnet Colleague
+# Student Colleague
 
 class ColleagueProfile(ArshidniProfile):
     user = models.OneToOneField(User, null=True,

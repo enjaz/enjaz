@@ -32,7 +32,7 @@ class StudentSignupForm(SignupForm):
     # string.
     mobile_number = forms.CharField(label=StudentProfile._meta.get_field('mobile_number').verbose_name)
     city = forms.CharField(label=u"المدينة", max_length=1, widget=forms.Select(choices=city_choices))
-    section = forms.CharField(label=u"القسم", max_length=2, widget=forms.Select(choices=section_choices))
+    section = forms.CharField(label=u"القسم", max_length=2, widget=forms.Select(choices=section_choices), required=False)
     college = forms.CharField(label=StudentProfile._meta.get_field('college').verbose_name, max_length=1, widget=forms.Select(choices=college_choices))
     gender = forms.CharField(label=u"الجنس", max_length=1, widget=forms.Select(choices=gender_choices))
 
@@ -76,6 +76,12 @@ class StudentSignupForm(SignupForm):
             if mobile_number_msg:
                 self._errors['mobile_number'] = self.error_class([mobile_number_msg])
                 del cleaned_data['mobile_number']
+
+        # Since Jeddah and Al-Hasa have only one campus, the section
+        # equals the city.
+        if 'city' in cleaned_data and \
+           cleaned_data['city'] in ['J', 'A']:
+            cleaned_data['section'] = cleaned_data['city']
 
         # Make sure that the college/section choice is actually valid.
         try:

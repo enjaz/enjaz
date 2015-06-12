@@ -225,9 +225,13 @@
 <script src="{% static 'neon/assets/js/jquery.inputmask.bundle.min.js' %}"></script>
 <script>
 $(function(){
-    // Let's start with the college and section fields disabled.
-    $("#section").prop("disabled", true);
-    $("#college").prop("disabled", true);
+    // Let's start with the college and section fields disabled, but only if the currently chosen field isn't Riyadh (that's useful in case of form errors, where the start isn't empty.)
+    if ($("#city").val() == ""){
+        $("#section").prop("disabled", true);
+        $("#college").prop("disabled", true);
+    }else if($("#city").val() == "A" || $("#city").val() == "J"){
+        $("#section-group").hide();
+    }
     // Then let's change the college and section fields based on the city choice. 
     $("#city").change(function(){
         $("#college").prop("disabled", true);

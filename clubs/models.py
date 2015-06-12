@@ -7,6 +7,8 @@ from forms_builder.forms.models import Form
 section_choices = (
     ('NG', u'الحرس الوطني'),
     ('KF', u'مدينة الملك فهد الطبية'),
+    ('J', u'جدة'),
+    ('A', u'الأحساء'),
 )
 
 gender_choices = (
@@ -74,6 +76,9 @@ class Club(models.Model):
                                          auto_now_add=True)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
     city = models.CharField(max_length=1, choices=city_choices, verbose_name=u"المدينة")
+    gender = models.CharField(max_length=1, choices=gender_choices,
+                              verbose_name=u"المدينة", blank=True,
+                              default="")
 
     # Special ``Club`` objects (eg, Deanship of Student Affairs) should be hidden from the clubs list
     visible = models.BooleanField(default=True,
@@ -158,9 +163,10 @@ class College(models.Model):
     gender = models.CharField(max_length=1, choices=gender_choices, verbose_name=u"الجنس")
 
     def __unicode__(self):
-        return u"%s (%s - %s)" % (self.get_name_display(),
-                                  self.get_section_display(),
-                                  self.get_gender_display())
+        return u"%s (%s - %s - %s)" % (self.get_name_display(),
+                                       self.get_city_display(),
+                                       self.get_section_display(),
+                                       self.get_gender_display())
 
     class Meta:
         # For the admin interface.

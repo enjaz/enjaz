@@ -48,6 +48,11 @@ def add_colleges(apps, schema_editor):
         section='J',
         city='J',
         gender='F')
+    College.objects.create(
+        name='N',
+        section='J',
+        city='J',
+        gender='F')
 
 def delete_colleges(apps, schema_editor):
     College = apps.get_model('clubs', 'College')
@@ -91,6 +96,11 @@ def delete_colleges(apps, schema_editor):
         gender='M').delete()
     College.objects.get(
         name='B',
+        section='J',
+        city='J',
+        gender='F').delete()
+    College.objects.create(
+        name='N',
         section='J',
         city='J',
         gender='F').delete()

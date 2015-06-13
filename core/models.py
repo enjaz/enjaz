@@ -47,3 +47,16 @@ class Publication(models.Model):
     class Meta:
         verbose_name = u"إصدار"
         verbose_name_plural = u"الإصدارات"
+
+class StudentClubYear(models.Model):
+    submission_date = models.DateTimeField(u"تاريخ الإضافة", auto_now_add=True)
+    start_date = models.DateTimeField(u"تاريخ البداية")
+    end_date = models.DateTimeField(u"تاريخ النهاية")
+    
+    def __unicode__(self):
+        return "%d/%d" % (self.start_date.year, self.end_date.year)
+
+    class Meta:
+        verbose_name = u"سنة نادي"
+        verbose_name_plural = u"سنوات النادي"
+

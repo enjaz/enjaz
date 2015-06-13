@@ -1,5 +1,6 @@
 # -*- coding: utf-8  -*-
 from django.db import models
+from django.utils import timezone
 
 # TODO: Announcements should be moved to media
 class Announcement(models.Model):
@@ -48,11 +49,19 @@ class Publication(models.Model):
         verbose_name = u"إصدار"
         verbose_name_plural = u"الإصدارات"
 
+class YearManager(models.Manager):
+    def get_by_year(self, start_year, end_year):
+        return self.get(start_date__year=start_year,
+                        end_date__year=end_year)
+    def get_current(self):
+        now = timezone.now()
+        return self.get(start_date__lte=now, end_date__gte=now)
+
 class StudentClubYear(models.Model):
     submission_date = models.DateTimeField(u"تاريخ الإضافة", auto_now_add=True)
     start_date = models.DateTimeField(u"تاريخ البداية")
     end_date = models.DateTimeField(u"تاريخ النهاية")
-    
+    objects = YearManager()
     def __unicode__(self):
         return "%d/%d" % (self.start_date.year, self.end_date.year)
 

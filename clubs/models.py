@@ -3,6 +3,7 @@ from django.contrib.contenttypes.generic import GenericRelation
 from django.db import models
 from django.contrib.auth.models import User
 from forms_builder.forms.models import Form
+from core.models import StudentClubYear
 
 section_choices = (
     ('NG', u'الحرس الوطني'),
@@ -77,10 +78,13 @@ class Club(models.Model):
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
     city = models.CharField(max_length=1, choices=city_choices, verbose_name=u"المدينة")
     gender = models.CharField(max_length=1, choices=gender_choices,
-                              verbose_name=u"المدينة", blank=True,
+                              verbose_name=u"الجنس", blank=True,
                               default="")
-
-    # Special ``Club`` objects (eg, Deanship of Student Affairs) should be hidden from the clubs list
+    year = models.ForeignKey(StudentClubYear, null=True, blank=True,
+                             on_delete=models.SET_NULL, default=None,
+                             verbose_name=u"السنة")
+    # Special ``Club`` objects (eg, Deanship of Student Affairs)
+    # should be hidden from the clubs list
     visible = models.BooleanField(default=True,
                                   verbose_name=u"مرئي؟")
     can_review = models.BooleanField(default=False,
@@ -154,7 +158,10 @@ class Club(models.Model):
         )
 
     def __unicode__(self):
-        return self.name
+        if self.gender:
+            return u"%s (%s)" % (self.name, self.get_gender_display())
+        else:
+            return self.name
 
 class College(models.Model):
     section = models.CharField(max_length=2, choices=section_choices, verbose_name=u"القسم")

@@ -18,7 +18,7 @@
 			{% if can_view_members %}<li><a href="{% url 'clubs:view_members' club.pk %}"><span class="entypo-users"></span> استعرض أعضاء النادي</a></li>{% endif %}
 			{% if can_view_deputies %}<li><a href="{% url 'clubs:view_deputies' club.pk %}"><span class="entypo-users"></span> استعرض نواب النادي</a></li>{% endif %}
 			{% if can_view_applications %}<li><a href="{% url 'clubs:view_application' club.pk %}"><span class="glyphicon glyphicon-list-alt"></span> راجع طلبات الانضمام</a></li>{% endif %}
-			{% if user.is_authenticated and club.registration_is_open %}
+			{% if user.is_authenticated and club.registration_is_open and user.common_profile.city == club.city and user.common_profile.college.gender == club.gender or user.is_authenticated and club.registration_is_open and not club.gender %}
 			<li><a href="{% url 'clubs:join' club.pk %}"><span class="glyphicon glyphicon-star"></span> انضم للنادي</a></li>
 			{% endif %}
             <li><a href="{% url 'forms:form_list' club.id %}"><span class="entypo-docs"></span> النماذج</a></li>

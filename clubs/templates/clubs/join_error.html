@@ -1,4 +1,4 @@
-{% extends "clubs_base.html" %}{% load bootstrap3 %}
+{% extends "clubs_base.html" %}
 {% block title %}اشترك في {{ club.name }}{% endblock %}
 
 {% block content %}
@@ -10,14 +10,9 @@
 سبق أن سجلت في هذا النادي!
 {% elif error_message == 'already_in' %}
 أنت عضو في النادي!
-{% else %}
-<form action="{% url 'clubs:join' club.id %}" method="post">
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    {% buttons %}
-        <button type="submit" class="btn btn-primary">
-            {% bootstrap_icon "star" %} أرسل
-        </button>
-    {% endbuttons %}
+{% elif error_message == 'city_error' %}
+يمكن فقط لطلاب وطالبات {{ club.get_city_display }} الانضمام ل{{ club.name }}.
+{% elif error_message == 'gender_error' %}
+الانضمام ل{{ club.name }} ممكن ل{{ club.get_gender.display }} فقط.
 {% endif %}
 {% endblock %}

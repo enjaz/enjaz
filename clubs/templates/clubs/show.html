@@ -44,12 +44,6 @@
     <th>البريد الإلكتروني</th>
     <td class="english-field">{{ club.email }}</td>
   </tr>
-{% if club.parent %}
-  <tr>
-    <th>النادي الأب</th>
-    <td>{{ club.parent }}</td>
-  </tr>
-{% endif %}
   <tr>
     <th>المنسق</th>
     <td>{% if club.coordinator %} {{ club.coordinator.common_profile.get_ar_full_name|default:club.coordinator.username }} {% else %} لا يوجد {% endif %}</td>

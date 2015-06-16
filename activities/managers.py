@@ -29,11 +29,7 @@ class ActivityManager(models.Manager):
 
         # WARNING: lengthy run-time; not lazy
 
-        activities = self.filter(is_deleted=False)
-        approved_activities = filter(lambda activity: activity.is_approved(), activities)
-        approved_pks = [activity.pk for activity in approved_activities]
-
-        return self.filter(pk__in=approved_pks)
+        return self.filter(is_deleted=False).filter(is_approved=True)
 
     def rejected(self):
         """
@@ -42,23 +38,15 @@ class ActivityManager(models.Manager):
         # A rejected activity is one which:
         # (1) has at least 1 review
         # (2) has any of its reviews rejected
-        return self.filter(is_deleted=False).annotate(review_count=Count("review")).filter(review_count__gte=1, review__is_approved=False)
+        return self.filter(is_deleted=False).filter(is_approved=False)
 
     def pending(self):
         """
         Return a queryset of pending activities.
         """
-        # A pending activity is one that's not approved or rejected
+        # pending activities that are not deleted.
 
-        # The following is dirty way of dealing with query sets, but this is the only way given the deep complexity
-        # of this query
-
-        # WARNING: lengthy run-time; not lazy
-
-        pending_activities = filter(lambda activity: activity.is_approved() is None, self.filter(is_deleted=False))
-        pending_pks = [activity.pk for activity in pending_activities]
-
-        return self.filter(pk__in=pending_pks)
+        return self.filter(is_deleted=False).filter(is_approved=None)
 
     def for_user(self, user=None):
         """

@@ -136,7 +136,22 @@ class Club(models.Model):
                                   episodes)
         return len(overdue_episodes)
 
-    def get_reviewer_parents(self):
+    def get_next_reviewing_parent(self):
+        """
+        Return the single upper parent of this club that can write activity
+        reviews
+        """
+        if not self.parent:
+            return None
+        else:
+            current_parent = self.parent
+            while True:
+                if current_parent.can_review:
+                    return current_parent
+                else:
+                    current_parent = current_parent.parent
+
+    def get_reviewing_parents(self):
         """
         Return the parents of this club that can write activity reviews, in order from the buttom-up.
         """
@@ -144,11 +159,15 @@ class Club(models.Model):
             return []
         else:
             parents = [self.parent]
-            while parents[-1].parent is not None:
-                parents.append(parents[-1].parent)
-            reviewing_parents = filter(lambda club: club.can_review, parents)
+            while True:
+                new_parent = parents[-1].parent
+                if new_parent:
+                    parents.append(new_parent)
+                else: # If parent == None
+                    break
+            reviewing_parents = [parent for parent in parents if parent.can_review]
             return reviewing_parents
-        
+
     class Meta:
         # For the admin interface.
         verbose_name = u"نادي"
@@ -158,8 +177,13 @@ class Club(models.Model):
         )
 
     def __unicode__(self):
-        if self.gender:
+        if self.gender and not self.city:
             return u"%s (%s)" % (self.name, self.get_gender_display())
+        elif self.city and not self.gender:
+            return u"%s (%s)" % (self.name, self.get_city_display())
+        elif self.city and self.gender:
+            return u"%s (%s/%s)" % (self.name, self.get_city_display(),
+                                    self.get_gender_display())
         else:
             return self.name
 

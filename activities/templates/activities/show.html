@@ -180,23 +180,13 @@
 
 				<!-- tabs for the profile links -->
 				<ul class="nav nav-tabs">
-                    {# <!-- TODO: permissions! --> #}
-                    {% for reviewer in activity.primary_club.get_reviewer_parents %}
-                        <li{% if active_tab == reviewer.pk %} class="active"{% endif %}>
-                            <a href="{% url 'activities:review' activity.id reviewer.id %}">مراجعة {{ reviewer.name }}</a>
-                        </li>
-                    {% endfor %}
-
-					{% if request.user|has_coordination_to_activity:activity or perms.activities.view_presidency_review or perms.activities.add_presidency_review %}
-					<li{% if active_tab == 'presidency' %} class="active"{% endif %}>
-						<a href="{% url 'activities:review_with_type' activity.pk 'p' %}">مراجعة رئاسة نادي الطلاب</a>
+			{% if request.user|has_coordination_to_activity:activity or request.user|can_review_activity:activity %}
+				{% for reviewer in activity.primary_club.get_reviewing_parents %}
+					<li{% if active_tab == reviewer.pk %} class="active"{% endif %}>
+					<a href="{% url 'activities:review' activity.id reviewer.id %}">مراجعة {{ reviewer.name }}</a>
 					</li>
-					{% endif %}
-					{% if request.user|has_coordination_to_activity:activity or perms.activities.view_deanship_review or perms.activities.add_deanship_review %}
-					<li{% if active_tab == 'deanship' %} class="active"{% endif %}>
-						<a href="{% url 'activities:review_with_type' activity.pk 'd' %}">مراجعة عمادة شؤون الطلاب</a>
-					</li>
-					{% endif %}
+				{% endfor %}
+			{% endif %}
                     {% if request.user|has_coordination_to_activity:activity or perms.niqati.view_order %}
 					<li{% if active_tab == 'niqati' %} class="active"{% endif %}>
 						<a href="{% url 'activities:niqati_orders' activity.pk %}">نقاطي</a>

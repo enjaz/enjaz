@@ -1,7 +1,6 @@
 """
 Utility functions for the activities app.
 """
-import warnings
 from activities.models import Activity
 from clubs.utils import is_coordinator_or_deputy, get_deanship, get_presidency
 
@@ -23,9 +22,12 @@ def get_club_notification_cc(activity):
     # If the person who submitted the activity is not the coordinator,
     # add the coordinator to the CC list.
     if activity.submitter != activity.primary_club.coordinator:
-        addresses.append(activity.primary_club.coordinator.email)
-    for secondary_club in activity.secondary_clubs.all():
-        addresses.append(secondary_club.coordinator.email)
+        if activity.primary_club.coordinator and \
+           activity.primary_club.coordinator.email:
+            addresses.append(activity.primary_club.coordinator.email)
+    for secondary_club in activity.secondary_clubs.filter(coordinator__isnull=False):
+        if secondary_club.coordinator.email:
+            addresses.append(secondary_club.coordinator.email)
     return addresses
 
 

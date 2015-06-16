@@ -25,10 +25,6 @@ def create_groups(sender, **kwargs):
     except ObjectDoesNotExist:
         deanship_group = Group.objects.create(name='deanship')
 
-    view_deanship_review = Permission.objects.get(codename='view_deanship_review')
-    deanship_group.permissions.add(view_deanship_review)
-    deanship_group.save()
-
     # This group is meant for the President of the Student Club and
     # his deputies.
     try:
@@ -36,7 +32,6 @@ def create_groups(sender, **kwargs):
     except ObjectDoesNotExist:
         presidency_group = Group.objects.create(name='presidency')
 
-    add_activity = Permission.objects.get(codename='add_activity')
     directly_add_activity = Permission.objects.get(codename='directly_add_activity')
     # The 'change_activity' permission indicates that the user can
     # changes activities regardless of the value of is_editable.
@@ -50,11 +45,10 @@ def create_groups(sender, **kwargs):
     # delete_book = Permission.objects.get(codename='delete_book')
     view_presidency_review = Permission.objects.get(codename='view_presidency_review')
     add_presidency_review = Permission.objects.get(codename='add_presidency_review')
-    presidency_group.permissions.add(add_activity,
-                                     directly_add_activity,
+    presidency_group.permissions.add(directly_add_activity,
                                      change_activity, view_activity,
-                                     add_club,
-                                     change_club, #change_book,
+                                     add_club, change_club,
+                                     #change_book,
                                      view_presidency_review,
                                      view_deanship_review,
                                      add_presidency_review)
@@ -68,5 +62,5 @@ def create_custom_permission(sender, **kwargs):
         Permission.objects.create(name="Is a deanship employee.", codename="deanship_employee",
                               content_type=ContentType.objects.get(model='user'))
 
-post_syncdb.connect(create_groups, sender=accounts.models)
-post_syncdb.connect(create_custom_permission, sender=accounts.models)
+#post_syncdb.connect(create_groups, sender=accounts.models)
+#post_syncdb.connect(create_custom_permission, sender=accounts.models)

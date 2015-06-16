@@ -95,3 +95,9 @@ def forms_editor_check(user, object):
     if not isinstance(object, Club):
         raise TypeError("Expected a Club object, received %s" % type(object))
     return is_coordinator_or_deputy(object, user) or user.is_superuser
+
+def can_review_activity(user, activity):
+    reviewing_parents = activity.primary_club.get_reviewing_parents()
+    user_clubs = get_user_coordination_and_deputyships(user)
+    print "can_review_activity", any([club in reviewing_parents for club in user_clubs])
+    return any([club in reviewing_parents for club in user_clubs])

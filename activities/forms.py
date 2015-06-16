@@ -12,10 +12,7 @@ from activities.models import Activity, Episode, Review, Evaluation
 
 class ActivityForm(ModelForm):
     """A general form, which doesn't include 'Presidency'."""
-    queryset = Club.objects.exclude(english_name="Presidency")
-    primary_club = ModelChoiceField(queryset=queryset,
-                                    label=Activity.primary_club.field.verbose_name,
-                                    help_text=Activity.primary_club.field.help_text)
+    queryset = Club.objects.exclude(english_name__startswith="Presidency")
     secondary_clubs = ModelMultipleChoiceField(queryset=queryset,
                                     label=Activity.secondary_clubs.field.verbose_name,
                                     help_text=Activity.secondary_clubs.field.help_text,
@@ -24,12 +21,10 @@ class ActivityForm(ModelForm):
     
     class Meta:
         model = Activity
-        fields = ['primary_club', # TODO: primary club is already known (signed in):
-                                  # no need to include as field
-                  'name', 'category', 'description', 'public_description',
-                  'organizers', 'participants',
-                  'secondary_clubs', 'inside_collaborators',
-                  'outside_collaborators', 'requirements',]
+        fields = [ 'name', 'category', 'description',
+                   'public_description', 'organizers', 'participants',
+                   'secondary_clubs', 'inside_collaborators',
+                   'outside_collaborators', 'requirements',]
 
     def __init__(self, *args, **kwargs):
         """

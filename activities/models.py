@@ -47,6 +47,17 @@ class Activity(models.Model):
     organizers = models.IntegerField(verbose_name=u"عدد المنظمين",
                                        help_text=u"عدد الطلاب الذين سينظمون النشاط")
     forms = GenericRelation(Form)
+    assignee = models.ForeignKey('clubs.Club', null=True,
+                                 on_delete=models.SET_NULL,
+                                 related_name='assigned_activities',
+                                 verbose_name=u"النادي المسند")
+    is_approved_choices = (
+        (True, u'معتمد'),
+        (False, u'مرفوض'),
+        (None, u'معلق'),
+        )
+    is_approved = models.NullBooleanField(verbose_name=u"الحالة",
+                                          choices=is_approved_choices)
 
     # Override the default manager with the activity custom manager
     objects = ActivityManager()
@@ -73,75 +84,50 @@ class Activity(models.Model):
         else:
             return None
 
-    # TODO: remove
-    def is_approved_by_deanship(self):
-        import warnings
-        warnings.warn("This utility function is no longer in use. It's so fixed!",
-                     DeprecationWarning)
-        try:
-            d_review = self.review_set.get(reviewer_club=get_deanship())
-            return d_review.is_approved
-        except (KeyError, Review.DoesNotExist): # deanship review does not exist
-            return None
-    is_approved_by_deanship.boolean = True
-    is_approved_by_deanship.short_description = u"اعتمدته العمادة؟"
+    def update_is_approved(self):
+        reviewing_parents = self.primary_club.get_reviewing_parents()
+        reviewer_count = len(reviewing_parents)
+        # If the club has no parents, activity is approved
+        # automatically
+        if not self.primary_club.parent:
+            self.is_approved = True
 
-    # TODO: remove
-    def is_approved_by_presidency(self):
-        import warnings
-        warnings.warn("This utility function is no longer in use. It's so fixed!",
-                     DeprecationWarning)
-        try:
-            p_review = self.review_set.get(reviewer_club=get_presidency())
-            return p_review.is_approved
-        except (KeyError, Review.DoesNotExist): # presidency review does not exist
-            return None
-    is_approved_by_presidency.boolean = True
-    is_approved_by_presidency.short_description = u"اعتمدته الرئاسة؟"
+        # If the assignee is the submitter club (i.e. the activity has
+        # been returned) and none of the above reviews are rejected
+        # then consider it approved.
+        #
+        # Alternatively:
+        #     self.primary_club == self.assignee
+        elif reviewer_count <= self.review_set.count() and not \
+             self.review_set.filter(is_approved__in=[False, None]).exists():
+            self.is_approved = True
 
-    def is_approved(self):
-        reviewer_parents = self.primary_club.get_reviewer_parents()
-        # If the club has no parents, activity is approved automatically
-        if len(reviewer_parents) == 0:
-            return True
-
-        # If the number of reviews is equal to the number of reviewing parents
-        # and all reviews are approved, then activity is approved
-        elif len(reviewer_parents) <= self.review_set.count() and \
-            all([review.is_approved for review in self.review_set.all()]):
-            return True
-
-        # If there is at least one review and there is any rejected review, then activity is rejected
-        elif len(reviewer_parents) > 0 and any([review.is_approved is False for review in self.review_set.all()]):
-            return False
+        # If there is at least one rejected review, then activity is
+        # rejected
+        elif self.review_set.filter(is_approved=False).exists():
+            self.is_approved = False
 
         # In all other cases, activity is pending
         else:
-            return None
-    is_approved.boolean = True
-    is_approved.short_description = u"تمت الموافقة على النشاط؟"
+            self.is_approved = None
+
+        # REMEMBER TO SAVE AFTER YOU CALL THIS!
 
     def get_approval_status_message(self):
         """
         Return a verbose version of the approval status.
         """
-        approved = self.is_approved()
-        if approved:
+        if self.is_approved:
             return u"تمت الموافقة على النشاط."
-        elif approved is False:
+        elif self.is_approved is False:
             return u"رُفض من قبل %s." % self.review_set.filter(is_approved=False).first().reviewer_club.name
-        elif approved is None:
+        elif self.is_approved is None:
             # Either there is a pending review waiting for edits...
-            if self.review_set.filter(is_approved=None).exists():
+            if self.assignee == self.primary_club:
                 return u"ينتظر تعديلاً."
-            else:  # ... or we're waiting for the next club up the hierarchy to review activity
-                reviewer_parents = self.primary_club.get_reviewer_parents()
-                # Loop over the reviewer parents (remember they are in order, from bottom-up)
-                for parent in reviewer_parents:
-                    # The first parent that doesn't have a review for this activity will be the one
-                    # whose review is pending
-                    if not parent.reviews.filter(activity=self).exists():
-                        return u"ينتظر مراجعة %s." % parent.name
+            elif self.assignee:  # ... or we're waiting for the next club up the hierarchy to review activity
+                return u"ينتظر مراجعة %s." % self.assignee.name
+            else:
                 return u"غير معروف"
     get_approval_status_message.short_description = u"حالة النشاط"
 
@@ -149,7 +135,7 @@ class Activity(models.Model):
         """
         Return an appropriate HTML button to be displayed in the activity list based on the activity's status.
         """
-        if self.is_approved() is None:
+        if self.is_approved is None:
             # Either there is a pending review waiting for edits...
             if self.review_set.filter(is_approved=None).exists():
                 message = u"اقرأ مراجعة %s" % self.review_set.filter(is_approved=None).first().reviewer_club.name

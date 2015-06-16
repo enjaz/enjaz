@@ -45,3 +45,7 @@ def is_employee(user, club):
 @register.filter
 def has_coordination_to_activity(user, activity):
     return utils.has_coordination_to_activity(user, activity)
+
+@register.filter
+def can_review_activity(user, activity):
+    return utils.can_review_activity(user, activity)

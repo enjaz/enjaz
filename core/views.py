@@ -15,10 +15,10 @@ def portal_home(request):
     if request.user.is_authenticated():
         context = {}
         # --- activities ---
-        current_year_activities = Activity.objects.all()
+
+        approved_activities = Activity.objects.approved().for_user_gender(request.user).for_user_city(request.user)
         # count only approved activites
-        approved_activities = Activity.objects.approved()
-        context['activity_count'] = approved_activities.count()
+        context['activity_count'] = Activity.objects.approved().count()
         
         today = date.today()
         next_week = today + timedelta(weeks=1)

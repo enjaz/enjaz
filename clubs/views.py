@@ -31,6 +31,7 @@ def list(request):
     clubs = Club.objects.filter(visible=True, year=current_year)
 
     city = get_user_city(request.user)
+    print city
     if city:
         clubs = clubs.filter(city=city) | clubs.filter(city="")
 

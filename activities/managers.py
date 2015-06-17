@@ -2,20 +2,14 @@ from django.db import models
 from django.db.models.aggregates import Count
 from clubs.utils import is_coordinator_of_any_club, is_deputy_of_any_club, get_user_clubs, \
     get_user_coordination_and_deputyships
+from accounts.utils import get_user_city, get_user_gender
 
 
-class ActivityManager(models.Manager):
+class ActivityQuerySet(models.QuerySet):
     """
     Custom manager for Activity model with custom querysets
     for approved, pending, and rejected activities.
     """
-    def get_queryset(self):
-        """
-        TODO: Exclude delete activities.
-        TODO: Exclude but the current year's activities.
-        """
-        return super(ActivityManager, self).get_queryset()
-
     def approved(self):
         """
         Return a queryset of approved activities.
@@ -35,9 +29,6 @@ class ActivityManager(models.Manager):
         """
         Return a queryset of rejected activities.
         """
-        # A rejected activity is one which:
-        # (1) has at least 1 review
-        # (2) has any of its reviews rejected
         return self.filter(is_deleted=False).filter(is_approved=False)
 
     def pending(self):
@@ -47,6 +38,39 @@ class ActivityManager(models.Manager):
         # pending activities that are not deleted.
 
         return self.filter(is_deleted=False).filter(is_approved=None)
+
+    def for_user_city(self, user=None):
+        city_condition = models.Q()
+
+        if user:
+            city = get_user_city(user)
+            if city:
+                city_condition = models.Q(primary_club__city=city) | \
+                                 models.Q(primary_club__city="")
+                user_clubs = get_user_clubs(user)
+                # Regardless of city, show the activities of the
+                # user clubs.
+                if user_clubs:
+                    city_condition |= models.Q(primary_club__in=user_clubs) | \
+                                        models.Q(secondary_clubs__in=user_clubs)
+        return self.filter(city_condition)
+
+    def for_user_gender(self, user=None):
+        gender_condition = models.Q()
+
+        if user:
+            gender = get_user_gender(user)
+            if gender:
+                gender_condition = models.Q(gender=gender) | \
+                                   models.Q(gender="")
+                user_clubs = get_user_clubs(user)
+                # Regardless of gender, show the activities of the
+                # user clubs.
+                if user_clubs:
+                    gender_condition |= models.Q(primary_club__in=user_clubs) | \
+                                        models.Q(secondary_clubs__in=user_clubs)
+
+        return self.filter(gender_condition)
 
     def for_user(self, user=None):
         """

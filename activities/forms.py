@@ -21,7 +21,7 @@ class ActivityForm(ModelForm):
     
     class Meta:
         model = Activity
-        fields = [ 'name', 'category', 'description',
+        fields = [ 'name', 'category', 'description', 'gender',
                    'public_description', 'organizers', 'participants',
                    'secondary_clubs', 'inside_collaborators',
                    'outside_collaborators', 'requirements',]

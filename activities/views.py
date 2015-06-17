@@ -5,15 +5,16 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.db.models import Q
 
 from post_office import mail
 
 from activities.models import Activity, Review, Episode
 from activities.forms import ActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm
-from accounts.models import get_gender
+from accounts.utils import get_user_gender
 from activities.utils import get_club_notification_to, get_club_notification_cc
 from clubs.models import Club
-from clubs.utils import get_presidency, is_coordinator_or_member, is_coordinator_or_deputy_of_any_club, \
+from clubs.utils import is_coordinator_or_member, is_coordinator_or_deputy_of_any_club, \
     is_coordinator_of_any_club, get_media_center, \
     is_member_of_any_club, is_employee_of_any_club, is_coordinator, is_coordinator_or_deputy, get_user_clubs, \
     get_user_coordination_and_deputyships, has_coordination_to_activity, get_deanship, is_employee, can_review_activity
@@ -70,32 +71,32 @@ def list_activities(request):
 
     if request.user.is_authenticated():
         template = 'activities/list_privileged.html'
-        if request.user.is_superuser or is_coordinator_or_member(get_presidency(), request.user)\
-                or request.user.has_perm('activities.add_presidency_review'):
+
+        # For logged-in users, only show city-specific and
+        # gender-specific activities.
+        context['approved'] = Activity.objects.approved().for_user_city(request.user).for_user_gender(request.user)
+
+        if request.user.is_superuser:
             # If the user is a super user or part of the presidency,
             # then show all activities
             context['pending'] = Activity.objects.pending()
             context['rejected'] = Activity.objects.rejected()
-
-        elif request.user.has_perm('activities.add_deanship_review'):
-            # If the user is part of the deanship of student affairs,
-            # only show activities approved by presidency
-            context['pending'] = Activity.objects.pending().filter(review__reviewer_club=get_presidency(), review__is_approved=True)
-            context['rejected'] = Activity.objects.rejected().filter(review__reviewer_club=get_presidency(), review__is_approved=True)
-        elif (is_coordinator_or_deputy_of_any_club(request.user) or is_member_of_any_club(request.user)) and \
-             not is_coordinator_or_member(get_presidency(), request.user) and \
-             not is_coordinator_or_member(get_media_center(), request.user):
-            # For club coordinators, deputies, and members, show approved
-            # activities as well as their own club's pending and rejected
-            # activities.
+        elif is_coordinator_or_deputy_of_any_club(request.user) or \
+             is_member_of_any_club(request.user):
+            # For club coordinators, deputies, and members, show
+            # approved activities as well as their own club's pending
+            # and rejected activities.  For coordinators, show also
+            # the activities waiting their action.
             user_coordination = get_user_coordination_and_deputyships(request.user)
             user_clubs = user_coordination | request.user.memberships.all()
+            # In addition to the gender-specific approved activities,
+            # show all activities of the user club.
             context['pending'] = (Activity.objects.pending().filter(primary_club__in=user_clubs) | \
-                                 Activity.objects.pending().filter(secondary_clubs__in=user_clubs) | \
-                                 Activity.objects.pending().filter(review__reviewer_club__in=user_clubs)).distinct()
+                                  Activity.objects.pending().filter(secondary_clubs__in=user_clubs) | \
+                                  Activity.objects.pending().filter(review__reviewer_club__in=user_clubs)).distinct()
             context['rejected'] = (Activity.objects.rejected().filter(primary_club__in=user_clubs) | \
-                                  Activity.objects.rejected().filter(secondary_clubs__in=user_clubs) | \
-                                  Activity.objects.rejected().filter(review__reviewer_club__in=user_clubs)).distinct()
+                                   Activity.objects.rejected().filter(secondary_clubs__in=user_clubs) | \
+                                   Activity.objects.rejected().filter(review__reviewer_club__in=user_clubs)).distinct()
 
             # Media-related
             # Only display to coordinators and deputies
@@ -236,12 +237,7 @@ def create(request):
     elif request.method == 'GET':
         context = {}
         if request.user.has_perm("activities.directly_add_activity"):
-            # Make it more user-friendly: if the user is an admin,
-            # automatically choose presidency as the default
-            # primary_club.
-            presidency = get_presidency()
-            activity = Activity(primary_club=presidency)
-            form = DirectActivityForm(instance=activity)
+            form = DirectActivityForm()
         else:
             form = ActivityForm()
             user_club = user_coordination[0]

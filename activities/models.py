@@ -4,7 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime, timedelta
-from activities.managers import ActivityManager
+from activities.managers import ActivityQuerySet
 
 from clubs.models import College
 from clubs.utils import get_deanship, get_presidency
@@ -51,6 +51,13 @@ class Activity(models.Model):
                                  on_delete=models.SET_NULL,
                                  related_name='assigned_activities',
                                  verbose_name=u"النادي المسند")
+    gender_choices = (
+        ('', u'الجميع'),
+        ('F', u'الطالبات'),
+        ('M', u'الطلاب'),
+        )
+    gender = models.CharField(max_length=1,verbose_name=u"النشاط موجه ل",
+                              choices=gender_choices, default="")
     is_approved_choices = (
         (True, u'معتمد'),
         (False, u'مرفوض'),
@@ -60,7 +67,7 @@ class Activity(models.Model):
                                           choices=is_approved_choices)
 
     # Override the default manager with the activity custom manager
-    objects = ActivityManager()
+    objects = ActivityQuerySet.as_manager()
 
     def registration_is_open(self):
         """

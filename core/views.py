@@ -16,9 +16,9 @@ def portal_home(request):
         context = {}
         # --- activities ---
 
-        approved_activities = Activity.objects.approved().for_user_gender(request.user).for_user_city(request.user)
+        approved_activities = Activity.objects.approved().current_year().for_user_gender(request.user).for_user_city(request.user)
         # count only approved activites
-        context['activity_count'] = Activity.objects.approved().count()
+        context['activity_count'] = Activity.objects.approved().current_year().count()
         
         today = date.today()
         next_week = today + timedelta(weeks=1)

@@ -65,7 +65,7 @@ def list_activities(request):
     #
     # By default (i.e. for students, employees and anonymous users),
     # no pending or rejected activities should be shown.
-    context = {'approved': Activity.objects.approved(),
+    context = {'approved': Activity.objects.approved().current_year(),
                'pending': Activity.objects.none(),
                'rejected': Activity.objects.none()}
 
@@ -79,8 +79,8 @@ def list_activities(request):
         if request.user.is_superuser:
             # If the user is a super user or part of the presidency,
             # then show all activities
-            context['pending'] = Activity.objects.pending()
-            context['rejected'] = Activity.objects.rejected()
+            context['pending'] = Activity.objects.pending().current_year()
+            context['rejected'] = Activity.objects.rejected().current_year()
         elif is_coordinator_or_deputy_of_any_club(request.user) or \
              is_member_of_any_club(request.user):
             # For club coordinators, deputies, and members, show
@@ -91,17 +91,19 @@ def list_activities(request):
             user_clubs = user_coordination | request.user.memberships.all()
             # In addition to the gender-specific approved activities,
             # show all activities of the user club.
-            context['pending'] = (Activity.objects.pending().filter(primary_club__in=user_clubs) | \
-                                  Activity.objects.pending().filter(secondary_clubs__in=user_clubs) | \
-                                  Activity.objects.pending().filter(review__reviewer_club__in=user_clubs)).distinct()
-            context['rejected'] = (Activity.objects.rejected().filter(primary_club__in=user_clubs) | \
-                                   Activity.objects.rejected().filter(secondary_clubs__in=user_clubs) | \
-                                   Activity.objects.rejected().filter(review__reviewer_club__in=user_clubs)).distinct()
+            context['pending'] = Activity.objects.pending().filter(Q(primary_club__in=user_clubs) | \
+                                                                   Q(secondary_clubs__in=user_clubs) | \
+                                                                   Q(review__reviewer_club__in=user_clubs)
+                                                                   ).current_year().distinct()
+            context['rejected'] = Activity.objects.rejected().filter(Q(primary_club__in=user_clubs) | \
+                                                                     Q(secondary_clubs__in=user_clubs) | \
+                                                                     Q(review__reviewer_club__in=user_clubs)
+                                                                     ).current_year().distinct()
 
             # Media-related
             # Only display to coordinators and deputies
             if is_coordinator_or_deputy_of_any_club(request.user):
-                context['todo'] = Activity.objects.pending().filter(assignee__in=user_coordination)
+                context['todo'] = Activity.objects.pending().current_year().filter(assignee__in=user_coordination)
                 context['due_report_count'] = user_coordination.all()[0].get_due_report_count()
                 context['overdue_report_count'] = user_coordination.all()[0].get_overdue_report_count()
                 # In activity templates, the MAX_OVERDUE_REPORTS

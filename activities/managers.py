@@ -3,6 +3,7 @@ from django.db.models.aggregates import Count
 from clubs.utils import is_coordinator_of_any_club, is_deputy_of_any_club, get_user_clubs, \
     get_user_coordination_and_deputyships
 from accounts.utils import get_user_city, get_user_gender
+from core.models import StudentClubYear
 
 
 class ActivityQuerySet(models.QuerySet):
@@ -38,6 +39,10 @@ class ActivityQuerySet(models.QuerySet):
         # pending activities that are not deleted.
 
         return self.filter(is_deleted=False).filter(is_approved=None)
+
+    def current_year(self):
+        current_year = StudentClubYear.objects.get_current()
+        return self.filter(primary_club__year=current_year)
 
     def for_user_city(self, user=None):
         city_condition = models.Q()

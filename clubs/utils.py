@@ -1,25 +1,22 @@
 """Utility functions related to the clubs app."""
-from core.models import StudentClubYear
 from .models import Club
-
-current_year = StudentClubYear.objects.get_current()
 
 def is_coordinator_of_any_club(user):
     """Return whether the user is a coordinator of any club."""
-    return Club.objects.filter(coordinator=user, year=current_year).exists()
+    return Club.objects.current_year().filter(coordinator=user).exists()
 
 def is_deputy_of_any_club(user):
     """Return whether the user is a deputy of any club."""
-    return Club.objects.filter(deputies=user, year=current_year).exists()
+    return Club.objects.current_year().filter(deputies=user).exists()
 
 def is_member_of_any_club(user):
     """Return whether the user is a member of any club."""
-    user_clubs = Club.objects.filter(members=user, year=current_year)
+    user_clubs = Club.objects.current_year().filter(members=user)
     return user_clubs.exists()
 
 def is_employee_of_any_club(user):
     """Return whether the user is an employee of any club."""
-    employee_clubs = Club.objects.filter(employee=user, year=current_year)
+    employee_clubs = Club.objects.current_year().filter(employee=user)
     return employee_clubs.exists()
 
 def is_coordinator(club, user):
@@ -73,14 +70,14 @@ def get_media_center():
     return Club.objects.get(english_name="Media Center")
 
 def get_user_clubs(user):
-    return user.memberships.filter(year=current_year) | user.coordination.filter(year=current_year)
+    return user.memberships.current_year() | user.coordination.current_year()
 
 def get_user_coordination_and_deputyships(user):
     """Return the clubs in which the given user is the coordinator or
     deputy.  Returns None if no clubs are found."""
 
-    coordination = user.coordination.filter(year=current_year)
-    deputyships = user.deputyships.filter(year=current_year)
+    coordination = user.coordination.current_year()
+    deputyships = user.deputyships.current_year()
     # Return a QuerySet to allow further filtering
     return (coordination | deputyships)
 

@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from forms_builder.forms.models import Form
 from core.models import StudentClubYear
+from clubs.managers import ClubQuerySet
 
 section_choices = (
     ('NG', u'الحرس الوطني'),
@@ -36,7 +37,7 @@ city_choices = (
 class Club(models.Model):
     name = models.CharField(max_length=200, verbose_name=u"الاسم")
     english_name = models.CharField(max_length=200, verbose_name=u"الاسم الإنجليزي")
-    description = models.TextField(verbose_name=u"الوصف")
+    description = models.TextField(verbose_name=u"الوصف", blank=True)
     email = models.EmailField(max_length=254, verbose_name=u"البريد الإلكتروني")
     parent = models.ForeignKey('self', null=True, blank=True,
                                related_name="children",
@@ -91,6 +92,7 @@ class Club(models.Model):
                                      verbose_name=u"يستطيع المراجعة؟")
 
     forms = GenericRelation(Form)
+    objects = ClubQuerySet.as_manager()
 
     def registration_is_open(self):
         """

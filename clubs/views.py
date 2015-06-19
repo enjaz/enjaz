@@ -12,7 +12,6 @@ import unicodecsv
 
 from clubs.utils import is_coordinator, is_coordinator_or_member, is_member, is_coordinator_or_deputy, get_presidency
 from core import decorators
-from core.models import StudentClubYear
 from clubs.forms import DisabledClubForm, ClubForm
 from clubs.models import Club
 from forms_builder.forms.models import FormEntry
@@ -27,19 +26,7 @@ FORMS_CURRENT_APP = "club_forms"
 
 @login_required
 def list(request):
-    current_year = StudentClubYear.objects.get_current()
-    clubs = Club.objects.filter(visible=True, year=current_year)
-
-    city = get_user_city(request.user)
-    print city
-    if city:
-        clubs = clubs.filter(city=city) | clubs.filter(city="")
-
-    gender = get_user_gender(request.user)
-    if gender:
-        clubs = clubs.filter(gender=gender) | \
-                clubs.filter(gender="")
-    
+    clubs = Club.objects.visible().current_year().for_user_gender(request.user).for_user_city(request.user)
     context = {'clubs':clubs}
     return render(request, 'clubs/list.html', context)
 

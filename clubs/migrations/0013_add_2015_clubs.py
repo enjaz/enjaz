@@ -22,7 +22,7 @@ def add_clubs(apps, schema_editor):
     female_presidency.save()
     jeddah_presidency = Club.objects.create(name="رئاسة نادي الطلاب (جدة)",
                                             english_name="Presidency (Jeddah)",
-                                            description="-",
+                                            description="",
                                             email="sc-j@ksau-hs.edu.sa",
                                             parent=presidency,
                                             can_review=True,
@@ -30,7 +30,7 @@ def add_clubs(apps, schema_editor):
                                             city="J")
     alahsa_presidency = Club.objects.create(name="رئاسة نادي الطلاب (الأحساء)",
                                             english_name="Presidency (Al-Ahsa)",
-                                            description="-",
+                                            description="",
                                             email="sc-ah@ksau-hs.edu.sa",
                                             parent=presidency,
                                             can_review=True,
@@ -84,7 +84,7 @@ def add_clubs(apps, schema_editor):
     # Riyadh clubs
     Club.objects.create(name="كلية العلوم و المهن الصحية",
                         english_name="College of Science and Health Professions",
-                        description="-",
+                        description="",
                         email="sc-coshp@ksau-hs.edu.sa",
                         parent=male_presidency,
                         gender="M",
@@ -93,7 +93,7 @@ def add_clubs(apps, schema_editor):
                         college=r_b_m)
     Club.objects.create(name="كلية العلوم و المهن الصحية",
                         english_name="College of Science and Health Professions",
-                        description="-",
+                        description="",
                         email="sc-coshpf@ksau-hs.edu.sa",
                         parent=female_presidency,
                         gender="F",
@@ -102,7 +102,7 @@ def add_clubs(apps, schema_editor):
                         college=r_b_f)
     Club.objects.create(name="كلية الطب",
                         english_name="College of Medicine",
-                        description="-",
+                        description="",
                         email="sc-com@ksau-hs.edu.sa",
                         parent=male_presidency,
                         gender="M",
@@ -111,7 +111,7 @@ def add_clubs(apps, schema_editor):
                         college=r_m_m)
     Club.objects.create(name="كلية الطب",
                         english_name="College of Medicine",
-                        description="-",
+                        description="",
                         email="sc-com@ksau-hs.edu.sa",
                         parent=female_presidency,
                         gender="F",
@@ -120,7 +120,7 @@ def add_clubs(apps, schema_editor):
                         college=r_m_f)
     Club.objects.create(name="كلية طب الأسنان",
                         english_name="College of Dentistry",
-                        description="-",
+                        description="",
                         email="sc-cod@ksau-hs.edu.sa",
                         parent=male_presidency,
                         gender="M",
@@ -129,7 +129,7 @@ def add_clubs(apps, schema_editor):
                         college=r_d_m)
     Club.objects.create(name="كلية طب الأسنان",
                         english_name="College of Dentistry",
-                        description="-",
+                        description="",
                         email="sc-codf@ksau-hs.edu.sa",
                         parent=female_presidency,
                         gender="F",
@@ -138,7 +138,7 @@ def add_clubs(apps, schema_editor):
                         college=r_d_f)
     Club.objects.create(name="كلية العلوم الطبية التطبيقية",
                         english_name="College of Applied Medical Sciences",
-                        description="-",
+                        description="",
                         email="sc-cams@ksau-hs.edu.sa",
                         parent=male_presidency,
                         gender="M",
@@ -147,7 +147,7 @@ def add_clubs(apps, schema_editor):
                         college=r_a_m)
     Club.objects.create(name="كلية العلوم الطبية التطبيقية",
                         english_name="College of Applied Medical Sciences",
-                        description="-",
+                        description="",
                         email="sc-camsf@ksau-hs.edu.sa",
                         parent=female_presidency,
                         gender="F",
@@ -156,7 +156,7 @@ def add_clubs(apps, schema_editor):
                         college=r_a_f)
     Club.objects.create(name="كلية الصيدلة",
                         english_name="College of Pharmacy",
-                        description="-",
+                        description="",
                         email="sc-cop@ksau-hs.edu.sa",
                         parent=male_presidency,
                         gender="M",
@@ -165,7 +165,7 @@ def add_clubs(apps, schema_editor):
                         college=r_p_m)
     Club.objects.create(name="كلية الصيدلة",
                         english_name="College of Pharmacy",
-                        description="-",
+                        description="",
                         email="sc-cop@ksau-hs.edu.sa",
                         parent=female_presidency,
                         gender="F",
@@ -174,7 +174,7 @@ def add_clubs(apps, schema_editor):
                         college=r_p_f)
     Club.objects.create(name="كلية الصحة العامة والمعلوماتية الصحية",
                         english_name="College of Public Health and Health Informatics",
-                        description="-",
+                        description="",
                         email="pending@ksau-hs.edu.sa",
                         parent=male_presidency,
                         gender="M",
@@ -183,7 +183,7 @@ def add_clubs(apps, schema_editor):
                         college=r_i_m)
     Club.objects.create(name="كلية التمريض",
                         english_name="College of Nursing",
-                        description="-",
+                        description="",
                         email="sc-conr@ksau-hs.edu.sa",
                         parent=female_presidency,
                         gender="F",
@@ -192,7 +192,7 @@ def add_clubs(apps, schema_editor):
                         college=r_n_f)
     Club.objects.create(name="نادي الفنون",
                         english_name="Arts Club",
-                        description="-",
+                        description="",
                         email="arts.club@ksau-hs.edu.sa",
                         parent=male_presidency,
                         gender="M",
@@ -200,7 +200,7 @@ def add_clubs(apps, schema_editor):
                         city="R")
     Club.objects.create(name="نادي الفنون",
                         english_name="Arts Club",
-                        description="-",
+                        description="",
                         email="arts.club@ksau-hs.edu.sa",
                         parent=female_presidency,
                         gender="F",
@@ -208,7 +208,7 @@ def add_clubs(apps, schema_editor):
                         city="R")
     Club.objects.create(name="نادي خير أمة",
                         english_name="Best Nation Club",
-                        description="-",
+                        description="",
                         email="bestnation.club@ksau-hs.edu.sa",
                         parent=male_presidency,
                         gender="M",
@@ -216,7 +216,7 @@ def add_clubs(apps, schema_editor):
                         city="R")
     Club.objects.create(name="نادي خير أمة",
                         english_name="Best Nation Club",
-                        description="-",
+                        description="",
                         email="bestnation.club@ksau-hs.edu.sa",
                         parent=female_presidency,
                         gender="F",
@@ -224,7 +224,7 @@ def add_clubs(apps, schema_editor):
                         city="R")
     Club.objects.create(name="نادي البحث والابتكار والتقنية",
                         english_name="Research, Innovation and Technology Club",
-                        description="-",
+                        description="",
                         email="researchclub@ksau-hs.edu.sa",
                         parent=male_presidency,
                         gender="M",
@@ -232,7 +232,7 @@ def add_clubs(apps, schema_editor):
                         city="R")
     Club.objects.create(name="نادي البحث والابتكار والتقنية",
                         english_name="Research, Innovation and Technology Club",
-                        description="-",
+                        description="",
                         email="researchclub@ksau-hs.edu.sa",
                         parent=female_presidency,
                         gender="F",
@@ -240,7 +240,7 @@ def add_clubs(apps, schema_editor):
                         city="R")
     Club.objects.create(name="نادي لين التطوعي",
                         english_name="Leen Club",
-                        description="-",
+                        description="",
                         email="LeenClub@ksau-hs.edu.sa",
                         parent=male_presidency,
                         gender="M",
@@ -248,7 +248,7 @@ def add_clubs(apps, schema_editor):
                         city="R")
     Club.objects.create(name="نادي لين التطوعي",
                         english_name="Leen Club",
-                        description="-",
+                        description="",
                         email="LeenClub@ksau-hs.edu.sa",
                         parent=female_presidency,
                         gender="F",
@@ -256,7 +256,7 @@ def add_clubs(apps, schema_editor):
                         city="R")
     Club.objects.create(name="أرشدني",
                         english_name="Arshidni",
-                        description="-",
+                        description="",
                         email="arshidny@ksau-hs.edu.sa",
                         parent=male_presidency,
                         gender="M",
@@ -264,7 +264,7 @@ def add_clubs(apps, schema_editor):
                         city="R")
     Club.objects.create(name="أرشدني",
                         english_name="Arshidny",
-                        description="-",
+                        description="",
                         email="arshidny@ksau-hs.edu.sa",
                         parent=female_presidency,
                         gender="F",
@@ -275,7 +275,7 @@ def add_clubs(apps, schema_editor):
     # No female College of Medicine in Jeddah, yet. 
     Club.objects.create(name="كلية الطب",
                         english_name="College of Medicine",
-                        description="-",
+                        description="",
                         email="sc-comj@ksau-hs.edu.sa",
                         parent=jeddah_presidency,
                         gender="M",
@@ -284,7 +284,7 @@ def add_clubs(apps, schema_editor):
                         college=j_m_m)
     Club.objects.create(name="كلية التمريض",
                         english_name="College of Nursing",
-                        description="-",
+                        description="",
                         email="sc-conj@ksau-hs.edu.sa",
                         parent=jeddah_presidency,
                         gender="F",
@@ -293,7 +293,7 @@ def add_clubs(apps, schema_editor):
                         college=j_n_f)
     Club.objects.create(name="كلية العلوم و المهن الصحية",
                         english_name="College of Science and Health Professions",
-                        description="-",
+                        description="",
                         email="sc-coshpj@ksau-hs.edu.sa",
                         parent=jeddah_presidency,
                         gender="M",
@@ -302,7 +302,7 @@ def add_clubs(apps, schema_editor):
                         college=j_b_m)
     Club.objects.create(name="كلية العلوم و المهن الصحية",
                         english_name="College of Science and Health Professions",
-                        description="-",
+                        description="",
                         email="pending@ksau-hs.edu.sa",
                         parent=jeddah_presidency,
                         gender="F",
@@ -311,7 +311,7 @@ def add_clubs(apps, schema_editor):
                         college=j_b_f)
     Club.objects.create(name="نادي الفنون",
                         english_name="Arts Club",
-                        description="-",
+                        description="",
                         email="pending@ksau-hs.edu.sa",
                         parent=jeddah_presidency,
                         gender="",
@@ -319,7 +319,7 @@ def add_clubs(apps, schema_editor):
                         city="J")
     Club.objects.create(name="نادي خير أمة",
                         english_name="Best Nation Club",
-                        description="-",
+                        description="",
                         email="pending@ksau-hs.edu.sa",
                         parent=jeddah_presidency,
                         gender="",
@@ -327,7 +327,7 @@ def add_clubs(apps, schema_editor):
                         city="J")
     Club.objects.create(name="نادي البحث والابتكار والتقنية",
                         english_name="Research, Innovation and Technology Club",
-                        description="-",
+                        description="",
                         email="research.clubj@ksau-hs.edu.sa",
                         parent=jeddah_presidency,
                         gender="",
@@ -335,7 +335,7 @@ def add_clubs(apps, schema_editor):
                         city="J")
     Club.objects.create(name="نادي لين التطوعي",
                         english_name="Leen Club",
-                        description="-",
+                        description="",
                         email="pending@ksau-hs.edu.sa",
                         parent=jeddah_presidency,
                         gender="",
@@ -343,7 +343,7 @@ def add_clubs(apps, schema_editor):
                         city="J")
     Club.objects.create(name="أرشدني",
                         english_name="Arshidni",
-                        description="-",
+                        description="",
                         email="pending@ksau-hs.edu.sa",
                         parent=jeddah_presidency,
                         gender="",
@@ -353,7 +353,7 @@ def add_clubs(apps, schema_editor):
     # Al-Ahsa clubs
     Club.objects.create(name="كلية التمريض",
                         english_name="College of Nursing",
-                        description="-",
+                        description="",
                         email="sc-conah@ksau-hs.edu.sa",
                         parent=alahsa_presidency,
                         gender="F",
@@ -362,7 +362,7 @@ def add_clubs(apps, schema_editor):
                         college=a_n_f)
     Club.objects.create(name="كلية العلوم الطبية التطبيقية",
                         english_name="College of Applied Medical Sciences",
-                        description="-",
+                        description="",
                         email="sc-cams@ksau-hs.edu.sa",
                         parent=alahsa_presidency,
                         gender="M",
@@ -371,7 +371,7 @@ def add_clubs(apps, schema_editor):
                         college=a_a_m)
     Club.objects.create(name="كلية العلوم الطبية التطبيقية",
                         english_name="College of Applied Medical Sciences",
-                        description="-",
+                        description="",
                         email="sc-camsf@ksau-hs.edu.sa",
                         parent=alahsa_presidency,
                         gender="F",
@@ -380,7 +380,7 @@ def add_clubs(apps, schema_editor):
                         college=a_a_f)
     Club.objects.create(name="نادي الفنون",
                         english_name="Arts Club",
-                        description="-",
+                        description="",
                         email="arts.clubah@ksau-hs.edu.sa",
                         parent=alahsa_presidency,
                         gender="",
@@ -388,7 +388,7 @@ def add_clubs(apps, schema_editor):
                         city="A")
     Club.objects.create(name="نادي خير أمة",
                         english_name="Best Nation Club",
-                        description="-",
+                        description="",
                         email="bestnation.clubah@ksau-hs.edu.sa",
                         parent=alahsa_presidency,
                         gender="",
@@ -396,7 +396,7 @@ def add_clubs(apps, schema_editor):
                         city="A")
     Club.objects.create(name="نادي البحث والابتكار والتقنية",
                         english_name="Research, Innovation and Technology Club",
-                        description="-",
+                        description="",
                         email="pending@ksau-hs.edu.sa",
                         parent=alahsa_presidency,
                         gender="",
@@ -404,7 +404,7 @@ def add_clubs(apps, schema_editor):
                         city="A")
     Club.objects.create(name="نادي لين التطوعي",
                         english_name="Leen Club",
-                        description="-",
+                        description="",
                         email="pending@ksau-hs.edu.sa",
                         parent=alahsa_presidency,
                         gender="",
@@ -412,7 +412,7 @@ def add_clubs(apps, schema_editor):
                         city="A")
     Club.objects.create(name="أرشدني",
                         english_name="Arshidni",
-                        description="-",
+                        description="",
                         email="pending@ksau-hs.edu.sa",
                         parent=alahsa_presidency,
                         gender="",

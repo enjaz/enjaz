@@ -47,7 +47,7 @@ class Activity(models.Model):
     organizers = models.IntegerField(verbose_name=u"عدد المنظمين",
                                        help_text=u"عدد الطلاب الذين سينظمون النشاط")
     forms = GenericRelation(Form)
-    assignee = models.ForeignKey('clubs.Club', null=True,
+    assignee = models.ForeignKey('clubs.Club', null=True, blank=True,
                                  on_delete=models.SET_NULL,
                                  related_name='assigned_activities',
                                  verbose_name=u"النادي المسند")

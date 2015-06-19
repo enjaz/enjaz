@@ -35,12 +35,12 @@
   <tr>
     <th>الاسم الإنجليزي</th>
     <td class="english-field">{{ club.english_name }}</td>
-  </tr>
+  </tr>{% if club.description %}
   <tr>
     <th>الوصف</th>
     <td>{{ club.description }}</td>
   </tr>
-  <tr>
+{% endif %}  <tr>
     <th>البريد الإلكتروني</th>
     <td class="english-field">{{ club.email }}</td>
   </tr>

@@ -57,7 +57,8 @@ class Activity(models.Model):
         ('M', u'الطلاب'),
         )
     gender = models.CharField(max_length=1,verbose_name=u"النشاط موجه ل",
-                              choices=gender_choices, default="")
+                              choices=gender_choices, default="",
+                              blank=True)
     is_approved_choices = (
         (True, u'معتمد'),
         (False, u'مرفوض'),

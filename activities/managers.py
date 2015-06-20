@@ -45,35 +45,36 @@ class ActivityQuerySet(models.QuerySet):
     def for_user_city(self, user=None):
         city_condition = models.Q()
 
-        if user:
+        if user and user.is_authenticated():
             city = get_user_city(user)
             if city:
                 city_condition = models.Q(primary_club__city=city) | \
                                  models.Q(primary_club__city="")
-                user_clubs = get_user_clubs(user)
-                # Regardless of city, show the activities of the
-                # user clubs.
-                if user_clubs:
-                    city_condition |= models.Q(primary_club__in=user_clubs) | \
-                                        models.Q(secondary_clubs__in=user_clubs)
         return self.filter(city_condition)
 
     def for_user_gender(self, user=None):
         gender_condition = models.Q()
 
-        if user:
+        if user and user.is_authenticated():
             gender = get_user_gender(user)
             if gender:
                 gender_condition = models.Q(gender=gender) | \
                                    models.Q(gender="")
-                user_clubs = get_user_clubs(user)
-                # Regardless of gender, show the activities of the
-                # user clubs.
-                if user_clubs:
-                    gender_condition |= models.Q(primary_club__in=user_clubs) | \
-                                        models.Q(secondary_clubs__in=user_clubs)
 
         return self.filter(gender_condition)
+
+    def for_user_clubs(self, user=None):
+        club_condition = models.Q()
+
+        if user and user.is_authenticated():
+            user_coordination = get_user_coordination_and_deputyships(user)
+            user_clubs = user_coordination | user.memberships.all()
+            if user_clubs:
+                club_condition = models.Q(primary_club__in=user_clubs) | \
+                                 models.Q(secondary_clubs__in=user_clubs) | \
+                                 models.Q(review__reviewer_club__in=user_clubs)
+
+        return self.filter(club_condition)
 
     def for_user(self, user=None):
         """

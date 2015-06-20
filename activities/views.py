@@ -85,25 +85,20 @@ def list_activities(request):
              is_member_of_any_club(request.user):
             # For club coordinators, deputies, and members, show
             # approved activities as well as their own club's pending
-            # and rejected activities.  For coordinators, show also
-            # the activities waiting their action.
-            user_coordination = get_user_coordination_and_deputyships(request.user)
-            user_clubs = user_coordination | request.user.memberships.all()
+            # and rejected activities.
+            context['pending'] = Activity.objects.pending().current_year().for_user_clubs(request.user).distinct()
+            context['rejected'] = Activity.objects.rejected().current_year().for_user_clubs(request.user).distinct()
             # In addition to the gender-specific approved activities,
             # show all activities of the user club.
-            context['pending'] = Activity.objects.pending().filter(Q(primary_club__in=user_clubs) | \
-                                                                   Q(secondary_clubs__in=user_clubs) | \
-                                                                   Q(review__reviewer_club__in=user_clubs)
-                                                                   ).current_year().distinct()
-            context['rejected'] = Activity.objects.rejected().filter(Q(primary_club__in=user_clubs) | \
-                                                                     Q(secondary_clubs__in=user_clubs) | \
-                                                                     Q(review__reviewer_club__in=user_clubs)
-                                                                     ).current_year().distinct()
+            context['approved'] = (context['approved'] |  Activity.objects.approved().for_user_clubs(request.user)).distinct()
 
-            # Media-related
             # Only display to coordinators and deputies
             if is_coordinator_or_deputy_of_any_club(request.user):
+                # For coordinators, show also the activities waiting their
+                # action.
+                user_coordination = get_user_coordination_and_deputyships(request.user)
                 context['todo'] = Activity.objects.pending().current_year().filter(assignee__in=user_coordination)
+                # Media-related
                 context['due_report_count'] = user_coordination.all()[0].get_due_report_count()
                 context['overdue_report_count'] = user_coordination.all()[0].get_overdue_report_count()
                 # In activity templates, the MAX_OVERDUE_REPORTS

@@ -8,7 +8,7 @@ def get_user_city(user):
     # If the profile is absent (i.e. superuser), return None.
     try: 
         city = user.common_profile.city
-    except ObjectDoesNotExist:
+    except (ObjectDoesNotExist, AttributeError):
         city = ''
 
     return city

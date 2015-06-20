@@ -69,10 +69,9 @@ class ActivityQuerySet(models.QuerySet):
         if user and user.is_authenticated():
             user_coordination = get_user_coordination_and_deputyships(user)
             user_clubs = user_coordination | user.memberships.all()
-            if user_clubs:
-                club_condition = models.Q(primary_club__in=user_clubs) | \
-                                 models.Q(secondary_clubs__in=user_clubs) | \
-                                 models.Q(review__reviewer_club__in=user_clubs)
+            club_condition = models.Q(primary_club__in=user_clubs) | \
+                             models.Q(secondary_clubs__in=user_clubs) | \
+                             models.Q(review__reviewer_club__in=user_clubs)
 
         return self.filter(club_condition)
 

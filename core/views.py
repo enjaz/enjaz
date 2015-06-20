@@ -16,21 +16,23 @@ def portal_home(request):
         context = {}
         # --- activities ---
 
-        approved_activities = Activity.objects.approved().current_year().for_user_gender(request.user).for_user_city(request.user)
+        approved_activities = Activity.objects.approved().current_year()
+        filtered_activities = (approved_activities.for_user_gender(request.user).for_user_city(request.user) | \
+                               approved_activities.for_user_clubs(request.user)).distinct()
         # count only approved activites
         context['activity_count'] = Activity.objects.approved().current_year().count()
-        
+
         today = date.today()
         next_week = today + timedelta(weeks=1)
-        next_week_activities = approved_activities.filter(episode__start_date__gte=today,
+        next_week_activities = filtered_activities.filter(episode__start_date__gte=today,
                                                           episode__start_date__lte=next_week).order_by('episode__start_date')
         context['upcoming_activities'] = next_week_activities
-        
+
         # --- niqati -------
         context['niqati_sum'] = sum(code.category.points for code in request.user.code_set.all())
         context['niqati_count'] = request.user.code_set.count()
         context['latest_entries'] = request.user.code_set.all()[::-1][:5]
-        
+
         # --- books --------
         context['books_count'] = Book.objects.count()
         context['my_books_count'] = request.user.book_contributions.count()

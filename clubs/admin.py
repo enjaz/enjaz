@@ -61,6 +61,7 @@ class GenderFilter(admin.SimpleListFilter):
 class ClubAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'city', 'email', 'coordinator', 'number_of_members')
     list_filter = (ClubFilter, CityFilter, GenderFilter, YearFilter)
+    search_fields = ('name', 'city', 'email')
     filter_horizontal = ('members', 'deputies')
 
     def number_of_members(self, obj):

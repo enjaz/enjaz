@@ -442,6 +442,7 @@ def review(request, activity_id, reviewer_id):
                 # correspondence to the review
                 activity.is_editable = True
                 activity.assignee = activity.primary_club
+                email_context['last_reviewer'] = reviewer_club
                 email_context['full_url'] = last_review_full_url
                 mail.send(get_club_notification_to(activity),
                           cc=get_club_notification_cc(activity),

@@ -90,6 +90,10 @@ class Club(models.Model):
                                   verbose_name=u"مرئي؟")
     can_review = models.BooleanField(default=False,
                                      verbose_name=u"يستطيع المراجعة؟")
+    can_delete = models.BooleanField(default=True,
+                                     verbose_name=u"يستطيع الحذف؟")
+    can_edit = models.BooleanField(default=True,
+                                     verbose_name=u"يستطيع التعديل؟")
 
     forms = GenericRelation(Form)
     objects = ClubQuerySet.as_manager()
@@ -143,32 +147,12 @@ class Club(models.Model):
         Return the single upper parent of this club that can write activity
         reviews
         """
-        if not self.parent:
-            return None
-        else:
-            current_parent = self.parent
-            while True:
-                if current_parent.can_review:
-                    return current_parent
-                else:
-                    current_parent = current_parent.parent
-
-    def get_reviewing_parents(self):
-        """
-        Return the parents of this club that can write activity reviews, in order from the buttom-up.
-        """
-        if not self.parent:
-            return []
-        else:
-            parents = [self.parent]
-            while True:
-                new_parent = parents[-1].parent
-                if new_parent:
-                    parents.append(new_parent)
-                else: # If parent == None
-                    break
-            reviewing_parents = [parent for parent in parents if parent.can_review]
-            return reviewing_parents
+        current_parent = self.parent
+        while current_parent:
+            if current_parent.can_review:
+                return current_parent
+            else:
+                current_parent = current_parent.parent
 
     class Meta:
         # For the admin interface.

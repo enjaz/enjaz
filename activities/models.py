@@ -3,10 +3,11 @@ from django.contrib.contenttypes.generic import GenericRelation
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 from datetime import datetime, timedelta
 from activities.managers import ActivityQuerySet
 
-from clubs.models import College
+from clubs.models import College, Club
 from clubs.utils import get_deanship, get_presidency
 from forms_builder.forms.models import Form
 from media.utils import REPORT_DUE_AFTER
@@ -93,21 +94,17 @@ class Activity(models.Model):
             return None
 
     def update_is_approved(self):
-        reviewing_parents = self.primary_club.get_reviewing_parents()
-        reviewer_count = len(reviewing_parents)
+        reviewer_count = Club.objects.reviewing_parents(self.primary_club).count()
         # If the club has no parents, activity is approved
         # automatically
         if not self.primary_club.parent:
             self.is_approved = True
 
-        # If the assignee is the submitter club (i.e. the activity has
-        # been returned) and none of the above reviews are rejected
-        # then consider it approved.
-        #
-        # Alternatively:
-        #     self.primary_club == self.assignee
+        # If all expected reviews are there, and none of them are
+        # rejected or pending then consider it approved.
         elif reviewer_count <= self.review_set.count() and not \
-             self.review_set.filter(is_approved__in=[False, None]).exists():
+             self.review_set.filter(models.Q(is_approved=False) |\
+                                    models.Q(is_approved=None)).exists():
             self.is_approved = True
 
         # If there is at least one rejected review, then activity is
@@ -146,8 +143,10 @@ class Activity(models.Model):
         if self.is_approved is None:
             # Either there is a pending review waiting for edits...
             if self.review_set.filter(is_approved=None).exists():
-                message = u"اقرأ مراجعة %s" % self.review_set.filter(is_approved=None).first().reviewer_club.name
-                url = ""
+                pending_reviewer = self.review_set.filter(is_approved=None).first().reviewer_club
+                message = u"اقرأ مراجعة %s" % pending_reviewer.name
+                url = reverse('activities:review',
+                              args=(self.pk, pending_reviewer.pk))
                 return "<a class='btn btn-xs btn-green' href='%s'>%s</a>" % (url, message)
             else:  # ... or we're waiting for the next club up the hierarchy to review activity
                 return ""
@@ -409,7 +408,10 @@ class Episode(models.Model):
         The report is due when the episode has ended, the due date hasn't passed,
         and the report hasn't been submitted.
         """
-        return self.requires_report and self.end_datetime() < datetime.now() < self.report_due_date() and not self.report_is_submitted()
+        return self.activity.is_approved and \
+               self.requires_report and \
+               self.end_datetime() < datetime.now() < self.report_due_date() and \
+               not self.report_is_submitted()
 
     def report_is_overdue(self):
         """
@@ -417,7 +419,10 @@ class Episode(models.Model):
         The report is overdue when the episode has ended, the due date has passed,
         and the report hasn't been submitted.
         """
-        return self.requires_report and datetime.now() > self.report_due_date() and not self.report_is_submitted()
+        return self.activity.is_approved and \
+               self.requires_report and \
+               datetime.now() > self.report_due_date() and \
+               not self.report_is_submitted()
 
 class Category(models.Model):
     ar_name = models.CharField(max_length=50,

@@ -1,5 +1,9 @@
 """Utility functions related to the clubs app."""
 from .models import Club
+from core.models import StudentClubYear
+
+current_year = StudentClubYear.objects.get_current()
+
 
 def is_coordinator_of_any_club(user):
     """Return whether the user is a coordinator of any club."""
@@ -61,13 +65,16 @@ def has_coordination_to_activity(user, activity):
     return coordination_clubs.exists()
 
 def get_deanship():
-    return Club.objects.get(english_name="Deanship of Student Affairs")
+    return Club.objects.get(english_name="Deanship of Student Affairs",
+                            year=current_year)
 
 def get_presidency():
-    return Club.objects.get(english_name="Presidency")
+    return Club.objects.get(english_name="Presidency",
+                            year=current_year)
 
 def get_media_center():
-    return Club.objects.get(english_name="Media Center")
+    return Club.objects.get(english_name="Media Center",
+                            year=current_year)
 
 def get_user_clubs(user):
     return user.memberships.current_year() | user.coordination.current_year()
@@ -94,7 +101,56 @@ def forms_editor_check(user, object):
     return is_coordinator_or_deputy(object, user) or user.is_superuser
 
 def can_review_activity(user, activity):
-    reviewing_parents = activity.primary_club.get_reviewing_parents()
-    user_clubs = get_user_coordination_and_deputyships(user)
-    print "can_review_activity", any([club in reviewing_parents for club in user_clubs])
-    return any([club in reviewing_parents for club in user_clubs])
+    if user.has_perm('activities.add_review'): # e.g. superuser
+        return True
+    reviewing_parents = Club.objects.reviewing_parents(activity.primary_club)
+    user_clubs = reviewing_parents.filter(coordinator=user) | \
+                 reviewing_parents.filter(deputies=user)
+    return user_clubs.exists()
+
+def can_delete_activity(user, activity):
+    # A user can delete an activity in three cases:
+    # * If they have the change_activity permission (e.g. superuser).
+    # * If they are the submitter, coordinator or deputy and the
+    #   activity is not reviewed yet.
+    # * If they are the coordinator or deputy of any club that can
+    #   review the activity, if that club has can_delete=True.  In
+    #   real life, this means vice presidents.
+    if user.has_perm('activities.change_activity'):
+        return True
+    elif activity.is_editable and \
+       not activity.review_set.exists() and \
+       (activity.submitter == user or \
+       has_coordination_to_activity(user, activity)):
+        return True
+    else:
+        reviewing_parents = Club.objects.reviewing_parents(activity.primary_club)
+        deleting_parents = reviewing_parents.filter(can_delete=True)
+        user_clubs = deleting_parents.filter(coordinator=user) | deleting_parents.filter(deputies=user)
+        return user_clubs.exists()
+
+def can_edit_activity(user, activity):
+    # A user can edit an activity in three cases:
+    # * If they have the change_activity permission (e.g. superuser).
+    # * If they are the submitter, coordinator or deputy and the
+    #   activity is_editable=True.
+    # * If they are the coordinator or deputy of any club that can
+    #   review the activity, if that club has can_edit=True.  In
+    #   real life, this means vice presidents.
+    if user.has_perm('activities.change_activity'):
+        return True
+    elif activity.is_approved == False and \
+         (activity.submitter == user or \
+         has_coordination_to_activity(user, activity)):
+        return False
+    elif (activity.submitter == user or \
+          has_coordination_to_activity(user, activity)):
+        # This doesn't necessarily mean that they would be able to
+        # edit the activity fully.  Further restriction is to be
+        # imposed in the view.
+        return True
+    else:
+        reviewing_parents = Club.objects.reviewing_parents(activity.primary_club)
+        editing_parents = reviewing_parents.filter(can_edit=True)
+        user_clubs = editing_parents.filter(coordinator=user) | editing_parents.filter(deputies=user)
+        return user_clubs.exists()

@@ -1,5 +1,6 @@
 from django import template
 from clubs import utils
+from clubs.models import Club
 
 register = template.Library()
 
@@ -49,3 +50,15 @@ def has_coordination_to_activity(user, activity):
 @register.filter
 def can_review_activity(user, activity):
     return utils.can_review_activity(user, activity)
+
+@register.filter
+def can_delete_activity(user, activity):
+    return utils.can_delete_activity(user, activity)
+
+@register.filter
+def can_edit_activity(user, activity):
+    return utils.can_edit_activity(user, activity)
+
+@register.filter
+def get_reviewing_parents(club):
+    return Club.objects.reviewing_parents(club)

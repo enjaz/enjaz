@@ -17,7 +17,8 @@ from clubs.models import Club
 from clubs.utils import is_coordinator_or_member, is_coordinator_or_deputy_of_any_club, \
     is_coordinator_of_any_club, get_media_center, \
     is_member_of_any_club, is_employee_of_any_club, is_coordinator, is_coordinator_or_deputy, get_user_clubs, \
-    get_user_coordination_and_deputyships, has_coordination_to_activity, get_deanship, is_employee, can_review_activity
+    get_user_coordination_and_deputyships, has_coordination_to_activity, get_deanship, is_employee, \
+    can_review_activity, can_delete_activity, can_edit_activity
 from media.utils import MAX_OVERDUE_REPORTS
 
 FORMS_CURRENT_APP = "activity_forms"
@@ -223,10 +224,10 @@ def create(request):
                     email_context = {'activity': form_object,
                                      'full_url': full_url,
                                      'reviewer_club': reviewing_parent}
-                    
-                    mail.send([reviewing_parent.coordinator.email],
-                              template="activity_submitted",
-                              context=email_context)
+                    if reviewing_parent.coordinator:
+                        mail.send([reviewing_parent.coordinator.email],
+                                   template="activity_submitted",
+                                   context=email_context)
             form_object.save()
             return HttpResponseRedirect(reverse('activities:list'))
         else:
@@ -246,15 +247,8 @@ def create(request):
 @login_required
 def edit(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
-    coordination_status = has_coordination_to_activity(request.user, activity)
 
-    # If the user is neither the submitter, nor has the permission to
-    # change activities (i.e. not part of the head of the Student
-    # Club, or the Media Team), nor a coordinator or deputy of any of
-    # the organizing clubs, raise a PermissionDenied error.
-    if not request.user == activity.submitter and \
-       not request.user.has_perm('activities.change_activity') and \
-       not coordination_status:
+    if not can_edit_activity(request.user, activity):
         raise PermissionDenied
 
     if request.method == 'POST':
@@ -262,7 +256,7 @@ def edit(request, activity_id):
             modified_activity = DirectActivityForm(request.POST,
                                                    instance=activity)
         elif not activity.is_editable and \
-             not request.user.has_perm('activities.change_activity'):
+             has_coordination_to_activity(request.user, activity):
             modified_activity = DisabledActivityForm(request.POST,
                                                      instance=activity)
         else:
@@ -301,7 +295,7 @@ def edit(request, activity_id):
         if request.user.has_perm('activities.directly_add_activity'):
             form = DirectActivityForm(instance=activity)
         elif not activity.is_editable and \
-             not request.user.has_perm('activities.change_activity'):
+             has_coordination_to_activity(request.user, activity):
             form = DisabledActivityForm(instance=activity)
         else:
             form = ActivityForm(instance=activity)
@@ -312,23 +306,11 @@ def edit(request, activity_id):
 @login_required
 def delete(request,activity_id):
     activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
-    coordination_status = has_coordination_to_activity(request.user, activity)
     context = {'activity': activity}
-    # If the user is neither the submitter, nor has the permission to
-    # change activities (i.e. not part of the head of the Student
-    # Club, or the Media Team), nor a coordinator or deputy of any of
-    # the organizing clubs, raise a PermissionDenied error.
-    if not request.user == activity.submitter and \
-       not request.user.has_perm('activities.change_activity') and \
-       not coordination_status:
+
+    if not can_delete_activity(request.user, activity):
         raise PermissionDenied
-    # If we are dealing with the coordinator or their deputies, we
-    # shouldn't allow them to delete unless the activity is editable.
-    # This also means that vice presidents can delte activities
-    # regardless of their is_editable status.
-    if (request.user == activity.submitter or coordination_status) \
-       and not activity.is_editable:
-        raise PermissionDenied
+
     if request.method == 'POST':
         if 'confirm' in request.POST:
             activity.is_deleted = True
@@ -356,11 +338,11 @@ def review(request, activity_id, reviewer_id):
     # (3) Employee responsible for the club that owns the activity. (READ)
     # (4) Superuser. (WRITE)
 
-    reviewing_parents = activity.primary_club.get_reviewing_parents()
+    reviewing_parents = Club.objects.reviewing_parents(activity.primary_club)
 
     # Is the passed reviewer club a member of the activity owner's
     # reviewer parents? If not, raise a 404 error.
-    if not reviewer_club in reviewing_parents:
+    if not reviewing_parents.filter(pk=reviewer_club.pk).exists():
         raise Http404
 
     # Is the current user a coordinator/deputy of any of the reviewing

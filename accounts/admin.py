@@ -12,6 +12,9 @@ from userena.admin import UserenaAdmin
 
 from clubs.models import Club, college_choices, section_choices
 from accounts.models import CommonProfile
+from core.models import StudentClubYear
+
+current_year = StudentClubYear.objects.get_current()
 
 class DeanshipAuthenticationForm(AdminAuthenticationForm):
     """A custom authentication form used in the admin app.  Based on the
@@ -97,9 +100,9 @@ class CoordinatorFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == '1':
-            return queryset.exclude(coordination__isnull=True)
+            return queryset.filter(coordination__year=current_year)
         if self.value() == '0':
-            return queryset.filter(coordination__isnull=True)
+            return queryset.exclude(coordination__year=current_year)
 
 class CollegeFilter(admin.SimpleListFilter):
     title = u"كلية الطالب"
@@ -153,10 +156,8 @@ ones) deal with the User model."""
     inlines = [CommonProfileInline,]
 
     def is_coordinator(self, obj):
-        if obj.coordination.all():
-            return True
-        else:
-            return False
+        return obj.coordination.current_year().exists()
+
     is_coordinator.boolean = True
     is_coordinator.short_description = u"منسق؟"
 

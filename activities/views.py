@@ -246,7 +246,8 @@ def create(request):
 
 @login_required
 def edit(request, activity_id):
-    activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
+    activity = get_object_or_404(Activity, pk=activity_id,
+                                 is_deleted=False)
 
     if not can_edit_activity(request.user, activity):
         raise PermissionDenied
@@ -381,12 +382,15 @@ def review(request, activity_id, reviewer_id):
         review = ReviewForm(request.POST, instance=review_object)
 
         if review.is_valid():
+            # If the review instance has an idea, it's being edited.
+            # Otherwise, it's a new review.
+            is_new = not bool(review.instance.id)
             review.save()
             # Once the activity is approved (or partially approved),
             # lock it from being edited.  This is very critical as to
             # prevent manipulations (ie, editing the request after the
             # approval of the presidency and before it's reviewed by
-            # DSA) Only when an edit is requested by the reviewer
+            # DSA). Only when an edit is requested by the reviewer
             # should editing be allowed.
             activity.is_editable = False
             activity.update_is_approved()
@@ -400,9 +404,9 @@ def review(request, activity_id, reviewer_id):
                 reviewing_parent = reviewer_club.get_next_reviewing_parent()
                 # Reached the top of the review hierarchy => activity
                 # approved.
-                if not reviewing_parent: 
-                    if activity.is_approved:  # sanity check
-                        activity.assignee = None
+                if not reviewing_parent:
+                    activity.assignee = None
+                    if 'is_approved' in review.changed_data:
                         # Email notifications
                         email_context['full_url'] = activity_full_url
                         mail.send(get_club_notification_to(activity),
@@ -422,32 +426,39 @@ def review(request, activity_id, reviewer_id):
                     upcoming_review_full_url = request.build_absolute_uri(upcoming_review_url)
                     email_context['full_url'] = upcoming_review_full_url
                     email_context['upcoming_reviewer'] = reviewing_parent
-                    if reviewing_parent.coordinator:
+                    if reviewing_parent.coordinator and 'is_approved' in review.changed_data:
                         mail.send(reviewing_parent.coordinator.email,
                                   template="activity_approved_to_next_reviewer",
                                   context=email_context)                    
             elif review.cleaned_data['is_approved'] == False:
                 activity.assignee = None
-                email_context['last_reviewer'] = reviewer_club
-                email_context['full_url'] = last_review_full_url
-                mail.send(get_club_notification_to(activity),
-                          cc=get_club_notification_cc(activity),
-                          template="activity_rejected_to_coordinator",
-                          context=email_context)
+                if 'is_approved' in review.changed_data:
+                    email_context['last_reviewer'] = reviewer_club
+                    email_context['full_url'] = last_review_full_url
+                    mail.send(get_club_notification_to(activity),
+                              cc=get_club_notification_cc(activity),
+                              template="activity_rejected_to_coordinator",
+                              context=email_context)
 
-            else:  # If changes are requested (review.is_approved == None)
-                # TODO: If the review is being edited, only do the
-                # following if an actual change has been made.
+            elif review.cleaned_data['is_approved'] == None: # If changes were requested.
                 # Enable coordinators to edit the activity request in
                 # correspondence to the review
                 activity.is_editable = True
                 activity.assignee = activity.primary_club
-                email_context['last_reviewer'] = reviewer_club
-                email_context['full_url'] = last_review_full_url
-                mail.send(get_club_notification_to(activity),
-                          cc=get_club_notification_cc(activity),
-                          template="activity_held_to_coordinator",
-                          context=email_context)
+                # We don't want to send email notification if
+                # is_approved hasn't been changed, but we also want to
+                # send a notification when the review is created.  The
+                # default choice for is_approved is None.  That's why
+                # it won't show in changed_data if a new review was
+                # created.  For that, we should add a special test,
+                # is_new.
+                if is_new or 'is_approved' in review.changed_data:
+                    email_context['last_reviewer'] = reviewer_club
+                    email_context['full_url'] = last_review_full_url
+                    mail.send(get_club_notification_to(activity),
+                              cc=get_club_notification_cc(activity),
+                              template="activity_held_to_coordinator",
+                              context=email_context)
             activity.save()
             return HttpResponseRedirect(reverse('activities:show',
                                                 args=(activity.pk, )))

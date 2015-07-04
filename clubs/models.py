@@ -94,6 +94,8 @@ class Club(models.Model):
                                      verbose_name=u"يستطيع الحذف؟")
     can_edit = models.BooleanField(default=True,
                                      verbose_name=u"يستطيع التعديل؟")
+    can_review_niqati = models.BooleanField(default=False,
+                                     verbose_name=u"يستطيع التعديل؟")
 
     forms = GenericRelation(Form)
     objects = ClubQuerySet.as_manager()

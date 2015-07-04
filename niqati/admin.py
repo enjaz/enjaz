@@ -4,7 +4,7 @@ from django.contrib import admin
 from niqati.models import Code, Code_Collection, Code_Order
 
 class CodeAdmin(admin.ModelAdmin):
-    list_display = ('code_string', 'episode', 'ordering_club', 'category', 'user', 'redeem_date',)
+    list_display = ('code_string', 'collection__parent_order__episode', 'ordering_club', 'collection__code_category', 'user', 'redeem_date',)
 
     def ordering_club(self, obj):
         return obj.episode.activity.primary_club.name

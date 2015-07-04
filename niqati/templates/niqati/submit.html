@@ -1,29 +1,23 @@
-{% extends "niqati_base.html" %}{% load staticfiles %}
+{% extends "niqati_base.html" %}{% load staticfiles %}{% load bootstrap3 %}
 {% block title %}إدخال النقاط{% endblock %}
 {% block content %}
 
 <h2>إدخال النقاط</h2>
 
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-          {{ message }}
+    {% for error in form.string.errors %}
+        <div class="alert alert-danger">
+            {{ error|escape }}
         </div>
     {% endfor %}
-{% endif %}
 
 <div class="">
-    <form action="{% url 'niqati:submit' %}" method="post">
-    {% csrf_token %}
-        <div class="row">
-            <div class="col-md-12">
-                <div class="form-group">
-                    <input type="text" class="english-field form-control input-lg" name="code" placeholder="أدخل رمز نقاطي"
-                           value="{{ code_to_redeem }}" required>
-                </div>
-            </div>
-        </div>
-        <div class="row">
+    <form method="post">
+      {% csrf_token %}
+        <div class="form-group{% if form.string.errors %} has-error{% endif %}">
+	  {{ form.string }}
+	</div>
+
+    <div class="row">
             <div class="col-xs-5"><hr></div>
             <div class="col-xs-2"><h6 align="center">تقييم النشاط</h6></div>
             <div class="col-xs-5"><hr></div>
@@ -56,8 +50,8 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <button class="btn btn-green btn-block" type="submit">إدخال</button>
+        <div class="form-group">
+            <input class="btn btn-success" type="submit" value="أدخِل"/>
         </div>
     </form>
 </div>

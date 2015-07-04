@@ -1,11 +1,12 @@
 # -*- coding: utf-8  -*-
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.models import User
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.utils import timezone
-
+from django.db.models import Sum
 from django.core.exceptions import PermissionDenied
 
 from post_office import mail
@@ -14,41 +15,53 @@ from core.decorators import post_only
 from core.utilities import MVP_EMAIL, FVP_EMAIL
 from activities.models import Activity, Evaluation
 from activities.forms import EvaluationForm
-from clubs.utils import has_coordination_to_activity
-from niqati.models import Niqati_User, Category, Code, Code_Order, Code_Collection
-from niqati.forms import OrderForm
-
-# TODO: The Core_Order model should have a submitter field, and the
-# notifications should be sent to the person who requested the codes.
-# This is espically important with the introduction of deputies and
-# notifications to secondary clubs.
+from activities.utils import get_club_notification_to, get_club_notification_cc
+from clubs.utils import has_coordination_to_activity, can_review_niqati, is_coordinator_or_deputy_of_any_club
+from niqati.models import Category, Code, Code_Order, Code_Collection
+from niqati.forms import OrderForm, RedeemCodeForm
 
 
 @login_required
 def index(request):
     user = request.user
-    if user.has_perms('niqati.view_general_report'):
+    if user.has_perms('niqati.view_general_report'): # Superuser
         return HttpResponseRedirect(reverse('niqati:general_report'))
-    elif user.has_perms('niqati.approve_order'):
+    elif can_review_niqati(user):
         return HttpResponseRedirect(reverse('niqati:approve'))
-    elif user.has_perms('niqati.view_order'):
+    elif is_coordinator_or_deputy_of_any_club(user):
         return HttpResponseRedirect(reverse('niqati:orders'))
-    else:
+    else: # Student Views
         return HttpResponseRedirect(reverse('niqati:submit'))
 
-    # Student Views
-
+@login_required
+def redeem(request, code=""):
+    """
+    GET: show the code submission form.
+    POST: submit a code.
+    """
+    if request.method == "POST":
+        form = RedeemCodeForm(request.user, request.POST)
+        eval_form = EvaluationForm(request.POST)
+        if form.is_valid() and eval_form.is_valid():
+            result = form.process()
+            messages.add_message(request, *result)
+            eval_form.save(form.code.event, request.user)
+            return HttpResponseRedirect(reverse("codes:submit"))
+    else:
+        form = RedeemCodeForm(request.user, initial={'string': code})
+        eval_form = EvaluationForm()
+    return render(request, "niqati/submit.html", {"form": form,  "eval_form": eval_form})
+    
 # TODO: fix redeem_date issue
 @login_required
 def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code submission requests
 
-    if timezone.now() > timezone.datetime(2015, 4, 21, 0, 0, 0, tzinfo=timezone.get_default_timezone()):
-        return render(request, "niqati/submit_closed.html")
+    #if timezone.now() > timezone.datetime(2015, 4, 21, 0, 0, 0, tzinfo=timezone.get_default_timezone()):
+    #    return render(request, "niqati/submit_closed.html")
 
     if request.method == "POST":
         # format code first i.e. make upper case & remove spaces or dashes
         code = request.POST['code'].upper().replace(" ", "").replace("-", "")
-
         try:  # assume at first that code exists
             c = Code.objects.get(code_string=code)
 
@@ -57,7 +70,6 @@ def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code s
             eval_form = EvaluationForm(request.POST,
                                        instance=Evaluation(episode=c.episode,
                                                            evaluator=request.user))
-            eval_form_valid = eval_form.is_valid()
 
             if not c.user:  # code isn't associated with any user -- free to use
                 try:  # assume user already has a code in the same episode
@@ -69,7 +81,6 @@ def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code s
                         evaluation = Evaluation.objects.get(evaluator=request.user, episode=c.episode)
                         eval_form = EvaluationForm(request.POST, instance=evaluation)
                         if eval_form.is_valid():
-
                             # Save new code to user
                             c.user = request.user
                             c.redeem_date = timezone.now()
@@ -150,9 +161,9 @@ def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code s
 @login_required
 def student_report(request):
     # calculate total points
-    point_sum = sum(code.category.points for code in request.user.code_set.all())
+    context = request.user.code_set.aggregate(total_points=Sum('category__points'))
     # TODO: sort codes
-    return render(request, 'niqati/student_report.html', {'user': request.user, 'total_points': point_sum})
+    return render(request, 'niqati/student_report.html', context)
 
 
 # Club Views
@@ -194,8 +205,6 @@ def create_codes(request, activity_id):
                                         code_category=cat,
                                         delivery_type=d,
                                         parent_order=o)
-                    if not cat.requires_approval:  # set to approved=True if approval is not required for this category
-                        x.approved = True
                     x.save()
 
             # send email to presidency for approval
@@ -302,11 +311,8 @@ def approve_codes(request):
 
                 # Send email notification after code generation
                 email_context = {'order': order}
-                if order.episode.activity.primary_club.coordinator:
-                    recipient = order.episode.activity.primary_club.coordinator.email
-                else:
-                    recipient = order.episode.activity.submitter.email
-                mail.send([recipient],
+                mail.send(get_club_notification_to(order.episode.activity),
+                          cc=get_club_notification_cc(order.episode.activity),
                           template="niqati_order_reject",
                           context=email_context)
 
@@ -337,6 +343,5 @@ def approve_codes(request):
 @login_required
 @permission_required('niqati.view_general_report', raise_exception=True)
 def general_report(request):
-    users = Niqati_User.objects.all()
-    users = sorted(users, key=lambda user: -user.total_points())  # sort users according to their points
+    users = User.objects.annotate(point_sum=Sum('code__category__points')).filter(point_sum__gt=0).order_by('-point_sum')
     return render(request, 'niqati/general_report.html', {'users': users})

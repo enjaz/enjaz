@@ -154,3 +154,11 @@ def can_edit_activity(user, activity):
         editing_parents = reviewing_parents.filter(can_edit=True)
         user_clubs = editing_parents.filter(coordinator=user) | editing_parents.filter(deputies=user)
         return user_clubs.exists()
+
+def can_review_niqati(user):
+    if user.has_perm('activities.change_code'): # e.g. superuser
+        return True
+    niqati_reviewers = Club.objects.filter(can_review_niqati=True)
+    user_clubs = niqati_reviewers.filter(coordinator=user) | \
+                 niqati_reviewers.filter(deputies=user)
+    return user_clubs.exists()

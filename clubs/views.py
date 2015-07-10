@@ -15,6 +15,7 @@ from core import decorators
 from clubs.forms import DisabledClubForm, ClubForm
 from clubs.models import Club
 from forms_builder.forms.models import FormEntry
+from accounts.utils import get_user_city, get_user_gender
 
 FORMS_CURRENT_APP = "club_forms"
 
@@ -25,7 +26,7 @@ FORMS_CURRENT_APP = "club_forms"
 
 @login_required
 def list(request):
-    clubs = Club.objects.exclude(english_name="Presidency").exclude(english_name="Media Center")
+    clubs = Club.objects.visible().current_year().for_user_gender(request.user).for_user_city(request.user)
     context = {'clubs':clubs}
     return render(request, 'clubs/list.html', context)
 
@@ -133,10 +134,14 @@ def join(request, club_id):
     # NOTE: This is only a superficial protection as the user can simply navigate to the form via the form list or URL
     if is_coordinator_or_member(club, request.user):
         context['error_message'] = 'already_in'
-        return render(request, 'clubs/join.html', context)
+    elif get_user_city(request.user) != club.city:
+        context['error_message'] = 'city_error'
+    elif get_user_gender(request.user) != club.gender:
+        context['error_message'] = 'gender_error'
 
-    # If the club's registration is open, then redirect to the registration form
-    # Otherwise, return a message that registration is closed
+    # If the club's registration is open, then redirect to the
+    # registration form Otherwise, return a message that registration
+    # is closed
     if club.registration_is_open():
         reg_form = club.get_registration_form()
         return HttpResponseRedirect(reverse("forms:form_detail",
@@ -144,7 +149,8 @@ def join(request, club_id):
                                             current_app=FORMS_CURRENT_APP))
     else:
         context['error_message'] = 'closed_membership'
-        return render(request, 'clubs/join.html', context)
+
+    return render(request, 'clubs/join_error.html', context)
 
 
 @login_required

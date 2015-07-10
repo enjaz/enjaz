@@ -14,7 +14,7 @@ from media.models import FollowUpReport, Story, StoryReview, Article, ArticleRev
 class CustomUserChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         try:
-            return obj.student_profile.get_ar_full_name()
+            return obj.common_profile.get_ar_full_name()
         except ObjectDoesNotExist:
             return obj
 

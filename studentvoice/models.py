@@ -194,7 +194,7 @@ class Recipient(models.Model):
                                      verbose_name=u"الكلية")
     users = models.ManyToManyField(User, blank=True,
                                    verbose_name=u"المستخدمون",
-                                   limit_choices_to={'nonstudent_profile__isnull':
+                                   limit_choices_to={'common_profile__is_student':
                                                      False})
     secondary_email = models.EmailField(max_length=254, verbose_name=u"البريد الإلكتروني", blank=True)
     creation_date = models.DateTimeField(u'تاريخ الإرسال',

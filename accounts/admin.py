@@ -11,7 +11,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from userena.admin import UserenaAdmin
 
 from clubs.models import Club, college_choices, section_choices
-from accounts.models import StudentProfile, NonStudentProfile
+from accounts.models import CommonProfile
+from core.models import StudentClubYear
+
+current_year = StudentClubYear.objects.get_current()
 
 class DeanshipAuthenticationForm(AdminAuthenticationForm):
     """A custom authentication form used in the admin app.  Based on the
@@ -36,7 +39,7 @@ original Django code."""
         return self.cleaned_data
 
 class DeanshipAdmin(AdminSite):
-    """This admin website is for the Studnet Affairs Deanship employees
+    """This admin website is for the Student Affairs Deanship employees
 to modify user permissions (e.g. who is the coordinator of which
 club)."""
 
@@ -66,16 +69,11 @@ def remove_add_bookrequest_perm(modeladmin, request, queryset):
         user.save()
 remove_add_bookrequest_perm.short_description = u"امنع من طلب استعارة الكتب"
 
-class StudentProfileInline(admin.StackedInline):
-    model = StudentProfile
+class CommonProfileInline(admin.StackedInline):
+    model = CommonProfile
     max_num = 1
     extra = 0
-
-class NonStudentProfileInline(admin.StackedInline):
-    model = NonStudentProfile
-    max_num = 1
-    extra = 0
-
+    
 class EmployeeFilter(admin.SimpleListFilter):
     title = u"عمادة شؤون الطلاب"
     parameter_name = 'is_employee'
@@ -102,9 +100,9 @@ class CoordinatorFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == '1':
-            return queryset.exclude(coordination__isnull=True)
+            return queryset.filter(coordination__year=current_year)
         if self.value() == '0':
-            return queryset.filter(coordination__isnull=True)
+            return queryset.exclude(coordination__year=current_year)
 
 class CollegeFilter(admin.SimpleListFilter):
     title = u"كلية الطالب"
@@ -115,7 +113,7 @@ class CollegeFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         # If the filter is actually selected, apply it
         if self.value():
-            return queryset.filter(student_profile__college__name=self.value())
+            return queryset.filter(common_profile__college__name=self.value())
 
 class SectionFilter(admin.SimpleListFilter):
     title = u"قسم الطالب"
@@ -126,7 +124,7 @@ class SectionFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         # If the filter is actually selected, apply it
         if self.value():
-            return queryset.filter(student_profile__college__section=self.value())
+            return queryset.filter(common_profile__college__section=self.value())
 
 class ModifiedUserAdmin(UserenaAdmin):
     """This changes the way the admin websites (both the main and deanship
@@ -138,30 +136,28 @@ ones) deal with the User model."""
     list_filter = (EmployeeFilter, CoordinatorFilter, CollegeFilter,
                    SectionFilter)
     search_fields= ('username', 'email',
-                    'student_profile__en_first_name',
-                    'student_profile__en_middle_name',
-                    'student_profile__en_last_name',
-                    'student_profile__ar_first_name',
-                    'student_profile__ar_middle_name',
-                    'student_profile__ar_last_name',
-                    'student_profile__student_id',
-                    'student_profile__badge_number',
-                    'student_profile__mobile_number',
-                    'nonstudent_profile__en_first_name',
-                    'nonstudent_profile__en_middle_name',
-                    'nonstudent_profile__en_last_name',
-                    'nonstudent_profile__ar_first_name',
-                    'nonstudent_profile__ar_middle_name',
-                    'nonstudent_profile__ar_last_name',
-                    'nonstudent_profile__badge_number',
-                    'nonstudent_profile__job_description')
-    inlines = [StudentProfileInline, NonStudentProfileInline]
+                    'common_profile__en_first_name',
+                    'common_profile__en_middle_name',
+                    'common_profile__en_last_name',
+                    'common_profile__ar_first_name',
+                    'common_profile__ar_middle_name',
+                    'common_profile__ar_last_name',
+                    'common_profile__student_id',
+                    'common_profile__badge_number',
+                    'common_profile__mobile_number',
+                    'common_profile__en_first_name',
+                    'common_profile__en_middle_name',
+                    'common_profile__en_last_name',
+                    'common_profile__ar_first_name',
+                    'common_profile__ar_middle_name',
+                    'common_profile__ar_last_name',
+                    'common_profile__badge_number',
+                    'common_profile__job_description')
+    inlines = [CommonProfileInline,]
 
     def is_coordinator(self, obj):
-        if obj.coordination.all():
-            return True
-        else:
-            return False
+        return obj.coordination.current_year().exists()
+
     is_coordinator.boolean = True
     is_coordinator.short_description = u"منسق؟"
 
@@ -175,14 +171,9 @@ ones) deal with the User model."""
 
     def full_en_name(self, obj):
         try:
-            return obj.student_profile.get_en_full_name()
+            return obj.common_profile.get_en_full_name()
         except ObjectDoesNotExist:
-            # If the user has no student_profile
-            try:
-                return obj.nonstudent_profile.get_en_full_name()
-            except ObjectDoesNotExist:
-                # If the user has no nonstudent_profile
-                return
+            return
 
     full_en_name.short_description = u"الاسم الإنجليزي الكامل"
 

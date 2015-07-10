@@ -330,13 +330,14 @@ def create(request):
     elif request.method == 'GET':
         form = VoiceForm()
         try:
-            student_profile = request.user.student_profile
+            common_profile = request.user.common_profile
+            student_college = common_profile.college
         except ObjectDoesNotExist: # not student
-            pass
+            student_college = None
 
-        if student_profile:
+        if student_college:
             try:
-                recipient = Recipient.objects.get(college=request.user.student_profile.college)
+                recipient = Recipient.objects.get(college=student_college)
                 voice = Voice(recipient=recipient)
                 form = VoiceForm(instance=voice)
             except ObjectDoesNotExist: # college has no recipient

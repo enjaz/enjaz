@@ -5,35 +5,52 @@ from django.utils.translation import ugettext as _
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
 from userena.models import UserenaBaseProfile
-from clubs.models import College
+from clubs.models import College, city_choices
 
 def get_gender(user):
-    try:
-        student_profile = user.student_profile
-    except ObjectDoesNotExist:
-        student_profile = None
-    if student_profile:
-        return student_profile.college.gender
-    else:
-        return 'M'
+    return 'M' # PLACEHOLDER
 
 
-class EnjazProfile(UserenaBaseProfile):
+class CommonProfile(models.Model):
+    """This model combine both: profiles for students and non-students.
+       This will make our lives much easier!"""
     user = models.OneToOneField(User,
                              unique=True,
                              verbose_name=_('user'),
-                             related_name='enjaz_profile')
-
-class EnjazBaseProfile(models.Model):
+                             related_name='common_profile')
+    is_student = models.BooleanField(default=True,
+                                     verbose_name=u"طالب؟")
     ar_first_name = models.CharField(max_length=30,
                                      verbose_name=u'الاسم الأول')
-    ar_middle_name = models.CharField(max_length=30, verbose_name=u'الاسم الأوسط')
-    ar_last_name = models.CharField(max_length=30, verbose_name=u'الاسم الأخير')
-    en_first_name = models.CharField(max_length=30, verbose_name=u'الاسم الأول')
-    en_middle_name = models.CharField(max_length=30, verbose_name=u'الاسم الأوسط')
-    en_last_name = models.CharField(max_length=30, verbose_name=u'الاسم الأخير')
-    badge_number = models.IntegerField(null=True, verbose_name=u'رقم البطاقة')
+    ar_middle_name = models.CharField(max_length=30,
+                                      verbose_name=u'الاسم الأوسط')
+    ar_last_name = models.CharField(max_length=30,
+                                    verbose_name=u'الاسم الأخير')
+    en_first_name = models.CharField(max_length=30,
+                                     verbose_name=u'الاسم الأول')
+    en_middle_name = models.CharField(max_length=30,
+                                      verbose_name=u'الاسم الأوسط')
+    en_last_name = models.CharField(max_length=30,
+                                    verbose_name=u'الاسم الأخير')
+    badge_number = models.IntegerField(null=True,
+                                       verbose_name=u'رقم البطاقة')
+    mobile_number = models.CharField(max_length=20,
+                                     verbose_name=u'رقم الجوال')
+    city = models.CharField(max_length=1, choices=city_choices,
+                            verbose_name=u"المدينة", default="R")
 
+    # Fields specific for students
+    student_id = models.IntegerField(null=True, blank=True,
+                                     verbose_name=u'الرقم الجامعي')
+    college = models.ForeignKey(College, null=True,
+                                blank=True,
+                                on_delete=models.SET_NULL,
+                                verbose_name=u'الكلية')
+    # Fields specific for non-students.
+    job_description = models.CharField(max_length=50,
+                                       blank=True,
+                                       verbose_name=u"المسمى الوظيفي")
+    
     def get_ar_full_name(self):
         ar_fullname = None
         try:
@@ -62,31 +79,9 @@ class EnjazBaseProfile(models.Model):
 
         return en_fullname
 
-class StudentProfile(EnjazBaseProfile):
+
+class EnjazProfile(UserenaBaseProfile):
     user = models.OneToOneField(User,
                              unique=True,
                              verbose_name=_('user'),
-                             related_name='student_profile')
-    student_id = models.IntegerField(null=True, blank=True, verbose_name=u'الرقم الجامعي')
-    mobile_number = models.CharField(max_length=20, verbose_name=u'رقم الجوال')
-    college = models.ForeignKey(College, null=True,
-                                on_delete=models.SET_NULL,
-                                verbose_name=u'الكلية')
-
-    class Meta:
-        # For the admin interface.
-        verbose_name = u"ملف طالب"
-        verbose_name_plural = u"ملفات الطلاب"
-
-class NonStudentProfile(EnjazBaseProfile):
-    user = models.OneToOneField(User,
-                             unique=True,
-                             verbose_name=_('user'),
-                             related_name='nonstudent_profile')
-    mobile_number = models.CharField(max_length=20, blank=True, verbose_name=u"رقم الجوال (اختياري)")
-    job_description = models.CharField(max_length=50,
-                                       verbose_name=u"المسمى الوظيفي")
-    class Meta:
-        # For the admin interface.
-        verbose_name = u"ملف مستخدم آخر"
-        verbose_name_plural = u"ملفات المستخدمين الآخرين"
+                             related_name='enjaz_profile')

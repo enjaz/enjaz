@@ -15,22 +15,24 @@ def portal_home(request):
     if request.user.is_authenticated():
         context = {}
         # --- activities ---
-        current_year_activities = Activity.objects.all()
+
+        approved_activities = Activity.objects.approved().current_year()
+        filtered_activities = (approved_activities.for_user_gender(request.user).for_user_city(request.user) | \
+                               approved_activities.for_user_clubs(request.user)).distinct()
         # count only approved activites
-        approved_activities = Activity.objects.approved()
-        context['activity_count'] = approved_activities.count()
-        
+        context['activity_count'] = Activity.objects.approved().current_year().count()
+
         today = date.today()
         next_week = today + timedelta(weeks=1)
-        upcoming_activities = filter(lambda a: a.get_next_episode() is not None, approved_activities)
-        next_week_activities = filter(lambda a: a.get_next_episode().start_date <= next_week, upcoming_activities)
-        context['upcoming_activities'] = next_week_activities[::-1]
-        
+        next_week_activities = filtered_activities.filter(episode__start_date__gte=today,
+                                                          episode__start_date__lte=next_week).order_by('episode__start_date')
+        context['upcoming_activities'] = next_week_activities
+
         # --- niqati -------
         context['niqati_sum'] = sum(code.category.points for code in request.user.code_set.all())
         context['niqati_count'] = request.user.code_set.count()
         context['latest_entries'] = request.user.code_set.all()[::-1][:5]
-        
+
         # --- books --------
         context['books_count'] = Book.objects.count()
         context['my_books_count'] = request.user.book_contributions.count()

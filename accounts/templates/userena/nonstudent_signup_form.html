@@ -116,6 +116,23 @@
 				</div>
 			</div>
 			<div class="form-group">
+				<div class="input-group{% if form.city.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-docs"></i>
+					</div>
+					<select {% if form.city.value and not form.city.errors %}value="{{ form.city.value }}" {% endif %}class="form-control" id="city" name="city"  title="{{ form.city.label }}" required="required">
+                                                <option value="">{{ form.city.label }}</option>
+                                                {% for value, label in form.fields.city.widget.choices %}
+                                                <option {% if form.city.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
+					</select>
+					{% if form.city.errors %}
+					    {% for error in form.city.errors %}
+					        <label class='error' for='city' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
 				<div class="input-group{% if form.job_description.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-vcard"></i>

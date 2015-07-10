@@ -17,8 +17,8 @@
                             <li>
                                 <a data-episode-pk="{{ episode.pk }}"
                                 data-mc-member-pk="{{ member.pk }}" href="#">
-                                {{ member.student_profile.ar_first_name }}
-                                {{ member.student_profile.ar_last_name }}
+                                {{ member.common_profile.ar_first_name }}
+                                {{ member.common_profile.ar_last_name }}
                                 </a>
                             </li>
                         {% endfor %}
@@ -40,8 +40,8 @@
                 class="btn btn-orange btn-xs">اكتب تغطية</a>
             {% else %}
                 <a href="{% url 'media:create_story' episode.pk %}" class="btn btn-gold btn-xs">
-                    معيَّن ل{{ episode.storytask.assignee.student_profile.ar_first_name }}
-                    {{ episode.storytask.assignee.student_profile.ar_last_name }}
+                    معيَّن ل{{ episode.storytask.assignee.common_profile.ar_first_name }}
+                    {{ episode.storytask.assignee.common_profile.ar_last_name }}
                 </a>
             {% endif %}
         {% endif %}

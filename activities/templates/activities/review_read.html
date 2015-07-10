@@ -17,11 +17,11 @@
 				<div>
 					حالة الطلب: 
 					{% if review.is_approved == True %}
-						<div class="label label-success">تمت الموافقة عليه</div>
+						<div class="label label-success">معتمد</div>
 					{% elif review.is_approved == None %}
 						<div class="label label-warning">معلَّق</div>
 					{% else %}
-						<div class="label label-danger">تم رفضه</div>
+						<div class="label label-danger">مرفوض</div>
 					{% endif %}
 				</div>
 				</th>

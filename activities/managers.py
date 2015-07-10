@@ -2,20 +2,14 @@ from django.db import models
 from django.db.models.aggregates import Count
 from clubs.utils import is_coordinator_of_any_club, is_deputy_of_any_club, get_user_clubs, \
     get_user_coordination_and_deputyships
+from accounts.utils import get_user_city, get_user_gender
+from clubs.models import Club
 
-
-class ActivityManager(models.Manager):
+class ActivityQuerySet(models.QuerySet):
     """
     Custom manager for Activity model with custom querysets
     for approved, pending, and rejected activities.
     """
-    def get_queryset(self):
-        """
-        TODO: Exclude delete activities.
-        TODO: Exclude but the current year's activities.
-        """
-        return super(ActivityManager, self).get_queryset()
-
     def approved(self):
         """
         Return a queryset of approved activities.
@@ -29,36 +23,57 @@ class ActivityManager(models.Manager):
 
         # WARNING: lengthy run-time; not lazy
 
-        activities = self.filter(is_deleted=False)
-        approved_activities = filter(lambda activity: activity.is_approved(), activities)
-        approved_pks = [activity.pk for activity in approved_activities]
-
-        return self.filter(pk__in=approved_pks)
+        return self.filter(is_deleted=False).filter(is_approved=True)
 
     def rejected(self):
         """
         Return a queryset of rejected activities.
         """
-        # A rejected activity is one which:
-        # (1) has at least 1 review
-        # (2) has any of its reviews rejected
-        return self.filter(is_deleted=False).annotate(review_count=Count("review")).filter(review_count__gte=1, review__is_approved=False)
+        return self.filter(is_deleted=False).filter(is_approved=False)
 
     def pending(self):
         """
         Return a queryset of pending activities.
         """
-        # A pending activity is one that's not approved or rejected
+        # pending activities that are not deleted.
 
-        # The following is dirty way of dealing with query sets, but this is the only way given the deep complexity
-        # of this query
+        return self.filter(is_deleted=False).filter(is_approved=None)
 
-        # WARNING: lengthy run-time; not lazy
+    def current_year(self):
+        return self.filter(primary_club__in=Club.objects.current_year())
 
-        pending_activities = filter(lambda activity: activity.is_approved() is None, self.filter(is_deleted=False))
-        pending_pks = [activity.pk for activity in pending_activities]
+    def for_user_city(self, user=None):
+        city_condition = models.Q()
 
-        return self.filter(pk__in=pending_pks)
+        if user and user.is_authenticated():
+            city = get_user_city(user)
+            if city:
+                city_condition = models.Q(primary_club__city=city) | \
+                                 models.Q(primary_club__city="")
+        return self.filter(city_condition)
+
+    def for_user_gender(self, user=None):
+        gender_condition = models.Q()
+
+        if user and user.is_authenticated():
+            gender = get_user_gender(user)
+            if gender:
+                gender_condition = models.Q(gender=gender) | \
+                                   models.Q(gender="")
+
+        return self.filter(gender_condition)
+
+    def for_user_clubs(self, user=None):
+        club_condition = models.Q()
+
+        if user and user.is_authenticated():
+            user_coordination = get_user_coordination_and_deputyships(user)
+            user_clubs = user_coordination | user.memberships.all()
+            club_condition = models.Q(primary_club__in=user_clubs) | \
+                             models.Q(secondary_clubs__in=user_clubs) | \
+                             models.Q(review__reviewer_club__in=user_clubs)
+
+        return self.filter(club_condition)
 
     def for_user(self, user=None):
         """

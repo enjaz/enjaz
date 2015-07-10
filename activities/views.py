@@ -5,19 +5,20 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.db.models import Q
 
 from post_office import mail
 
 from activities.models import Activity, Review, Episode
 from activities.forms import ActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm
-from accounts.models import get_gender
+from accounts.utils import get_user_gender
 from activities.utils import get_club_notification_to, get_club_notification_cc
 from clubs.models import Club
-from clubs.utils import get_presidency, is_coordinator_or_member, is_coordinator_or_deputy_of_any_club, \
+from clubs.utils import is_coordinator_or_member, is_coordinator_or_deputy_of_any_club, \
     is_coordinator_of_any_club, get_media_center, \
     is_member_of_any_club, is_employee_of_any_club, is_coordinator, is_coordinator_or_deputy, get_user_clubs, \
-    get_user_coordination_and_deputyships, has_coordination_to_activity, get_deanship, is_employee
-from core.utilities import FVP_EMAIL, MVP_EMAIL, DHA_EMAIL
+    get_user_coordination_and_deputyships, has_coordination_to_activity, get_deanship, is_employee, \
+    can_review_activity, can_delete_activity, can_edit_activity
 from media.utils import MAX_OVERDUE_REPORTS
 
 FORMS_CURRENT_APP = "activity_forms"
@@ -65,41 +66,40 @@ def list_activities(request):
     #
     # By default (i.e. for students, employees and anonymous users),
     # no pending or rejected activities should be shown.
-    context = {'approved': Activity.objects.approved(),
+    context = {'approved': Activity.objects.approved().current_year(),
                'pending': Activity.objects.none(),
                'rejected': Activity.objects.none()}
 
     if request.user.is_authenticated():
         template = 'activities/list_privileged.html'
-        if request.user.is_superuser or is_coordinator_or_member(get_presidency(), request.user)\
-                or request.user.has_perm('activities.add_presidency_review'):
+
+        # For logged-in users, only show city-specific and
+        # gender-specific activities.
+        context['approved'] = Activity.objects.approved().for_user_city(request.user).for_user_gender(request.user)
+
+        if request.user.is_superuser:
             # If the user is a super user or part of the presidency,
             # then show all activities
-            context['pending'] = Activity.objects.pending()
-            context['rejected'] = Activity.objects.rejected()
+            context['pending'] = Activity.objects.pending().current_year()
+            context['rejected'] = Activity.objects.rejected().current_year()
+        elif is_coordinator_or_deputy_of_any_club(request.user) or \
+             is_member_of_any_club(request.user):
+            # For club coordinators, deputies, and members, show
+            # approved activities as well as their own club's pending
+            # and rejected activities.
+            context['pending'] = Activity.objects.pending().current_year().for_user_clubs(request.user).distinct()
+            context['rejected'] = Activity.objects.rejected().current_year().for_user_clubs(request.user).distinct()
+            # In addition to the gender-specific approved activities,
+            # show all activities of the user club.
+            context['approved'] = (context['approved'] |  Activity.objects.approved().for_user_clubs(request.user)).distinct()
 
-        elif request.user.has_perm('activities.add_deanship_review'):
-            # If the user is part of the deanship of student affairs,
-            # only show activities approved by presidency
-            context['pending'] = Activity.objects.pending().filter(review__reviewer_club=get_presidency(), review__is_approved=True)
-            context['rejected'] = Activity.objects.rejected().filter(review__reviewer_club=get_presidency(), review__is_approved=True)
-
-        elif (is_coordinator_or_deputy_of_any_club(request.user) or is_member_of_any_club(request.user)) and \
-             not is_coordinator_or_member(get_presidency(), request.user) and \
-             not is_coordinator_or_member(get_media_center(), request.user):
-            # For club coordinators, deputies, and members, show approved
-            # activities as well as their own club's pending and rejected
-            # activities.
-            user_coordination = get_user_coordination_and_deputyships(request.user)
-            user_clubs = user_coordination | request.user.memberships.all()
-            context['pending'] = Activity.objects.pending().filter(primary_club__in=user_clubs) | \
-                                 Activity.objects.pending().filter(secondary_clubs__in=user_clubs)
-            context['rejected'] = Activity.objects.rejected().filter(primary_club__in=user_clubs) | \
-                                  Activity.objects.rejected().filter(secondary_clubs__in=user_clubs)
-
-            # Media-related
             # Only display to coordinators and deputies
             if is_coordinator_or_deputy_of_any_club(request.user):
+                # For coordinators, show also the activities waiting their
+                # action.
+                user_coordination = get_user_coordination_and_deputyships(request.user)
+                context['todo'] = Activity.objects.pending().current_year().filter(assignee__in=user_coordination)
+                # Media-related
                 context['due_report_count'] = user_coordination.all()[0].get_due_report_count()
                 context['overdue_report_count'] = user_coordination.all()[0].get_overdue_report_count()
                 # In activity templates, the MAX_OVERDUE_REPORTS
@@ -158,15 +158,12 @@ def show(request, activity_id):
     #  a coordinator of a secondary club in the activity, show the activity regardless of status
     # Elseif user is a DSA reviewer, show the activity if it's approved by presidency
     # Else (employees or others), show activity only if approved
-    if request.user.is_superuser or request.user.has_perm('activities.add_presidency_review') \
+    if request.user.is_superuser or can_review_activity(request.user, activity) \
        or request.user.has_perm('activities.view_activity') or any([club in activity_clubs for club in user_clubs]):
         # Don't raise any errors
         pass
-    elif request.user.has_perm('activities.add_deanship_review'):
-        if not activity.is_approved_by_presidency():
-            raise PermissionDenied
     else:
-        if not activity.is_approved():
+        if not activity.is_approved:
             raise PermissionDenied
 
     return render(request, 'activities/show.html', context, current_app=FORMS_CURRENT_APP)
@@ -194,80 +191,65 @@ def create(request):
     if any([club.get_overdue_report_count() > MAX_OVERDUE_REPORTS for club in user_coordination]):
         raise PermissionDenied
     
-    presidency = get_presidency() # Club.objects.get(english_name="Presidency")
     if request.method == 'POST':
-        activity = Activity(submitter=request.user)
-        if request.user.has_perm('activities.directly_add_activity'):
+        # DirectActivityForm get to choose what club to submit the
+        # activity under.  Normal users shouldn't.
+        can_directly_add = request.user.has_perm('activities.directly_add_activity')
+        if can_directly_add:
+            activity = Activity(submitter=request.user)
             form = DirectActivityForm(request.POST, instance=activity)
         else:
+            user_club = user_coordination[0]
+            activity = Activity(submitter=request.user, primary_club=user_club)
             form = ActivityForm(request.POST, instance=activity)
         if form.is_valid():
             form_object = form.save()
-            # If the chosen primary_club is the Presidency, make it
-            # automatically approved by the deanship.  Otherwise,
-            # email the vice president.
-            if form_object.primary_club == presidency:
-                # If the user has enough privileges, mark the activity as approved directly by creating
-                # presidency and deanship reviews
-                Review.objects.create(
-                    activity=form_object, reviewer=request.user,
-                    is_approved=True, reviewer_club=get_presidency())
-                Review.objects.create(
-                    activity=form_object, reviewer=request.user,
-                    is_approved=True, reviewer_club=get_deanship())
+            # If the user can directly add activities, make the
+            # activity automatically approved.  Otherwise, email the
+            # reviewing parent.
+            if can_directly_add:
+                form_object.is_approved = True
+                form_object.assignee = None
             else:
-                show_activity_url = reverse('activities:show', args=(form_object.pk,))
-                full_url = request.build_absolute_uri(show_activity_url)
-                submitter_gender = get_gender(request.user)
-                email_context = {'activity': form_object, 'full_url':
-                           full_url}
-                if submitter_gender == 'M':
-                    mail.send([MVP_EMAIL],
-                              template="activity_submitted",
-                              context=email_context)
+                reviewing_parent = form_object.primary_club.get_next_reviewing_parent()
+
+                if not reviewing_parent:
+                    form_object.is_approved = True
+                    form_object.assignee = None
                 else:
-                    mail.send([FVP_EMAIL],
-                              template="activity_submitted",
-                              context=email_context)
+                    form_object.is_approved = None
+                    form_object.assignee = reviewing_parent
+                    show_activity_url = reverse('activities:show', args=(form_object.pk,))
+                    full_url = request.build_absolute_uri(show_activity_url)
+                    email_context = {'activity': form_object,
+                                     'full_url': full_url,
+                                     'reviewer_club': reviewing_parent}
+                    if reviewing_parent.coordinator:
+                        mail.send([reviewing_parent.coordinator.email],
+                                   template="activity_submitted",
+                                   context=email_context)
+            form_object.save()
             return HttpResponseRedirect(reverse('activities:list'))
         else:
             context = {'form': form}
             return render(request, 'activities/new.html', context)
-    else:
-        # By default, just choose the first user coordination that we
-        # find.  Typically, it is the only one.
-        if user_coordination:
-            user_club = user_coordination[0]
-        else:
-            # Make it more user-friendly: if the user is an admin,
-            # automatically choose presidency as the default
-            # primary_club.
-            can_directly_add = request.user.has_perm("activities.directly_add_activity")
-            if can_directly_add:
-                user_club = presidency
-            else:
-                user_club = None
-
-        activity = Activity(primary_club=user_club)
+    elif request.method == 'GET':
+        context = {}
         if request.user.has_perm("activities.directly_add_activity"):
-            form = DirectActivityForm(instance=activity)
+            form = DirectActivityForm()
         else:
-            form = ActivityForm(instance=activity)
-        context = {'form': form}
+            form = ActivityForm()
+            user_club = user_coordination[0]
+            context['user_club'] = user_club
+        context['form'] = form
         return render(request, 'activities/new.html', context)
 
 @login_required
 def edit(request, activity_id):
-    activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
-    coordination_status = has_coordination_to_activity(request.user, activity)
+    activity = get_object_or_404(Activity, pk=activity_id,
+                                 is_deleted=False)
 
-    # If the user is neither the submitter, nor has the permission to
-    # change activities (i.e. not part of the head of the Student
-    # Club, or the Media Team), nor a coordinator or deputy of any of
-    # the organizing clubs, raise a PermissionDenied error.
-    if not request.user == activity.submitter and \
-       not request.user.has_perm('activities.change_activity') and \
-       not coordination_status:
+    if not can_edit_activity(request.user, activity):
         raise PermissionDenied
 
     if request.method == 'POST':
@@ -275,7 +257,7 @@ def edit(request, activity_id):
             modified_activity = DirectActivityForm(request.POST,
                                                    instance=activity)
         elif not activity.is_editable and \
-             not request.user.has_perm('activities.change_activity'):
+             has_coordination_to_activity(request.user, activity):
             modified_activity = DisabledActivityForm(request.POST,
                                                      instance=activity)
         else:
@@ -284,32 +266,22 @@ def edit(request, activity_id):
         # Should check that edits are valid before saving
         if modified_activity.is_valid():
             modified_activity.save()
-
             # If the edit has been done in response to a review, send a notification email
-            try:
-                # FIXME: edit to become dynamic (not fixed by p & d)
+            if activity.assignee == activity.primary_club:
                 pending_review = activity.review_set.get(is_approved=None)
-
-                email_context = {'activity': activity}
-                if pending_review.reviewer_club == get_presidency():
-                    if get_gender(activity.primary_club.coordinator) == 'M':
-                        mail.send([MVP_EMAIL],
-                                  template="activity_presidency_edited",
-                                  context=email_context)
-                    elif get_gender(activity.primary_club.coordinator) == 'F':
-                        mail.send([FVP_EMAIL],
-                                  template="activity_presidency_edited",
-                                  context=email_context)
-                elif pending_review.reviewer_club == get_deanship():
-                    mail.send([DHA_EMAIL],
-                              template="activity_deanship_edited",
-                              context=email_context)
-            except ObjectDoesNotExist:
-                pass
-
+                activity.assignee = pending_review.reviewer_club
+                activity.save()
+                review_url = reverse('activities:review',
+                       args=(activity_id, pending_review.reviewer_club.pk))
+                review_full_url =  request.build_absolute_uri(review_url)
+                email_context = {'activity': activity,
+                                 'pending_review': pending_review,
+                                 'full_url': review_full_url}
+                mail.send([pending_review.reviewer.email],
+                          template="activity_edited_to_reviewer",
+                          context=email_context)
             return HttpResponseRedirect(reverse('activities:show',
-                                                args=(activity.pk, ))
-                                        )
+                                                args=(activity.pk, )))
         else:
             context = {'form': modified_activity, 'activity_id': activity_id,
                        'edit': True}
@@ -324,7 +296,7 @@ def edit(request, activity_id):
         if request.user.has_perm('activities.directly_add_activity'):
             form = DirectActivityForm(instance=activity)
         elif not activity.is_editable and \
-             not request.user.has_perm('activities.change_activity'):
+             has_coordination_to_activity(request.user, activity):
             form = DisabledActivityForm(instance=activity)
         else:
             form = ActivityForm(instance=activity)
@@ -335,23 +307,11 @@ def edit(request, activity_id):
 @login_required
 def delete(request,activity_id):
     activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
-    coordination_status = has_coordination_to_activity(request.user, activity)
     context = {'activity': activity}
-    # If the user is neither the submitter, nor has the permission to
-    # change activities (i.e. not part of the head of the Student
-    # Club, or the Media Team), nor a coordinator or deputy of any of
-    # the organizing clubs, raise a PermissionDenied error.
-    if not request.user == activity.submitter and \
-       not request.user.has_perm('activities.change_activity') and \
-       not coordination_status:
+
+    if not can_delete_activity(request.user, activity):
         raise PermissionDenied
-    # If we are dealing with the coordinator or their deputies, we
-    # shouldn't allow them to delete unless the activity is editable.
-    # This also means that vice presidents can delte activities
-    # regardless of their is_editable status.
-    if (request.user == activity.submitter or coordination_status) \
-       and not activity.is_editable:
-        raise PermissionDenied
+
     if request.method == 'POST':
         if 'confirm' in request.POST:
             activity.is_deleted = True
@@ -363,43 +323,49 @@ def delete(request,activity_id):
     return render(request, 'activities/delete.html', context)
 
 @login_required
-def review(request, activity_id, lower_review_type=None):
-    activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
+def review(request, activity_id, reviewer_id):
+    activity = get_object_or_404(Activity, pk=activity_id,
+                                 is_deleted=False)
     reviewer_club = get_object_or_404(Club, pk=reviewer_id)
 
     # --- Permission checks ---
     # The reviewer club should actually be one of the activity owner's reviewing parents.
     # The user should either be a(n):
-    # (1) Coordinator or deputy of the club that owns the activity (primary or secondary);
-    #     in this case the user can only READ.
+    # (1) Coordinator or deputy of the club that owns the activity
+    #     (primary or secondary); in this case the user can only READ.
     # (2) Coordinator or deputy of a reviewer club; there are 2 cases here as well:
     #     a- either the reviewer is accessing "their" review; here they can WRITE.
     #     b- or the reviewer is accessing a review of another reviewer; here they can only READ.
     # (3) Employee responsible for the club that owns the activity. (READ)
     # (4) Superuser. (WRITE)
 
-    reviewer_parents = activity.primary_club.get_reviewer_parents()
+    reviewing_parents = Club.objects.reviewing_parents(activity.primary_club)
 
-    # Is the passed reviewer club a member of the activity owner's reviewer parents? If not, raise a 404 error.
-    if not reviewer_club in reviewer_parents:
+    # Is the passed reviewer club a member of the activity owner's
+    # reviewer parents? If not, raise a 404 error.
+    if not reviewing_parents.filter(pk=reviewer_club.pk).exists():
         raise Http404
 
-    # Is the current user a coordinator/deputy of any of the reviewing parents?
-    user_is_any_reviewer = any([club in reviewer_parents for club in get_user_clubs(request.user)])
+    # Is the current user a coordinator/deputy of any of the reviewing
+    # parents?
+    user_is_any_reviewer = can_review_activity(request.user, activity)
 
     # Is the current user a coordinator/deputy of the reviewer club?
     user_is_current_reviewer = is_coordinator_or_deputy(reviewer_club, request.user)
 
-    # The user can WRITE if they are the coordinator or deputy of the reviewer club; or a superuser
+    # The user can WRITE if they are the coordinator or deputy of the
+    # reviewer club; or a superuser
     can_write = user_is_current_reviewer or request.user.is_superuser
 
-    # The user can READ if they are the coordinator or deputy of the activity owning club (primary or secondary);
-    #       the coordinator or deputy of a parent reviewer other than the ``reviewer_club``;
-    #       or an employee responsible for the activity owning club.
+    # The user can READ if they are the coordinator or deputy of the
+    # activity owning club (primary or secondary); the coordinator or
+    # deputy of a parent reviewer other than the ``reviewer_club``; or
+    # an employee responsible for the activity owning club.
     can_read = has_coordination_to_activity(request.user, activity) or user_is_any_reviewer or \
                is_employee(activity.primary_club, request.user)
 
-    # If the user has no read or write permissions, then they can't access the view.
+    # If the user has no read or write permissions, then they can't
+    # access the view.
     if not can_read and not can_write:
         raise PermissionDenied
 
@@ -416,47 +382,91 @@ def review(request, activity_id, lower_review_type=None):
         review = ReviewForm(request.POST, instance=review_object)
 
         if review.is_valid():
+            # If the review instance has an idea, it's being edited.
+            # Otherwise, it's a new review.
+            is_new = not bool(review.instance.id)
             review.save()
-            # Once the activity is approved (or partially approved), lock it from being edited.
-            # This is very critical as to prevent manipulations (ie, editing the request after
-            # the approval of the presidency and before it's reviewed by DSA)
-            # Only when an edit is requested by the reviewer should editing be allowed
+            # Once the activity is approved (or partially approved),
+            # lock it from being edited.  This is very critical as to
+            # prevent manipulations (ie, editing the request after the
+            # approval of the presidency and before it's reviewed by
+            # DSA). Only when an edit is requested by the reviewer
+            # should editing be allowed.
             activity.is_editable = False
-            activity.save()
+            activity.update_is_approved()
+            last_review_url = reverse('activities:review',
+                                   args=(activity_id, reviewer_id))
+            last_review_full_url =  request.build_absolute_uri(last_review_url)
+            activity_url = reverse('activities:show', args=(activity_id,))
+            activity_full_url = request.build_absolute_uri(activity_url)
+            email_context = {'activity': activity}
             if review.cleaned_data['is_approved']:
-
-                try:
-                    next_reviewer = reviewer_club.get_reviewer_parents()[0]
-
-                    # TODO: Send notification to the reviewer next up in the hierarchy (if present)
-                    # DID TEMPLATE FOR THIS
-
-                except IndexError:  # Reached the top of the review hierarchy => activity approved
-                    if activity.is_approved():  # sanity check
-                        # TODO: If activity is approved:
-                        # -- send notification to coordinator  # DID TEMPLATE FOR THIS
-                        # -- schedule report reminders  # HAVE TEMPLATE FOR THIS
-                        # -- send to employee  # DID TEMPLATE FOR THIS
-                        pass
-
+                reviewing_parent = reviewer_club.get_next_reviewing_parent()
+                # Reached the top of the review hierarchy => activity
+                # approved.
+                if not reviewing_parent:
+                    activity.assignee = None
+                    if 'is_approved' in review.changed_data:
+                        # Email notifications
+                        email_context['full_url'] = activity_full_url
+                        mail.send(get_club_notification_to(activity),
+                            cc=get_club_notification_cc(activity),
+                            template="activity_approved_to_coordinator",
+                            context=email_context)
+                        if activity.primary_club.employee:
+                            email_context['full_url'] = last_review_full_url
+                            mail.send([activity.primary_club.employee.email],
+                                  template="activity_approved_to_employee",
+                                  context=email_context)
+                else:
+                    activity.assignee = reviewing_parent
+                    email_context['last_reviewer'] = reviewer_club
+                    upcoming_review_url = reverse('activities:review',
+                                           args=(activity_id, reviewing_parent.pk))
+                    upcoming_review_full_url = request.build_absolute_uri(upcoming_review_url)
+                    email_context['full_url'] = upcoming_review_full_url
+                    email_context['upcoming_reviewer'] = reviewing_parent
+                    if reviewing_parent.coordinator and 'is_approved' in review.changed_data:
+                        mail.send(reviewing_parent.coordinator.email,
+                                  template="activity_approved_to_next_reviewer",
+                                  context=email_context)                    
             elif review.cleaned_data['is_approved'] == False:
+                activity.assignee = None
+                if 'is_approved' in review.changed_data:
+                    email_context['last_reviewer'] = reviewer_club
+                    email_context['full_url'] = last_review_full_url
+                    mail.send(get_club_notification_to(activity),
+                              cc=get_club_notification_cc(activity),
+                              template="activity_rejected_to_coordinator",
+                              context=email_context)
 
-                # TODO: Send notification to coordinator
-                pass
-
-            else:  # If changes are requested (review.is_approved == None)
-                # TODO: If the review is being edited, only do the following if an actual change has been made
-                # Enable coordinators to edit the activity request in correspondence to the review
+            elif review.cleaned_data['is_approved'] == None: # If changes were requested.
+                # Enable coordinators to edit the activity request in
+                # correspondence to the review
                 activity.is_editable = True
-                activity.save()
-
-                # TODO: Send a notification to coordinator
-
-            return HttpResponseRedirect(reverse('activities:show', args=(activity.pk, )))
+                activity.assignee = activity.primary_club
+                # We don't want to send email notification if
+                # is_approved hasn't been changed, but we also want to
+                # send a notification when the review is created.  The
+                # default choice for is_approved is None.  That's why
+                # it won't show in changed_data if a new review was
+                # created.  For that, we should add a special test,
+                # is_new.
+                if is_new or 'is_approved' in review.changed_data:
+                    email_context['last_reviewer'] = reviewer_club
+                    email_context['full_url'] = last_review_full_url
+                    mail.send(get_club_notification_to(activity),
+                              cc=get_club_notification_cc(activity),
+                              template="activity_held_to_coordinator",
+                              context=email_context)
+            activity.save()
+            return HttpResponseRedirect(reverse('activities:show',
+                                                args=(activity.pk, )))
         # TODO: if not valid, show the error messages.
 
     else:
-        # If the user has the permission to write then return the review form page to add or edit the review.
+        # If the user has the permission to write then return the
+        # review form page to add or edit the review.
         # Else, if they can read, then return the review read page.
         if can_write:
             template = 'activities/review_write.html'
@@ -466,179 +476,21 @@ def review(request, activity_id, lower_review_type=None):
                 review = ReviewForm(instance=review_object)
             except ObjectDoesNotExist:
                 review = ReviewForm()
-                # Note 1: Here, review is a ReviewForm object, because we want to write
+                # Note 1: Here, review is a ReviewForm object, because
+                # we want to write
 
         elif can_read:  # If the user has read permissions, show the review read page.
             template = 'activities/review_read.html'
             try:
                 review = Review.objects.get(activity=activity,
                                             reviewer_club=reviewer_club)
-                # Note 2: Here, review is a Review object, because we just want to read
+                # Note 2: Here, review is a Review object, because we
+                # just want to read
             except ObjectDoesNotExist:
                 review = None
 
-    context = {'activity': activity, 'review': review, 'active_tab': reviewer_club.pk}
-
-    return render(request, template, context)
-
-@login_required
-def review_old(request, activity_id, lower_review_type=None):
-
-    activity = get_object_or_404(Activity, pk=activity_id)
-    # Check if the user is a coordinator or deputy of any of the
-    # activity's primary or secondary clubs.
-    coordination_status = has_coordination_to_activity(request.user, activity)  # TODO: REMOVE
-
-    if lower_review_type == None:
-        # If the user has any permission (read or write) related to
-        # the deanship review, redirect to review/d/. Otherwise, if
-        # the user has any permission (read or write) related to the
-        # presidency review, redirect to review/p/.  Otherwise, raise
-        # PermissionDenied
-        if request.user.has_perm('activities.add_deanship_review') or \
-           request.user.has_perm('activities.view_deanship_review'):
-            return HttpResponseRedirect(reverse('activities:review_with_type',
-                                                args=(activity_id, 'd')))
-
-        elif request.user.has_perm('activities.add_presidency_review') or \
-             request.user.has_perm('activities.view_presidency_review'):
-            return HttpResponseRedirect(reverse('activities:review_with_type',
-                                                args=(activity_id, 'p')))
-        else:
-            raise PermissionDenied
-    elif lower_review_type in ['d', 'p']:
-        review_type = lower_review_type.upper()
-    else:
-        raise Http404
-    
-    # Review Type Full
-    rt_full = {'P': 'presidency', 'D': 'deanship'}[review_type]
-    reviewer_club = {'P': get_presidency(), 'D': get_deanship()}[review_type]
-    
-    if request.method == 'POST':
-        try: # If the review is already there, edit it.
-            review_object = Review.objects.get(activity=activity,
-                                               reviewer_club=reviewer_club)
-        except ObjectDoesNotExist:
-            review_object = Review(activity=activity,
-                                   reviewer=request.user,
-                                   reviewer_club=reviewer_club)
-        review = ReviewForm(request.POST, instance=review_object)
-        if review.is_valid():
-            review.save()
-            # Once the activity is approved (or partially approved), lock it from being edited.
-            # This is very critical as to prevent manipulations (ie, editing the request after
-            # the approval of the presidency and before it's reviewed by DSA)
-            # Only when an edit is requested by the reviewer should editing be allowed
-            activity.is_editable = False
-            activity.save()
-            deanship_review_url = reverse('activities:review_with_type', args=(activity_id, 'd'))
-            deanship_full_url =  request.build_absolute_uri(deanship_review_url)
-            presidency_review_url = reverse('activities:review_with_type', args=(activity_id, 'p'))
-            presidency_full_url =  request.build_absolute_uri(presidency_review_url)
-            activity_url = reverse('activities:show', args=(activity_id,))
-            activity_full_url = request.build_absolute_uri(activity_url)
-            email_context = {'activity': activity}
-            if review.cleaned_data['is_approved']:
-                if reviewer_club == get_presidency():
-                    email_context['full_url'] = presidency_full_url
-                    mail.send([DHA_EMAIL],
-                              template="activity_presidency_approved",
-                              context=email_context)
-                elif reviewer_club == get_deanship():
-                    if activity.primary_club.coordinator:
-                        email_context['full_url'] = activity_full_url
-                        mail.send(get_club_notification_to(activity),
-                                  cc=get_club_notification_cc(activity),
-                                  template="activity_deanship_approved",
-                                  context=email_context)
-
-                        for episode in activity.episode_set.all():
-                            # Schedule an email at the date of the episode
-                            # to remind the coordinator of submitting the media report
-                            
-                            mail.send(get_club_notification_to(activity),
-                                      cc=get_club_notification_cc(activity),
-                                      template="first_report_reminder",
-                                      scheduled_time=episode.start_date,
-                                      context={"episode": episode})
-
-                            # Schedule another email 3 days after the episode as a second reminder
-                            # to submit the media report
-                            # TODO: there should be a better way that doesn't send the second email
-                            # if the report is already submitted
-                            mail.send(get_club_notification_to(activity),
-                                      cc=get_club_notification_cc(activity),
-                                      template="first_report_reminder",
-                                      scheduled_time=episode.start_date + timedelta(days=3),
-                                      context={"episode": episode})
-
-                    if activity.primary_club.employee:
-                        email_context['full_url'] = deanship_full_url
-                        mail.send([activity.primary_club.employee.email],
-                                  template="activity_approved_employee",
-                                  context=email_context)
-            elif review.cleaned_data['is_approved'] == False:
-                # if the activity is rejected.
-                if reviewer_club == get_presidency():
-                    email_context['full_url'] = presidency_full_url
-                    mail.send(get_club_notification_to(activity),
-                              cc=get_club_notification_cc(activity),
-                              template="activity_presidency_rejected",
-                              context=email_context)
-                elif reviewer_club == get_deanship():
-                    email_context['full_url'] = deanship_full_url
-                    mail.send(get_club_notification_to(activity),
-                              cc=get_club_notification_cc(activity),
-                              template="activity_deanship_rejected",
-                              context=email_context)
-            else:  # If changes are requested (review.is_approved == None)
-                # TODO: If the review is being edited, only do the following if an actual change has been made
-                # Enable coordinators to edit the activity request in correspondence to the review
-                activity.is_editable = True
-                activity.save()
-                if reviewer_club == get_presidency():
-                    mail.send(get_club_notification_to(activity),
-                              cc=get_club_notification_cc(activity),
-                              template="activity_presidency_holded",
-                              context=email_context)
-                elif reviewer_club == get_deanship():
-                    mail.send(get_club_notification_to(activity),
-                              cc=get_club_notification_cc(activity),
-                              template="activity_deanship_holded",
-                              context=email_context)
-            return HttpResponseRedirect(reverse('activities:show', args=(activity.pk, )))
-        # TODO: if not valid, show the error messages.
-    else: # if not POST
-        # If the user has the permission to add a review of the
-        # corresponding type then return the review form page to add
-        # or edit the review.
-        # Else, if if they have the permission to read, then return
-        # the review read page Otherwise, raise PermissionDenied
-        if request.user.has_perm('activities.add_' + rt_full + '_review'):
-            template = 'activities/review_write.html'
-            try: # If the review is already there, edit it.
-                review_object = Review.objects.get(activity=activity,
-                                                   reviewer_club=reviewer_club)
-                review = ReviewForm(instance=review_object)
-            except ObjectDoesNotExist:
-                review = ReviewForm()
-                # Note 1: Here, review is a ReviewForm object, because we want to write
-        # Deanship employees, presidency students and the specific
-        # club coordinator should be able to see the reviews.
-        elif request.user.has_perm('activities.view_' + rt_full + '_review') or coordination_status:
-            template = 'activities/review_read.html'
-            try:
-                review = Review.objects.get(activity=activity,
-                                            reviewer_club=reviewer_club)
-                # Note 2: Here, review is a Review object, because we just want to read
-            except ObjectDoesNotExist:
-                review = None
-        else:
-            raise PermissionDenied
-        
-    context = {'activity': activity, 'active_tab': rt_full,
-               'review': review, 'review_type': review_type}
+    context = {'activity': activity, 'review': review, 'active_tab':
+               reviewer_club.pk}
 
     return render(request, template, context)
 

@@ -30,13 +30,13 @@
     <tbody>
     {% for user in users %}
         <tr>
-            <td>{{ user.student_profile.get_ar_full_name|default:user }}</td>
-            <td>{{ user.student_profile.get_en_full_name|default:user }}</td>
-            <td>{{ user.student_profile.college }}</td>
-            <td>{{ user.student_profile.student_id }}</td>
-            <td>{{ user.student_profile.badge_number }}</td>
+            <td>{{ user.common_profile.get_ar_full_name|default:user }}</td>
+            <td>{{ user.common_profile.get_en_full_name|default:user }}</td>
+            <td>{{ user.common_profile.college }}</td>
+            <td>{{ user.common_profile.student_id }}</td>
+            <td>{{ user.common_profile.badge_number }}</td>
             <td>{{ user.email }}</td>
-            <td>{{ user.student_profile.mobile_number }}</td>
+            <td>{{ user.common_profile.mobile_number }}</td>
             <td class="points">{{ user.total_points }}</td>
         </tr>
     {% endfor %}

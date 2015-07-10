@@ -3,10 +3,14 @@ from django.contrib.contenttypes.generic import GenericRelation
 from django.db import models
 from django.contrib.auth.models import User
 from forms_builder.forms.models import Form
+from core.models import StudentClubYear
+from clubs.managers import ClubQuerySet
 
 section_choices = (
     ('NG', u'الحرس الوطني'),
     ('KF', u'مدينة الملك فهد الطبية'),
+    ('J', u'جدة'),
+    ('A', u'الأحساء'),
 )
 
 gender_choices = (
@@ -33,7 +37,7 @@ city_choices = (
 class Club(models.Model):
     name = models.CharField(max_length=200, verbose_name=u"الاسم")
     english_name = models.CharField(max_length=200, verbose_name=u"الاسم الإنجليزي")
-    description = models.TextField(verbose_name=u"الوصف")
+    description = models.TextField(verbose_name=u"الوصف", blank=True)
     email = models.EmailField(max_length=254, verbose_name=u"البريد الإلكتروني")
     parent = models.ForeignKey('self', null=True, blank=True,
                                related_name="children",
@@ -49,12 +53,12 @@ class Club(models.Model):
     deputies = models.ManyToManyField(User, verbose_name=u"النواب",
                                       blank=True,
                                       related_name="deputyships",
-                                      limit_choices_to={'student_profile__isnull':
+                                      limit_choices_to={'common_profile__is_student':
                                                         False})
     members = models.ManyToManyField(User, verbose_name=u"الأعضاء",
                                      blank=True,
                                      related_name="memberships",
-                                     limit_choices_to={'student_profile__isnull':
+                                     limit_choices_to={'common_profile__is_student':
                                                        False})
     employee = models.ForeignKey(User, null=True, blank=True,
                                  related_name="employee",
@@ -74,14 +78,25 @@ class Club(models.Model):
                                          auto_now_add=True)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
     city = models.CharField(max_length=1, choices=city_choices, verbose_name=u"المدينة")
-
-    # Special ``Club`` objects (eg, Deanship of Student Affairs) should be hidden from the clubs list
+    gender = models.CharField(max_length=1, choices=gender_choices,
+                              verbose_name=u"الجنس", blank=True,
+                              default="")
+    year = models.ForeignKey(StudentClubYear, null=True, blank=True,
+                             on_delete=models.SET_NULL, default=None,
+                             verbose_name=u"السنة")
+    # Special ``Club`` objects (eg, Deanship of Student Affairs)
+    # should be hidden from the clubs list
     visible = models.BooleanField(default=True,
                                   verbose_name=u"مرئي؟")
     can_review = models.BooleanField(default=False,
                                      verbose_name=u"يستطيع المراجعة؟")
+    can_delete = models.BooleanField(default=True,
+                                     verbose_name=u"يستطيع الحذف؟")
+    can_edit = models.BooleanField(default=True,
+                                     verbose_name=u"يستطيع التعديل؟")
 
     forms = GenericRelation(Form)
+    objects = ClubQuerySet.as_manager()
 
     def registration_is_open(self):
         """
@@ -127,19 +142,18 @@ class Club(models.Model):
                                   episodes)
         return len(overdue_episodes)
 
-    def get_reviewer_parents(self):
+    def get_next_reviewing_parent(self):
         """
-        Return the parents of this club that can write activity reviews, in order from the buttom-up.
+        Return the single upper parent of this club that can write activity
+        reviews
         """
-        if not self.parent:
-            return []
-        else:
-            parents = [self.parent]
-            while parents[-1].parent is not None:
-                parents.append(parents[-1].parent)
-            reviewing_parents = filter(lambda club: club.can_review, parents)
-            return reviewing_parents
-        
+        current_parent = self.parent
+        while current_parent:
+            if current_parent.can_review:
+                return current_parent
+            else:
+                current_parent = current_parent.parent
+
     class Meta:
         # For the admin interface.
         verbose_name = u"نادي"
@@ -149,7 +163,15 @@ class Club(models.Model):
         )
 
     def __unicode__(self):
-        return self.name
+        if self.gender and not self.city:
+            return u"%s (%s)" % (self.name, self.get_gender_display())
+        elif self.city and not self.gender:
+            return u"%s (%s)" % (self.name, self.get_city_display())
+        elif self.city and self.gender:
+            return u"%s (%s/%s)" % (self.name, self.get_city_display(),
+                                    self.get_gender_display())
+        else:
+            return self.name
 
 class College(models.Model):
     section = models.CharField(max_length=2, choices=section_choices, verbose_name=u"القسم")
@@ -159,8 +181,8 @@ class College(models.Model):
 
     def __unicode__(self):
         return u"%s (%s - %s)" % (self.get_name_display(),
-                                  self.get_section_display(),
-                                  self.get_gender_display())
+                                       self.get_section_display(),
+                                       self.get_gender_display())
 
     class Meta:
         # For the admin interface.

@@ -1,5 +1,5 @@
 {% extends 'arshidni_base.html' %}{% load bootstrap3 %}
-{% block title %}تقديم طلب زمالة ل{{ colleague_profile.user.student_profile.get_ar_full_name|default:colleague_profile.user.username }}{% endblock %}
+{% block title %}تقديم طلب زمالة ل{{ colleague_profile.user.common_profile.get_ar_full_name|default:colleague_profile.user.username }}{% endblock %}
 
 {% block navbar %}
 	<li><a href="{% url 'arshidni:list_colleagues' %}"><span class="entypo-users"></span> الزملاء الطلابيون</a></li>
@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block content %}
-	<h2>تقديم طلب زمالة ل{{ colleague_profile.user.student_profile.get_ar_full_name|default:colleague_profile.user.username }}</h2>
+	<h2>تقديم طلب زمالة ل{{ colleague_profile.user.common_profile.get_ar_full_name|default:colleague_profile.user.username }}</h2>
 	{% if user.colleague_profile.pk == colleague_profile.pk %}
 		<p class="alert alert-warning">
 			لا يمكن أن تقدم طلبًا لنفسك!
@@ -23,7 +23,7 @@
 		{% elif error == 'current_colleague_requests' %}
 			لدى الزميل الطلابي زمالات سابقة!
 		{% elif error == 'gender' %}
-			يمكن {% if colleague_profile.user.student_profile.college.gender == 'F' %}للطالبات{% else %}للطلاب{% endif %} فقط أن يطلبوا من {{ colleague_profile.user.student_profile.ar_first_name }} الزمالة.
+			يمكن {% if colleague_profile.user.common_profile.college.gender == 'F' %}للطالبات{% else %}للطلاب{% endif %} فقط أن يطلبوا من {{ colleague_profile.user.common_profile.ar_first_name }} الزمالة.
 		{% endif %}
 		</p>
 	{% else %}

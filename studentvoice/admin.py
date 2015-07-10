@@ -87,7 +87,7 @@ class VoiceAdmin(admin.ModelAdmin):
 
     def get_full_name(self, obj):
         try:
-            return obj.submitter.student_profile.get_ar_full_name()
+            return obj.submitter.common_profile.get_ar_full_name()
         except ObjectDoesNotExist:
             return obj.submitter.username
     get_full_name.short_description = u"المستخدم"

@@ -29,7 +29,7 @@
                 </a>
             </td>
             <td>{{ task.description }}</td>
-            <td>{{ task.assignee.student_profile.get_ar_full_name }}</td>
+            <td>{{ task.assignee.common_profile.get_ar_full_name }}</td>
             <td>{{ task.due_date|date:"j F Y" }}</td>
         </tr>
         {% endfor %}

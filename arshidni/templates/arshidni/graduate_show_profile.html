@@ -1,7 +1,7 @@
 {% extends 'arshidni_base.html' %}
 {% block title %}الخريجون المتعاونون{% endblock %}
 {% block navbar %}
- 	{% if user.student_profile and not user.graduate_profile %}
+ 	{% if user.common_profile.is_student and not user.graduate_profile %}
 		<li><a href="{% url 'arshidni:register_graduate_profile' %}"><span class="glyphicon glyphicon-plus"></span> سجّل نفسك خريجا متعاونا</a></li>
  	{% endif %}
 	{% if graduate_profile == user.graduate_profile or perms.change_graduateprofile %}
@@ -23,7 +23,7 @@
 		</colgroup>
 		<tr>
 			<th>الاسم</th>
-			<td>{{ graduate_profile.user.student_profile.get_ar_full_name|default:graduate_profile.user.username }}</td>
+			<td>{{ graduate_profile.user.common_profile.get_ar_full_name|default:graduate_profile.user.username }}</td>
 		</tr>
 		<tr>
 			<th>طريقة التواصل</th>
@@ -31,11 +31,11 @@
 		</tr>
 		<tr>
 			<th>الكلية</th>
-			<td>{{ graduate_profile.user.student_profile.college }}</td>
+			<td>{{ graduate_profile.user.common_profile.college }}</td>
 		</tr>
 		<tr>
 			<th>المدينة</th>
-			<td>{{ graduate_profile.user.student_profile.college.get_city_display }}</td>
+			<td>{{ graduate_profile.user.common_profile.get_city_display }}</td>
 		</tr>
 		<tr>
 			<th>نبذة</th>

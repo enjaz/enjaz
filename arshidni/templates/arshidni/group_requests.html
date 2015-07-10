@@ -23,7 +23,7 @@
 			 <tbody>
 				{% for r in group.join_requests.all %}
 				<tr>
-					<td>{{ r.submitter.student_profile.get_ar_full_name|default:r.submitter.username }}</td>
+					<td>{{ r.submitter.common_profile.get_ar_full_name|default:r.submitter.username }}</td>
 					<td>{{ r.submission_date|date:"j F Y" }}</td>
 					<td>{{ r.submitter.email }}</td>
 					<td id="status-{{ r.pk }}">{{ r.get_status_display }}</td>

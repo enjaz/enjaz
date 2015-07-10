@@ -38,10 +38,12 @@ Licensed under the General Public License version 3 of the License, or
 
 Current dependencies:
 * django-constance
+* django-cors-headers
 * django-email_extras
 * django-taggit
 * django-templated-email
 * django-userena
+* djangorestframework
 * future
 * pdfcrowd
 * post_office _(with the cronjob)_

@@ -40,6 +40,7 @@ Current dependencies:
 * Django
 * django-bootstrap3
 * django-constance-updated
+* django-cors-headers
 * django-email_extras
 * django-picklefield
 * django-post-office _(check out the official installation documentation)_
@@ -49,6 +50,7 @@ Current dependencies:
 * django-templated-email
 * django-userena _(check out the official installation documentation)_
 * easy-thumbnails
+* djangorestframework
 * future
 * pdfcrowd
 * requests

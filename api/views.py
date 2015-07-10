@@ -16,25 +16,26 @@ class ActivityList(generics.ListAPIView):
     def get_queryset(self):
         queryset = Activity.objects.current_year().approved()
 
-        # By default, we should display activities since the beginning
-        # of time.
+        # By default, we should display activities happening today
+        # onwards.
+        since_date_object = datetime.today().date()
         since_date = self.request.query_params.get('since_date', None)
         if since_date:
             try:
                 since_date_object = datetime.strptime(since_date, "%Y-%m-%d").date()
-                queryset = queryset.filter(episode__start_date__gte=since_date_object)
             except ValueError: # If the date is malformatted.
                 pass
-
-        # By default, we should display activities until today.
-        until_date_object = datetime.today().date()
+        queryset = queryset.filter(episode__start_date__gte=since_date_object)
+        
+        # By default, we should display activities until the end of
+        # time.
         until_date = self.request.query_params.get('until_date', None)
         if until_date:
             try:
                 until_date_object = datetime.strptime(until_date, "%Y-%m-%d").date()
+                queryset = queryset.filter(episode__start_date__lte=until_date_object)
             except ValueError: # If the date is malformatted.
                 pass
-        queryset = queryset.filter(episode__start_date__lte=until_date_object)
 
         # By default, we should display activities in the user's city.
         city = self.request.query_params.get('city', None)

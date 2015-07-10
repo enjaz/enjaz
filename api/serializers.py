@@ -5,7 +5,7 @@ from clubs.models import Club
 class EpisodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Episode
-        fields = ('start_datetime', 'end_datetime')
+        fields = ('pk', 'start_datetime', 'end_datetime')
 
 class ClubSerializer(serializers.ModelSerializer):
     class Meta:

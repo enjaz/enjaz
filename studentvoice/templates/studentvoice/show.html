@@ -20,7 +20,7 @@
 	<h2><a href="{% url 'studentvoice:show' voice.pk %}">{% if not voice.is_published %}<span class="unpublished">[غير منشور]</span> {% endif %}{{ voice.title }} </a></h2>
 
 	<div class="voice-update-info-container">
-	<div class="voice-update-info"><p>كتبه <strong>{{ voice.submitter.student_profile.get_ar_full_name|default:voice.submitter.username }}</strong> في <strong><abbr class="timeago" title="{{ voice.submission_date|date:'c' }}">{{ voice.submission_date|date:'j F' }}</abbr></strong>
+	<div class="voice-update-info"><p>كتبه <strong>{{ voice.submitter.common_profile.get_ar_full_name|default:voice.submitter.username }}</strong> في <strong><abbr class="timeago" title="{{ voice.submission_date|date:'c' }}">{{ voice.submission_date|date:'j F' }}</abbr></strong>
 	{% if user == voice.submitter or perms.studentvoice.change_voice or perms.studentvoice.delete_voice %}({% if user == voice.submitter or perms.studentvoice.change_voice %}<a href="{% url 'studentvoice:edit' voice.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a>{% endif %}{% if user == voice.submitter or perms.studentvoice.delete_voice %} <a href="{% url 'studentvoice:delete' voice.pk %}"><span class="glyphicon glyphicon-remove"></span> احذف</a>{% endif %}){% endif %}</p></div>
 	</div>
 	<p>{{ voice.text|linebreaksbr }}</p> 
@@ -31,7 +31,7 @@
 <div class="row studentvoice-response">
 	<h3>الاستجابة</h3>
 {% if voice.response %}
-	<div class="voice-update-info"><p>كتبه <strong>{{ voice.response.submitter.nonstudent_profile.get_ar_full_name|default:voice.response.submitter.username }}</strong> ({{ voice.response.submitter.nonstudent_profile.job_description }}) في <strong><abbr class="timeago" title="{{ voice.response.submission_date|date:'c' }}">{{ voice.response.submission_date|date:'j F' }}</abbr></strong>
+	<div class="voice-update-info"><p>كتبه <strong>{{ voice.response.submitter.common_profile.get_ar_full_name|default:voice.response.submitter.username }}</strong> ({{ voice.response.submitter.common_profile.job_description }}) في <strong><abbr class="timeago" title="{{ voice.response.submission_date|date:'c' }}">{{ voice.response.submission_date|date:'j F' }}</abbr></strong>
 	{% if user == voice.response.submitter or perms.studentvoice.change_response %}(<a href="{% url 'studentvoice:edit_response' voice.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a>){% endif %}</p></div>
 	<p>{{ voice.response.text|linebreaksbr }}</p> 
 {% else %}
@@ -50,7 +50,7 @@
 <div id="question-img-downvote-{{ comment.pk }}" class="question-img-downvote post-vote downvote {% has_voted user comment 'D' %}"> </div>
 </div>
 <div class="voice-update-info-container">
-<div class="voice-update-info"><p>كتبه {{ comment.submitter.student_profile.get_ar_full_name|default:comment.submitter.username }} في <strong><abbr class="timeago" title="{{ comment.submission_date|date:'c'}}">{{ comment.submission_date|date:'j F' }} </abbr></strong> {% if user == comment.submitter or perms.studentvoice.change_voice or perms.studentvoice.delete_voice %}({% if user == comment.submitter or perms.studentvoice.change_voice %}<a href="{% url 'studentvoice:edit' comment.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a>{% endif %}{% if user == comment.submitter or perms.studentvoice.delete_voice %} <a href="{% url 'studentvoice:delete' comment.pk %}"><span class="glyphicon glyphicon-remove"></span> احذف</a>{% endif %}){% endif %}</p></div>
+<div class="voice-update-info"><p>كتبه {{ comment.submitter.common_profile.get_ar_full_name|default:comment.submitter.username }} في <strong><abbr class="timeago" title="{{ comment.submission_date|date:'c'}}">{{ comment.submission_date|date:'j F' }} </abbr></strong> {% if user == comment.submitter or perms.studentvoice.change_voice or perms.studentvoice.delete_voice %}({% if user == comment.submitter or perms.studentvoice.change_voice %}<a href="{% url 'studentvoice:edit' comment.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a>{% endif %}{% if user == comment.submitter or perms.studentvoice.delete_voice %} <a href="{% url 'studentvoice:delete' comment.pk %}"><span class="glyphicon glyphicon-remove"></span> احذف</a>{% endif %}){% endif %}</p></div>
 {% comment %}{% if comment.edit_date > comment.submission_date %}<div class="voice-update-info"> <p style="line-height:12px;"> <a href="/en/questions/10507/revisions/">عدله <strong><abbr class="timeago" title="{{ comment.submission_date|date:'c' }}">{{ comment.edit_date|date:'j F' }}</abbr></strong></a> </p></div>{% endif %}{% endcomment %}
 </div>
 <p>{{ comment.text }}</p>

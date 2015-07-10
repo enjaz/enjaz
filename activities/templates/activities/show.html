@@ -48,7 +48,7 @@
 							{# if the user can view unapproved activity, show the activity status #}
 							{# is-online = approved, is-idle = pending, is-busy = rejected #}
 							
-							{% if perms.activities.view_activity %}
+							{% if perms.activities.view_activity or request.user|has_coordination_to_activity:activity or request.user|can_review_activity:activity %}
 							<a href="#" class="user-status {% if activity.is_approved %}is-online{% elif activity.is_approved == None %}is-idle{% else %}is-busy{% endif %} tooltip-primary"
 							data-toggle="tooltip" data-placement="top"
 							data-original-title="{{ activity.get_approval_status_message }}"></a>
@@ -73,13 +73,13 @@
 				{% endif %}
 
                 {# if the user can edit the activity... #}
-				{% if perms.activities.change_activity or request.user|has_coordination_to_activity:activity %}
+				{% if request.user|can_edit_activity:activity %}
 				<a href="{% url 'activities:edit' activity.pk %}" class="btn btn-default">
 					<i class="entypo-pencil"></i>
 					عدّل
 				</a>
 				{% endif %}
-				{% if perms.activities.change_activity or request.user|has_coordination_to_activity:activity and activity.is_editable %}
+				{% if request.user|can_delete_activity:activity %}
 				<a href="{% url 'activities:delete' activity.pk %}" class="btn btn-default btn-red">
 					<i class="entypo-trash"></i>
 					احذف
@@ -163,7 +163,7 @@
                                     {% if episode.can_report_early %}
                                         <a href="{% url 'media:submit_report' episode.pk %}"
                                         class="btn btn-block btn-info btn-xs">ارفع التقرير</a>
-                                    {% else %}
+                                    {% elif activity.is_approved %}
                                         <a class="btn btn-block btn-primary btn-xs disabled">بانتظار انتهاء النشاط</a>
                                     {% endif %}
                                 {% endif %}
@@ -180,23 +180,13 @@
 
 				<!-- tabs for the profile links -->
 				<ul class="nav nav-tabs">
-                    {# <!-- TODO: permissions! --> #}
-                    {% for reviewer in activity.primary_club.get_reviewer_parents %}
-                        <li{% if active_tab == reviewer.pk %} class="active"{% endif %}>
-                            <a href="{% url 'activities:review' activity.id reviewer.id %}">مراجعة {{ reviewer.name }}</a>
-                        </li>
-                    {% endfor %}
-
-					{% if request.user|has_coordination_to_activity:activity or perms.activities.view_presidency_review or perms.activities.add_presidency_review %}
-					<li{% if active_tab == 'presidency' %} class="active"{% endif %}>
-						<a href="{% url 'activities:review_with_type' activity.pk 'p' %}">مراجعة رئاسة نادي الطلاب</a>
+			{% if request.user|has_coordination_to_activity:activity or request.user|can_review_activity:activity %}
+				{% for reviewer in activity.primary_club|get_reviewing_parents %}
+					<li{% if active_tab == reviewer.pk %} class="active"{% endif %}>
+					<a href="{% url 'activities:review' activity.id reviewer.id %}">مراجعة {{ reviewer.name }}</a>
 					</li>
-					{% endif %}
-					{% if request.user|has_coordination_to_activity:activity or perms.activities.view_deanship_review or perms.activities.add_deanship_review %}
-					<li{% if active_tab == 'deanship' %} class="active"{% endif %}>
-						<a href="{% url 'activities:review_with_type' activity.pk 'd' %}">مراجعة عمادة شؤون الطلاب</a>
-					</li>
-					{% endif %}
+				{% endfor %}
+			{% endif %}
                     {% if request.user|has_coordination_to_activity:activity or perms.niqati.view_order %}
 					<li{% if active_tab == 'niqati' %} class="active"{% endif %}>
 						<a href="{% url 'activities:niqati_orders' activity.pk %}">نقاطي</a>

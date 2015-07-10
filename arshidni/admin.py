@@ -126,7 +126,7 @@ class ColleagueProfileAdmin(admin.ModelAdmin):
     list_filter = [ColleagueAvailabilityFilter]
 
     def get_user_full_name(self, obj):
-        return obj.user.student_profile.get_ar_full_name()
+        return obj.user.common_profile.get_ar_full_name()
     get_user_full_name.short_description = u"اسم الزميل الطلابي"
 
 class GraduateProfileAdmin(admin.ModelAdmin):
@@ -137,11 +137,11 @@ class SupervisionRequestAdmin(admin.ModelAdmin):
     list_filter = [SupervisionRequestStatusFilter]
 
     def get_user_full_name(self, obj):
-        return obj.user.student_profile.get_ar_full_name()
+        return obj.user.common_profile.get_ar_full_name()
     get_user_full_name.short_description = u"اسم الطالب المستجد"
 
     def get_colleague_full_name(self, obj):
-        return obj.colleague.user.student_profile.get_ar_full_name()
+        return obj.colleague.user.common_profile.get_ar_full_name()
     get_colleague_full_name.short_description = u"اسم الزميل الطلابي"
 
 class JoinStudyGroupRequestAdmin(admin.ModelAdmin):

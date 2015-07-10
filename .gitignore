@@ -10,3 +10,4 @@ mediafiles/
 .pydevproject
 .settings/
 *.sqlite3
+*~

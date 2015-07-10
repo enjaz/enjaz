@@ -5,7 +5,7 @@ from django.contrib import admin
 from activities.models import Activity, Episode, Category, Evaluation, Review
 from clubs.models import section_choices
 from clubs.utils import get_presidency, get_deanship
-
+from core.models import StudentClubYear
 
 class EpisodeInline(admin.TabularInline):
     model = Episode
@@ -14,6 +14,22 @@ class EpisodeInline(admin.TabularInline):
 class ReviewInline(admin.StackedInline):
     model = Review
     extra = 0
+
+class YearFilter(admin.SimpleListFilter):
+    title = u"السنة"
+    parameter_name = 'year'
+    def lookups(self, request, model_admin):
+        years = StudentClubYear.objects.all()
+        year_lookups = [(year.start_date.year, unicode(year))
+                        for year in years]
+        return year_lookups
+
+    def queryset(self, request, queryset):
+        if self.value():
+            start_year = int(self.value())
+            end_year = start_year + 1
+            chosen_year = StudentClubYear.objects.get_by_year(start_year, end_year)
+            return queryset.filter(primary_club__year=chosen_year)
 
 class CategoryFilter(admin.SimpleListFilter):
     title = u"التصنيف"
@@ -47,34 +63,30 @@ class SubmissionFilter(admin.SimpleListFilter):
                 time_ago = datetime.datetime.now()
             return queryset.filter(submission_date__gte=time_ago)
 
-
-# FIXME: Edit or remove this filter (it's fixed!)
 class StatusFilter(admin.SimpleListFilter):
     title = u"الحالة"
     parameter_name = 'status'
     def lookups(self, request, model_admin):
         return (
-            ('w', u'تنتظر مراجعة الرئاسة'), # waiting
-            ('p', u'راجعتها الرئاسة ولم تراجعها العمادة'), # presidency
-            ('d', u'راجعتهاالرئاسة والعمادة'), # deanship
+            ('a', u'مقبول'),
+            ('r', u'مرفوض'),
+            ('p', u'معلق'),
             )
+
     def queryset(self, request, queryset):
-        if self.value():
-            if self.value() == 'w':
-                return queryset.exclude(review__reviewer_club=get_presidency())
-            elif self.value() == 'p':
-                presidency_reviewed = queryset.filter(review__reviewer_club=get_presidency())
-                deanship_unreviewed = presidency_reviewed.exclude(review__reviewer_club=get_deanship())
-                return deanship_unreviewed
-            elif self.value() == 'd':
-                return queryset.filter(review__reviewer_club=get_deanship())
+        if self.value() == 'a':
+            return queryset.filter(is_approved=True)
+        elif self.value() == 'r':
+            return queryset.filter(is_approved=False)
+        elif self.value() == 'p':
+            return queryset.filter(is_approved=None)
 
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'primary_club', 'category',
                     'submission_date', 'is_approved',
                     'get_approval_status_message', 'get_relevance_score_average',
                     'get_quality_score_average', 'get_evaluation_count')
-    list_filter = [CategoryFilter, SubmissionFilter, StatusFilter]
+    list_filter = [CategoryFilter, SubmissionFilter, StatusFilter, YearFilter]
     readonly_fields = ('get_relevance_score_average', 'get_quality_score_average', )
     inlines = [EpisodeInline, ReviewInline]
 

@@ -6,16 +6,15 @@ from django import forms
 from django.forms import ModelForm, ModelChoiceField, ModelMultipleChoiceField
 from django.forms.widgets import TextInput
 
-from clubs.models import Club
 from activities.models import Activity, Episode, Review, Evaluation
+from clubs.models import Club
+from core.models import StudentClubYear
 
+current_year = StudentClubYear.objects.get_current()
 
 class ActivityForm(ModelForm):
     """A general form, which doesn't include 'Presidency'."""
-    queryset = Club.objects.exclude(english_name="Presidency")
-    primary_club = ModelChoiceField(queryset=queryset,
-                                    label=Activity.primary_club.field.verbose_name,
-                                    help_text=Activity.primary_club.field.help_text)
+    queryset = Club.objects.current_year().visible()
     secondary_clubs = ModelMultipleChoiceField(queryset=queryset,
                                     label=Activity.secondary_clubs.field.verbose_name,
                                     help_text=Activity.secondary_clubs.field.help_text,
@@ -24,12 +23,10 @@ class ActivityForm(ModelForm):
     
     class Meta:
         model = Activity
-        fields = ['primary_club', # TODO: primary club is already known (signed in):
-                                  # no need to include as field
-                  'name', 'category', 'description', 'public_description',
-                  'organizers', 'participants',
-                  'secondary_clubs', 'inside_collaborators',
-                  'outside_collaborators', 'requirements',]
+        fields = [ 'name', 'category', 'description', 'gender',
+                   'public_description', 'organizers', 'participants',
+                   'secondary_clubs', 'inside_collaborators',
+                   'outside_collaborators', 'requirements',]
 
     def __init__(self, *args, **kwargs):
         """
@@ -169,7 +166,7 @@ class ActivityForm(ModelForm):
     
 class DirectActivityForm(ActivityForm):
     """A form which has 'Presidency' as an option."""
-    queryset = Club.objects.all()
+    queryset = Club.objects.current_year()
     primary_club = ModelChoiceField(queryset=queryset,
                                     label=Activity.primary_club.field.verbose_name,
                                     help_text=Activity.primary_club.field.help_text)
@@ -177,6 +174,13 @@ class DirectActivityForm(ActivityForm):
                                     label=Activity.secondary_clubs.field.verbose_name,
                                     help_text=Activity.secondary_clubs.field.help_text,
                                     required=False)
+
+    class Meta:
+        model = Activity
+        fields = [ 'name', 'primary_club', 'category', 'description', 'gender',
+                   'public_description', 'organizers', 'participants',
+                   'secondary_clubs', 'inside_collaborators',
+                   'outside_collaborators', 'requirements',]
 
 class DisabledActivityForm(ActivityForm):
     def __init__(self, *args, **kwargs):

@@ -27,7 +27,7 @@ urlpatterns = patterns('',
     url(r'^groups/(?P<group_id>\d+)/edit/$', views.edit_group, name='edit_group'),
     url(r'^groups/(?P<group_id>\d+)/requests/$', views.join_group_requests, name='join_group_requests'),
     url(r'^groups/search/$', views.search_groups, name='search_groups'),
-    # Studnet colleagues
+    # Student colleagues
     url(r'^colleagues/$', views.list_colleagues, name='list_colleagues'),
     url(r'^colleagues/student_action$', views.student_action, name='student_action'),
     url(r'^colleagues/colleague_action$', views.colleague_action, name='colleague_action'),

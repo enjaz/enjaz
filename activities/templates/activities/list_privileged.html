@@ -2,6 +2,11 @@
 {% block title %}الأنشطة{% endblock %}
 
 {% block content %}
+<style type="text/css">
+    .panel-todo .panel-heading {
+     background-color: #97DFE5;
+    }
+</style>
 {% if due_report_count > 0 %}
 <div class="alert alert-minimal">
     <strong>تنبيه</strong> لديك <span class="badge badge-warning">{{ due_report_count }}</span> تقارير إعلامية حان وقت تسليمها. يرجى كتابتها و تسليمها في أقرب فرصة.
@@ -19,16 +24,33 @@
 </div>
 {% endif %}
 <div class="panel-group" id="activities-accordion">
-		
-    <div class="panel panel-success">
+    <div class="panel panel-todo">
         <div class="panel-heading">
             <h4 class="panel-title">
                 <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseOne-2" class="collapsed">
-                    الأنشطة المعتمدة
+                    أنشطة تنتظر إجراءً منك ({{ todo|length }})
                 </a>
             </h4>
         </div>
         <div id="collapseOne-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <div class="row">
+                {% with activities=todo privileged=1 %}
+                    {% include 'activities/components/activities_table.html' %}
+                {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseTwo-2" class="collapsed">
+                    الأنشطة المعتمدة ({{ approved|length}} )
+                </a>
+            </h4>
+        </div>
+        <div id="collapseTwo-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
                 <div class="row">
                 {% with activities=approved privileged=1 approved_table=1 %}
@@ -42,12 +64,12 @@
     <div class="panel panel-warning">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseTwo-2" class="notcollapsed">
-                    الأنشطة المعلّقة
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseThree-2" class="notcollapsed">
+                    الأنشطة المعلّقة ({{ pending|length }})
                 </a>
             </h4>
         </div>
-        <div id="collapseTwo-2" class="panel-collapse collapse" style="height: 0px;">
+        <div id="collapseThree-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
                 <div class="row">
                 {% with activities=pending privileged=1 %}
@@ -61,12 +83,12 @@
     <div class="panel panel-danger">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseThree-2" class="collapsed">
-                    الأنشطة المرفوضة
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseFour-2" class="collapsed">
+                    الأنشطة المرفوضة ({{ rejected|length }})
                 </a>
             </h4>
         </div>
-        <div id="collapseThree-2" class="panel-collapse collapse" style="height: 0px;">
+        <div id="collapseFour-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
                 <div class="row">
                 {% with activities=rejected privileged=1 %}
@@ -80,12 +102,12 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseFour-2" class="collapsed">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseFive-2" class="collapsed">
                     التقويم
                 </a>
             </h4>
         </div>
-        <div id="collapseFour-2" class="panel-collapse collapse" style="height: 0px;">
+        <div id="collapseFive-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
 
                 <style>

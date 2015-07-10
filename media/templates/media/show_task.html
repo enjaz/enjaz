@@ -43,7 +43,7 @@
 
 			<tr>
 				<th class="text-center">المكلَّف</th>
-				<td colspan="3">{{ task.assignee.student_profile.get_ar_full_name }}</td>
+				<td colspan="3">{{ task.assignee.common_profile.get_ar_full_name }}</td>
 			</tr>
 
 			<tr>
@@ -74,7 +74,7 @@
                 <!-- Comment Entry --><li>
                     <div class="comment-details">
                         <div class="comment-head">
-                            <a href="#">{{ comment.author.student_profile.get_ar_full_name }}</a>
+                            <a href="#">{{ comment.author.common_profile.get_ar_full_name }}</a>
                             -
                             {{ comment.date|date:"j F Y" }}
                         </div>

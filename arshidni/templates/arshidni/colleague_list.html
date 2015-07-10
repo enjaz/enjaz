@@ -2,7 +2,7 @@
 {% block title %}الزملاء الطلابيون{% endblock %}
 {% block navbar %}
 	<li><a href="{% url 'arshidni:list_colleagues' %}"><span class="entypo-users"></span> الزملاء الطلابيون</a></li>
- 	{% if user.student_profile and not user.colleague_profile and perms.arshidni.add_colleagueprofile %}
+ 	{% if user.common_profile.is_student and not user.colleague_profile and perms.arshidni.add_colleagueprofile %}
 		<li><a href="{% url 'arshidni:register_colleague_profile' %}"><span class="glyphicon glyphicon-plus"></span> سجّل نفسك زميلا طلابيا</a></li>
  	{% endif %}
 	{% if user.colleague_profile %}
@@ -35,8 +35,8 @@
 			 <tbody>
 				{% for c in page_colleague_profiles %}
 				<tr>
-					<td><a href="{% url 'arshidni:show_colleague_profile' c.pk %}">{{ c.user.student_profile.get_ar_full_name|default:c.user.username }}</a></td>
-					<td>{{ c.user.student_profile.college }}</a></td>
+					<td><a href="{% url 'arshidni:show_colleague_profile' c.pk %}">{{ c.user.common_profile.get_ar_full_name|default:c.user.username }}</a></td>
+					<td>{{ c.user.common_profile.college }}</a></td>
 					<td>{{ c.batch }}</td>
                        			<td data-order="{{ c.submission_date|date:"U" }}">{{ c.submission_date|date:"j F Y" }}</td>
                        			<td>{% if user.colleague_profile != c %}<a href="{% url 'arshidni:submit_supervision_request' c.pk %}">اختر</a>{% endif %}</td>

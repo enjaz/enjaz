@@ -18,7 +18,7 @@
 		<tr>
 			<!-- <td>{{ article.pk }}</td> -->
 			<td><a href="{% url 'media:show_article' article.pk %}">{{ article.title }}</a></td>
-			<td>{{ article.author.student_profile.get_ar_full_name }}</td>
+			<td>{{ article.author.common_profile.get_ar_full_name }}</td>
 			<td>{{ article.date_submitted|date:"j F Y" }}</td>
 			<td>{{ article.get_status_display }}</td>
 			<td>

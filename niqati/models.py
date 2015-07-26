@@ -19,10 +19,9 @@ from clubs.models import Club
 from core.models import StudentClubYear
 from niqati.managers import CodeQuerySet
 
-def generate_code(length):
-    chars = string.ascii_uppercase + string.digits
-    code = ''.join([random.choice(chars) for i in range(length)])
-    return code
+CODE_STRING_LENGTH = 6
+COUPON = '0'
+SHORT_LINK = '1'
 
 class Category(models.Model):
     label = models.CharField(max_length=20)
@@ -64,7 +63,28 @@ class Code(models.Model):
     
     # To be removed
     asset = models.CharField(max_length=300, blank=True) # either (1) short link or (2) link to QR (depending on delivery_type of parent collection)
-    
+
+    def __init__(self, *args, **kwargs):
+        """
+        Generate a unique string for the current code.
+        """
+        super(Code, self).__init__(*args, **kwargs)
+
+        # If the code is new (not being loaded from db), then generate
+        # a unique string, and add a year.
+        if self.code_string == "":
+            chars = string.ascii_uppercase + string.digits
+            while True:
+                random_string = ''.join(random.choice(chars) for i in range(CODE_STRING_LENGTH))
+                # If the string is unique, then break the
+                # loop. Otherwise keep generating random strings.
+                if not self.__class__.objects.filter(code_string=random_string).exists():
+                    break
+            self.string = random_string
+
+            if self.year is None:
+                self.year = StudentClubYear.objects.get_current()
+        
     def __unicode__(self):
         return self.code_string
 
@@ -72,25 +92,7 @@ class Code(models.Model):
         return self.user is not None
     is_redeemed.boolean = True
     is_redeemed.short_description = u"تم استخدامه؟"
-    
-    def generate_unique(self):
-        if not self.code_string: # only works when there is no string (when code is created for first time)
-            while True:
-                new_code = generate_code(6)
-                if not Code.objects.filter(code_string=new_code).exists():
-                    self.code_string = new_code
-                    return
-    # Obsolete.  We don't need this method anymore.  It is only kept
-    # for backward compatibility.
-    # returns a "spaced code" i.e. XXXX XXXX XXXX XXXX instead of XXXXXXXXXXXXXXXX
-    def spaced_code(self):
-        spaced_code = ""
-        for i in range(len(self.code_string)):
-            if i % 4 == 0 and i > 0:
-                spaced_code += " "
-            spaced_code += self.code_string[i]
-        return spaced_code
-    
+        
     class Meta:
         verbose_name = u"نقطة"
         verbose_name_plural = u"النقاط"
@@ -116,8 +118,6 @@ class Code(models.Model):
 
 class Code_Collection(models.Model): # group of codes that are (1) of the same type & (2) of the same Code_Order
 
-    COUPON = '0'
-    SHORT_LINK = '1'
     DELIVERY_TYPE_CHOICES = (
         (COUPON, u"كوبونات"),
         (SHORT_LINK, u"روابط قصيرة"),

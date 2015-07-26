@@ -49,21 +49,25 @@ class RedeemCodeForm(forms.Form):
         code_string = self.cleaned_data['string'].upper().replace(" ", "").replace("-", "")
 
         # first, check that code exists
-        if not Code.objects.filter(string=code_string).exists():
-            raise forms.ValidationError(u"هذا الرمز غير صحيح.", code="DoesNotExist")
-        else:
+        try:
             code = Code.objects.get(code_string=code_string)
-            # next, check that code is available
-            if code.user is not None:
-                raise forms.ValidationError(u"هذا الرمز غير متوفر.", code="Unavailable")
-            else:
-                # finally, check that user doesn't have another code
-                # in the same episode, unless the episode allows this
-                # to happen.
-                if not code.collection.parent_order.episode.allow_multiple_niqati:
-                    if Code.objects.filter(collection__parent_order__episode=code.collection.parent_order.episode,
-                                           user=self.user).exists():
-                        raise forms.ValidationError(u"لديك رمز آخر في نفس النشاط.", code="HasOtherCode")
+        except Code.DoesNotExist:
+            raise forms.ValidationError(u"هذا الرمز غير صحيح.", code="DoesNotExist")
+
+        # next, check that code is available
+        if code.user == self.user:
+            raise forms.ValidationError(u"سبق أن استخدمت هذا الرمز", code="Used")
+        if code.user is not None:
+            raise forms.ValidationError(u"هذا الرمز غير متوفر.", code="Unavailable")
+        else:
+            # finally, check that user doesn't have another code
+            # in the same episode, unless the episode allows this
+            # to happen.
+            if not code.collection.parent_order.episode.allow_multiple_niqati:
+                if Code.objects.filter(collection__parent_order__episode=code.collection.parent_order.episode,
+                                       user=self.user).exists():
+                    raise forms.ValidationError(u"لديك رمز آخر في نفس النشاط.", code="HasOtherCode")
+
 
         return code_string
 
@@ -73,6 +77,9 @@ class RedeemCodeForm(forms.Form):
         In both cases, return an appropriate message.
         :return: a tuple containing a message type and a message.
         """
+        # TODO:
+        # * If the user already has a code, count the one with more
+        #   points. (Already implemented before redesign) [20150712]
         if self.is_valid():
             code = Code.objects.get(code_string=self.cleaned_data['string'])
             code.user = self.user

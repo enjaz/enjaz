@@ -193,8 +193,24 @@
                             لا يوجد.
                         {% endif %}
                     </td>
-                </tr>
-			<tr>
+            </tr>{% if activity.attachment_set.all %}
+            <tr>
+                <th>المستندات المرفقة</th>
+                <td>
+                    {% for attachment in activity.attachment_set.all %}
+                    {% if forloop.first %}<ul>{% endif %}
+                        <li>
+                        <a href="{{ attachment.document.url }}">
+                            {{ attachment.description }}
+                        </a>
+                        </li>
+                    {% if forloop.last %}</ul>{% endif %}
+                {% empty %}
+                    <p>لا يوجد.</p>
+                {% endfor %}
+                </td>
+            </tr>
+			{% endif %}<tr>
 				<th>موعد تقديم الطلب</th>
 				<td>{{ activity.submission_date }}</td>
 				<td>

@@ -60,5 +60,5 @@ def can_edit_activity(user, activity):
     return utils.can_edit_activity(user, activity)
 
 @register.filter
-def get_reviewing_parents(club):
-    return Club.objects.reviewing_parents(club)
+def get_activity_reviewing_parents(activity):
+    return Club.objects.activity_reviewing_parents(activity)

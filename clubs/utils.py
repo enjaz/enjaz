@@ -103,7 +103,7 @@ def forms_editor_check(user, object):
 def can_review_activity(user, activity):
     if user.has_perm('activities.add_review'): # e.g. superuser
         return True
-    reviewing_parents = Club.objects.reviewing_parents(activity.primary_club)
+    reviewing_parents = Club.objects.activity_reviewing_parents(activity)
     user_clubs = reviewing_parents.filter(coordinator=user) | \
                  reviewing_parents.filter(deputies=user)
     return user_clubs.exists()
@@ -124,7 +124,7 @@ def can_delete_activity(user, activity):
        has_coordination_to_activity(user, activity)):
         return True
     else:
-        reviewing_parents = Club.objects.reviewing_parents(activity.primary_club)
+        reviewing_parents = Club.objects.activity_reviewing_parents(activity)
         deleting_parents = reviewing_parents.filter(can_delete=True)
         user_clubs = deleting_parents.filter(coordinator=user) | deleting_parents.filter(deputies=user)
         return user_clubs.exists()
@@ -150,7 +150,7 @@ def can_edit_activity(user, activity):
         # imposed in the view.
         return True
     else:
-        reviewing_parents = Club.objects.reviewing_parents(activity.primary_club)
+        reviewing_parents = Club.objects.activity_reviewing_parents(activity)
         editing_parents = reviewing_parents.filter(can_edit=True)
         user_clubs = editing_parents.filter(coordinator=user) | editing_parents.filter(deputies=user)
         return user_clubs.exists()

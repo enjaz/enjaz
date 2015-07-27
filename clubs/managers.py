@@ -35,7 +35,7 @@ class ClubQuerySet(models.QuerySet):
                                    models.Q(gender="")
         return self.filter(gender_condition)
 
-    def reviewing_parents(self, club=None):
+    def reviewing_parents(self, club):
         reviewing_parent_pks = []
         new_parent = club.parent
 
@@ -46,3 +46,20 @@ class ClubQuerySet(models.QuerySet):
             new_parent = new_parent.parent
 
         return self.filter(pk__in=reviewing_parent_pks)
+
+    def activity_reviewing_parents(self, activity):
+        if activity.chosen_reviewer_club:
+            chosen_reviewer_query = self.filter(pk=activity.chosen_reviewer_club.pk)
+        else:
+            chosen_reviewer_query = self.none()
+
+        reviewing_parent_pks = []
+        new_parent = activity.primary_club.parent
+
+        while new_parent:
+            if new_parent.can_review:
+                reviewing_parent_pks.append(new_parent.pk)
+
+            new_parent = new_parent.parent
+
+        return chosen_reviewer_query | self.filter(pk__in=reviewing_parent_pks)

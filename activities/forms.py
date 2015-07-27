@@ -5,8 +5,9 @@ This module contains the forms used in the activities app.
 from django import forms
 from django.forms import ModelForm, ModelChoiceField, ModelMultipleChoiceField
 from django.forms.widgets import TextInput
+from django.forms.models import inlineformset_factory
 
-from activities.models import Activity, Episode, Review, Evaluation
+from activities.models import Activity, Episode, Review, Evaluation, Attachment
 from clubs.models import Club
 from core.models import StudentClubYear
 
@@ -23,10 +24,11 @@ class ActivityForm(ModelForm):
     
     class Meta:
         model = Activity
-        fields = [ 'name', 'category', 'description', 'gender',
-                   'public_description', 'organizers', 'participants',
-                   'secondary_clubs', 'inside_collaborators',
-                   'outside_collaborators', 'requirements',]
+        fields = ['name', 'category', 'description',
+                  'public_description', 'gender', 'organizers',
+                  'participants', 'secondary_clubs',
+                  'inside_collaborators', 'outside_collaborators',
+                  'requirements']
 
     def __init__(self, *args, **kwargs):
         """
@@ -163,6 +165,19 @@ class ActivityForm(ModelForm):
 
             
         return activity            
+
+class ReviewerActivityForm(ActivityForm):
+    """A form which allows the submitter to choose the reviewer."""
+    chosen_reviewer_club = ModelChoiceField(queryset=Club.objects.none(),
+                                            label=u"المُراجع",
+                                            help_text=u"الكلية المراجعة")
+    class Meta:
+        model = Activity
+        fields = ['chosen_reviewer_club', 'name', 'category',
+                  'description', 'public_description', 'gender',
+                  'organizers', 'participants', 'secondary_clubs',
+                  'inside_collaborators', 'outside_collaborators',
+                  'requirements']
     
 class DirectActivityForm(ActivityForm):
     """A form which has 'Presidency' as an option."""
@@ -177,10 +192,11 @@ class DirectActivityForm(ActivityForm):
 
     class Meta:
         model = Activity
-        fields = [ 'name', 'primary_club', 'category', 'description', 'gender',
-                   'public_description', 'organizers', 'participants',
-                   'secondary_clubs', 'inside_collaborators',
-                   'outside_collaborators', 'requirements',]
+        fields = ['name', 'primary_club', 'category', 'description',
+                  'public_description', 'gender', 'organizers',
+                  'participants', 'secondary_clubs',
+                  'inside_collaborators', 'outside_collaborators',
+                  'requirements',]
 
 class DisabledActivityForm(ActivityForm):
     def __init__(self, *args, **kwargs):
@@ -229,7 +245,8 @@ class ReviewForm(ModelForm):
                   'datetime_notes', 'requirement_notes',
                   'inside_notes', 'outside_notes',
                   'organizers_notes', 'participants_notes',
-                  'is_approved', 'submission_date_notes']
+                  'is_approved', 'attachment_notes',
+                  'submission_date_notes']
 
 
 class EvaluationForm(ModelForm):
@@ -247,3 +264,5 @@ class EvaluationForm(ModelForm):
     class Meta:
         model = Evaluation
         fields = ['quality', 'relevance']
+
+AttachmentFormSet = inlineformset_factory(Activity, Attachment, fields=['document', 'description'], extra=1)

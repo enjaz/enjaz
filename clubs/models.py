@@ -43,6 +43,10 @@ class Club(models.Model):
                                related_name="children",
                                on_delete=models.SET_NULL,
                                default=None, verbose_name=u"النادي الأب")
+    possible_parents = models.ManyToManyField('self',
+                                              verbose_name=u"النوادي الأب الممكنة",
+                                              blank=True,
+                                              related_name="possible_children")
     coordinator = models.ForeignKey(User, null=True,
                                     blank=True,
                                     verbose_name=u"المنسق",

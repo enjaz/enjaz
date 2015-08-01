@@ -140,6 +140,16 @@ def show(request, activity_id):
     if request.user.is_authenticated():
         user_clubs = get_user_clubs(request.user)
 
+        # Save a click, redirect reviewers to the appropriate
+        # reviewing page.
+        reviewing_parents = Club.objects.activity_reviewing_parents(activity)
+        user_reviewing_clubs = reviewing_parents.filter(coordinator=request.user) | \
+                               reviewing_parents.filter(deputies=request.user)
+        if user_reviewing_clubs.exists():
+            reviewer_club = user_reviewing_clubs.first()
+            return HttpResponseRedirect(reverse('activities:review',
+                                                args=(activity.pk, reviewer_club.pk)))
+
         # Anyone can view forms; yet due to URL reversing issues it has to be restricted to this view only
         # Otherwise, we'll end up having to specify the `current_app` attribute for every view that contains a link
         # to the forms

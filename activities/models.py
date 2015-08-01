@@ -470,8 +470,8 @@ class Evaluation(models.Model):
 class Attachment(models.Model):
     activity = models.ForeignKey(Activity)
     description = models.CharField(max_length=200, verbose_name=u"الوصف")
-    preview = models.FileField(verbose_name=u"معاينة", upload_to="media/activity_attachment_previews/")
-    document = models.FileField(verbose_name=u"المستند", upload_to="media/activity_attachments/")
+    preview = models.FileField(verbose_name=u"معاينة", upload_to="activity_attachment_previews/")
+    document = models.FileField(verbose_name=u"المستند", upload_to="activity_attachments/")
     submitter = models.ForeignKey(User)
     submission_date = models.DateTimeField(u'تاريخ الإرسال',
                                            auto_now_add=True)

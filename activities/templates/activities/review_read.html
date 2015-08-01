@@ -201,7 +201,7 @@
                     {% if forloop.first %}<ul>{% endif %}
                         <li>
                         <a href="{{ attachment.document.url }}">
-                            {{ attachment.description }}
+                            {% if attachment.description %}{{ attachment.description }}{% else %}{{ attachment.filename }}{% endif %}
                         </a>
                         </li>
                     {% if forloop.last %}</ul>{% endif %}

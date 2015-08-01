@@ -22,7 +22,6 @@
 			
 			<!-- panel body -->
     </div>
-    {% if user_club.city != 'R' %}
     <h4>المستندات المرفقة</h4>
     {# -------- #}
     {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
@@ -61,7 +60,6 @@
     </table>
     <hr>
     {# ------- #}
-    {% endif %}
     {% buttons %}
     	<button type="submit" class="btn btn-primary btn-block">
     		{% bootstrap_icon "ok-sign" %} أرسل
@@ -329,7 +327,7 @@ function updateEpisodes() {
 <script>
     // add formset controls
     $("#attachment-formset .form-container").formset({
-        prefix: '{{ formset.prefix }}',
+        prefix: '{{ attachment_formset.prefix }}',
         addText: 'أضف مستندًا',
         deleteText: 'احذف',
         addCssClass: 'add-row btn btn-xs btn-primary',

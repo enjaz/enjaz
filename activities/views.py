@@ -191,8 +191,8 @@ def create(request):
     if any([club.get_overdue_report_count() > MAX_OVERDUE_REPORTS for club in user_coordination]):
         raise PermissionDenied
 
-    if user_coordination:
-        user_club = user_coordination[0]
+    if user_coordination.exists():
+        user_club = user_coordination.first()
 
     if request.method == 'POST':
         # DirectActivityForm get to choose what club to submit the
@@ -217,8 +217,6 @@ def create(request):
             for attachment in attachments:
                 attachment.submitter = request.user
                 attachment.save()
-            for deleted_attachment in attachment_formset.deleted_objects:
-                deleted_attachment.delete()
 
             # If the user can directly add activities, make the
             # activity automatically approved.  Otherwise, email the

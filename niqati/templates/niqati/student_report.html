@@ -22,8 +22,8 @@
     {% for code in user.code_set.all %}
         <tr>
             <td><a href="{% url 'activities:show' code.episode.activity.pk %}">{{ code.episode }}</a></td>
-            <td>{{ code.category.ar_label }}</td>
-            <td>{{ code.category.points }}</td>
+            <td>{% if code.category %}{{ code.category.ar_label }}{% else %}مُخصّصة{% endif %}</td>
+            <td>{{ code.points }}</td>
             <td>{{ code.redeem_date }}</td>
         </tr>
     {% endfor %}

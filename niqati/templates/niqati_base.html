@@ -11,7 +11,7 @@
     <li><a href="{% url 'niqati:submit' %}"><span class="glyphicon glyphicon-plus"></span> أدخل نقاطًا</a></li>
     <li><a href="{% url 'niqati:student_report' %}"><span class="glyphicon glyphicon-file"></span> تقرير نقاطي</a></li>
 
-    {% if perms.niqati.approve_order %}<li><a href="{% url 'niqati:approve' %}"><span class="glyphicon glyphicon-ok-circle"></span> مراجعة طلبات النقاط</a></li>{% endif %}
+    {% if perms.niqati.approve_order %}<li><a href="{% url 'niqati:list_pending_orders' %}"><span class="glyphicon glyphicon-ok-circle"></span> مراجعة طلبات النقاط</a></li>{% endif %}
     {% if perms.niqati.view_general_report %}<li><a href="{% url 'niqati:general_report' %}"><span class="glyphicon glyphicon-stats"></span> التقرير العام</a></li>{% endif %}
     
 {% endblock %}

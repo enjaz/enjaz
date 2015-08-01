@@ -28,23 +28,23 @@
 			{% for order in episode.code_order_set.all %}
 			<tr>
 				<th>تاريخ الطلب:
-                    {{ order.date_ordered|date:"j F Y" }}</th>
+                    {{ order.date_ordered|date:"j F Y" }}
+                    {% if order.is_approved == True%}
+                        <span class="badge badge-success">تمت الموافقة</span>
+                    {% elif order.is_approved == False %}
+                        <span class="badge badge-danger">تم الرفض</span>
+                    {% else %}
+                        <span class="badge badge-warning">معلق</span>
+                    {% endif %}
+                </th>
+                
 			    <td>
 			        <ul class="list-group">
 			        {# collections #}
 			        {% for collec in order.code_collection_set.all %}
 			            <li class="list-group-item">
 			 				<span class="badge">{{ collec.code_count }} أكواد</span>
-                            {% if collec.approved == True and collec.date_created %}
-                            <span class="badge badge-success">تمت الموافقة</span>
-                            {% elif collec.approved == True and not collec.date_created %}
-                            <span class="badge badge-warning">تمت الموافقة و يجري إنشاء النقاط</span>
-                            {% elif collec.approved == False %}
-                            <span class="badge badge-danger">تم الرفض</span>
-                            {% else %}
-                            <span class="badge badge-warning">معلق</span>
-                            {% endif %}
-			                <a href="{% if collec.approved == True and collec.date_created %}{% url 'niqati:view_collec' collec.pk %}{% else %}#{% endif %}">{{ collec.code_category.ar_label }}</a>
+			                {{ collec.code_category.ar_label }}{% if order.is_approved == True %}<ul class="list-inline"><li class="entypo-docs"><a href="{% url 'niqati:download_coupons' collec.pk %}">كوبونات</a></li><li class="entypo-link"><a href="{% url 'niqati:download_links' collec.pk %}">روابط</a></li></ul>{% endif %}
 			            </li>
 			        {% endfor %}   
 			        </ul>

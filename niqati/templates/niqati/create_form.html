@@ -1,3 +1,4 @@
+{% load bootstrap3 %}
 <form method="post" action="{% url 'activities:niqati_orders' activity.pk %}" class="form-inline">
     <style>
         .form-inline .form-control {
@@ -5,55 +6,7 @@
         }
     </style>
     {% csrf_token %}
-<div class="row">
-    <div class="col-md-2">
-        {{ form.episode }}
-    </div>
-    <div class="col-md-2">
-        <div class="form-group{% if form.idea.errors %} has-error{% endif %}">
-            <div class="row">
-            <div class="col-md-5 col-md-offset-1">
-                <h5>{{ form.idea.label }}</h5>
-            </div>
-            <div class="col-md-6">
-                <div class="row">
-                {{ form.idea }}
-                </div>
-            </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-2">
-        <div class="form-group{% if form.organizer.errors %} has-error{% endif %}">
-            <div class="row">
-            <div class="col-md-6">
-                <h5>{{ form.organizer.label }}</h5>
-            </div>
-            <div class="col-md-6">
-                <div class="row">
-                {{ form.organizer }}
-                </div>
-            </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-2">
-        <div class="form-group{% if form.participant.errors %} has-error{% endif %}">
-            <div class="row">
-            <div class="col-md-6">
-                <h5>{{ form.participant.label }}</h5>
-            </div>
-            <div class="col-md-6">
-                <div class="row">
-                {{ form.participant }}
-                </div>
-            </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-2">
-        {{ form.delivery_type }}
-    </div>
+     {% bootstrap_form form %}
     <div class="col-md-2">
         <button type="submit" class="btn btn-block btn-default btn-green">
             أرسل

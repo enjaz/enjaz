@@ -4,7 +4,7 @@ from django.contrib import admin
 from niqati.models import Code, Code_Collection, Code_Order
 
 class CodeAdmin(admin.ModelAdmin):
-    list_display = ('code_string', 'collection__parent_order__episode', 'ordering_club', 'collection__code_category', 'user', 'redeem_date',)
+    #list_display = ('code_string', 'collection__parent_order__episode', 'ordering_club', 'collection__code_category', 'user', 'redeem_date',)
 
     def ordering_club(self, obj):
         return obj.episode.activity.primary_club.name
@@ -12,7 +12,7 @@ class CodeAdmin(admin.ModelAdmin):
 class CodeCollectionAdmin(admin.TabularInline):
     model = Code_Collection
     extra = 0
-    readonly_fields = ('code_category', 'code_count', 'delivery_type', 'approved', 'date_created', 'admin_asset_link', )
+    #readonly_fields = ('code_category', 'code_count', 'approved', 'date_created', 'admin_asset_link', )
     exclude = ('asset', )
 
 class CodeOrderAdmin(admin.ModelAdmin):

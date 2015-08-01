@@ -3,32 +3,67 @@
 
 from django import forms
 # from django.core.exceptions import ValidationError
-from niqati.models import Code_Collection  #, Code
+from niqati.models import Code_Order, Code_Collection, Category, Code
 
 class OrderForm(forms.Form):
     def __init__(self, *args, **kwargs):
-        assert "activity" in kwargs, "Kwarg 'activity' is required."
-        activity = kwargs.pop("activity", None)
+        assert 'activity' in kwargs, "Kwarg 'activity' is required."
+        assert 'user' in kwargs, "Kwarg 'user' is required."
+        self.activity = kwargs.pop("activity", None)
+        self.user = kwargs.pop("user", None)
         super(OrderForm, self).__init__(*args, **kwargs)
-        self.fields['episode'] = forms.ModelChoiceField(activity.episode_set.all(), empty_label=u"اختر موعدًا ")
-        for field in self.fields:
-            self.fields[field].widget.attrs['class'] = 'form-control popover-default'
-            if isinstance(self.fields[field], forms.IntegerField):
-                self.fields[field].widget.attrs['data-toggle'] = 'popover'
-                self.fields[field].widget.attrs['data-trigger'] = 'focus'
-                self.fields[field].widget.attrs['data-placement'] = 'left'
-                self.fields[field].widget.attrs['data-original-title'] = u"ملاحظة"
-                self.fields[field].widget.attrs['data-content'] = u"لأفضل نتائج عند طلب كوبونات نقاطي، يرجى مراعاة ألا يزيد مجموع الكوبونات في الطلب عن ١٠٠-١٥٠ كوبون. " + \
-                                                                  u"في حال كون الطلب يتجاوز ذلك، يرجى تقسيمه على أكثر من طلب."
-
-    idea = forms.IntegerField(label=u"الفكرة", help_text=u"عدد نقاط الفكرة", required=False, initial=0,
+        episodes = self.activity.episode_set.all()
+        if episodes.count() == 1:
+            initial = episodes.first().pk
+        else:
+            initial = None
+        self.fields['episode'] = forms.ModelChoiceField(episodes, label=u"الموعد", empty_label=u"اختر موعدًا ", initial=initial)
+        for category in Category.objects.all():
+            self.fields["category_%s" % category.pk] = forms.IntegerField(label=category.ar_label, required=False, initial=0,
                               min_value=0)
-    organizer = forms.IntegerField(label=u"المنظمون", help_text=u"عدد نقاط التنظيم", required=False, initial=0,
-                                   min_value=0)
-    participant = forms.IntegerField(label=u"المشاركون", help_text=u"عدد نقاط المشاركة", required=False, initial=0,
-                                     min_value=0)
-    delivery_type = forms.ChoiceField(label=u"طريقة التسليم",
-                                      choices=Code_Collection.DELIVERY_TYPE_CHOICES)
+            # `clean()` (below) will make sure that at least one field has a non-zero value.
+
+    def clean(self):
+        """
+        Make sure that at least one category has a non-zero value.
+        """
+        cleaned_data = super(OrderForm, self).clean()
+
+        # If all the values are either 0's or None's (no non-zero values), raise a validation error
+        if all([(cleaned_data[field] is None or cleaned_data[field] == 0) for field in cleaned_data]):
+            raise forms.ValidationError(u"أدخل، على الأقل، قيمة واحدة أكبر من الصفر.")
+
+        # Replace None's with 0's
+        for field in cleaned_data:
+            if cleaned_data[field] is None:
+                cleaned_data[field] = 0
+
+        return cleaned_data
+
+    def save(self):
+        reviewing_parent = self.activity.primary_club.get_next_niqati_reviewing_parent()
+        print "next_niqati_reviewing_parent", reviewing_parent # REMOVE
+        order = Code_Order.objects.create(episode=self.cleaned_data['episode'],
+                                          assignee=reviewing_parent,
+                                          submitter=self.user)
+
+        # No need to keep the episode.
+        del self.cleaned_data['episode']
+        
+        print self.cleaned_data # REMOVE
+        
+        for field_name in self.cleaned_data:
+            count = self.cleaned_data[field_name]
+            category = Category.objects.get(pk=int(field_name.split("_")[-1]))
+            if not count: # If zero, skip
+                continue
+            Code_Collection.objects.create(code_count=count,
+                                           code_category=category,
+                                           parent_order=order)
+
+        return order
+
+
 
 class RedeemCodeForm(forms.Form):
     string = forms.CharField(label="")

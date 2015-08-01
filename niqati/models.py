@@ -42,7 +42,13 @@ class Code(models.Model):
                              null=True,
                              on_delete=models.SET_NULL)
     code_string = models.CharField(max_length=16, unique=True) # a 16-digit string, unique throughout all the db
-    points = models.PositiveSmallIntegerField()
+    points = models.PositiveSmallIntegerField(default=0)
+
+    # To document the reason for manually-added codes.
+    note = models.CharField(max_length=200, blank=True)
+
+    # Obsolete
+    category = models.ForeignKey(Category, null=True, blank=True)
 
     # Generation-related
     collection = models.ForeignKey('Code_Collection', null=True,
@@ -61,7 +67,7 @@ class Code(models.Model):
 
     objects = CodeQuerySet.as_manager()
     
-    # To be removed
+    # Obsolete
     asset = models.CharField(max_length=300, blank=True) # either (1) short link or (2) link to QR (depending on delivery_type of parent collection)
 
     def __init__(self, *args, **kwargs):
@@ -76,11 +82,10 @@ class Code(models.Model):
             chars = string.ascii_uppercase + string.digits
             while True:
                 random_string = ''.join(random.choice(chars) for i in range(CODE_STRING_LENGTH))
-                # If the string is unique, then break the
-                # loop. Otherwise keep generating random strings.
+                # If the string is unique, break the loop.
                 if not self.__class__.objects.filter(code_string=random_string).exists():
                     break
-            self.string = random_string
+            self.code_string = random_string
 
             if self.year is None:
                 self.year = StudentClubYear.objects.get_current()
@@ -117,24 +122,17 @@ class Code(models.Model):
 
 
 class Code_Collection(models.Model): # group of codes that are (1) of the same type & (2) of the same Code_Order
-
-    DELIVERY_TYPE_CHOICES = (
-        (COUPON, u"كوبونات"),
-        (SHORT_LINK, u"روابط قصيرة"),
-    )
-
     # Generation-related
     code_category = models.ForeignKey(Category)
     code_count = models.PositiveSmallIntegerField()
     parent_order = models.ForeignKey('Code_Order') # --- relation to activity is through the Code_Order
+
     # Approval choices:
     #   None: Unreviewed
     #   True: Approved
     #   False: Rejected
     approved = models.NullBooleanField(default=None) # for idea codes
 
-    # Delivery-related
-    delivery_type = models.CharField(max_length=1, choices=DELIVERY_TYPE_CHOICES)
     date_downloaded = models.DateTimeField(null=True, blank=True, verbose_name=u"تاريخ التنزيل")
 
     # To be removed:
@@ -156,57 +154,43 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
 class Code_Order(models.Model): # consists of one Code_Collection or more
     episode = models.ForeignKey(Episode, verbose_name=u"الموعد")
     date_ordered = models.DateTimeField(auto_now_add=True)
+    assignee = models.ForeignKey('clubs.Club', null=True, blank=True,
+                                 on_delete=models.SET_NULL,
+                                 related_name='assigned_niqati_orders',
+                                 verbose_name=u"النادي المسند")
     submitter = models.ForeignKey(User, null=True,
                                   on_delete=models.SET_NULL,
                                   related_name="submitted_code")
-    date_reviewed = models.DateTimeField(null=True, blank=True,
-                                         verbose_name=u"تاريخ المراجعة")
-    reviewer_club = models.ForeignKey('clubs.Club', related_name="reviewed_niqati_orders",
-                                      limit_choices_to={'can_review_niqati': True},
-                                      verbose_name=u"النادي المراجِع",
-                                      null=True)
-    reviewer = models.ForeignKey(User, null=True,
-                                 on_delete=models.SET_NULL,
-                                 related_name="reviewed_code")
 
-    def process(self, host):
-        for collec in self.code_collection_set.all():
-            collec.process(host)
-        self.save()
+    # Approval choices:
+    #   None: Unreviewed
+    #   True: Approved
+    #   False: Rejected
+    is_approved = models.NullBooleanField(default=None)
 
-        # Send email notification after code generation
-        email_context = {'order': self}
-        mail.send(get_club_notification_to(self.episode.activity),
-                  cc=get_club_notification_cc(self.episode.activity),
-                  template="niqati_order_approve",
-                  context=email_context)
-    
+    # Obsolete
     def is_reviewed(self):
         if len(self.code_collection_set.filter(approved=None)) == 0:
             return True
         else:
             return False
 
-    def get_delivery_type(self):
-        # This is a dirty hack, should be fixed later
-        return self.code_collection_set.first().delivery_type
-
-    def is_approved(self):
-        # Might be a dirty hack as well
-        return all([collec.approved for collec in self.code_collection_set.all()])
-
-    def is_processed(self):
-        return all([collec.date_created is not None for collec in self.code_collection_set.all()])
-
-    def mark_as_processed(self):
+    # Obsolete (=unused_ 
+    def get_categories(self):
         """
-        Mark the code collections constituting the current order as processed.
-        This is to prevent troublesome orders from causing delays in the generation queue.
+        Iterate over the categories includes in this order.
+        Yield a queryset for each category including the codes within this order that are of that category.
         """
-        for collec in self.code_collection_set.all():
-            if collec.date_created is None:
-                collec.date_created = timezone.now()
-                collec.save()
+        for category in Category.objects.all():
+            if self.codes.filter(category=category).exists():
+                yield self.codes.filter(category=category)
+        
+    def create_codes(self):
+        for collection in self.code_collection_set.all():
+            points = collection.code_category.points
+            for i in range(collection.code_count):
+                Code.objects.create(points=points,
+                                    collection=collection)
 
     def __unicode__(self):
         return self.episode.__unicode__()
@@ -219,3 +203,23 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
         )
         verbose_name = u"طلب نقاط"
         verbose_name_plural = u"طلبات النقاط"
+
+class Review(models.Model):
+    date_reviewed = models.DateTimeField(null=True, blank=True,
+                                         verbose_name=u"تاريخ المراجعة",
+                                         auto_now_add=True)
+    reviewer_club = models.ForeignKey('clubs.Club', related_name="reviewed_niqati_orders",
+                                      limit_choices_to={'can_review_niqati': True},
+                                      verbose_name=u"النادي المراجِع",
+                                      null=True)
+    reviewer = models.ForeignKey(User, null=True,
+                                 on_delete=models.SET_NULL,
+                                 related_name="reviewed_niqati_orders")
+    order = models.ForeignKey('Code_Order', null=True,
+                                   blank=True,
+                                   on_delete=models.SET_NULL)
+    # Approval choices:
+    #   None: Unreviewed
+    #   True: Approved
+    #   False: Rejected
+    is_approved = models.NullBooleanField(default=None) # for idea codes

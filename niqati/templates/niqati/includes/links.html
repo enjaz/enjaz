@@ -1,0 +1,16 @@
+<!DOCTYPE html>{% load niqati_tags %}
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>{{ collection }}</title>
+</head>
+<body>
+    <h2>{{ collection.code_category.name }}</h2>
+
+    <ol>
+    {% for code in collection.code_set.all %}
+        <li>{% get_short_link domain endpoint code %}</li>
+    {% endfor %}
+    </ol>
+</body>
+</html>

@@ -3,9 +3,31 @@
 <head lang="ar">
     <meta charset="UTF-8">
     <script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'neon/assets/css/bootstrap.min.css' %}">
     <title>{{ collection }}</title>
+    <style>
+body {
+    font-size: 16px;
+    direction: rtl;
+}
+
+#link-list{
+    direction: ltr;   
+}
+
+#generating{
+    display: none;
+    text-align: center;
+    font-size: 20px;
+
+}
+    </style>
 </head>
 <body>
+<div class="container">
+	<div class="row">
+		<div class="col-sm-4 col-sm-offset-4"">
+<p id="generating" class="alert alert-warning">النقاط تُولّد...</p>
     <h2>{{ collection.code_category.name }}</h2>
 
     <ol id="link-list">
@@ -15,9 +37,21 @@
         {% endif %}
     {% endfor %}
     </ol>
+		</div>
+	</div>
+</div>
 <script>
 $(function() {
-    var code_pks = [{% for code in collection.code_set.all %}{% if not code.short_link %}{{ code.pk }},{% endif %}{% endfor %}]
+    var code_pks = [{% for code in collection.code_set.all %}{% if not code.short_link %}{{ code.pk }},{% endif %}{% endfor %}];
+    var remaining_pks = code_pks;
+    if (code_pks.length){
+        $('#generating').show('slow');
+    }
+    function remvoveNote(){
+        if (!remaining_pks.length){
+            $('#generating').hide('slow');
+        }
+    }
     $.each(code_pks, function(index, pk){
         $.ajax({
             type: 'POST',
@@ -28,6 +62,9 @@ $(function() {
             success: function(data){
                 if (data['success'] == true){
                     $('#link-list').append('<li><a href="' + data['url'] + '">' + data['url'] + '</a></li>')
+                    var index = remaining_pks.indexOf(pk);
+                    remaining_pks.splice(index, 1);
+                    remvoveNote();
                 } else {
                     alert(data['message']);
                 }

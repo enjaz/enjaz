@@ -42,26 +42,9 @@ def show(request, club_id):
     if request.user.has_perm('activities.view_activity') or \
        request.user.has_perm('activities.add_presidency_review') or \
        is_coordinator_or_member(club, request.user):
-        activities = club.primary_activity.all()
-
-    elif request.user.has_perm('activities.add_deanship_review'):
-        activities = club.primary_activity.filter(review__reviewer_club=get_presidency(), review__is_approved=True)
-
+        activities = club.primary_activity.all().current_year()
     else:
-        activities = club.primary_activity.approved()
-
-    # If the user has the view_activity permission, is a member or is
-    # the coordinator of the given club, they will be able to see all
-    # related activities regardless fo their status.  Otherwise, only
-    # see the approved ones.
-    # if request.user.is_authenticated() and \
-    #    (request.user.has_perm('activities.view_activity') or \
-    #     club in request.user.memberships.all() or \
-    #     club in request.user.coordination.all()):
-    #     activities = club.primary_activity.all() | club.secondary_activity.all()
-    # else:
-    #     activities = club.primary_activity.filter(review__is_approved=True) |\
-    #                  club.secondary_activity.filter(review__is_approved=True)
+        activities = club.primary_activity.current_year().approved()
 
     can_edit = is_coordinator(club, request.user) or \
                request.user.has_perm('clubs.change_club')

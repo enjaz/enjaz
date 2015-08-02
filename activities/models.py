@@ -1,4 +1,6 @@
 # -*- coding: utf-8  -*-
+import os
+
 from django.contrib.contenttypes.generic import GenericRelation
 from django.db import models
 from django.contrib.auth.models import User
@@ -21,6 +23,11 @@ class Activity(models.Model):
     secondary_clubs = models.ManyToManyField('clubs.Club', blank=True,
                                             related_name="secondary_activity",
                                             verbose_name=u"الأندية المتعاونة")
+    chosen_reviewer_club = models.ForeignKey('clubs.Club', null=True,
+                                             blank=True,
+                                             on_delete=models.SET_NULL,
+                                             related_name='chosen_reviewer_activities',
+                                             verbose_name=u"الكلية المراجعة")
     name = models.CharField(max_length=200, verbose_name=u"اسم النشاط")
     description = models.TextField(verbose_name=u"وصف النشاط")
     public_description = models.TextField(verbose_name=u"الوصف الإعلامي",
@@ -94,7 +101,7 @@ class Activity(models.Model):
             return None
 
     def update_is_approved(self):
-        reviewer_count = Club.objects.reviewing_parents(self.primary_club).count()
+        reviewer_count = Club.objects.activity_reviewing_parents(self).count()
         # If the club has no parents, activity is approved
         # automatically
         if not self.primary_club.parent:
@@ -254,6 +261,8 @@ class Review(models.Model):
                                             verbose_name=u"ملاحظات على عدد المشاركين")
     organizers_notes = models.TextField(blank=True,
                                         verbose_name=u"ملاحظات على عدد المنظمين")
+    attachment_notes = models.TextField(blank=True,
+                                             verbose_name=u"ملاحظات على المستندات المرفقة")
     submission_date_notes = models.TextField(blank=True,
                                              verbose_name=u"ملاحظات على تاريخ تقديم الطلب")
     review_type_choices = (
@@ -459,3 +468,18 @@ class Evaluation(models.Model):
     class Meta:
         verbose_name = u"تقييم"
         verbose_name_plural = u"التقييمات"
+
+class Attachment(models.Model):
+    activity = models.ForeignKey(Activity)
+    description = models.CharField(max_length=200, verbose_name=u"الوصف", blank=True)
+    preview = models.FileField(verbose_name=u"معاينة", upload_to="activity_attachment_previews/")
+    document = models.FileField(verbose_name=u"المستند", upload_to="activity_attachments/")
+    submitter = models.ForeignKey(User)
+    submission_date = models.DateTimeField(u'تاريخ الإرسال',
+                                           auto_now_add=True)
+
+    def filename(self):
+        return os.path.basename(self.document.name)
+
+    def __unicode__(self):
+        return self.filename()

@@ -10,7 +10,7 @@ from django.db.models import Q
 from post_office import mail
 
 from activities.models import Activity, Review, Episode
-from activities.forms import ActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm
+from activities.forms import ActivityForm, ReviewerActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm, AttachmentFormSet
 from accounts.utils import get_user_gender
 from activities.utils import get_club_notification_to, get_club_notification_cc
 from clubs.models import Club
@@ -136,9 +136,19 @@ def show(request, activity_id):
 
     # If the activity is approved, everyone can see it.  If it is not,
     # only the head of the Student Club, the Media Team, the members
-    # of the related clubs and the person who submitted it can see it.    
+    # of the related clubs and the person who submitted it can see it.
     if request.user.is_authenticated():
         user_clubs = get_user_clubs(request.user)
+
+        # Save a click, redirect reviewers to the appropriate
+        # reviewing page.
+        reviewing_parents = Club.objects.activity_reviewing_parents(activity)
+        user_reviewing_clubs = reviewing_parents.filter(coordinator=request.user) | \
+                               reviewing_parents.filter(deputies=request.user)
+        if user_reviewing_clubs.exists():
+            reviewer_club = user_reviewing_clubs.first()
+            return HttpResponseRedirect(reverse('activities:review',
+                                                args=(activity.pk, reviewer_club.pk)))
 
         # Anyone can view forms; yet due to URL reversing issues it has to be restricted to this view only
         # Otherwise, we'll end up having to specify the `current_app` attribute for every view that contains a link
@@ -182,28 +192,42 @@ def create(request):
     # presidency group)
     user_coordination = get_user_coordination_and_deputyships(request.user)
     if not request.user.has_perm("activities.add_activity") and not user_coordination:
-        raise PermissionDenied
+        raise PermissionDenied        
     
-    # (2) Check if the user's club has no more than 3 overdue follow-up reports.
-    # If any club coordinated by the user exceeds the 3-report threshold,
-    # prevent new activity submission (again in reality the user will only coordinate
-    # one club)
+    # (2) Check if the user's club has no more than 3 overdue
+    # follow-up reports.  If any club coordinated by the user exceeds
+    # the 3-report threshold, prevent new activity submission (again
+    # in reality the user will only coordinate one club)
     if any([club.get_overdue_report_count() > MAX_OVERDUE_REPORTS for club in user_coordination]):
         raise PermissionDenied
-    
+
+    if user_coordination.exists():
+        user_club = user_coordination.first()
+
     if request.method == 'POST':
         # DirectActivityForm get to choose what club to submit the
         # activity under.  Normal users shouldn't.
         can_directly_add = request.user.has_perm('activities.directly_add_activity')
+        attachment_formset = AttachmentFormSet(request.POST, request.FILES)
         if can_directly_add:
             activity = Activity(submitter=request.user)
             form = DirectActivityForm(request.POST, instance=activity)
         else:
-            user_club = user_coordination[0]
             activity = Activity(submitter=request.user, primary_club=user_club)
-            form = ActivityForm(request.POST, instance=activity)
-        if form.is_valid():
+            if user_club.possible_parents.exists():
+                # If there are multiple possible parents, all the user to choose.
+                form = ReviewerActivityForm(request.POST, instance=activity)
+                form.fields['chosen_reviewer_club'].queryset = user_club.possible_parents.all()
+            else:
+                form = ActivityForm(request.POST, instance=activity)
+        if form.is_valid() and attachment_formset.is_valid():
             form_object = form.save()
+            attachment_formset.instance = form_object
+            attachments = attachment_formset.save(commit=False)
+            for attachment in attachments:
+                attachment.submitter = request.user
+                attachment.save()
+
             # If the user can directly add activities, make the
             # activity automatically approved.  Otherwise, email the
             # reviewing parent.
@@ -211,7 +235,10 @@ def create(request):
                 form_object.is_approved = True
                 form_object.assignee = None
             else:
-                reviewing_parent = form_object.primary_club.get_next_reviewing_parent()
+                if 'chosen_reviewer_club' in form.cleaned_data:
+                    reviewing_parent = form.cleaned_data['chosen_reviewer_club']
+                else:
+                    reviewing_parent = form_object.primary_club.get_next_reviewing_parent()
 
                 if not reviewing_parent:
                     form_object.is_approved = True
@@ -231,15 +258,19 @@ def create(request):
             form_object.save()
             return HttpResponseRedirect(reverse('activities:list'))
         else:
-            context = {'form': form}
+            context = {'form': form,
+                       'attachment_formset': attachment_formset}
             return render(request, 'activities/new.html', context)
     elif request.method == 'GET':
-        context = {}
+        context = {'attachment_formset': AttachmentFormSet()}
         if request.user.has_perm("activities.directly_add_activity"):
             form = DirectActivityForm()
         else:
-            form = ActivityForm()
-            user_club = user_coordination[0]
+            if user_club.possible_parents.exists():
+                form = ReviewerActivityForm()
+                form.fields['chosen_reviewer_club'].queryset = user_club.possible_parents.all()
+            else:
+                form = ActivityForm()
             context['user_club'] = user_club
         context['form'] = form
         return render(request, 'activities/new.html', context)
@@ -253,6 +284,9 @@ def edit(request, activity_id):
         raise PermissionDenied
 
     if request.method == 'POST':
+        attachment_formset = AttachmentFormSet(request.POST,
+                                               request.FILES,
+                                               instance=activity)
         if request.user.has_perm('activities.directly_add_activity'):
             modified_activity = DirectActivityForm(request.POST,
                                                    instance=activity)
@@ -260,14 +294,48 @@ def edit(request, activity_id):
              has_coordination_to_activity(request.user, activity):
             modified_activity = DisabledActivityForm(request.POST,
                                                      instance=activity)
+        elif activity.primary_club.possible_parents.exists():
+            modified_activity = ReviewerActivityForm(request.POST, instance=activity)
+            modified_activity.fields['chosen_reviewer_club'].queryset = activity.primary_club.possible_parents.all()
         else:
             modified_activity = ActivityForm(request.POST,
                                              instance=activity)
         # Should check that edits are valid before saving
-        if modified_activity.is_valid():
+        if modified_activity.is_valid() and attachment_formset.is_valid():
             modified_activity.save()
-            # If the edit has been done in response to a review, send a notification email
-            if activity.assignee == activity.primary_club:
+
+            # Handle attachments
+            attachments = attachment_formset.save(commit=False)
+            for changed_attachment in attachment_formset.changed_objects:
+                changed_attachment.save()
+            for new_attachment in attachment_formset.new_objects:
+                # Just in case an attachment was uploaded by a user
+                # other than the original activity submitter, we need
+                # to document that.
+                new_attachment.submitter = request.user
+                new_attachment.save()
+            for deleted_attachment in attachment_formset.deleted_objects:
+                deleted_attachment.delete()
+            
+            # If the choesn reviewer club was changed, the new one
+            # should be the assignee (i.e. reset the stage), send them
+            # a notification, and no notification should be sent to
+            # that pending review club. Otherwise, if the edit has
+            # been done in response to a review, send a notification
+            # email to the pending review club.
+            if 'chosen_reviewer_club' in modified_activity.changed_data:
+                chosen_reviewer_club = modified_activity.cleaned_data['chosen_reviewer_club']
+                activity.assignee = chosen_reviewer_club
+                show_activity_url = reverse('activities:show', args=(activity.pk,))
+                full_url = request.build_absolute_uri(show_activity_url)
+                email_context = {'activity': activity,
+                                 'full_url': full_url,
+                                 'reviewer_club': chosen_reviewer_club}
+                if chosen_reviewer_club.coordinator:
+                    mail.send([chosen_reviewer_club.coordinator.email],
+                               template="activity_submitted",
+                               context=email_context)
+            elif activity.assignee == activity.primary_club:
                 pending_review = activity.review_set.get(is_approved=None)
                 activity.assignee = pending_review.reviewer_club
                 activity.save()
@@ -280,13 +348,17 @@ def edit(request, activity_id):
                 mail.send([pending_review.reviewer.email],
                           template="activity_edited_to_reviewer",
                           context=email_context)
+
             return HttpResponseRedirect(reverse('activities:show',
                                                 args=(activity.pk, )))
         else:
-            context = {'form': modified_activity, 'activity_id': activity_id,
+            context = {'form': modified_activity,
+                       'activity_id': activity_id,
+                       'attachment_formset': attachment_formset,
                        'edit': True}
             return render(request, 'activities/new.html', context)
     else:
+        attachment_formset = AttachmentFormSet(instance=activity)
         # There are different activity forms depending on what
         # permission the user has.  Presidency group members
         # (i.e. with directly_add_activity) can add activities
@@ -298,10 +370,14 @@ def edit(request, activity_id):
         elif not activity.is_editable and \
              has_coordination_to_activity(request.user, activity):
             form = DisabledActivityForm(instance=activity)
+        elif activity.primary_club.possible_parents.exists():
+            form = ReviewerActivityForm(instance=activity)
+            form.fields['chosen_reviewer_club'].queryset = activity.primary_club.possible_parents.all()
         else:
             form = ActivityForm(instance=activity)
         context = {'form': form, 'activity_id': activity_id,
-                   'activity': activity, 'edit': True}
+                   'activity': activity, 'edit': True,
+                   'attachment_formset': attachment_formset}
         return render(request, 'activities/new.html', context)
 
 @login_required
@@ -339,7 +415,7 @@ def review(request, activity_id, reviewer_id):
     # (3) Employee responsible for the club that owns the activity. (READ)
     # (4) Superuser. (WRITE)
 
-    reviewing_parents = Club.objects.reviewing_parents(activity.primary_club)
+    reviewing_parents = Club.objects.activity_reviewing_parents(activity)
 
     # Is the passed reviewer club a member of the activity owner's
     # reviewer parents? If not, raise a 404 error.

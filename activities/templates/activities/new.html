@@ -6,28 +6,9 @@
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 {% if edit and not activity.is_editable and request.user|has_coordination_to_activity:activity %}<p class="bg-warning">{% if activity.is_approved %}اعتمد{% else %}مُعلّق{% endif %} هذا النشاط، ولم يعد ممكنا تعديله.  ستتمكن من تعديل {{ form.fields.public_description.label }} فقط.</p>{% endif %}
-<form action="{% if edit %}{% url 'activities:edit' activity_id %}{% else %}{% url 'activities:create' %}{% endif %}" method="post" class="form">
-{% csrf_token %}
-
-	{% comment %}------start_experimental------{% endcomment %}
-	
-	{% comment %}
-	
-	{% regroup form.fields by group as field_groups %}
-	{% for group in field_groups %}
-	<div class="group_{{ group.grouper }}">
-	  {% for field in group.list %}
-	    {% bootstrap_field field %}
-	  {% endfor %}
-	</div>
-	{% endfor %}
-	
-	{% endcomment %}
-	
-	{% comment %}------end_experimental------{% endcomment %}
-	
+<form action="{% if edit %}{% url 'activities:edit' activity_id %}{% else %}{% url 'activities:create' %}{% endif %}" method="post" class="form" enctype="multipart/form-data">
+    {% csrf_token %}
 	{% bootstrap_form form %}
-	
 	<div id="episode_panel" class="panel panel-primary" data-collapsed="0">
 			
 			<!-- panel head -->
@@ -40,8 +21,45 @@
 			</div>
 			
 			<!-- panel body -->
-		</div>
-	
+    </div>
+    <h4>المستندات المرفقة</h4>
+    {# -------- #}
+    {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
+    {{ attachment_formset.management_form }}
+    {{ attachment_formset.non_form_errors.as_ul }}
+    <table id="attachment-formset" class="form" style="width: 100%;">
+    {% for form in attachment_formset.forms %}
+      {% if forloop.first %}
+        <colgroup>
+            <col class="col-xs-8">
+            <col class="col-xs-4">
+        </colgroup>
+      <thead><tr>
+        {% for field in form.visible_fields %}
+        <th>{{ field.label|capfirst }}</th>
+        {% endfor %}
+      </tr></thead>
+      {% endif %}
+      <tr class="form-container">
+      {% for field in form.visible_fields %}
+        <td>
+        {# Include the hidden fields in the form #}
+        {% if forloop.first %}
+          {% for hidden in form.hidden_fields %}
+          {{ hidden }}
+          {% endfor %}
+        {% endif %}
+            <div class="form-group">
+          {{ field.errors.as_ul }}
+          {{ field }}
+            </div>
+        </td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+    </table>
+    <hr>
+    {# ------- #}
     {% buttons %}
     	<button type="submit" class="btn btn-primary btn-block">
     		{% bootstrap_icon "ok-sign" %} أرسل
@@ -304,7 +322,17 @@ function updateEpisodes() {
 {% endblock %}
 
 {% block customscript %}
-<!-- <script src="{% static 'neon/assets/js/bootstrap-datepicker.js' %}"></script> -->
+<script src="{% static 'js/jquery.formset.js' %}"></script>
 <script src="{% static 'neon/assets/js/bootstrap-timepicker.min.js' %}"></script>
+<script>
+    // add formset controls
+    $("#attachment-formset .form-container").formset({
+        prefix: '{{ attachment_formset.prefix }}',
+        addText: 'أضف مستندًا',
+        deleteText: 'احذف',
+        addCssClass: 'add-row btn btn-xs btn-primary',
+        deleteCssClass: 'delete-row btn btn-xs btn-default',
+    });
+</script>
 {% endblock %}
 

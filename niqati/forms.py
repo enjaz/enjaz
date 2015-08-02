@@ -1,6 +1,10 @@
 # -*- coding: utf-8  -*-
 """Forms for Niqati app."""
 
+import datetime
+from django.contrib import messages
+from django.utils import timezone
+
 from django import forms
 # from django.core.exceptions import ValidationError
 from niqati.models import Code_Order, Code_Collection, Category, Code
@@ -85,51 +89,79 @@ class RedeemCodeForm(forms.Form):
 
         # first, check that code exists
         try:
-            code = Code.objects.get(code_string=code_string)
+            self.code = Code.objects.get(code_string=code_string)
         except Code.DoesNotExist:
             raise forms.ValidationError(u"هذا الرمز غير صحيح.", code="DoesNotExist")
 
         # next, check that code is available
-        if code.user == self.user:
+        if self.code.user == self.user:
             raise forms.ValidationError(u"سبق أن استخدمت هذا الرمز", code="Used")
-        if code.user is not None:
+        elif self.code.user:
             raise forms.ValidationError(u"هذا الرمز غير متوفر.", code="Unavailable")
         else:
-            # finally, check that user doesn't have another code
-            # in the same episode, unless the episode allows this
-            # to happen.
-            if not code.collection.parent_order.episode.allow_multiple_niqati:
-                if Code.objects.filter(collection__parent_order__episode=code.collection.parent_order.episode,
-                                       user=self.user).exists():
-                    raise forms.ValidationError(u"لديك رمز آخر في نفس النشاط.", code="HasOtherCode")
-
+            # finally, check that user doesn't have another code in
+            # the same episode, unless the episode allows this to
+            # happen.  If they do have another code, but the new one
+            # has higher point, replace it.
+            if not self.code.collection.parent_order.episode.allow_multiple_niqati:
+                other_codes = Code.objects.filter(collection__parent_order__episode=self.code.collection.parent_order.episode,
+                                                  user=self.user)
+                if other_codes.exists():
+                    self.other_code = other_codes.first()
+                    if self.other_code.points > self.code.points:
+                        raise forms.ValidationError(u"لديك رمز آخر في نفس النشاط، وبنقاط أعلى.", code="HasOtherCode")
+                    elif self.other_code.points == self.code.points:
+                        raise forms.ValidationError(u"لديك رمز آخر في نفس النشاط، وبنفس مقدار النقاط.", code="HasOtherCode")
+                else:
+                    self.other_code = None
 
         return code_string
 
+    def clean(self):
+        """
+        Make sure that it hasn't been two weeks since the episode ended.
+        """
+        cleaned_data = super(RedeemCodeForm, self).clean()
+        # Check that we indeed have a valid string, and that the code
+        # is part of collection
+        if 'string' in cleaned_data and \
+           self.code.collection and \
+           timezone.now().date() > self.code.collection.parent_order.episode.end_date + datetime.timedelta(14):
+            message = u"مضى أكثر من أسبوعين على انتهاء النشاط ولم يعد ممكنا إدخال نقاطي!"
+            message_level = messages.ERROR
+            #return (message_level, message)
+
+            raise forms.ValidationError(u"مضى أكثر من أسبوعين على انتهاء النشاط ولم يعد ممكنا إدخال نقاطي!", code="TwoWeeks")
+
+        return cleaned_data
+    
     def process(self):
         """
         Register the submitted code for the submitting user if the submission is valid; otherwise do nothing.
         In both cases, return an appropriate message.
         :return: a tuple containing a message type and a message.
         """
-        # TODO:
-        # * If the user already has a code, count the one with more
-        #   points. (Already implemented before redesign) [20150712]
         if self.is_valid():
-            code = Code.objects.get(code_string=self.cleaned_data['string'])
-            code.user = self.user
-            code.redeem_date = timezone.now()
-            code.save()
+            # If the user already has a code, count the one with more
+            # points.
+            if self.other_code:
+                self.other_code.user = None
+                self.other_code.save()
+                message = u"تم إدخال الرمز القديم برمز ذي نقاط أعلى."
+            else:
+                message = u"تم إدخال الرمز بنجاح."
+            message_level = messages.SUCCESS
 
-            self.code = code
+            new_code = Code.objects.get(code_string=self.cleaned_data['string'])
+            new_code.user = self.user
+            new_code.redeem_date = timezone.now()
+            new_code.save()
 
-            message = u"تم إدخال الرمز بنجاح."
-            message_type = messages.SUCCESS
-
+            self.code = new_code
         else:
             message = u"حصل خطأ ما."
-            message_type = messages.ERROR
+            message_level = messages.ERROR
 
             print self.fields['string'].errors.as_data()
 
-        return (message_type, message)
+        return (message_level, message)

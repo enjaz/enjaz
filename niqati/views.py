@@ -1,4 +1,7 @@
 # -*- coding: utf-8  -*-
+import requests
+import datetime
+
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
@@ -8,6 +11,7 @@ from django.contrib.sites.models import Site
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from django.utils.http import urlquote
 from django.db.models import Sum
 from django.core.exceptions import PermissionDenied
 from django.views.decorators import csrf
@@ -60,8 +64,8 @@ def redeem(request, code=""):
         if form.is_valid() and eval_form.is_valid():
             result = form.process()
             messages.add_message(request, *result)
-            eval_form.save(form.code.event, request.user)
-            return HttpResponseRedirect(reverse("codes:submit"))
+            eval_form.save(form.code.collection.parent_order.episode, request.user)
+            return HttpResponseRedirect(reverse("niqati:submit"))
     elif request.method == "GET":
         form = RedeemCodeForm(request.user, initial={'string': code})
         eval_form = EvaluationForm()
@@ -75,7 +79,7 @@ def student_report(request):
         return render(request, "niqati/submit_coordinators.html", context)
     else:
         # calculate total points
-        total_points = request.user.code_set.aggregate(total_points=Sum('points'))['total_points']
+        total_points = request.user.code_set.current_year().aggregate(total_points=Sum('points'))['total_points']
         if total_points is None:
             total_points = 0
         context = {'total_points': total_points}
@@ -98,7 +102,14 @@ def coordinator_view(request, activity_id):
     if not has_coordination_to_activity(request.user, activity) \
        and not request.user.is_superuser:
         raise PermissionDenied
-    
+
+    # If it has been two weeks since the end of the activity, don't
+    # alow niqati requests.
+    last_episode = activity.episode_set.order_by('-end_date', '-end_time').first()
+    if timezone.now().date() > last_episode.end_date + datetime.timedelta(14):
+        return render(request, 'niqati/activity_orders.html',
+                      {'activity': activity, 'active_tab': 'niqati',
+                       'error': 'closed'})
     if request.method == 'POST':
         form = OrderForm(request.POST, activity=activity, user=request.user)
         if form.is_valid():
@@ -145,11 +156,7 @@ def download_collection(request, pk, download_type):
                                                                    "domain": domain,
                                                                    "endpoint": endpoint})
     elif download_type == SHORT_LINK:
-        endpoint = "https://api-ssl.bitly.com/v3/shorten?format=txt&access_token=%(api_key)s&longUrl=" % {"api_key": settings.BITLY_KEY}
-
-        response = render(request, 'niqati/includes/links.html', {"collection": collection,
-                                                                 "domain": domain,
-                                                                 "endpoint": endpoint})
+        response = render(request, 'niqati/includes/links.html', {"collection": collection})
     # Mark codes as downloaded
     collection.date_downloaded = timezone.now()
 
@@ -168,7 +175,6 @@ def review_order(request):
     niqati_reviewers = Club.objects.niqati_reviewing_parents(order)
     user_clubs = niqati_reviewers.filter(coordinator=request.user) | \
                  niqati_reviewers.filter(deputies=request.user)
-    email_context = {'order': order}
 
     # Permission check
     if request.user.has_perm('activities.change_code'):
@@ -178,6 +184,8 @@ def review_order(request):
     else: # If not a superuser, nor has reviewer 
         raise PermissionDenied
 
+    email_context = {'order': order}
+    
     if action == 'accept':
         is_approved = True
 
@@ -256,3 +264,39 @@ def list_pending_orders(request):
 def general_report(request):
     users = User.objects.annotate(point_sum=Sum('code__category__points')).filter(point_sum__gt=0).order_by('-point_sum')
     return render(request, 'niqati/general_report.html', {'users': users})
+
+@login_required
+@csrf.csrf_exempt
+@decorators.ajax_only
+@decorators.post_only
+def get_short_url(request):
+    pk = request.POST.get('pk')
+    print pk
+    code = get_object_or_404(Code, pk=pk)
+    order = code.collection.parent_order
+    activity = order.episode.activity
+    niqati_reviewers = Club.objects.niqati_reviewing_parents(order)
+    user_clubs_niqati_reviewers = niqati_reviewers.filter(coordinator=request.user) | \
+                                  niqati_reviewers.filter(deputies=request.user)
+
+    # Only the coordinators and deputies of activities, niqati
+    # reviewers and the superuser are allowed to access this API.
+    if not has_coordination_to_activity(request.user, activity) and \
+       not user_clubs_niqati_reviewers.exists() and \
+       not request.user.is_superuser:
+        raise PermissionDenied
+
+    if not code.short_link:
+        endpoint = "https://api-ssl.bitly.com/v3/shorten?format=txt&access_token=%(api_key)s&longUrl=" % {"api_key": settings.BITLY_KEY}
+        domain = Site.objects.get_current().domain
+        domain =  'enjazportal.com' # REMOVE
+        full_url = urlquote("http://%s%s?code=%s" % (domain, reverse("niqati:submit"), code.code_string))
+        response = requests.get(endpoint + full_url)
+        short_link = response.text
+        if short_link == "RATE_LIMIT_EXCEEDED":
+            raise Exception("تعّر إنشاء أحد الروابط. حدّث الصفحة.")
+        code.short_link = short_link
+        code.save()
+
+    return {'url': code.short_link }
+

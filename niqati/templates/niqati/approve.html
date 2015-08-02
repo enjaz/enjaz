@@ -49,8 +49,11 @@
 <script>
 $(function() {
     $('.reject-order, .accept-order').click(function(){
+	// Remove action classes, to prevented repeated actions.
         var action = $(this).data('action');
         var pk = $(this).data('pk');
+        $('a[data-pk=' + pk + ']').removeClass('reject-order accept-order');
+        $('a[data-pk=' + pk + ']').addClass('disabled');
         var data = {'pk': pk, 'action': action};
         $.ajax({
             type: 'POST',
@@ -60,9 +63,12 @@ $(function() {
             cache: false,
             success: function(data){
                 if (data['success'] == true){
-                    $('#order-' + pk).hide('slow');
+                    $('#order-' + pk).hide('fast');
                 } else {
                     alert(data['message']);
+                    $('a[data-pk=' + pk + '][data-action=reject]').addClass('reject-order');
+                    $('a[data-pk=' + pk + '][data-action=accept]').addClass('accept-order');
+                    $('a[data-pk=' + pk + ']').removeClass('disabled');
                 }
             }
         });

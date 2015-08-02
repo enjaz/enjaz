@@ -60,7 +60,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='code',
             name='short_link',
-            field=models.URLField(null=True, verbose_name='\u0631\u0627\u0628\u0637 \u0642\u0635\u064a\u0631', blank=True),
+            field=models.URLField(default="", verbose_name='\u0631\u0627\u0628\u0637 \u0642\u0635\u064a\u0631', blank=True),
         ),
         migrations.AddField(
             model_name='code',

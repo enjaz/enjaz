@@ -63,32 +63,12 @@ class Code(models.Model):
 
     # to avoid generating a new link with each download, we'll store
     # the link in our db; no need to do the same for QRs.
-    short_link = models.URLField(verbose_name=u"رابط قصير", null=True, blank=True)
+    short_link = models.URLField(verbose_name=u"رابط قصير", blank=True, default="")
 
     objects = CodeQuerySet.as_manager()
     
     # Obsolete
     asset = models.CharField(max_length=300, blank=True) # either (1) short link or (2) link to QR (depending on delivery_type of parent collection)
-
-    def __init__(self, *args, **kwargs):
-        """
-        Generate a unique string for the current code.
-        """
-        super(Code, self).__init__(*args, **kwargs)
-
-        # If the code is new (not being loaded from db), then generate
-        # a unique string, and add a year.
-        if self.code_string == "":
-            chars = string.ascii_uppercase + string.digits
-            while True:
-                random_string = ''.join(random.choice(chars) for i in range(CODE_STRING_LENGTH))
-                # If the string is unique, break the loop.
-                if not self.__class__.objects.filter(code_string=random_string).exists():
-                    break
-            self.code_string = random_string
-
-            if self.year is None:
-                self.year = StudentClubYear.objects.get_current()
         
     def __unicode__(self):
         return self.code_string
@@ -131,21 +111,22 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
     #   None: Unreviewed
     #   True: Approved
     #   False: Rejected
+    # Obsolete
     approved = models.NullBooleanField(default=None) # for idea codes
 
     date_downloaded = models.DateTimeField(null=True, blank=True, verbose_name=u"تاريخ التنزيل")
 
-    # To be removed:
+    # Obsolete
     asset = models.FileField(upload_to='niqati/codes/') # either the PDF file for coupons or the list of short links (as txt/html?)
 
     def __unicode__(self):
         return self.parent_order.episode.__unicode__() + " - " + self.code_category.ar_label
     
-    def admin_asset_link(self):
+    def admin_coupon_link(self):
         if self.pk:
-            link = reverse('niqati:view_collec', args=(self.pk, ))
-            return "<a href='%s'>%s</a>" % (link, u"اعرض الملف المرفق")
-    admin_asset_link.allow_tags = True
+            link = reverse('niqati:download_coupons', args=(self.pk,))
+            return "<a href='%s'>%s</a>" % (link, u"اعرض الكوبونات")
+    admin_coupon_link.allow_tags = True
                 
     class Meta:
         verbose_name = u"مجموعة نقاط"
@@ -175,7 +156,7 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
         else:
             return False
 
-    # Obsolete (=unused_ 
+    # Obsolete (=unused)
     def get_categories(self):
         """
         Iterate over the categories includes in this order.
@@ -186,11 +167,47 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
                 yield self.codes.filter(category=category)
         
     def create_codes(self):
+        # To reduce database queries and to improve performance, we
+        # are going to generate all random strings once and check them
+        # all in one query to see if any of them is already taken.  If
+        # any of them is, we would simply replace that and try again
+        # until none is taken.  Previously, the number of queires was:
+        #     2 * number_of_codes
+        # Now, it can be as low as 2 queries for the whole collection.
+        # Previously, it took 30 seconds to generate 200 codes, now it
+        # takes 1 second.
+        look_alike = "O0I1"
+        all_chars = string.ascii_uppercase + string.digits
+        chars = "".join([char for char in all_chars
+                         if not char in look_alike])
+        year = StudentClubYear.objects.get_current()
+
         for collection in self.code_collection_set.all():
+            random_strings = []
+            required_codes = collection.code_count
+            while True:
+                for i in range(required_codes):
+                    random_string = ''.join(random.choice(chars) for i in range(CODE_STRING_LENGTH))
+                    random_strings.append(random_string)
+
+                identical_codes = Code.objects.filter(code_string__in=random_strings)
+                if identical_codes.exists():
+                    identical_strings = [identical_code.code_string \
+                                         for identical_code in identical_codes]
+                    for identical_string in identical_strings:
+                        random_strings.pop(identical_string)
+                    required_codes = len(identical_strings)    
+                else:
+                    break
+
             points = collection.code_category.points
-            for i in range(collection.code_count):
-                Code.objects.create(points=points,
-                                    collection=collection)
+            codes = []
+            for random_string in random_strings:
+                codes.append(Code(code_string=random_string,
+                                  points=points,
+                                  collection=collection,
+                                  year=year))
+            Code.objects.bulk_create(codes)
 
     def __unicode__(self):
         return self.episode.__unicode__()

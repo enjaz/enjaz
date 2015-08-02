@@ -1,4 +1,7 @@
 {% load bootstrap3 %}
+{% if error == 'closed '%}
+<p class="alert alert-danger">مضى أكثر من 14 يومًا على انقضاء النشاط، ولم يعد ممكنًا رفع طلب نقاطي.</p>
+{% else %}
 <form method="post" action="{% url 'activities:niqati_orders' activity.pk %}" class="form-inline">
     <style>
         .form-inline .form-control {
@@ -14,3 +17,4 @@
     </div>
 </div>
 </form>
+{% endif %}

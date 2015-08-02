@@ -1,16 +1,40 @@
-<!DOCTYPE html>{% load niqati_tags %}
+<!DOCTYPE html>{% load niqati_tags %}{% load staticfiles %}
 <html>
-<head lang="en">
+<head lang="ar">
     <meta charset="UTF-8">
+    <script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
     <title>{{ collection }}</title>
 </head>
 <body>
     <h2>{{ collection.code_category.name }}</h2>
 
-    <ol>
+    <ol id="link-list">
     {% for code in collection.code_set.all %}
-        <li>{% get_short_link domain endpoint code %}</li>
+        {% if code.short_link %}
+	    <li><a href="{{ code.short_link }}">{{ code.short_link }}</a></li>
+        {% endif %}
     {% endfor %}
     </ol>
+<script>
+$(function() {
+    var code_pks = [{% for code in collection.code_set.all %}{% if not code.short_link %}{{ code.pk }},{% endif %}{% endfor %}]
+    $.each(code_pks, function(index, pk){
+        $.ajax({
+            type: 'POST',
+            data: {'pk': pk },
+            dataType: 'json',
+            url: '{% url 'niqati:get_short_url' %}',
+            cache: false,
+            success: function(data){
+                if (data['success'] == true){
+                    $('#link-list').append('<li><a href="' + data['url'] + '">' + data['url'] + '</a></li>')
+                } else {
+                    alert(data['message']);
+                }
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>

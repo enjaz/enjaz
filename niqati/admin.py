@@ -12,12 +12,11 @@ class CodeAdmin(admin.ModelAdmin):
 class CodeCollectionAdmin(admin.TabularInline):
     model = Code_Collection
     extra = 0
-    #readonly_fields = ('code_category', 'code_count', 'approved', 'date_created', 'admin_asset_link', )
-    exclude = ('asset', )
+    readonly_fields = ('code_category', 'code_count', 'date_downloaded', 'admin_coupon_link', )
 
 class CodeOrderAdmin(admin.ModelAdmin):
     list_display = ('episode', 'ordering_club', 'date_ordered')
-    readonly_fields = ('episode', 'ordering_club', 'date_ordered', )
+    readonly_fields = ('submitter', 'episode', 'ordering_club', 'date_ordered', )
     inlines = (CodeCollectionAdmin, )
 
     def ordering_club(self, obj):

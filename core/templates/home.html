@@ -152,8 +152,8 @@
 					<tbody>
 						{% for c in latest_entries %}
 						<tr>
-							<td>{{ c.episode }}</td>
-							<td>{{ c.category.points }}</td>
+							<td>{% if c.collection %}<a href="{% url 'activities:show' c.collection.parent_order.episode.activity.pk %}">{{ c.collection.parent_order.episode }}</a>{% else %}مخصّصة{% endif %}</td>
+							<td>{{ c.points }}</td>
 							<td>{{ c.redeem_date }}</td>
 						</tr>
 						{% endfor %}

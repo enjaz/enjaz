@@ -30,10 +30,10 @@ def portal_home(request):
         context['upcoming_activities'] = next_week_activities
 
         # --- niqati -------
-        niqati_sum = request.user.code_set.aggregate(niqati_sum=Sum('points'))['niqati_sum']
+        niqati_sum = request.user.code_set.current_year().aggregate(niqati_sum=Sum('points'))['niqati_sum']
         context['niqati_sum'] = niqati_sum
-        context['niqati_count'] = request.user.code_set.count()
-        context['latest_entries'] = request.user.code_set.all()[::-1][:5]
+        context['niqati_count'] = request.user.code_set.current_year().count()
+        context['latest_entries'] = request.user.code_set.current_year().order_by('-redeem_date')[::-1][:5]
 
         # --- books --------
         context['books_count'] = Book.objects.count()

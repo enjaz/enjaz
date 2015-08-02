@@ -1,4 +1,4 @@
-{% extends "clubs_base.html" %}
+{% extends "clubs_base.html" %}{% load staticfiles %}
 {% block title %}{{ club.name }}{% endblock %}
 
 {% block content %}
@@ -52,17 +52,49 @@
     <th>تاريخ الإنشاء</th>
     <td>{{ club.creation_date|date:"j F Y" }}</td>
   </tr>
-{% if activities %}
-  <tr>
-    <th>النشاطات</th>
-    <td><ul>
-        {% for activity in activities %}
-        <li><a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a></li>
-        {% endfor %}
-    </ul></td>
-  </tr>
-{% endif %}
 </table>
 </div>
+<h3>النشاطات</h3>
+{% if activities %}
+<table class="display datatable">{% load l10n %}
+    <thead>
+        <tr>
+            <th>الاسم</th>
+            <th>تاريخ الانعقاد</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for activity in activities %}
+        <tr>
+            <td><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}</a></td>
+            <td data-order="{{ activity.get_first_date|date:"U" }}">{{ activity.get_first_date|date:"j F" }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>لا توجد نشاطات.</p>
+{% endif %}
 </div>
+
+{% endblock %}
+
+{% block customscript %}
+	<script src="{% static 'neon/assets/js/fullcalendar/fullcalendar.min.js' %}"></script>
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script>
+    var approved_table = $('.datatable:first').DataTable({
+        "order": [[ 2, "asc" ]],
+        "language": {% include 'js/dataTables-arabic.json' %}
+    });
+    var approved_table_nodes = approved_table.column(2, {order: 'current'}).nodes();
+    for (i=0; i < approved_table_nodes.length; i++) {
+       if ($(approved_table_nodes[i]).data('order') > unix_seconds) {
+            var page_number = Math.floor( i / approved_table.page.info().length );
+            approved_table.page(page_number).draw(false);
+            break
+       }
+    }
+</script>
 {% endblock %}

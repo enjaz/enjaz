@@ -295,6 +295,7 @@ def get_short_url(request):
         short_link = response.text
         if short_link == "RATE_LIMIT_EXCEEDED":
             raise Exception("تعّر إنشاء أحد الروابط. حدّث الصفحة.")
+        short_link = short_link.replace("http:", "https:") # Duh!
         code.short_link = short_link
         code.save()
 

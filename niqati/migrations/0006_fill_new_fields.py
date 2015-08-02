@@ -51,9 +51,10 @@ def empty_new_fields(apps, schema_editor):
             code.short_link = ""
         code.save()
 
-    Review.objects.filter(reviewer_club=presidency).delete()
+    for review in Review.objects.filter(reviewer_club=presidency):
+        review.order.code_collection_set.update(approved=review.is_approved)
+        review.delete()
 
-    
 class Migration(migrations.Migration):
 
     dependencies = [

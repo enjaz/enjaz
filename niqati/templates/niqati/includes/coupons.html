@@ -1,142 +1,116 @@
 <!doctype html>{% load staticfiles %}
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>{{ collection }}</title>
-    <style type="text/css">
-
+<meta charset="UTF-8">
+<title>{{ collection }}</title>
+<style type="text/css">
     @font-face {font-family: "GE Dinar One"; font-weight: lighter; src: url({% static 'fonts/ge-dinar-one-light.woff' %});}
     @font-face {font-family: "GE Dinar One"; font-weight: normal; src: url({% static 'fonts/ge-dinar-one-med.woff' %});}
 
-    html {
-        font-family: "GE Dinar One";
-    }
-
-    .light {
-        font-weight: lighter;
-    }
-
-    .coupon {
-        height: 70mm;
-        width: 195mm;
-        border: 2px solid #000;
-        margin-bottom: 5mm;
-        background-image: url('{% static 'niqati/niqaticardbackground.png' %}');
-        background-size: 195mm auto;
-        background-position: 0% 80%;
-        clear: both;
-    }
-
-    @media print {
-        .coupon {page-break-inside: avoid;}
-    }
-
-    tr td th {
-        border: none;
-    }
-
-    .right {
-        text-align: center;
-        vertical-align: bottom;
-        padding-bottom: 1cm;
-    }
-
-    .left {
-        width: 30%;
-    }
-
-    .qr-image {
-        text-align: center;
-    }
-
-    .qr-image img {
-        padding: 1mm;
-        background-color: #fff;
-    }
-
-    .event-name, .code-type {
-        text-align: center;
-        font-size: 1.5em;
-        margin: 0px;
-        padding: 0px;
-    }
-
-    .code-type {
-        font-size: 1em;
-    }
-
-    .right img {
-        width: 120px;
-    }
-
-    span .url {
-        font-family: Arial;
-    }
-
-    .code {
-        text-align: center;
-        font-size: 2em;
-        font-weight: 10;
-        font-family: Courier New;
-
-        margin: 0 1.5cm 0 1.5cm;
-        padding: 1mm;
-
-        background-color: #fff;
-    }
-
-    </style>
+#card {
+    page-break-inside: avoid;
+	width: 6.75in;
+	border-style: solid;
+	height: 2.8in;
+	background-image: url({% static 'images/niqati/niqaticardbackground.png' %});
+	background-size: auto 4.4in;
+	background-position: 0% -176%;
+    clear: both;
+}
+#left {
+	float: left;
+	width: 2in;
+	padding-top: 10px;
+	padding-right: 0px;
+	padding-bottom: 10px;
+	padding-left: 10px;
+	text-align: center;
+	height: 100%;
+}
+#instructions {
+	font-size: x-small;
+}
+#right {
+	float: right;
+	width: 4.5in;
+	height: 100%;
+	padding-top: 10px;
+	padding-right: 10px;
+	padding-bottom: 10px;
+}
+#logos img {
+	width: 290px;
+	height: auto;
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+	position: relative;
+	left: 80px;
+	top: -6px;
+}
+#code {
+	background-color: #FFFFFF;
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+	width: 3.5in;
+	text-align: center;
+	font-size: 26px;
+	font-family: "Courier New";
+	font-style: normal;
+	font-weight: 400;
+	position: relative;
+	top: -8px;
+}
+#qr img {
+	background-color: #FFFFFF;
+	padding-top: 4px;
+	padding-right: 4px;
+	padding-bottom: 4px;
+	padding-left: 4px;
+}
+#activity {
+	font-family: "GE Dinar One", "Arial";
+    font-size: 16px;
+	font-weight: lighter;
+}
+#role    {
+	font-weight: lighter;
+}
+#title {
+	font-weight: normal;
+}
+#instructions img {
+	height: 1.75in;
+	width: auto;
+}
+</style>
 </head>
 
 <body>
-    {# category name #}
-    <h2>{{ collection.code_category.ar_label }}</h2>
-
     {% for code in collection.code_set.all %}
-
-    <table class="coupon">
-
-        <tr>
-            <td class="left">
-                <div class="qr-image">
-                    <img src="{{ endpoint }}{% url 'niqati:submit' %}?code={{ code.code_string }}"/>
-                </div>
-                <div class="qr-textbox">
-                    <p class="event-name">
-                        {{ code.collection.parent_order.episode.activity.name }}
-                    </p>
-                    <p class="code-type">
-                        {{ collection.code_category.ar_label }}
-                    </p>
-                </div>
-            </td>
-            <td class="right" dir="rtl">
-                <img src="{% static 'codes/logo.png' %}" alt="I see." />
-
-                <p>
-                    شكرًا لمشاركتك في أنشطة نادي الطلاب.<br>
-                    <span class="light">
-                يمكنك تسجيل مشاركتك من خلال إحدى الطريقتين التاليتين:<br>
-                        ١. إما بالذهاب للعنوان التالي وإدخال الرمز أدناه يدويًا
-                        <span dir="ltr" class="url">{{ domain }}{% url 'niqati:submit' %}</span>
-                        .<br>
-                        ٢. أو بمسح رمز الـQR الأيسر بهاتفك النقال.
-                    </span>
-                </p>
-
-                <p class="code">
-                    {{ code.code_string }}
-                </p>
-            </td>
-        </tr>
-
-    </table>
-
+        <div id="card">
+          <div id="left">
+            <div id="qr"><img src="{{ endpoint }}{% url 'niqati:submit' %}?code={{ code.code_string }}" alt=""/></div>
+            <div dir="rtl" id="activity">
+              <div dir="auto" id="title">{{ collection.parent_order.episode }}</div>
+              <div id="role">{{ collection.category.ar_label }}<!-- change to ar_label --></div>
+            </div>
+          </div>
+          <div id="right">
+            <div id="instructions">{% if collection.code_category.label == 'Idea'  %}
+<img src="{% static 'images/niqati/cardinstructions3pt.png' %}"alt=""/>
+{% elif collection.code_category.label == 'Organizer'  %}
+<img src="{% static 'images/niqati/cardinstructions2pt.png' %}"alt=""/>
+{% elif collection.code_category.label == 'Participation'  %}
+<img src="{% static 'images/niqati/cardinstructions1pt.png' %}"alt=""/>
+{% endif %}</div>
+              
+            <div id="code">{{ code.code_string }}</div>
+        <div id="logos"><img src="{% static 'images/niqati/niqatiformheader.png' %}"/></div>
+          </div>
+        </div>
+    
     {% endfor %}
-
-        {% if not forloop.last %}
-        <!-- pagebreak -->
-        <p style="page-break-after:always;"></p>
-        {% endif %}
 </body>
 </html>

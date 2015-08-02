@@ -293,6 +293,7 @@ def get_short_url(request):
         full_url = urlquote("http://%s%s?code=%s" % (domain, reverse("niqati:submit"), code.code_string))
         response = requests.get(endpoint + full_url)
         short_link = response.text
+        short_link = short_link.strip() # remove tailing new lines
         if short_link == "RATE_LIMIT_EXCEEDED":
             raise Exception("تعّر إنشاء أحد الروابط. حدّث الصفحة.")
         short_link = short_link.replace("http:", "https:") # Duh!

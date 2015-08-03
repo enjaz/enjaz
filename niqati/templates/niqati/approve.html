@@ -27,8 +27,15 @@
 				<ul class="list-group">
 				 	{% for collection in order.code_collection_set.all %}
 				 	<li class="list-group-item">
-					    <span class="badge">{{ collection.code_count }} أكواد</span>
+					    {% if not collection.students.exists %}<span class="badge">{{ collection.code_count }} أكواد</span>{% endif %}
 					    {{ collection.code_category.ar_label }}
+						{% if collection.students %}
+						<ul>
+							{% for student in collection.students.all %} 
+							<li>{{ student.common_profile.get_ar_full_name }}</li>
+							{% endfor %}
+						</ul>
+						{% endif %}
 				  	</li>
 				 	{% endfor %} 
 				</ul>

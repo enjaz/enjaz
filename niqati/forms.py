@@ -2,14 +2,16 @@
 """Forms for Niqati app."""
 
 import datetime
+import autocomplete_light
+
 from django.contrib import messages
 from django.utils import timezone
-
 from django import forms
-# from django.core.exceptions import ValidationError
 from niqati.models import Code_Order, Code_Collection, Category, Code
 
 class OrderForm(forms.Form):
+
+
     def __init__(self, *args, **kwargs):
         assert 'activity' in kwargs, "Kwarg 'activity' is required."
         assert 'user' in kwargs, "Kwarg 'user' is required."
@@ -23,8 +25,11 @@ class OrderForm(forms.Form):
             initial = None
         self.fields['episode'] = forms.ModelChoiceField(episodes, label=u"الموعد", empty_label=u"اختر موعدًا ", initial=initial)
         for category in Category.objects.all():
-            self.fields["category_%s" % category.pk] = forms.IntegerField(label=category.ar_label, required=False, initial=0,
+            self.fields["count_%s" % category.pk] = forms.IntegerField(label=category.ar_label, required=False, initial=0,
                               min_value=0)
+            if category.direct_entry:
+                self.fields['students_%s' % category.pk] =  autocomplete_light.ModelMultipleChoiceField('UserAutocomplete', label=u"طلاب ال" + category.ar_label, required=False)
+                self.fields["count_%s" % category.pk].widget.attrs = {'data-direct-entry': 'true', 'data-category': category.pk}
             # `clean()` (below) will make sure that at least one field has a non-zero value.
 
     def clean(self):
@@ -46,7 +51,9 @@ class OrderForm(forms.Form):
 
     def save(self):
         reviewing_parent = self.activity.primary_club.get_next_niqati_reviewing_parent()
-        print "next_niqati_reviewing_parent", reviewing_parent # REMOVE
+        # Use this to check if we have created any collections.  If we
+        # haven't (i.e. all of them are zero), don't create the order.
+        collections_created = False 
         order = Code_Order.objects.create(episode=self.cleaned_data['episode'],
                                           assignee=reviewing_parent,
                                           submitter=self.user)
@@ -55,19 +62,28 @@ class OrderForm(forms.Form):
         del self.cleaned_data['episode']
         
         print self.cleaned_data # REMOVE
-        
-        for field_name in self.cleaned_data:
+        count_fields = [field_name for field_name in self.cleaned_data
+                        if field_name.startswith('count')]
+        for field_name in count_fields:
+            category_pk = field_name.split("_")[-1]
+            category = Category.objects.get(pk=int(category_pk))
             count = self.cleaned_data[field_name]
-            category = Category.objects.get(pk=int(field_name.split("_")[-1]))
-            if not count: # If zero, skip
+            students = self.cleaned_data.get('students_' + category_pk)
+            if not count and not students: # If zero, skip
                 continue
-            Code_Collection.objects.create(code_count=count,
-                                           code_category=category,
-                                           parent_order=order)
-
-        return order
-
-
+            students = self.cleaned_data.get('students_' + category_pk)
+            collections_created = True # If count is 
+            collection = Code_Collection.objects.create(code_count=count,
+                                                        code_category=category,
+                                                        parent_order=order)
+            if students:
+                collection.students.add(*students)
+                collection.save()
+        if not collections_created:
+            order.delete()
+            return
+        else:
+            return order
 
 class RedeemCodeForm(forms.Form):
     string = forms.CharField(label="")
@@ -165,3 +181,4 @@ class RedeemCodeForm(forms.Form):
             print self.fields['string'].errors.as_data()
 
         return (message_level, message)
+

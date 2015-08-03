@@ -27,14 +27,11 @@ class Category(models.Model):
     label = models.CharField(max_length=20)
     ar_label = models.CharField(max_length=20)
     points = models.PositiveSmallIntegerField()
+    direct_entry = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.label
     
-    def instructions(self):
-        return {'Participation':'http://msarabi95.comyr.com/cardinstructions1pt.png',
-                'Organizer':'http://msarabi95.comyr.com/cardinstructions2pt.png',
-                'Idea':'http://msarabi95.comyr.com/cardinstructions3pt.png'}[self.label]
 
 class Code(models.Model):
     # Basic Properties
@@ -106,6 +103,9 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
     code_category = models.ForeignKey(Category)
     code_count = models.PositiveSmallIntegerField()
     parent_order = models.ForeignKey('Code_Order') # --- relation to activity is through the Code_Order
+    students = models.ManyToManyField(User, blank=True,
+                                      limit_choices_to={'common_profile__is_student': True,
+                                                        'coordination__isnull': True})
 
     # Approval choices:
     #   None: Unreviewed
@@ -184,7 +184,14 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
 
         for collection in self.code_collection_set.all():
             random_strings = []
-            required_codes = collection.code_count
+            points = collection.code_category.points
+            codes = []
+
+            if collection.students.exists():
+                required_codes = collection.students.count()
+            else:
+                required_codes = collection.code_count
+
             while True:
                 for i in range(required_codes):
                     random_string = ''.join(random.choice(chars) for i in range(CODE_STRING_LENGTH))
@@ -199,14 +206,25 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
                     required_codes = len(identical_strings)    
                 else:
                     break
-
-            points = collection.code_category.points
-            codes = []
-            for random_string in random_strings:
-                codes.append(Code(code_string=random_string,
-                                  points=points,
-                                  collection=collection,
-                                  year=year))
+            
+            # If we are deadling with direct entry of students
+            if collection.students.exists():
+                string_count = 0
+                for student in collection.students.all():
+                    random_string = random_strings[string_count]
+                    codes.append(Code(code_string=random_string,
+                                      points=points,
+                                      collection=collection,
+                                      year=year,
+                                      user=student,
+                                      redeem_date=timezone.now()))
+                    string_count += 1
+            else: # If we are deadling with counts
+                    for random_string in random_strings:
+                        codes.append(Code(code_string=random_string,
+                                          points=points,
+                                          collection=collection,
+                                          year=year))
             Code.objects.bulk_create(codes)
 
     def __unicode__(self):

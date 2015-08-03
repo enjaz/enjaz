@@ -114,20 +114,24 @@ def coordinator_view(request, activity_id):
         form = OrderForm(request.POST, activity=activity, user=request.user)
         if form.is_valid():
             order = form.save()
-            reviewing_parent = activity.primary_club.get_next_niqati_reviewing_parent()
-            # Make sure that a coordinator was assigned to the
-            # reviewing club before trying to send an email
-            # notification.
-            if reviewing_parent and reviewing_parent.coordinator:
-                list_pending_orders_url = reverse('niqati:list_pending_orders')
-                full_url = request.build_absolute_uri(list_pending_orders_url)
-                email_context = {'order': order, 'full_url': full_url}
-                mail.send([reviewing_parent.coordinator.email],
-                          template="niqati_order_submitted",
-                          context=email_context)
+            if order:
+                reviewing_parent = activity.primary_club.get_next_niqati_reviewing_parent()
+                # Make sure that a coordinator was assigned to the
+                # reviewing club before trying to send an email
+                # notification.
+                if reviewing_parent and reviewing_parent.coordinator:
+                    list_pending_orders_url = reverse('niqati:list_pending_orders')
+                    full_url = request.build_absolute_uri(list_pending_orders_url)
+                    email_context = {'order': order, 'full_url': full_url}
+                    mail.send([reviewing_parent.coordinator.email],
+                              template="niqati_order_submitted",
+                              context=email_context)
 
-                msg = u"تم إرسال الطلب؛ و سيتم إنشاء النقاط فور الموافقة عليه"
-                messages.add_message(request, messages.SUCCESS, msg)
+                    msg = u"تم إرسال الطلب؛ و سيتم إنشاء النقاط فور الموافقة عليه"
+                    messages.add_message(request, messages.SUCCESS, msg)
+            else:
+                msg = u"لم ينشأ أي طلب لأنك لم تدخل أي رقم."
+                messages.add_message(request, messages.WARNING, msg)
         else:
             msg = u"الرجاء ملء النموذج بشكل صحيح."
             messages.add_message(request, messages.ERROR, msg)

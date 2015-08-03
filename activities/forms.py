@@ -250,16 +250,15 @@ class ReviewForm(ModelForm):
 
 
 class EvaluationForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(EvaluationForm, self).__init__(*args, **kwargs)
-        for field in self.fields:
-            self.fields[field].widget = TextInput()
-            self.fields[field].widget.attrs = {'class': 'knob', 'data-min': 0, 'data-max': 5,
-                                               'data-width': 125, 'data-height': 125, 'data-thickness': .25,
-                                               'data-fgcolor': '#00b19d', 'data-bgcolor': '#ebebeb',
-                                               'data-anglearc': 240, 'data-angleoffset': -120}
     quality = forms.IntegerField(min_value=1, max_value=5)
     relevance = forms.IntegerField(min_value=1, max_value=5)
+
+    def save(self, episode, user):
+        evaluation = Evaluation.objects.create(episode=episode,
+                                               evaluator=user,
+                                               quality=self.cleaned_data['quality'],
+                                               relevance=self.cleaned_data['relevance'])
+        return evaluation
 
     class Meta:
         model = Evaluation

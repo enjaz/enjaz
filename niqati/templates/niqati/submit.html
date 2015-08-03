@@ -1,9 +1,8 @@
-{% extends "niqati_base.html" %}{% load staticfiles %}
+{% extends "niqati_base.html" %}{% load staticfiles %}{% load bootstrap3 %}
 {% block title %}إدخال النقاط{% endblock %}
 {% block content %}
 
 <h2>إدخال النقاط</h2>
-
 {% if messages %}
     {% for message in messages %}
         <div class="alert alert-{{ message.tags }}">
@@ -12,58 +11,128 @@
     {% endfor %}
 {% endif %}
 
-<div class="">
-    <form action="{% url 'niqati:submit' %}" method="post">
-    {% csrf_token %}
-        <div class="row">
-            <div class="col-md-12">
-                <div class="form-group">
-                    <input type="text" class="english-field form-control input-lg" name="code" placeholder="أدخل رمز نقاطي"
-                           value="{{ code_to_redeem }}" required>
-                </div>
-            </div>
+{% if form.non_field_errors or form.string.errors %}
+        <div class="alert alert-danger">
+    {% for error in form.non_field_errors %}
+          {{ error }}
+    {% endfor %}
+    {% for error in form.string.errors %}
+          {{ error }}
+    {% endfor %}
         </div>
-        <div class="row">
+{% endif %}
+
+    <form id="redeem-form" method="post">
+      {% csrf_token %}
+        <div class="form-group{% if form.string.errors %} has-error{% endif %}">
+	  {{ form.string }}
+	</div>
+
+    <div class="row">
             <div class="col-xs-5"><hr></div>
             <div class="col-xs-2"><h6 align="center">تقييم النشاط</h6></div>
             <div class="col-xs-5"><hr></div>
         </div>
         <div class="row">
             <div class="col-xs-12">
-                <h6 class="dinar-light" align="center">قم بتقييم النشاط من ١ إلى ٥ حسب السؤالين التاليين. يمكنك تدوير المقبض إلى القيمة المرغوبة أو إدخالها مباشرة.</h6>
+                <h6 class="dinar-light" align="center">قم بتقييم النشاط من ١ إلى ٥ حسب السؤالين التاليين.</h6>
             </div>
         </div>
         <div class="row">
             <div class="col-xs-12"><hr></div>
         </div>
         <div class="row">
-            <div class="col-md-4 col-md-offset-1">
+            <div class="col-sm-5 col-sm-offset-1">
                 <div class="row">
-                    <div class="col-xs-5">
+                    <div class="col-xs-4">
                         <h4>ما تقييمك لملاءمة النشاط لاهتماماتك كطالبـ/ـة؟</h4>
                         <!--<h4><small class="dinar-light">(من ١ إلى ٥ حيث ٥ هو الأعلى)</small></h4>-->
                     </div>
-                    <div class="col-xs-7" dir="ltr">{{ eval_form.relevance }}</div>
+                    <div class="col-xs-8" dir="rtl">
+                        {% if eval_form.relevance.errors %}<div class="alert alert-danger">{{ eval_form.relevance.errors }}</div>{% endif %}
+                        <i data-type="relevance" data-rating='1' class="entypo-star-empty eval-star"></i><i data-rating='2' data-type="relevance" class="entypo-star-empty eval-star"></i><i data-rating='3' data-type="relevance" class="entypo-star-empty eval-star"></i><i data-rating='4' data-type="relevance" class="entypo-star-empty eval-star"></i><i data-rating='5' data-type="relevance" class="entypo-star-empty eval-star"></i></div>
                 </div>
             </div>
-            <div class="col-md-4 col-md-offset-2">
+            <div class="col-sm-5 col-sm-offset-1">
                 <div class="row">
-                    <div class="col-xs-5">
+                    <div class="col-xs-4">
                         <h4>ما تقييمك لجودة تنظيم النشاط؟</h4>
                         <!--<h4><small class="dinar-light">(من ١ إلى ٥ حيث ٥ هو الأعلى)</small></h4>-->
                     </div>
-                    <div class="col-xs-7" dir="ltr">{{ eval_form.quality }}</div>
+                    <div class="col-xs-8" dir="rtl">
+                        {% if eval_form.quality.errors %}<div class="alert alert-danger">{{ eval_form.quality.errors }}</div>{% endif %}
+                        <i data-type="quality" data-rating='1' class="entypo-star-empty eval-star"></i><i data-rating='2' data-type="quality" class="entypo-star-empty eval-star"></i><i data-rating='3' data-type="quality" class="entypo-star-empty eval-star"></i><i data-rating='4' data-type="quality" class="entypo-star-empty eval-star"></i><i data-rating='5' data-type="quality" class="entypo-star-empty eval-star"></i></div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <button class="btn btn-green btn-block" type="submit">إدخال</button>
+        <div class="form-group">
+            <input class="btn btn-success" type="submit" value="أدخِل"/>
         </div>
     </form>
-</div>
 
 {% endblock %}
     
 {% block customscript %}
 <script src="{% static 'neon/assets/js/jquery.knob.js' %}"></script>
+<style>
+i.eval-star:before{
+	font-size: 30px;
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+i.entypo-star{
+ 	color: rgb(255, 235, 32);
+}
+
+i.entypo-star-empty{
+ 	color: rgb(216, 214, 197);
+}
+
+i.entypo-star-empty:hover{
+	animation-name: empty;
+	animation-duration: 2s;
+        animation-iteration-count: infinite;
+}
+
+@keyframes empty {
+    0% {color: rgb(216, 214, 197);}
+    50% {color: rgb(255, 235, 32);}
+    100% {color: rgb(216, 214, 197);}
+}
+
+
+/* On large devices, the stars can be bigger. */
+@media (min-width: 1200px) {
+	i.eval-star:before{
+		font-size: 40px;
+	}	
+}
+
+</style>
+<script>
+$(function(){
+	$('.eval-star').click(function(){
+		var rating  = $(this).data('rating');
+		var type  = $(this).data('type');
+		for (i=1; i <= rating; i++){
+			$('i[data-type=' + type + '][data-rating=' + i + ']').removeClass('entypo-star-empty');
+			$('i[data-type=' + type + '][data-rating=' + i + ']').addClass('entypo-star');
+		}
+		for (i=rating + 1; i <= 5; i++){
+			$('i[data-type=' + type + '][data-rating=' + i + ']').removeClass('entypo-star');
+			$('i[data-type=' + type + '][data-rating=' + i + ']').addClass('entypo-star-empty');
+		}
+		console.log('input[name=' + type + ']')
+		if ($('input[name=' + type + ']').length){
+			console.log("change existing!");
+			$('input[name=' + type + ']').val(rating);
+		}else{
+			console.log("add a new!");
+			$('<input>').attr({type: 'hidden', name: type, value: rating}).appendTo('form');
+		}
+
+	});
+});
+</script>
 {% endblock %}

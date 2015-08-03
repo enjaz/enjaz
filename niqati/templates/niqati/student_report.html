@@ -19,11 +19,11 @@
     <th>عدد النقاط</th>
     <th>تاريخ الإدخال</th>
   </tr>
-    {% for code in user.code_set.all %}
+    {% for code in user.code_set.current_year %}
         <tr>
-            <td><a href="{% url 'activities:show' code.episode.activity.pk %}">{{ code.episode }}</a></td>
-            <td>{{ code.category.ar_label }}</td>
-            <td>{{ code.category.points }}</td>
+            <td>{% if code.collection %}<a href="{% url 'activities:show' code.collection.parent_order.episode.activity.pk %}">{{ code.collection.parent_order.episode }}</a>{% else %}مخصّصة{% endif %}</td>
+            <td>{% if code.collection %}{{ code.collection.code_category.ar_label }}{% else %}مُخصّصة{% endif %}</td>
+            <td>{{ code.points }}</td>
             <td>{{ code.redeem_date }}</td>
         </tr>
     {% endfor %}

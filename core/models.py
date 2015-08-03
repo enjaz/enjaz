@@ -61,6 +61,8 @@ class StudentClubYear(models.Model):
     submission_date = models.DateTimeField(u"تاريخ الإضافة", auto_now_add=True)
     start_date = models.DateTimeField(u"تاريخ البداية")
     end_date = models.DateTimeField(u"تاريخ النهاية")
+    niqati_closure_date = models.DateTimeField(u"تاريخ إغلاق نقاطي",
+                                               null=True, blank=True)
     objects = YearManager()
     def __unicode__(self):
         return "%d/%d" % (self.start_date.year, self.end_date.year)

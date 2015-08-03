@@ -2,16 +2,17 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>{{ collec.parent_order.episode.activity.name }} - {{ collec.code_category.ar_label }}</title>
+<title>{{ collection }}</title>
 <style type="text/css">
-@font-face {font-family: "GE Dinar One"; font-weight: lighter; src: url('http://msarabi95.comyr.com/HelpMacNet-Fonts-563.otf');} 
-@font-face {font-family: "GE Dinar One"; font-weight: normal; src: url('http://msarabi95.comyr.com/HelpMacNet-Fonts-565.otf');}
+    @font-face {font-family: "GE Dinar One"; font-weight: lighter; src: url({% static 'fonts/ge-dinar-one-light.woff' %});}
+    @font-face {font-family: "GE Dinar One"; font-weight: normal; src: url({% static 'fonts/ge-dinar-one-med.woff' %});}
+
 #card {
     page-break-inside: avoid;
 	width: 6.75in;
 	border-style: solid;
 	height: 2.8in;
-	background-image: url(http://msarabi95.comyr.com/niqaticardbackground.png);
+	background-image: url({% static 'images/niqati/niqaticardbackground.png' %});
 	background-size: auto 4.4in;
 	background-position: 0% -176%;
     clear: both;
@@ -87,22 +88,26 @@
 </head>
 
 <body>
-    {% for code in collec.code_set.all %}
-
+    {% for code in collection.code_set.all %}
         <div id="card">
           <div id="left">
-            <div id="qr"><img src="{{ code.asset }}" width="180" height="180" alt=""/></div>
+            <div id="qr"><img src="{{ endpoint }}{% url 'niqati:submit' %}?code={{ code.code_string }}" alt=""/></div>
             <div dir="rtl" id="activity">
-              <div id="title">{{ code.collection.parent_order.episode }}</div>
-              <div id="role">{{ code.category.ar_label }}<!-- change to ar_label --></div>
+              <div dir="auto" id="title">{{ collection.parent_order.episode }}</div>
+              <div id="role">{{ collection.category.ar_label }}<!-- change to ar_label --></div>
             </div>
           </div>
           <div id="right">
+            <div id="instructions">{% if collection.code_category.label == 'Idea'  %}
+<img src="{% static 'images/niqati/cardinstructions3pt.png' %}"alt=""/>
+{% elif collection.code_category.label == 'Organizer'  %}
+<img src="{% static 'images/niqati/cardinstructions2pt.png' %}"alt=""/>
+{% elif collection.code_category.label == 'Participation'  %}
+<img src="{% static 'images/niqati/cardinstructions1pt.png' %}"alt=""/>
+{% endif %}</div>
               
-            <div id="instructions"><img src="{{ code.category.instructions }}"alt=""/></div>
-              
-            <div id="code">{{ code.spaced_code }}</div>
-        <div id="logos"><img src="http://msarabi95.comyr.com/niqatiformheader.png" alt=""/></div>
+            <div id="code">{{ code.code_string }}</div>
+        <div id="logos"><img src="{% static 'images/niqati/niqatiformheader.png' %}"/></div>
           </div>
         </div>
     

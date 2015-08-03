@@ -1,0 +1,19 @@
+{% extends "niqati_base.html" %}
+{% block title %}إدخال النقاط{% endblock %}
+{% block content %}
+<div class="page-error-404">
+
+
+	<div class="error-symbol">
+		<i class="entypo-infinity"></i>
+	</div>
+
+	<div class="error-text">
+		<h2>لا يمكن لمنسقّي الأندية المشاركة في نقاطي!</h2>
+        <p>بصفتك مسؤولا عن {{ user_club.name }}، لا يمكنك تسجيل النقاط.</p>
+    </div>
+
+	<hr />
+
+</div>
+{% endblock %}

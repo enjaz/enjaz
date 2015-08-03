@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, date
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
+from django.db.models import Sum
 
 from activities.models import Activity
 from books.models import Book
@@ -29,9 +30,10 @@ def portal_home(request):
         context['upcoming_activities'] = next_week_activities
 
         # --- niqati -------
-        context['niqati_sum'] = sum(code.category.points for code in request.user.code_set.all())
-        context['niqati_count'] = request.user.code_set.count()
-        context['latest_entries'] = request.user.code_set.all()[::-1][:5]
+        niqati_sum = request.user.code_set.current_year().aggregate(niqati_sum=Sum('points'))['niqati_sum']
+        context['niqati_sum'] = niqati_sum
+        context['niqati_count'] = request.user.code_set.current_year().count()
+        context['latest_entries'] = request.user.code_set.current_year().order_by('-redeem_date')[::-1][:5]
 
         # --- books --------
         context['books_count'] = Book.objects.count()

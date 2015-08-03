@@ -1,80 +1,167 @@
 # -*- coding: utf-8  -*-
 """Forms for Niqati app."""
 
+import datetime
+from django.contrib import messages
+from django.utils import timezone
+
 from django import forms
 # from django.core.exceptions import ValidationError
-from niqati.models import Code_Collection  #, Code
+from niqati.models import Code_Order, Code_Collection, Category, Code
 
 class OrderForm(forms.Form):
     def __init__(self, *args, **kwargs):
-        assert "activity" in kwargs, "Kwarg 'activity' is required."
-        activity = kwargs.pop("activity", None)
+        assert 'activity' in kwargs, "Kwarg 'activity' is required."
+        assert 'user' in kwargs, "Kwarg 'user' is required."
+        self.activity = kwargs.pop("activity", None)
+        self.user = kwargs.pop("user", None)
         super(OrderForm, self).__init__(*args, **kwargs)
-        self.fields['episode'] = forms.ModelChoiceField(activity.episode_set.all(), empty_label=u"اختر موعدًا ")
-        for field in self.fields:
-            self.fields[field].widget.attrs['class'] = 'form-control popover-default'
-            if isinstance(self.fields[field], forms.IntegerField):
-                self.fields[field].widget.attrs['data-toggle'] = 'popover'
-                self.fields[field].widget.attrs['data-trigger'] = 'focus'
-                self.fields[field].widget.attrs['data-placement'] = 'left'
-                self.fields[field].widget.attrs['data-original-title'] = u"ملاحظة"
-                self.fields[field].widget.attrs['data-content'] = u"لأفضل نتائج عند طلب كوبونات نقاطي، يرجى مراعاة ألا يزيد مجموع الكوبونات في الطلب عن ١٠٠-١٥٠ كوبون. " + \
-                                                                  u"في حال كون الطلب يتجاوز ذلك، يرجى تقسيمه على أكثر من طلب."
-
-    idea = forms.IntegerField(label=u"الفكرة", help_text=u"عدد نقاط الفكرة", required=False, initial=0,
+        episodes = self.activity.episode_set.all()
+        if episodes.count() == 1:
+            initial = episodes.first().pk
+        else:
+            initial = None
+        self.fields['episode'] = forms.ModelChoiceField(episodes, label=u"الموعد", empty_label=u"اختر موعدًا ", initial=initial)
+        for category in Category.objects.all():
+            self.fields["category_%s" % category.pk] = forms.IntegerField(label=category.ar_label, required=False, initial=0,
                               min_value=0)
-    organizer = forms.IntegerField(label=u"المنظمون", help_text=u"عدد نقاط التنظيم", required=False, initial=0,
-                                   min_value=0)
-    participant = forms.IntegerField(label=u"المشاركون", help_text=u"عدد نقاط المشاركة", required=False, initial=0,
-                                     min_value=0)
-    delivery_type = forms.ChoiceField(label=u"طريقة التسليم",
-                                      choices=Code_Collection.DELIVERY_TYPE_CHOICES)
+            # `clean()` (below) will make sure that at least one field has a non-zero value.
 
-# # TODO: use django forms in code submission
-# class SubmissionForm(forms.ModelForm):
-#     """
-#     A form that handles code submission.
-#     """
-#     def __init__(self, *args, **kwargs):
-#         super(SubmissionForm, self).__init__(*args, **kwargs)
-#         self.user = self.instance.user
-#         self.fields['code_string'].widget.attrs['class'] = 'input-lg form-control'
-#
-#     code_string = forms.CharField()
-#
-#     def clean_code_string(self):
-#         """
-#         Verify that:
-#         (1) Code exists
-#         (2) Code hasn't been used before by the submitter
-#         (3) Code hasn't been used before by another user
-#         (4) User doesn't have another code (of same or greater value) in the same activity
-#         """
-#         # Format the code string
-#         code = self.cleaned_data['code_string'].upper().replace(" ", "").replace("-", "")
-#         # self.code = self.code.upper().replace(" ", "").replace("-", "")
-#
-#         # Check that code exists
-#         if not Code.objects.filter(code_string=code).exists():
-#             raise ValidationError(u"%s ليس رمزًا صحيحًا" % code, code="invalid")
-#         # If it does, get it for further validation
-#         code = Code.objects.get(code_string=code)
-#         self.instance = code
-#         if code.user == self.user:
-#             raise ValidationError(u"لقد استخدمت الرمز %s من قبل؛ لا يمكنك استخدامه مرة أخرى." % code, code="used")
-#         if code.user is not None:
-#             raise ValidationError(u"الرمز %s غير متوفر." % code,
-#                                   code="unavailable")
-#         # Check that user has another code in the same activity
-#         if Code.objects.filter(activity=code.activity, user=self.user).exists():
-#             if Code.objects.get(activity=code.activity, user=self.user).category.points >= code.category.points:
-#                 raise ValidationError(u"لديك رمز آخر مسجل في نفس النشاط؛ لا يمكنك إدخال أكثر من رمز لنشاط واحد.",
-#                                       code="has_other")
-#             else:
-#                 raise ValidationError(u"User has another code (of less value) in the same activity.",
-#                                       code="has_other_less")
-#         return code
-#
-#     class Meta:
-#         model = Code
-#         fields = ['code_string']
+    def clean(self):
+        """
+        Make sure that at least one category has a non-zero value.
+        """
+        cleaned_data = super(OrderForm, self).clean()
+
+        # If all the values are either 0's or None's (no non-zero values), raise a validation error
+        if all([(cleaned_data[field] is None or cleaned_data[field] == 0) for field in cleaned_data]):
+            raise forms.ValidationError(u"أدخل، على الأقل، قيمة واحدة أكبر من الصفر.")
+
+        # Replace None's with 0's
+        for field in cleaned_data:
+            if cleaned_data[field] is None:
+                cleaned_data[field] = 0
+
+        return cleaned_data
+
+    def save(self):
+        reviewing_parent = self.activity.primary_club.get_next_niqati_reviewing_parent()
+        print "next_niqati_reviewing_parent", reviewing_parent # REMOVE
+        order = Code_Order.objects.create(episode=self.cleaned_data['episode'],
+                                          assignee=reviewing_parent,
+                                          submitter=self.user)
+
+        # No need to keep the episode.
+        del self.cleaned_data['episode']
+        
+        print self.cleaned_data # REMOVE
+        
+        for field_name in self.cleaned_data:
+            count = self.cleaned_data[field_name]
+            category = Category.objects.get(pk=int(field_name.split("_")[-1]))
+            if not count: # If zero, skip
+                continue
+            Code_Collection.objects.create(code_count=count,
+                                           code_category=category,
+                                           parent_order=order)
+
+        return order
+
+
+
+class RedeemCodeForm(forms.Form):
+    string = forms.CharField(label="")
+
+    def __init__(self, user, *args, **kwargs):
+        super(RedeemCodeForm, self).__init__(*args, **kwargs)
+        self.user = user  # Save the user as this is important for validation
+        self.fields['string'].widget.attrs = {"class": "form-control input-lg input-wide english-field", "placeholder": u"أدخل رمزًا..."}
+
+    def clean_string(self):
+        """
+        Check that:
+        (1) code exists.
+        (2) code is available.
+        (3) user doesn't have another code in the same event.
+        """
+        # Make sure the code is uppercase, without any spaces or hyphens
+        code_string = self.cleaned_data['string'].upper().replace(" ", "").replace("-", "")
+
+        # first, check that code exists
+        try:
+            self.code = Code.objects.get(code_string=code_string)
+        except Code.DoesNotExist:
+            raise forms.ValidationError(u"هذا الرمز غير صحيح.", code="DoesNotExist")
+
+        # next, check that code is available
+        if self.code.user == self.user:
+            raise forms.ValidationError(u"سبق أن استخدمت هذا الرمز", code="Used")
+        elif self.code.user:
+            raise forms.ValidationError(u"هذا الرمز غير متوفر.", code="Unavailable")
+        else:
+            # finally, check that user doesn't have another code in
+            # the same episode, unless the episode allows this to
+            # happen.  If they do have another code, but the new one
+            # has higher point, replace it.
+            if not self.code.collection.parent_order.episode.allow_multiple_niqati:
+                other_codes = Code.objects.filter(collection__parent_order__episode=self.code.collection.parent_order.episode,
+                                                  user=self.user)
+                if other_codes.exists():
+                    self.other_code = other_codes.first()
+                    if self.other_code.points > self.code.points:
+                        raise forms.ValidationError(u"لديك رمز آخر في نفس النشاط، وبنقاط أعلى.", code="HasOtherCode")
+                    elif self.other_code.points == self.code.points:
+                        raise forms.ValidationError(u"لديك رمز آخر في نفس النشاط، وبنفس مقدار النقاط.", code="HasOtherCode")
+                else:
+                    self.other_code = None
+
+        return code_string
+
+    def clean(self):
+        """
+        Make sure that it hasn't been two weeks since the episode ended.
+        """
+        cleaned_data = super(RedeemCodeForm, self).clean()
+        # Check that we indeed have a valid string, and that the code
+        # is part of collection
+        if 'string' in cleaned_data and \
+           self.code.collection and \
+           timezone.now().date() > self.code.collection.parent_order.episode.end_date + datetime.timedelta(14):
+            message = u"مضى أكثر من أسبوعين على انتهاء النشاط ولم يعد ممكنا إدخال نقاطي!"
+            message_level = messages.ERROR
+            #return (message_level, message)
+
+            raise forms.ValidationError(u"مضى أكثر من أسبوعين على انتهاء النشاط ولم يعد ممكنا إدخال نقاطي!", code="TwoWeeks")
+
+        return cleaned_data
+    
+    def process(self):
+        """
+        Register the submitted code for the submitting user if the submission is valid; otherwise do nothing.
+        In both cases, return an appropriate message.
+        :return: a tuple containing a message type and a message.
+        """
+        if self.is_valid():
+            # If the user already has a code, count the one with more
+            # points.
+            if self.other_code:
+                self.other_code.user = None
+                self.other_code.save()
+                message = u"تم إدخال الرمز القديم برمز ذي نقاط أعلى."
+            else:
+                message = u"تم إدخال الرمز بنجاح."
+            message_level = messages.SUCCESS
+
+            new_code = Code.objects.get(code_string=self.cleaned_data['string'])
+            new_code.user = self.user
+            new_code.redeem_date = timezone.now()
+            new_code.save()
+
+            self.code = new_code
+        else:
+            message = u"حصل خطأ ما."
+            message_level = messages.ERROR
+
+            print self.fields['string'].errors.as_data()
+
+        return (message_level, message)

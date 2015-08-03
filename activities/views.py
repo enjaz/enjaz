@@ -238,7 +238,7 @@ def create(request):
                 if 'chosen_reviewer_club' in form.cleaned_data:
                     reviewing_parent = form.cleaned_data['chosen_reviewer_club']
                 else:
-                    reviewing_parent = form_object.primary_club.get_next_reviewing_parent()
+                    reviewing_parent = form_object.primary_club.get_next_activity_reviewing_parent()
 
                 if not reviewing_parent:
                     form_object.is_approved = True
@@ -477,7 +477,7 @@ def review(request, activity_id, reviewer_id):
             activity_full_url = request.build_absolute_uri(activity_url)
             email_context = {'activity': activity}
             if review.cleaned_data['is_approved']:
-                reviewing_parent = reviewer_club.get_next_reviewing_parent()
+                reviewing_parent = reviewer_club.get_next_activity_reviewing_parent()
                 # Reached the top of the review hierarchy => activity
                 # approved.
                 if not reviewing_parent:

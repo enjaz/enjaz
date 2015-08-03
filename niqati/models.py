@@ -4,7 +4,6 @@ import random
 from django.core.urlresolvers import reverse
 import requests
 import os
-import pdfcrowd
 
 from django.db import models, IntegrityError
 from django.contrib.auth.models import User
@@ -13,32 +12,21 @@ from django.utils.http import urlquote
 from django.template.loader import render_to_string
 from django.core.files import File
 from django.conf import settings
-
+from activities.utils import get_club_notification_to, get_club_notification_cc
 from post_office import mail
 from activities.models import Activity, Episode
 from clubs.models import Club
+from core.models import StudentClubYear
+from niqati.managers import CodeQuerySet
 
-def generate_code(length):
-    chars = string.ascii_uppercase + string.digits
-    code = ''
-    for i in range(length):
-        # select a random char
-        char = random.choice(chars)
-        code += char
-    return code
-
-class Niqati_User(User):
-    def total_points(self):
-        return sum(code.category.points for code in self.code_set.all())
-    class Meta:
-        proxy=True # nice trick to add custom methods to the User class; proxy=True means this model will use
-                   # the User table and will not have a table of its own in the db
+CODE_STRING_LENGTH = 6
+COUPON = '0'
+SHORT_LINK = '1'
 
 class Category(models.Model):
     label = models.CharField(max_length=20)
     ar_label = models.CharField(max_length=20)
-    points = models.IntegerField()
-    requires_approval = models.BooleanField(default=False)
+    points = models.PositiveSmallIntegerField()
 
     def __unicode__(self):
         return self.label
@@ -50,43 +38,46 @@ class Category(models.Model):
 
 class Code(models.Model):
     # Basic Properties
+    year = models.ForeignKey(StudentClubYear,
+                             null=True,
+                             on_delete=models.SET_NULL)
     code_string = models.CharField(max_length=16, unique=True) # a 16-digit string, unique throughout all the db
-    category = models.ForeignKey(Category)
-    episode = models.ForeignKey(Episode)
+    points = models.PositiveSmallIntegerField(default=0)
+
+    # To document the reason for manually-added codes.
+    note = models.CharField(max_length=200, blank=True)
+
+    # Obsolete
+    category = models.ForeignKey(Category, null=True, blank=True)
 
     # Generation-related
-    collection = models.ForeignKey('Code_Collection')
+    collection = models.ForeignKey('Code_Collection', null=True,
+                                   blank=True,
+                                   on_delete=models.SET_NULL)
     generation_date = models.DateTimeField(auto_now_add=True)
-    asset = models.CharField(max_length=300, blank=True) # either (1) short link or (2) link to QR (depending on delivery_type of parent collection)
 
     # Redeem-related
     user = models.ForeignKey(User, null=True, blank=True)
-    redeem_date = models.DateTimeField(null=True, blank=True)
+    redeem_date = models.DateTimeField(null=True, blank=True,
+                                       verbose_name=u"تاريخ الإدخال")
 
+    # to avoid generating a new link with each download, we'll store
+    # the link in our db; no need to do the same for QRs.
+    short_link = models.URLField(verbose_name=u"رابط قصير", blank=True, default="")
+
+    objects = CodeQuerySet.as_manager()
+    
+    # Obsolete
+    asset = models.CharField(max_length=300, blank=True) # either (1) short link or (2) link to QR (depending on delivery_type of parent collection)
+        
     def __unicode__(self):
         return self.code_string
 
-    def generate_unique(self):
-        if not self.code_string: # only works when there is no string (when code is created for first time)
-            unique = False
-            while unique == False:
-                new_code = generate_code(16)
-                unique = True
-                if len(Code.objects.filter(code_string=new_code)) == 0:
-                    self.code_string = new_code
-                    return
-                else:
-                    unique = False
-    
-    # returns a "spaced code" i.e. XXXX XXXX XXXX XXXX instead of XXXXXXXXXXXXXXXX
-    def spaced_code(self):
-        spaced_code = ""
-        for i in range(len(self.code_string)):
-            if i % 4 == 0 and i > 0:
-                spaced_code += " "
-            spaced_code += self.code_string[i]
-        return spaced_code
-    
+    def is_redeemed(self):
+        return self.user is not None
+    is_redeemed.boolean = True
+    is_redeemed.short_description = u"تم استخدامه؟"
+        
     class Meta:
         verbose_name = u"نقطة"
         verbose_name_plural = u"النقاط"
@@ -111,161 +102,112 @@ class Code(models.Model):
 
 
 class Code_Collection(models.Model): # group of codes that are (1) of the same type & (2) of the same Code_Order
-
-    COUPON = '0'
-    SHORT_LINK = '1'
-    DELIVERY_TYPE_CHOICES = (
-        (COUPON, u"كوبونات"),
-        (SHORT_LINK, u"روابط قصيرة"),
-    )
-
-    # Basics
-    date_ordered = models.DateTimeField(auto_now_add=True)
-
     # Generation-related
     code_category = models.ForeignKey(Category)
-    code_count = models.IntegerField()
+    code_count = models.PositiveSmallIntegerField()
     parent_order = models.ForeignKey('Code_Order') # --- relation to activity is through the Code_Order
 
-    # Approval-related
-    #   Approval choices:
-    #       None: Unreviewed
-    #       True: Approved
-    #       False: Rejected
+    # Approval choices:
+    #   None: Unreviewed
+    #   True: Approved
+    #   False: Rejected
+    # Obsolete
     approved = models.NullBooleanField(default=None) # for idea codes
 
-    # Delivery-related
-    delivery_type = models.CharField(max_length=1, choices=DELIVERY_TYPE_CHOICES)
-    date_created = models.DateTimeField(null=True, blank=True, default=None) # date/time of actual code generation (after approval)
-    asset = models.FileField(upload_to='niqati/codes/') # either the PDF file for coupons or the list of short links (as txt/html?)
-    # thought: txt or html file not for download; instead read as strings and displayed in browser
+    date_downloaded = models.DateTimeField(null=True, blank=True, verbose_name=u"تاريخ التنزيل")
 
-    def admin_asset_link(self):
-        if self.pk:
-            link = reverse('niqati:view_collec', args=(self.pk, ))
-            return "<a href='%s'>%s</a>" % (link, u"اعرض الملف المرفق")
-    admin_asset_link.allow_tags = True
+    # Obsolete
+    asset = models.FileField(upload_to='niqati/codes/') # either the PDF file for coupons or the list of short links (as txt/html?)
 
     def __unicode__(self):
         return self.parent_order.episode.__unicode__() + " - " + self.code_category.ar_label
-
+    
+    def admin_coupon_link(self):
+        if self.pk:
+            link = reverse('niqati:download_coupons', args=(self.pk,))
+            return "<a href='%s'>%s</a>" % (link, u"اعرض الكوبونات")
+    admin_coupon_link.allow_tags = True
+                
     class Meta:
         verbose_name = u"مجموعة نقاط"
         verbose_name_plural = u"مجموعات النقاط"
 
-    def process(self, host):
-        if self.approved and (self.date_created is None):
-            for i in range(self.code_count):
-                c = Code(category=self.code_category,
-                         episode=self.parent_order.episode,
-                         collection=self)
-                c.generate_unique()
-                c.save()
-
-            if self.delivery_type == self.COUPON:
-
-                # generate QR codes for each coupon
-                qr_endpoint = "http://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" + host
-                for code in self.code_set.all():
-                    code.asset = qr_endpoint + code.code_string
-                    code.save()
-
-                # ---
-
-                context = {'collec': self}
-                html_file = render_to_string('niqati/coupons.html', context)
-
-                try:
-                    # create an API client instance
-                    client = pdfcrowd.Client(settings.PDFCROWD_USERNAME, settings.PDFCROWD_KEY)
-
-                    # convert HTML string and save the result to a file
-                    output_file = open('codes_' + str(self.pk) + '.pdf', 'wb')
-                    client.convertHtml(html_file.encode('utf-8'), output_file)
-                    output_file = open('codes_' + str(self.pk) + '.pdf', 'r+')
-                    self.asset.save(self.parent_order.episode.__unicode__() + " - " + self.code_category.ar_label, File(output_file))
-                    self.save()
-                    
-                    output_file.close()
-                    os.remove('codes_' + str(self.pk) + '.pdf')
-
-                except pdfcrowd.Error, why:
-                    print 'Failed:', why
-                
-
-            else:
-                # generate short links for each code
-                for code in self.code_set.all():
-                    long_link = urlquote(host + code.code_string)
-                    response = requests.get("https://api-ssl.bitly.com/v3/shorten?access_token=" + settings.BITLY_KEY + "&format=txt&longUrl=" + long_link)
-                    short_link = response.text
-                    code.asset = short_link
-                    code.save()
-                # generate a file that houses them all
-                
-                context = {'collec': self}
-                html_file = render_to_string('niqati/links.html', context)
-                
-                output_file = open('links_' + str(self.pk) + '.html', 'wb')
-                output_file.write(html_file.encode('utf-16'))
-                output_file = open('links_' + str(self.pk) + '.html', "r+")
-                self.asset.save(self.parent_order.episode.__unicode__() + " - " + self.code_category.ar_label, File(output_file))
-                output_file.close()
-                
-                os.remove('links_' + str(self.pk) + '.html')
-
-            # Record the date and time the collection was processed
-            # Placing this at the end ensures that collections which experience issues while
-            # being processed won't be falsely marked as processed
-            self.date_created = timezone.now()
-            self.save()
-                
-
 class Code_Order(models.Model): # consists of one Code_Collection or more
     episode = models.ForeignKey(Episode, verbose_name=u"الموعد")
     date_ordered = models.DateTimeField(auto_now_add=True)
+    assignee = models.ForeignKey('clubs.Club', null=True, blank=True,
+                                 on_delete=models.SET_NULL,
+                                 related_name='assigned_niqati_orders',
+                                 verbose_name=u"النادي المسند")
+    submitter = models.ForeignKey(User, null=True,
+                                  on_delete=models.SET_NULL,
+                                  related_name="submitted_code")
 
-    def process(self, host):
-        for collec in self.code_collection_set.all():
-            collec.process(host)
-        self.save()
+    # Approval choices:
+    #   None: Unreviewed
+    #   True: Approved
+    #   False: Rejected
+    is_approved = models.NullBooleanField(default=None)
 
-        # Send email notification after code generation
-        email_context = {'order': self}
-        if self.episode.activity.primary_club.coordinator:
-            recipient = self.episode.activity.primary_club.coordinator.email
-        else:
-            recipient = self.episode.activity.submitter.email
-        mail.send([recipient],
-                  template="niqati_order_approve",
-                  context=email_context)
-    
+    # Obsolete
     def is_reviewed(self):
         if len(self.code_collection_set.filter(approved=None)) == 0:
             return True
         else:
             return False
 
-    def get_delivery_type(self):
-        # This is a dirty hack, should be fixed later
-        return self.code_collection_set.first().delivery_type
-
-    def is_approved(self):
-        # Might be a dirty hack as well
-        return all([collec.approved for collec in self.code_collection_set.all()])
-
-    def is_processed(self):
-        return all([collec.date_created is not None for collec in self.code_collection_set.all()])
-
-    def mark_as_processed(self):
+    # Obsolete (=unused)
+    def get_categories(self):
         """
-        Mark the code collections constituting the current order as processed.
-        This is to prevent troublesome orders from causing delays in the generation queue.
+        Iterate over the categories includes in this order.
+        Yield a queryset for each category including the codes within this order that are of that category.
         """
-        for collec in self.code_collection_set.all():
-            if collec.date_created is None:
-                collec.date_created = timezone.now()
-                collec.save()
+        for category in Category.objects.all():
+            if self.codes.filter(category=category).exists():
+                yield self.codes.filter(category=category)
+        
+    def create_codes(self):
+        # To reduce database queries and to improve performance, we
+        # are going to generate all random strings once and check them
+        # all in one query to see if any of them is already taken.  If
+        # any of them is, we would simply replace that and try again
+        # until none is taken.  Previously, the number of queires was:
+        #     2 * number_of_codes
+        # Now, it can be as low as 2 queries for the whole collection.
+        # Previously, it took 30 seconds to generate 200 codes, now it
+        # takes 1 second.
+        look_alike = "O0I1"
+        all_chars = string.ascii_uppercase + string.digits
+        chars = "".join([char for char in all_chars
+                         if not char in look_alike])
+        year = StudentClubYear.objects.get_current()
+
+        for collection in self.code_collection_set.all():
+            random_strings = []
+            required_codes = collection.code_count
+            while True:
+                for i in range(required_codes):
+                    random_string = ''.join(random.choice(chars) for i in range(CODE_STRING_LENGTH))
+                    random_strings.append(random_string)
+
+                identical_codes = Code.objects.filter(code_string__in=random_strings)
+                if identical_codes.exists():
+                    identical_strings = [identical_code.code_string \
+                                         for identical_code in identical_codes]
+                    for identical_string in identical_strings:
+                        random_strings.pop(identical_string)
+                    required_codes = len(identical_strings)    
+                else:
+                    break
+
+            points = collection.code_category.points
+            codes = []
+            for random_string in random_strings:
+                codes.append(Code(code_string=random_string,
+                                  points=points,
+                                  collection=collection,
+                                  year=year))
+            Code.objects.bulk_create(codes)
 
     def __unicode__(self):
         return self.episode.__unicode__()
@@ -278,3 +220,23 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
         )
         verbose_name = u"طلب نقاط"
         verbose_name_plural = u"طلبات النقاط"
+
+class Review(models.Model):
+    date_reviewed = models.DateTimeField(null=True, blank=True,
+                                         verbose_name=u"تاريخ المراجعة",
+                                         auto_now_add=True)
+    reviewer_club = models.ForeignKey('clubs.Club', related_name="reviewed_niqati_orders",
+                                      limit_choices_to={'can_review_niqati': True},
+                                      verbose_name=u"النادي المراجِع",
+                                      null=True)
+    reviewer = models.ForeignKey(User, null=True,
+                                 on_delete=models.SET_NULL,
+                                 related_name="reviewed_niqati_orders")
+    order = models.ForeignKey('Code_Order', null=True,
+                                   blank=True,
+                                   on_delete=models.SET_NULL)
+    # Approval choices:
+    #   None: Unreviewed
+    #   True: Approved
+    #   False: Rejected
+    is_approved = models.NullBooleanField(default=None) # for idea codes

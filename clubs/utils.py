@@ -2,8 +2,8 @@
 from .models import Club
 from core.models import StudentClubYear
 
-current_year = StudentClubYear.objects.get_current()
 
+current_year = StudentClubYear.objects.get_current()
 
 def is_coordinator_of_any_club(user):
     """Return whether the user is a coordinator of any club."""
@@ -154,3 +154,17 @@ def can_edit_activity(user, activity):
         editing_parents = reviewing_parents.filter(can_edit=True)
         user_clubs = editing_parents.filter(coordinator=user) | editing_parents.filter(deputies=user)
         return user_clubs.exists()
+
+def can_review_any_niqati(user):
+    if user.has_perm('activities.change_code'): # e.g. superuser
+        return True
+    niqati_reviewers = Club.objects.filter(can_review_niqati=True)
+    user_clubs = niqati_reviewers.filter(coordinator=user) | \
+                 niqati_reviewers.filter(deputies=user)
+    return user_clubs.exists()
+
+def get_order_reviewing_clubs_by_user(user, order):
+    niqati_reviewers = Club.objects.niqati_reviewing_parents(order)
+    user_clubs = niqati_reviewers.filter(coordinator=user) | \
+                 niqati_reviewers.filter(deputies=user)
+    return user_clubs

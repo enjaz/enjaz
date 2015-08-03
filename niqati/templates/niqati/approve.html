@@ -9,8 +9,8 @@
 
 <h2>مراجعة طلبات النقاط</h2>
 
-{% if activities %}
-{% for activity in activities %}
+{% if activities_with_pending_orders %}
+{% for activity in activities_with_pending_orders %}
 <h3><a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a> <small>{{ activity.primary_club.name }}</small></h3>
 <table class="table">
 	<tr>
@@ -20,34 +20,22 @@
 	</tr>
 	{% for episode in activity.episode_set.all %}
     {% for order in episode.code_order_set.all %}
-	{% if not order.is_reviewed %}
-		<tr>
+	{% if order.is_approved == None %}
+		<tr id="order-{{ order.pk }}">
 			<td>{{ order.date_ordered }}</td>
 			<td>
 				<ul class="list-group">
-				 	{% for collec in unapproved_collec %}
-				 	{% if collec in order.code_collection_set.all %}
+				 	{% for collection in order.code_collection_set.all %}
 				 	<li class="list-group-item">
-					    <span class="badge">{{ collec.code_count }} أكواد</span>
-					    {{ collec.code_category.ar_label }}
+					    <span class="badge">{{ collection.code_count }} أكواد</span>
+					    {{ collection.code_category.ar_label }}
 				  	</li>
-				  	{% endif %}
 				 	{% endfor %} 
 				</ul>
 			</td>
 			<td>
-				<form style="display:inline" action="{% url 'niqati:approve' %}" method="post" class="form-inline" role="form">
-		            {% csrf_token %}
-		            <input type="hidden" name="pk" value="{{ order.pk }}"/>
-		            <input type="hidden" name="action" value="approve_order"/>
-		            <button type="submit" class="btn btn-success">قبول</button>
-		        </form>
-		        <form style="display:inline" action="{% url 'niqati:approve' %}" method="post" class="form-inline" role="form">
-		            {% csrf_token %}
-		            <input type="hidden" name="pk" value="{{ order.pk }}"/>
-		            <input type="hidden" name="action" value="reject_order"/>
-		            <button type="submit" class="btn btn-danger">رفض</button>
-		        </form>    
+		            <a type="submit" data-pk="{{ order.pk }}" data-action="accept" class="accept-order btn btn-success">قبول</a>
+		            <a type="submit" data-pk="{{ order.pk }}" data-action="reject" class="reject-order btn btn-danger">رفض</a>
 			</td>
 		</tr>
 	{% endif %}
@@ -58,4 +46,33 @@
 {% else %}
 <p>لا توجد طلبات نقاط حاليًا.</p>
 {% endif %}
+<script>
+$(function() {
+    $('.reject-order, .accept-order').click(function(){
+	// Remove action classes, to prevented repeated actions.
+        var action = $(this).data('action');
+        var pk = $(this).data('pk');
+        $('a[data-pk=' + pk + ']').removeClass('reject-order accept-order');
+        $('a[data-pk=' + pk + ']').addClass('disabled');
+        var data = {'pk': pk, 'action': action};
+        $.ajax({
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            url: '{% url 'niqati:review_order' %}',
+            cache: false,
+            success: function(data){
+                if (data['success'] == true){
+                    $('#order-' + pk).hide('fast');
+                } else {
+                    alert(data['message']);
+                    $('a[data-pk=' + pk + '][data-action=reject]').addClass('reject-order');
+                    $('a[data-pk=' + pk + '][data-action=accept]').addClass('accept-order');
+                    $('a[data-pk=' + pk + ']').removeClass('disabled');
+                }
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

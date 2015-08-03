@@ -177,7 +177,7 @@ def review_order(request):
                  niqati_reviewers.filter(deputies=request.user)
 
     # Permission check
-    if request.user.has_perm('activities.change_code'):
+    if request.user.has_perm('niqati.change_code_order'):
         reviewer_club = None
     elif user_clubs.exists():
         reviewer_club = user_clubs.first()
@@ -251,11 +251,17 @@ def review_order(request):
 def list_pending_orders(request):
     user_clubs = get_user_coordination_and_deputyships(request.user)
     user_niqati_reviewing_clubs = user_clubs.filter(can_review_niqati=True)
-    if not request.user.has_perm('activities.change_code') and \
+    if not request.user.has_perm('niqati.change_code') and \
        not user_niqati_reviewing_clubs.exists():
         raise PermissionDenied
-    activities_with_pending_orders = Activity.objects.filter(episode__code_order__assignee__in=user_niqati_reviewing_clubs,
-                                                             episode__code_order__is_approved__isnull=True).distinct()
+
+    # For the superuser, show all pending requests.
+    if request.user.has_perm('niqati.change_code_order'):
+        activities_with_pending_orders = Activity.objects.filter(episode__code_order__isnull=False,
+                                                                 episode__code_order__is_approved__isnull=True).distinct()
+    else:
+        activities_with_pending_orders = Activity.objects.filter(episode__code_order__assignee__in=user_niqati_reviewing_clubs,
+                                                                 episode__code_order__is_approved__isnull=True).distinct()
     context = {'activities_with_pending_orders': activities_with_pending_orders}
     return render(request, 'niqati/approve.html', context)
 

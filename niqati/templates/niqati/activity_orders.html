@@ -41,10 +41,21 @@
 			    <td>
 			        <ul class="list-group">
 			        {# collections #}
-			        {% for collec in order.code_collection_set.all %}
+			        {% for collection in order.code_collection_set.all %}
 			            <li class="list-group-item">
-			 				<span class="badge">{{ collec.code_count }} أكواد</span>
-			                {{ collec.code_category.ar_label }}{% if order.is_approved == True %}<ul class="list-inline"><li class="entypo-docs"><a href="{% url 'niqati:download_coupons' collec.pk %}">كوبونات</a></li><li class="entypo-link"><a href="{% url 'niqati:download_links' collec.pk %}">روابط</a></li></ul>{% endif %}
+				        {{ collection.code_category.ar_label }}
+			 		{% if not collection.students.exists %}
+						<span class="badge">{{ collection.code_count }} أكواد</span>
+						{% if order.is_approved == True %}<ul class="list-inline"><li class="entypo-docs"><a href="{% url 'niqati:download_coupons' collection.pk %}">كوبونات</a></li><li class="entypo-link"><a href="{% url 'niqati:download_links' collection.pk %}">روابط</a></li></ul>{% endif %}
+					{% else %}
+						{% if collection.students %}
+						<ul>
+							{% for student in collection.students.all %} 
+							<li>{{ student.common_profile.get_ar_full_name }}</li>
+							{% endfor %}
+						</ul>
+						{% endif %}
+					{% endif %}
 			            </li>
 			        {% endfor %}   
 			        </ul>

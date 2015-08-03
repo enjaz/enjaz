@@ -1,8 +1,17 @@
 {% load bootstrap3 %}
+<style>
+.autocomplete-light-widget{
+	display: block;
+}
+</style>
+{% include 'autocomplete_light/static.html' %}
+
 {% if error == 'closed' %}
 <p class="alert alert-danger">مضى أكثر من 14 يومًا على انقضاء النشاط، ولم يعد ممكنًا رفع طلب نقاطي.</p>
 {% else %}
-<form method="post" action="{% url 'activities:niqati_orders' activity.pk %}" class="form-inline">
+<div class="row">
+	<div class="col-sm-4 col-sm-offset-4">
+<form method="post" action="{% url 'activities:niqati_orders' activity.pk %}">
     {% csrf_token %}
     {% bootstrap_form form %}
     <div class="form-group">
@@ -10,6 +19,46 @@
             أرسل
         </button>
     </div>
-</div>
 </form>
+	</div>
+</div>
+
+<script>
+$(function(){
+	$.each($('input[data-direct-entry=true]'), function(index, input){
+		var category = $(input).data('category');
+		// By default, hide the autocomplete input field and label.
+		$('#id_students_' + category + '-wrapper').hide();
+		$('label[for=id_students_' + category).hide();
+		// Show a link that would display it.
+		$('label[for=id_count_' + category + ']').append(" (<a data-action='autocomplete' data-category=" + category + ">ادخال مباشر!</a>)");
+		$('label[for=id_students_' + category + ']').append(" (<a data-action='number' data-category=" + category + ">ألغِ الإدخال المباشر!</a>)");
+	});
+	$('a[data-category]').click(function(){
+		var category = $(this).data('category');
+		var action = $(this).data('action');
+		if (action == 'autocomplete'){
+			// remove previous selection
+			$('#id_count_' + category).val(0);
+			// Hide number selection
+			$('#id_count_' + category).hide(300);
+			$('label[for=id_count_' + category + ']').hide(300, function(){
+				$('#id_students_' + category + '-wrapper').show(300).css('display', 'block');
+				$('label[for=id_students_' + category + ']').show(300);
+			});
+
+		}else{
+			// remove previous selection
+			$('#id_students_' + category).html("");
+			$('#id_students_' + category + '-deck').html("");
+			// Hide autocomplete selection
+			$('#id_students_' + category + '-wrapper').hide(300);
+			$('label[for=id_students_' + category + ']').hide(300, function(){
+				$('#id_count_' + category).show(300);
+				$('label[for=id_count_' + category + ']').show(300);
+			});
+		}
+	});
+});
+</script>
 {% endif %}

@@ -3,15 +3,10 @@
 <p class="alert alert-danger">مضى أكثر من 14 يومًا على انقضاء النشاط، ولم يعد ممكنًا رفع طلب نقاطي.</p>
 {% else %}
 <form method="post" action="{% url 'activities:niqati_orders' activity.pk %}" class="form-inline">
-    <style>
-        .form-inline .form-control {
-            width: 100%;
-        }
-    </style>
     {% csrf_token %}
-     {% bootstrap_form form %}
-    <div class="col-md-2">
-        <button type="submit" class="btn btn-block btn-default btn-green">
+    {% bootstrap_form form %}
+    <div class="form-group">
+        <button type="submit" class="btn form-control btn-green">
             أرسل
         </button>
     </div>

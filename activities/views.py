@@ -75,7 +75,7 @@ def list_activities(request):
 
         # For logged-in users, only show city-specific and
         # gender-specific activities.
-        context['approved'] = Activity.objects.approved().for_user_city(request.user).for_user_gender(request.user)
+        context['approved'] = Activity.objects.approved().current_year().for_user_city(request.user).for_user_gender(request.user)
 
         if request.user.is_superuser:
             # If the user is a super user or part of the presidency,
@@ -87,8 +87,8 @@ def list_activities(request):
             # For club coordinators, deputies, and members, show
             # approved activities as well as their own club's pending
             # and rejected activities.
-            context['pending'] = Activity.objects.pending().current_year().for_user_clubs(request.user).distinct()
-            context['rejected'] = Activity.objects.rejected().current_year().for_user_clubs(request.user).distinct()
+            context['pending'] = Activity.objects.pending().for_user_clubs(request.user).distinct()
+            context['rejected'] = Activity.objects.rejected().for_user_clubs(request.user).distinct()
             # In addition to the gender-specific approved activities,
             # show all activities of the user club.
             context['approved'] = (context['approved'] |  Activity.objects.approved().for_user_clubs(request.user)).distinct()
@@ -117,7 +117,7 @@ def list_activities(request):
             # An employee is basically similar to a normal user, the
             # only difference is having another table that includes
             # the employee's relevant activities
-            context['club_approved'] = Activity.objects.approved().filter(primary_club__in=request.user.employee.all())
+            context['club_approved'] = Activity.objects.approved().current_year().filter(primary_club__in=request.user.employee.current_year())
 
             template = 'activities/list_employee.html'
         else: # For students and other normal users.

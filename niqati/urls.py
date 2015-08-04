@@ -17,4 +17,5 @@ urlpatterns = patterns('',
     url(r'^short_url/$', views.get_short_url, name='get_short_url'),
     url(r'^approve/$', views.list_pending_orders, name='list_pending_orders'),
     url(r'^generalreport/$', views.general_report, name='general_report'),
+    url(r'^generalreport/(?P<city>\w+)/$', views.general_report, name='general_report_for_city'),
 )

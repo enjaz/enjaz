@@ -2,6 +2,14 @@
 {% block title %}التقرير العام{% endblock %}
 
 {% block content %}
+
+{% if city_choices %}
+<ul>
+{% for city in city_choices %}
+<li><a href="{% url 'niqati:general_report_for_city' city.0 %}">{{ city.1 }}</a></li>
+{% endfor %}
+</ul>
+{% else %}
 <style type="text/css">
     .points {
         font-weight: bold !important;
@@ -42,6 +50,7 @@
     {% endfor %}
     </tbody>
 </table>
+{% endif %}
 {% endblock %}
 
 {% block customscript %}

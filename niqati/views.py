@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.http import urlquote
@@ -23,7 +23,7 @@ from core.models import StudentClubYear
 from activities.models import Activity, Evaluation
 from activities.forms import EvaluationForm
 from activities.utils import get_club_notification_to, get_club_notification_cc
-from clubs.models import Club
+from clubs.models import Club, city_choices
 from clubs.utils import has_coordination_to_activity, get_user_coordination_and_deputyships, can_review_any_niqati, is_coordinator_or_deputy_of_any_club
 from niqati.models import Category, Code, Code_Order, Code_Collection, Review, COUPON, SHORT_LINK
 from niqati.forms import OrderForm, RedeemCodeForm
@@ -279,9 +279,18 @@ def list_pending_orders(request):
 
 @login_required
 @permission_required('niqati.view_general_report', raise_exception=True)
-def general_report(request):
-    users = User.objects.filter(code__year=current_year).annotate(point_sum=Sum('code__points')).filter(point_sum__gt=0).order_by('-point_sum')
-    return render(request, 'niqati/general_report.html', {'users': users})
+def general_report(request, city=""):
+    if city:
+        city_codes = [city_pair[0] for city_pair in city_choices]
+        if not city in city_codes:
+            raise Http404
+        users = User.objects.filter(common_profile__city=city,
+                                    code__year=current_year).annotate(point_sum=Sum('code__points')).filter(point_sum__gt=0).order_by('-point_sum')
+        context = {'users': users}
+    else:
+        context = {'city_choices':
+                   city_choices}
+    return render(request, 'niqati/general_report.html', context)
 
 @login_required
 @csrf.csrf_exempt

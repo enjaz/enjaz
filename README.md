@@ -37,16 +37,22 @@ Licensed under the General Public License version 3 of the License, or
 # Installation 
 
 Current dependencies:
-* django-constance
+* Django
+* django-bootstrap3
+* django-constance-updated
 * django-cors-headers
 * django-email_extras
+* django-picklefield
+* django-post-office _(check out the official installation documentation)_
+* django-tagging
+* django-tagging-autocomplete
 * django-taggit
 * django-templated-email
-* django-userena
+* django-userena _(check out the official installation documentation)_
+* easy-thumbnails
 * djangorestframework
 * future
 * pdfcrowd
-* post_office _(with the cronjob)_
 * requests
 * unicodecsv
 * unidecode
@@ -117,10 +123,6 @@ CONSTANCE_CONFIG = {
 ```
 
 # First run
-
-* The platform has many KSAU-HS-dependent conentns and they are load
-  automatically as part of `*/fixtures/initial_data.json`.  Make sure
-  you too need them.
 * Usernea requires certain permissions to function.  Those are
   provided with the `manage.py check_permissions` command.  Make sure
   that you run it because otherwise, the sign-up page may just stop

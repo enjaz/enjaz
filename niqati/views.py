@@ -72,19 +72,27 @@ def redeem(request, code=""):
     return render(request, "niqati/submit.html", {"form": form,  "eval_form": eval_form})
     
 @login_required
-def student_report(request):
-    if request.user.coordination.current_year().exists():
+def student_report(request, username=None):
+    # Only the superuser can see a specific user.  Coordinators will
+    # get an introduction page to Niqati becaues they are not supposed
+    # to register any codes.
+    if username and not request.user.has_perm('niqati.view_code'):
+        raise PermissionDenied
+    elif request.user.coordination.current_year().exists():
         user_club = request.user.coordination.current_year().first()
         context = {'user_club': user_club}
         return render(request, "niqati/submit_coordinators.html", context)
+
+    if username:
+        niqati_user = get_object_or_404(User, username=username)
     else:
-        # calculate total points
-        total_points = request.user.code_set.current_year().aggregate(total_points=Sum('points'))['total_points']
-        if total_points is None:
-            total_points = 0
-        context = {'total_points': total_points}
-        # TODO: sort codes
-        return render(request, 'niqati/student_report.html', context)
+        niqati_user = request.user
+    # TODO: sort codes
+    total_points = niqati_user.code_set.current_year().aggregate(total_points=Sum('points'))['total_points']
+    if total_points is None:
+        total_points = 0
+    context = {'total_points': total_points, 'niqati_user': niqati_user}
+    return render(request, 'niqati/student_report.html', context)
 
 # Club Views
 @login_required
@@ -272,7 +280,7 @@ def list_pending_orders(request):
 @login_required
 @permission_required('niqati.view_general_report', raise_exception=True)
 def general_report(request):
-    users = User.objects.annotate(point_sum=Sum('code__category__points')).filter(point_sum__gt=0).order_by('-point_sum')
+    users = User.objects.filter(code__year=current_year).annotate(point_sum=Sum('code__points')).filter(point_sum__gt=0).order_by('-point_sum')
     return render(request, 'niqati/general_report.html', {'users': users})
 
 @login_required

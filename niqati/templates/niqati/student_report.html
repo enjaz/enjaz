@@ -1,5 +1,5 @@
 {% extends "niqati_base.html" %}
-{% block title %}تقريري{% endblock %}
+{% block title %}{% if user == niqati_user %}تقريري{% else %}تقرير {{ niqati_user.common_profile.get_ar_full_name }}{% endif %}{% endblock %}
 
 {% block content %}
 <style type="text/css">
@@ -7,8 +7,7 @@
 .tg td{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;}
 .tg th{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
 </style>
-
-<h3>تقرير نقاطي</h3>
+<h1>تقرير نقاطي {% if user != niqati_user %}ل{{ niqati_user.common_profile.get_ar_full_name }}{% endif %}</h1>
 <div class="page-header">
   <h3>مجموع نقاطي: <small>{{ total_points }} نقطة</small></h3>
 </div>
@@ -19,7 +18,7 @@
     <th>عدد النقاط</th>
     <th>تاريخ الإدخال</th>
   </tr>
-    {% for code in user.code_set.current_year %}
+    {% for code in niqati_user.code_set.current_year %}
         <tr>
             <td>{% if code.collection %}<a href="{% url 'activities:show' code.collection.parent_order.episode.activity.pk %}">{{ code.collection.parent_order.episode }}</a>{% else %}مخصّصة{% endif %}</td>
             <td>{% if code.collection %}{{ code.collection.code_category.ar_label }}{% else %}مُخصّصة{% endif %}</td>

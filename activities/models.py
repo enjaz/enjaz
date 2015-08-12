@@ -3,6 +3,7 @@ import os
 
 from django.contrib.contenttypes.generic import GenericRelation
 from django.db import models
+from django.db.models import Avg, F, Sum
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
@@ -13,6 +14,24 @@ from clubs.models import College, Club
 from clubs.utils import get_deanship, get_presidency
 from forms_builder.forms.models import Form
 from media.utils import REPORT_DUE_AFTER
+
+
+class Evaluation(models.Model):
+    """ An activity evaluation filled by students upon Niqati code submission. """
+    episode = models.ForeignKey('Episode')
+    evaluator = models.ForeignKey(User)
+
+    # Evaluation criteria, where evaluation is on a scale from 1
+    # (lowest) to 5 (highest) (So far there isn't a way to enforce min
+    # and max for model fields, so this has to be done on the form
+    # level)
+    quality = models.PositiveIntegerField(verbose_name=u"جودة تنظيم النشاط",
+                                          help_text=u"كيف تقيم عمل النادي في تنظيم النشاط؟")
+    relevance = models.PositiveIntegerField(verbose_name=u"ملاءمة النشاط لاهتمام الطلاب",
+                                            help_text=u"ما مدى ملاءمة النشاط لاهتمام الطلاب؟")
+    class Meta:
+        verbose_name = u"تقييم"
+        verbose_name_plural = u"التقييمات"
 
 
 class Activity(models.Model):
@@ -130,7 +149,10 @@ class Activity(models.Model):
         Return a verbose version of the approval status.
         """
         if self.is_approved:
-            return u"تمت الموافقة على النشاط."
+            if self.assignee is None:
+                return u"تمت الموافقة على النشاط."
+            elif self.assignee != self.primary_club:
+                return u"ينتظر تقييم %s." % self.assignee.name
         elif self.is_approved is False:
             return u"رُفض من قبل %s." % self.review_set.filter(is_approved=False).first().reviewer_club.name
         elif self.is_approved is None:
@@ -194,31 +216,45 @@ class Activity(models.Model):
         """
         Get all the evaluations from all the episodes of the activity
         """
-        evaluations = []
-        for episode in self.episode_set.all():
-            evaluations.extend(episode.evaluation_set.all())
+        evaluations = Evaluation.objects.filter(episode__activity=self)
         return evaluations
 
     def get_evaluation_count(self):
-        return len(self.get_evaluations())
+        return self.get_evaluations().count()
     get_evaluation_count.short_description = u"عدد التقييمات"
 
     def get_relevance_score_average(self):
         """
         Return the average evaluation score for relevance to student needs.
         """
-        relevance_scores = [e.relevance for e in self.get_evaluations()]
-        return float(sum(relevance_scores))/len(relevance_scores) if len(relevance_scores) > 0 else 0
-        # NOTE: the conditional is to avoid division by zero
+        return self.get_evaluations().aggregate(avg=Avg('relevance'))['avg']
     get_relevance_score_average.short_description = u"معدل تقييم ملاءمة النشاط"
 
     def get_quality_score_average(self):
         """
         Return the average evaluation score for quality of the activity.
         """
-        quality_scores = [e.quality for e in self.get_evaluations()]
-        return float(sum(quality_scores))/len(quality_scores) if len(quality_scores) > 0 else 0
+        return self.get_evaluations().aggregate(avg=Avg('quality'))['avg']
     get_quality_score_average.short_description = u"معدل تقييم جودة النشاط"
+
+    def get_evaluation_percentage(self):
+        percentage = self.get_evaluations().aggregate(avg=Avg(F('quality') + F('relevance')))['avg']
+        if percentage:
+            percentage *= 10 
+        return percentage
+
+    def get_total_assessment_points(self):
+        return self.assessment_set.aggregate(total=Sum('criterionvalue__value'))['total']
+
+    def get_presidency_assessment_points(self):
+        return self.assessment_set.filter(criterionvalue__criterion__category='P').aggregate(presidency=Sum('criterionvalue__value'))['presidency']
+
+    def get_media_assessment_points(self):
+        return self.assessment_set.filter(criterionvalue__criterion__category='M').aggregate(media=Sum('criterionvalue__value'))['media']
+
+    def get_cooperator_points(self):
+        return self.assessment_set.aggregate(cooperation=Sum('cooperator_points'))['cooperation']
+
 
     class Meta:
         permissions = (
@@ -452,23 +488,6 @@ class Category(models.Model):
         verbose_name = u"تصنيف"
         verbose_name_plural = u"التصنيفات"
 
-
-class Evaluation(models.Model):
-    """ An activity evaluation filled by students upon Niqati code submission. """
-    episode = models.ForeignKey(Episode)
-    evaluator = models.ForeignKey(User)
-
-    # Evaluation criteria, where evaluation is on a scale from 1 (lowest) to 5 (highest)
-    # (So far there isn't a way to enforce min and max for model fields, so this has
-    # to be done on the form level)
-    quality = models.PositiveIntegerField(verbose_name=u"جودة تنظيم النشاط",
-                                          help_text=u"كيف تقيم عمل النادي في تنظيم النشاط؟")
-    relevance = models.PositiveIntegerField(verbose_name=u"ملاءمة النشاط لاهتمام الطلاب",
-                                            help_text=u"ما مدى ملاءمة النشاط لاهتمام الطلاب؟")
-    class Meta:
-        verbose_name = u"تقييم"
-        verbose_name_plural = u"التقييمات"
-
 class Attachment(models.Model):
     activity = models.ForeignKey(Activity)
     description = models.CharField(max_length=200, verbose_name=u"الوصف", blank=True)
@@ -483,3 +502,39 @@ class Attachment(models.Model):
 
     def __unicode__(self):
         return self.filename()
+
+class Assessment(models.Model):
+    activity = models.ForeignKey(Activity)
+    assessor = models.ForeignKey(User)
+    assessor_club = models.ForeignKey(Club, null=True,
+                                      blank=True)
+    submission_date = models.DateTimeField(u'تاريخ الإرسال',
+                                           auto_now_add=True)
+    cooperator_points = models.IntegerField(default=0,
+                                            verbose_name=u"نقاط التعاون")
+    notes = models.TextField(verbose_name=u"وصف النشاط", blank=True)
+
+    def primary_points(self):
+        return 
+
+class Criterion(models.Model):
+    year = models.ForeignKey('core.StudentClubYear', null=True,
+                             blank=True, on_delete=models.SET_NULL,
+                             default=None, verbose_name=u"السنة")
+    ar_name = models.CharField(max_length=200,
+                               verbose_name=u"اسم المعيار بالعربية")
+    code_name = models.CharField(max_length=200,
+                                 verbose_name=u"اسم المعيار البرمجي")
+    instructions = models.TextField(verbose_name=u"تعليمات")
+    category_choices  = (
+        ('P', u'رئاسة نادي الطلاب'),
+        ('M', u'المركز الإعلامي')
+        )
+    category = models.CharField(max_length=1, verbose_name=u"التصنيف")
+
+class CriterionValue(models.Model):
+    assessment = models.ForeignKey(Assessment, verbose_name=u"التقييم")
+    criterion = models.ForeignKey(Criterion, null=True,
+                             blank=True, on_delete=models.SET_NULL,
+                             default=None, verbose_name=u"المعيار")
+    value = models.IntegerField(verbose_name=u"القيمة")

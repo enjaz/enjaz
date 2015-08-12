@@ -29,7 +29,7 @@
             </td>{% endif %}{% if not MAX_OVERDUE_REPORTS and approved_table and privileged %}
             <td>{{ activity.get_relevance_score_average|stringformat:".2f" }}</td>
             <td>{{ activity.get_quality_score_average|stringformat:".2f" }}</td>
-            <td>{{ activity.get_evaluation_count }}</td>
+            <td>{{ activity.get_evaluations.count }}</td>
             {% endif %}
         </tr>
     {% endfor %}

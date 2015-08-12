@@ -1,4 +1,4 @@
-{% extends "clubs_base.html" %}{% load staticfiles %}
+{% extends "clubs_base.html" %}{% load staticfiles %}{% load clubs_utils %}
 {% block title %}{{ club.name }}{% endblock %}
 
 {% block content %}
@@ -14,6 +14,7 @@
 		<!-- panel body -->
 		<div class="panel-body">
 			<p style="font-size:1em;"><ul class="list-unstyled">
+			{% if user|can_view_assessments:club %}<li><a href="{% url 'clubs:view_assessments' club.pk %}"><span class="glyphicon glyphicon-gift"></span> تقييمات الأنشطة</a></li>{% endif %}
 			{% if can_edit %}<li><a href="{% url 'clubs:edit' club.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>{% endif %}
 			{% if can_view_members %}<li><a href="{% url 'clubs:view_members' club.pk %}"><span class="entypo-users"></span> استعرض أعضاء النادي</a></li>{% endif %}
 			{% if can_view_deputies %}<li><a href="{% url 'clubs:view_deputies' club.pk %}"><span class="entypo-users"></span> استعرض نواب النادي</a></li>{% endif %}

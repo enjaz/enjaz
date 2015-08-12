@@ -7,10 +7,11 @@ from clubs.models import Club
 from clubs.utils import forms_editor_check
 
 urlpatterns = patterns('',
-    url(r'^$', views.list, name='list'),
+    url(r'^$', views.list_clubs, name='list'),
     url(r'^create/$', views.create, name='create'),
     url(r'^(?P<club_id>\d+)/$', views.show, name='show'),
     url(r'^(?P<club_id>\d+)/edit/$', views.edit, name='edit'),
+    url(r'^(?P<club_id>\d+)/assessments/$', views.view_assessments, name='view_assessments'),
     url(r'^(?P<club_id>\d+)/join/$', views.join, name='join'),
     url(r'^(?P<club_id>\d+)/join/done/$', TemplateView.as_view(template_name='clubs/join_done.html'), name='join_done'),
     url(r'^(?P<club_id>\d+)/members/$', views.view_members, name='view_members'),

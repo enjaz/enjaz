@@ -65,6 +65,18 @@ class ClubQuerySet(models.QuerySet):
 
         return chosen_reviewer_query | self.filter(pk__in=reviewing_parent_pks)
 
+    def club_assessing_parents(self, club):
+        assessing_parent_pks = []
+        new_parent = club.parent
+
+        while new_parent:
+            if new_parent.can_assess:
+                assessing_parent_pks.append(new_parent.pk)
+
+            new_parent = new_parent.parent
+
+        return self.filter(pk__in=assessing_parent_pks)
+
     def niqati_reviewing_parents(self, order):
         reviewing_parent_pks = []
         

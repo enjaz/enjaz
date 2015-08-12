@@ -191,7 +191,12 @@
 					<li{% if active_tab == 'niqati' %} class="active"{% endif %}>
 						<a href="{% url 'activities:niqati_orders' activity.pk %}">نقاطي</a>
 					</li>
-					{% endif %}
+ 		    {% endif %}
+                    {% if request.user|can_assess_club:activity.primary_club %}
+					<li{% if active_tab == 'assessment' %} class="active"{% endif %}>
+						<a href="{% url 'activities:assessment_index' activity.pk %}">قيّم</a>
+					</li>
+ 		    {% endif %}
                     {% comment %}
                     In order to avoid URL reversing issues, the forms button has to be (at least temporarily) restricted
                     to the `show` view and the very views of the forms app. The `show` view will pass a `can_view_forms`

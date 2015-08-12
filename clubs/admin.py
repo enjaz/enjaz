@@ -59,7 +59,7 @@ class GenderFilter(admin.SimpleListFilter):
             return queryset.filter(gender=self.value())
         
 class ClubAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'city', 'email', 'coordinator', 'number_of_members')
+    list_display = ('__unicode__', 'city', 'email', 'coordinator', 'number_of_members', 'get_total_points')
     list_filter = (ClubFilter, CityFilter, GenderFilter, YearFilter)
     search_fields = ('name', 'city', 'email')
     filter_horizontal = ('members', 'deputies')

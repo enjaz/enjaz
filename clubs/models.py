@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from forms_builder.forms.models import Form
 from core.models import StudentClubYear
 from clubs.managers import ClubQuerySet
+from django.db.models import Sum
+
 
 section_choices = (
     ('NG', u'الحرس الوطني'),
@@ -102,6 +104,10 @@ class Club(models.Model):
                                      verbose_name=u"يستطيع التعديل؟")
     can_review_niqati = models.BooleanField(default=False,
                                      verbose_name=u"يستطيع مراجعة النقاط؟")
+    can_assess = models.BooleanField(default=False,
+                                     verbose_name=u"يستطيع تقييم لأنشطة؟")
+    can_view_assessments = models.BooleanField(default=False,
+                                               verbose_name=u"يستطيع مشاهدة تقييمات الأنشطة؟")
 
     forms = GenericRelation(Form)
     objects = ClubQuerySet.as_manager()
@@ -173,6 +179,18 @@ class Club(models.Model):
                 return current_parent
             else:
                 current_parent = current_parent.parent
+
+    def get_total_points(self):
+        points = 0
+        primary_points = self.primary_activity.aggregate(primary_points=Sum('assessment__criterionvalue__value'))['primary_points']
+        if primary_points:
+            points += primary_points
+        secondary_points = self.secondary_activity.aggregate(secondary_points=Sum('assessment__cooperator_points'))['secondary_points']
+        if secondary_points:
+            points += secondary_points
+
+        return points
+    get_total_points.short_description = u'إجمالي النقاط'
 
     class Meta:
         # For the admin interface.

@@ -644,6 +644,20 @@ def assess(request, activity_id, category):
                               category=category)
         if form.is_valid():
             form.save()
+            # By default, after an activity has ended, it will be
+            # assigned for presidency for assessment, but an email
+            # will be sent to both: presidency and the media center.
+            # If the presidency assess it, but the Media Center is
+            # still lacking, it will be assigned to the Media Center,
+            # otherwise, it will be assigned to no one (#yay).
+            if category  == 'P':
+                media_center = activity.get_media_assessor()
+                if media_center.assessment_set.filter(activity=activity).exists():
+                    activity.assignee = None
+                else:
+                    activity.assignee = media_center
+                activity.save()
+
             return HttpResponseRedirect(reverse('activities:show',
                                         args=(activity_id,)))
 

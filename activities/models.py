@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from datetime import datetime, timedelta
 from activities.managers import ActivityQuerySet
 
+from core.models import StudentClubYear
 from clubs.models import College, Club
 from clubs.utils import get_deanship, get_presidency
 from forms_builder.forms.models import Form
@@ -255,6 +256,43 @@ class Activity(models.Model):
     def get_cooperator_points(self):
         return self.assessment_set.aggregate(cooperation=Sum('cooperator_points'))['cooperation']
 
+
+    def get_presidency_assessor(self):
+        current_year = StudentClubYear.objects.get_current()
+        # In Riyadh, there are two presidencies for each gender.
+        if self.primary_club.city == 'R' and self.primary_club.gender:
+            presidency_gender = self.primary_club.gender
+        elif self.primary_club.city == 'R' and not self.primary_club.gender:
+            # Just in case a Riyadh club doesn't have a gender fall
+            # back to male presidency.
+            presidency_gender = 'M'
+        else: # For other cities
+            presidency_gender = ''
+
+        presidency = Club.objects.get(year=current_year,
+                                        english_name__contains='Presidency',
+                                        city=self.primary_club.city,
+                                        gender=presidency_gender)
+        return presidency
+
+    def get_media_assessor(self):
+        current_year = StudentClubYear.objects.get_current()
+
+        # In Riyadh, there are two Media Centers for each gender.
+        if self.primary_club.city == 'R' and self.primary_club.gender:
+            media_center_gender = self.primary_club.gender
+        elif self.primary_club.city == 'R' and not self.primary_club.gender:
+            # Just in case a Riyadh club doesn't have a gender fall
+            # back to male Media Center.
+            media_center_gender = 'M'
+        else: # For other cities
+            media_center_gender = ''
+
+        media_center = Club.objects.get(year=current_year,
+                                        english_name__contains='Media Center',
+                                        city=self.primary_club.city,
+                                        gender=media_center_gender)
+        return media_center
 
     class Meta:
         permissions = (

@@ -10,7 +10,8 @@ from django.views.decorators import csrf
 from post_office import mail
 import unicodecsv
 
-from clubs.utils import is_coordinator, is_coordinator_or_member, is_member, is_coordinator_or_deputy, get_presidency
+from activities.models import Activity
+from clubs.utils import is_coordinator, is_coordinator_or_member, is_member, is_coordinator_or_deputy, can_view_assessments
 from core import decorators
 from clubs.forms import DisabledClubForm, ClubForm
 from clubs.models import Club
@@ -25,8 +26,9 @@ FORMS_CURRENT_APP = "club_forms"
 #     action was taken regarding their membership. [Osama, Aug 2]
 
 @login_required
-def list(request):
+def list_clubs(request):
     clubs = Club.objects.visible().current_year().for_user_gender(request.user).for_user_city(request.user)
+    order = []
     context = {'clubs':clubs}
     return render(request, 'clubs/list.html', context)
 
@@ -235,3 +237,17 @@ def view_deputies(request, club_id):
        not request.user.has_perm('clubs.view_deputies'):
         raise PermissionDenied
     return render(request, 'clubs/deputies.html', {'club': club})
+
+@login_required
+def view_assessments(request, club_id):
+    club = get_object_or_404(Club, pk=club_id)
+    if not can_view_assessments(request.user, club):
+        raise PermissionDenied
+
+    assessed_primary_activities = Activity.objects.approved().filter(primary_club=club, assessment__isnull=False)
+    assessed_secondary_activities = Activity.objects.approved().filter(secondary_clubs=club, assessment__isnull=False)
+
+    context = {'club': club,
+               'primary_activities': assessed_primary_activities,
+               'secondary_activities': assessed_secondary_activities}
+    return render(request, 'clubs/assessments.html', context)

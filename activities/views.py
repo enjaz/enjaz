@@ -9,8 +9,8 @@ from django.db.models import Q
 
 from post_office import mail
 
-from activities.models import Activity, Review, Episode
-from activities.forms import ActivityForm, ReviewerActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm, AttachmentFormSet
+from activities.models import Activity, Review, Episode,  Assessment
+from activities.forms import ActivityForm, ReviewerActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm, AttachmentFormSet, AssessmentForm
 from accounts.utils import get_user_gender
 from activities.utils import get_club_notification_to, get_club_notification_cc
 from clubs.models import Club
@@ -18,7 +18,8 @@ from clubs.utils import is_coordinator_or_member, is_coordinator_or_deputy_of_an
     is_coordinator_of_any_club, get_media_center, \
     is_member_of_any_club, is_employee_of_any_club, is_coordinator, is_coordinator_or_deputy, get_user_clubs, \
     get_user_coordination_and_deputyships, has_coordination_to_activity, get_deanship, is_employee, \
-    can_review_activity, can_delete_activity, can_edit_activity
+    can_review_activity, can_delete_activity, can_edit_activity, can_assess_club, \
+    get_club_assessing_clubs_by_user
 from media.utils import MAX_OVERDUE_REPORTS
 
 FORMS_CURRENT_APP = "activity_forms"
@@ -75,7 +76,7 @@ def list_activities(request):
 
         # For logged-in users, only show city-specific and
         # gender-specific activities.
-        context['approved'] = Activity.objects.approved().for_user_city(request.user).for_user_gender(request.user)
+        context['approved'] = Activity.objects.approved().current_year().for_user_city(request.user).for_user_gender(request.user)
 
         if request.user.is_superuser:
             # If the user is a super user or part of the presidency,
@@ -87,8 +88,8 @@ def list_activities(request):
             # For club coordinators, deputies, and members, show
             # approved activities as well as their own club's pending
             # and rejected activities.
-            context['pending'] = Activity.objects.pending().current_year().for_user_clubs(request.user).distinct()
-            context['rejected'] = Activity.objects.rejected().current_year().for_user_clubs(request.user).distinct()
+            context['pending'] = Activity.objects.pending().for_user_clubs(request.user).distinct()
+            context['rejected'] = Activity.objects.rejected().for_user_clubs(request.user).distinct()
             # In addition to the gender-specific approved activities,
             # show all activities of the user club.
             context['approved'] = (context['approved'] |  Activity.objects.approved().for_user_clubs(request.user)).distinct()
@@ -98,7 +99,7 @@ def list_activities(request):
                 # For coordinators, show also the activities waiting their
                 # action.
                 user_coordination = get_user_coordination_and_deputyships(request.user)
-                context['todo'] = Activity.objects.pending().current_year().filter(assignee__in=user_coordination)
+                context['todo'] = Activity.objects.current_year().filter(assignee__in=user_coordination)
                 # Media-related
                 context['due_report_count'] = user_coordination.all()[0].get_due_report_count()
                 context['overdue_report_count'] = user_coordination.all()[0].get_overdue_report_count()
@@ -117,7 +118,7 @@ def list_activities(request):
             # An employee is basically similar to a normal user, the
             # only difference is having another table that includes
             # the employee's relevant activities
-            context['club_approved'] = Activity.objects.approved().filter(primary_club__in=request.user.employee.all())
+            context['club_approved'] = Activity.objects.approved().current_year().filter(primary_club__in=request.user.employee.current_year())
 
             template = 'activities/list_employee.html'
         else: # For students and other normal users.
@@ -585,3 +586,93 @@ def participate(request, activity_id):
     else:
         context['error_message'] = 'closed'
         return render(request, 'activities/participate.html', context)
+
+@login_required
+def assessment_index(request, activity_id):
+    activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
+
+    if not can_assess_club(request.user, activity.primary_club):
+        raise PermissionDenied
+
+    # Determine the category.  If not Media Center (i.e. super user or
+    # vice president, default to the presidency review)
+    user_clubs = request.user.coordination.current_year() | request.user.deputyships.current_year()
+    user_media_center = user_clubs.filter(english_name__contains='Media Center',
+                                          city=activity.primary_club.city)
+    if user_media_center.exists():
+        return HttpResponseRedirect(reverse('activities:assess',
+                                    args=(activity_id, 'm')))
+    else: 
+        return HttpResponseRedirect(reverse('activities:assess',
+                                    args=(activity_id, 'p')))
+
+@login_required
+def assess(request, activity_id, category):
+    activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
+    category = category.upper()
+
+    if not can_assess_club(request.user, activity.primary_club):
+        raise PermissionDenied
+
+    # Don't make it possible for Media Center to enter presidency
+    # assessment and vice versa.  If no assessing clubs, we are
+    # dealing with the superuser, so don't preform such checks and set
+    # the assessor_club to None.
+    assessing_clubs = get_club_assessing_clubs_by_user(request.user, activity.primary_club)   
+    if assessing_clubs.exists():
+        if assessing_clubs.filter(english_name__contains="Media Center").exists() and \
+           category != 'M':
+            raise PermissionDenied
+        elif assessing_clubs.filter(english_name__contains="Presidency").exists() and category != 'P':
+            raise PermissionDenied
+        assessor_club = assessing_clubs.first()
+    else:
+        assessor_club = None
+
+    try:  # If the assessment is already there, edit it.
+        assessment = Assessment.objects.get(activity=activity,
+                                        assessor_club=assessor_club)
+    except ObjectDoesNotExist:
+        assessment = Assessment(activity=activity,
+                                assessor=request.user,
+                                assessor_club=assessor_club)
+
+    if request.method == 'POST':
+        form = AssessmentForm(request.POST, instance=assessment,
+                              activity=activity,
+                              user=request.user, club=assessor_club,
+                              category=category)
+        if form.is_valid():
+            form.save()
+            # By default, after an activity has ended, it will be
+            # assigned for presidency for assessment, but an email
+            # will be sent to both: presidency and the media center.
+            # If the presidency assess it, but the Media Center is
+            # still lacking, it will be assigned to the Media Center,
+            # otherwise, it will be assigned to no one (#yay).
+            if category  == 'P':
+                media_center = activity.get_media_assessor()
+                if media_center.assessment_set.filter(activity=activity).exists():
+                    activity.assignee = None
+                else:
+                    activity.assignee = media_center
+                activity.save()
+
+            return HttpResponseRedirect(reverse('activities:show',
+                                        args=(activity_id,)))
+
+    elif request.method == 'GET':
+        form = AssessmentForm(instance=assessment, activity=activity,
+                              user=request.user, club=assessor_club,
+                              category=category)
+
+    context = {'activity': activity, 'form': form, 'active_tab': 'assessment'}
+    if category == 'P':
+        template_name = 'activities/assessment_presidency.html'
+        # Presidency-specific helper calculations
+        submission_interval = (activity.get_first_date() - activity.submission_date.date()).days
+        context['submission_interval'] = submission_interval
+    elif category == 'M':
+        template_name = 'activities/assessment_media_center.html'
+
+    return render(request, template_name, context)

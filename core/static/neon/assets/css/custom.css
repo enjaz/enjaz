@@ -1,7 +1,9 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto);
 
+/*  Font enhancement */
+
 body, p, .form-control, .page-container .sidebar-menu #main-menu li, .login-page .login-header .description, .login-page .form-register-success p {
-   font-size: 14px;
+   font-size: 15px;
 }
 
 .login-page .form-register-success h3 {
@@ -18,6 +20,14 @@ body, p, .form-control, .page-container .sidebar-menu #main-menu li, .login-page
     font-family: 'GE Dinar One';
     font-weight: normal;
     src: url("../../../fonts/ge-dinar-one-med.woff");
+}
+
+.profile-env section.profile-info-tabs .nav-tabs li a{
+   font-size: 14px;
+}
+
+.profile-env>header .profile-info-sections .profile-name span{
+   font-size: 13px;
 }
 
 .frontend .description p {

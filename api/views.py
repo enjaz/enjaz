@@ -52,7 +52,7 @@ class ActivityList(generics.ListAPIView):
         else:
             queryset = queryset.for_user_gender(self.request.user)
         
-        return queryset
+        return queryset.distinct()
 
 class ActivityDetail(generics.RetrieveAPIView):
     serializer_class = ActivitySerializer
@@ -76,7 +76,7 @@ class ClubList(generics.ListAPIView):
         else:
             queryset = queryset.for_user_gender(self.request.user)
         
-        return queryset
+        return queryset.distinct()
 
 class ClubDetail(generics.RetrieveAPIView):
     serializer_class = ClubSerializer

@@ -9,66 +9,9 @@
 <div class="panel panel-primary panel-shadow" data-collapsed="0">		
 	<!-- panel body -->
 	<div class="panel-body with-table">
-		
-		<table class="table table-bordered table-responsive">
-		<colgroup>
-			<col class="col-md-3">
-			<col class="col-md-9">
-		</colgroup>
-		<thead>
-			<tr>
-				<th colspan="2">
-                    <h4>{{ episode }}<br>
-                        {{ episode.start_date|date:"j F" }} - {{ episode.end_date|date:"j F" }} | {{ episode.start_time|time }} - {{ episode.end_time|time }} | {{ episode.location }}</h4>
-				</th>
-			</tr>
-		</thead>
-		
-		<tbody>
-			{% for order in episode.code_order_set.all %}
-			<tr>
-				<th>تاريخ الطلب:
-                    {{ order.date_ordered|date:"j F Y" }}
-                    {% if order.is_approved == True%}
-                        <span class="badge badge-success">تمت الموافقة</span>
-                    {% elif order.is_approved == False %}
-                        <span class="badge badge-danger">تم الرفض</span>
-                    {% else %}
-                        <span class="badge badge-warning">معلق</span>
-                    {% endif %}
-                </th>
-                
-			    <td>
-			        <ul class="list-group">
-			        {# collections #}
-			        {% for collection in order.code_collection_set.all %}
-			            <li class="list-group-item">
-				        {{ collection.code_category.ar_label }}
-			 		{% if not collection.students.exists %}
-						<span class="badge">{{ collection.code_count }} أكواد</span>
-						{% if order.is_approved == True %}<ul class="list-inline"><li class="entypo-docs"><a href="{% url 'niqati:download_coupons' collection.pk %}">كوبونات</a></li><li class="entypo-link"><a href="{% url 'niqati:download_links' collection.pk %}">روابط</a></li></ul>{% endif %}
-					{% else %}
-						{% if collection.students %}
-						<ul>
-							{% for student in collection.students.all %} 
-							<li>{{ student.common_profile.get_ar_full_name }}</li>
-							{% endfor %}
-						</ul>
-						{% endif %}
-					{% endif %}
-			            </li>
-			        {% endfor %}   
-			        </ul>
-			    </td>
-			</tr>
-			{% empty %}
-			<th colspan="2">
-				لا توجد طلبات نقاط لهذا الموعد.
-			</th>
-			{% endfor %}
-		</tbody>
-	</table>
-		
+        {% with orders=episode.code_order_set.all %}
+            {% include 'niqati/includes/episode_orders.html' %}
+        {% endwith %}
 	</div>
 </div>
 

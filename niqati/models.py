@@ -171,7 +171,7 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
         # are going to generate all random strings once and check them
         # all in one query to see if any of them is already taken.  If
         # any of them is, we would simply replace that and try again
-        # until none is taken.  Previously, the number of queires was:
+        # until none is taken.  Previously, the number of queries was:
         #     2 * number_of_codes
         # Now, it can be as low as 2 queries for the whole collection.
         # Previously, it took 30 seconds to generate 200 codes, now it

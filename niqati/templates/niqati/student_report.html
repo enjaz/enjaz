@@ -1,4 +1,4 @@
-{% extends "niqati_base.html" %}
+{% extends "niqati_base.html" %}{% load staticfiles %}
 {% block title %}{% if user == niqati_user %}تقريري{% else %}تقرير {{ niqati_user.common_profile.get_ar_full_name }}{% endif %}{% endblock %}
 
 {% block content %}
@@ -11,20 +11,36 @@
 <div class="page-header">
   <h3>مجموع نقاطي: <small>{{ total_points }} نقطة</small></h3>
 </div>
-<table class="table">
-  <tr>
-    <th>النشاط</th>
-    <th>دورك في النشاط</th>
-    <th>عدد النقاط</th>
-    <th>تاريخ الإدخال</th>
-  </tr>
+<table id="niqati" class="datatable display">
+    <thead>
+      <tr>
+        <th>النشاط</th>
+        <th>دورك في النشاط</th>
+        <th>عدد النقاط</th>
+        <th>تاريخ الإدخال</th>
+      </tr>
+    </thead>
+    <tbody>
     {% for code in niqati_user.code_set.current_year %}
         <tr>
             <td>{% if code.collection %}<a href="{% url 'activities:show' code.collection.parent_order.episode.activity.pk %}">{{ code.collection.parent_order.episode }}</a>{% else %}مخصّصة{% endif %}</td>
-            <td>{% if code.collection %}{{ code.collection.code_category.ar_label }}{% else %}مُخصّصة{% endif %}</td>
+            <td>{% if code.collection %}{{ code.collection.code_category.ar_label }}{% else %}{{ code.note }}{% endif %}</td>
             <td>{{ code.points }}</td>
-            <td>{{ code.redeem_date }}</td>
+            <td data-order="{{ code.redeem_date|date:"U" }}">{{ code.redeem_date }}</td>
         </tr>
     {% endfor %}
+    </tbody>
 </table>
+{% endblock %}
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script>
+$(function () {
+	$('#niqati').DataTable({
+        "order": [[ 3, "desc" ]],
+        "language": {% include 'js/dataTables-arabic.json' %}
+    });
+});
+</script>
 {% endblock %}

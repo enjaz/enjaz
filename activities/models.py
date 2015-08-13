@@ -8,8 +8,8 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from datetime import datetime, timedelta
-from activities.managers import ActivityQuerySet
 
+from activities.managers import ActivityQuerySet
 from core.models import StudentClubYear
 from clubs.models import College, Club
 from clubs.utils import get_deanship, get_presidency
@@ -506,6 +506,9 @@ class Episode(models.Model):
                self.requires_report and \
                datetime.now() > self.report_due_date() and \
                not self.report_is_submitted()
+
+    def get_reviewed_niqati_orders(self):
+        return self.code_order_set.filter(is_approved__isnull=False)
 
 class Category(models.Model):
     ar_name = models.CharField(max_length=50,

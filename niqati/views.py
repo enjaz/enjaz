@@ -140,13 +140,13 @@ def coordinator_view(request, activity_id):
             else:
                 msg = u"لم ينشأ أي طلب لأنك لم تدخل أي رقم."
                 messages.add_message(request, messages.WARNING, msg)
+            return HttpResponseRedirect(reverse("activities:niqati_orders", args=(activity.id, )))
         else:
             msg = u"الرجاء ملء النموذج بشكل صحيح."
             messages.add_message(request, messages.ERROR, msg)
-        return HttpResponseRedirect(reverse("activities:niqati_orders", args=(activity.id, )))
     elif request.method == 'GET':
         form = OrderForm(activity=activity, user=request.user)
-        return render(request, 'niqati/activity_orders.html', {'activity': activity,
+    return render(request, 'niqati/activity_orders.html', {'activity': activity,
                                                            'form': form,
                                                            'active_tab': 'niqati'})
 

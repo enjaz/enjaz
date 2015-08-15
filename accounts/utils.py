@@ -31,3 +31,19 @@ def get_user_gender(user):
         gender = ''
 
     return gender
+
+
+def get_user_college(user):
+    """Return the user's college.  If unavailable, return None."""
+
+    if user.is_superuser:
+        return
+    
+    # If either the profile or the college are absent, return an empty
+    # string.
+    try: 
+        college = user.common_profile.college
+    except (ObjectDoesNotExist, AttributeError):
+        college = None
+
+    return college

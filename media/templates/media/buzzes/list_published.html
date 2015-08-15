@@ -1,0 +1,23 @@
+<h2>المستجدات المنشورة</h2>
+<hr>
+
+{% for buzz in buzzes %}
+    {% if forloop.first %}
+    {% endif %}
+    <div id="active-buzz-{{ buzz.id }}" class="active-buzz" data-buzz-id="{{ buzz.id }}">
+        {% include "media/polls/ajax-loader.html" %}
+    </div>
+    {% if not forloop.last %}
+        <hr>
+    {% endif %}
+    {# <!-- FIXME: This will load a script for EACH buzz --> #}
+    <script>
+        $(function () {
+            $("#active-buzz-{{ buzz.id }}").load("{% url 'media:show_buzz' buzz.id %}");
+        });
+    </script>
+    {% if forloop.last %}
+    {% endif %}
+{% empty %}
+    <p>لا توجد مستجدات حالية.</p>
+{% endfor %}

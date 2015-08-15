@@ -8,4 +8,7 @@ urlpatterns = patterns('',
     url(r'^(?P<version>v1)/activities/(?P<pk>\d+)/$', views.ActivityDetail.as_view(), name='activity-detail'),
     url(r'^(?P<version>v1)/clubs/$', views.ClubList.as_view(), name='club-list'),
     url(r'^(?P<version>v1)/clubs/(?P<pk>\d+)/$', views.ClubDetail.as_view(), name='club-detail'),
+    url(r'^(?P<version>v1)/buzzes/$', views.BuzzList.as_view(), name='buzz-list'),
+    url(r'^(?P<version>v1)/buzzes/(?P<buzz_pk>\d+)/views/$', views.BuzzViewCreate.as_view(), name='buzzview-create'),
+    url(r'^(?P<version>v1)/buzzes/(?P<buzz_pk>\d+)/views/(?P<pk>\d+)/$', views.BuzzViewUpdate.as_view(), name='buzzview-update'),
 )

@@ -1,0 +1,128 @@
+{% load bootstrap3 %}{% load staticfiles %}
+<form id="edit-buzz-form" action="post">
+{% csrf_token %}
+{% bootstrap_form form %}
+</form>
+{% if form.instance.pk %}
+<hr>
+<div class="col-md-3">
+<button id="delete-buzz" class="btn btn-xs btn-danger btn-icon">
+    <i class="entypo-cancel"></i>
+    احذف المستجد
+</button>
+</div>
+<div class="col-md-9">
+<form style="display: none;" id="confirm-delete-form" class="form form-inline">
+    {% csrf_token %}
+    <label>هل أنت متأكد؟ سيتم حذف كل المعلومات المتعلقة بالمستجد.</label>
+    <button class="btn btn-xs btn-danger" type="submit">نعم</button>
+    <button id="abort-delete" class="btn btn-xs btn-default">لا</button>
+</form>
+</div>
+{% endif %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/jquery.datetimepicker.css' %}"/>
+<script src="{% static 'js/jquery.datetimepicker.js' %}"></script>
+
+<script type="text/javascript">
+$(function () {
+    $(".dynamic-form").each(function () {
+        var deleteColumn = $(this).find("td:last-child");
+        console.log(deleteColumn.find(".delete-row"));
+        console.log(deleteColumn.find(".delete-row").length == 0);
+        if (deleteColumn.find(".delete-row").length == 0) {
+            // insert a delete button
+            var button = '<a class="delete-row btn btn-xs btn-default" href="javascript:void(0)">احذف</a>';
+            deleteColumn.append(button);
+            console.log("appended a button");
+        };
+    });
+
+    // initialize date/time pickers
+    var $datetimeFields = $("input[name=announcement_date]");
+    $datetimeFields.addClass("english-field").datetimepicker({
+        format: 'Y-m-d H:i',
+    });
+
+    // modify form submission behaviour to be ajaxy
+    $("form#edit-buzz-form").submit(function (event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var $form = $(this),
+            data = $form.serialize(),
+            {% if buzz %}{# if a buzz is passed, then post to edit_buzz url, otherwise to add_buzz #}
+            url = "{% url 'media:edit_buzz' buzz.id %}";
+            {% else %}
+            url = "{% url 'media:add_buzz' %}";
+            {% endif %}
+
+        /* Send the data using post */
+        var posting = $.post(url, data);
+
+        posting.done(function (data) {
+            if (data.message == "success") {
+
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                {% if buzz %}
+                toastr.success("تم تعديل {{ buzz.title }} بنجاح.");
+                {% else %}
+                toastr.success("تم إنشاء مستجد جديد بنجاح.");
+                {% endif %}
+
+                // hide modal
+                var $modal = $("#edit-buzz-modal")
+                $modal.modal('hide');
+
+                // refresh buzz lists
+                loadBuzzes()
+
+            } else {
+                $("#edit-buzz-modal .modal-body").html(data);
+            }
+        });
+    });
+
+    {% if form.instance.pk %}
+    $deleteForm = $('#confirm-delete-form');
+    $("button#delete-buzz").click(function () {
+        $deleteForm.slideDown();
+    });
+    $("button#abort-delete").click(function (event) {
+        event.preventDefault();
+        $deleteForm.slideUp();
+    });
+    $deleteForm.submit(function (event) {
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var $form = $(this),
+            data = $form.serialize(),
+            url = "{% url 'media:delete_buzz' buzz.id %}";
+
+        /* Send the data using post */
+        var posting = $.post(url, data);
+
+        posting.done(function (data) {
+            if (data.message == "success") {
+
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                toastr.info("تم حذف {{ buzz.title }} بنجاح.");
+
+                // hide modal
+                var $modal = $("#edit-buzz-modal")
+                $modal.modal('hide');
+
+                // refresh buzz lists
+                loadBuzzes()
+
+            }
+        });
+    });
+    {% endif %}
+});
+</script>

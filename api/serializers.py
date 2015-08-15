@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from activities.models import Activity, Episode
 from clubs.models import Club
+from media.models import Buzz, BuzzView
 
 class EpisodeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,3 +20,13 @@ class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
         fields = ('pk', 'name', 'primary_club', 'secondary_clubs', 'public_description', 'episode_set', 'gender')
+
+class BuzzSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Buzz
+        fields = ('pk', 'title', 'body', 'image')
+
+class BuzzViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BuzzView
+        fields = ('pk', 'viewer', 'buzz', 'off_date')

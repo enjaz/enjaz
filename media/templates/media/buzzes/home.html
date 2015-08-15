@@ -1,0 +1,126 @@
+{% extends "media_base.html" %}{% load staticfiles %}
+{% block title %}ما الجديد؟{% endblock %}
+{% block content %}
+    <div class="row">
+    من هنا يمكن إرسال إعلانات موجّهة إلى مستخدمي تطبيق إنجاز.
+
+
+        <div style="text-align: left;">
+            <button id="add-buzz" class="btn btn-icon btn-info">
+                <i class="entypo-plus"></i>
+                أضف مستجًا
+            </button>
+        </div>
+        <br>
+
+        <!-- upcoming buzzes -->
+
+    <div class="panel panel-info panel-shadow" data-collapsed="0">
+
+        <!-- panel body -->
+        <div class="panel-body">
+
+        <div id="upcoming-buzzes">
+            {% include "media/polls/ajax-loader.html" %}
+        </div>
+
+        </div>
+
+    </div>
+
+        <br>
+    <!-- published buzzes -->
+
+    <div class="panel panel-success panel-shadow" data-collapsed="0">
+
+        <!-- panel body -->
+        <div class="panel-body">
+
+        <div id="published-buzzes">
+            {% include "media/polls/ajax-loader.html" %}
+        </div>
+
+        </div>
+
+    </div>
+
+    <!--<br>-->
+
+
+    </div>
+{% endblock %}
+
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/minimal/_all.css' %}">
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/square/_all.css' %}">
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/flat/_all.css' %}">
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/futurico/futurico.css' %}">
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/polaris/polaris.css' %}">
+<link rel="stylesheet" href="{% static 'neon/assets/js/icheck/skins/line/_all.css' %}">
+
+<script src="{% static 'neon/assets/js/raphael-min.js' %}"></script>
+<script src="{% static 'neon/assets/js/morris.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/icheck/icheck.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        // initialize buzz edit modal
+        $('#edit-buzz-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        })
+        $("button#add-buzz").click(function () {
+            $("#edit-buzz-modal").modal('show');
+
+            $("#edit-buzz-modal .modal-title").html("أضف مستجدًا");
+            $("#edit-buzz-modal .modal-body").load("{% url 'media:add_buzz' %}");
+
+            var $submitButton = $("#edit-buzz-modal button#submit-button");
+            // Unbind any handlers previously attached to the submit button
+            // This is necessary to avoid multiple submissions of the form
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-buzz-form").submit();
+            });
+        });
+        // load buzzes
+        loadBuzzes();
+    });
+    function loadBuzzes() {
+        // Load published and upcoming buzzes
+        $("#upcoming-buzzes").load("{% url 'media:buzzes_list_upcoming' %}");
+        $("#published-buzzes").load("{% url 'media:buzzes_list_published' %}");
+    }
+
+  // ----
+  // enable scrolling in modal body due to its length
+  // script source: http://stackoverflow.com/a/20765540/4249696
+  $(document).ready(ajustamodal);
+  $(window).resize(ajustamodal);
+  function ajustamodal() {
+    var altura = $(window).height() - 155; //value corresponding to the modal heading + footer
+    $(".ativa-scroll").css({"height":altura,"overflow-y":"auto"});
+  }
+  // ----
+</script>
+
+<!-- buzz adding/editing modal -->
+<div class="modal fade" id="edit-buzz-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">أغلق</span></button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body ativa-scroll">
+        {% include "media/polls/ajax-loader.html" %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">أغلق</button>
+        <button type="button" class="btn btn-primary" id="submit-button">احفظ</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+{% endblock %}

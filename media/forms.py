@@ -7,7 +7,7 @@ from django.forms.models import inlineformset_factory
 from clubs.utils import get_media_center
 
 from media.models import FollowUpReport, Story, StoryReview, Article, ArticleReview, CustomTask, TaskComment, Poll, \
-    PollResponse, WHAT_IF, HUNDRED_SAYS, PollComment, PollChoice, FollowUpReportImage, ReportComment
+    PollResponse, WHAT_IF, HUNDRED_SAYS, PollComment, PollChoice, FollowUpReportImage, ReportComment, Buzz
 
 # A nice trick to display full names instead of usernames
 # Check: http://stackoverflow.com/questions/16369403/foreign-key-and-select-field-value-in-admin-interface
@@ -149,3 +149,8 @@ class PollSuggestForm(forms.Form):
 
     title = forms.CharField(label=u"العنوان", required=False)
     text = forms.CharField(widget=forms.Textarea(), label=u"النص")
+
+class BuzzForm(ModelForm):
+    class Meta:
+        model = Buzz
+        fields = ['title', 'body', 'image', 'colleges', 'announcement_date']

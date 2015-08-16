@@ -330,7 +330,7 @@ def entries_view(request, form_id, show=False, export=False,
     export_xls = export_xls or request.POST.get("export_xls")
     if submitted:
         if export:
-            response = HttpResponse(mimetype="text/csv")
+            response = HttpResponse(content_type="text/csv")
             fname = "%s-%s.csv" % (form.slug, slugify(now().ctime()))
             attachment = "attachment; filename=%s" % fname
             response["Content-Disposition"] = attachment
@@ -351,7 +351,7 @@ def entries_view(request, form_id, show=False, export=False,
             response.write(data)
             return response
         elif XLWT_INSTALLED and export_xls:
-            response = HttpResponse(mimetype="application/vnd.ms-excel")
+            response = HttpResponse(content_type="application/vnd.ms-excel")
             fname = "%s-%s.xls" % (form.slug, slugify(now().ctime()))
             attachment = "attachment; filename=%s" % fname
             response["Content-Disposition"] = attachment
@@ -412,7 +412,7 @@ def file_view(request, field_entry_id,
     if perm_check(request.user, object) is False:
         raise PermissionDenied
     path = join(fs.location, field_entry.value)
-    response = HttpResponse(mimetype=guess_type(path)[0])
+    response = HttpResponse(content_type=guess_type(path)[0])
     f = open(path, "r+b")
     response["Content-Disposition"] = "attachment; filename=%s" % f.name
     response.write(f.read())

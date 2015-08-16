@@ -330,7 +330,7 @@ def entries_view(request, form_id, show=False, export=False,
     export_xls = export_xls or request.POST.get("export_xls")
     if submitted:
         if export:
-            response = HttpResponse(content_type="text/csv")
+            response = HttpResponse(content_type="text/csv; charset=utf-8")
             fname = "%s-%s.csv" % (form.slug, slugify(now().ctime()))
             attachment = "attachment; filename=%s" % fname
             response["Content-Disposition"] = attachment
@@ -351,7 +351,7 @@ def entries_view(request, form_id, show=False, export=False,
             response.write(data)
             return response
         elif XLWT_INSTALLED and export_xls:
-            response = HttpResponse(content_type="application/vnd.ms-excel")
+            response = HttpResponse(content_type="application/vnd.ms-excel; charset=utf-8")
             fname = "%s-%s.xls" % (form.slug, slugify(now().ctime()))
             attachment = "attachment; filename=%s" % fname
             response["Content-Disposition"] = attachment

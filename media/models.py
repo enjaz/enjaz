@@ -6,6 +6,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from activities.models import Activity, Episode
+from media.managers import BuzzManager, PollManager
+
 
 # Constants for media poll types
 
@@ -338,33 +340,6 @@ class TaskComment(BaseComment):
         verbose_name_plural = u"التعليقات على المهام"
 
 
-class PollManager(models.Manager):
-    """
-    A custom manager for polls.
-    """
-    def hundred_says(self):
-        return self.filter(poll_type=HUNDRED_SAYS)
-
-    def what_if(self):
-        return self.filter(poll_type=WHAT_IF)
-
-    def active(self):
-        """
-        Return objects whose open date is before or equal to now, and whose close date is still ahead.
-        """
-        return self.filter(open_date__lte=timezone.now(), close_date__gt=timezone.now())
-
-    def past(self):
-        """
-        Return objects whose close date is before ``now``.
-        """
-        return self.filter(close_date__lte=timezone.now())
-
-    def upcoming(self):
-        """
-        Return objects whose open date is to come yet.
-        """
-        return self.filter(open_date__gt=timezone.now())
 
 
 class Poll(models.Model):
@@ -461,3 +436,24 @@ class PollComment(BaseComment):
 
     def __unicode__(self):
         return self.poll.title + " - comment by: " + self.author.__unicode__()
+
+class Buzz(models.Model):
+    submission_date = models.DateTimeField(auto_now_add=True, verbose_name=u"تاريخ الإرسال")
+    submitter = models.ForeignKey(User)
+    body = models.TextField(blank=True, verbose_name=u"النص")
+    title = models.CharField(max_length=128, verbose_name=u"العنوان")
+    announcement_date = models.DateTimeField(verbose_name=u"وقت الإعلان")
+    is_deleted = models.BooleanField(default=False)
+    colleges = models.ManyToManyField('clubs.College', verbose_name=u"الكليات المستهدفة",
+                                      blank=True)
+    image = models.ImageField(upload_to="media/buzzimages/", null=True, blank=True, verbose_name=u"الصورة")
+    objects = BuzzManager()
+
+    def is_published(self):
+        return self.announcement_date <= timezone.now()
+
+class BuzzView(models.Model):
+    buzz = models.ForeignKey('Buzz')
+    viewer = models.ForeignKey(User)
+    on_date = models.DateTimeField(auto_now_add=True, verbose_name=u"البداية")
+    off_date = models.DateTimeField(null=True, blank=True, verbose_name=u"النهاية")

@@ -1,5 +1,5 @@
 {% load bootstrap3 %}{% load staticfiles %}
-<form id="edit-buzz-form" action="post">
+<form enctype="multipart/form-data" id="edit-buzz-form" action="post">
 {% csrf_token %}
 {% bootstrap_form form %}
 </form>
@@ -50,39 +50,45 @@ $(function () {
         event.preventDefault();
 
         /* get some values from elements on the page: */
-        var $form = $(this),
-            data = $form.serialize(),
-            {% if buzz %}{# if a buzz is passed, then post to edit_buzz url, otherwise to add_buzz #}
-            url = "{% url 'media:edit_buzz' buzz.id %}";
-            {% else %}
-            url = "{% url 'media:add_buzz' %}";
-            {% endif %}
+        var formData = new FormData($(this)[0]); 
+        {% if buzz %}{# if a buzz is passed, then post to edit_buzz url, otherwise to add_buzz #}
+        var url = "{% url 'media:edit_buzz' buzz.id %}";
+        {% else %}
+        var url = "{% url 'media:add_buzz' %}";
+        {% endif %}
 
-        /* Send the data using post */
-        var posting = $.post(url, data);
+        /* Send the data */
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (data) {
+                if (data.message == "success") {
 
-        posting.done(function (data) {
-            if (data.message == "success") {
+                    // show success message (using toastr)
+                    toastr.options.positionClass = "toast-top-left";
+                    {% if buzz %}
+                    toastr.success("تم تعديل {{ buzz.title }} بنجاح.");
+                    {% else %}
+                    toastr.success("تم إنشاء مستجد جديد بنجاح.");
+                    {% endif %}
 
-                // show success message (using toastr)
-                toastr.options.positionClass = "toast-top-left";
-                {% if buzz %}
-                toastr.success("تم تعديل {{ buzz.title }} بنجاح.");
-                {% else %}
-                toastr.success("تم إنشاء مستجد جديد بنجاح.");
-                {% endif %}
+                    // hide modal
+                    var $modal = $("#edit-buzz-modal")
+                    $modal.modal('hide');
 
-                // hide modal
-                var $modal = $("#edit-buzz-modal")
-                $modal.modal('hide');
+                    // refresh buzz lists
+                    loadBuzzes()
 
-                // refresh buzz lists
-                loadBuzzes()
-
-            } else {
-                $("#edit-buzz-modal .modal-body").html(data);
-            }
+                } else {
+                    $("#edit-buzz-modal .modal-body").html(data);
+                }}
         });
+
     });
 
     {% if form.instance.pk %}

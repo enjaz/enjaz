@@ -306,7 +306,7 @@ def edit(request, activity_id):
 
             # Handle attachments
             attachments = attachment_formset.save(commit=False)
-            for changed_attachment in attachment_formset.changed_objects:
+            for changed_attachment, fields in attachment_formset.changed_objects:
                 changed_attachment.save()
             for new_attachment in attachment_formset.new_objects:
                 # Just in case an attachment was uploaded by a user

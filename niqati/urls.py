@@ -5,6 +5,7 @@ from niqati.models import COUPON, SHORT_LINK
 urlpatterns = patterns('',
     url(r'^$', views.index, name='index'),
     url(r'^submit/$', views.redeem, name='submit'),
+    url(r'^submit/claim/$', views.claim_code, name='claim_code'),
     url(r'^submit/(?P<code>[\w\d]+)/$', views.redeem, name='submit_prefilled'),
     url(r'^report/$', views.student_report, name='student_report'),
     url(r'^report/(?P<username>[\w\d]+)/$', views.student_report, name='student_report_with_username'),

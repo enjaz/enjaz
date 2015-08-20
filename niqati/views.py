@@ -46,31 +46,39 @@ def index(request):
         return HttpResponseRedirect(reverse('niqati:submit'))
 
 @login_required
+@decorators.get_only
 def redeem(request, code=""):
     """
     GET: show the code submission form.
     POST: submit a code.
-    """
-    
+    """    
     if current_year.niqati_closure_date and timezone.now() > current_year.niqati_closure_date:
         return render(request, "niqati/submit_closed.html")
-    if request.user.coordination.current_year().exists():
+    elif request.user.coordination.current_year().exists():
         user_club = request.user.coordination.current_year().first()
         context = {'user_club': user_club}
         return render(request, "niqati/submit_coordinators.html", context)
-    if request.method == "POST":
-        form = RedeemCodeForm(request.user, request.POST)
-        eval_form = EvaluationForm(request.POST)
-        if form.is_valid() and eval_form.is_valid():
-            result = form.process()
-            messages.add_message(request, *result)
-            eval_form.save(form.code.collection.parent_order.episode, request.user)
-            return HttpResponseRedirect(reverse("niqati:submit"))
-    elif request.method == "GET":
+    else:
         form = RedeemCodeForm(request.user, initial={'string': code})
         eval_form = EvaluationForm()
-    return render(request, "niqati/submit.html", {"form": form,  "eval_form": eval_form})
-    
+        return render(request, "niqati/submit.html", {"form": form,  "eval_form": eval_form})
+
+@login_required
+@csrf.csrf_exempt
+@decorators.ajax_only
+@decorators.post_only
+def claim_code(request):
+    form = RedeemCodeForm(request.user, request.POST)
+    eval_form = EvaluationForm(request.POST)
+    if form.is_valid() and eval_form.is_valid():
+        result = form.process()
+        return result
+        eval_form.save(form.code.collection.parent_order.episode, request.user)
+    else:
+        errors = form.errors
+        errors.update(eval_form.errors)
+        return {'errors': errors}
+
 @login_required
 def student_report(request, username=None):
     # Only the superuser can see a specific user.  Coordinators will
@@ -298,7 +306,6 @@ def general_report(request, city=""):
 @decorators.post_only
 def get_short_url(request):
     pk = request.POST.get('pk')
-    print pk
     code = get_object_or_404(Code, pk=pk)
     order = code.collection.parent_order
     activity = order.episode.activity

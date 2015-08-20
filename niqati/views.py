@@ -24,7 +24,7 @@ from activities.models import Activity, Evaluation
 from activities.forms import EvaluationForm
 from activities.utils import get_club_notification_to, get_club_notification_cc
 from clubs.models import Club, city_choices
-from clubs.utils import has_coordination_to_activity, get_user_coordination_and_deputyships, can_review_any_niqati, is_coordinator_or_deputy_of_any_club
+from clubs.utils import has_coordination_to_activity, get_user_coordination_and_deputyships, can_review_any_niqati, is_coordinator_of_any_club
 from niqati.models import Category, Code, Code_Order, Code_Collection, Review, COUPON, SHORT_LINK
 from niqati.forms import OrderForm, RedeemCodeForm
 
@@ -37,7 +37,7 @@ def index(request):
         return HttpResponseRedirect(reverse('niqati:general_report'))
     elif can_review_any_niqati(request.user):
         return HttpResponseRedirect(reverse('niqati:list_pending_orders'))
-    elif is_coordinator_or_deputy_of_any_club(request.user):
+    elif is_coordinator_of_any_club(request.user):
         user_clubs = get_user_coordination_and_deputyships(request.user)
         user_club = user_clubs.first()
         context = {'user_club': user_club}
@@ -54,7 +54,7 @@ def redeem(request, code=""):
     """    
     if current_year.niqati_closure_date and timezone.now() > current_year.niqati_closure_date:
         return render(request, "niqati/submit_closed.html")
-    elif request.user.coordination.current_year().exists():
+    elif is_coordinator_of_any_club(request.user):
         user_club = request.user.coordination.current_year().first()
         context = {'user_club': user_club}
         return render(request, "niqati/submit_coordinators.html", context)

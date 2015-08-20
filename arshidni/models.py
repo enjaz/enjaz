@@ -5,7 +5,8 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from clubs.models import College, college_choices
-
+from core.models import StudentClubYear
+from arshidni.managers import ColleagueQuerySet
 
 is_published_choices = (
     (None, u'لم يراجع بعد'),
@@ -153,6 +154,9 @@ class StudyGroup(models.Model):
     is_published = models.NullBooleanField(verbose_name=u"منشور؟",
                                            default=True,
                                            choices=is_published_choices)
+    year = models.ForeignKey(StudentClubYear, null=True,
+                             on_delete=models.SET_NULL, default=None,
+                             verbose_name=u"السنة")
     status = models.CharField(max_length=1, verbose_name=u"الحالة",
                               default='P', choices=group_status_choices)
     
@@ -231,6 +235,10 @@ class ColleagueProfile(ArshidniProfile):
     # very expensive.
     is_available = models.BooleanField(verbose_name=u"هل هو متاح؟",
                                             default=True)
+    year = models.ForeignKey(StudentClubYear, null=True,
+                             on_delete=models.SET_NULL, default=None,
+                             verbose_name=u"السنة")
+    objects = ColleagueQuerySet.as_manager()
     class Meta:
         verbose_name = u"ملف زميل طلابي"
         verbose_name_plural = u"ملفات الزملاء الطلابيين"

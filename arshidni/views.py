@@ -13,120 +13,27 @@ from django.views.decorators import csrf
 from post_office import mail
 
 from core import decorators
+from core.models import StudentClubYear
 from arshidni.models import GraduateProfile, Question, Answer, StudyGroup, LearningObjective, JoinStudyGroupRequest, ColleagueProfile, SupervisionRequest
-from arshidni.utilities import get_arshidni_coordinator
+
+from arshidni.forms import  GraduateProfileForm, QuestionForm, AnswerForm, StudyGroupForm, ColleagueProfileForm, SupervisionRequestForm
+from arshidni.utilities import get_arshidni_club_for_user, is_arshindi_coordinator_or_deputy
+
 from clubs.models import College
-from accounts.models import get_gender
+from accounts.utils import get_user_city, get_user_gender
 
 # Anything that should solely be done by the Arshidni coordinator
 # should be done through the arshidni admin interface.
 
 # TODO:
-#  * Add college to college and graduate form pages. [Osama, Aug 2]
-#  * Add view_* permissions [Osama, Aug 2]
+#  * Add college to college and graduate form pages. [Osama, Aug 2, 2014]
+#  * Add view_* permissions [Osama, Aug 2, 2014]
 #  * End date pickers should start at present date. (Don't apply this
 #    rule to the start date because some groups may be register after
-#    they have already started. [Osama, Aug 2]
- 
-class GraduateProfileForm(forms.ModelForm):
-    class Meta:
-        model = GraduateProfile
-        fields = ['contacts', 'bio', 'interests',
-                  'answers_questions', 'gives_lectures']
+#    they have already started. [Osama, Aug 2, 2014]
 
-class QuestionForm(forms.ModelForm):
-    class Meta:
-        model = Question
-        fields = ['text']
+current_year = StudentClubYear.objects.get_current()
 
-class AnswerForm(forms.ModelForm):
-    class Meta:
-        model = Answer
-        fields = ['text']
-
-class StudyGroupForm(forms.ModelForm):
-    class Meta:
-        model = StudyGroup
-        fields = ['name', 'starting_date', 'ending_date',
-                  'max_members']
-
-    def clean(self):
-        cleaned_data = super(StudyGroupForm, self).clean()
-        if 'starting_date' in cleaned_data and 'ending_date' in cleaned_data:
-            if cleaned_data['starting_date'] > cleaned_data['ending_date']:
-                msg = u'تاريخ انتهاء المدة قبل تاريخ بدئها!'
-                self._errors["starting_date"] = self.error_class([msg])
-                self._errors["ending_date"] = self.error_class([msg])
-                # Remove invalid fields
-                del cleaned_data["starting_date"]
-                del cleaned_data["ending_date"]
-
-        new_learningobjective_fields = [field for field in self.data if field.startswith('new_learningobjective-')]
-        existing_learningobjective_fields = [field for field in self.data if field.startswith('existing_learningobjective-')]
-
-        for field_name in new_learningobjective_fields:
-            text = self.data[field_name].strip()
-            if not text: # if empty
-                continue
-            cleaned_data[field_name] = self.data[field_name]
-        for field_name in existing_learningobjective_fields:
-            text = self.data[field_name].strip()
-            if not text: # if empty
-                continue
-            cleaned_data[field_name] = self.data[field_name]
-
-        return cleaned_data
-
-    def clean_max_members(self):
-        "Define max_members range."
-        # TODO: Move this hard-coded number into a Django setting.
-        # The maximum number of students in each group is 8.
-        max_members = self.cleaned_data["max_members"]
-        if max_members > 8:
-            msg = u'لا يمكن أن يكون عدد أعضاء المجموعة أكثر من 8!'
-            self._errors["max_members"] = self.error_class([msg])
-        elif max_members < 3:
-            msg = u'لا يمكن أن يكون عدد أعضاء المجموعة أقل من 3!'
-            self._errors["max_members"] = self.error_class([msg])
-        return max_members
-
-    def save(self, *args, **kwargs):
-        group = super(StudyGroupForm, self).save(*args, **kwargs)
-        remaining_pk = [] # List of kept learning objects (whether
-                          # modified or not)
-        new_learningobjective_fields = [field for field in self.cleaned_data if field.startswith('new_learningobjective-')]
-        existing_learningobjective_fields = [field for field in self.cleaned_data if field.startswith('existing_learningobjective-')]
-
-        for field_name in new_learningobjective_fields:
-            text = self.cleaned_data[field_name]
-            new_learningobjective = LearningObjective.objects.create(group=group,text=text)
-            remaining_pk.append(new_learningobjective.pk)
-
-        for field_name in existing_learningobjective_fields:
-            pk_str = field_name.lstrip("existing_learningobjective-")
-            pk = int(pk_str)
-            remaining_pk.append(pk)
-            text = self.cleaned_data[field_name]
-            existing_learningobjective = LearningObjective.objects.get(pk=pk)
-            existing_learningobjective.text = text
-            existing_learningobjective.save()
-
-        deleted_learningobjectives = LearningObjective.objects.exclude(pk__in=remaining_pk).filter(group=group)
-        for deleted_learningobjective in deleted_learningobjectives:
-            print "Deleting", deleted_learningobjective.text
-            deleted_learningobjective.delete()
-
-        return group
-
-class ColleagueProfileForm(forms.ModelForm):
-    class Meta:
-        model = ColleagueProfile
-        fields = ['batch', 'contacts', 'bio', 'interests']
-
-class SupervisionRequestForm(forms.ModelForm):
-    class Meta:
-        model = SupervisionRequest
-        fields = ['batch', 'contacts', 'interests']
 
 # Home
 
@@ -149,8 +56,8 @@ def home(request):
     my_group_count = StudyGroup.objects.filter(members=request.user).count() + StudyGroup.objects.filter(coordinator=request.user).count()
 
     # Student colleague:
-    latest_colleagues = ColleagueProfile.objects.filter(is_published=True, is_available=True).order_by('-submission_date')[:10]
-    colleague_count = ColleagueProfile.objects.count()
+    latest_colleagues = ColleagueProfile.objects.current_year().available().published().for_user_gender(request.user).for_user_city(request.user).order_by('-submission_date')[:10]
+    colleague_count = ColleagueProfile.objects.current_year().count()
     context = {'latest_questions': latest_questions, 'question_count':
                question_count, 'my_question_count': my_question_count,
                'latest_groups': latest_groups, 'group_count':
@@ -175,13 +82,14 @@ def register_graduate_profile(request):
             graduate_profile_url = reverse('arshidni:show_graduate_profile',
                                            args=(new_graduate_profile.pk,))
             full_url = request.build_absolute_uri(graduate_profile_url)
-            arshidni_coordinator = get_arshidni_coordinator()
-            email_context = {'arshidni_coordinator': arshidni_coordinator,
-                             'graduate_profile': new_graduate_profile,
-                             'full_url': full_url}
-            mail.send([arshidni_coordinator.email],
-                      template="graduate_profile_submitted",
-                      context=email_context)
+            arshidni_coordinator = get_arshidni_club_for_user(request.user).coordinator
+            if arshidni_coordinator:
+                email_context = {'arshidni_coordinator': arshidni_coordinator,
+                                 'graduate_profile': new_graduate_profile,
+                                 'full_url': full_url}
+                mail.send([arshidni_coordinator.email],
+                          template="graduate_profile_submitted",
+                          context=email_context)
             return HttpResponseRedirect(graduate_profile_url)
         else:
             context = {'form': form}
@@ -219,7 +127,8 @@ def edit_graduate_profile(request, graduate_profile_id):
     # Only allow the user of the profile to edit it or those with the
     # change_graduateprofile permission.
     if not request.user == graduate_profile.user and \
-       not request.user.has_perm('arshidni:change_graduateprofile'):
+       not request.user.has_perm('arshidni:change_graduateprofile') and \
+       not is_arshindi_coordinator_or_deputy(request.user):
         raise PermissionDenied
 
     context = {'edit': True, 'graduate_profile': graduate_profile}
@@ -266,7 +175,8 @@ def list_questions(request, college_name):
 
     # If the user has the view_questions permission, show questions
     # that are pending-revision.
-    if request.user.has_perm('arshidni.view_question'):
+    if request.user.has_perm('arshidni.view_question') or \
+       is_arshindi_coordinator_or_deputy(request.user):
         questions = Question.objects.filter(college=upper_college_name,
                                             is_published__in=[True, None])
     else:
@@ -322,7 +232,8 @@ def mark_answered(request):
     question = get_object_or_404(Question, pk=question_id)
 
     if not question.submitter == request.user and \
-       request.user.has_perm('arshidni.change_question'):
+       not request.user.has_perm('arshidni.change_question') and \
+       not is_arshindi_coordinator_or_deputy(request.user):
         raise PermissionDenied
 
     if question.is_answered:
@@ -342,7 +253,8 @@ def show_question(request, question_id):
     # view_question.
     if not question.is_published and \
        not request.user == question.submitter and \
-       not request.user.has_perm('arshidni:view_question'):
+       not request.user.has_perm('arshidni:view_question') and \
+       not is_arshindi_coordinator_or_deputy(request.user):
         raise PermissionDenied
 
     published_answers = Answer.objects.filter(question=question,
@@ -377,7 +289,8 @@ def edit_question(request, question_id):
                                  is_published__in=[True, None])
 
     if not request.user == question.submitter and \
-       not request.user.has_perm('arshidni:change_question'):
+       not request.user.has_perm('arshidni:change_question') and \
+       not is_arshindi_coordinator_or_deputy(request.user):
         raise PermissionDenied
 
     context = {'edit': True, 'question': question}
@@ -429,7 +342,8 @@ def edit_answer(request, question_id, answer_id):
                                is_published__in=[True, None])
 
     if not request.user == answer.submitter and \
-       not request.user.has_perm('arshidni:change_answer'):
+       not request.user.has_perm('arshidni:change_answer') and\
+       not is_arshindi_coordinator_or_deputy(request.user):
         raise PermissionDenied
 
     # FIXME: remove edit
@@ -455,7 +369,8 @@ def edit_answer(request, question_id, answer_id):
 def list_groups(request):
     # If the user has the view_groups permission, show groups
     # that are pending-revision.
-    if request.user.has_perm('arshidni.view_group'):
+    if request.user.has_perm('arshidni.view_group') or \
+       is_arshindi_coordinator_or_deputy(request.user):
         groups = StudyGroup.objects.filter(status__in=['A', 'P'])
     else:
         user_groups = StudyGroup.objects.filter(coordinator=request.user)
@@ -474,8 +389,8 @@ def join_group(request):
     group_id = request.POST.get('group_id')
     group = get_object_or_404(StudyGroup, pk=group_id)
 
-    user_gender = get_gender(request.user)
-    coordinator_gender = get_gender(group.coordinator)
+    user_gender = get_user_gender(request.user)
+    coordinator_gender = get_user_gender(group.coordinator)
 
     if user_gender != coordinator_gender:
         if coordinator_gender == 'F':
@@ -511,14 +426,15 @@ def submit_group(request):
             group_full_url = request.build_absolute_uri(group_url)
             admin_url = reverse('arshidni_admin:index')
             admin_full_url = request.build_absolute_uri(admin_url)
-            arshidni_coordinator = get_arshidni_coordinator()
-            email_context = {'arshidni_coordinator': arshidni_coordinator,
-                             'group': new_group,
-                             'full_url': group_full_url,
-                             'admin_full_url': admin_full_url}
-            mail.send([arshidni_coordinator.email],
-                      template="study_group_submitted",
-                      context=email_context)
+            arshidni_coordinator = get_arshidni_club_for_user(request.user).coordinator
+            if arshidni_coordinator:
+                email_context = {'arshidni_coordinator': arshidni_coordinator,
+                                 'group': new_group,
+                                 'full_url': group_full_url,
+                                 'admin_full_url': admin_full_url}
+                mail.send([arshidni_coordinator.email],
+                          template="study_group_submitted",
+                          context=email_context)
             return HttpResponseRedirect(group_url)
         else:
             context = {'form': form}
@@ -535,7 +451,8 @@ def edit_group(request, group_id):
                               is_published__in=[True, None])
 
     if not request.user == group.coordinator and \
-       not request.user.has_perm('arshidni:change_group'):
+       not request.user.has_perm('arshidni:change_group') and \
+       not is_arshindi_coordinator_or_deputy(request.user):
         raise PermissionDenied
 
     context = {'edit': True, 'group': group}
@@ -566,7 +483,8 @@ def show_group(request, group_id):
     # and to those with view_group permission.
     if not group.status == 'A' and \
        not request.user == group.coordinator and \
-       not request.user.has_perm('arshidni.view_group'):
+       not request.user.has_perm('arshidni.view_group') and \
+       not is_arshindi_coordinator_or_deputy(request.user):
         raise PermissionDenied
 
     previous_request = JoinStudyGroupRequest.objects.filter(submitter=request.user, group=group)
@@ -583,7 +501,8 @@ def join_group_requests(request, group_id):
     # Only the coordinator and people with the change_group permission
     # can handle join group requests.
     if not request.user == group.coordinator and \
-       not request.user.has_perm('arshidni.change_group'):
+       not request.user.has_perm('arshidni.change_group') and \
+       not is_arshindi_coordinator_or_deputy(request.user):
         raise PermissionDenied
 
     context = {'group': group}
@@ -633,12 +552,18 @@ def search_groups(request):
 
 @login_required
 def list_colleagues(request):
-    # If the user has the view_colleague_profiles permission, show colleague_profiles
-    # that are pending-revision.
-    if request.user.has_perm('arshidni.view_colleagueprofile'):
-        colleague_profiles = ColleagueProfile.objects.filter(is_published__in=[True, None])
+    # If the user has the view_colleague_profiles permission, show
+    # colleague_profiles that are pending-revision.
+    if is_arshindi_coordinator_or_deputy(request.user) or \
+       request.user.has_perm('arshidni.view_colleagueprofile'):
+        colleague_profiles = ColleagueProfile.objects.for_user_city(request.user).filter(is_published__in=[True, None])
+        city = get_user_city(request.user)
+        # For cities other than Riyadh, we have gender-unspecific
+        # Arshidni (yay).
+        if city == 'R':
+            colleague_profiles = colleague_profiles.for_user_gender(request.user)
     else:
-        colleague_profiles = ColleagueProfile.objects.filter(is_available=True, is_published=True)
+        colleague_profiles = ColleagueProfile.objects.current_year().available().published().for_user_gender(request.user).for_user_city(request.user)
 
     context = {'page_colleague_profiles': colleague_profiles}
     return render(request, 'arshidni/colleague_list.html', context)
@@ -649,6 +574,7 @@ def submit_supervision_request(request, colleague_profile_id):
     # Make sure no previous request, and no approved request
     colleague_profile = get_object_or_404(ColleagueProfile,
                                           pk=colleague_profile_id,
+                                          year=current_year,
                                           is_published=True)
     context = {'colleague_profile': colleague_profile}
     if request.method == 'POST':
@@ -659,14 +585,15 @@ def submit_supervision_request(request, colleague_profile_id):
             new_request = form.save()
             to_me_url = reverse('arshidni:supervision_requests_to_me')
             full_url = request.build_absolute_uri(to_me_url)
-            arshidni_coordinator = get_arshidni_coordinator()
-            email_context = {'full_url': full_url,
-                             'supervision_request': new_request,
-                             'colleague_profile': colleague_profile}
-            mail.send([colleague_profile.user.email],
-                      cc=[arshidni_coordinator.email],
-                      template="supervision_request_submitted",
-                      context=email_context)
+            arshidni_coordinator = get_arshidni_club_for_user(request.user).coordinator
+            if arshidni_coordinator:
+                email_context = {'full_url': full_url,
+                                 'supervision_request': new_request,
+                                 'colleague_profile': colleague_profile}
+                mail.send([colleague_profile.user.email],
+                          cc=[arshidni_coordinator.email],
+                          template="supervision_request_submitted",
+                          context=email_context)
             after_url = reverse('arshidni:my_supervision_requests') + '#request-' + str(new_request.pk)
             return HttpResponseRedirect(after_url)
         else:
@@ -685,7 +612,7 @@ def submit_supervision_request(request, colleague_profile_id):
             context['error'] = 'current_student_requests'
         elif current_colleague_requests:
             context['error'] = 'current_colleague_requests'
-        elif get_gender(request.user) != get_gender(colleague_profile.user):
+        elif get_user_gender(request.user) != get_user_gender(colleague_profile.user):
             context['error'] = 'gender'
         else:
             form = SupervisionRequestForm()
@@ -701,14 +628,14 @@ def register_colleague_profile(request):
     # Check if the user already has a profile. If so, redirect them to
     # the edit page.
     try:
-        current_profile = ColleagueProfile.objects.get(user=request.user)
+        current_profile = ColleagueProfile.objects.get(user=request.user, year=current_year)
         return HttpResponseRedirect(reverse('arshidni:edit_colleague_profile',
                                                 args=(current_profile.pk,)))
     except ObjectDoesNotExist:
         pass
 
     if request.method == 'POST':
-        colleague_object = ColleagueProfile(user=request.user)
+        colleague_object = ColleagueProfile(user=request.user, year=current_year)
         form = ColleagueProfileForm(request.POST, instance=colleague_object)
         if form.is_valid():
             new_colleague = form.save()
@@ -742,7 +669,8 @@ def show_colleague_profile(request, colleague_profile_id):
     # those with change_colleagueprofile.
     if not colleague_profile.is_published and \
        not request.user == colleague_profile.user and \
-       not request.user.has_perm('arshidni:view_colleagueprofile'):
+       not request.user.has_perm('arshidni:view_colleagueprofile') and \
+       not is_arshindi_coordinator_or_deputy(request.user):
         raise PermissionDenied
 
     context = {'colleague_profile': colleague_profile}
@@ -752,13 +680,15 @@ def show_colleague_profile(request, colleague_profile_id):
 def edit_colleague_profile(request, colleague_profile_id):
     # Don't allow editing deleted profiles
     colleague_profile = get_object_or_404(ColleagueProfile,
+                                          year=current_year,
                                           pk=colleague_profile_id,
                                           is_published__in=[True, None])
 
     # Only allow the user of the profile to edit it or those with the
     # change_colleagueprofile permission.
     if not request.user == colleague_profile.user and \
-       not request.user.has_perm('arshidni:change_colleagueprofile'):
+       not request.user.has_perm('arshidni:change_colleagueprofile') and \
+       not is_arshindi_coordinator_or_deputy(request.user):
         raise PermissionDenied
 
     context = {'edit': True, 'colleague_profile': colleague_profile}
@@ -776,9 +706,11 @@ def edit_colleague_profile(request, colleague_profile_id):
 
     return render(request, 'arshidni/colleague_edit_profile.html', context)
 
+@login_required
 def supervision_requests_to_me(request):
     try:
-        colleague_profile = ColleagueProfile.objects.get(user=request.user)
+        colleague_profile = ColleagueProfile.objects.get(user=request.user,
+                                                         year=current_year)
     except ObjectDoesNotExist:
         colleague_profile = None
 
@@ -798,7 +730,8 @@ def supervision_requests_to_me(request):
 def my_supervision_requests(request):
     # TODO: [Arshidni-wide] if you the user is colleague himself, they
     # shouldn't be able to submit any requests.
-    supervision_requests = SupervisionRequest.objects.filter(user=request.user)
+    supervision_requests = SupervisionRequest.objects.filter(user=request.user,
+                                                             colleague__year=current_year)
 
     context = {'page_requests': supervision_requests}
     return render(request, 'arshidni/my_supervision_requests.html', context)
@@ -811,7 +744,9 @@ def my_supervision_requests(request):
 def student_action(request):
     supervision_request_id = request.POST.get('supervision_request_id')
     action = request.POST.get('action')
-    supervision_request = get_object_or_404(SupervisionRequest, pk=supervision_request_id)
+    supervision_request = get_object_or_404(SupervisionRequest,
+                                            pk=supervision_request_id,
+                                            colleague__year=current_year)
 
     if supervision_request.user != request.user:
         raise Exception(u'لست أنت مقدم الطلب!')
@@ -823,13 +758,14 @@ def student_action(request):
             supervision_request.withdrawal_date = now
             to_me_url = reverse('arshidni:supervision_requests_to_me')
             full_url = request.build_absolute_uri(to_me_url)
-            arshidni_coordinator = get_arshidni_coordinator()
-            email_context = {'full_url': full_url,
-                             'supervision_request': supervision_request}
-            mail.send([supervision_request.colleague.user.email],
-                      cc=[arshidni_coordinator.email],
-                      template="supervision_request_withdrawn",
-                      context=email_context)
+            arshidni_coordinator = get_arshidni_club_for_user(request.user).coordinator
+            if arshidni_coordinator:
+                email_context = {'full_url': full_url,
+                                 'supervision_request': supervision_request}
+                mail.send([supervision_request.colleague.user.email],
+                          cc=[arshidni_coordinator.email],
+                          template="supervision_request_withdrawn",
+                          context=email_context)
         elif supervision_request.status == 'P':
             supervision_request.status = 'D'
         else: # Just in case
@@ -848,8 +784,9 @@ def student_action(request):
 def colleague_action(request):
     supervision_request_id = request.POST.get('supervision_request_id')
     action = request.POST.get('action')
-    supervision_request = get_object_or_404(SupervisionRequest, pk=supervision_request_id)
-
+    supervision_request = get_object_or_404(SupervisionRequest,
+                                            pk=supervision_request_id,
+                                            colleague__year=current_year)
     colleague_profile = supervision_request.colleague
 
     if colleague_profile != request.user.colleague_profile:
@@ -867,13 +804,14 @@ def colleague_action(request):
             colleague_profile.save()
             mine_url = reverse('arshidni:my_supervision_requests')
             full_url = request.build_absolute_uri(mine_url)
-            arshidni_coordinator = get_arshidni_coordinator()
-            email_context = {'full_url': full_url,
-                             'supervision_request': supervision_request}
-            mail.send([supervision_request.user.email],
-                      cc=[arshidni_coordinator.email],
-                      template="supervision_request_accepted",
-                      context=email_context)
+            arshidni_coordinator = get_arshidni_club_for_user(request.user).coordinator
+            if arshidni_coordinator:
+                email_context = {'full_url': full_url,
+                                 'supervision_request': supervision_request}
+                mail.send([supervision_request.user.email],
+                          cc=[arshidni_coordinator.email],
+                          template="supervision_request_accepted",
+                          context=email_context)
         else: # Just in case
             raise Exception(u'حدث خطأ غير معروف.')
 
@@ -897,7 +835,3 @@ def colleague_action(request):
     return  {'current_status': supervision_request.status,
              'full_current_status': supervision_request.get_status_display(),
              'contacts': supervision_request.contacts}
-
-# Acadmic activities
-
-#?

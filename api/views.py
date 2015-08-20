@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.db.models import Sum
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
@@ -12,10 +13,10 @@ from rest_framework.views import APIView
 from activities.models import Activity
 
 from accounts.utils import get_user_college
-from api.serializers import ActivitySerializer, ClubSerializer, BuzzSerializer, BuzzViewSerializer
+from api.serializers import ActivitySerializer, ClubSerializer, BuzzSerializer, BuzzViewSerializer, CodeSerializer
 from clubs.models import Club
 from media.models import Buzz, BuzzView
-
+from niqati.models import Code
 
 class ActivityList(generics.ListAPIView):
     serializer_class = ActivitySerializer
@@ -140,3 +141,16 @@ class BuzzViewUpdate(generics.UpdateAPIView):
 
     def perform_update(self, serializer):
         serializer.save(off_date=timezone.now())
+
+class CodeList(generics.ListAPIView):
+    serializer_class = CodeSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        return Code.objects.current_year().filter(user=self.request.user).order_by('-redeem_date')
+
+class CodeSum(APIView):
+    permission_classes = (IsAuthenticated,)
+    def get(self, request):
+        return Response(request.user.code_set.current_year().aggregate(niqati_sum=Sum('points')))
+

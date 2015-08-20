@@ -143,10 +143,6 @@ class RedeemCodeForm(forms.Form):
         if 'string' in cleaned_data and \
            self.code.collection and \
            timezone.now().date() > self.code.collection.parent_order.episode.end_date + datetime.timedelta(14):
-            message = u"مضى أكثر من أسبوعين على انتهاء النشاط ولم يعد ممكنا إدخال نقاطي!"
-            message_level = messages.ERROR
-            #return (message_level, message)
-
             raise forms.ValidationError(u"مضى أكثر من أسبوعين على انتهاء النشاط ولم يعد ممكنا إدخال نقاطي!", code="TwoWeeks")
 
         return cleaned_data
@@ -166,7 +162,7 @@ class RedeemCodeForm(forms.Form):
                 message = u"تم إدخال الرمز القديم برمز ذي نقاط أعلى."
             else:
                 message = u"تم إدخال الرمز بنجاح."
-            message_level = messages.SUCCESS
+            message_level = 'success'
 
             new_code = Code.objects.get(code_string=self.cleaned_data['string'])
             new_code.user = self.user
@@ -176,9 +172,7 @@ class RedeemCodeForm(forms.Form):
             self.code = new_code
         else:
             message = u"حصل خطأ ما."
-            message_level = messages.ERROR
+            message_level = 'error'
 
-            print self.fields['string'].errors.as_data()
-
-        return (message_level, message)
+        return {'message_level': message_level, 'message': message}
 

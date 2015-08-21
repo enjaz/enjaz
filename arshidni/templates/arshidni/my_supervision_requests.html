@@ -1,22 +1,19 @@
-{% extends 'arshidni_base.html' %}{% load staticfiles %}
-{% block title %}الزملاء الطلابيون{% endblock %}
+{% extends 'arshidni_base.html' %}{% load staticfiles %}{% load arshidni_tags %}
+{% block title %}المرشدون الطلابيون{% endblock %}
+
 {% block navbar %}
-	<li><a href="{% url 'arshidni:list_colleagues' %}"><span class="entypo-users"></span> الزملاء الطلابيون</a></li>
-	{% if not user.colleague_profile %}
-		<li><a href="{% url 'arshidni:my_supervision_requests' %}"><span class="glyphicon glyphicon-star"></span> طلبات وجهتَها</a></li>
- 	{% endif %}
+{% include 'arshidni/includes/colleague_nav.html' %}
 {% endblock %}
+
 {% block content %}
+<h2>طلبات الزمالة الطلابية</h2>
 <div class="panel panel-primary">
-	<div class="panel-heading">
-		<h3 class="panel-title">طلبات الزمالة الطلابية</h3>
-	</div>
 	 <div class="panel-body">
 	{% if user.supervision_requests.all %}
 		<table id="request-table" class="display">
 			<thead>
 				<tr>
-					<th>اسم الزميل</th>
+					<th>اسم المرشد</th>
 					<th>معلومات التواصل</th>
 					<th>تاريخ الطلب</th>
 					<th>حالة الطلب</th>

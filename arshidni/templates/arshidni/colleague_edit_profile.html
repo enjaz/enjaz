@@ -1,20 +1,20 @@
-{% extends 'arshidni_base.html' %}{% load bootstrap3 %}
+{% extends 'arshidni_base.html' %}{% load bootstrap3 %}{% load arshidni_tags %}
 {% block title %}{% if edit %} تعديل ملف {{ colleague_profile.user.common_profile.get_ar_full_name|default:colleague_profile.user.username }}{% else %} تسجيل زميل طلابي{% endif %}{% endblock %}
 
 {% block navbar %}
-	<li><a href="{% url 'arshidni:list_colleagues' %}"><span class="entypo-users"></span> الزملاء الطلابيون</a></li>
- 	{% if user.common_profile.is_student and not user.colleague_profile %}
-		<li><a href="{% url 'arshidni:register_colleague_profile' %}"><span class="glyphicon glyphicon-plus"></span> سجّل نفسك زميلا طلابيا</a></li>
- 	{% endif %}
+{% include 'arshidni/includes/colleague_nav.html' %}
 {% endblock %}
 
 {% block content %}
+{% if not edit %}
+<p class="alert arshidni-intro">من هنا تستطيع تسجيل نفسك مرشدا طلابيا لتعرض في قائمة المرشدين الطلابيين ليتعرف عليك الطلاب المستجدون. ستصلك تنبيهات بريدية عندما يطلب طالبٌ مستجد إرشادك.  اكتب معلومات تشرح اهتمامتك وما أنت قادر على تقديمه.</p>
+{% endif %}
 <h2>{% if edit %} تعديل ملف {{ colleague_profile.user.common_profile.get_ar_full_name|default:colleague_profile.user.username }} {% else %} تسجيل زميل طلابي{% endif %}</h2>
 
 {% if error %}
 	<p class="alter alter-danger">
 	{% if error == 'notstudent' %}
-		يمكن للطلاب فقط تسجيل أنفسهم زملاء طلابيين.
+		يمكن للطلاب فقط تسجيل أنفسهم مرشدين طلابيين.
 	{% endif %}
 	</p>
 {% else %}

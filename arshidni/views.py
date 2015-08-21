@@ -559,7 +559,7 @@ def list_colleagues(request):
     # colleague_profiles that are pending-revision.
     if is_arshindi_coordinator_or_deputy(request.user) or \
        request.user.has_perm('arshidni.view_colleagueprofile'):
-        user_colleagues = ColleagueProfile.objects.for_user_city(request.user)
+        user_colleagues = ColleagueProfile.objects.current_year().for_user_city(request.user)
         city = get_user_city(request.user)
         # For cities other than Riyadh, we have gender-unspecific
         # Arshidni (yay).

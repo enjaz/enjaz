@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 
 from clubs.models import College, college_choices
 from core.models import StudentClubYear
-from arshidni.managers import ColleagueQuerySet
+from arshidni.managers import ColleagueQuerySet, SupervisionRequestQuerySet
 
 is_published_choices = (
     (None, u'لم يراجع بعد'),
@@ -225,10 +225,10 @@ class JoinStudyGroupRequest(models.Model):
 # Student Colleague
 
 class ColleagueProfile(ArshidniProfile):
-    user = models.OneToOneField(User, null=True,
-                                on_delete=models.SET_NULL,
-                                verbose_name=u"المستخدم",
-                                related_name="colleague_profile")
+    user = models.ForeignKey(User, null=True,
+                             on_delete=models.SET_NULL,
+                             verbose_name=u"المستخدم",
+                             related_name="colleague_profiles")
     bio = models.TextField(u"نبذة", help_text=u"هل خضت أي اختبارات عالمية؟ هل تدربت في مستشفى؟ هل شاركت في أبحاث؟")
     batch = models.PositiveSmallIntegerField(verbose_name=u"الدفعة")
     # The following field can be dynamically predicted but this can be
@@ -243,6 +243,9 @@ class ColleagueProfile(ArshidniProfile):
         verbose_name = u"ملف زميل طلابي"
         verbose_name_plural = u"ملفات الزملاء الطلابيين"
 
+    def __unicode__(self):
+        return self.user.common_profile.get_ar_full_name()
+
     
 class SupervisionRequest(models.Model):    
     user = models.ForeignKey(User, null=True,
@@ -252,7 +255,7 @@ class SupervisionRequest(models.Model):
     colleague = models.ForeignKey(ColleagueProfile, null=True,
                                   on_delete=models.SET_NULL,
                                   verbose_name=u"الزميل",
-                                  related_name="colleague")
+                                  related_name="supervision_requests")
     status = models.CharField(max_length=2, verbose_name=u"الحالة",
                               default='P',
                               choices=supervision_request_status_choices)
@@ -266,6 +269,8 @@ class SupervisionRequest(models.Model):
                                            null=True,
                                            default=None)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
+
+    objects = SupervisionRequestQuerySet.as_manager()
 
     def __unicode__(self):
         return self.user.common_profile.get_en_full_name()

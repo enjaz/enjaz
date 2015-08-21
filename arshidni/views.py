@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 import datetime
 
+from django.db.models import Q
 from django import forms
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404, get_list_or_404
@@ -21,6 +22,8 @@ from arshidni.utilities import get_arshidni_club_for_user, is_arshindi_coordinat
 
 from clubs.models import College
 from accounts.utils import get_user_city, get_user_gender
+
+COLLEAGUE_SUPERVISION_LIMIT = 8
 
 # Anything that should solely be done by the Arshidni coordinator
 # should be done through the arshidni admin interface.
@@ -556,22 +559,23 @@ def list_colleagues(request):
     # colleague_profiles that are pending-revision.
     if is_arshindi_coordinator_or_deputy(request.user) or \
        request.user.has_perm('arshidni.view_colleagueprofile'):
-        colleague_profiles = ColleagueProfile.objects.for_user_city(request.user).filter(is_published__in=[True, None])
+        colleague_profiles = ColleagueProfile.objects.for_user_city(request.user).filter(Q(is_published=True) |  Q(is_published__isnull=True))
         city = get_user_city(request.user)
         # For cities other than Riyadh, we have gender-unspecific
         # Arshidni (yay).
         if city == 'R':
             colleague_profiles = colleague_profiles.for_user_gender(request.user)
     else:
-        colleague_profiles = ColleagueProfile.objects.current_year().available().published().for_user_gender(request.user).for_user_city(request.user)
-
-    context = {'page_colleague_profiles': colleague_profiles}
+        user_colleagues = ColleagueProfile.objects.current_year().for_user_gender(request.user).for_user_city(request.user).published() 
+        available = user_colleagues.available()
+        unavailable = user_colleagues.unavailable()
+        
+    context = {'available': available, 'unavailable': unavailable}
     return render(request, 'arshidni/colleague_list.html', context)
 
 @login_required
 @permission_required('arshidni.add_supervisionrequest', raise_exception=True)
 def submit_supervision_request(request, colleague_profile_id):
-    # Make sure no previous request, and no approved request
     colleague_profile = get_object_or_404(ColleagueProfile,
                                           pk=colleague_profile_id,
                                           year=current_year,
@@ -585,15 +589,12 @@ def submit_supervision_request(request, colleague_profile_id):
             new_request = form.save()
             to_me_url = reverse('arshidni:supervision_requests_to_me')
             full_url = request.build_absolute_uri(to_me_url)
-            arshidni_coordinator = get_arshidni_club_for_user(request.user).coordinator
-            if arshidni_coordinator:
-                email_context = {'full_url': full_url,
-                                 'supervision_request': new_request,
-                                 'colleague_profile': colleague_profile}
-                mail.send([colleague_profile.user.email],
-                          cc=[arshidni_coordinator.email],
-                          template="supervision_request_submitted",
-                          context=email_context)
+            email_context = {'full_url': full_url,
+                             'supervision_request': new_request,
+                             'colleague_profile': colleague_profile}
+            mail.send([colleague_profile.user.email],
+                      template="supervision_request_submitted",
+                      context=email_context)
             after_url = reverse('arshidni:my_supervision_requests') + '#request-' + str(new_request.pk)
             return HttpResponseRedirect(after_url)
         else:
@@ -601,17 +602,18 @@ def submit_supervision_request(request, colleague_profile_id):
     elif request.method == 'GET':
         # Check if the user has any pending or accepted supervision
         # requests
-        current_student_requests = SupervisionRequest.objects.filter(
-            user=request.user, status__in=['P', 'A'])
-        # Check if the user has any accepted supervision requests
-        # already.
-        current_colleague_requests = SupervisionRequest.objects.filter(
-            colleague=colleague_profile, status='A')
-
-        if current_student_requests:
-            context['error'] = 'current_student_requests'
-        elif current_colleague_requests:
-            context['error'] = 'current_colleague_requests'
+        accepted_student_requests = SupervisionRequest.objects.filter(user=request.user, status='A')
+        pending_student_requests = SupervisionRequest.objects.filter(user=request.user, status='P')
+        # Check if the colleague has exceeded the supervision limit.
+        colleague_supervisions = colleague_profile.supervision_requests.accepted()
+        if colleague_supervisions.filter(user=request.user).exists():
+            context['error'] = 'already_supervisor'
+        elif accepted_student_requests.exists():
+            context['error'] = 'accepted_supervision_requests'
+        elif pending_student_requests.exists():
+            context['error'] = 'pending_supervision_requests'
+        elif colleague_supervisions.count() >= COLLEAGUE_SUPERVISION_LIMIT:
+            context['error'] = 'colleague_supervision_limit'
         elif get_user_gender(request.user) != get_user_gender(colleague_profile.user):
             context['error'] = 'gender'
         else:
@@ -662,6 +664,7 @@ def register_colleague_profile(request):
 @login_required
 def show_colleague_profile(request, colleague_profile_id):
     colleague_profile = get_object_or_404(ColleagueProfile,
+                                          year=current_year,
                                           pk=colleague_profile_id,
                                           is_published__in=[True,
                                                             None])
@@ -789,7 +792,7 @@ def colleague_action(request):
                                             colleague__year=current_year)
     colleague_profile = supervision_request.colleague
 
-    if colleague_profile != request.user.colleague_profile:
+    if colleague_profile.user != request.user:
         raise Exception(u'الطلب ليس موجها لك!')
 
     if action == 'accept':
@@ -800,8 +803,9 @@ def colleague_action(request):
             # undo an immediate mistake.
             supervision_request.status = 'A'
             supervision_request.save()
-            colleague_profile.is_available = False
-            colleague_profile.save()
+            if colleague_profile.supervision_requests.accepted().count() >= COLLEAGUE_SUPERVISION_LIMIT:
+                colleague_profile.is_available = False
+                colleague_profile.save()
             mine_url = reverse('arshidni:my_supervision_requests')
             full_url = request.build_absolute_uri(mine_url)
             arshidni_coordinator = get_arshidni_club_for_user(request.user).coordinator

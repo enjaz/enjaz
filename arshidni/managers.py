@@ -3,6 +3,9 @@ from django.db import models
 from accounts.utils import get_user_city, get_user_gender
 from core.models import StudentClubYear
 
+class SupervisionRequestQuerySet(models.QuerySet):
+    def accepted(self):
+        return self.filter(status='A')
 
 class ColleagueQuerySet(models.QuerySet):
     def current_year(self):
@@ -11,6 +14,9 @@ class ColleagueQuerySet(models.QuerySet):
 
     def available(self):
         return self.filter(is_available=True)
+
+    def unavailable(self):
+        return self.filter(is_available=False)
 
     def published(self):
         return self.filter(is_published=True)

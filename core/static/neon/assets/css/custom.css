@@ -385,8 +385,10 @@ span.unpublished {
 }
 
 .arshidni-intro {
-	font-size: 1.3em;
+	font-size: 1.1em;
 	text-align: justify;
+	background-color: rgb(244, 244, 244);
+	color: black;
 }
 
 /* Override neon customization to DataTables.*/

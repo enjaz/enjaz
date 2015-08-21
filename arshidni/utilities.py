@@ -28,5 +28,4 @@ def get_arshidni_club_for_user(user):
 
 def is_arshindi_coordinator_or_deputy(user):
     user_clubs = get_user_coordination_and_deputyships(user)
-    user_clubs.filter(english_name='Arshidni')
-    return user_clubs.exists()
+    return user_clubs.filter(english_name='Arshidni').exists()

@@ -1,50 +1,54 @@
-{% extends 'arshidni_base.html' %}{% load staticfiles %}
-{% block title %}الزملاء الطلابيون{% endblock %}
+{% extends 'arshidni_base.html' %}{% load staticfiles %}{% load arshidni_tags %}
+{% block title %}المرشدون الطلابيون{% endblock %}
+
 {% block navbar %}
-	<li><a href="{% url 'arshidni:list_colleagues' %}"><span class="entypo-users"></span> الزملاء الطلابيون</a></li>
- 	{% if user.common_profile.is_student and not user.colleague_profile and perms.arshidni.add_colleagueprofile %}
-		<li><a href="{% url 'arshidni:register_colleague_profile' %}"><span class="glyphicon glyphicon-plus"></span> سجّل نفسك زميلا طلابيا</a></li>
- 	{% endif %}
-	{% if user.colleague_profile %}
-		<li><a href="{% url 'arshidni:supervision_requests_to_me' %}"><span class="glyphicon glyphicon-star"></span> طلبات موجهة إليّ</a></li>
- 	{% else %}
-		<li><a href="{% url 'arshidni:my_supervision_requests' %}"><span class="glyphicon glyphicon-star"></span> طلبات وجهتَها</a></li>
- 	{% endif %}
+{% include 'arshidni/includes/colleague_nav.html' %}
 {% endblock %}
+
 {% block content %}
 <div class="row">
 	<div class="col-md-10 col-md-offset-1">
-		<p class="alert alert-info arshidni-intro">هذه حلقة التواصل بين الطلاب المستجدين والطلاب الأقدم في الجامعة. يقدم الزميل الطلابي المشورة للطالب المستجد بناء على تجربته الشخصية، كإعانته على الانتقال من النظام الدراسي المدرسي إلى النظام الدراسي الجامعي، ونقل خبراته في طرق الاستذكار المثلى لمختلف المواد والمواضيع، والمساعدة في حل الصعوبات الأكاديمية التي قد يواجهها الطالب المستجد.</p>
+		<p class="alert  arshidni-intro">هذه حلقة التواصل بين الطلاب المستجدين والطلاب الأقدم في الجامعة. يقدم المرشد الطلابي المشورة للطالب المستجد بناء على تجربته الشخصية، كإعانته على الانتقال من النظام الدراسي المدرسي إلى النظام الدراسي الجامعي، ونقل خبراته في طرق الاستذكار المثلى لمختلف المواد والمواضيع، والمساعدة في حل الصعوبات الأكاديمية التي قد يواجهها الطالب المستجد.</p>
 	</div>
 </div>
-<div class="panel panel-primary">
-	<div class="panel-heading">
-		<h3 class="panel-title">الزملاء الطلابيون</h3>
-	</div>
-	 <div class="panel-body">
-		<table id="colleague-table" class="display">
-			<thead>
-				<tr>
-					<th>الزميل</th>
-					<th>الكلية</th>
-					<th>الدفعة</th>
-					<th>تاريخ الإضافة</th>
-					<th></th>
-				</tr>
-			</thead>
-			 <tbody>
-				{% for c in page_colleague_profiles %}
-				<tr>
-					<td><a href="{% url 'arshidni:show_colleague_profile' c.pk %}">{{ c.user.common_profile.get_ar_full_name|default:c.user.username }}</a></td>
-					<td>{{ c.user.common_profile.college }}</a></td>
-					<td>{{ c.batch }}</td>
-                       			<td data-order="{{ c.submission_date|date:"U" }}">{{ c.submission_date|date:"j F Y" }}</td>
-                       			<td>{% if user.colleague_profile != c %}<a href="{% url 'arshidni:submit_supervision_request' c.pk %}">اختر</a>{% endif %}</td>
-				</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-	</div>
+<div class="panel-group" id="arshidni-accordion" role="tablist" aria-multiselectable="true">
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a role="button"  aria-expanded="true" data-toggle="collapse" data-parent="#arshidni-accordion" href="#collapseOne">
+                    المرشدون المتاحون ({{ available|length}} )
+                </a>
+            </h4>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" >
+            <div class="panel-body">
+                <div class="row">
+                {% with colleague_profiles=available %}
+                    {% include 'arshidni/includes/colleague_table.html' %}
+                {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a role="button"  data-toggle="collapse" data-parent="#arshidni-accordion" href="#collapseTwo" role="tabpanel" >
+                    المرشدون غير المتاحون ({{ unavailable|length }})
+                </a>
+            </h4>
+        </div>
+        <div id="collapseTwo" class="panel-collapse collapse">
+            <div class="panel-body">
+                <div class="row">
+                {% with colleague_profiles=unavailable %}
+                    {% include 'arshidni/includes/colleague_table.html' %}
+                {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -53,7 +57,7 @@
 	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 <script>
 $(document).ready(function () {
-	$('#colleague-table').dataTable({
+	$('.datatable').dataTable({
 		"order": [[ 3, "desc" ]],
 		"language": {% include 'js/dataTables-arabic.json' %}
 	});

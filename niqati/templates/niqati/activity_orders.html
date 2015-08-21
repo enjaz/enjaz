@@ -9,55 +9,9 @@
 <div class="panel panel-primary panel-shadow" data-collapsed="0">		
 	<!-- panel body -->
 	<div class="panel-body with-table">
-		
-		<table class="table table-bordered table-responsive">
-		<colgroup>
-			<col class="col-md-3">
-			<col class="col-md-9">
-		</colgroup>
-		<thead>
-			<tr>
-				<th colspan="2">
-                    <h4>{{ episode }}<br>
-                        {{ episode.start_date|date:"j F" }} - {{ episode.end_date|date:"j F" }} | {{ episode.start_time|time }} - {{ episode.end_time|time }} | {{ episode.location }}</h4>
-				</th>
-			</tr>
-		</thead>
-		
-		<tbody>
-			{% for order in episode.code_order_set.all %}
-			<tr>
-				<th>تاريخ الطلب:
-                    {{ order.date_ordered|date:"j F Y" }}</th>
-			    <td>
-			        <ul class="list-group">
-			        {# collections #}
-			        {% for collec in order.code_collection_set.all %}
-			            <li class="list-group-item">
-			 				<span class="badge">{{ collec.code_count }} أكواد</span>
-                            {% if collec.approved == True and collec.date_created %}
-                            <span class="badge badge-success">تمت الموافقة</span>
-                            {% elif collec.approved == True and not collec.date_created %}
-                            <span class="badge badge-warning">تمت الموافقة و يجري إنشاء النقاط</span>
-                            {% elif collec.approved == False %}
-                            <span class="badge badge-danger">تم الرفض</span>
-                            {% else %}
-                            <span class="badge badge-warning">معلق</span>
-                            {% endif %}
-			                <a href="{% if collec.approved == True and collec.date_created %}{% url 'niqati:view_collec' collec.pk %}{% else %}#{% endif %}">{{ collec.code_category.ar_label }}</a>
-			            </li>
-			        {% endfor %}   
-			        </ul>
-			    </td>
-			</tr>
-			{% empty %}
-			<th colspan="2">
-				لا توجد طلبات نقاط لهذا الموعد.
-			</th>
-			{% endfor %}
-		</tbody>
-	</table>
-		
+        {% with orders=episode.code_order_set.all %}
+            {% include 'niqati/includes/episode_orders.html' %}
+        {% endwith %}
 	</div>
 </div>
 

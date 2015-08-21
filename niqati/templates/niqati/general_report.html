@@ -2,6 +2,14 @@
 {% block title %}التقرير العام{% endblock %}
 
 {% block content %}
+
+{% if city_choices %}
+<ul>
+{% for city in city_choices %}
+<li><a href="{% url 'niqati:general_report_for_city' city.0 %}">{{ city.1 }}</a></li>
+{% endfor %}
+</ul>
+{% else %}
 <style type="text/css">
     .points {
         font-weight: bold !important;
@@ -28,25 +36,26 @@
       </tr>
     </thead>
     <tbody>
-    {% for user in users %}
+    {% for niqati_user in users %}
         <tr>
-            <td>{{ user.common_profile.get_ar_full_name|default:user }}</td>
-            <td>{{ user.common_profile.get_en_full_name|default:user }}</td>
-            <td>{{ user.common_profile.college }}</td>
-            <td>{{ user.common_profile.student_id }}</td>
-            <td>{{ user.common_profile.badge_number }}</td>
-            <td>{{ user.email }}</td>
-            <td>{{ user.common_profile.mobile_number }}</td>
-            <td class="points">{{ user.total_points }}</td>
+            <td><a href="{% url 'niqati:student_report_with_username' niqati_user.username %}">{{ niqati_user.common_profile.get_ar_full_name|default:niqati_user }}</a></td>
+            <td>{{ niqati_user.common_profile.get_en_full_name|default:niqati_user }}</td>
+            <td>{{ niqati_user.common_profile.college }}</td>
+            <td>{{ niqati_user.common_profile.student_id }}</td>
+            <td>{{ niqati_user.common_profile.badge_number }}</td>
+            <td>{{ niqati_user.email }}</td>
+            <td>{{ niqati_user.common_profile.mobile_number }}</td>
+            <td class="points">{{ niqati_user.point_sum }}</td>
         </tr>
     {% endfor %}
     </tbody>
 </table>
+{% endif %}
 {% endblock %}
 
 {% block customscript %}
     <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
-	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
     <script type="text/javascript">
     $(document).ready(function () {
         $(".datatable").DataTable({

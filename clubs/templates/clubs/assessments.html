@@ -1,0 +1,55 @@
+{% extends "clubs_base.html" %}{% load staticfiles %}
+{% block title %}تقييمات {{ club }}{% endblock %}
+
+{% block content %}
+<h2>تقييمات <a href="{% url 'clubs:show' club.pk %}">{{ club }}</a></h2>
+<p class="alert alert-warning"><i class="entypo-book"></i>إجمالي النقاط: {{ club.get_total_points }}</p>
+
+<h3>الأنشطة الرئيسية</h3>
+<table class="display datatable">
+  <thead>
+    <th>النشاط</th>
+    <th>تقييم الرئاسة</th>
+    <th>تقييم المركز الإعلامي</th>
+    <td>المجموع</td>
+  </thead>
+  <tbody>
+    {% for activity in primary_activities %}
+    <tr>
+        <td><a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a></td>
+        <td>{% if activity.get_presidency_assessment_points %}<a href="{% url 'activities:assess' activity.pk 'p' %}">{{ activity.get_presidency_assessment_points }}</a>{% else %}-{% endif %}</td>
+        <td>{% if activity.get_media_assessment_points %}<a href="{% url 'activities:assess' activity.pk 'm' %}">{{ activity.get_media_assessment_points }}</a>{% else %}-{% endif %}</td>
+        <td>{{ activity.get_total_assessment_points }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h3>أنشطة التعاون</h3>
+<table class="display datatable">
+  <thead>
+    <th>النشاط</th>
+    <th>نقاط التعاون</th>
+  </thead>
+  <tbody>
+    {% for activity in secondary_activities %}
+    <tr>
+        <td><a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a></td>
+        <td><a href="{% url 'activities:assess' activity.pk 'p' %}">{{ activity.get_cooperator_points }}</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}
+{% block customscript %}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script>
+$(function () {
+	$('.datatable').DataTable({
+        "language": {% include 'js/dataTables-arabic.json' %}
+    });
+});
+</script>
+{% endblock %}

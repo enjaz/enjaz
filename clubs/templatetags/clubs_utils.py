@@ -60,5 +60,17 @@ def can_edit_activity(user, activity):
     return utils.can_edit_activity(user, activity)
 
 @register.filter
+def can_assess_club(user, club):
+    return utils.can_assess_club(user, club)
+
+@register.filter
+def can_view_assessments(user, club):
+    return utils.can_view_assessments(user, club)
+
+@register.filter
 def get_activity_reviewing_parents(activity):
     return Club.objects.activity_reviewing_parents(activity)
+
+@register.filter
+def can_review_any_niqati(user):
+    return utils.can_review_any_niqati(user)

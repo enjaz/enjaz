@@ -289,7 +289,7 @@ class ModifiedAuthenticationForm(forms.Form):
                                widget=forms.PasswordInput(attrs={'class': 'required'}, render_value=False))
     remember_me = forms.BooleanField(widget=forms.CheckboxInput(),
                                      required=False,
-                                     label=u'تذكرني شهرا')
+                                     label=u'تذكرني (مدّة شهر)')
     def clean(self):
         """
         Checks for the identification and password.

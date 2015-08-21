@@ -2,6 +2,7 @@ from django.db import models
 from accounts.utils import get_user_city, get_user_gender
 from core.models import StudentClubYear
 
+
 current_year = StudentClubYear.objects.get_current()
 
 class ClubQuerySet(models.QuerySet):
@@ -63,3 +64,27 @@ class ClubQuerySet(models.QuerySet):
             new_parent = new_parent.parent
 
         return chosen_reviewer_query | self.filter(pk__in=reviewing_parent_pks)
+
+    def club_assessing_parents(self, club):
+        assessing_parent_pks = []
+        new_parent = club.parent
+
+        while new_parent:
+            if new_parent.can_assess:
+                assessing_parent_pks.append(new_parent.pk)
+
+            new_parent = new_parent.parent
+
+        return self.filter(pk__in=assessing_parent_pks)
+
+    def niqati_reviewing_parents(self, order):
+        reviewing_parent_pks = []
+        
+        new_parent = order.episode.activity.primary_club
+        while new_parent:
+            if new_parent.can_review_niqati:
+                reviewing_parent_pks.append(new_parent.pk)
+
+            new_parent = new_parent.parent
+
+        return self.filter(pk__in=reviewing_parent_pks)

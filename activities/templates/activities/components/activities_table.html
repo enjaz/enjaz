@@ -1,37 +1,39 @@
-<table class="display datatable">{% load l10n %}
-    <thead>
-        <tr>
-            <th>الاسم</th>
-            <th>النادي المنظم</th>
-            {# In privileged view, show the submission date. #}{% if privileged %}
-            <th>تاريخ الإرسال</th>
-            {% endif %}<th>تاريخ الانعقاد</th>
-            {# In approved, no need to show the status nor the options. #}{% if not approved_table %}
-            <th>الحالة</th>
-            <th>الخيارات</th>{% endif %}{# For privileged non-coordinators users and in approved activities, show the scores.  We use MAX_OVERDUE_REPORTS, which is only passed for coordinators. #}{% if not MAX_OVERDUE_REPORTS and approved_table and privileged %}
-            <th>تقييم الملائمة</th>
-            <th>تقييم الجودة</th>
-            <th>عدد التقييمات</th>{% endif %}
-        </tr>
-    </thead>
-    <tbody>
-    {% for activity in activities %}
-        <tr>
-            <td><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}</a></td>
-            <td><a href="{% url 'clubs:show' activity.primary_club.id %}">{{ activity.primary_club }}</a></td>{% if privileged %}
-            <td data-order="{{ activity.submission_date|date:"U" }}">{{ activity.submission_date|date:"j F" }}</td>
-            {% endif %}
-            <td data-order="{{ activity.get_first_date|date:"U" }}">{{ activity.get_first_date|date:"j F" }}</td>
-            {% if not approved_table %}
-            <td>{{ activity.get_approval_status_message }}</td>
-            <td>
-                {{ activity.get_list_activity_action|safe }}
-            </td>{% endif %}{% if not MAX_OVERDUE_REPORTS and approved_table and privileged %}
-            <td>{{ activity.get_relevance_score_average|stringformat:".2f" }}</td>
-            <td>{{ activity.get_quality_score_average|stringformat:".2f" }}</td>
-            <td>{{ activity.get_evaluation_count }}</td>
-            {% endif %}
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<div class="table-responsive">{% load l10n %}
+   <table class="display datatable">
+        <thead>
+            <tr>
+                <th>الاسم</th>
+                <th>النادي المنظم</th>
+                {# In privileged view, show the submission date. #}{% if privileged %}
+                <th>تاريخ الإرسال</th>
+                {% endif %}<th>تاريخ الانعقاد</th>
+                {# In approved, no need to show the status nor the options. #}{% if not approved_table %}
+                <th>الحالة</th>
+                <th>الخيارات</th>{% endif %}{# For privileged non-coordinators users and in approved activities, show the scores.  We use MAX_OVERDUE_REPORTS, which is only passed for coordinators. #}{% if not MAX_OVERDUE_REPORTS and approved_table and privileged %}
+                <th>تقييم الملائمة</th>
+                <th>تقييم الجودة</th>
+                <th>عدد التقييمات</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for activity in activities %}
+            <tr>
+                <td><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}</a></td>
+                <td><a href="{% url 'clubs:show' activity.primary_club.id %}">{{ activity.primary_club }}</a></td>{% if privileged %}
+                <td data-order="{{ activity.submission_date|date:"U" }}">{{ activity.submission_date|date:"j F" }}</td>
+                {% endif %}
+                <td data-order="{{ activity.get_first_date|date:"U" }}">{{ activity.get_first_date|date:"j F" }}</td>
+                {% if not approved_table %}
+                <td>{{ activity.get_approval_status_message }}</td>
+                <td>
+                    {{ activity.get_list_activity_action|safe }}
+                </td>{% endif %}{% if not MAX_OVERDUE_REPORTS and approved_table and privileged %}
+                <td>{{ activity.get_relevance_score_average|stringformat:".2f" }}</td>
+                <td>{{ activity.get_quality_score_average|stringformat:".2f" }}</td>
+                <td>{{ activity.get_evaluations.count }}</td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -34,6 +34,15 @@ urlpatterns = patterns('',
     url(r'^tasks/(?P<pk>\d+)/complete/$', views.mark_task_complete, name="mark_task_complete"),
     url(r'^tasks/(?P<pk>\d+)/comment/$', views.add_comment, name="add_comment"),
 
+    # What's new?
+    url(r'^buzzes/$', views.buzzes_home, name="buzzes_home"),
+    url(r'^buzzes/add/$', views.add_buzz, name="add_buzz"),
+    url(r'^buzzes/(?P<buzz_id>\d+)/delete/$', views.delete_buzz, name="delete_buzz"),
+    url(r'^buzzes/(?P<buzz_id>\d+)/$', views.show_buzz, name="show_buzz"),
+    url(r'^buzzes/(?P<buzz_id>\d+)/edit/$', views.edit_buzz, name="edit_buzz"),
+    url(r'^buzzes/list/published/$', views.buzzes_list, {"list_filter": views.ACTIVE}, name="buzzes_list_published"),
+    url(r'^buzzes/list/upcoming/$', views.buzzes_list, {"list_filter": views.UPCOMING}, name="buzzes_list_upcoming"),
+
     # Polls
     url(r'^(?P<poll_type>\w+)/$', views.polls_home, name="polls_home"),
     url(r'^(?P<poll_type>\w+)/list/active/$', views.polls_list, {"filter": views.ACTIVE}, name="polls_list_active"),
@@ -47,4 +56,7 @@ urlpatterns = patterns('',
     url(r'^(?P<poll_type>\w+)/(?P<poll_id>\d+)/deletecomment/$', views.delete_poll_comment, name="delete_poll_comment"),
     url(r'^(?P<poll_type>\w+)/(?P<poll_id>\d+)/results/$', views.poll_results, name="poll_results"),
     url(r'^(?P<poll_type>\w+)/suggest/$', views.suggest_poll, name="suggest_poll"),
+
+    # Buzz
+
 )

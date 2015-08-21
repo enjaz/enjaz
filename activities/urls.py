@@ -15,6 +15,8 @@ urlpatterns = patterns('',
     url(r'^(?P<activity_id>\d+)/delete/$', views.delete, name='delete'),
     url(r'^(?P<activity_id>\d+)/review/(?P<reviewer_id>\d+)/$', views.review, name='review'),
     url(r'^(?P<activity_id>\d+)/participate/$', views.participate, name='participate'),
+    url(r'^(?P<activity_id>\d+)/assess/$', views.assessment_index, name='assessment_index'),
+    url(r'^(?P<activity_id>\d+)/assess/(?P<category>[mp])/$', views.assess, name='assess'),
     url(r'^(?P<activity_id>\d+)/niqati/$', niqati_views.coordinator_view, name='niqati_orders'),
     # url(r'^(?P<activity_id>\d+)/niqati/create/$', niqati_views.coordinator_view, name='niqati_create'),
 )

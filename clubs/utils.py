@@ -2,12 +2,12 @@
 from .models import Club
 from core.models import StudentClubYear
 
-current_year = StudentClubYear.objects.get_current()
 
+current_year = StudentClubYear.objects.get_current()
 
 def is_coordinator_of_any_club(user):
     """Return whether the user is a coordinator of any club."""
-    return Club.objects.current_year().filter(coordinator=user).exists()
+    return user.coordination.current_year().exists()
 
 def is_deputy_of_any_club(user):
     """Return whether the user is a deputy of any club."""
@@ -74,7 +74,8 @@ def get_presidency():
 
 def get_media_center():
     return Club.objects.get(english_name="Media Center",
-                            year=current_year)
+                            year=current_year, city='R',
+                            gender='M')
 
 def get_user_clubs(user):
     return user.memberships.current_year() | user.coordination.current_year()
@@ -154,3 +155,61 @@ def can_edit_activity(user, activity):
         editing_parents = reviewing_parents.filter(can_edit=True)
         user_clubs = editing_parents.filter(coordinator=user) | editing_parents.filter(deputies=user)
         return user_clubs.exists()
+
+def can_review_any_niqati(user):
+    if user.has_perm('activities.change_code'): # e.g. superuser
+        return True
+    niqati_reviewers = Club.objects.filter(can_review_niqati=True)
+    user_clubs = niqati_reviewers.filter(coordinator=user) | \
+                 niqati_reviewers.filter(deputies=user)
+    return user_clubs.exists()
+
+def get_order_reviewing_clubs_by_user(user, order):
+    niqati_reviewers = Club.objects.niqati_reviewing_parents(order)
+    user_clubs = niqati_reviewers.filter(coordinator=user) | \
+                 niqati_reviewers.filter(deputies=user)
+    return user_clubs
+
+def get_club_assessing_clubs_by_user(user, club):
+    # Three user types can assess a given activity:
+    # * Superuser (which we are not handling here)
+    # * Clubs with can_assess (i.e. Student Club president deputies)
+    # * Medica Club in the same city
+    user_clubs =  user.coordination.current_year() | user.deputyships.current_year()
+
+    # In Riyadh, there are two Media Centers for each gender.
+    if club.city == 'R' and club.gender:
+        media_center_gender = club.gender
+    elif club.city == 'R' and not club.gender:
+        # Just in case a Riyadh club doesn't have a gender
+        # (i.e. presidency), fall back to male Media Center.
+        media_center_gender = 'M'
+    else: # For other cities
+        media_center_gender = ''
+    
+    user_media_center = user_clubs.filter(english_name__contains='Media Center',
+                                          city=club.city, gender=media_center_gender)
+
+    club_assessing_clubs = Club.objects.club_assessing_parents(club)
+    user_assessing_clubs = club_assessing_clubs.filter(coordinator=user) | \
+                           club_assessing_clubs.filter(deputies=user)
+    return user_assessing_clubs | user_media_center
+
+def can_assess_club(user, club, category=""):
+    # Three user types can assess a given activity:
+    # * Superuser
+    # * Clubs with can_assess (i.e. student club president deputies)
+    # * Medica Club in the same city
+    if user.has_perms('activities.add_assessment'): # e.g. superuser
+        return True
+    user_clubs = get_club_assessing_clubs_by_user(user, club)
+    return user_clubs.exists()
+
+def can_view_assessments(user, club):
+    # Two user types can view assessments a given activity:
+    # * Superuser
+    # * Clubs with can_view_assessment (i.e. student club president deputies)
+    if user.has_perms('activities.delete_assessment'): # e.g. superuser
+        return True
+    user_clubs = get_club_assessing_clubs_by_user(user, club).filter(can_view_assessments=True)
+    return user_clubs.exists()

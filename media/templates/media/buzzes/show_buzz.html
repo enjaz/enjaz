@@ -1,0 +1,63 @@
+<div class="row">
+    <div class="col-md-12">
+    {% if buzz.image %}
+        {% if buzz.is_published %}<div class="col-md-3">{% else %}<div class="col-md-2">{% endif %}
+            <div class="screenshot">
+                <div style="text-align: center; border-left: solid 1px #eee;">
+                    <style>
+                        #buzz-{{ buzz.id }}-img {
+                            width:90%;
+                            padding-bottom:90%;
+                            border:solid 2px #ddd;
+                            margin:10px;
+                            background:url('{{ buzz.image.url }}') center center no-repeat;
+                            background-size: auto 100%;
+                        }
+                    </style>
+                    <div id="buzz-{{ buzz.id }}-img" class="img-circle" style="max-width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+        {% if buzz.is_published %}<div class="col-md-9">{% else %}<div class="col-md-10">{% endif %}
+    {% else %}
+    <div class="col-md-12">
+    {% endif %}
+    <h2>
+        {{ buzz.title }}
+        <span style="float: left;">
+            <button id="edit-buzz-{{ buzz.id }}" class="btn btn-xs btn-icon btn-gold">
+                <i class="entypo-pencil"></i>
+                عدل
+            </button>
+            <button id="show-buzz-{{ buzz.id }}-results" class="btn btn-xs btn-icon btn-info">
+                <i class="entypo-chart-pie"></i>
+                استعرض الإحصاءات
+            </button>
+        </span>
+
+    </h2>
+    <p>
+        {{ buzz.body|safe }}
+    </p>
+    </div>
+</div>
+<script type="text/javascript">
+    // attach function to edit buzz button
+    $(document).ready(function () {
+        $("button#edit-buzz-{{ buzz.id }}").click(function () {
+            // show the edit buzz modal {# you can find it in media/buzzes/home.html #}
+            $("#edit-buzz-modal").modal('show');
+
+            $("#edit-buzz-modal .modal-title").html("عدّل {{ buzz.title }}");
+            $("#edit-buzz-modal .modal-body").load("{% url 'media:edit_buzz' buzz.id %}");
+
+            var $submitButton = $("#edit-buzz-modal button#submit-button");
+            // Unbind any handlers previously attached to the submit button
+            // This is necessary to avoid multiple submissions of the form
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-buzz-form").submit();
+            });
+        });
+    });
+</script>

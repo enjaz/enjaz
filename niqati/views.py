@@ -1,233 +1,115 @@
 # -*- coding: utf-8  -*-
+import requests
+import datetime
+
+from django.conf import settings
 from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
-from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.utils import timezone
-
+from django.utils.http import urlquote
+from django.db.models import Sum
 from django.core.exceptions import PermissionDenied
+from django.views.decorators import csrf
 
 from post_office import mail
 from accounts.models import get_gender
-from core.decorators import post_only
-from core.utilities import MVP_EMAIL, FVP_EMAIL
+from core import decorators
+from core.models import StudentClubYear
 from activities.models import Activity, Evaluation
 from activities.forms import EvaluationForm
-from clubs.utils import has_coordination_to_activity
-from niqati.models import Niqati_User, Category, Code, Code_Order, Code_Collection
-from niqati.forms import OrderForm
+from activities.utils import get_club_notification_to, get_club_notification_cc
+from clubs.models import Club, city_choices
+from clubs.utils import has_coordination_to_activity, get_user_coordination_and_deputyships, can_review_any_niqati, is_coordinator_of_any_club
+from niqati.models import Category, Code, Code_Order, Code_Collection, Review, COUPON, SHORT_LINK
+from niqati.forms import OrderForm, RedeemCodeForm
 
-# TODO: The Core_Order model should have a submitter field, and the
-# notifications should be sent to the person who requested the codes.
-# This is espically important with the introduction of deputies and
-# notifications to secondary clubs.
 
+current_year = StudentClubYear.objects.get_current()
 
 @login_required
 def index(request):
-    user = request.user
-    if user.has_perms('niqati.view_general_report'):
+    if request.user.has_perms('niqati.view_general_report'): # Superuser
         return HttpResponseRedirect(reverse('niqati:general_report'))
-    elif user.has_perms('niqati.approve_order'):
-        return HttpResponseRedirect(reverse('niqati:approve'))
-    elif user.has_perms('niqati.view_order'):
-        return HttpResponseRedirect(reverse('niqati:orders'))
-    else:
+    elif can_review_any_niqati(request.user):
+        return HttpResponseRedirect(reverse('niqati:list_pending_orders'))
+    elif is_coordinator_of_any_club(request.user):
+        user_clubs = get_user_coordination_and_deputyships(request.user)
+        user_club = user_clubs.first()
+        context = {'user_club': user_club}
+        return render(request, "niqati/intro_coordinators.html", context)
+    else: # Student Views
         return HttpResponseRedirect(reverse('niqati:submit'))
 
-    # Student Views
-
-# TODO: fix redeem_date issue
 @login_required
-def submit(request, code=""):  # (1) Shows submit code page & (2) Handles code submission requests
-
-    if timezone.now() > timezone.datetime(2015, 4, 21, 0, 0, 0, tzinfo=timezone.get_default_timezone()):
+@decorators.get_only
+def redeem(request, code=""):
+    """
+    GET: show the code submission form.
+    POST: submit a code.
+    """    
+    if current_year.niqati_closure_date and timezone.now() > current_year.niqati_closure_date:
         return render(request, "niqati/submit_closed.html")
-
-    if request.method == "POST":
-        # format code first i.e. make upper case & remove spaces or dashes
-        code = request.POST['code'].upper().replace(" ", "").replace("-", "")
-
-        try:  # assume at first that code exists
-            c = Code.objects.get(code_string=code)
-
-            # If the code exists, then initialize and check the evaluation form
-            # Only if the code is actually saved, the evaluation will be saved, too.
-            eval_form = EvaluationForm(request.POST,
-                                       instance=Evaluation(episode=c.episode,
-                                                           evaluator=request.user))
-            eval_form_valid = eval_form.is_valid()
-
-            if not c.user:  # code isn't associated with any user -- free to use
-                try:  # assume user already has a code in the same episode
-                    a = request.user.code_set.get(episode=c.episode)
-                    if c.episode.allow_multiple_niqati:  # the episode accepts multiple code submissions
-
-                        # Since the user already has an evaluation (submitted a code previously),
-                        # we'll get that evaluation and update it rather than create a new one.
-                        evaluation = Evaluation.objects.get(evaluator=request.user, episode=c.episode)
-                        eval_form = EvaluationForm(request.POST, instance=evaluation)
-                        if eval_form.is_valid():
-
-                            # Save new code to user
-                            c.user = request.user
-                            c.redeem_date = timezone.now()
-                            c.save()
-                            message = u"تم تسجيل الرمز بنجاح."
-                            messages.add_message(request, messages.SUCCESS, message)
-
-                            eval_form.save()
-                            eval_form = EvaluationForm()
-
-                    elif c.category.points > a.category.points:  # new code has more points than existing one
-
-                        # Since the user already has an evaluation (submitted a code previously),
-                        # we'll get that evaluation and update it rather than create a new one.
-                        evaluation = Evaluation.objects.get(evaluator=request.user, episode=c.episode)
-                        eval_form = EvaluationForm(request.POST, instance=evaluation)
-                        if eval_form.is_valid():
-
-                            # replace old code & show message that it has been replaced
-                            a.user = None
-                            a.redeem_date = None
-                            a.save()
-                            c.user = request.user
-                            c.redeem_date = timezone.now()
-                            c.save()
-                            message = u"تم إدخال الرمز بنجاح و استبدال الرمز السابق لك في هذا النشاط."
-                            messages.add_message(request, messages.INFO, message)
-
-                            eval_form.save()
-                            eval_form = EvaluationForm()
-                        else:
-                            message = u"يرجى التأكد من تعبئة تقييم النشاط بشكل صحيح."
-                            messages.add_message(request, messages.ERROR, message)
-
-                    else:  # new code has equal or less points than existing one
-                        # show message: you have codes in the same episode
-                        message = u"لا يمكن إدخال هذا الرمز؛ لديك رمز نقاطي آخر في نفس النشاط ذو قيمة مساوية أو أكبر."
-                        messages.add_message(request, messages.ERROR, message)
-
-                except (KeyError, Code.DoesNotExist):  # no codes in the same episode
-                    # redeem & show success message --- default behavior
-                    if eval_form.is_valid():
-                        c.user = request.user
-                        c.redeem_date = timezone.now()
-                        c.save()
-
-                        eval_form.save()
-
-                        message = u"تم تسجيل الرمز بنجاح."
-                        messages.add_message(request, messages.SUCCESS, message)
-
-                    else:
-                        message = u"يرجى التأكد من تعبئة تقييم النشاط بشكل صحيح."
-                        messages.add_message(request, messages.ERROR, message)
-
-            elif c.user == request.user:  # user has used the same code before
-                # show message: you have used this code before
-                message = u"لقد استخدمت هذا الرمز من قبل؛ لا يمكنك استخدامه مرة أخرى"
-                messages.add_message(request, messages.ERROR, message)
-
-            else:  # code is used by another user
-                # show message: code not available (used by other)
-                message = u"هذا الرمز غير متوفر."
-                messages.add_message(request, messages.ERROR, message)
-
-        except (KeyError, Code.DoesNotExist):  # code does not exist
-            # show message: code doesn't exist
-            message = u"هذا الرمز غير صحيح."
-            messages.add_message(request, messages.ERROR, message)
-
-        return HttpResponseRedirect(reverse("niqati:submit"))
-
-    else:  # request method is not POST
-        return render(request, 'niqati/submit.html', {'code_to_redeem': code,
-                                                      'eval_form': EvaluationForm()})
-
+    elif is_coordinator_of_any_club(request.user):
+        user_club = request.user.coordination.current_year().first()
+        context = {'user_club': user_club}
+        return render(request, "niqati/submit_coordinators.html", context)
+    else:
+        form = RedeemCodeForm(request.user, initial={'string': code})
+        eval_form = EvaluationForm()
+        return render(request, "niqati/submit.html", {"form": form,  "eval_form": eval_form})
 
 @login_required
-def student_report(request):
-    # calculate total points
-    point_sum = sum(code.category.points for code in request.user.code_set.all())
-    # TODO: sort codes
-    return render(request, 'niqati/student_report.html', {'user': request.user, 'total_points': point_sum})
+@csrf.csrf_exempt
+@decorators.ajax_only
+@decorators.post_only
+def claim_code(request):
+    form = RedeemCodeForm(request.user, request.POST)
+    eval_form = EvaluationForm(request.POST)
+    if form.is_valid() and eval_form.is_valid():
+        result = form.process()
+        return result
+        eval_form.save(form.code.collection.parent_order.episode, request.user)
+    else:
+        errors = form.errors
+        errors.update(eval_form.errors)
+        return {'errors': errors}
 
+@login_required
+def student_report(request, username=None):
+    # Only the superuser can see a specific user.  Coordinators will
+    # get an introduction page to Niqati becaues they are not supposed
+    # to register any codes.
+    if username and not request.user.has_perm('niqati.view_code'):
+        raise PermissionDenied
+    elif request.user.coordination.current_year().exists():
+        user_club = request.user.coordination.current_year().first()
+        context = {'user_club': user_club}
+        return render(request, "niqati/submit_coordinators.html", context)
+
+    if username:
+        niqati_user = get_object_or_404(User, username=username)
+    else:
+        niqati_user = request.user
+    # TODO: sort codes
+    total_points = niqati_user.code_set.current_year().aggregate(total_points=Sum('points'))['total_points']
+    if total_points is None:
+        total_points = 0
+    context = {'total_points': total_points, 'niqati_user': niqati_user}
+    return render(request, 'niqati/student_report.html', context)
 
 # Club Views
-# TODO: reduce club coordinator views to one view, where GET requests return the order list
-# and POST creates new orders
-
 @login_required
-@post_only
-# @permission_required('niqati.request_order', raise_exception=True)
-def create_codes(request, activity_id):
+def coordinator_view(request, activity_id):
     """
-    Request the creation of niqati codes.
+    If request is GET, view orders.
+    If POST, create codes.
     """
-    activity = get_object_or_404(Activity, pk=activity_id)
 
-    # --- Permission checks ---
-    # The user must be the coordinator of the club that owns the activity.
-    if not has_coordination_to_activity(request.user, activity) \
-       and not request.user.is_superuser:
-        raise PermissionDenied
-
-    form = OrderForm(request.POST, activity=activity)
-    if form.is_valid():
-        episode = form.cleaned_data['episode']
-        idea_c = form.cleaned_data['idea']  # idea count
-        org_c = form.cleaned_data['organizer']  # org count
-        par_c = form.cleaned_data['participant']  # participant count
-        counts = [idea_c, org_c, par_c]
-        d = form.cleaned_data['delivery_type']
-
-        # create the Code_Order
-        if idea_c > 0 or org_c > 0 or par_c > 0:  # if code count > 0
-            o = Code_Order.objects.create(episode=episode)
-
-            # create the Code_Collections
-            for cat in Category.objects.all():
-                if counts[cat.pk - 1] > 0:  # if ordered codes > 0
-                    x = Code_Collection(code_count=counts[cat.pk - 1],
-                                        code_category=cat,
-                                        delivery_type=d,
-                                        parent_order=o)
-                    if not cat.requires_approval:  # set to approved=True if approval is not required for this category
-                        x.approved = True
-                    x.save()
-
-            # send email to presidency for approval
-            email_context = {'order': o}
-            if get_gender(episode.activity.primary_club.coordinator) == 'M':
-                mail.send([MVP_EMAIL],
-                          template="niqati_order_submit",
-                          context=email_context)
-            elif get_gender(episode.activity.primary_club.coordinator) == 'F':
-                mail.send([FVP_EMAIL],
-                          template="niqati_order_submit",
-                          context=email_context)
-            
-            msg = u"تم إرسال الطلب؛ و سيتم إنشاء النقاط فور الموافقة عليه"
-            messages.add_message(request, messages.SUCCESS, msg)
-        else:
-            msg = u"لم تطلب أية أكواد!"
-            messages.add_message(request, messages.WARNING, msg)
-        form = OrderForm(activity=activity)
-    else:
-        msg = u"الرجاء ملء النموذج بشكل صحيح."
-        messages.add_message(request, messages.ERROR, msg)
-    return HttpResponseRedirect(reverse("activities:niqati_orders", args=(activity.id, )))
-    # return render(request, 'niqati/activity_orders.html', {'activity': activity,
-    #                                                        'form': form,
-    #                                                        'msg': msg})
-
-@login_required
-def view_orders(request, activity_id):
-    """
-    View niqati orders associated with a given activity.
-    """
     activity = get_object_or_404(Activity, pk=activity_id)
 
     # --- Permission checks ---
@@ -237,106 +119,220 @@ def view_orders(request, activity_id):
        and not request.user.is_superuser:
         raise PermissionDenied
 
+    # If it has been two weeks since the end of the activity, don't
+    # alow niqati requests.
+    last_episode = activity.episode_set.order_by('-end_date', '-end_time').first()
+    if timezone.now().date() > last_episode.end_date + datetime.timedelta(14):
+        return render(request, 'niqati/activity_orders.html',
+                      {'activity': activity, 'active_tab': 'niqati',
+                       'error': 'closed'})
+    if request.method == 'POST':
+        form = OrderForm(request.POST, activity=activity, user=request.user)
+        if form.is_valid():
+            order = form.save()
+            if order:
+                reviewing_parent = activity.primary_club.get_next_niqati_reviewing_parent()
+                # Make sure that a coordinator was assigned to the
+                # reviewing club before trying to send an email
+                # notification.
+                if reviewing_parent and reviewing_parent.coordinator:
+                    list_pending_orders_url = reverse('niqati:list_pending_orders')
+                    full_url = request.build_absolute_uri(list_pending_orders_url)
+                    email_context = {'order': order, 'full_url': full_url}
+                    mail.send([reviewing_parent.coordinator.email],
+                              template="niqati_order_submitted",
+                              context=email_context)
+
+                    msg = u"تم إرسال الطلب؛ و سيتم إنشاء النقاط فور الموافقة عليه"
+                    messages.add_message(request, messages.SUCCESS, msg)
+            else:
+                msg = u"لم ينشأ أي طلب لأنك لم تدخل أي رقم."
+                messages.add_message(request, messages.WARNING, msg)
+            return HttpResponseRedirect(reverse("activities:niqati_orders", args=(activity.id, )))
+        else:
+            msg = u"الرجاء ملء النموذج بشكل صحيح."
+            messages.add_message(request, messages.ERROR, msg)
+    elif request.method == 'GET':
+        form = OrderForm(activity=activity, user=request.user)
     return render(request, 'niqati/activity_orders.html', {'activity': activity,
-                                                           'form': OrderForm(activity=activity),
+                                                           'form': form,
                                                            'active_tab': 'niqati'})
 
-
 @login_required
-def coordinator_view(request, activity_id):
-    """
-    If request is GET, view orders.
-    If POST, create codes.
-    """
-    if request.method == 'POST':
-        return create_codes(request, activity_id)
-    else:
-        return view_orders(request, activity_id)
+def download_collection(request, pk, download_type):
+    collection = get_object_or_404(Code_Collection, pk=pk)
+    activity = collection.parent_order.episode.activity
+    domain = Site.objects.get_current().domain
+    domain =  'enjazportal.com' # REMOVE
 
+    if not has_coordination_to_activity(request.user, activity) and \
+       not request.user.is_superuser:
+        raise PermissionDenied
 
-@login_required
-#@permission_required('niqati.view_order', raise_exception=True)
-def view_collection(request, pk):
-    collec = get_object_or_404(Code_Collection, pk=pk)
-    try:
-        if collec.delivery_type == '0':  # Coupon
-            final_file = collec.asset.read()
-            response = HttpResponse(mimetype="application/pdf")
-        else:  # short link
-            final_file = collec.asset.read()
-            response = HttpResponse(mimetype="text/html")
-        response.write(final_file)
-    except ValueError:  # If file doesn't exist, i.e. collection wasn't approved.
-        if collec.approved == False:
-            context = {'message': 'disapproved'}
-        elif collec.approved == None:
-            context = {'message': 'pending'}
-        else:
-            context = {'message': 'unknown'}
-        response = render(request, 'niqati/order_not_approved.html', context)
+    if download_type == COUPON:
+        endpoint = "http://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" + domain
+
+        response = render(request, 'niqati/includes/coupons.html', {"collection": collection,
+                                                                   "domain": domain,
+                                                                   "endpoint": endpoint})
+    elif download_type == SHORT_LINK:
+        response = render(request, 'niqati/includes/links.html', {"collection": collection})
+    # Mark codes as downloaded
+    collection.date_downloaded = timezone.now()
 
     return response
-
 
 # Management Views
 
 @login_required
-@permission_required('niqati.approve_order', raise_exception=True)
-def approve_codes(request):
-    if request.method == 'POST':
-        pk = request.POST['pk']
-        if request.POST['action'] == "approve_order":
-            order = Code_Order.objects.get(pk=pk)
-            for collec in order.code_collection_set.filter(approved=None):
-                collec.approved = True
-                collec.save()
+@csrf.csrf_exempt
+@decorators.ajax_only
+@decorators.post_only
+def review_order(request):
+    order_pk = request.POST.get('pk')
+    action = request.POST.get('action')
+    order = get_object_or_404(Code_Order, pk=order_pk)
+    niqati_reviewers = Club.objects.niqati_reviewing_parents(order)
+    user_clubs = niqati_reviewers.filter(coordinator=request.user) | \
+                 niqati_reviewers.filter(deputies=request.user)
 
-            # host = request.build_absolute_uri(reverse('niqati:submit'))
-            # order.process(host)
+    # Permission check
+    if request.user.has_perm('niqati.change_code_order'):
+        reviewer_club = None
+    elif user_clubs.exists():
+        reviewer_club = user_clubs.first()
+    else: # If not a superuser, nor has reviewer 
+        raise PermissionDenied
 
-        elif request.POST['action'] == "reject_order":
-            order = Code_Order.objects.get(pk=pk)
-            for collec in order.code_collection_set.filter(approved=None):
-                collec.approved = False
-                collec.save()
+    email_context = {'order': order}
+    
+    if action == 'accept':
+        is_approved = True
 
-                # Send email notification after code generation
-                email_context = {'order': order}
-                if order.episode.activity.primary_club.coordinator:
-                    recipient = order.episode.activity.primary_club.coordinator.email
-                else:
-                    recipient = order.episode.activity.submitter.email
-                mail.send([recipient],
-                          template="niqati_order_reject",
-                          context=email_context)
+        # If the reviewer belongs to a reviewer club (i.e. not the
+        # superuser), then check if we have a niqati reviewing parent.
+        # If so, assign the order to them.  If not, consider the order
+        # approved and email the submitter.  Otherwise, if the review
+        # does not belong to a reviewer club (i.e. superuser),
+        # consider the order approved.
+        if reviewer_club:
+            next_parent = reviewer_club.get_next_niqati_reviewing_parent()
+            if next_parent:
+                order.assignee = next_parent
+                order.is_approved = None
+                if next_parent.coordinator:
+                    list_pending_orders_url = reverse('niqati:list_pending_orders')
+                    full_url = request.build_absolute_uri(list_pending_orders_url)
+                    email_context['full_url'] = full_url
+                    email_context['last_reviewer'] = reviewer_club
+                    email_context['upcoming_reviewer'] = next_parent
+                    mail.send(next_parent.coordinator.email,
+                              template="niqati_approved_to_next_reviwer",
+                              context=email_context)
+            else:
+                order.assignee = None
+                order.is_approved = True
+        else: # superuser
+            order.assignee = None
+            order.is_approved = True
 
-        elif request.POST['action'] == "approve_collec":
-            collec = Code_Collection.objects.get(pk=pk)
-            collec.approved = True
+        if order.is_approved:
+            order.create_codes()
+            niqati_orders_url = reverse('activities:niqati_orders', args=(order.episode.activity.pk,))
+            full_url = request.build_absolute_uri(niqati_orders_url)
+            email_context['full_url'] = full_url            
+            mail.send(get_club_notification_to(order.episode.activity),
+                      cc=get_club_notification_cc(order.episode.activity),
+                      template="niqati_approved_to_submitter",
+                      context=email_context)
 
-            host = request.build_absolute_uri(reverse('niqati:submit'))
-            collec.process(host)
-            collec.save()
+    elif action == 'reject':
+        is_approved = False
+        order.assignee = None
+        order.is_approved = False
+        niqati_orders_url = reverse('activities:niqati_orders', args=(order.episode.activity.pk,))
+        full_url = request.build_absolute_uri(niqati_orders_url)
+        email_context['full_url'] = full_url
 
-        elif request.POST['action'] == "reject_collec":
-            collec = Code_Collection.objects.get(pk=pk)
-            collec.approved = False
-            collec.save()
+        mail.send(get_club_notification_to(order.episode.activity),
+                  cc=get_club_notification_cc(order.episode.activity),
+                  template="niqati_rejected_to_submitter",
+                  context=email_context)
+    else:
+        raise Exception(u'تصرف خاطئ.')
 
-        return HttpResponseRedirect(reverse("niqati:approve"))
+    Review.objects.create(order=order,
+                          reviewer=request.user,
+                          reviewer_club=reviewer_club,
+                          is_approved=is_approved)
+    order.save()
 
-    unapproved_collec = Code_Collection.objects.filter(approved=None)
-    activities = []
-    for collec in unapproved_collec:
-        if not collec.parent_order.episode.activity in activities:
-            activities.append(collec.parent_order.episode.activity)
-    context = {'unapproved_collec': unapproved_collec, 'activities': activities}
+@login_required
+def list_pending_orders(request):
+    user_clubs = get_user_coordination_and_deputyships(request.user)
+    user_niqati_reviewing_clubs = user_clubs.filter(can_review_niqati=True)
+    if not request.user.has_perm('niqati.change_code') and \
+       not user_niqati_reviewing_clubs.exists():
+        raise PermissionDenied
+
+    # For the superuser, show all pending requests.
+    if request.user.has_perm('niqati.change_code_order'):
+        activities_with_pending_orders = Activity.objects.filter(episode__code_order__isnull=False,
+                                                                 episode__code_order__is_approved__isnull=True).distinct()
+    else:
+        activities_with_pending_orders = Activity.objects.filter(episode__code_order__assignee__in=user_niqati_reviewing_clubs,
+                                                                 episode__code_order__is_approved__isnull=True).distinct()
+    context = {'activities_with_pending_orders': activities_with_pending_orders}
     return render(request, 'niqati/approve.html', context)
-
 
 @login_required
 @permission_required('niqati.view_general_report', raise_exception=True)
-def general_report(request):
-    users = Niqati_User.objects.all()
-    users = sorted(users, key=lambda user: -user.total_points())  # sort users according to their points
-    return render(request, 'niqati/general_report.html', {'users': users})
+def general_report(request, city=""):
+    if city:
+        city_codes = [city_pair[0] for city_pair in city_choices]
+        if not city in city_codes:
+            raise Http404
+        users = User.objects.filter(common_profile__city=city,
+                                    code__year=current_year).annotate(point_sum=Sum('code__points')).filter(point_sum__gt=0).order_by('-point_sum')
+        context = {'users': users}
+    else:
+        context = {'city_choices':
+                   city_choices}
+    return render(request, 'niqati/general_report.html', context)
+
+@login_required
+@csrf.csrf_exempt
+@decorators.ajax_only
+@decorators.post_only
+def get_short_url(request):
+    pk = request.POST.get('pk')
+    code = get_object_or_404(Code, pk=pk)
+    order = code.collection.parent_order
+    activity = order.episode.activity
+    niqati_reviewers = Club.objects.niqati_reviewing_parents(order)
+    user_clubs_niqati_reviewers = niqati_reviewers.filter(coordinator=request.user) | \
+                                  niqati_reviewers.filter(deputies=request.user)
+
+    # Only the coordinators and deputies of activities, niqati
+    # reviewers and the superuser are allowed to access this API.
+    if not has_coordination_to_activity(request.user, activity) and \
+       not user_clubs_niqati_reviewers.exists() and \
+       not request.user.is_superuser:
+        raise PermissionDenied
+
+    if not code.short_link:
+        endpoint = "https://api-ssl.bitly.com/v3/shorten?format=txt&access_token=%(api_key)s&longUrl=" % {"api_key": settings.BITLY_KEY}
+        domain = Site.objects.get_current().domain
+        domain =  'enjazportal.com' # REMOVE
+        full_url = urlquote("http://%s%s?code=%s" % (domain, reverse("niqati:submit"), code.code_string))
+        response = requests.get(endpoint + full_url)
+        short_link = response.text
+        short_link = short_link.strip() # remove tailing new lines
+        if short_link == "RATE_LIMIT_EXCEEDED":
+            raise Exception("تعّر إنشاء أحد الروابط. حدّث الصفحة.")
+        short_link = short_link.replace("http:", "https:") # Duh!
+        code.short_link = short_link
+        code.save()
+
+    return {'url': code.short_link }
+

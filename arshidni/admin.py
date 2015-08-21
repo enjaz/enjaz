@@ -9,6 +9,7 @@ from django.contrib.admin.sites import AdminSite
 from django.core.exceptions import ObjectDoesNotExist
 
 from arshidni.models import Question, Answer, StudyGroup, LearningObjective, JoinStudyGroupRequest, group_status_choices, ColleagueProfile, SupervisionRequest, GraduateProfile, supervision_request_status_choices
+from arshidni.utilities import is_arshindi_coordinator_or_deputy
 
 class ArshidniAuthenticationForm(admin.forms.AdminAuthenticationForm):
     """A custom authentication form used in the admin app.  Based on the
@@ -18,7 +19,6 @@ original Django code."""
         password = self.cleaned_data.get('password')
         message = admin.forms.ERROR_MESSAGE
         params = {'username': self.username_field.verbose_name}
-        arshidni_group = Group.objects.get(name='arshidni')
 
         if username and password:
             self.user_cache = authenticate(username=username, password=password)
@@ -27,7 +27,7 @@ original Django code."""
             # If the user isn't in the arshidni group and isn't a
             # system administrator, they must not be able to use the
             # arshidni admin interface.
-            elif not arshidni_group in self.user_cache.groups.all() and\
+            elif is_arshindi_coordinator_or_deputy(self.user_cache) and\
                  not self.user_cache.is_superuser:
                 raise forms.ValidationError(message, code='invalid', params=params)
         return self.cleaned_data
@@ -39,9 +39,7 @@ so they can monitor the different aspects of the section."""
     login_form = ArshidniAuthenticationForm
 
     def has_permission(self, request):
-        arshidni_group = Group.objects.get(name='arshidni')
-        print arshidni_group
-        return arshidni_group in request.user.groups.all() or request.user.is_superuser
+        return is_arshindi_coordinator_or_deputy(request.user) or request.user.is_superuser
 
 class AnswerInline(admin.StackedInline):
     model = Answer
@@ -111,19 +109,36 @@ class StudyGroupAdmin(admin.ModelAdmin):
                     'get_period_in_weeks', 'status')
     list_filter = [GroupStatusFilter]
     inlines = [LearningObjectiveInline]
+    def has_change_permission(self, request, obj=None):
+        return is_arshindi_coordinator_or_deputy(request.user) or request.user.is_superuser
+    def has_delete_permission(self, request, obj=None):
+        return is_arshindi_coordinator_or_deputy(request.user) or request.user.is_superuser
 
 class LearningObjectiveAdmin(admin.ModelAdmin):
     list_display = ('group', 'is_done', 'submission_date')
+    def has_change_permission(self, request, obj=None):
+        return is_arshindi_coordinator_or_deputy(request.user) or request.user.is_superuser
+    def has_delete_permission(self, request, obj=None):
+        return is_arshindi_coordinator_or_deputy(request.user) or request.user.is_superuser
 
 class QuestionAdmin(admin.ModelAdmin):
     list_display = ('get_title', 'submitter', 'is_answered',
                     'is_published', 'submission_date')
     list_filter = [PublishedFilter]
     inlines = [AnswerInline]
+    def has_change_permission(self, request, obj=None):
+        return is_arshindi_coordinator_or_deputy(request.user) or request.user.is_superuser
+    def has_delete_permission(self, request, obj=None):
+        return is_arshindi_coordinator_or_deputy(request.user) or request.user.is_superuser
 
 class ColleagueProfileAdmin(admin.ModelAdmin):
     list_display = ('get_user_full_name', 'batch', 'is_available')
     list_filter = [ColleagueAvailabilityFilter]
+
+    def has_change_permission(self, request, obj=None):
+        return is_arshindi_coordinator_or_deputy(request.user) or request.user.is_superuser
+    def has_delete_permission(self, request, obj=None):
+        return is_arshindi_coordinator_or_deputy(request.user) or request.user.is_superuser
 
     def get_user_full_name(self, obj):
         return obj.user.common_profile.get_ar_full_name()
@@ -131,11 +146,20 @@ class ColleagueProfileAdmin(admin.ModelAdmin):
 
 class GraduateProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'answers_questions', 'gives_lectures')
+    def has_change_permission(self, request, obj=None):
+        return is_arshindi_coordinator_or_deputy(request.user) or request.user.is_superuser
+    def has_delete_permission(self, request, obj=None):
+        return is_arshindi_coordinator_or_deputy(request.user) or request.user.is_superuser
 
 class SupervisionRequestAdmin(admin.ModelAdmin):
     list_display = ('get_user_full_name', 'batch', 'get_colleague_full_name', 'status', 'submission_date')
     list_filter = [SupervisionRequestStatusFilter]
 
+    def has_change_permission(self, request, obj=None):
+        return is_arshindi_coordinator_or_deputy(request.user) or request.user.is_superuser
+    def has_delete_permission(self, request, obj=None):
+        return is_arshindi_coordinator_or_deputy(request.user) or request.user.is_superuser
+    
     def get_user_full_name(self, obj):
         return obj.user.common_profile.get_ar_full_name()
     get_user_full_name.short_description = u"اسم الطالب المستجد"
@@ -146,6 +170,10 @@ class SupervisionRequestAdmin(admin.ModelAdmin):
 
 class JoinStudyGroupRequestAdmin(admin.ModelAdmin):
     list_display = ('submitter', 'group', 'is_accepted', 'submission_date')
+    def has_change_permission(self, request, obj=None):
+        return is_arshindi_coordinator_or_deputy(request.user) or request.user.is_superuser
+    def has_delete_permission(self, request, obj=None):
+        return is_arshindi_coordinator_or_deputy(request.user) or request.user.is_superuser
 
 arshidni_admin = ArshidniAdmin('arshidni_admin')
 

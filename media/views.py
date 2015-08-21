@@ -12,17 +12,17 @@ from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
 from post_office import mail
+
 from clubs.utils import get_media_center, is_coordinator_or_member, is_coordinator_of_any_club, is_member_of_any_club, \
     is_coordinator, is_coordinator_or_deputy, has_coordination_to_activity, is_employee_of_any_club
-
 from core import decorators
 from clubs.models import Club
 from activities.models import Activity, Episode
 from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment, \
-    WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment, POLL_TYPE_CHOICES, ReportComment
+    WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment, POLL_TYPE_CHOICES, ReportComment, Buzz
 from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
     TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm, \
-    FollowUpReportImageFormset, ReportCommentForm
+    FollowUpReportImageFormset, ReportCommentForm, BuzzForm
 
 # --- Constants and wrapper for polls
 
@@ -1072,3 +1072,103 @@ def suggest_poll(request, poll_type):
         return render(request, "media/polls/suggest.html", {"form": form,
                                                             "poll_type_url": poll_type_url,
                                                             "poll_type_name": poll_type_name})
+
+
+# What's New?
+@login_required
+@user_passes_test(is_media_coordinator_or_member)
+def buzzes_home(request):
+    """
+    Return the buzzes home
+    The buzz home consists of the current published buzz, and a list of upcoming buzzes.
+    """
+    # The buzz home page consists of "boxes" for its different parts, which are loaded
+    # via ajax on page load
+
+    return render(request, "media/buzzes/home.html")
+
+
+@decorators.ajax_only
+@login_required
+@user_passes_test(is_media_coordinator_or_member)
+def buzzes_list(request, list_filter):
+    """
+    For media center coordinator, deputies, or members: return the full list of buzzes.
+    The list should be classified into published, and upcoming.
+    """
+    if list_filter == ACTIVE:
+        buzzes = Buzz.objects.published()
+        template = "media/buzzes/list_published.html"
+    elif list_filter == UPCOMING:
+        buzzes = Buzz.objects.upcoming()
+        template = "media/buzzes/list_upcoming.html"
+    context = {'buzzes': buzzes}
+    return render(request, template, context)
+
+
+@decorators.ajax_only
+@login_required
+@user_passes_test(is_media_coordinator_or_member)
+def add_buzz(request):
+    """
+    GET: return the buzz addition form.
+    POST: add a new buzz
+    """
+    if request.method == "POST":
+        form = BuzzForm(request.POST, request.FILES, instance=Buzz(submitter=request.user))
+
+        if form.is_valid():
+            buzz = form.save()
+            return {"message": "success"}
+        else:
+            context = {'form': form}
+    else:
+        context = {'form': BuzzForm()}
+    return render(request, "media/buzzes/edit_buzz.html", context)
+
+@decorators.ajax_only
+@login_required
+@user_passes_test(is_media_coordinator_or_member)
+def edit_buzz(request, buzz_id):
+    """
+    GET: return the buzz editing form.
+    POST: edit the passed buzz.
+    """
+    buzz = get_object_or_404(Buzz, pk=buzz_id)
+    context = {'buzz': buzz}
+    if request.method == "POST":
+        form = BuzzForm(request.POST, request.FILES, instance=buzz)
+
+        if form.is_valid():
+            form.save()
+            return {"message": "success"}
+        else:
+            context['form'] = form
+    else:
+        context['form'] = BuzzForm(instance=buzz)
+    return render(request, "media/buzzes/edit_buzz.html", context)
+
+@decorators.ajax_only
+@login_required
+@user_passes_test(is_media_coordinator_or_member)
+def show_buzz(request, buzz_id):
+    """
+    GET: return buzz contents (title, text, and image)
+    """
+    buzz = get_object_or_404(Buzz, id=buzz_id)
+    context = {'buzz': buzz}
+    return render(request, "media/buzzes/show_buzz.html", context)
+
+@decorators.ajax_only
+@decorators.post_only
+@login_required
+@user_passes_test(is_media_coordinator_or_member)
+def delete_buzz(request, buzz_id):
+    """
+    GET: show confirmation message.
+    POST: delete given poll.
+    """
+    buzz = get_object_or_404(Buzz, pk=buzz_id)
+    buzz.is_deleted=True
+    buzz.save()
+    return {"message": "success"}

@@ -1,6 +1,20 @@
 {% load staticfiles %}
 <!DOCTYPE html>
 <html lang="en" dir="rtl">
+<!--
+  ______         _               _   _                  _       __     __            _ 
+ |  ____|       (_)             | \ | |                | |      \ \   / /           | |
+ | |__    _ __   _   __ _  ____ |  \| |  ___   ___   __| | ___   \ \_/ /___   _   _ | |
+ |  __|  | '_ \ | | / _` ||_  / | . ` | / _ \ / _ \ / _` |/ __|   \   // _ \ | | | || |
+ | |____ | | | || || (_| | / /  | |\  ||  __/|  __/| (_| |\__ \    | || (_) || |_| ||_|
+ |______||_| |_|| | \__,_|/___| |_| \_| \___| \___| \__,_||___/    |_| \___/  \__,_|(_)
+               _/ |                                                                    
+              |__/                                                                     
+
+You must be so cool if you are reading this! Our Studnets' Club can
+totally use your help! Drop us a line at hello@enjazportal.com, will
+you?
+-->
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,7 +24,6 @@
 	<meta name="author" content="" />
 	
 	<title>إنجاز | {% block title %}{% endblock %}</title>
-	<!--<link rel="stylesheet" href="{% static 'neon/assets/js/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css' %}">-->
 	<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/entypo/css/entypo.css' %}">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:400,700,400italic">
@@ -19,8 +32,8 @@
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-theme.min.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-forms.min.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.min.css' %}">
-	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/skins/green.css' %}">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
 	<script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
 	<script src="{% static 'neon/assets/js/custom.js' %}"></script>
 	<!--[if lt IE 9]><script src="{% static 'neon/assets/js/ie8-responsive-file-warning.js' %}"></script><![endif]-->
@@ -34,7 +47,6 @@
 	
 </head>
 <body class="page-body skin-green" data-url="http://neon.dev">
-
 <div class="page-container right-sidebar"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->	
 	
 		<div class="sidebar-menu">
@@ -88,11 +100,29 @@
 					<span>أنشطة</span>
 				</a>
 			</li>
-            {% if user.common_profile.is_student %}
+            {% if user.common_profile.is_student or user.is_superuser %}
 			<li>
 				<a href="{% url 'niqati:index' %}">
 					<i class="entypo-chart-bar"></i>
 					<span>نقاطي</span>
+				</a>
+			</li>
+			<li>
+				<a href="{% url 'arshidni:home' %}">
+					<i class="entypo-graduation-cap"></i>
+					<span>أرشدني</span>
+				</a>
+			</li>
+			<li>
+				<a href="{% url 'userena_password_change' user.username %}">
+					<i class="entypo-pencil"></i>
+					<span>غيّر كلمة السر</span>
+				</a>
+			</li>
+			<li>
+				<a href="{% url 'userena_signout' %}">
+					<i class="entypo-export"></i>
+					<span>اخرج</span>
 				</a>
 			</li>
             {% endif %}
@@ -107,12 +137,6 @@
 				<a href="{% url 'studentvoice:home' %}">
 					<i class="entypo-chat"></i>
 					<span>صوتك مسموع</span>
-				</a>
-			</li>
-			<li>
-				<a href="{% url 'arshidni:home' %}">
-					<i class="entypo-graduation-cap"></i>
-					<span>أرشدني</span>
 				</a>
 			</li>
 			<li>
@@ -180,17 +204,6 @@
 	<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 		<ul class="nav navbar-nav">
 			{% block navbar %}{% endblock %}
-		</ul>
-		<ul class="nav navbar-nav navbar-left">
-			<li>
-                                {% if user.is_authenticated %}
-				<a href="{% url 'userena_password_change' user.username %}">غيّر كلمة السر</a>
-				<a href="{% url 'userena_signout' %}">اخرج</a>
-                                {% else %}
-                                <a href="{% url 'userena_signin' %}">ادخل</a>
-                                <a href="{% url 'userena_signup' %}">سجّل</a>
-                                {% endif %}
-			</li>
 		</ul>
 	</div>
 	<!-- /.navbar-collapse -->

@@ -9,7 +9,7 @@ def get_club_notification_to(activity):
     """Return the address that should be sent an email notifcation in the
     'to' field.
     """
-    # The submitter, whether they are the coordinator or not shoudl
+    # The submitter, whether they are the coordinator or not should
     # receive be in the 'to' field.
     return [activity.submitter.email]
 

@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from forms_builder.forms.models import Form
 from core.models import StudentClubYear
 from clubs.managers import ClubQuerySet
+from django.db.models import Sum
+
 
 section_choices = (
     ('NG', u'الحرس الوطني'),
@@ -53,23 +55,25 @@ class Club(models.Model):
                                     related_name="coordination",
                                     on_delete=models.SET_NULL,
                                     # To exclude AnonymousUser
-                                    limit_choices_to={'pk__gt': -1})
+                                    limit_choices_to={'common_profile__is_student':
+                                                        True})
     deputies = models.ManyToManyField(User, verbose_name=u"النواب",
                                       blank=True,
                                       related_name="deputyships",
                                       limit_choices_to={'common_profile__is_student':
-                                                        False})
+                                                        True})
     members = models.ManyToManyField(User, verbose_name=u"الأعضاء",
                                      blank=True,
                                      related_name="memberships",
                                      limit_choices_to={'common_profile__is_student':
-                                                       False})
+                                                        True})
     employee = models.ForeignKey(User, null=True, blank=True,
                                  related_name="employee",
                                  on_delete=models.SET_NULL,
                                  default=None,
                                  verbose_name=u"الموظف المسؤول",
-                                 limit_choices_to={'user_permissions__codename': 'deanship_employee'})
+                                 limit_choices_to={'common_profile__is_student':
+                                                   False})
 
     # To make it easy to make it specific to a certain college
     # (e.g. for membership), let's add this field.  That's also one
@@ -98,6 +102,12 @@ class Club(models.Model):
                                      verbose_name=u"يستطيع الحذف؟")
     can_edit = models.BooleanField(default=True,
                                      verbose_name=u"يستطيع التعديل؟")
+    can_review_niqati = models.BooleanField(default=False,
+                                     verbose_name=u"يستطيع مراجعة النقاط؟")
+    can_assess = models.BooleanField(default=False,
+                                     verbose_name=u"يستطيع تقييم لأنشطة؟")
+    can_view_assessments = models.BooleanField(default=False,
+                                               verbose_name=u"يستطيع مشاهدة تقييمات الأنشطة؟")
 
     forms = GenericRelation(Form)
     objects = ClubQuerySet.as_manager()
@@ -146,7 +156,7 @@ class Club(models.Model):
                                   episodes)
         return len(overdue_episodes)
 
-    def get_next_reviewing_parent(self):
+    def get_next_activity_reviewing_parent(self):
         """
         Return the single upper parent of this club that can write activity
         reviews
@@ -157,6 +167,30 @@ class Club(models.Model):
                 return current_parent
             else:
                 current_parent = current_parent.parent
+
+    def get_next_niqati_reviewing_parent(self):
+        """
+        Return the single upper parent of this club that can write activity
+        reviews
+        """
+        current_parent = self.parent
+        while current_parent:
+            if current_parent.can_review_niqati:
+                return current_parent
+            else:
+                current_parent = current_parent.parent
+
+    def get_total_points(self):
+        points = 0
+        primary_points = self.primary_activity.aggregate(primary_points=Sum('assessment__criterionvalue__value'))['primary_points']
+        if primary_points:
+            points += primary_points
+        secondary_points = self.secondary_activity.aggregate(secondary_points=Sum('assessment__cooperator_points'))['secondary_points']
+        if secondary_points:
+            points += secondary_points
+
+        return points
+    get_total_points.short_description = u'إجمالي النقاط'
 
     class Meta:
         # For the admin interface.

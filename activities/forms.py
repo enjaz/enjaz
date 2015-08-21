@@ -7,7 +7,7 @@ from django.forms import ModelForm, ModelChoiceField, ModelMultipleChoiceField
 from django.forms.widgets import TextInput
 from django.forms.models import inlineformset_factory
 
-from activities.models import Activity, Episode, Review, Evaluation, Attachment
+from activities.models import Activity, Episode, Review, Evaluation, Attachment, Assessment, Criterion, CriterionValue
 from clubs.models import Club
 from core.models import StudentClubYear
 
@@ -250,19 +250,78 @@ class ReviewForm(ModelForm):
 
 
 class EvaluationForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(EvaluationForm, self).__init__(*args, **kwargs)
-        for field in self.fields:
-            self.fields[field].widget = TextInput()
-            self.fields[field].widget.attrs = {'class': 'knob', 'data-min': 0, 'data-max': 5,
-                                               'data-width': 125, 'data-height': 125, 'data-thickness': .25,
-                                               'data-fgcolor': '#00b19d', 'data-bgcolor': '#ebebeb',
-                                               'data-anglearc': 240, 'data-angleoffset': -120}
     quality = forms.IntegerField(min_value=1, max_value=5)
     relevance = forms.IntegerField(min_value=1, max_value=5)
+
+    def save(self, episode, user):
+        evaluation = Evaluation.objects.create(episode=episode,
+                                               evaluator=user,
+                                               quality=self.cleaned_data['quality'],
+                                               relevance=self.cleaned_data['relevance'])
+        return evaluation
 
     class Meta:
         model = Evaluation
         fields = ['quality', 'relevance']
 
 AttachmentFormSet = inlineformset_factory(Activity, Attachment, fields=['document', 'description'], extra=1)
+
+class AssessmentForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        assert 'activity' in kwargs, "Kwarg 'activity' is required."
+        assert 'user' in kwargs, "Kwarg 'user' is required."
+        assert 'club' in kwargs, "Kwarg 'user' is required."
+        assert 'category' in kwargs, "Kwarg 'category' is required."
+        self.activity = kwargs.pop("activity", None)
+        self.user = kwargs.pop("user", None)
+        self.club = kwargs.pop("club", None)
+        self.category = kwargs.pop("category", None)
+        super(AssessmentForm, self).__init__(*args, **kwargs)
+        for criterion in Criterion.objects.filter(year=current_year,
+                                                  category=self.category):
+            if self.instance.id:
+                initial_value = CriterionValue.objects.get(assessment=self.instance, criterion=criterion).value
+            else:
+                initial_value = 0
+            self.fields['criterion_' + str(criterion.code_name)] = forms.IntegerField(label=criterion.ar_name, initial=initial_value,
+                                                                                      required=True,
+                                                                                      help_text=criterion.instructions)
+    def save(self):
+        notes = self.cleaned_data.pop('notes', '')
+        cooperator_points = self.cleaned_data.pop('cooperator_points', 0)
+
+        # Create only if the instance is not saved (i.e. we are not editing)
+        if not self.instance.id:
+            assessment = Assessment.objects.create(activity=self.activity,
+                                                   assessor=self.user,
+                                                   assessor_club=self.club,
+                                                   cooperator_points=cooperator_points,
+                                                   notes=notes)
+        else:
+            assessment = self.instance
+            assessment.assessor = self.user
+            assessment.assessor_club = self.club
+            assessment.notes = notes
+            assessment.cooperator_points = cooperator_points
+            assessment.save()
+            
+
+        for field_name in self.cleaned_data:
+            value = self.cleaned_data[field_name]
+            criterion_name = field_name.replace('criterion_', '')
+            criterion = Criterion.objects.get(code_name=criterion_name)
+            if not self.instance.id:
+                CriterionValue.objects.create(criterion=criterion,
+                                              assessment=assessment,
+                                              value=value)
+            else:
+                criterion_value = CriterionValue.objects.get(criterion=criterion,
+                                                             assessment=assessment)
+                criterion_value.value = value
+                criterion_value.save()
+
+        return assessment
+
+    class Meta:
+        model = Assessment
+        fields = ['notes', 'cooperator_points']

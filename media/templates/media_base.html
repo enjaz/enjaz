@@ -10,6 +10,7 @@
 {% block navbar %}
 
     {% if request.user|is_media_coordinator_or_member or request.user.is_superuser %}
+	<li><a href="{% url 'media:buzzes_home' %}"><i class="entypo-megaphone"></i> ما الجديد؟</a></li>
 	<li><a href="{% url 'media:list_activities' %}"><i class="entypo-flag"></i> التقارير و التغطيات</a></li>
     <li><a href="{% url 'media:list_articles' %}"><i class="entypo-newspaper"></i> المقالات</a></li>
     {% else %}

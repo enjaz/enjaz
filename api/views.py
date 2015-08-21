@@ -1,14 +1,22 @@
 from datetime import datetime
+
+from django.db.models import Sum
+from django.utils import timezone
+from django.shortcuts import get_object_or_404
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import parsers, renderers
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.views import APIView
 from activities.models import Activity
-from clubs.models import Club
-from api.serializers import ActivitySerializer, ClubSerializer
 
+from accounts.utils import get_user_college
+from api.serializers import ActivitySerializer, ClubSerializer, BuzzSerializer, BuzzViewSerializer, CodeSerializer
+from clubs.models import Club
+from media.models import Buzz, BuzzView
+from niqati.models import Code
 
 class ActivityList(generics.ListAPIView):
     serializer_class = ActivitySerializer
@@ -18,7 +26,7 @@ class ActivityList(generics.ListAPIView):
 
         # By default, we should display activities happening today
         # onwards.
-        since_date_object = datetime.today().date()
+        since_date_object = timezone.now().date()
         since_date = self.request.query_params.get('since_date', None)
         if since_date:
             try:
@@ -52,7 +60,7 @@ class ActivityList(generics.ListAPIView):
         else:
             queryset = queryset.for_user_gender(self.request.user)
         
-        return queryset
+        return queryset.distinct()
 
 class ActivityDetail(generics.RetrieveAPIView):
     serializer_class = ActivitySerializer
@@ -76,7 +84,7 @@ class ClubList(generics.ListAPIView):
         else:
             queryset = queryset.for_user_gender(self.request.user)
         
-        return queryset
+        return queryset.distinct()
 
 class ClubDetail(generics.RetrieveAPIView):
     serializer_class = ClubSerializer
@@ -106,3 +114,43 @@ class ObtainAuthToken(APIView):
                          'college': user.common_profile.college.name,
                          'gender': user.common_profile.college.name,
                          'section': user.common_profile.college.section})
+
+class BuzzList(generics.ListAPIView):
+    serializer_class = BuzzSerializer
+    def get_queryset(self):
+        queryset = Buzz.objects.published()
+        user_college = get_user_college(self.request.user)
+        if user_college:
+            queryset = queryset.filter(colleges=user_college)
+        return queryset
+
+class BuzzViewCreate(generics.CreateAPIView):
+    serializer_class = BuzzViewSerializer
+    queryset = BuzzView.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def perform_create(self, serializer):
+        buzz_pk = self.kwargs.get('buzz_pk', None)
+        buzz = get_object_or_404(Buzz, pk=buzz_pk)
+        serializer.save(viewer=self.request.user, buzz=buzz)
+
+class BuzzViewUpdate(generics.UpdateAPIView):
+    serializer_class = BuzzViewSerializer
+    queryset = BuzzView.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def perform_update(self, serializer):
+        serializer.save(off_date=timezone.now())
+
+class CodeList(generics.ListAPIView):
+    serializer_class = CodeSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        return Code.objects.current_year().filter(user=self.request.user).order_by('-redeem_date')
+
+class CodeSum(APIView):
+    permission_classes = (IsAuthenticated,)
+    def get(self, request):
+        return Response(request.user.code_set.current_year().aggregate(niqati_sum=Sum('points')))
+

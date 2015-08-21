@@ -559,17 +559,18 @@ def list_colleagues(request):
     # colleague_profiles that are pending-revision.
     if is_arshindi_coordinator_or_deputy(request.user) or \
        request.user.has_perm('arshidni.view_colleagueprofile'):
-        colleague_profiles = ColleagueProfile.objects.for_user_city(request.user).filter(Q(is_published=True) |  Q(is_published__isnull=True))
+        user_colleagues = ColleagueProfile.objects.for_user_city(request.user)
         city = get_user_city(request.user)
         # For cities other than Riyadh, we have gender-unspecific
         # Arshidni (yay).
         if city == 'R':
-            colleague_profiles = colleague_profiles.for_user_gender(request.user)
+            user_colleagues = user_colleagues.for_user_gender(request.user)
+        available = user_colleagues.available().published()
+        unavailable = user_colleagues.filter(Q(is_available=False) | Q(is_published__isnull=True))
     else:
         user_colleagues = ColleagueProfile.objects.current_year().for_user_gender(request.user).for_user_city(request.user).published() 
         available = user_colleagues.available()
         unavailable = user_colleagues.unavailable()
-        
     context = {'available': available, 'unavailable': unavailable}
     return render(request, 'arshidni/colleague_list.html', context)
 

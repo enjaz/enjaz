@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+1# -*- coding: utf-8  -*-
 import requests
 import datetime
 
@@ -277,10 +277,10 @@ def list_pending_orders(request):
 
     # For the superuser, show all pending requests.
     if request.user.has_perm('niqati.change_code_order'):
-        activities_with_pending_orders = Activity.objects.filter(episode__code_order__isnull=False,
-                                                                 episode__code_order__is_approved__isnull=True).distinct()
+        activities_with_pending_orders = Activity.objects.current_year().filter(episode__code_order__isnull=False,
+                                                                              episode__code_order__is_approved__isnull=True).distinct()
     else:
-        activities_with_pending_orders = Activity.objects.filter(episode__code_order__assignee__in=user_niqati_reviewing_clubs,
+        activities_with_pending_orders = Activity.objects.current_year().filter(episode__code_order__assignee__in=user_niqati_reviewing_clubs,
                                                                  episode__code_order__is_approved__isnull=True).distinct()
     context = {'activities_with_pending_orders': activities_with_pending_orders}
     return render(request, 'niqati/approve.html', context)

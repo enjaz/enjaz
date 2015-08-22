@@ -93,7 +93,7 @@
 						<i class="entypo-mobile"></i>
 					</div>
 					
-					<input {% if form.mobile_number.value and not form.badge_number.errors %}value="{{ form.mobile_number.value }}" {% endif %}type="text" class="form-control" name="mobile_number" id="mobile_number" placeholder="{{ form.mobile_number.label }}"required="required"/>
+					<input {% if form.mobile_number.value and not form.mobile_number.errors %}value="{{ form.mobile_number.value }}" {% endif %}type="text" class="form-control" name="mobile_number" id="mobile_number" placeholder="{{ form.mobile_number.label }}" required="required"/>
 					{% if form.mobile_number.errors %}
 					    {% for error in form.mobile_number.errors %}
 					        <label class='error' for='mobile_number' style='display: inline-block'>{{ error|escape }}</label>
@@ -107,7 +107,7 @@
 						<i class="entypo-vcard"></i>
 					</div>
 					
-					<input {% if form.badge_number.value and not form.badge_number.errors %}value="{{ form.badge_number.value }}" {% endif %}type="text" class="form-control" name="badge_number" id="badge_number" placeholder="{{ form.badge_number.label }}" required="required"/>
+					<input {% if form.badge_number.value and not form.badge_number.errors %}value="{{ form.badge_number.value }}" {% endif %}type="text" class="form-control" name="badge_number" id="badge_number" placeholder="{{ form.badge_number.label }}"/>
 					{% if form.badge_number.errors %}
 					    {% for error in form.badge_number.errors %}
 					        <label class='error' for='badge_number' style='display: inline-block'>{{ error|escape }}</label>
@@ -121,7 +121,7 @@
 						<i class="entypo-graduation-cap"></i>
 					</div>
 					
-					<input {% if form.student_id.value and not form.student_id.errors %}value="{{ form.student_id.value }}" {% endif %}type="text" class="form-control" name="student_id" id="student_id" placeholder="{{ form.student_id.label }}" required="required"/>
+					<input {% if form.student_id.value and not form.student_id.errors %}value="{{ form.student_id.value }}" {% endif %}type="text" class="form-control" name="student_id" id="student_id" placeholder="{{ form.student_id.label }}" />
 					{% if form.student_id.errors %}
 					    {% for error in form.student_id.errors %}
 					        <label class='error' for='student_id' style='display: inline-block'>{{ error|escape }}</label>

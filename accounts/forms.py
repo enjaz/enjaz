@@ -26,8 +26,8 @@ class StudentSignupForm(SignupForm):
                                 max_length=30)
     en_last_name = forms.CharField(label=CommonProfile._meta.get_field('en_last_name').verbose_name,
                                 max_length=30)
-    badge_number = forms.IntegerField(label=CommonProfile._meta.get_field('badge_number').verbose_name)
-    student_id = forms.IntegerField(label=CommonProfile._meta.get_field('student_id').verbose_name)
+    badge_number = forms.IntegerField(label=CommonProfile._meta.get_field('badge_number').verbose_name, required=False)
+    student_id = forms.IntegerField(label=CommonProfile._meta.get_field('student_id').verbose_name, required=False)
     # Since the mobile number starts with a zero, store it as a
     # string.
     mobile_number = forms.CharField(label=CommonProfile._meta.get_field('mobile_number').verbose_name)
@@ -164,9 +164,9 @@ class StudentSignupForm(SignupForm):
                                      en_first_name=self.cleaned_data['en_first_name'],
                                      en_middle_name=self.cleaned_data['en_middle_name'],
                                      en_last_name=self.cleaned_data['en_last_name'],
-                                     badge_number=self.cleaned_data['badge_number'],
+                                     badge_number=self.cleaned_data.get('badge_number'),
                                      city=self.cleaned_data['city'],
-                                     student_id=self.cleaned_data['student_id'],
+                                     student_id=self.cleaned_data.get('student_id'),
                                      mobile_number=self.cleaned_data['mobile_number'],
                                      college=student_college,
                                      job_description="")

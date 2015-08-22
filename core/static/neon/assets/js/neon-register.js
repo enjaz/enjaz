@@ -33,9 +33,9 @@ var neonRegister = neonRegister || {};
 					email: true
 				},
 				
-				student_id: {
-					required: true	
-				},
+				//student_id: {
+				//	required: true	
+				//},
 				
 				section: {
 					required: true	

@@ -53,7 +53,7 @@
         <div id="collapseTwo-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
                 <div class="row">
-                {% with activities=approved privileged=1 approved_table=1 %}
+                {% with activities=approved privileged=1 table_type='approved' %}
                     {% include 'activities/components/activities_table.html' %}
                 {% endwith %}
                 </div>
@@ -72,7 +72,7 @@
         <div id="collapseThree-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
                 <div class="row">
-                {% with activities=pending privileged=1 %}
+                {% with activities=pending privileged=1 table_type='pending' %}
                     {% include 'activities/components/activities_table.html' %}
                 {% endwith %}
                 </div>
@@ -91,7 +91,7 @@
         <div id="collapseFour-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
                 <div class="row">
-                {% with activities=rejected privileged=1 %}
+                {% with activities=rejected privileged=1 table_type='rejected' %}
                     {% include 'activities/components/activities_table.html' %}
                 {% endwith %}
                 </div>
@@ -134,7 +134,9 @@
 {% block customscript %}
 	<script src="{% static 'neon/assets/js/fullcalendar/fullcalendar.min.js' %}"></script>
 	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
 	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
 	<script>
     $(function(){
         $('.datatable').dataTable({

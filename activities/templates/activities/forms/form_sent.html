@@ -1,8 +1,5 @@
 {% extends 'activities_base.html' %}
 {% block title %}{{ form.title }}{% endblock %}
-{% block navbar %}
-<li><a href="{% url 'activities:show' form.content_object.pk %}">{{ form.content_object.name }}</a><li>
-{% endblock %}
 {% block content %}
     <style>
         .errorlist {color:#f00;}

@@ -1,5 +1,5 @@
 {% extends "base.html" %}{% load staticfiles %}
-
+{% block navbutton %}{% endblock %}
 {% block title %}الصفحة الرئيسية{% endblock %}
 {% block pageheader %}الصفحة الرئيسية{% endblock %}
 {% block content %}
@@ -65,9 +65,9 @@
 					<thead>
 						<tr>
 							<th>النشاط</th>
-							<th>النادي المنظم</th>
+							<th class="hidden-xs">النادي المنظم</th>
 							<th>التاريخ و الوقت</th>
-							<th>المكان</th>
+							<th class="hidden-md hidden-xs">المكان</th>
 						</tr>
 					</thead>
 					
@@ -75,9 +75,9 @@
 						{% for a in upcoming_activities %}
 						<tr>
 							<td><a href="{% url 'activities:show' a.pk %}">{{ a.name }}</a></td>
-							<td>{{ a.primary_club }}</td>
+							<td class="hidden-xs">{{ a.primary_club }}</td>
 							<td>{{ a.get_first_date }}</td>
-							<td>{{ a.get_first_location }}</td>
+							<td class="hidden-md hidden-xs">{{ a.get_first_location }}</td>
 						</tr>
 						{% endfor %}
 					</tbody>

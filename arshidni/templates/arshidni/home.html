@@ -203,18 +203,18 @@
 					<thead>
 						<tr>
 							<th>المرشد</th>
-							<th>الكلية</th>
-							<th>الدفعة</th>
-							<th>تاريخ الإضافة</th>
+							<th class="hidden-xs">الكلية</th>
+							<th class="hidden-xs">الدفعة</th>
+							<th class="hidden-xs">تاريخ الإضافة</th>
 						</tr>
 					</thead>
 					<tbody>
 						{% for c in latest_colleagues %}
 						<tr>
 							<td><a href="{% url 'arshidni:show_colleague_profile' c.pk %}">{{ c.user.common_profile.get_ar_full_name|default:c.user.username }}</a></td>
-							<td>{{ c.user.common_profile.college }}</a></td>
-							<td>{{ c.batch }}</td>
-							<td>{{ c.submission_date|date:"j F Y" }}</td>
+							<td class="hidden-xs">{{ c.user.common_profile.college }}</a></td>
+							<td class="hidden-xs">{{ c.batch }}</td>
+							<td class="hidden-xs">{{ c.submission_date|date:"j F Y" }}</td>
 						</tr>
 						{% endfor %}
 					</tbody>

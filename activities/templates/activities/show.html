@@ -1,4 +1,4 @@
-{% extends 'activities_base.html' %}{% load staticfiles %}{% load clubs_utils %}
+{% extends 'activities_base.html' %}{% load staticfiles %}{% load clubs_utils %}{% load activities_utils %}
 {% block title %}{{ activity.name }}{% endblock %}
 {% block content %}
 {% if error_message %}
@@ -196,7 +196,7 @@
                     attribute to the context. All django-pluggable-forms views pass a context variable `object_id` to
                     their templates. That's how we can know the request is coming from any of these 2.
                     {% endcomment %}
-                    {% if can_view_forms or object_id %}
+                    {% if can_view_forms and activity|show_activity_forms:user or object_id %}
 					<li{% if active_tab == 'forms' %} class="active"{% endif %}>
                     {% with current_app='activity_forms' %}
 						<a href="{% url 'forms:form_list' activity.pk %}">النماذج</a>

@@ -29,6 +29,7 @@ def fill_new_fields(apps, schema_editor):
         review = Review(order=order,
                         reviewer_club=presidency,
                         is_approved=is_approved)
+        reviews.append(review)
 
     Review.objects.bulk_create(reviews)
 

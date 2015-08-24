@@ -11,4 +11,6 @@ urlpatterns = patterns('',
     url(r'^(?P<version>v1)/buzzes/$', views.BuzzList.as_view(), name='buzz-list'),
     url(r'^(?P<version>v1)/buzzes/(?P<buzz_pk>\d+)/views/$', views.BuzzViewCreate.as_view(), name='buzzview-create'),
     url(r'^(?P<version>v1)/buzzes/(?P<buzz_pk>\d+)/views/(?P<pk>\d+)/$', views.BuzzViewUpdate.as_view(), name='buzzview-update'),
+    url(r'^(?P<version>v1)/niqati/$', views.CodeList.as_view(), name='code-list'),
+    url(r'^v1/niqati/sum/$', views.CodeSum.as_view(), name='code-sum'),
 )

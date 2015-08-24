@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+{% block navbutton %}
+    {% if perms.activities.add_activity or user.coordination.all or user.deputyships.all %}
+        {% include 'includes/nav-button.html' %}
+    {% endif %}
+{% endblock %}
 {% block title %}{% endblock %}
 {% block pageheaderurl %}{% url 'activities:list' %}{% endblock %}
 {% block pageheader %}الأنشطة{% endblock %}

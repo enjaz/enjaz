@@ -24,7 +24,7 @@ from activities.models import Activity, Evaluation
 from activities.forms import EvaluationForm
 from activities.utils import get_club_notification_to, get_club_notification_cc
 from clubs.models import Club, city_choices
-from clubs.utils import has_coordination_to_activity, get_user_coordination_and_deputyships, can_review_any_niqati, is_coordinator_or_deputy_of_any_club
+from clubs.utils import has_coordination_to_activity, get_user_coordination_and_deputyships, can_review_any_niqati, is_coordinator_of_any_club
 from niqati.models import Category, Code, Code_Order, Code_Collection, Review, COUPON, SHORT_LINK
 from niqati.forms import OrderForm, RedeemCodeForm
 
@@ -37,7 +37,7 @@ def index(request):
         return HttpResponseRedirect(reverse('niqati:general_report'))
     elif can_review_any_niqati(request.user):
         return HttpResponseRedirect(reverse('niqati:list_pending_orders'))
-    elif is_coordinator_or_deputy_of_any_club(request.user):
+    elif is_coordinator_of_any_club(request.user):
         user_clubs = get_user_coordination_and_deputyships(request.user)
         user_club = user_clubs.first()
         context = {'user_club': user_club}
@@ -46,31 +46,39 @@ def index(request):
         return HttpResponseRedirect(reverse('niqati:submit'))
 
 @login_required
+@decorators.get_only
 def redeem(request, code=""):
     """
     GET: show the code submission form.
     POST: submit a code.
-    """
-    
+    """    
     if current_year.niqati_closure_date and timezone.now() > current_year.niqati_closure_date:
         return render(request, "niqati/submit_closed.html")
-    if request.user.coordination.current_year().exists():
+    elif is_coordinator_of_any_club(request.user):
         user_club = request.user.coordination.current_year().first()
         context = {'user_club': user_club}
         return render(request, "niqati/submit_coordinators.html", context)
-    if request.method == "POST":
-        form = RedeemCodeForm(request.user, request.POST)
-        eval_form = EvaluationForm(request.POST)
-        if form.is_valid() and eval_form.is_valid():
-            result = form.process()
-            messages.add_message(request, *result)
-            eval_form.save(form.code.collection.parent_order.episode, request.user)
-            return HttpResponseRedirect(reverse("niqati:submit"))
-    elif request.method == "GET":
+    else:
         form = RedeemCodeForm(request.user, initial={'string': code})
         eval_form = EvaluationForm()
-    return render(request, "niqati/submit.html", {"form": form,  "eval_form": eval_form})
-    
+        return render(request, "niqati/submit.html", {"form": form,  "eval_form": eval_form})
+
+@login_required
+@csrf.csrf_exempt
+@decorators.ajax_only
+@decorators.post_only
+def claim_code(request):
+    form = RedeemCodeForm(request.user, request.POST)
+    eval_form = EvaluationForm(request.POST)
+    if form.is_valid() and eval_form.is_valid():
+        result = form.process()
+        return result
+        eval_form.save(form.code.collection.parent_order.episode, request.user)
+    else:
+        errors = form.errors
+        errors.update(eval_form.errors)
+        return {'errors': errors}
+
 @login_required
 def student_report(request, username=None):
     # Only the superuser can see a specific user.  Coordinators will
@@ -269,10 +277,10 @@ def list_pending_orders(request):
 
     # For the superuser, show all pending requests.
     if request.user.has_perm('niqati.change_code_order'):
-        activities_with_pending_orders = Activity.objects.filter(episode__code_order__isnull=False,
-                                                                 episode__code_order__is_approved__isnull=True).distinct()
+        activities_with_pending_orders = Activity.objects.current_year().filter(episode__code_order__isnull=False,
+                                                                              episode__code_order__is_approved__isnull=True).distinct()
     else:
-        activities_with_pending_orders = Activity.objects.filter(episode__code_order__assignee__in=user_niqati_reviewing_clubs,
+        activities_with_pending_orders = Activity.objects.current_year().filter(episode__code_order__assignee__in=user_niqati_reviewing_clubs,
                                                                  episode__code_order__is_approved__isnull=True).distinct()
     context = {'activities_with_pending_orders': activities_with_pending_orders}
     return render(request, 'niqati/approve.html', context)
@@ -298,7 +306,6 @@ def general_report(request, city=""):
 @decorators.post_only
 def get_short_url(request):
     pk = request.POST.get('pk')
-    print pk
     code = get_object_or_404(Code, pk=pk)
     order = code.collection.parent_order
     activity = order.episode.activity

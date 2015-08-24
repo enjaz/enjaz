@@ -1,5 +1,5 @@
 {% load bootstrap3 %}{% load staticfiles %}
-<form id="edit-poll-form" action="post">
+<form enctype="multipart/form-data" id="edit-poll-form" action="post">
 {% csrf_token %}
 {% bootstrap_form form %}
 {% if choices_formset %}
@@ -113,39 +113,45 @@ $(document).ready(function () {
         event.preventDefault();
 
         /* get some values from elements on the page: */
-        var $form = $(this),
-            data = $form.serialize(),
-            {% if poll %}{# if a poll is passed, then post to edit_poll url, otherwise to add_poll #}
-            url = "{% url 'media:edit_poll' poll_type_url poll.id %}";
-            {% else %}
-            url = "{% url 'media:add_poll' poll_type_url %}";
-            {% endif %}
+        var formData = new FormData($(this)[0]); 
+        {% if poll %}{# if a poll is passed, then post to edit_poll url, otherwise to add_poll #}
+        var url = "{% url 'media:edit_poll' poll_type_url poll.id %}";
+        {% else %}
+        var url = "{% url 'media:add_poll' poll_type_url %}";
+        {% endif %}
 
-        /* Send the data using post */
-        var posting = $.post(url, data);
+        /* Send the data */
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (data) {
+                if (data.message == "success") {
 
-        posting.done(function (data) {
-            if (data.message == "success") {
+                    // show success message (using toastr)
+                    toastr.options.positionClass = "toast-top-left";
+                    {% if poll %}
+                    toastr.success("تم تعديل {{ poll.title }} بنجاح.");
+                    {% else %}
+                    toastr.success("تم إنشاء استطلاع جديد بنجاح.");
+                    {% endif %}
 
-                // show success message (using toastr)
-                toastr.options.positionClass = "toast-top-left";
-                {% if poll %}
-                toastr.success("تم تعديل {{ poll.title }} بنجاح.");
-                {% else %}
-                toastr.success("تم إنشاء تصويت جديد بنجاح.");
-                {% endif %}
+                    // hide modal
+                    var $modal = $("#edit-poll-modal")
+                    $modal.modal('hide');
 
-                // hide modal
-                var $modal = $("#edit-poll-modal")
-                $modal.modal('hide');
+                    // refresh poll lists
+                    loadPolls()
 
-                // refresh poll lists
-                loadPolls()
-
-            } else {
-                $("#edit-poll-modal .modal-body").html(data);
-            }
+                } else {
+                    $("#edit-poll-modal .modal-body").html(data);
+                }}
         });
+        
     });
 
     {% if form.instance.pk %}

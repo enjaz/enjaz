@@ -60,6 +60,7 @@
 {% endblock %}
     
 {% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
 <script src="{% static 'neon/assets/js/jquery.knob.js' %}"></script>
 <style>
 i.eval-star:before{
@@ -110,16 +111,52 @@ $(function(){
 			$('i[data-type=' + type + '][data-rating=' + i + ']').removeClass('entypo-star');
 			$('i[data-type=' + type + '][data-rating=' + i + ']').addClass('entypo-star-empty');
 		}
-		console.log('input[name=' + type + ']')
 		if ($('input[name=' + type + ']').length){
-			console.log("change existing!");
 			$('input[name=' + type + ']').val(rating);
 		}else{
-			console.log("add a new!");
 			$('<input>').attr({type: 'hidden', name: type, value: rating}).appendTo('form');
 		}
 
 	});
+    $("form#redeem-form").submit(function (event) {
+        event.preventDefault();
+        var formData = $(this).serialize();
+        var url = "{% url 'niqati:claim_code' %}";
+
+        /* Send the data */
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            cache: false,
+            success: function (data) {
+                if (data['success'] == true){
+                    // show success message (using toastr)
+                    toastr.options.positionClass = "toast-top-left";
+                    if ( data.message_level == 'success'){ 
+                        toastr.success(data['message']);
+                    } else if ( data.message_level == 'error'){ 
+                        console.log('aa');
+                        toastr.warning(data['message']);
+                    } else if ( data.errors ){
+                        if (data.errors.string){
+                            toastr.error(data.errors.string);
+                        }
+                        if (data.errors.relevance){
+                            toastr.error("الملائمة: " + data.errors.relevance);
+                        }
+                        if (data.errors.quality){
+                            toastr.error("الجودة: " + data.errors.quality);
+                        }
+                    }
+
+                } else {
+                    toastr.error(data['message']);
+                }}
+        });
+
+    });
+
 });
 </script>
 {% endblock %}

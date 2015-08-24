@@ -1,0 +1,26 @@
+{% load arshidni_tags %}		
+<table id="colleague-table" class="display datatable dt-responsive">
+    <thead>
+        <tr>
+            <th>المرشد</th>
+            <th class="not-mobile">الكلية</th>
+            <th class="not-mobile">الدفعة</th>
+            <th class="not-mobile">تاريخ الإضافة</th>
+            <th class="not-mobile"></th>
+        </tr>
+    </thead>
+     <tbody>
+        {% for c in colleague_profiles %}
+        <tr>
+            <td><a href="{% url 'arshidni:show_colleague_profile' c.pk %}">{{ c.user.common_profile.get_ar_full_name|default:c.user.username }}</a></td>
+            <td>{{ c.user.common_profile.college }}</a></td>
+            <td>{{ c.batch }}</td>
+                        <td data-order="{{ c.submission_date|date:"U" }}">{{ c.submission_date|date:"j F Y" }}</td>
+                        <td> {% if not user|has_current_colleague_profile and not user|is_arshindi_coordinator_or_deputy  %}<a href="{% url 'arshidni:submit_supervision_request' c.pk %}">اختر</a>{% endif %}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+

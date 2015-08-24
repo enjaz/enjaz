@@ -443,3 +443,10 @@ body.login-page .login-content .alert-warning a {
 	text-align: right;
 }
 
+.activity-description{
+    text-align: justify;
+}
+
+.profile-env>header .profile-info-sections .profile-name strong .activity-name {
+    font-size: 30px;
+}

@@ -43,8 +43,7 @@
 				<li>
 					<div class="profile-name">
 						<strong>
-							<a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a>
-							
+							<a class="activity-name" href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a>
 							{# if the user can view unapproved activity, show the activity status #}
 							{# is-online = approved, is-idle = pending, is-busy = rejected #}
 							
@@ -98,17 +97,13 @@
 
 				<ul class="user-details">{# if the user is privileged, show them the internal description #}
                     {% if request.user|has_coordination_to_activity:activity or perms.activities.add_deanship_review or perms.activities.add_presidency_review or perms.activities.view_deanship_review or perms.activities.view_presidency_review %}
-					<li>
-						<a href="#">
-							<i class="entypo-info-circled"></i>
-							{{ activity.description|linebreaksbr }}
-						</a>
+					<li class="activity-description">
+                        <i class="entypo-info-circled"></i>
+                        {{ activity.description|linebreaksbr }}
 					</li>{% endif %}
-					<li>
-						<a href="#">
-							<i class="entypo-info-circled"></i>
-							{{ activity.public_description|linebreaksbr }}
-						</a>
+					<li class="activity-description">
+                        <i class="entypo-info-circled"></i>
+                        {{ activity.public_description|linebreaksbr }}
 					</li>
 					{% for episode in activity.episode_set.all %}
 					<li>
@@ -119,7 +114,6 @@
 						{# space for the report button #}
 						<div class="col-md-10">
 						{% endif %}
-						<a href="#">
 							<div class="col-sm-4">
 								<i class="entypo-calendar"></i>
 								{{ episode.start_date }}
@@ -136,7 +130,6 @@
 								<i class="entypo-location"></i>
 								{{ episode.location }}
 							</div>
-						</a>
                         {# if the user has privileges to add or view a follow-up report... #}
 						{% if request.user|is_employee_of_any_club or request.user|has_coordination_to_activity:activity or perms.media.add_followupreport %}
 						</div>

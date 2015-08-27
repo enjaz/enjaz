@@ -277,6 +277,12 @@ class AssessmentForm(ModelForm):
         self.club = kwargs.pop("club", None)
         self.category = kwargs.pop("category", None)
         super(AssessmentForm, self).__init__(*args, **kwargs)
+
+        # Only the media coordinator will be able to review assessments.
+        if not can_assess_club_as_media_coordinator(self.user, self.activity.primary_club):
+            del self.fields['is_reviewed']
+            del self.fields['review_date']
+
         for criterion in Criterion.objects.filter(year=current_year,
                                                   category=self.category):
             if self.instance.id:
@@ -289,6 +295,8 @@ class AssessmentForm(ModelForm):
     def save(self):
         notes = self.cleaned_data.pop('notes', '')
         cooperator_points = self.cleaned_data.pop('cooperator_points', 0)
+        is_reviewed = self.cleaned_data.pop('is_reviewed', True)
+        review_date = self.cleaned_data.pop('is_reviewed', None)
 
         # Create only if the instance is not saved (i.e. we are not editing)
         if not self.instance.id:
@@ -296,15 +304,18 @@ class AssessmentForm(ModelForm):
                                                    assessor=self.user,
                                                    assessor_club=self.club,
                                                    cooperator_points=cooperator_points,
-                                                   notes=notes)
+                                                   notes=notes,
+                                                   is_reviewed=is_reviewed,
+                                                   review_date=review_date)
         else:
             assessment = self.instance
             assessment.assessor = self.user
             assessment.assessor_club = self.club
             assessment.notes = notes
             assessment.cooperator_points = cooperator_points
+            assessment.is_reviewed = is_reviewed
+            assessment.review_date = review_date
             assessment.save()
-            
 
         for field_name in self.cleaned_data:
             value = self.cleaned_data[field_name]
@@ -324,4 +335,4 @@ class AssessmentForm(ModelForm):
 
     class Meta:
         model = Assessment
-        fields = ['notes', 'cooperator_points']
+        fields = ['notes', 'cooperator_points', 'is_reviewed', 'review_date']

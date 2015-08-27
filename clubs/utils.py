@@ -15,8 +15,7 @@ def is_deputy_of_any_club(user):
 
 def is_member_of_any_club(user):
     """Return whether the user is a member of any club."""
-    user_clubs = Club.objects.current_year().filter(members=user)
-    return user_clubs.exists()
+    return user.memberships.current_year().exists()
 
 def is_employee_of_any_club(user):
     """Return whether the user is an employee of any club."""
@@ -65,17 +64,14 @@ def has_coordination_to_activity(user, activity):
     return coordination_clubs.exists()
 
 def get_deanship():
-    return Club.objects.get(english_name="Deanship of Student Affairs",
-                            year=current_year)
+    return Club.objects.current_year().get(english_name="Deanship of Student Affairs")
 
 def get_presidency():
-    return Club.objects.get(english_name="Presidency",
-                            year=current_year)
+    return Club.objects.current_year().get(english_name="Presidency")
 
 def get_media_center():
-    return Club.objects.get(english_name="Media Center",
-                            year=current_year, city='R',
-                            gender='M')
+    return Club.objects.current_year().get(english_name="Media Center",
+                                           city='R', gender='M')
 
 def get_user_clubs(user):
     return user.memberships.current_year() | user.coordination.current_year()
@@ -175,7 +171,7 @@ def get_club_assessing_clubs_by_user(user, club):
     # * Superuser (which we are not handling here)
     # * Clubs with can_assess (i.e. Student Club president deputies)
     # * Medica Club in the same city
-    user_clubs =  user.coordination.current_year() | user.deputyships.current_year()
+    user_clubs =  get_user_clubs(user).filter(can_assess=True)
 
     # In Riyadh, there are two Media Centers for each gender.
     if club.city == 'R' and club.gender:
@@ -213,3 +209,6 @@ def can_view_assessments(user, club):
         return True
     user_clubs = get_club_assessing_clubs_by_user(user, club).filter(can_view_assessments=True)
     return user_clubs.exists()
+
+def can_assess_any_club(user):
+    return get_user_clubs(user).filter(can_assess=True).exists()

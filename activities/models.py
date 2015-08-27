@@ -549,6 +549,10 @@ class Assessment(models.Model):
     assessor = models.ForeignKey(User)
     assessor_club = models.ForeignKey(Club, null=True,
                                       blank=True)
+    is_reviewed = models.BooleanField(default=True, verbose_name=u"روجعت؟")
+    review_date = models.DateTimeField(u'تاريخ الإرسال',
+                                       null=True,
+                                       blank=True)
     submission_date = models.DateTimeField(u'تاريخ الإرسال',
                                            auto_now_add=True)
     cooperator_points = models.IntegerField(default=0,
@@ -572,6 +576,9 @@ class Criterion(models.Model):
         ('M', u'المركز الإعلامي')
         )
     category = models.CharField(max_length=1, verbose_name=u"التصنيف")
+
+    def __unicode__(self):
+        return self.code_name
 
 class CriterionValue(models.Model):
     assessment = models.ForeignKey(Assessment, verbose_name=u"التقييم")

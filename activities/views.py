@@ -20,7 +20,7 @@ from clubs.utils import is_coordinator_or_member, is_coordinator_or_deputy_of_an
     get_user_coordination_and_deputyships, has_coordination_to_activity, get_deanship, is_employee, \
     can_review_activity, can_delete_activity, can_edit_activity, can_assess_club, \
     get_club_assessing_clubs_by_user
-from media.utils import MAX_OVERDUE_REPORTS
+from media.utils import MAX_OVERDUE_REPORTS, can_assess_club_as_media_coordinator, can_assess_club_as_media_member, can_assess_club_as_media
 
 FORMS_CURRENT_APP = "activity_forms"
 
@@ -596,16 +596,33 @@ def assessment_index(request, activity_id):
 
     # Determine the category.  If not Media Center (i.e. super user or
     # vice president, default to the presidency review)
-    user_clubs = request.user.coordination.current_year() | request.user.deputyships.current_year()
-    user_media_center = user_clubs.filter(english_name__contains='Media Center',
-                                          city=activity.primary_club.city)
-    if user_media_center.exists():
+    if can_assess_club_as_media(request.user, activity.primary_club):
         return HttpResponseRedirect(reverse('activities:assess',
                                     args=(activity_id, 'm')))
     else: 
         return HttpResponseRedirect(reverse('activities:assess',
                                     args=(activity_id, 'p')))
 
+@login_required
+def assessment_list(request):
+    if not can_assess_any_club(request.user):
+        raise PermissionDenied
+
+    user_assessing_clubs = get_user_clubs(user).filter(can_assess=True)
+    user_media_center = get_user_media_center(request.user)
+
+    if request.user.is_superuser:
+        assessed_activities = Activity.objects.current_year().approved().filter(assessment__criterionvalue__criterion__category='P')\
+                                                                        .filter(assessment__criterionvalue__criterion__category='M').distinct()
+        no_media_assessment = Activity.objects.current_year().approved().filter(assessment__criterionvalue__criterion__category='P').exclude(assessment__criterionvalue__criterion__category='M').distinct()
+        no_presidency_assessment = Activity.objects.current_year().approved().filter(assessment__criterionvalue__criterion__category='P').exclude(assessment__criterionvalue__criterion__category='M').distinct()
+    elif user_media_center:
+        assessed_activities = Activity.objects.current_year().approved().filter(assessment__criterionvalue__criterion__category='P')\
+                                                                        .filter(assessment__criterionvalue__criterion__category='M').distinct()
+    else: # Vice president
+        pass
+    
+    
 @login_required
 def assess(request, activity_id, category):
     activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
@@ -614,24 +631,27 @@ def assess(request, activity_id, category):
     if not can_assess_club(request.user, activity.primary_club):
         raise PermissionDenied
 
+    assessing_clubs = get_club_assessing_clubs_by_user(request.user, activity.primary_club)
+
     # Don't make it possible for Media Center to enter presidency
     # assessment and vice versa.  If no assessing clubs, we are
     # dealing with the superuser, so don't preform such checks and set
     # the assessor_club to None.
-    assessing_clubs = get_club_assessing_clubs_by_user(request.user, activity.primary_club)   
     if assessing_clubs.exists():
-        if assessing_clubs.filter(english_name__contains="Media Center").exists() and \
-           category != 'M':
-            raise PermissionDenied
-        elif assessing_clubs.filter(english_name__contains="Presidency").exists() and category != 'P':
-            raise PermissionDenied
         assessor_club = assessing_clubs.first()
-    else:
+        if can_assess_club_as_media(request.user, activity.primary_club):
+            if category != 'M':
+                raise PermissionDenied
+        else: # Vice president
+            if category != 'P':
+                raise PermissionDenied
+    elif user.has_perms('activities.add_assessment'): # superuser
         assessor_club = None
 
-    try:  # If the assessment is already there, edit it.
+    # If the assessment is already there, edit it.
+    try:  
         assessment = Assessment.objects.get(activity=activity,
-                                        assessor_club=assessor_club)
+                                            assessor_club=assessor_club)
     except ObjectDoesNotExist:
         assessment = Assessment(activity=activity,
                                 assessor=request.user,
@@ -673,6 +693,9 @@ def assess(request, activity_id, category):
         submission_interval = (activity.get_first_date() - activity.submission_date.date()).days
         context['submission_interval'] = submission_interval
     elif category == 'M':
-        template_name = 'activities/assessment_media_center.html'
+        if can_assess_club_as_media_member(request.user, activity.primary_club):
+            template_name = 'activities/assessment_media_coordinator.html'
+        else: # Media coordinator or superuser 
+            template_name = 'activities/assessment_media_member.html'
 
     return render(request, template_name, context)

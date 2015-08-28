@@ -153,4 +153,5 @@ class PollSuggestForm(forms.Form):
 class BuzzForm(ModelForm):
     class Meta:
         model = Buzz
-        fields = ['title', 'body', 'image', 'colleges', 'announcement_date']
+        fields = ['title', 'body', 'image', 'colleges',
+                  'announcement_date', 'is_push']

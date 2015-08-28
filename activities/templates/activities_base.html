@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block navbutton %}
-    {% if perms.activities.add_activity or user.coordination.all or user.deputyships.all %}
+    {% if perms.activities.add_activity or user.coordination.current_year.exists or user.deputyships.current_year.exists %}
         {% include 'includes/nav-button.html' %}
     {% endif %}
 {% endblock %}
@@ -9,8 +9,8 @@
 {% block pageheader %}الأنشطة{% endblock %}
 {% block navbar %}
     {# if the user is a coordinator of any club, or if they have the add_activity permission #}
-    {% if perms.activities.add_activity or user.coordination.all or user.deputyships.all %}
-        {% if not user.coordination.all.0.get_overdue_report_count > 3 %}
+    {% if perms.activities.add_activity or user.coordination.current_year.exists or user.deputyships.current_year.exists %}
+        {% if not user.coordination.current_year.0.get_overdue_report_count > 3 %}
 		<li><a href="{% url 'activities:create' %}"><span class="glyphicon glyphicon-plus"></span> أضف نشاطًا</a></li>
         {% endif %}
 	{% endif %}

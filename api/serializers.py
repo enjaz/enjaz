@@ -25,7 +25,7 @@ class ActivitySerializer(serializers.ModelSerializer):
 class BuzzSerializer(serializers.ModelSerializer):
     class Meta:
         model = Buzz
-        fields = ('pk', 'title', 'body', 'image')
+        fields = ('pk', 'title', 'body', 'image', 'is_push')
 
 class BuzzViewSerializer(serializers.ModelSerializer):
     class Meta:

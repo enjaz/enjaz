@@ -444,6 +444,7 @@ class Buzz(models.Model):
     title = models.CharField(max_length=128, verbose_name=u"العنوان")
     announcement_date = models.DateTimeField(verbose_name=u"وقت الإعلان")
     is_deleted = models.BooleanField(default=False)
+    is_push = models.BooleanField(default=False, verbose_name=u"إعلان عام؟")
     colleges = models.ManyToManyField('clubs.College', verbose_name=u"الكليات المستهدفة",
                                       blank=True)
     image = models.ImageField(upload_to="media/buzzimages/", null=True, blank=True, verbose_name=u"الصورة")

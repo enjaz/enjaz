@@ -8,14 +8,12 @@
             <th class="not-mobile">تاريخ الإرسال</th>
             {% endif %}
             <th>تاريخ الانعقاد</th>
-            {# In approved, no need to show the status nor the options. #}{% if privileged and not table_type == 'approved' %}
+            {# In approved, no need to show the status nor the options. #}
+            {% if privileged and not table_type == 'approved' or table_type == 'employee' %}
             <th class="not-mobile">الحالة</th>
             {% endif %}
             {% if table_type == 'pending' %}
             <th class="not-mobile">الخيارات</th>
-            {% endif %}
-            {% if table_type == 'employee' %}
-            <th class="not-mobile">الحالة</th>
             {% endif %}
         </tr>
     </thead>
@@ -28,16 +26,13 @@
             <td data-order="{{ activity.submission_date|date:"U" }}">{{ activity.submission_date|date:"j F" }}</td>
             {% endif %}
             <td data-order="{{ activity.get_first_date|date:"U" }}">{{ activity.get_first_date|date:"j F" }}</td>
-            {% if privileged and not table_type == 'approved' %}
+            {% if privileged and not table_type == 'approved' or table_type == 'employee' %}
             <td>{{ activity.get_approval_status_message }}</td>
             {% endif %}
             {% if table_type == 'pending' %}
             <td>
                 {{ activity.get_list_activity_action|safe }}
             </td>
-            {% endif %}
-            {% if table_type == 'employee' %}
-            <td>{{ activity.get_is_approved_display }}</td>
             {% endif %}
         </tr>
     {% endfor %}

@@ -61,7 +61,6 @@ class OrderForm(forms.Form):
         # No need to keep the episode.
         del self.cleaned_data['episode']
         
-        print self.cleaned_data # REMOVE
         count_fields = [field_name for field_name in self.cleaned_data
                         if field_name.startswith('count')]
         for field_name in count_fields:

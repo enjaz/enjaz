@@ -6,8 +6,10 @@ from django import forms
 from django.forms import ModelForm, ModelChoiceField, ModelMultipleChoiceField
 from django.forms.widgets import TextInput
 from django.forms.models import inlineformset_factory
+from django.utils import timezone
 
 from activities.models import Activity, Episode, Review, Evaluation, Attachment, Assessment, Criterion, CriterionValue
+from media.utils import can_assess_club_as_media_coordinator
 from clubs.models import Club
 from core.models import StudentClubYear
 
@@ -278,25 +280,51 @@ class AssessmentForm(ModelForm):
         self.category = kwargs.pop("category", None)
         super(AssessmentForm, self).__init__(*args, **kwargs)
 
-        # Only the media coordinator will be able to review assessments.
-        if not can_assess_club_as_media_coordinator(self.user, self.activity.primary_club):
+        # Only the Media Center coordinators will be able to review
+        # assessments, and only in the Media Center assessment.
+        if self.category == 'P' or \
+           self.category == 'M' and \
+           not can_assess_club_as_media_coordinator(self.user, self.activity.primary_club) and\
+           not self.user.is_superuser:
             del self.fields['is_reviewed']
-            del self.fields['review_date']
+
+        if self.category == 'M':
+            del self.fields['cooperator_points']
 
         for criterion in Criterion.objects.filter(year=current_year,
-                                                  category=self.category):
+                                                  category=self.category,
+                                                  city__contains=self.activity.primary_club.city):
+            field_name = 'criterion_' + str(criterion.code_name)
             if self.instance.id:
                 initial_value = CriterionValue.objects.get(assessment=self.instance, criterion=criterion).value
             else:
                 initial_value = 0
-            self.fields['criterion_' + str(criterion.code_name)] = forms.IntegerField(label=criterion.ar_name, initial=initial_value,
+            self.fields[field_name] = forms.IntegerField(label=criterion.ar_name, initial=initial_value,
                                                                                       required=True,
                                                                                       help_text=criterion.instructions)
+            if self.category == 'M':
+                self.fields[field_name].widget.attrs['readonly'] = 'readonly'
+
     def save(self):
         notes = self.cleaned_data.pop('notes', '')
         cooperator_points = self.cleaned_data.pop('cooperator_points', 0)
-        is_reviewed = self.cleaned_data.pop('is_reviewed', True)
-        review_date = self.cleaned_data.pop('is_reviewed', None)
+
+        # If we are dealing with a Media Center assessment, check if
+        # the reviewer is the presidency of the Media Center or the
+        # superuser, take the input of is_reviewed.  If it is being
+        # edited by a Media Center member, mark is_reviewed as false.  If the 
+        if self.category == 'M' \
+           and (can_assess_club_as_media_coordinator(self.user, self.activity.primary_club) \
+           or self.user.is_superuser):
+            review_date = timezone.now()
+            is_reviewed = self.cleaned_data.pop('is_reviewed', False )
+        elif self.category == 'M':
+            review_date = None
+            is_reviewed = False
+        elif self.category == 'P':
+            review_date = None
+            is_reviewed = True
+
 
         # Create only if the instance is not saved (i.e. we are not editing)
         if not self.instance.id:
@@ -335,4 +363,4 @@ class AssessmentForm(ModelForm):
 
     class Meta:
         model = Assessment
-        fields = ['notes', 'cooperator_points', 'is_reviewed', 'review_date']
+        fields = ['notes', 'cooperator_points', 'is_reviewed']

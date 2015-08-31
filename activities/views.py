@@ -19,8 +19,9 @@ from clubs.utils import is_coordinator_or_member, is_coordinator_or_deputy_of_an
     is_member_of_any_club, is_employee_of_any_club, is_coordinator, is_coordinator_or_deputy, get_user_clubs, \
     get_user_coordination_and_deputyships, has_coordination_to_activity, get_deanship, is_employee, \
     can_review_activity, can_delete_activity, can_edit_activity, can_assess_club, \
-    get_club_assessing_clubs_by_user
-from media.utils import MAX_OVERDUE_REPORTS, can_assess_club_as_media_coordinator, can_assess_club_as_media_member, can_assess_club_as_media
+    get_club_assessing_clubs_by_user, can_assess_any_club
+from media.utils import MAX_OVERDUE_REPORTS, can_assess_club_as_media_coordinator, can_assess_club_as_media_member, can_assess_club_as_media, is_media_coordinator_or_deputy, get_user_media_center, get_clubs_for_assessment_by_user
+from media.models import FollowUpReport, FollowUpReportImage, Story
 
 FORMS_CURRENT_APP = "activity_forms"
 
@@ -608,20 +609,43 @@ def assessment_list(request):
     if not can_assess_any_club(request.user):
         raise PermissionDenied
 
-    user_assessing_clubs = get_user_clubs(user).filter(can_assess=True)
+    context = {}
+    user_assessing_clubs = get_user_clubs(request.user).filter(can_assess=True)
     user_media_center = get_user_media_center(request.user)
+    clubs_for_user = get_clubs_for_assessment_by_user(request.user)
 
-    if request.user.is_superuser:
-        assessed_activities = Activity.objects.current_year().approved().filter(assessment__criterionvalue__criterion__category='P')\
-                                                                        .filter(assessment__criterionvalue__criterion__category='M').distinct()
-        no_media_assessment = Activity.objects.current_year().approved().filter(assessment__criterionvalue__criterion__category='P').exclude(assessment__criterionvalue__criterion__category='M').distinct()
-        no_presidency_assessment = Activity.objects.current_year().approved().filter(assessment__criterionvalue__criterion__category='P').exclude(assessment__criterionvalue__criterion__category='M').distinct()
-    elif user_media_center:
-        assessed_activities = Activity.objects.current_year().approved().filter(assessment__criterionvalue__criterion__category='P')\
-                                                                        .filter(assessment__criterionvalue__criterion__category='M').distinct()
-    else: # Vice president
-        pass
-    
+    approved_activvities = Activity.objects.current_year().approved().done().filter(primary_club__in=clubs_for_user).distinct()
+    # 'done' has different meanings for the Media Center, the
+    # Presidency and the superuser.
+    if user_media_center: # Media
+        context['category'] = 'M'
+        context['todo'] = approved_activvities.exclude(assessment__criterionvalue__criterion__category='M')
+        if is_media_coordinator_or_deputy(request.user):
+            context['done'] = approved_activvities.filter(assessment__criterionvalue__criterion__category='M')\
+                                                  .exclude(assessment__is_reviewed=False)
+        else:
+            context['done'] = approved_activvities.filter(assessment__criterionvalue__criterion__category='M')
+    elif user_assessing_clubs.exists(): # Presidency
+        context['category'] = 'P'
+        context['done'] = approved_activvities.filter(assessment__criterionvalue__criterion__category='P')
+        context['todo'] = approved_activvities.exclude(assessment__criterionvalue__criterion__category='P')
+    else: # Superuser
+        context['category'] = 'P'
+        context['done'] = approved_activvities.filter(assessment__criterionvalue__criterion__category='P')\
+                                              .filter(assessment__criterionvalue__criterion__category='M')\
+                                              .exclude(assessment__is_reviewed=False)
+        # FIXME: The following query is buggy (#24525)
+        #context['todo'] = (approved_activvities.exclude(assessment__criterionvalue__criterion__category='M') | \
+        #                   approved_activvities.exclude(assessment__criterionvalue__criterion__category='P')\
+        #                                       .exclude(assessment__is_reviewed=False))
+        context['todo'] = approved_activvities.exclude(assessment__criterionvalue__criterion__category='P')
+    # Only show 'toreview' to media coordinator and deputy, and to the
+    # superuser.
+    if is_media_coordinator_or_deputy(request.user) or \
+       request.user.is_superuser:
+        context['toreview'] = approved_activvities.filter(assessment__criterionvalue__criterion__category='M',
+                                                          assessment__is_reviewed=False)
+    return render(request, 'activities/assessment_list.html', context)
     
 @login_required
 def assess(request, activity_id, category):
@@ -645,13 +669,13 @@ def assess(request, activity_id, category):
         else: # Vice president
             if category != 'P':
                 raise PermissionDenied
-    elif user.has_perms('activities.add_assessment'): # superuser
+    elif request.user.has_perms('activities.add_assessment'): # superuser
         assessor_club = None
 
     # If the assessment is already there, edit it.
     try:  
-        assessment = Assessment.objects.get(activity=activity,
-                                            assessor_club=assessor_club)
+        assessment = Assessment.objects.distinct().get(activity=activity,
+                                                       criterionvalue__criterion__category=category)
     except ObjectDoesNotExist:
         assessment = Assessment(activity=activity,
                                 assessor=request.user,
@@ -678,8 +702,7 @@ def assess(request, activity_id, category):
                     activity.assignee = media_center
                 activity.save()
 
-            return HttpResponseRedirect(reverse('activities:show',
-                                        args=(activity_id,)))
+            return HttpResponseRedirect(reverse('activities:assessment_list'))
 
     elif request.method == 'GET':
         form = AssessmentForm(instance=assessment, activity=activity,
@@ -693,9 +716,9 @@ def assess(request, activity_id, category):
         submission_interval = (activity.get_first_date() - activity.submission_date.date()).days
         context['submission_interval'] = submission_interval
     elif category == 'M':
-        if can_assess_club_as_media_member(request.user, activity.primary_club):
-            template_name = 'activities/assessment_media_coordinator.html'
-        else: # Media coordinator or superuser 
-            template_name = 'activities/assessment_media_member.html'
+        context['reports'] = FollowUpReport.objects.filter(episode__activity=activity)
+        context['images'] = FollowUpReportImage.objects.filter(report__episode__activity=activity)
+        context['stories'] = Story.objects.filter(episode__activity=activity)
+        template_name = 'activities/assessment_media_center.html'
 
     return render(request, template_name, context)

@@ -114,33 +114,6 @@ you?
 				</a>
 			</li>
             {% endif %}
-            {% if user.is_authenticated %}
-			<li>
-				<a href="{% url 'userena_password_change' user.username %}">
-					<i class="entypo-pencil"></i>
-					<span>غيّر كلمة السر</span>
-				</a>
-			</li>
-			<li>
-				<a href="{% url 'userena_signout' %}">
-					<i class="entypo-export"></i>
-					<span>اخرج</span>
-				</a>
-			</li>
-            {% endif %}
-            {% comment %}
-			<li>
-				<a href="{% url 'books:list' %}">
-					<i class="entypo-book"></i>
-					<span>كتب</span>
-				</a>
-			</li>
-			<li>
-				<a href="{% url 'studentvoice:home' %}">
-					<i class="entypo-chat"></i>
-					<span>صوتك مسموع</span>
-				</a>
-			</li>
 			<li>
 				<a href="{% url 'media:index' %}">
 					<i class="entypo-megaphone"></i>
@@ -183,6 +156,33 @@ you?
                     </li>
                     {% endif %}
                 </ul>
+			</li>
+            {% if user.is_authenticated %}
+			<li>
+				<a href="{% url 'userena_password_change' user.username %}">
+					<i class="entypo-pencil"></i>
+					<span>غيّر كلمة السر</span>
+				</a>
+			</li>
+			<li>
+				<a href="{% url 'userena_signout' %}">
+					<i class="entypo-export"></i>
+					<span>اخرج</span>
+				</a>
+			</li>
+            {% endif %}
+            {% comment %}
+			<li>
+				<a href="{% url 'books:list' %}">
+					<i class="entypo-book"></i>
+					<span>كتب</span>
+				</a>
+			</li>
+			<li>
+				<a href="{% url 'studentvoice:home' %}">
+					<i class="entypo-chat"></i>
+					<span>صوتك مسموع</span>
+				</a>
 			</li>
             {% endcomment %}
 		</ul>

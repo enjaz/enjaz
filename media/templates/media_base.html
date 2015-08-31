@@ -3,16 +3,16 @@
 {% block title %}المركز الإعلامي{% endblock %}
 
 {% block pageheaderurl %}
-    {% if request.user|is_media_coordinator_or_member or request.user.is_superuser %}{% url 'media:index' %}{% else %}#{% endif %}
+    {% if user|is_media_coordinator_or_member or user.is_superuser %}{% url 'media:index' %}{% else %}#{% endif %}
 {% endblock %}
 {% block pageheader %}المركز الإعلامي{% endblock %}
 
 {% block navbar %}
-
-    {% if request.user|is_media_coordinator_or_member or request.user.is_superuser %}
+    {% if user|is_media_coordinator_or_member or user.is_superuser %}
 	<li><a href="{% url 'media:buzzes_home' %}"><i class="entypo-megaphone"></i> ما الجديد؟</a></li>
 	<li><a href="{% url 'media:list_activities' %}"><i class="entypo-flag"></i> التقارير و التغطيات</a></li>
     <li><a href="{% url 'media:list_articles' %}"><i class="entypo-newspaper"></i> المقالات</a></li>
+    <li><a href="{% url 'activities:assessment_list' %}"><span class="glyphicon glyphicon-pencil"></span> قيّم الأنشطة</a></li>
     {% else %}
     <li><a href="{% url 'media:submit_article' %}"><i class="entypo-feather"></i> أرسل مقالًا</a></li>
     <li><a href="{% url 'media:list_articles' %}"><i class="entypo-newspaper"></i> مقالاتي</a></li>

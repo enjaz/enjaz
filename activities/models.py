@@ -182,7 +182,7 @@ class Activity(models.Model):
                 return ""
         else:
             return ""
-
+        
     def is_single_episode(self):
         return self.episode_set.count() == 1
     
@@ -202,6 +202,12 @@ class Activity(models.Model):
         """
         return self.episode_set.order_by('start_date', 'start_time').first()
 
+    def get_last_episode(self):
+        """
+        Return the last scheduled episode for this activity.
+        """
+        return self.episode_set.order_by('-end_date', 'end_time').first()
+    
     def get_next_episode(self):
         """
         Return the next scheduled episode for this activity.
@@ -241,8 +247,14 @@ class Activity(models.Model):
     def get_evaluation_percentage(self):
         percentage = self.get_evaluations().aggregate(avg=Avg(F('quality') + F('relevance')))['avg']
         if percentage:
-            percentage *= 10 
+            percentage *= 10
         return percentage
+
+    def get_presidency_assessment(self):
+        return self.assessment_set.distinct().get(criterionvalue__criterion__category='P', activity=self)
+
+    def get_media_assessment(self):
+        return self.assessment_set.distinct().get(criterionvalue__criterion__category='M', activity=self)
 
     def get_total_assessment_points(self):
         return self.assessment_set.aggregate(total=Sum('criterionvalue__value'))['total']
@@ -253,9 +265,11 @@ class Activity(models.Model):
     def get_media_assessment_points(self):
         return self.assessment_set.filter(criterionvalue__criterion__category='M').aggregate(media=Sum('criterionvalue__value'))['media']
 
+    def get_media_assessment_points(self):
+        return self.assessment_set.filter(criterionvalue__criterion__category='M').aggregate(media=Sum('criterionvalue__value'))['media']
+    
     def get_cooperator_points(self):
         return self.assessment_set.aggregate(cooperation=Sum('cooperator_points'))['cooperation']
-
 
     def get_presidency_assessor(self):
         current_year = StudentClubYear.objects.get_current()
@@ -570,6 +584,7 @@ class Criterion(models.Model):
                                verbose_name=u"اسم المعيار بالعربية")
     code_name = models.CharField(max_length=200,
                                  verbose_name=u"اسم المعيار البرمجي")
+    city = models.CharField(max_length=10, default="RAJ", verbose_name=u"المدينة")
     instructions = models.TextField(verbose_name=u"تعليمات")
     category_choices  = (
         ('P', u'رئاسة نادي الطلاب'),
@@ -586,3 +601,6 @@ class CriterionValue(models.Model):
                              blank=True, on_delete=models.SET_NULL,
                              default=None, verbose_name=u"المعيار")
     value = models.IntegerField(verbose_name=u"القيمة")
+
+    def __unicode__(self):
+        return "{}: {}".format(self.criterion.code_name, self.value)

@@ -191,30 +191,46 @@ def approve_application(request, club_id):
 @csrf.csrf_exempt
 @decorators.ajax_only
 @decorators.post_only
-def control_deputies(request, club_id):
+def control_deputies_and_representatives(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
     if not is_coordinator_or_deputy(club, request.user) and \
        not request.user.is_superuser:
         raise PermissionDenied
+    role = request.POST.get('role')
     username = request.POST.get('username')
     action = request.POST.get('action')
 
-    if not username or not action:
+    if not username or not action or not role:
         raise Exception(u'حدث خطأ!')
 
     user = User.objects.get(username=username)
-    current_deputies = club.deputies.all()
+    if role == 'deputy':
+        current_deputies = club.deputies.all()
 
-    if action == 'set':
-        if user in current_deputies:
-            raise Exception(u'المستخدم نائب حاليا!')
-        else:
-            club.deputies.add(user)
-    elif action == 'unset':
-        if not user in current_deputies:
-            raise Exception(u'المستخدم ليس نائبا!')
-        else:
-            club.deputies.remove(user)
+        if action == 'set':
+            if user in current_deputies:
+                raise Exception(u'المستخدم نائب حاليا!')
+            else:
+                club.deputies.add(user)
+        elif action == 'unset':
+            if not user in current_deputies:
+                raise Exception(u'المستخدم ليس نائبا!')
+            else:
+                club.deputies.remove(user)
+    elif role == 'media_representative':
+        current_representatives = club.media_representatives.all()
+        if action == 'set':
+            if user in current_representatives:
+                raise Exception(u'المستخدم ممثل إعلامي حاليا!')
+            else:
+                club.media_representatives.add(user)
+                print "done!"
+        elif action == 'unset':
+            if not user in current_representatives:
+                raise Exception(u'المستخدم ليس ممثلا إعلاميًا!')
+            else:
+                club.media_representatives.remove(user)
+        
 
 @login_required
 def view_members(request, club_id):

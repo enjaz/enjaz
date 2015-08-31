@@ -16,7 +16,7 @@ urlpatterns = patterns('',
     url(r'^(?P<club_id>\d+)/join/done/$', TemplateView.as_view(template_name='clubs/join_done.html'), name='join_done'),
     url(r'^(?P<club_id>\d+)/members/$', views.view_members, name='view_members'),
     url(r'^(?P<club_id>\d+)/deputies/$', views.view_deputies, name='view_deputies'),
-    url(r'^(?P<club_id>\d+)/deputies/control_deputies$', views.control_deputies, name='control_deputies'),
+    url(r'^(?P<club_id>\d+)/deputies/control$', views.control_deputies_and_representatives, name='control_deputies_and_representatives'),
     url(r'^(?P<club_id>\d+)/applications/$', views.view_application, name='view_application'),
     url(r'^(?P<club_id>\d+)/applications/approve/$', views.approve_application, name='approve_application'),
 )

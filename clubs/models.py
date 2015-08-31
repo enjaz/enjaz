@@ -2,11 +2,11 @@
 from django.contrib.contenttypes.generic import GenericRelation
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Sum
+
 from forms_builder.forms.models import Form
 from core.models import StudentClubYear
 from clubs.managers import ClubQuerySet
-from django.db.models import Sum
-
 
 section_choices = (
     ('NG', u'الحرس الوطني'),
@@ -62,6 +62,12 @@ class Club(models.Model):
                                       related_name="deputyships",
                                       limit_choices_to={'common_profile__is_student':
                                                         True})
+    media_representatives = models.ManyToManyField(User,
+                                                   verbose_name=u"الممثلين ال الإعلاميين",
+                                                   blank=True,
+                                                   related_name="media_representations",
+                                                   limit_choices_to={'common_profile__is_student':
+                                                                     True})
     members = models.ManyToManyField(User, verbose_name=u"الأعضاء",
                                      blank=True,
                                      related_name="memberships",

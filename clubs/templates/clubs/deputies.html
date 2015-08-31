@@ -17,9 +17,14 @@
 		<td>{% if member in club.deputies.all %}نائب{% else %}عضو{% endif %}</td>
 		<td>
 			{% if member in club.deputies.all %}
-			<button class="btn btn-danger btn-xs btn-deputy" data-username="{{ member.username }}" data-action="unset">ألغِ النيابة</button>
+			<button class="btn btn-danger btn-xs btn-deputy" data-username="{{ member.username }}" data-action="unset" data-role="deputy">ألغِ النيابة</button>
 			{% else %}
-			<button class="btn btn-success btn-xs btn-deputy" data-username="{{ member.username }}" data-action="set">عيّن نائبا</button>
+			<button class="btn btn-success btn-xs btn-deputy" data-username="{{ member.username }}" data-action="set" data-role="deputy">عيّن نائبا</button>
+			{% endif %}
+			{% if member in club.media_representatives.all %}
+			<button class="btn btn-danger btn-xs btn-deputy" data-username="{{ member.username }}" data-action="unset" data-role="media_representative">ألغِ التمثيل الإعلامي</button>
+			{% else %}
+			<button class="btn btn-success btn-xs btn-deputy" data-username="{{ member.username }}" data-action="set" data-role="media_representative">عيّن مُمثّلا إعلاميًا</button>
 			{% endif %}
 		</td>
         </tr>
@@ -36,12 +41,12 @@
 $(function () {
     $('.btn-deputy').click(function(){
         var btn = this;
-        var data = {'username': $(this).data('username'), 'action': $(this).data('action')};
+        var data = {'username': $(this).data('username'), 'action': $(this).data('action'), 'role': $(this).data('role')};
         $.ajax({
             type: 'POST',
             data: data,
             dataType: 'json',
-            url: '{% url 'clubs:control_deputies' club.pk %}',
+            url: '{% url 'clubs:control_deputies_and_representatives' club.pk %}',
             cache: false,
             success: function(data){
                 if (data['success'] == true){

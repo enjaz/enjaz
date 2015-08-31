@@ -211,4 +211,4 @@ def can_view_assessments(user, club):
     return user_clubs.exists()
 
 def can_assess_any_club(user):
-    return get_user_clubs(user).filter(can_assess=True).exists()
+    return get_user_clubs(user).filter(can_assess=True).exists() or user.is_superuser

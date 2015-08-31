@@ -5,7 +5,8 @@ from django.http import HttpResponseRedirect, Http404
 
 from core.models import StudentClubYear
 from clubs.models import Club
-from clubs.utils import is_coordinator_or_member, is_coordinator_of_any_club, is_member_of_any_club, is_coordinator_or_member, get_media_center, get_user_clubs, get_user_coordination_and_deputyships
+from clubs.utils import is_coordinator_or_member, is_coordinator_of_any_club, is_member_of_any_club, is_coordinator_or_member, get_media_center, get_user_clubs, get_user_coordination_and_deputyships,  has_coordination_to_activity
+
 
 current_year = StudentClubYear.objects.get_current()
 
@@ -80,12 +81,6 @@ def get_user_media_center(user):
     else:
         return None
 
-def get_clubs_for_media_center(media_center):
-    clubs = Club.objects.current_year().visible().filter(city=media_center.city)
-    if media_center.city == 'R':
-        clubs = clubs.filter(gender=media_center.gender)
-    return clubs
-
 def can_assess_club_as_media_member(user, club):
     user_media_centers = get_user_clubs(user).filter(english_name='Media Center',
                                                      city=club.city)
@@ -113,3 +108,23 @@ def can_assess_club_as_media(user, club):
         user_media_centers = user_media_centers.filter(gender=club.gender)
 
     return user_media_centers.exists()
+
+def can_submit_followupreport(user, activity):
+    return has_coordination_to_activity(user, activity) or \
+           user in activity.primary_club.media_representatives.all() or \
+           is_media_coordinator_or_member(user) or \
+           user.is_superuser
+
+def get_clubs_for_assessment_by_user(user):
+    user_assessing_clubs = get_user_clubs(user).filter(can_assess=True)
+    current_year_clubs = Club.objects.current_year().visible()
+    # Filter the targetted clubs based on city and gender.
+    if user_assessing_clubs.exists(): # Media or Presidency
+        user_assessing_club = user_assessing_clubs.first()
+        clubs_for_user = current_year_clubs.filter(city=user_assessing_club.city)
+        if user_assessing_club.city == 'R':
+            clubs_for_user = clubs_for_user.filter(gender=user_assessing_club.gender)
+    else: # Superuser
+        clubs_for_user = current_year_clubs
+
+    return clubs_for_user

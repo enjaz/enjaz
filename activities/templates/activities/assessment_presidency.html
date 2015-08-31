@@ -1,4 +1,4 @@
-{% extends 'activities/show.html' %}
+{% extends 'activities/show.html' %}{% load l10n %}
 {% block review_content %}
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
             <div class="panel panel-default">
@@ -9,7 +9,28 @@
                 </div>
                 <div id="collapseOne" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="headingOne">
                     <div class="panel-body">
-                        يوما ما!
+                        {% if activity.get_media_assessment %}
+                            <table class="table">
+                                <thead>
+                                    <th>المعيار</th>
+                                    <td>النقاط</td>
+                                </thead>
+                                <tbody>
+                                    {% for criterionvalue in activity.get_media_assessment.criterionvalue_set.all %}
+                                    <tr>
+                                        <td>{{ criterionvalue.criterion.ar_name }}</td>
+                                        <td>{{ criterionvalue.value }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr>
+                                        <th>الإجمالي</th>
+                                        <th>{{ activity.get_media_assessment_points }}</th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        {% else %}
+                        <p>لم يُقيّم المركز الإعلامي هذا النشاط بعد.</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -320,7 +341,7 @@ $(function(){
 	episode_input.val(eispide_points);
 	episode_input.append('<span class="points">(' + eispide_points + ' نقاط)</span>');
     // If students' percentage is 80 or more, automatically select give them the credit.
-    var evaluation_percentage = {% if activity.get_evaluation_percentage %}{{ activity.get_evaluation_percentage }}{% else %}0{% endif %};
+    var evaluation_percentage = {% if activity.get_evaluation_percentage %}{{ activity.get_evaluation_percentage|unlocalize }}{% else %}0{% endif %};
     if (80 >= evaluation_percentage){
         $('input[data-choice=episodes][name=student_evaluation_option]').prop('checked', 'checked');
     }

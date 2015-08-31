@@ -74,3 +74,7 @@ def get_activity_reviewing_parents(activity):
 @register.filter
 def can_review_any_niqati(user):
     return utils.can_review_any_niqati(user)
+
+@register.filter
+def can_assess_any_club(user):
+    return utils.can_assess_any_club(user)

@@ -1,4 +1,4 @@
-{% extends 'activities_base.html' %}{% load staticfiles %}{% load clubs_utils %}{% load activities_utils %}
+{% extends 'activities_base.html' %}{% load staticfiles %}{% load clubs_utils %}{% load activities_utils %}{% load media_tags %}
 {% block title %}{{ activity.name }}{% endblock %}
 {% block content %}
 {% if error_message %}
@@ -116,9 +116,13 @@
 						{% endif %}
 							<div class="col-sm-4">
 								<i class="entypo-calendar"></i>
+                                {% if episode.start_date == episode.end_date %}
+                                    {{ episode.start_date }}
+                                {% else %}
 								{{ episode.start_date }}
 								-
 								{{ episode.end_date }}
+                                {% endif %}
 							</div>
 							<div class="col-sm-4">
 								<i class="entypo-clock"></i>
@@ -131,7 +135,7 @@
 								{{ episode.location }}
 							</div>
                         {# if the user has privileges to add or view a follow-up report... #}
-						{% if request.user|is_employee_of_any_club or request.user|has_coordination_to_activity:activity or perms.media.add_followupreport %}
+						{% if request.user|is_employee_of_any_club or user|can_submit_followupreport:activity or perms.media.add_followupreport %}
 						</div>
 						<div class="followupreport_zone col-md-2">
                             {# The particular logic for the following is described here: https://github.com/osamak/student-portal/issues/81 #}

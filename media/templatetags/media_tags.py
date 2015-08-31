@@ -1,5 +1,5 @@
 from django import template
-from clubs.utils import is_coordinator_or_member, get_media_center
+from media import utils
 
 from media.models import RED, GREEN, BLUE, AERO, GREY, ORANGE, YELLOW, PINK, PURPLE
 
@@ -28,4 +28,12 @@ def convert_to_hex(color):
 
 @register.filter
 def is_media_coordinator_or_member(user):
-    return is_coordinator_or_member(get_media_center(), user)
+    return utils.is_media_coordinator_or_member(user)
+
+@register.filter
+def can_review_media_assessment(user):
+    return utils.is_media_coordinator_or_deputy(user) or user.is_superuser
+
+@register.filter
+def can_submit_followupreport(user, activity):
+    return utils.can_submit_followupreport(user, activity)

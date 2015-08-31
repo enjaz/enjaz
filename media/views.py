@@ -23,7 +23,7 @@ from media.models import FollowUpReport, Story, Article, StoryReview, ArticleRev
 from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
     TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm, \
     FollowUpReportImageFormset, ReportCommentForm, BuzzForm
-from media.utils import is_media_coordinator_or_member, is_club_coordinator_or_member, is_media_or_club_coordinator_or_member, proper_poll_type, get_poll_type_url, media_coordinator_or_member_test, get_user_media_center, get_clubs_for_media_center
+from media.utils import is_media_coordinator_or_member, is_club_coordinator_or_member, is_media_or_club_coordinator_or_member, proper_poll_type, get_poll_type_url, media_coordinator_or_member_test, get_user_media_center, get_clubs_for_assessment_by_user, can_submit_followupreport
 
 # Keywords
 ACTIVE = "active"
@@ -48,13 +48,8 @@ def list_activities(request):
     Show a list of activities, with recently approved ones marked, together with
     the available options of FollowUpReports and Stories.
     """
-    media_center = get_user_media_center(request.user)
-    if media_center:
-        clubs = get_clubs_for_media_center(media_center)
-    else:
-        # For superuser, show them all.
-        clubs = Club.objects.current_year().visible()
-    return render(request, 'media/list_activities.html', {'clubs': clubs})
+    clubs_for_user = get_clubs_for_assessment_by_user(request.user)
+    return render(request, 'media/list_activities.html', {'clubs': clubs_for_user})
 
 # --- Follow-up Reports ---
 
@@ -65,14 +60,9 @@ def list_reports(request):
     Show a list of all reports in a single table.
     """
     # Get all reports
-    media_center = get_user_media_center(request.user)
-    if media_center:
-        clubs = get_clubs_for_media_center(media_center)
-    else:
-        # For superuser, show them all.
-        clubs = Club.objects.current_year().visible()
 
-    reports = FollowUpReport.objects.current_year().filter(episode__activity__primary_club__in=clubs)
+    clubs_for_user = get_clubs_for_assessment_by_user(request.user)
+    reports = FollowUpReport.objects.current_year().filter(episode__activity__primary_club__in=clubs_for_user)
     return render(request, 'media/list_reports.html', {'reports': reports})
 
 #@permission_required('add_followupreport')
@@ -86,7 +76,7 @@ def submit_report(request, episode_pk):
     
     # Permission checks
     # (1) The user should be part of the primary or secondary club(s) owning the activity
-    if not has_coordination_to_activity(request.user, episode.activity) and not request.user.is_superuser:
+    if not can_submit_followupreport(request.user, episode.activity):
         raise PermissionDenied
     # (2) The passed episode shouldn't already have a report.
     #     Overriding a previous submission shouldn't be allowed
@@ -95,7 +85,7 @@ def submit_report(request, episode_pk):
         raise PermissionDenied
     except ObjectDoesNotExist:
         pass
-    
+
     if request.method == 'POST':
         form = FollowUpReportForm(request.POST,
                                   instance=FollowUpReport(pk=episode.pk, # make pk equal to episode pk
@@ -151,7 +141,7 @@ def update_report_options(request):
     Update report options for a particular episode.
     There 2 options: whether a report is required, and whether a report can be submitted early.
     """
-    media_center = get_media_center()
+    media_center = get_user_media_center(request.user)
     # Permission checks
     # The user should be the coordinator or deputy of the media center
     if not is_media_coordinator_or_member(request.user) and not request.user.is_superuser:
@@ -225,17 +215,13 @@ def show_report(request, episode_pk):
     return render(request, 'media/report_read.html', {'report': report, 'comment_form': ReportCommentForm()})
 
 @login_required
-@user_passes_test(is_media_or_club_coordinator_or_member)
 def edit_report(request, episode_pk):
     episode = get_object_or_404(Episode, pk=episode_pk)
     report = get_object_or_404(FollowUpReport, episode=episode)
 
     # Permission checks
     # The passed episode should be owned by the user's club or the user should be a member of the media center
-    # This is more specific than the test of ``user_passes_test`` above.
-    if not has_coordination_to_activity(request.user, episode.activity)\
-            and not is_media_coordinator_or_member(request.user) \
-            and not request.user.is_superuser:
+    if not can_submit_followupreport(request.user, episode.activity):
         raise PermissionDenied
 
     if request.method == 'POST':
@@ -246,7 +232,7 @@ def edit_report(request, episode_pk):
             image_formset.save()
 
             # Send notification to media center
-            mail.send([get_media_center().email],
+            mail.send([get_user_media_center().email],
                       template="media_edit_report",
                       context={"report": report})
 
@@ -311,9 +297,11 @@ def create_story(request, episode_pk):
     
     # --- Permission Checks ---
     # (1) The user should be part of the Media Center (either head or member)
-    media_center = get_media_center()
+
+
+    media_center = get_user_media_center(request.user)
     user_clubs = get_user_clubs(request.user)
-    if media_center not in user_clubs and not request.user.is_superuser:
+    if not is_media_coordinator_or_member(request.user) and not request.user.is_superuser:
         raise PermissionDenied
     # (2) The passed episode shouldn't already have a story.
     #     If so, redirect to the edit view
@@ -371,7 +359,7 @@ def show_story(request, episode_pk):
     """
     # --- Permission Checks ---
     # The user should be part of the Media Center (either head or member)
-    if get_media_center() not in get_user_clubs(request.user) and not request.user.is_superuser:
+    if not is_media_coordinator_or_member(request.user) and not request.user.is_superuser:
         raise PermissionDenied 
     
     episode = get_object_or_404(Episode, pk=episode_pk)
@@ -402,7 +390,8 @@ def edit_story(request, episode_pk):
     # The user should be part of the Media Center (either head or member)
     media_center = get_media_center()
     user_clubs = get_user_clubs(request.user)
-    if media_center not in user_clubs and not request.user.is_superuser:
+    if not is_media_coordinator_or_member(request.user) and \
+       not request.user.is_superuser:
         raise PermissionDenied    
     
     if request.method == 'POST':
@@ -423,7 +412,7 @@ def edit_story(request, episode_pk):
     
     context = {}
     context['form'] = form
-    if request.user == media_center.coordinator or request.user.is_superuser:
+    if is_media_coordinator_or_deputy(request.user) or request.user.is_superuser:
         context['review_form'] = review_form
     else:
         context['review'] = review
@@ -477,9 +466,7 @@ def list_articles(request):
     """
     # --- Permission Checks ---
     # The user should be part of the Media Center (either head or member)
-    media_center = get_media_center()
-    user_clubs = get_user_clubs(request.user)
-    if media_center in user_clubs or request.user.is_superuser:
+    if is_media_coordinator_or_member(request.user) or request.user.is_superuser:
         # show a list of all articles
         articles = Article.objects.all()
         return render(request, 'media/list_articles.html', {'articles': articles})
@@ -525,7 +512,7 @@ def show_article(request, pk):
     # Only media center members and the article's author can view
     # the article before it's approved
     if not article.status == 'A':
-        if not get_media_center() in get_user_clubs(request.user) \
+        if not is_media_coordinator_or_member(request.user) \
            and not article.author == request.user \
            and not request.user.is_superuser:
             raise PermissionDenied
@@ -540,7 +527,7 @@ def show_article(request, pk):
     context['article'] = article
     # if the user is a member of the media club plus being the article's
     # assignee, show the review form; otherwise only show the review
-    if (get_media_center() in get_user_clubs(request.user) and \
+    if (is_media_coordinator_or_member(request.user) and \
        article.assignee == request.user) or \
        get_media_center().coordinator == request.user or \
        request.user.is_superuser:
@@ -596,9 +583,9 @@ def review_article(request, pk):
     # --- Permission Checks ---
     # Only the article's assignee in addition to the media center's
     # head is allowed to review articles
-    if (get_media_center() not in get_user_clubs(request.user) or \
+    if (is_media_coordinator_or_member(request.user) or \
        not article.assignee == request.user) and \
-       not get_media_center().coordinator == request.user and \
+       not is_media_coordinator_or_deputy(request.user) and \
        not request.user.is_superuser:
         raise PermissionDenied
     

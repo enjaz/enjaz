@@ -15,7 +15,7 @@
         <div id="collapseOne-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
                 <div class="row">
-                {% with activities=approved approved_table=1 %}
+                {% with activities=approved table_type='approved' %}
                     {% include 'activities/components/activities_table.html' %}
                 {% endwith %}
                 </div>

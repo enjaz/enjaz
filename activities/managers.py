@@ -39,6 +39,9 @@ class ActivityQuerySet(models.QuerySet):
 
         return self.filter(is_deleted=False).filter(is_approved=None)
 
+    def undeleted(self):
+        return self.filter(is_deleted=False)
+
     def current_year(self):
         return self.filter(primary_club__in=Club.objects.current_year())
 

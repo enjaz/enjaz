@@ -164,7 +164,7 @@
 					أرسل هذا النشاط قبل <span class="points">{{ submission_interval }} أيام</span> من عقده (أرسل يوم {{ activity.submission_date|date:"j F Y"  }} وعقد في {{ activity.get_first_date|date:"j F"  }}).
 					</p>
 					<label>
-						<input type="radio" value="2" name="time_option"> رفع النشاط قبل الموعد المحدد <span class="points">(نقطتان)</span>
+						<input data-choice="before_time" type="radio" value="2" name="time_option"> رفع النشاط قبل الموعد المحدد <span class="points">(نقطتان)</span>
 					</label>
 					<br>
 					<label>
@@ -344,6 +344,10 @@ $(function(){
     var evaluation_percentage = {% if activity.get_evaluation_percentage %}{{ activity.get_evaluation_percentage|unlocalize }}{% else %}0{% endif %};
     if (80 >= evaluation_percentage){
         $('input[data-choice=episodes][name=student_evaluation_option]').prop('checked', 'checked');
+    }
+    // Time of submission
+    if ({{ submission_interval }} >= 14 ){
+        $('input[data-choice=before_time][name=time_option]').prop('checked', 'checked');
     }
     // Cooperation
  {% if activity.secondary_clubs.exists %}

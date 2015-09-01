@@ -27,8 +27,14 @@
 				<td>
 					<div class="alert alert-warning">
                         <ul>
-                            {% for epsiode in activity.episode_set.all %}
-                                <li>انتهاء الحدث: {{ epsiode.end_date|date:"j F" }}. رفع التقرير: {{ episode.followupreport.date_submitted|date:"j F" }}.</li>
+                            {% for episode in activity.episode_set.all %}
+                                <li>
+                                    {% if episode.followupreport %}
+                                    انتهاء الحدث: {{ episode.end_date|date:"j F" }}. رفع التقرير: {{ episode.followupreport.date_submitted|date:"j F" }}.
+                                    {% else %}
+                                    لم يرفع تقرير لحدث {{ episode.end_date|date:"j F" }}.
+                                    {% endif %}
+                                </li>
                             {% endfor %}
                         </ul>
 					</div>
@@ -121,7 +127,7 @@
 				<th>التفاعل</th>
 				<td>
 					<p class="alert alert-warning"><i class="entypo-eye"></i>
-					حظي النشاط بتغطية إعلامية أثناء حدوثه.
+					هل حظي النشاط بتغطية إعلامية أثناء حدوثه؟
 					</p>
 					<label>
 						<input type="radio" value="1" name="interactivity_option"> نعم <span class="points">(نقطة واحدة)</span>
@@ -141,7 +147,12 @@
                         {% if images.exists %}
                         <ul>
                             {% for image in images %}
-                                <li><a href="{{ image.url }}">{{ image.filename }}</a></li>
+                                <li>
+                                    <a href="{{ image.image.url }}" class="">
+                                        <i class="entypo-picture"></i>
+                                        {{ image.image.name }}
+                                    </a>
+                                </li>
                             {% endfor %}
                         </ul>
                         {% else %}<i class="entypo-eye"></i>
@@ -162,7 +173,7 @@
 				<th>المخالفات</th>
 				<td>
 					<p class="alert alert-warning"><i class="entypo-eye"></i>
-                        ارتكب النادي في تغطيته مخالفات إعلامية.
+                        هل ارتكب النادي في تغطيته مخالفات إعلامية؟
 					</p>
 					<label>
 						<input type="radio" value="-2" name="violations_option"> نعم <span class="points">(احسم نقطتين)</span>

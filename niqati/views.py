@@ -145,6 +145,10 @@ def coordinator_view(request, activity_id):
 
                     msg = u"تم إرسال الطلب؛ و سيتم إنشاء النقاط فور الموافقة عليه"
                     messages.add_message(request, messages.SUCCESS, msg)
+                elif not reviewing_parent:
+                    order.is_approved = True
+                    order.save()
+                    order.create_codes()
             else:
                 msg = u"لم ينشأ أي طلب لأنك لم تدخل أي رقم."
                 messages.add_message(request, messages.WARNING, msg)

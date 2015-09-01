@@ -89,8 +89,8 @@ def list_activities(request):
             # For club coordinators, deputies, and members, show
             # approved activities as well as their own club's pending
             # and rejected activities.
-            context['pending'] = Activity.objects.pending().for_user_clubs(request.user).distinct()
-            context['rejected'] = Activity.objects.rejected().for_user_clubs(request.user).distinct()
+            context['pending'] = Activity.objects.pending().undeleted().for_user_clubs(request.user).distinct()
+            context['rejected'] = Activity.objects.rejected().undeleted().for_user_clubs(request.user).distinct()
             # In addition to the gender-specific approved activities,
             # show all activities of the user club.
             context['approved'] = (context['approved'] |  Activity.objects.approved().for_user_clubs(request.user)).distinct()
@@ -100,7 +100,7 @@ def list_activities(request):
                 # For coordinators, show also the activities waiting their
                 # action.
                 user_coordination = get_user_coordination_and_deputyships(request.user)
-                context['todo'] = Activity.objects.current_year().filter(assignee__in=user_coordination)
+                context['todo'] = Activity.objects.current_year().filter(assignee__in=user_coordination).undeleted()
                 # Media-related
                 context['due_report_count'] = user_coordination.all()[0].get_due_report_count()
                 context['overdue_report_count'] = user_coordination.all()[0].get_overdue_report_count()
@@ -119,7 +119,7 @@ def list_activities(request):
             # An employee is basically similar to a normal user, the
             # only difference is having another table that includes
             # the employee's relevant activities
-            context['club_approved'] = Activity.objects.approved().current_year().filter(primary_club__in=request.user.employee.current_year())
+            context['club_approved'] = Activity.objects.current_year().filter(primary_club__in=request.user.employee.current_year()).undeleted()
 
             template = 'activities/list_employee.html'
         else: # For students and other normal users.
@@ -170,8 +170,11 @@ def show(request, activity_id):
     #  a coordinator of a secondary club in the activity, show the activity regardless of status
     # Elseif user is a DSA reviewer, show the activity if it's approved by presidency
     # Else (employees or others), show activity only if approved
-    if request.user.is_superuser or can_review_activity(request.user, activity) \
-       or request.user.has_perm('activities.view_activity') or any([club in activity_clubs for club in user_clubs]):
+    if request.user.is_superuser or \
+       can_review_activity(request.user, activity) or \
+       request.user.has_perm('activities.view_activity') or \
+       is_employee(activity.primary_club, request.user) or\
+       any([club in activity_clubs for club in user_clubs]):
         # Don't raise any errors
         pass
     else:

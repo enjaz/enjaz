@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
+from clubs.models import Club
 
 class PollManager(models.Manager):
     """
@@ -46,4 +47,8 @@ class BuzzManager(models.Manager):
         Return objects whose open date is to come yet.
         """
         return self.filter(announcement_date__gt=timezone.now(), is_deleted=False).order_by('-announcement_date')
+
+class FollowUpQuerySet(models.QuerySet):
+    def current_year(self):
+        return self.filter(episode__activity__primary_club__in=Club.objects.current_year()).distinct()
 

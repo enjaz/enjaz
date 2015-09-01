@@ -1,4 +1,275 @@
-{% extends 'activities/show.html' %}
+{% extends 'activities/show.html' %}{% load bootstrap3 %}
 {% block review_content %}
-<p>وما زال في العمر فجر جديد.</p>
+
+<div class="panel panel-default panel-shadow" data-collapsed="0">		
+	<!-- panel body -->
+	<div class="panel-body with-table">
+		<table class="table table-bordered table-responsive">
+		<form method="post">
+            {{ form.errors }}
+		{% csrf_token %}
+		<colgroup>
+			<col class="col-md-2">
+			<col class="col-md-7">
+			<col class="col-md-3">
+		</colgroup>
+		<thead>
+			<tr>
+				<th>المعيار</th>
+				<th>الخيارات</th>
+				<th>النقاط</th>
+			</tr>
+		</thead>
+		
+		<tbody>
+			<tr>
+				<th>التقرير</th>
+				<td>
+					<div class="alert alert-warning">
+                        <ul>
+                            {% for epsiode in activity.episode_set.all %}
+                                <li>انتهاء الحدث: {{ epsiode.end_date|date:"j F" }}. رفع التقرير: {{ episode.followupreport.date_submitted|date:"j F" }}.</li>
+                            {% endfor %}
+                        </ul>
+					</div>
+					<label>
+						<input type="radio" value="1" name="report_option"> خلال 5 أيام من حدوث النشاط <span class="points">(نقطة واحدة)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="0" name="report_option"> بعد خمس أيام من حدوث النشاط <span class="points">(لا نقاط)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_report }}</td>
+			</tr>
+{% if activity.primary_club.city != 'A' %}
+			<tr>
+				<th>أماكن النشر</th>
+				<td>
+					<p class="alert alert-warning"><i class="entypo-eye"></i>
+					هل استخدمت {% if activity.primary_club.city == 'J' %}وسيلتين{% else %} ثلاثة وسائل{% endif %} للنشر؟ (ورقي، تويتر، إنستغرام،سنابتشات، فاين)
+                    </p>
+					<label>
+						<input type="radio" value="1" name="advertisement_option"> نعم <span class="points">(نقطة واحدة)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="0" name="advertisement_option"> لا <span class="points">(لا نقاط)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_advertisement }}</td>
+			</tr>
+			<tr>
+				<th>جودة الخبر الصحفي</th>
+				<td>
+                    <div class="alert alert-warning">
+
+                    {% if stories.exists %}
+                            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" role="tab" id="headingOne">
+                                        <h4 class="panel-title">
+                                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">تقييم المركز الإعلامي</a>
+                                        </h4>
+                                    </div>
+                                    <div id="collapseOne" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="headingOne">
+                                        <div class="panel-body">
+                                            يوما ما!
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    {% else %}<i class="entypo-eye"></i>
+                        لم يكتب أي خبر لهذا النشاط
+                    {% endif %}
+                    </div>
+					<label>
+						<input type="radio" value="1" name="news_quality_option"> جيّد <span class="points">(نقطة واحدة)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="0" name="news_quality_option"> غير جيّد <span class="points">(لا نقاط)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_news_quality }}</td>
+			</tr>
+			<tr>
+				<th>تاريخ إرسال الخبر الصحفي</th>
+				<td>
+					<div class="alert alert-warning">
+                        {% if stories.exists %}
+                        <ul>
+                            {% for epsiode in activity.episode_set.all %}
+                                <li>انتهاء الحدث: {{ epsiode.end_date|date:"j F" }}. رفع التقرير: {{ episode.story.date_submitted|date:"j F" }}.</li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}<i class="entypo-eye"></i>
+                        لم يكتب أي خبر لهذا النشاط
+                        {% endif %}
+                    </div>
+					<label>
+						<input type="radio" value="1" name="news_punctuality_option"> خلال ثلاثة أيام من حدوث النشاط <span class="points">(نقطة واحدة)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="0" name="news_punctuality_option"> بعد ثلاثة أيام من حدوث النشاط <span class="points">(لا نقاط)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_news_punctuality }}</td>
+			</tr>
+			<tr>
+				<th>التفاعل</th>
+				<td>
+					<p class="alert alert-warning"><i class="entypo-eye"></i>
+					حظي النشاط بتغطية إعلامية أثناء حدوثه.
+					</p>
+					<label>
+						<input type="radio" value="1" name="interactivity_option"> نعم <span class="points">(نقطة واحدة)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="0" name="interactivity_option"> لا <span class="points">(لا نقاط)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_interactivity }}</td>
+			</tr>
+{% endif %}
+			<tr>
+				<th>جودة الصور والإعلان</th>
+				<td>
+					<div class="alert alert-warning">
+                        {% if images.exists %}
+                        <ul>
+                            {% for image in images %}
+                                <li><a href="{{ image.url }}">{{ image.filename }}</a></li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}<i class="entypo-eye"></i>
+                            لا توجد صور لهذا النشاط
+                        {% endif %}
+                    </div>
+					<label>
+						<input type="radio" value="1" name="image_quality_option"> جيّدة <span class="points">(نقطة واحدة)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="0" name="image_quality_option"> غير جيّدة <span class="points">(لا نقاط)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_image_quality }}</td>
+			</tr>
+			<tr>
+				<th>المخالفات</th>
+				<td>
+					<p class="alert alert-warning"><i class="entypo-eye"></i>
+                        ارتكب النادي في تغطيته مخالفات إعلامية.
+					</p>
+					<label>
+						<input type="radio" value="-2" name="violations_option"> نعم <span class="points">(احسم نقطتين)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="0" name="violations_option"> لا <span class="points">(لا تحسم أي نقطة)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_violations }}</td>
+			</tr>
+			<tr>
+				<th  colspan="2">الإجمالي</th>
+				<th class="total"></th>
+
+			</tr>
+			<tr>
+				<td>
+				ملاحظة
+				</td>
+				<td colspan="2">
+				{{ form.notes }}
+				</td>
+			</tr>{% if form.is_reviewed %}
+            <tr>
+				<th  colspan="3">{% bootstrap_field form.is_reviewed %}</th>
+			</tr>{% endif %}
+			<tr><td colspan="3">
+		    	<button type="submit" class="btn btn-primary btn-block">
+		    		<span class="glyphicon glyphicon-ok-sign"></span> أرسل
+		    	</button>
+			</td></tr>
+		</tbody>
+	</form>
+	</table>
+		
+	</div>
+</div>
+<script>
+$(function(){
+	// All criteria fields should be required.
+	$('input[type=number]').prop('required', 'required');
+	// On loading the page and on changing and click fields, update the total count. .
+    function updateTotal(){
+        var total = 0;
+		$.each($('input[type=number][name^=criterion_]'), function(index, element){
+			total += +$(element).val();
+		});
+		$('.total').html(total);
+        // If the total changes, also update the points given for cooperator, but only if equal points are given.
+        $("#id_cooperator_points.equal-points").val(total);
+    }
+    updateTotal();
+	$('input[type=number], input[type=radio]').on('click change', updateTotal);
+
+	// Choosing a radio input changes the criterion field.
+	$('input[type=radio]').change(function(){
+		criterion_field_name = 'criterion_' + $(this).prop('name').replace('_option', '');
+		criterion_field = $('#id_' + criterion_field_name);
+		$(criterion_field).val($(this).val());
+	});
+	// Choosing the criterion field results in choosing the match radio option (or other if no matches were found).
+    function link_text_to_radio(){
+		criterion_code_name = $(this).prop('name').replace('criterion_', '');
+		entered_value = $(this).val()
+		entered_option = $('input[name=' + criterion_code_name +'_option][value=' + entered_value + ']:first');
+		if (entered_option.length){	
+			entered_option.prop('checked', 'checked');
+		}else{
+			other_option = $('input[name=' + criterion_code_name +'_option][data-other=true]');
+			other_option.prop('checked', 'checked');
+		}
+	}
+    $.each($('input[name^=criterion_]'), link_text_to_radio);
+	$('input[name^=criterion_]').on('change', link_text_to_radio);
+	// Episode auto calculation (if the episode input is there anyway)  
+	var episode_input = $('input[data-choice=episodes][name=episodes_option]');
+	var episode_count = {{ activity.episode_set.count }};
+	var eispide_points = episode_count * 3;
+	episode_input.val(eispide_points);
+	episode_input.append('<span class="points">(' + eispide_points + ' نقاط)</span>');
+    // If students' percentage is 80 or more, automatically select give them the credit.
+    var evaluation_percentage = {% if activity.get_evaluation_percentage %}{{ activity.get_evaluation_percentage }}{% else %}0{% endif %};
+    if (80 >= evaluation_percentage){
+        $('input[data-choice=episodes][name=student_evaluation_option]').prop('checked', 'checked');
+    }
+	$("textarea").removeAttr("cols")
+		.removeAttr("rows")
+		.css("height", "100%")
+		.css("width", "100%")
+		.addClass("form-control")
+		.addClass("autogrow");
+});
+</script>
+<style>
+.points{
+	color: black;
+}
+.alert{
+    margin-bottom: 5px;
+}
+blockquote{
+    margin-bottom: -8.5px;
+}
+#id_is_reviewed{
+    margin-right: 20px;
+    margin-left: 20px;
+}
+</style>
 {% endblock %}

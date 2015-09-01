@@ -1,9 +1,12 @@
 from django.db import models
 from django.db.models.aggregates import Count
+from django.utils import timezone
+
 from clubs.utils import is_coordinator_of_any_club, is_deputy_of_any_club, get_user_clubs, \
     get_user_coordination_and_deputyships
 from accounts.utils import get_user_city, get_user_gender
 from clubs.models import Club
+
 
 class ActivityQuerySet(models.QuerySet):
     """
@@ -77,6 +80,9 @@ class ActivityQuerySet(models.QuerySet):
                              models.Q(review__reviewer_club__in=user_clubs)
 
         return self.filter(club_condition)
+
+    def done(self):
+        return self.exclude(episode__end_date__gte=timezone.now().date(), episode__end_time__gte=timezone.now().time())
 
     def for_user(self, user=None):
         """

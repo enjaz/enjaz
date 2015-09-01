@@ -1,4 +1,4 @@
-{% extends 'activities_base.html' %}{% load staticfiles %}{% load clubs_utils %}{% load activities_utils %}
+{% extends 'activities_base.html' %}{% load staticfiles %}{% load clubs_utils %}{% load activities_utils %}{% load media_tags %}
 {% block title %}{{ activity.name }}{% endblock %}
 {% block content %}
 {% if error_message %}
@@ -94,20 +94,19 @@
 		<div class="row">
 			
 			<div class="col-sm-offset-2 col-sm-10">
-
-				<ul class="user-details">{# if the user is privileged, show them the internal description #}
-                    {% if request.user|has_coordination_to_activity:activity or perms.activities.add_deanship_review or perms.activities.add_presidency_review or perms.activities.view_deanship_review or perms.activities.view_presidency_review %}
-					<li class="activity-description">
-                        <i class="entypo-info-circled"></i>
-                        {{ activity.description|linebreaksbr }}
-					</li>{% endif %}
-					<li class="activity-description">
-                        <i class="entypo-info-circled"></i>
-                        {{ activity.public_description|linebreaksbr }}
-					</li>
-					{% for episode in activity.episode_set.all %}
-					<li>
-						<div class="row">
+                    <ul class="user-details">{# if the user is privileged, show them the internal description #}
+                        {% if request.user|has_coordination_to_activity:activity or perms.activities.add_deanship_review or perms.activities.add_presidency_review or perms.activities.view_deanship_review or perms.activities.view_presidency_review %}
+                        <li class="activity-description">
+                            <i class="entypo-info-circled"></i>
+                            {{ activity.description|linebreaksbr }}
+                        </li>
+                        {% endif %}
+                        <li class="activity-description">
+                            <i class="entypo-info-circled"></i>
+                            {{ activity.public_description|linebreaksbr }}
+                        </li>
+                        {% for episode in activity.episode_set.all %}
+                        <li>
                         {# if the user has privileges to add a follow-up report... #}
 						{% if  request.user|is_employee_of_any_club or request.user|has_coordination_to_activity:activity or perms.media.add_followupreport %}
 						{# group the activity info in a div to make #}
@@ -116,9 +115,13 @@
 						{% endif %}
 							<div class="col-sm-4">
 								<i class="entypo-calendar"></i>
+                                {% if episode.start_date == episode.end_date %}
+                                    {{ episode.start_date }}
+                                {% else %}
 								{{ episode.start_date }}
 								-
 								{{ episode.end_date }}
+                                {% endif %}
 							</div>
 							<div class="col-sm-4">
 								<i class="entypo-clock"></i>
@@ -131,7 +134,7 @@
 								{{ episode.location }}
 							</div>
                         {# if the user has privileges to add or view a follow-up report... #}
-						{% if request.user|is_employee_of_any_club or request.user|has_coordination_to_activity:activity or perms.media.add_followupreport %}
+						{% if request.user|is_employee_of_any_club or user|can_submit_followupreport:activity or perms.media.add_followupreport %}
 						</div>
 						<div class="followupreport_zone col-md-2">
                             {# The particular logic for the following is described here: https://github.com/osamak/student-portal/issues/81 #}
@@ -166,11 +169,12 @@
 			            	{% endif %}
 						</div>
 						{% endif %}
-						</div>
 					</li>
 					{% endfor %}
 				</ul>
-
+            </div>
+        </div>
+        <div class="row">
 				<!-- tabs for the profile links -->
 				<ul class="nav nav-tabs">
 			{% if request.user|has_coordination_to_activity:activity or request.user|can_review_activity:activity or request.user|is_employee_of_any_club %}
@@ -205,7 +209,6 @@
 					{% endif %}
 				</ul>
 			</div>
-		</div>
 	</section>
 	
 	<section class="profile-feed">

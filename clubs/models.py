@@ -68,6 +68,13 @@ class Club(models.Model):
                                                    related_name="media_representations",
                                                    limit_choices_to={'common_profile__is_student':
                                                                      True})
+    media_assessor = models.ForeignKey(User, null=True, blank=True,
+                                       related_name="media_assessments",
+                                       on_delete=models.SET_NULL,
+                                       default=None,
+                                       verbose_name=u"المُقيّم الإعلامي",
+                                       limit_choices_to={'common_profile__is_student':
+                                                         True})
     members = models.ManyToManyField(User, verbose_name=u"الأعضاء",
                                      blank=True,
                                      related_name="memberships",

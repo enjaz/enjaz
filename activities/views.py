@@ -12,14 +12,14 @@ from post_office import mail
 from activities.models import Activity, Review, Episode,  Assessment
 from activities.forms import ActivityForm, ReviewerActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm, AttachmentFormSet, AssessmentForm
 from accounts.utils import get_user_gender
-from activities.utils import get_club_notification_to, get_club_notification_cc
+from activities.utils import get_club_notification_to, get_club_notification_cc, can_assess_club, \
+    get_club_assessing_club_by_user, can_assess_any_club
 from clubs.models import Club
 from clubs.utils import is_coordinator_or_member, is_coordinator_or_deputy_of_any_club, \
     is_coordinator_of_any_club, get_media_center, \
     is_member_of_any_club, is_employee_of_any_club, is_coordinator, is_coordinator_or_deputy, get_user_clubs, \
     get_user_coordination_and_deputyships, has_coordination_to_activity, get_deanship, is_employee, \
-    can_review_activity, can_delete_activity, can_edit_activity, can_assess_club, \
-    get_club_assessing_clubs_by_user, can_assess_any_club
+    can_review_activity, can_delete_activity, can_edit_activity
 from media.utils import MAX_OVERDUE_REPORTS, can_assess_club_as_media_coordinator, can_assess_club_as_media_member, can_assess_club_as_media, is_media_coordinator_or_deputy, get_user_media_center, get_clubs_for_assessment_by_user
 from media.models import FollowUpReport, FollowUpReportImage, Story
 
@@ -643,8 +643,12 @@ def assessment_list(request):
     # superuser.
     if is_media_coordinator_or_deputy(request.user) or \
        request.user.is_superuser:
-        context['toreview'] = approved_activvities.filter(assessment__criterionvalue__criterion__category='M',
-                                                          assessment__is_reviewed=False)
+        # Jeddah has no Media Center members, so don't show them the
+        # toreview table.  It is all going to be done by the Medica
+        # Center President.
+        if not (user_media_center and user_media_center.city == 'J'):
+            context['toreview'] = approved_activvities.filter(assessment__criterionvalue__criterion__category='M',
+                                                              assessment__is_reviewed=False)
     return render(request, 'activities/assessment_list.html', context)
     
 @login_required
@@ -655,14 +659,13 @@ def assess(request, activity_id, category):
     if not can_assess_club(request.user, activity.primary_club):
         raise PermissionDenied
 
-    assessing_clubs = get_club_assessing_clubs_by_user(request.user, activity.primary_club)
+    assessor_club = get_club_assessing_club_by_user(request.user, activity.primary_club)
 
     # Don't make it possible for Media Center to enter presidency
     # assessment and vice versa.  If no assessing clubs, we are
     # dealing with the superuser, so don't preform such checks and set
     # the assessor_club to None.
-    if assessing_clubs.exists():
-        assessor_club = assessing_clubs.first()
+    if assessor_club:
         if can_assess_club_as_media(request.user, activity.primary_club):
             if category != 'M':
                 raise PermissionDenied

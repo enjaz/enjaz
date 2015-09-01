@@ -121,7 +121,7 @@ you?
 				</a>
                 <ul>
                     {% load media_tags %}
-                    {% if request.user|is_media_coordinator_or_member or request.user.is_superuser %}
+                    {% if user|is_media_coordinator_or_member or user.is_superuser or user.media_representations.current_year.exists %}
                     <li>
                         <a href="{% url 'media:list_activities' %}">
                             <i class="entypo-flag"></i>
@@ -135,6 +135,7 @@ you?
                             <span>المقالات</span>
                         </a>
                     </li>
+                    {% comment %}
                     <li>
                         <a href="{% url 'media:polls_home' 'whatif' %}">
                             <i class="glyphicon glyphicon-question-sign"></i>
@@ -147,7 +148,7 @@ you?
                             <span>المئة تقول</span>
                         </a>
                     </li>
-                    {% if request.user|is_media_coordinator_or_member or request.user.is_superuser %}
+                    {% if user|is_media_coordinator_or_member or user.is_superuser %}
                     <li>
                         <a href="{% url 'media:list_tasks' %}">
                             <i class="glyphicon glyphicon-ok-circle"></i>
@@ -155,6 +156,7 @@ you?
                         </a>
                     </li>
                     {% endif %}
+                    {% endcomment %}
                 </ul>
 			</li>
             {% if user.is_authenticated %}

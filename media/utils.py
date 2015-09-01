@@ -57,12 +57,23 @@ def is_media_coordinator_or_member(user):
     user_clubs = get_user_clubs(user)
     return user_clubs.filter(english_name='Media Center').exists()
 
+def is_media_representative_of_club(user, club):
+    return user in club.media_representatives.all()
+
 def media_coordinator_or_member_test(user):
     if not is_media_coordinator_or_member(user) and not user.is_superuser:
         raise PermissionDenied
     else:
         return True
 
+def media_user_test(user):
+    if not is_media_coordinator_or_member(user) and \
+       not user.is_superuser and \
+       not user.media_representations.current_year().exists():
+        raise PermissionDenied
+    else:
+        return True    
+    
 def is_club_coordinator_or_member(user):
     if not ((is_coordinator_of_any_club(user) or is_member_of_any_club(user)
              and not is_media_coordinator_or_member(user)) or user.is_superuser):
@@ -111,8 +122,8 @@ def can_assess_club_as_media(user, club):
 
 def can_submit_followupreport(user, activity):
     return has_coordination_to_activity(user, activity) or \
-           user in activity.primary_club.media_representatives.all() or \
            is_media_coordinator_or_member(user) or \
+           is_media_representative_of_club(user, activity.primary_club) or\
            user.is_superuser
 
 def get_clubs_for_assessment_by_user(user):
@@ -124,7 +135,30 @@ def get_clubs_for_assessment_by_user(user):
         clubs_for_user = current_year_clubs.filter(city=user_assessing_club.city)
         if user_assessing_club.city == 'R':
             clubs_for_user = clubs_for_user.filter(gender=user_assessing_club.gender)
+        if is_media_member(user):
+            # If the Media Center member is linked to specific clubs,
+            # only show them the ones that they are linked to.  If
+            # not, only show them the clubs that don't have anyone
+            # linked to them.
+            user_media_assessments = user.media_assessments.current_year()
+            if user_media_assessments.exists():
+                clubs_for_user = user_media_assessments
+            else:
+                clubs_for_user = clubs_for_user.filter(media_assessor__isnull=True)
     else: # Superuser
         clubs_for_user = current_year_clubs
 
     return clubs_for_user
+
+
+def get_club_media_center(club):
+    media_cetnrs = Club.objects.current_year().filter(english_name__contains="Media Center")
+    if club.city == 'R':
+        if club.gender:
+            return media_cetnrs.get(city=club.city,
+                                    gender=club.gender)
+        else:
+            return media_cetnrs.get(city=club.city,
+                                    gender='M')
+    else:
+        return media_cetnrs.get(city=club.city)

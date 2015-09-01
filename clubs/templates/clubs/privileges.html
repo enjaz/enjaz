@@ -46,7 +46,7 @@ $(function () {
             type: 'POST',
             data: data,
             dataType: 'json',
-            url: '{% url 'clubs:control_deputies_and_representatives' club.pk %}',
+            url: '{% url 'clubs:control_privileges' club.pk %}',
             cache: false,
             success: function(data){
                 if (data['success'] == true){

@@ -11,7 +11,8 @@ from post_office import mail
 import unicodecsv
 
 from activities.models import Activity
-from clubs.utils import is_coordinator, is_coordinator_or_member, is_member, is_coordinator_or_deputy, can_view_assessments
+from clubs.utils import is_coordinator, is_coordinator_or_member, is_member, is_coordinator_or_deputy
+from activities.utils import can_view_assessments
 from core import decorators
 from clubs.forms import DisabledClubForm, ClubForm
 from clubs.models import Club
@@ -52,14 +53,14 @@ def show(request, club_id):
                request.user.has_perm('clubs.change_club')
     can_view_members = is_coordinator_or_deputy(club, request.user) or \
                        request.user.has_perm('clubs.view_members')
-    can_view_deputies = is_coordinator(club, request.user) or \
+    can_view_privileges = is_coordinator(club, request.user) or \
                         request.user.has_perm('clubs.view_deputies')
     can_view_applications = is_coordinator_or_deputy(club, request.user) or \
                             request.user.is_superuser
     context = {'club': club, 'can_edit': can_edit,
                'can_view_members': can_view_members,
                'can_view_applications': can_view_applications,
-               'can_view_deputies': can_view_deputies,
+               'can_view_privileges': can_view_privileges,
                'activities': activities}
     return render(request, 'clubs/show.html', context, current_app='club_forms')
 
@@ -191,7 +192,7 @@ def approve_application(request, club_id):
 @csrf.csrf_exempt
 @decorators.ajax_only
 @decorators.post_only
-def control_deputies_and_representatives(request, club_id):
+def control_privileges(request, club_id):
     club = get_object_or_404(Club, pk=club_id)
     if not is_coordinator_or_deputy(club, request.user) and \
        not request.user.is_superuser:
@@ -244,7 +245,7 @@ def view_members(request, club_id):
     return render(request, 'clubs/members.html', {'club': club})
 
 @login_required
-def view_deputies(request, club_id):
+def view_privileges(request, club_id):
     """
     View a list of the club's members.
     """
@@ -252,7 +253,7 @@ def view_deputies(request, club_id):
     if not is_coordinator_or_deputy(club, request.user) and \
        not request.user.has_perm('clubs.view_deputies'):
         raise PermissionDenied
-    return render(request, 'clubs/deputies.html', {'club': club})
+    return render(request, 'clubs/privileges.html', {'club': club})
 
 @login_required
 def view_assessments(request, club_id):

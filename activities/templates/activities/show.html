@@ -94,20 +94,19 @@
 		<div class="row">
 			
 			<div class="col-sm-offset-2 col-sm-10">
-
-				<ul class="user-details">{# if the user is privileged, show them the internal description #}
-                    {% if request.user|has_coordination_to_activity:activity or perms.activities.add_deanship_review or perms.activities.add_presidency_review or perms.activities.view_deanship_review or perms.activities.view_presidency_review %}
-					<li class="activity-description">
-                        <i class="entypo-info-circled"></i>
-                        {{ activity.description|linebreaksbr }}
-					</li>{% endif %}
-					<li class="activity-description">
-                        <i class="entypo-info-circled"></i>
-                        {{ activity.public_description|linebreaksbr }}
-					</li>
-					{% for episode in activity.episode_set.all %}
-					<li>
-						<div class="row">
+                    <ul class="user-details">{# if the user is privileged, show them the internal description #}
+                        {% if request.user|has_coordination_to_activity:activity or perms.activities.add_deanship_review or perms.activities.add_presidency_review or perms.activities.view_deanship_review or perms.activities.view_presidency_review %}
+                        <li class="activity-description">
+                            <i class="entypo-info-circled"></i>
+                            {{ activity.description|linebreaksbr }}
+                        </li>
+                        {% endif %}
+                        <li class="activity-description">
+                            <i class="entypo-info-circled"></i>
+                            {{ activity.public_description|linebreaksbr }}
+                        </li>
+                        {% for episode in activity.episode_set.all %}
+                        <li>
                         {# if the user has privileges to add a follow-up report... #}
 						{% if  request.user|is_employee_of_any_club or request.user|has_coordination_to_activity:activity or perms.media.add_followupreport %}
 						{# group the activity info in a div to make #}
@@ -170,11 +169,12 @@
 			            	{% endif %}
 						</div>
 						{% endif %}
-						</div>
 					</li>
 					{% endfor %}
 				</ul>
-
+            </div>
+        </div>
+        <div class="row">
 				<!-- tabs for the profile links -->
 				<ul class="nav nav-tabs">
 			{% if request.user|has_coordination_to_activity:activity or request.user|can_review_activity:activity or request.user|is_employee_of_any_club %}
@@ -209,7 +209,6 @@
 					{% endif %}
 				</ul>
 			</div>
-		</div>
 	</section>
 	
 	<section class="profile-feed">

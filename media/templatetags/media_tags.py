@@ -25,6 +25,9 @@ def convert_to_hex(color):
     }
     return hex_values[color]
 
+@register.filter
+def is_media_coordinator_or_deputy(user):
+    return utils.is_media_coordinator_or_deputy(user)
 
 @register.filter
 def is_media_coordinator_or_member(user):

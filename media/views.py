@@ -10,11 +10,13 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
+from django.utils import timezone
+
 from post_office import mail
 
 from clubs.utils import get_media_center,  is_member_of_any_club, \
                         has_coordination_to_activity, \
-                        is_employee_of_any_club, get_user_clubs
+                        is_employee_of_any_club
 from core import decorators
 from clubs.models import Club
 from activities.models import Activity, Episode
@@ -23,7 +25,7 @@ from media.models import FollowUpReport, Story, Article, StoryReview, ArticleRev
 from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
     TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm, \
     FollowUpReportImageFormset, ReportCommentForm, BuzzForm
-from media.utils import is_media_coordinator_or_member, is_club_coordinator_or_member, is_media_or_club_coordinator_or_member, proper_poll_type, get_poll_type_url, media_coordinator_or_member_test, get_user_media_center, get_clubs_for_assessment_by_user, can_submit_followupreport
+from media.utils import is_media_coordinator_or_member, is_club_coordinator_or_member, is_media_or_club_coordinator_or_member, proper_poll_type, get_poll_type_url, media_coordinator_or_member_test, get_user_media_center, get_clubs_for_assessment_by_user, can_submit_followupreport, get_club_media_center, media_user_test
 
 # Keywords
 ACTIVE = "active"
@@ -42,32 +44,39 @@ def index(request):
     # a welcome page with a link to article submission
 
 @login_required
-@user_passes_test(media_coordinator_or_member_test)
+@user_passes_test(media_user_test)
 def list_activities(request):
     """
-    Show a list of activities, with recently approved ones marked, together with
-    the available options of FollowUpReports and Stories.
+    Show a list of activities, with recently approved ones marked,
+    together with the available options of FollowUpReports and
+    Stories.  This page is to be used by both Media Center members, in
+    addition to the media representatives of clubs.
     """
-    clubs_for_user = get_clubs_for_assessment_by_user(request.user)
+    media_representations = request.user.media_representations.current_year()
+    if media_representations.exists():
+        clubs_for_user = media_representations
+    else:
+        clubs_for_user = get_clubs_for_assessment_by_user(request.user)
     return render(request, 'media/list_activities.html', {'clubs': clubs_for_user})
 
 # --- Follow-up Reports ---
 
 @login_required
-@user_passes_test(media_coordinator_or_member_test)
+@user_passes_test(media_user_test)
 def list_reports(request):
     """
     Show a list of all reports in a single table.
     """
     # Get all reports
-
-    clubs_for_user = get_clubs_for_assessment_by_user(request.user)
+    media_representations = request.user.media_representations.current_year()
+    if media_representations.exists():
+        clubs_for_user = media_representations
+    else:
+        clubs_for_user = get_clubs_for_assessment_by_user(request.user)
     reports = FollowUpReport.objects.current_year().filter(episode__activity__primary_club__in=clubs_for_user)
     return render(request, 'media/list_reports.html', {'reports': reports})
 
-#@permission_required('add_followupreport')
 @login_required
-@user_passes_test(is_club_coordinator_or_member)
 def submit_report(request, episode_pk):
     """
     Submit a FollowUpReport.
@@ -75,14 +84,14 @@ def submit_report(request, episode_pk):
     episode = get_object_or_404(Episode, pk=episode_pk)
     
     # Permission checks
-    # (1) The user should be part of the primary or secondary club(s) owning the activity
     if not can_submit_followupreport(request.user, episode.activity):
         raise PermissionDenied
     # (2) The passed episode shouldn't already have a report.
     #     Overriding a previous submission shouldn't be allowed
     try:
         report = episode.followupreport
-        raise PermissionDenied
+        return HttpResponseRedirect(reverse('media:edit_report',
+                                            args=(episode.pk, )))
     except ObjectDoesNotExist:
         pass
 
@@ -98,17 +107,14 @@ def submit_report(request, episode_pk):
             instance = form.save()
             image_formset.instance = instance
             image_formset.save()
+            
 
-            # If there is an MC member assigned to write a story for the passed episode, notify them that
-            # the report has been submitted
-            try:
-                task = episode.storytask
-
-                mail.send([task.assignee.email],
-                          template="media_report_submit",
-                          context={"report": instance, "task": task})
-            except ObjectDoesNotExist:
-                pass
+            if episode.activity.primary_club.media_assessor:
+                assess_activity_url = reverse('activities:assess', args=(episode.activity.pk, 'm'))
+                full_url = request.build_absolute_uri(assess_activity_url)
+                email_context = {'full_url': full_url,
+                                 'assessor': episode.activity.primary_club.media_assessor,
+                                 'report': instance}
 
             return HttpResponseRedirect(reverse('activities:show',
                                                 args=(episode.activity.pk, )
@@ -232,7 +238,8 @@ def edit_report(request, episode_pk):
             image_formset.save()
 
             # Send notification to media center
-            mail.send([get_user_media_center().email],
+            media_center = get_club_media_center(episode.activity.primary_club)
+            mail.send([media_center.coordinator.email],
                       template="media_edit_report",
                       context={"report": report})
 
@@ -249,7 +256,6 @@ def edit_report(request, episode_pk):
 
 @decorators.post_only
 @login_required
-@user_passes_test(is_media_or_club_coordinator_or_member)
 def report_comment(request, episode_pk):
     episode = get_object_or_404(Episode, pk=episode_pk)
     report = get_object_or_404(FollowUpReport, episode=episode)
@@ -257,9 +263,7 @@ def report_comment(request, episode_pk):
     # Permission checks
     # The passed episode should be owned by the user's club or the user should be a member of the media center
     # This is more specific than the test of ``user_passes_test`` above.
-    if not has_coordination_to_activity(request.user, episode.activity)\
-            and not is_media_coordinator_or_member(request.user) \
-            and not request.user.is_superuser:
+    if not can_submit_followupreport(request.user, episode.activity):
         raise PermissionDenied
 
     comment_form = ReportCommentForm(request.POST, instance=ReportComment(report=report, author=request.user))
@@ -288,7 +292,6 @@ def report_comment(request, episode_pk):
 # --- Stories ---
 
 @login_required
-@user_passes_test(media_coordinator_or_member_test)
 def create_story(request, episode_pk):
     """
     Create a story for an episode.
@@ -298,11 +301,9 @@ def create_story(request, episode_pk):
     # --- Permission Checks ---
     # (1) The user should be part of the Media Center (either head or member)
 
-
-    media_center = get_user_media_center(request.user)
-    user_clubs = get_user_clubs(request.user)
-    if not is_media_coordinator_or_member(request.user) and not request.user.is_superuser:
+    if not can_submit_followupreport(request.user, episode.activity):
         raise PermissionDenied
+
     # (2) The passed episode shouldn't already have a story.
     #     If so, redirect to the edit view
     try:
@@ -311,10 +312,6 @@ def create_story(request, episode_pk):
                                             args=(episode.pk, )))
     except ObjectDoesNotExist:
         pass
-    # (3) The episode should have no task associated with it;
-    #     or it should have a task assigned to the user
-    #    #TODO
-    
     
     if request.method == 'POST':
         form = StoryForm(request.POST,
@@ -329,12 +326,13 @@ def create_story(request, episode_pk):
                          )
         if form.is_valid():
             story = form.save()
-            # TODO: resolve task
 
             # Send a notification to the media center email
-            mail.send([get_media_center().email],
-                      template="media_story_created",
-                      context={"story": story})
+            media_center = get_club_media_center(episode.activity.primary_club)
+            if media_center.coordinator:
+                mail.send([media_center.coordinator.email],
+                          template="media_story_created",
+                          context={"story": story})
 
             return HttpResponseRedirect(reverse('media:show_story',
                                                 args=(episode.pk, )))
@@ -387,12 +385,8 @@ def edit_story(request, episode_pk):
                              reviewer=request.user)
     
     # --- Permission Checks ---
-    # The user should be part of the Media Center (either head or member)
-    media_center = get_media_center()
-    user_clubs = get_user_clubs(request.user)
-    if not is_media_coordinator_or_member(request.user) and \
-       not request.user.is_superuser:
-        raise PermissionDenied    
+    if not can_submit_followupreport(request.user, episode.activity):
+        raise PermissionDenied
     
     if request.method == 'POST':
         form = StoryForm(request.POST,

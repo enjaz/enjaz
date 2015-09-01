@@ -1,0 +1,45 @@
+{% load l10n %}{% load media_tags %}
+<table class="display datatable dt-responsive">
+    <thead>
+        <tr>
+            <th class="all">الاسم</th>
+            <th class="not-mobile">النادي المنظم</th>
+            <th class="not-mobile">تاريخ الانتهاء</th>
+            {% if table_type == 'toreview' %}
+            <th class="not-mobile">تاريخ المراجعة</th>
+            {% endif %}
+            {% if table_type != 'done' %}
+            <th class="not-mobile">الخيارات</th>
+            {% elif table_type == 'done' and category == 'P' %}
+            <td>تقييم الرئاسة</td>
+            <th>تقييم المركز الإعلامي</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+    {% for activity in activities %}
+        <tr>
+            <td><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}</a></td>
+            <td><a href="{% url 'clubs:show' activity.primary_club.id %}">{{ activity.primary_club }}</a></td>
+            <td data-order="{{ activity.get_last_episode.end_date |date:'U' }}">{{ activity.get_last_episode.end_date|date:"j F" }}</td>
+            {% if table_type == 'toreview' %}
+            <td data-order="{{ activity.get_media_assessment.submission_date |date:'U' }}">{{ activity.get_media_assessment.submission_date|date:"j F" }}</td>
+            {% endif %}
+            {% if table_type != 'done'  %}
+            <td>
+                {% if not activity.get_presidency_assessment and table_type == 'todo' and category != 'M' %}
+                <a class='btn btn-xs btn-green' href="{% url 'activities:assess' activity.pk 'p' %}">قيّم</a>
+                {% elif not activity.get_media_assessment and table_type == 'todo' %}
+                <a class='btn btn-xs btn-green' href="{% url 'activities:assess' activity.pk 'm' %}">قيّم</a>
+                {% elif activity.get_media_assessment and category == 'M' and user|can_review_media_assessment or activity.get_media_assessment and category == 'M' and user.is_superuser %}
+                <a class='btn btn-xs btn-green' href="{% url 'activities:assess' activity.pk 'm' %}">راجع</a>
+                {% endif %}
+            </td>
+            {% elif table_type == 'done' and category == 'P' %}
+            <td>{{ activity.get_presidency_assessment_points }}</td>
+            <td>{{ activity.get_media_assessment_points }}</td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

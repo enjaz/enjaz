@@ -6,7 +6,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from activities.models import Activity, Episode
-from media.managers import BuzzManager, PollManager
+from media.managers import BuzzManager, PollManager, FollowUpQuerySet
 
 
 # Constants for media poll types
@@ -81,7 +81,7 @@ class FollowUpReport(models.Model):
 
     announcement_sites = models.TextField(verbose_name=u"أماكن النشر و الإعلان")
     notes = models.TextField(verbose_name=u"ملاحظات", null=True, blank=True)
-    
+    objects = FollowUpQuerySet.as_manager()
     def __unicode__(self):
         "Return the name of the parent activity followed by the number of the episode"
         return self.episode.activity.name + " #" + str(self.episode.get_index())
@@ -444,6 +444,7 @@ class Buzz(models.Model):
     title = models.CharField(max_length=128, verbose_name=u"العنوان")
     announcement_date = models.DateTimeField(verbose_name=u"وقت الإعلان")
     is_deleted = models.BooleanField(default=False)
+    is_push = models.BooleanField(default=False, verbose_name=u"إعلان عام؟")
     colleges = models.ManyToManyField('clubs.College', verbose_name=u"الكليات المستهدفة",
                                       blank=True)
     image = models.ImageField(upload_to="media/buzzimages/", null=True, blank=True, verbose_name=u"الصورة")

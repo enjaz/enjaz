@@ -1,5 +1,4 @@
 # -*- coding: utf-8  -*-
-import functools
 import random
 
 from django.contrib.auth.decorators import permission_required, login_required, user_passes_test
@@ -11,10 +10,13 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
+from django.utils import timezone
+
 from post_office import mail
 
-from clubs.utils import get_media_center, is_coordinator_or_member, is_coordinator_of_any_club, is_member_of_any_club, \
-    is_coordinator, is_coordinator_or_deputy, has_coordination_to_activity, is_employee_of_any_club
+from clubs.utils import get_media_center,  is_member_of_any_club, \
+                        has_coordination_to_activity, \
+                        is_employee_of_any_club
 from core import decorators
 from clubs.models import Club
 from activities.models import Activity, Episode
@@ -23,62 +25,13 @@ from media.models import FollowUpReport, Story, Article, StoryReview, ArticleRev
 from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
     TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm, \
     FollowUpReportImageFormset, ReportCommentForm, BuzzForm
-
-# --- Constants and wrapper for polls
-
-WHAT_IF_URL = "whatif"
-HUNDRED_SAYS_URL = "100says"
+from media.utils import is_media_coordinator_or_member, is_club_coordinator_or_member, is_media_or_club_coordinator_or_member, proper_poll_type, get_poll_type_url, media_coordinator_or_member_test, get_user_media_center, get_clubs_for_assessment_by_user, can_submit_followupreport, get_club_media_center, media_user_test
 
 # Keywords
 ACTIVE = "active"
 UPCOMING = "upcoming"
 PAST = "past"
 
-def proper_poll_type(view_func):
-    """
-    A wrapper to ensure the passed ``poll_type`` is valid, then convert that from a url
-    to a poll_type easily understood by the view.
-    """
-    @functools.wraps(view_func)
-    def wrapper(request, poll_type, *args, **kwargs):
-        if poll_type == WHAT_IF_URL:
-            simple_poll_type = WHAT_IF
-        elif poll_type == HUNDRED_SAYS_URL:
-            simple_poll_type = HUNDRED_SAYS
-        else:
-            raise Http404
-        return view_func(request, poll_type=simple_poll_type, *args, **kwargs)
-    return wrapper
-
-def get_poll_type_url(poll_type):
-    """
-    Return the appropriate url keyword for the passed poll type.
-    """
-    if poll_type == WHAT_IF:
-        return WHAT_IF_URL
-    elif poll_type == HUNDRED_SAYS:
-        return HUNDRED_SAYS_URL
-
-# --- Helper functions
-
-def get_user_clubs(user):
-    return user.coordination.all() | user.memberships.all()
-
-def is_media_coordinator_or_member(user):
-    if not (is_coordinator_or_member(get_media_center(), user) or user.is_superuser):
-        raise PermissionDenied
-    return True
-
-def is_club_coordinator_or_member(user):
-    if not ((is_coordinator_of_any_club(user) or is_member_of_any_club(user)
-        and not (is_coordinator_or_member(get_media_center(), user))) or user.is_superuser):
-        raise PermissionDenied
-    return True
-
-def is_media_or_club_coordinator_or_member(user):
-    if not (is_coordinator_of_any_club(user) or is_member_of_any_club(user) or user.is_superuser):
-        raise PermissionDenied
-    return True
 # --- Views ---
 
 @login_required
@@ -91,35 +44,39 @@ def index(request):
     # a welcome page with a link to article submission
 
 @login_required
-@user_passes_test(is_media_coordinator_or_member)
+@user_passes_test(media_user_test)
 def list_activities(request):
     """
-    Show a list of activities, with recently approved ones marked, together with
-    the available options of FollowUpReports and Stories.
+    Show a list of activities, with recently approved ones marked,
+    together with the available options of FollowUpReports and
+    Stories.  This page is to be used by both Media Center members, in
+    addition to the media representatives of clubs.
     """
-    # Get all approved activities
-    clubs = Club.objects.all()
-    activities = Activity.objects.approved()
-    media_center = get_media_center()
-    return render(request, 'media/list_activities.html', {'clubs': clubs,
-                                                          'activities': activities,
-                                                          'media_center': media_center})
+    media_representations = request.user.media_representations.current_year()
+    if media_representations.exists():
+        clubs_for_user = media_representations
+    else:
+        clubs_for_user = get_clubs_for_assessment_by_user(request.user)
+    return render(request, 'media/list_activities.html', {'clubs': clubs_for_user})
 
 # --- Follow-up Reports ---
 
 @login_required
-@user_passes_test(is_media_coordinator_or_member)
+@user_passes_test(media_user_test)
 def list_reports(request):
     """
     Show a list of all reports in a single table.
     """
     # Get all reports
-    reports = FollowUpReport.objects.all()
+    media_representations = request.user.media_representations.current_year()
+    if media_representations.exists():
+        clubs_for_user = media_representations
+    else:
+        clubs_for_user = get_clubs_for_assessment_by_user(request.user)
+    reports = FollowUpReport.objects.current_year().filter(episode__activity__primary_club__in=clubs_for_user)
     return render(request, 'media/list_reports.html', {'reports': reports})
 
-#@permission_required('add_followupreport')
 @login_required
-@user_passes_test(is_club_coordinator_or_member)
 def submit_report(request, episode_pk):
     """
     Submit a FollowUpReport.
@@ -127,17 +84,17 @@ def submit_report(request, episode_pk):
     episode = get_object_or_404(Episode, pk=episode_pk)
     
     # Permission checks
-    # (1) The user should be part of the primary or secondary club(s) owning the activity
-    if not has_coordination_to_activity(request.user, episode.activity) and not request.user.is_superuser:
+    if not can_submit_followupreport(request.user, episode.activity):
         raise PermissionDenied
     # (2) The passed episode shouldn't already have a report.
     #     Overriding a previous submission shouldn't be allowed
     try:
         report = episode.followupreport
-        raise PermissionDenied
+        return HttpResponseRedirect(reverse('media:edit_report',
+                                            args=(episode.pk, )))
     except ObjectDoesNotExist:
         pass
-    
+
     if request.method == 'POST':
         form = FollowUpReportForm(request.POST,
                                   instance=FollowUpReport(pk=episode.pk, # make pk equal to episode pk
@@ -150,17 +107,14 @@ def submit_report(request, episode_pk):
             instance = form.save()
             image_formset.instance = instance
             image_formset.save()
+            
 
-            # If there is an MC member assigned to write a story for the passed episode, notify them that
-            # the report has been submitted
-            try:
-                task = episode.storytask
-
-                mail.send([task.assignee.email],
-                          template="media_report_submit",
-                          context={"report": instance, "task": task})
-            except ObjectDoesNotExist:
-                pass
+            if episode.activity.primary_club.media_assessor:
+                assess_activity_url = reverse('activities:assess', args=(episode.activity.pk, 'm'))
+                full_url = request.build_absolute_uri(assess_activity_url)
+                email_context = {'full_url': full_url,
+                                 'assessor': episode.activity.primary_club.media_assessor,
+                                 'report': instance}
 
             return HttpResponseRedirect(reverse('activities:show',
                                                 args=(episode.activity.pk, )
@@ -193,10 +147,10 @@ def update_report_options(request):
     Update report options for a particular episode.
     There 2 options: whether a report is required, and whether a report can be submitted early.
     """
-    media_center = get_media_center()
+    media_center = get_user_media_center(request.user)
     # Permission checks
     # The user should be the coordinator or deputy of the media center
-    if not is_coordinator_or_deputy(media_center, request.user) and not request.user.is_superuser:
+    if not is_media_coordinator_or_member(request.user) and not request.user.is_superuser:
         raise PermissionDenied
 
     episode = get_object_or_404(Episode, pk=request.POST['episode_pk'])
@@ -259,7 +213,7 @@ def show_report(request, episode_pk):
     # should be a member of the media center, or the user needs to be
     # an employee.
     if not has_coordination_to_activity(request.user, episode.activity) \
-       and not is_coordinator_or_member(get_media_center(), request.user) \
+       and not is_media_coordinator_or_member(request.user) \
        and not request.user.is_superuser \
        and not is_employee_of_any_club(request.user):
         raise PermissionDenied
@@ -267,17 +221,13 @@ def show_report(request, episode_pk):
     return render(request, 'media/report_read.html', {'report': report, 'comment_form': ReportCommentForm()})
 
 @login_required
-@user_passes_test(is_media_or_club_coordinator_or_member)
 def edit_report(request, episode_pk):
     episode = get_object_or_404(Episode, pk=episode_pk)
     report = get_object_or_404(FollowUpReport, episode=episode)
 
     # Permission checks
     # The passed episode should be owned by the user's club or the user should be a member of the media center
-    # This is more specific than the test of ``user_passes_test`` above.
-    if not has_coordination_to_activity(request.user, episode.activity)\
-            and not is_coordinator_or_member(get_media_center(), request.user) \
-            and not request.user.is_superuser:
+    if not can_submit_followupreport(request.user, episode.activity):
         raise PermissionDenied
 
     if request.method == 'POST':
@@ -288,7 +238,8 @@ def edit_report(request, episode_pk):
             image_formset.save()
 
             # Send notification to media center
-            mail.send([get_media_center().email],
+            media_center = get_club_media_center(episode.activity.primary_club)
+            mail.send([media_center.coordinator.email],
                       template="media_edit_report",
                       context={"report": report})
 
@@ -305,7 +256,6 @@ def edit_report(request, episode_pk):
 
 @decorators.post_only
 @login_required
-@user_passes_test(is_media_or_club_coordinator_or_member)
 def report_comment(request, episode_pk):
     episode = get_object_or_404(Episode, pk=episode_pk)
     report = get_object_or_404(FollowUpReport, episode=episode)
@@ -313,9 +263,7 @@ def report_comment(request, episode_pk):
     # Permission checks
     # The passed episode should be owned by the user's club or the user should be a member of the media center
     # This is more specific than the test of ``user_passes_test`` above.
-    if not has_coordination_to_activity(request.user, episode.activity)\
-            and not is_coordinator_or_member(get_media_center(), request.user) \
-            and not request.user.is_superuser:
+    if not can_submit_followupreport(request.user, episode.activity):
         raise PermissionDenied
 
     comment_form = ReportCommentForm(request.POST, instance=ReportComment(report=report, author=request.user))
@@ -344,7 +292,6 @@ def report_comment(request, episode_pk):
 # --- Stories ---
 
 @login_required
-@user_passes_test(is_media_coordinator_or_member)
 def create_story(request, episode_pk):
     """
     Create a story for an episode.
@@ -353,10 +300,10 @@ def create_story(request, episode_pk):
     
     # --- Permission Checks ---
     # (1) The user should be part of the Media Center (either head or member)
-    media_center = get_media_center()
-    user_clubs = get_user_clubs(request.user)
-    if media_center not in user_clubs and not request.user.is_superuser:
+
+    if not can_submit_followupreport(request.user, episode.activity):
         raise PermissionDenied
+
     # (2) The passed episode shouldn't already have a story.
     #     If so, redirect to the edit view
     try:
@@ -365,10 +312,6 @@ def create_story(request, episode_pk):
                                             args=(episode.pk, )))
     except ObjectDoesNotExist:
         pass
-    # (3) The episode should have no task associated with it;
-    #     or it should have a task assigned to the user
-    #    #TODO
-    
     
     if request.method == 'POST':
         form = StoryForm(request.POST,
@@ -383,12 +326,13 @@ def create_story(request, episode_pk):
                          )
         if form.is_valid():
             story = form.save()
-            # TODO: resolve task
 
             # Send a notification to the media center email
-            mail.send([get_media_center().email],
-                      template="media_story_created",
-                      context={"story": story})
+            media_center = get_club_media_center(episode.activity.primary_club)
+            if media_center.coordinator:
+                mail.send([media_center.coordinator.email],
+                          template="media_story_created",
+                          context={"story": story})
 
             return HttpResponseRedirect(reverse('media:show_story',
                                                 args=(episode.pk, )))
@@ -406,14 +350,14 @@ def create_story(request, episode_pk):
     return render(request, 'media/story_write.html', context)
 
 @login_required
-@user_passes_test(is_media_coordinator_or_member)
+@user_passes_test(media_coordinator_or_member_test)
 def show_story(request, episode_pk):
     """
     Show a Story.
     """
     # --- Permission Checks ---
     # The user should be part of the Media Center (either head or member)
-    if get_media_center() not in get_user_clubs(request.user) and not request.user.is_superuser:
+    if not is_media_coordinator_or_member(request.user) and not request.user.is_superuser:
         raise PermissionDenied 
     
     episode = get_object_or_404(Episode, pk=episode_pk)
@@ -427,7 +371,7 @@ def show_story(request, episode_pk):
                                                      'episode': episode})
 
 @login_required
-@user_passes_test(is_media_coordinator_or_member)
+@user_passes_test(media_coordinator_or_member_test)
 def edit_story(request, episode_pk):
     """
     Review a Story by writing notes or editing it directly.
@@ -441,11 +385,8 @@ def edit_story(request, episode_pk):
                              reviewer=request.user)
     
     # --- Permission Checks ---
-    # The user should be part of the Media Center (either head or member)
-    media_center = get_media_center()
-    user_clubs = get_user_clubs(request.user)
-    if media_center not in user_clubs and not request.user.is_superuser:
-        raise PermissionDenied    
+    if not can_submit_followupreport(request.user, episode.activity):
+        raise PermissionDenied
     
     if request.method == 'POST':
         form = StoryForm(request.POST,
@@ -465,7 +406,7 @@ def edit_story(request, episode_pk):
     
     context = {}
     context['form'] = form
-    if request.user == media_center.coordinator or request.user.is_superuser:
+    if is_media_coordinator_or_deputy(request.user) or request.user.is_superuser:
         context['review_form'] = review_form
     else:
         context['review'] = review
@@ -519,9 +460,7 @@ def list_articles(request):
     """
     # --- Permission Checks ---
     # The user should be part of the Media Center (either head or member)
-    media_center = get_media_center()
-    user_clubs = get_user_clubs(request.user)
-    if media_center in user_clubs or request.user.is_superuser:
+    if is_media_coordinator_or_member(request.user) or request.user.is_superuser:
         # show a list of all articles
         articles = Article.objects.all()
         return render(request, 'media/list_articles.html', {'articles': articles})
@@ -567,7 +506,7 @@ def show_article(request, pk):
     # Only media center members and the article's author can view
     # the article before it's approved
     if not article.status == 'A':
-        if not get_media_center() in get_user_clubs(request.user) \
+        if not is_media_coordinator_or_member(request.user) \
            and not article.author == request.user \
            and not request.user.is_superuser:
             raise PermissionDenied
@@ -582,7 +521,7 @@ def show_article(request, pk):
     context['article'] = article
     # if the user is a member of the media club plus being the article's
     # assignee, show the review form; otherwise only show the review
-    if (get_media_center() in get_user_clubs(request.user) and \
+    if (is_media_coordinator_or_member(request.user) and \
        article.assignee == request.user) or \
        get_media_center().coordinator == request.user or \
        request.user.is_superuser:
@@ -628,7 +567,7 @@ def edit_article(request, pk):
                                                         'review': review})
 
 @login_required
-@user_passes_test(is_media_coordinator_or_member)
+@user_passes_test(media_coordinator_or_member_test)
 def review_article(request, pk):
     """
     Review an article.
@@ -638,9 +577,9 @@ def review_article(request, pk):
     # --- Permission Checks ---
     # Only the article's assignee in addition to the media center's
     # head is allowed to review articles
-    if (get_media_center() not in get_user_clubs(request.user) or \
+    if (is_media_coordinator_or_member(request.user) or \
        not article.assignee == request.user) and \
-       not get_media_center().coordinator == request.user and \
+       not is_media_coordinator_or_deputy(request.user) and \
        not request.user.is_superuser:
         raise PermissionDenied
     
@@ -673,14 +612,14 @@ def review_article(request, pk):
                                     )
 
 @login_required
-@user_passes_test(is_media_coordinator_or_member)
+@user_passes_test(media_coordinator_or_member_test)
 def list_tasks(request):
     """
     For the media center coordinator, list the tasks for all media center members.
     For media center members, list tasks assigned to them.
     """
     context = {}
-    if is_coordinator(get_media_center(), request.user) or request.user.is_superuser:
+    if is_media_coordinator_or_member(request.user) or request.user.is_superuser:
         context['tasks'] = CustomTask.objects.all()
         context['add_task_form'] = TaskForm()
     else:
@@ -693,7 +632,7 @@ def create_task(request):
     Create a new task.
     """
     # Only the media center coordinator is allowed to assign tasks
-    if not is_coordinator(get_media_center(), request.user) and not request.user.is_superuser:
+    if not is_media_coordinator_or_member(request.user) and not request.user.is_superuser:
         raise PermissionDenied
     if request.method == "POST":
         task = TaskForm(request.POST,
@@ -709,7 +648,7 @@ def create_task(request):
     return render(request, 'media/create_task.html', {'task_form': task})
 
 @login_required
-@user_passes_test(is_media_coordinator_or_member)
+@user_passes_test(media_coordinator_or_member_test)
 def show_task(request, pk):
     """
     Show the task with the given pk.
@@ -719,7 +658,7 @@ def show_task(request, pk):
                                                     'comment_form': TaskCommentForm()})
 
 @login_required
-@user_passes_test(is_media_coordinator_or_member)
+@user_passes_test(media_coordinator_or_member_test)
 def edit_task(request, pk):
     """
     Show the edit task form if the request is GET.
@@ -758,7 +697,7 @@ def mark_task_complete(request, pk):
 
 @login_required
 @decorators.post_only
-@user_passes_test(is_media_coordinator_or_member)
+@user_passes_test(media_coordinator_or_member_test)
 def add_comment(request, pk):
     """
     Add a comment to the task with given pk.
@@ -820,7 +759,7 @@ def polls_home(request, poll_type):
     else:
         raise Http404
 
-    is_editor = is_coordinator_or_member(get_media_center(), request.user) or request.user.is_superuser
+    is_editor = is_media_coordinator_or_member(request.user) or request.user.is_superuser
 
     context = {"title": title,
                "intro": intro,
@@ -962,7 +901,7 @@ def show_poll(request, poll_type, poll_id):
 
         context['is_active'] = poll.is_active()
         context['has_choices'] = poll.poll_type == HUNDRED_SAYS
-        context['is_editor'] = is_coordinator_or_member(get_media_center(), request.user) or request.user.is_superuser
+        context['is_editor'] = is_media_coordinator_or_member(request.user) or request.user.is_superuser
         context['has_voted'] = poll.responses.filter(user=request.user).exists()
 
         # If the poll is a hundred-says poll and is active, then pass the voting form to the context
@@ -983,7 +922,7 @@ def poll_comment(request, poll_type, poll_id):
     poll = get_object_or_404(Poll, poll_type=poll_type, pk=poll_id)
     context = {"poll": poll,
                "poll_type_url": get_poll_type_url(poll_type),
-               "is_editor": is_coordinator_or_member(get_media_center(), request.user) or request.user.is_superuser,
+               "is_editor": is_media_coordinator_or_member(request.user) or request.user.is_superuser,
                'comments': poll.comments.all()}
     if request.method == "POST":
         comment_form = PollCommentForm(request.POST, instance=PollComment(poll=poll, author=request.user))
@@ -1003,7 +942,7 @@ def poll_comment(request, poll_type, poll_id):
 @decorators.ajax_only
 @decorators.post_only
 @proper_poll_type
-@user_passes_test(is_media_coordinator_or_member)
+@user_passes_test(media_coordinator_or_member_test)
 @login_required
 def delete_poll_comment(request, poll_type, poll_id):
     poll = get_object_or_404(Poll, poll_type=poll_type, pk=poll_id)
@@ -1029,7 +968,7 @@ def poll_results(request, poll_type, poll_id):
     # The poll should be inactive or the
     # user should either be an editor or has voted in order to be allowed to see the results
     has_voted = poll.responses.filter(user=request.user).exists()
-    if poll.is_active() and not has_voted and not (request.user.is_superuser or is_coordinator_or_member(get_media_center(), request.user)):
+    if poll.is_active() and not has_voted and not (request.user.is_superuser or is_media_coordinator_or_member(user)):
         raise PermissionDenied
 
     return render(request, "media/polls/results.html", {"poll": poll, "poll_type_url": get_poll_type_url(poll_type)})
@@ -1076,7 +1015,7 @@ def suggest_poll(request, poll_type):
 
 # What's New?
 @login_required
-@user_passes_test(is_media_coordinator_or_member)
+@user_passes_test(media_coordinator_or_member_test)
 def buzzes_home(request):
     """
     Return the buzzes home
@@ -1090,7 +1029,7 @@ def buzzes_home(request):
 
 @decorators.ajax_only
 @login_required
-@user_passes_test(is_media_coordinator_or_member)
+@user_passes_test(media_coordinator_or_member_test)
 def buzzes_list(request, list_filter):
     """
     For media center coordinator, deputies, or members: return the full list of buzzes.
@@ -1108,7 +1047,7 @@ def buzzes_list(request, list_filter):
 
 @decorators.ajax_only
 @login_required
-@user_passes_test(is_media_coordinator_or_member)
+@user_passes_test(media_coordinator_or_member_test)
 def add_buzz(request):
     """
     GET: return the buzz addition form.
@@ -1128,7 +1067,7 @@ def add_buzz(request):
 
 @decorators.ajax_only
 @login_required
-@user_passes_test(is_media_coordinator_or_member)
+@user_passes_test(media_coordinator_or_member_test)
 def edit_buzz(request, buzz_id):
     """
     GET: return the buzz editing form.
@@ -1150,7 +1089,7 @@ def edit_buzz(request, buzz_id):
 
 @decorators.ajax_only
 @login_required
-@user_passes_test(is_media_coordinator_or_member)
+@user_passes_test(media_coordinator_or_member_test)
 def show_buzz(request, buzz_id):
     """
     GET: return buzz contents (title, text, and image)
@@ -1162,7 +1101,7 @@ def show_buzz(request, buzz_id):
 @decorators.ajax_only
 @decorators.post_only
 @login_required
-@user_passes_test(is_media_coordinator_or_member)
+@user_passes_test(media_coordinator_or_member_test)
 def delete_buzz(request, buzz_id):
     """
     GET: show confirmation message.

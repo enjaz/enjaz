@@ -82,7 +82,7 @@ class ActivityQuerySet(models.QuerySet):
         return self.filter(club_condition)
 
     def done(self):
-        return self.exclude(episode__end_date__gte=timezone.now().date(), episode__end_time__gte=timezone.now().time())
+        return self.exclude(episode__end_date__gt=timezone.now().date()).exclude(episode__end_time__gt=timezone.now().time())
 
     def for_user(self, user=None):
         """

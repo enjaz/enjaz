@@ -27,8 +27,14 @@
 				<td>
 					<div class="alert alert-warning">
                         <ul>
-                            {% for epsiode in activity.episode_set.all %}
-                                <li>انتهاء الحدث: {{ epsiode.end_date|date:"j F" }}. رفع التقرير: {{ episode.followupreport.date_submitted|date:"j F" }}.</li>
+                            {% for episode in activity.episode_set.all %}
+                                <li>
+                                    {% if episode.followupreport %}
+                                    انتهاء الحدث: {{ episode.end_date|date:"j F" }}. رفع التقرير: {{ episode.followupreport.date_submitted|date:"j F" }}.
+                                    {% else %}
+                                    لم يرفع تقرير لحدث {{ episode.end_date|date:"j F" }}.
+                                    {% endif %}
+                                </li>
                             {% endfor %}
                         </ul>
 					</div>
@@ -121,7 +127,7 @@
 				<th>التفاعل</th>
 				<td>
 					<p class="alert alert-warning"><i class="entypo-eye"></i>
-					حظي النشاط بتغطية إعلامية أثناء حدوثه.
+					هل حظي النشاط بتغطية إعلامية أثناء حدوثه؟
 					</p>
 					<label>
 						<input type="radio" value="1" name="interactivity_option"> نعم <span class="points">(نقطة واحدة)</span>
@@ -141,7 +147,12 @@
                         {% if images.exists %}
                         <ul>
                             {% for image in images %}
-                                <li><a href="{{ image.url }}">{{ image.filename }}</a></li>
+                                <li>
+                                    <a href="{{ image.image.url }}" class="english-field">
+                                        <i class="entypo-picture"></i>
+                                        {{ image.image.name }}
+                                    </a>
+                                </li>
                             {% endfor %}
                         </ul>
                         {% else %}<i class="entypo-eye"></i>
@@ -162,7 +173,7 @@
 				<th>المخالفات</th>
 				<td>
 					<p class="alert alert-warning"><i class="entypo-eye"></i>
-                        ارتكب النادي في تغطيته مخالفات إعلامية.
+                        هل ارتكب النادي في تغطيته مخالفات إعلامية؟
 					</p>
 					<label>
 						<input type="radio" value="-2" name="violations_option"> نعم <span class="points">(احسم نقطتين)</span>
@@ -205,18 +216,6 @@
 $(function(){
 	// All criteria fields should be required.
 	$('input[type=number]').prop('required', 'required');
-	// On loading the page and on changing and click fields, update the total count. .
-    function updateTotal(){
-        var total = 0;
-		$.each($('input[type=number][name^=criterion_]'), function(index, element){
-			total += +$(element).val();
-		});
-		$('.total').html(total);
-        // If the total changes, also update the points given for cooperator, but only if equal points are given.
-        $("#id_cooperator_points.equal-points").val(total);
-    }
-    updateTotal();
-	$('input[type=number], input[type=radio]').on('click change', updateTotal);
 
 	// Choosing a radio input changes the criterion field.
 	$('input[type=radio]').change(function(){
@@ -238,17 +237,20 @@ $(function(){
 	}
     $.each($('input[name^=criterion_]'), link_text_to_radio);
 	$('input[name^=criterion_]').on('change', link_text_to_radio);
-	// Episode auto calculation (if the episode input is there anyway)  
-	var episode_input = $('input[data-choice=episodes][name=episodes_option]');
-	var episode_count = {{ activity.episode_set.count }};
-	var eispide_points = episode_count * 3;
-	episode_input.val(eispide_points);
-	episode_input.append('<span class="points">(' + eispide_points + ' نقاط)</span>');
-    // If students' percentage is 80 or more, automatically select give them the credit.
-    var evaluation_percentage = {% if activity.get_evaluation_percentage %}{{ activity.get_evaluation_percentage }}{% else %}0{% endif %};
-    if (80 >= evaluation_percentage){
-        $('input[data-choice=episodes][name=student_evaluation_option]').prop('checked', 'checked');
+
+	// On loading the page and on changing and click fields, update the total count. .
+    function updateTotal(){
+        var total = 0;
+		$.each($('input[type=number][name^=criterion_]'), function(index, element){
+			total += +$(element).val();
+		});
+		$('.total').html(total);
+        // If the total changes, also update the points given for cooperator, but only if equal points are given.
+        $("#id_cooperator_points.equal-points").val(total);
     }
+    updateTotal();
+	$('input[type=number], input[type=radio]').on('click change', updateTotal);
+
 	$("textarea").removeAttr("cols")
 		.removeAttr("rows")
 		.css("height", "100%")

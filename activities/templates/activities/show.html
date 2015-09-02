@@ -140,32 +140,32 @@
                             {# The particular logic for the following is described here: https://github.com/osamak/student-portal/issues/81 #}
 			    {% if episode.report_is_submitted %}
 			            		<a href="{% url 'media:show_report' episode.pk %}"
-			            		class="btn btn-block btn-green btn-xs">استعرض التقرير</a>
+			            		class="btn btn-green btn-xs">استعرض التقرير</a>
                             {# show a special note for employees, that the report hasn't been submitted yet. #}
                             {% elif not episode.report_is_submitted and request.user|is_employee_of_any_club %}
-			            		<a class="btn btn-block btn-primary btn-xs disabled">لم يرفع التقرير بعد</a>
+			            		<a class="btn btn-primary btn-xs disabled">لم يرفع التقرير بعد</a>
                             {# only show the link if the user is not an employee #}
                             {% elif episode.requires_report and not request.user|is_employee_of_any_club %}
 
                                 {% if episode.report_is_due %}
                                     <a href="{% url 'media:submit_report' episode.pk %}"
-                                    class="btn btn-block btn-gold btn-xs">ارفع التقرير</a>
+                                    class="btn btn-gold btn-xs">ارفع التقرير</a>
 
                                 {% elif episode.report_is_overdue %}
                                     <a href="{% url 'media:submit_report' episode.pk %}"
-                                    class="btn btn-block btn-red btn-xs">ارفع التقرير</a>
+                                    class="btn btn-red btn-xs">ارفع التقرير</a>
 
                                 {% else %}
                                     {% if episode.can_report_early %}
                                         <a href="{% url 'media:submit_report' episode.pk %}"
-                                        class="btn btn-block btn-info btn-xs">ارفع التقرير</a>
+                                        class="btn btn-info btn-xs">ارفع التقرير</a>
                                     {% elif activity.is_approved %}
-                                        <a class="btn btn-block btn-primary btn-xs disabled">بانتظار انتهاء النشاط</a>
+                                        <a class="btn btn-primary btn-xs disabled">بانتظار انتهاء النشاط</a>
                                     {% endif %}
                                 {% endif %}
                             {% elif not request.user|is_employee_of_any_club %}
                                 <a href="{% url 'media:submit_report' episode.pk %}"
-                                class="btn btn-block btn-info btn-xs">ارفع التقرير (اختياري)</a>
+                                class="btn btn-info btn-xs">ارفع التقرير (اختياري)</a>
 			            	{% endif %}
 						</div>
 						{% endif %}

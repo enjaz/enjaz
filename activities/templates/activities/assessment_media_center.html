@@ -216,18 +216,6 @@
 $(function(){
 	// All criteria fields should be required.
 	$('input[type=number]').prop('required', 'required');
-	// On loading the page and on changing and click fields, update the total count. .
-    function updateTotal(){
-        var total = 0;
-		$.each($('input[type=number][name^=criterion_]'), function(index, element){
-			total += +$(element).val();
-		});
-		$('.total').html(total);
-        // If the total changes, also update the points given for cooperator, but only if equal points are given.
-        $("#id_cooperator_points.equal-points").val(total);
-    }
-    updateTotal();
-	$('input[type=number], input[type=radio]').on('click change', updateTotal);
 
 	// Choosing a radio input changes the criterion field.
 	$('input[type=radio]').change(function(){
@@ -249,17 +237,20 @@ $(function(){
 	}
     $.each($('input[name^=criterion_]'), link_text_to_radio);
 	$('input[name^=criterion_]').on('change', link_text_to_radio);
-	// Episode auto calculation (if the episode input is there anyway)  
-	var episode_input = $('input[data-choice=episodes][name=episodes_option]');
-	var episode_count = {{ activity.episode_set.count }};
-	var eispide_points = episode_count * 3;
-	episode_input.val(eispide_points);
-	episode_input.append('<span class="points">(' + eispide_points + ' نقاط)</span>');
-    // If students' percentage is 80 or more, automatically select give them the credit.
-    var evaluation_percentage = {% if activity.get_evaluation_percentage %}{{ activity.get_evaluation_percentage }}{% else %}0{% endif %};
-    if (80 >= evaluation_percentage){
-        $('input[data-choice=episodes][name=student_evaluation_option]').prop('checked', 'checked');
+
+	// On loading the page and on changing and click fields, update the total count. .
+    function updateTotal(){
+        var total = 0;
+		$.each($('input[type=number][name^=criterion_]'), function(index, element){
+			total += +$(element).val();
+		});
+		$('.total').html(total);
+        // If the total changes, also update the points given for cooperator, but only if equal points are given.
+        $("#id_cooperator_points.equal-points").val(total);
     }
+    updateTotal();
+	$('input[type=number], input[type=radio]').on('click change', updateTotal);
+
 	$("textarea").removeAttr("cols")
 		.removeAttr("rows")
 		.css("height", "100%")

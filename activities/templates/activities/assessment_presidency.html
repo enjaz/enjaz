@@ -301,18 +301,6 @@
 $(function(){
 	// All criteria fields should be required.
 	$('input[type=number]').prop('required', 'required');
-	// On loading the page and on changing and click fields, update the total count. .
-    function updateTotal(){
-        var total = 0;
-		$.each($('input[type=number][name^=criterion_]'), function(index, element){
-			total += +$(element).val();
-		});
-		$('.total').html(total);
-        // If the total changes, also update the points given for cooperator, but only if equal points are given.
-        $("#id_cooperator_points.equal-points").val(total);
-    }
-    updateTotal();
-	$('input[type=number], input[type=radio]').on('click change', updateTotal);
 
 	// Choosing a radio input changes the criterion field.
 	$('input[type=radio]').change(function(){
@@ -343,14 +331,14 @@ $(function(){
     // If students' percentage is 80 or more, automatically select give them the credit.
     var evaluation_percentage = {% if activity.get_evaluation_percentage %}{{ activity.get_evaluation_percentage|unlocalize }}{% else %}0{% endif %};
     if (80 >= evaluation_percentage){
-        $('input[data-choice=episodes][name=student_evaluation_option]').prop('checked', 'checked');
+        $('input[data-choice=episodes][name=student_evaluation_option]').prop('checked', 'checked').trigger('change');
     }
     // Time of submission
     if ({{ submission_interval }} >= 14 ){
-        $('input[data-choice=before_time][name=time_option]').prop('checked', 'checked');
+        $('input[data-choice=before_time][name=time_option]').prop('checked', 'checked').trigger('change');
     }
     // Cooperation
- {% if activity.secondary_clubs.exists %}
+    {% if activity.secondary_clubs.exists %}
 	var episode_input = $('input[name=cooperation_option]').change(function(){
         if ($('input[data-choice=equal-points][name=cooperation_option]').prop('checked')){
             $('#id_cooperator_points').addClass('equal-points');
@@ -359,10 +347,22 @@ $(function(){
             $("#id_cooperator_points").val($(this).val());
         }
     });
- {% else %}
-   $("#id_cooperator_points").hide();
- {% endif %}
-
+    {% else %}
+    $("#id_cooperator_points").hide();
+    {% endif %}
+    // On loading the page and on changing and click fields, update the total count. .
+    function updateTotal(){
+        var total = 0;
+		$.each($('input[type=number][name^=criterion_]'), function(index, element){
+			total += +$(element).val();
+		});
+		$('.total').html(total);
+        // If the total changes, also update the points given for cooperator, but only if equal points are given.
+        $("#id_cooperator_points.equal-points").val(total);
+    }
+    updateTotal();
+    $('input[type=number], input[type=radio]').on('click change', updateTotal);
+ 
 	$("textarea").removeAttr("cols")
 		.removeAttr("rows")
 		.css("height", "100%")

@@ -445,6 +445,7 @@ body.login-page .login-content .alert-warning a {
 
 .activity-description{
     text-align: justify;
+    font-size: 15px;
 }
 
 .profile-env>header .profile-info-sections .profile-name strong .activity-name {

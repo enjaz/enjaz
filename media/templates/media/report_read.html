@@ -33,10 +33,10 @@
 		<div class="col-sm-3 invoice-left">
 		
 			<h4>الجهات المنظمة</h4>
-			{{ report.episode.activity.primary_club.name }}
+            <a href="{% url 'clubs:show' report.episode.activity.primary_club.pk %}">{{ report.episode.activity.primary_club.name }}</a>
 			{% for club in report.episode.activity.secondary_clubs.all %}
 				<br>
-				{{ club.name }}
+                <a href="{% url 'clubs:show' club.pk %}">{{ club.name }}</a>
 			{% endfor %}
 			
 		</div>
@@ -44,7 +44,7 @@
 		<div class="col-sm-3 invoice-left">
 			 
 			<h4>النشاط</h4>
-			{{ report.episode.activity.name }}
+			<a href="{% url 'activities:show' report.episode.activity.pk %}">{{ report.episode.activity.name }}</a>
 			<br>
 			الموعد #
 			{% for e in report.episode.activity.episode_set.all %}
@@ -78,7 +78,7 @@
 		<tbody>
 			<tr>
 				<th class="text-center">الوصف</th>
-				<td colspan="3">{{ report.description|linebreaksbr }}</td>
+				<td colspan="3" class="activity-description">{{ report.description|linebreaksbr }}</td>
 			</tr>
 			
 			<tr>
@@ -126,7 +126,7 @@
                 {% for image in report.images.all %}
                     {% if forloop.first %}<ul>{% endif %}
                         <li>
-                        <a href="{{ image.image.url }}" class="">
+                        <a href="{{ image.image.url }}" class="english-field">
                             <i class="entypo-picture"></i>
                             {{ image.image.name }}
                         </a>

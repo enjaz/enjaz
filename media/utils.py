@@ -96,17 +96,11 @@ def can_assess_club_as_media_member(user, club):
     user_media_centers = get_user_clubs(user).filter(english_name='Media Center',
                                                      city=club.city)
 
-    if club.city == 'R':
-        user_media_centers = user_media_centers.filter(gender=club.gender)
-
     return user_media_centers.exists()
 
 def can_assess_club_as_media_coordinator(user, club):
     user_media_centers = get_user_coordination_and_deputyships(user).filter(english_name='Media Center',
                                                                             city=club.city)
-
-    if club.city == 'R':
-        user_media_centers = user_media_centers.filter(gender=club.gender)
 
     return user_media_centers.exists()
 
@@ -114,9 +108,6 @@ def can_assess_club_as_media_coordinator(user, club):
 def can_assess_club_as_media(user, club):
     user_media_centers = get_user_clubs(user).filter(english_name='Media Center',
                                                      city=club.city)
-
-    if club.city == 'R':
-        user_media_centers = user_media_centers.filter(gender=club.gender)
 
     return user_media_centers.exists()
 
@@ -133,8 +124,6 @@ def get_clubs_for_assessment_by_user(user):
     if user_assessing_clubs.exists(): # Media or Presidency
         user_assessing_club = user_assessing_clubs.first()
         clubs_for_user = current_year_clubs.filter(city=user_assessing_club.city)
-        if user_assessing_club.city == 'R':
-            clubs_for_user = clubs_for_user.filter(gender=user_assessing_club.gender)
         if is_media_member(user):
             # If the Media Center member is linked to specific clubs,
             # only show them the ones that they are linked to.  If

@@ -43,6 +43,17 @@ def forms_editor_check(user, object):
 def get_club_assessing_club_by_user(user, club):
     """Check if the user can assess a given club. Returns the assessor
        club, or None."""
+
+    media_centers = Club.objects.current_year().filter(english_name__contains='Media Center',
+                                                   city=club.city)
+    user_media_center = get_user_media_center(user)
+
+    if user_media_center in media_centers:
+        if is_media_member(user):
+            if club.media_assessor and club.media_assessor != user:
+                return
+        return user_media_center
+
     if club.city == 'R':
         if club.gender:
             club_gender = club.gender
@@ -53,20 +64,10 @@ def get_club_assessing_club_by_user(user, club):
     else: # For other cities
         club_gender = ''
 
-    media_center = Club.objects.get(english_name__contains='Media Center',
-                                    city=club.city,
-                                    gender=club_gender)
-    user_media_center = get_user_media_center(user)
 
-    if media_center == user_media_center:
-        if is_media_member(user):
-            if club.media_assessor and club.media_assessor != user:
-                return
-        return media_center
-
-    presidency = Club.objects.get(english_name__contains='Presidency',
-                                  city=club.city,
-                                  gender=club_gender)
+    presidency = Club.objects.current_year().get(english_name__contains='Presidency',
+                                                 city=club.city,
+                                                 gender=club_gender)
 
     if presidency in get_user_coordination_and_deputyships(user):
         return presidency

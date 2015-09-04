@@ -25,7 +25,7 @@ from media.models import FollowUpReport, Story, Article, StoryReview, ArticleRev
 from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
     TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm, \
     FollowUpReportImageFormset, ReportCommentForm, BuzzForm
-from media.utils import is_media_coordinator_or_member, is_club_coordinator_or_member, is_media_or_club_coordinator_or_member, proper_poll_type, get_poll_type_url, media_coordinator_or_member_test, get_user_media_center, get_clubs_for_assessment_by_user, can_submit_followupreport, get_club_media_center, media_user_test
+from media.utils import is_media_coordinator_or_member, is_club_coordinator_or_member, is_media_or_club_coordinator_or_member, proper_poll_type, get_poll_type_url, media_coordinator_or_member_test, get_user_media_center, get_clubs_for_assessment_by_user, can_submit_followupreport, get_club_media_center, media_user_test, is_media_coordinator_or_deputy
 
 # Keywords
 ACTIVE = "active"
@@ -208,14 +208,7 @@ def show_report(request, episode_pk):
     report = get_object_or_404(FollowUpReport, episode=episode)
 
     # Permission checks
-
-    # The passed episode should be owned by the user's club, the user
-    # should be a member of the media center, or the user needs to be
-    # an employee.
-    if not has_coordination_to_activity(request.user, episode.activity) \
-       and not is_media_coordinator_or_member(request.user) \
-       and not request.user.is_superuser \
-       and not is_employee_of_any_club(request.user):
+    if not can_submit_followupreport(request.user, episode.activity):
         raise PermissionDenied
 
     return render(request, 'media/report_read.html', {'report': report, 'comment_form': ReportCommentForm()})
@@ -226,7 +219,6 @@ def edit_report(request, episode_pk):
     report = get_object_or_404(FollowUpReport, episode=episode)
 
     # Permission checks
-    # The passed episode should be owned by the user's club or the user should be a member of the media center
     if not can_submit_followupreport(request.user, episode.activity):
         raise PermissionDenied
 
@@ -350,18 +342,17 @@ def create_story(request, episode_pk):
     return render(request, 'media/story_write.html', context)
 
 @login_required
-@user_passes_test(media_coordinator_or_member_test)
 def show_story(request, episode_pk):
     """
     Show a Story.
     """
-    # --- Permission Checks ---
-    # The user should be part of the Media Center (either head or member)
-    if not is_media_coordinator_or_member(request.user) and not request.user.is_superuser:
-        raise PermissionDenied 
-    
     episode = get_object_or_404(Episode, pk=episode_pk)
     story = get_object_or_404(Story, episode=episode)
+
+    # --- Permission Checks ---
+    if not can_submit_followupreport(request.user, episode.activity):
+        raise PermissionDenied    
+
     try:
         review = story.storyreview
     except ObjectDoesNotExist:
@@ -371,7 +362,6 @@ def show_story(request, episode_pk):
                                                      'episode': episode})
 
 @login_required
-@user_passes_test(media_coordinator_or_member_test)
 def edit_story(request, episode_pk):
     """
     Review a Story by writing notes or editing it directly.

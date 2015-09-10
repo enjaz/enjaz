@@ -3,11 +3,18 @@ from datetime import datetime, timedelta, date
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
-from django.db.models import Sum
+from django.db.models import Sum, Count
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
+from django.utils import timezone
 
+from clubs.models import Club, College, city_choices
 from activities.models import Activity
 from books.models import Book
-from .models import Announcement, Publication
+from .models import Announcement, Publication, StudentClubYear
+from niqati.models import Code_Order
+from accounts.utils import get_user_gender
 
 
 def portal_home(request):
@@ -61,3 +68,63 @@ def visit_announcement(request, pk):
 
 def about_sc(request, template_name="about_sc.html"):
     return render(request, template_name, {"publications": Publication.objects.all()}) # the dashboard
+
+@login_required
+def indicators(request, city=""):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    if city:
+        current_year = StudentClubYear.objects.get_current()
+        city_codes = [city_pair[0] for city_pair in city_choices]
+        if not city in city_codes:
+            raise Http404
+        last_month = timezone.now() - timedelta(30)
+        clubs_by_niqati_orders = Club.objects.current_year()\
+                                             .visible()\
+                                             .filter(city=city)\
+                                             .filter(primary_activity__submission_date__gte=last_month)\
+                                             .annotate(niqati_orders=Count('primary_activity__episode__code_order'),
+                                                       activities=Count('primary_activity'))\
+                                             .order_by('-niqati_orders')
+        clubs_by_niqati_entered = Club.objects.current_year()\
+                                              .visible()\
+                                              .filter(city=city)\
+                                              .filter(primary_activity__submission_date__gte=last_month)\
+                                              .filter(primary_activity__episode__code_order__code_collection__code__user__isnull=False)\
+                                              .annotate(niqati_count=Count('primary_activity__episode__code_order__code_collection__code__user'),
+                                                        activities=Count('primary_activity'))\
+                                              .order_by('-niqati_count')
+        clubs_by_members = Club.objects.current_year()\
+                                       .visible()\
+                                       .filter(city=city)\
+                                       .annotate(member_count=Count('members'))\
+                                       .order_by('-member_count')
+        users_by_niqati_points = User.objects.filter(common_profile__city=city,
+                                                     code__year=current_year)\
+                                             .annotate(point_sum=Sum('code__points'))\
+                                             .filter(point_sum__gt=0)\
+                                             .order_by('-point_sum')[:20]
+        city_colleges = College.objects.filter(city=city)
+        male_count = 0
+        female_count = 0
+        for user in users_by_niqati_points:
+            gender = get_user_gender(user)
+            if gender == 'M':
+                male_count += 1
+            elif gender == 'F':
+                female_count += 1
+                
+        context = {'male_count': male_count,
+                   'female_count': female_count,
+                   'users_by_niqati_points': users_by_niqati_points,
+                   'clubs_by_niqati_orders': clubs_by_niqati_orders,
+                   'clubs_by_niqati_entered': clubs_by_niqati_entered,
+                   'city_colleges': city_colleges,
+                   'clubs_by_members': clubs_by_members,
+                   }
+    else:
+        context = {'city_choices':
+                   city_choices}
+
+    return render(request, 'indicators.html', context)

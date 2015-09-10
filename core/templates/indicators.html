@@ -1,0 +1,194 @@
+{% extends "base.html" %}{% load staticfiles %}
+{% block navbutton %}{% endblock %}
+{% block title %}البيانات{% endblock %}
+{% block pageheader %}البيانات{% endblock %}
+{% block pageheaderurl %}{% url 'indicators' %}{% endblock %}
+
+{% block content %}
+{% if city_choices %}
+    <ul>
+    {% for city in city_choices %}
+        <li><a href="{% url 'indicators_for_city' city.0 %}">{{ city.1 }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+<h1>بيانات إنجاز</h1>
+<p>شاهد أيضا <a href="https://osamakhalid.com/mirror/enjaz_stats/">المؤشرات الحيوية لإنجاز</a>.</p>
+<div class="row">
+    <h2>التسجيل في إنجاز</h2>
+    <div class="col-md-6">
+            <h3>المسجلون في البوابة بحسب الكليّة</h3>
+            <table id="city-colleges" class="table datatable">
+                <thead>
+                    <tr>
+                        <th>الكلية</th>
+                        <th>عدد المسجلين</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for college in city_colleges %}
+                    <tr>
+                        <td>{{ college }}</td>
+                        <td>{{ college.commonprofile_set.count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>
+    <div class="col-md-6">
+        <h3>الأندية بحسب عدد الأعضاء</h3>
+        <table id="club-members" class="table datatable">
+            <thead>
+                <tr>
+                    <th>النادي</th>
+                    <th>الأعضاء</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for club in clubs_by_members %}
+                <tr>
+                    <td><a href="{% url 'clubs:show' club.id %}">{{ club }}</a></td>
+                    <td>{{ club.member_count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <h2>نقاطي</h2>
+    <div class="col-md-6">
+        <h3>أكثر الطلاب حيازة للنقاط</h3>
+        <table id="niqati-students" class="table datatable">
+            <thead>
+                <tr>
+                    <th>الطالب</th>
+                    <th>الكلية</th>
+                    <th>مجموع النقاط</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for niqati_user in users_by_niqati_points %}
+                <tr>
+                    <td><a href="{% url 'niqati:student_report_with_username' niqati_user.username %}">{{ niqati_user.common_profile.get_ar_full_name|default:niqati_user }}</a></td>
+                    <td>{{ niqati_user.common_profile.college }}</td>
+                    <td>{{ niqati_user.point_sum }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <h3>توزيع النقاط بين الطلاب والطالبات</h3>
+        {% if male_count or female_count %}
+        <div id="niqati-gender" class="ct-chart ct-perfect-fourth"></div>
+        {% else %}
+        <p>لم تسجّل أي نقاط.</p>
+        {% endif %}
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <h3>الأندية بحسب عدد طلباتها للنقاط خلال الشهر المنصرم</h3>
+        <table id="niqati-orders" class="table datatable">
+            <thead>
+                <tr>
+                    <th>النادي</th>
+                    <th>أنشطة الشهر</th>
+                    <th>طلبات نقاطي لأنشطة الشهر</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for club in clubs_by_niqati_orders %}
+                <tr>
+                    <td><a href="{% url 'clubs:show' club.id %}">{{ club }}</a></td>
+                    <td>{{ club.activities }}</td>
+                    <td>{{ club.niqati_orders }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <h3>الأندية بحسب عدد النقاط المحتسبة لأنشطة الشهر المنصرم</h3>
+        <table id="niqati-code-count" class="table datatable">
+            <thead>
+                <tr>
+                    <th>النادي</th>
+                    <th>أنشطة الشهر</th>
+                    <th>النقطة المدخلة لأنشطة الشهر</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for club in clubs_by_niqati_entered %}
+                <tr>
+                    <td><a href="{% url 'clubs:show' club.id %}">{{ club }}</a></td>
+                    <td>{{ club.activities }}</td>
+                    <td>{{ club.niqati_count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'css/chartist.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/chartist.min.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        language = {% include 'js/dataTables-arabic.json' %};
+        $("#niqati-students, #niqati-orders, #niqati-code-count").DataTable({
+            "order": [[ 2, "desc" ]],
+            "language": language,
+        });
+        $("#city-colleges, #club-members").DataTable({
+            "order": [[ 1, "desc" ]],
+            "language": language,
+        });
+        
+    });
+var data = {
+  labels: ['طلاب', 'طالبات'],
+  series: [{{ female_count }}, {{ male_count }}]
+};
+
+var options = {
+    labelInterpolationFnc: function(value) {
+      return value;
+    }
+};
+    
+var responsiveOptions = [
+  ['screen and (min-width: 640px)', {
+    chartPadding: 30,
+    labelDirection: 'explode',
+  }],
+  ['screen and (min-width: 1024px)', {
+    chartPadding: 20
+  }]
+];
+    
+new Chartist.Pie('#niqati-gender', data, options, responsiveOptions);
+//new Chartist.Pie('#niqati-gender', data, {
+//    donut: true,
+//    donutWidth: 60,
+//    startAngle: 270,
+//    total: 20,
+//    showLabel: false
+//                    });
+</script>
+<style>
+    .ct-label{
+        font-size: 20px;
+    }
+    h2, h3{
+        background-color: rgb(250, 250, 250);
+        padding: 5px;
+        margin-top: 25px;
+    }
+</style>
+{% endblock %}

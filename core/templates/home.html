@@ -1,5 +1,14 @@
 {% extends "base.html" %}{% load staticfiles %}
-{% block navbutton %}{% endblock %}
+{% block navbutton %}
+    {% if user.is_superuser %}
+        {% include 'includes/nav-button.html' %}
+    {% endif %}
+{% endblock %}
+{% block navbar %}
+     {% if user.is_superuser %}
+        <li><a href="{% url 'indicators' %}"><span class="glyphicon glyphicon-stats"></span> مؤشرات إنجاز</a></li>
+    {% endif %}
+{% endblock %}
 {% block title %}الصفحة الرئيسية{% endblock %}
 {% block pageheader %}الصفحة الرئيسية{% endblock %}
 {% block content %}

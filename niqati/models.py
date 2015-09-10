@@ -209,6 +209,7 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
             
             # If we are deadling with direct entry of students
             if collection.students.exists():
+                activity = collection.parent_order.episode.activity
                 string_count = 0
                 for student in collection.students.all():
                     random_string = random_strings[string_count]
@@ -219,6 +220,11 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
                                       user=student,
                                       redeem_date=timezone.now()))
                     string_count += 1
+                    mail.send(student.email,
+                              template="niqati_approved_to_direct_recipient",
+                              context={'activity': activity,
+                                       'student': student})
+
             else: # If we are deadling with counts
                     for random_string in random_strings:
                         codes.append(Code(code_string=random_string,

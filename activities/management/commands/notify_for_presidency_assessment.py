@@ -18,9 +18,14 @@ class Command(BaseCommand):
         end_time_since = (timezone.now() - datetime.timedelta(minutes=10)).time()
         end_time_until = timezone.now().time()
         for activity in Activity.objects.current_year().approved().done().filter(episode__end_date=end_date_target)\
-                                                                         .filter(episode__end_time__gt=end_time_since,
-                                                                                 episode__end_time__lte=end_time_until)\
                                                                          .exclude(assessment__criterionvalue__criterion__category='P'):
+            # If the activity didn't end within the past ten minutes,
+            # skip, because another proccess would have sent a
+            # notification about it.
+            if not activity.episode_set.filter(episode__end_date=end_date_target,
+                                               episode__end_time__gt=end_time_since,
+                                               episode__end_time__lte=end_time_until).exists():
+                continue
             email_context = {'activity': activity}
             assessor_club = Club.objects.club_assessing_parents(activity.primary_club).first()
             if assessor_club.coordinator:

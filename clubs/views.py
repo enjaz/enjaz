@@ -42,10 +42,9 @@ def show(request, club_id):
     # If user is a deanship reviewer, show only those approved by presidency.
     # If user is none of above (employee, student, or other), show only approved activities
 
-    if request.user.has_perm('activities.view_activity') or \
-       request.user.has_perm('activities.add_presidency_review') or \
-       is_coordinator_or_member(club, request.user):
-        activities = club.primary_activity.all().current_year()
+    if is_coordinator_or_member(club, request.user) or \
+       request.user.is_superuser:
+        activities = club.primary_activity.current_year().filter(is_deleted=False)
     else:
         activities = club.primary_activity.current_year().approved()
 
@@ -54,7 +53,7 @@ def show(request, club_id):
     can_view_members = is_coordinator_or_deputy(club, request.user) or \
                        request.user.has_perm('clubs.view_members')
     can_view_privileges = is_coordinator(club, request.user) or \
-                        request.user.has_perm('clubs.view_deputies')
+                          request.user.has_perm('clubs.view_deputies')
     can_view_applications = is_coordinator_or_deputy(club, request.user) or \
                             request.user.is_superuser
     context = {'club': club, 'can_edit': can_edit,

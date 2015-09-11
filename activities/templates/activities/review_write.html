@@ -47,7 +47,7 @@
 					{% if activity.secondary_clubs.all %}
 					    <ul>
 					    {% for club in activity.secondary_clubs.all %}
-					    <li><a href="{% url 'clubs:show' club.pk %}">{{ club.name }}</a></li>
+					    <li><a href="{% url 'clubs:show' club.pk %}">{{ club }}</a></li>
 					    {% endfor %}
 					    </ul>
 					{% else %}

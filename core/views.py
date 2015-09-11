@@ -108,6 +108,13 @@ def indicators(request, city=""):
                                              .filter(point_sum__gt=0)\
                                              .order_by('-point_sum')[:20]
         city_colleges = College.objects.filter(city=city)
+        # It gets funky if we try to do it through Django's ORM
+        for college in city_colleges:
+            college.active_count = college.commonprofile_set.filter(user__is_active=True).count()
+            if college.commonprofile_set.exists():
+                college.active_percentage = "%.2f%%" % (float(college.commonprofile_set.filter(user__is_active=True).count()) / college.commonprofile_set.count() * 100)
+            else:
+                college.active_percentage = '-'
         male_count = 0
         female_count = 0
         for user in users_by_niqati_points:

@@ -1,10 +1,10 @@
-{% extends "clubs_base.html" %}{% load staticfiles %}{% load clubs_utils %}
+{% extends "clubs_base.html" %}{% load staticfiles %}{% load clubs_utils %}{% load l10n %}
 {% block title %}{{ club.name }}{% endblock %}
 
 {% block content %}
 <h2>{{ club }}</h2>
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-<div class="col-md-3">
+<div class="row">
+<div class="col-md-4">
 	<div class="panel panel-primary" data-collapsed="0">
 		<!-- panel head -->
 		<div class="panel-heading">
@@ -27,7 +27,7 @@
 		</div>
 	</div>
 </div>
-<div class="col-md-9">
+<div class="col-md-8">
 <table class="tg table-hover table">
   <colgroup>
     <col class="col-xs-2">
@@ -55,9 +55,11 @@
   </tr>
 </table>
 </div>
+</div>
+<div class="row">
 <h3>النشاطات</h3>
 {% if activities %}
-<table class="display datatable">{% load l10n %}
+<table class="display datatable">
     <thead>
         <tr>
             <th>الاسم</th>
@@ -77,7 +79,6 @@
 <p>لا توجد نشاطات.</p>
 {% endif %}
 </div>
-
 {% endblock %}
 
 {% block customscript %}
@@ -85,15 +86,16 @@
 	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
 	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 <script>
-    var approved_table = $('.datatable:first').DataTable({
-        "order": [[ 2, "asc" ]],
+    var activity_table = $('.datatable').DataTable({
+        "order": [[ 1, "asc" ]],
         "language": {% include 'js/dataTables-arabic.json' %}
     });
-    var approved_table_nodes = approved_table.column(2, {order: 'current'}).nodes();
-    for (i=0; i < approved_table_nodes.length; i++) {
-       if ($(approved_table_nodes[i]).data('order') > unix_seconds) {
-            var page_number = Math.floor( i / approved_table.page.info().length );
-            approved_table.page(page_number).draw(false);
+    var activity_table_nodes = activity_table.column(2, {order: 'current'}).nodes();
+    var unix_seconds = Math.round(+new Date()/1000);
+    for (i=0; i < activity_table_nodes.length; i++) {
+       if ($(activity_table_nodes[i]).data('order') > unix_seconds) {
+            var page_number = Math.floor( i / activity_table.page.info().length );
+            activity_table.page(page_number).draw(false);
             break
        }
     }

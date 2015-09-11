@@ -13,7 +13,7 @@ from clubs.models import Club, College, city_choices
 from activities.models import Activity
 from books.models import Book
 from .models import Announcement, Publication, StudentClubYear
-from niqati.models import Code_Order
+from niqati.models import Code_Order, Code
 from accounts.utils import get_user_gender
 
 
@@ -80,21 +80,20 @@ def indicators(request, city=""):
         if not city in city_codes:
             raise Http404
         last_month = timezone.now() - timedelta(30)
-        clubs_by_niqati_orders = Club.objects.current_year()\
-                                             .visible()\
-                                             .filter(city=city)\
-                                             .filter(primary_activity__submission_date__gte=last_month)\
-                                             .annotate(niqati_orders=Count('primary_activity__episode__code_order'),
-                                                       activities=Count('primary_activity'))\
-                                             .order_by('-niqati_orders')
-        clubs_by_niqati_entered = Club.objects.current_year()\
+
+        clubs_by_niqati = Club.objects.current_year()\
                                               .visible()\
-                                              .filter(city=city)\
-                                              .filter(primary_activity__submission_date__gte=last_month)\
-                                              .filter(primary_activity__episode__code_order__code_collection__code__user__isnull=False)\
-                                              .annotate(niqati_count=Count('primary_activity__episode__code_order__code_collection__code__user'),
-                                                        activities=Count('primary_activity'))\
-                                              .order_by('-niqati_count')
+                                              .filter(city=city)
+        # It gets funky if we try to do it through Django's ORM
+        for club in clubs_by_niqati:
+            club.month_activities = club.primary_activity.filter(episode__start_date__gte=last_month).count()
+            club.month_code_orders = Code_Order.objects.filter(episode__activity__primary_club=club,
+                                                               episode__start_date__gte=last_month).count()
+            club.month_generated_codes = Code.objects.distinct().filter(collection__parent_order__episode__activity__primary_club=club,
+                                                                        collection__parent_order__episode__start_date__gte=last_month).count()
+            club.month_entered_codes = Code.objects.distinct().filter(collection__parent_order__episode__activity__primary_club=club,
+                                                                      collection__parent_order__episode__start_date__gte=last_month,
+                                                                      user__isnull=False).count()
         clubs_by_members = Club.objects.current_year()\
                                        .visible()\
                                        .filter(city=city)\
@@ -118,8 +117,7 @@ def indicators(request, city=""):
         context = {'male_count': male_count,
                    'female_count': female_count,
                    'users_by_niqati_points': users_by_niqati_points,
-                   'clubs_by_niqati_orders': clubs_by_niqati_orders,
-                   'clubs_by_niqati_entered': clubs_by_niqati_entered,
+                   'clubs_by_niqati': clubs_by_niqati,
                    'city_colleges': city_colleges,
                    'clubs_by_members': clubs_by_members,
                    }

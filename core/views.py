@@ -86,12 +86,15 @@ def indicators(request, city=""):
                                               .filter(city=city)
         # It gets funky if we try to do it through Django's ORM
         for club in clubs_by_niqati:
-            club.month_activities = club.primary_activity.filter(episode__start_date__gte=last_month).count()
-            club.month_code_orders = Code_Order.objects.filter(episode__activity__primary_club=club,
+            club.month_activities = club.primary_activity.approved().filter(episode__start_date__gte=last_month).count()
+            club.month_code_orders = Code_Order.objects.filter(episode__activity__is_approved=True,
+                                                               episode__activity__primary_club=club,
                                                                episode__start_date__gte=last_month).count()
-            club.month_generated_codes = Code.objects.distinct().filter(collection__parent_order__episode__activity__primary_club=club,
+            club.month_generated_codes = Code.objects.distinct().filter(collection__parent_order__episode__activity__is_approved=True,
+                                                                        collection__parent_order__episode__activity__primary_club=club,
                                                                         collection__parent_order__episode__start_date__gte=last_month).count()
-            club.month_entered_codes = Code.objects.distinct().filter(collection__parent_order__episode__activity__primary_club=club,
+            club.month_entered_codes = Code.objects.distinct().filter(collection__parent_order__episode__activity__is_approved=True,
+                                                                      collection__parent_order__episode__activity__primary_club=club,
                                                                       collection__parent_order__episode__start_date__gte=last_month,
                                                                       user__isnull=False).count()
         clubs_by_members = Club.objects.current_year()\

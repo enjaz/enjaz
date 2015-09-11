@@ -65,9 +65,13 @@
 						<a href="#">
 							<div>
 								<i class="entypo-calendar"></i>
+                                {% if episode.start_date == episode.end_date %}
+                                    {{ episode.start_date }}
+                                {% else %}
 								{{ episode.start_date }}
 								-
 								{{ episode.end_date }}
+                                {% endif %}
 							</div>
 							<div>
 								<i class="entypo-clock"></i>

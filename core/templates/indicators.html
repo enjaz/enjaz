@@ -88,43 +88,26 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-6">
-        <h3>الأندية بحسب عدد طلباتها للنقاط خلال الشهر المنصرم</h3>
-        <table id="niqati-orders" class="table datatable">
-            <thead>
-                <tr>
-                    <th>النادي</th>
-                    <th>أنشطة الشهر</th>
-                    <th>طلبات نقاطي لأنشطة الشهر</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for club in clubs_by_niqati_orders %}
-                <tr>
-                    <td><a href="{% url 'clubs:show' club.id %}">{{ club }}</a></td>
-                    <td>{{ club.activities }}</td>
-                    <td>{{ club.niqati_orders }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="col-md-6">
-        <h3>الأندية بحسب عدد النقاط المحتسبة لأنشطة الشهر المنصرم</h3>
+    <div class="col-md-12">
+        <h3>الأندية بحسب نقاطي لأنشطة الشهر المنصرم</h3>
         <table id="niqati-code-count" class="table datatable">
             <thead>
                 <tr>
                     <th>النادي</th>
                     <th>أنشطة الشهر</th>
-                    <th>النقطة المدخلة لأنشطة الشهر</th>
+                    <th>طلبات النقاط لأنشطة الشهر</th>
+                    <th>النقاط المُولدة لأشنطة الشهر</th>
+                    <th>النقطة المُدخلة لأنشطة الشهر</th>
                 </tr>
             </thead>
             <tbody>
-                {% for club in clubs_by_niqati_entered %}
+                {% for club in clubs_by_niqati %}
                 <tr>
                     <td><a href="{% url 'clubs:show' club.id %}">{{ club }}</a></td>
-                    <td>{{ club.activities }}</td>
-                    <td>{{ club.niqati_count }}</td>
+                    <td>{{ club.month_activities }}</td>
+                    <td>{{ club.month_code_orders }}</td>
+                    <td>{{ club.month_generated_codes }}</td>
+                    <td>{{ club.month_entered_codes }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -141,7 +124,7 @@
 <script type="text/javascript">
     $(function () {
         language = {% include 'js/dataTables-arabic.json' %};
-        $("#niqati-students, #niqati-orders, #niqati-code-count").DataTable({
+        $("#niqati-students, #niqati-orders").DataTable({
             "order": [[ 2, "desc" ]],
             "language": language,
         });
@@ -149,10 +132,13 @@
             "order": [[ 1, "desc" ]],
             "language": language,
         });
-        
+        $("#niqati-code-count").DataTable({
+            "order": [[ 4, "desc" ]],
+            "language": language,
+        });
     });
 var data = {
-  labels: ['طلاب', 'طالبات'],
+  labels: ['طالبات', 'طلاب'],
   series: [{{ female_count }}, {{ male_count }}]
 };
 
@@ -173,13 +159,7 @@ var responsiveOptions = [
 ];
     
 new Chartist.Pie('#niqati-gender', data, options, responsiveOptions);
-//new Chartist.Pie('#niqati-gender', data, {
-//    donut: true,
-//    donutWidth: 60,
-//    startAngle: 270,
-//    total: 20,
-//    showLabel: false
-//                    });
+
 </script>
 <style>
     .ct-label{

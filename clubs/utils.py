@@ -49,6 +49,8 @@ def has_coordination_to_activity(user, activity):
     """Return whether the user is the coordinator or deputy assigned to
     any of the primry or secondary clubs of a given activity.
     """
+    if not user.is_authenticated():
+        return False
     # First get clubs associated with the activity.  We need both of
     # them to be QuerySets
     activity_primary_club = Club.objects.filter(

@@ -1,7 +1,7 @@
 {% extends "base.html" %}{% load staticfiles %}
 {% block navbutton %}{% endblock %}
-{% block title %}البيانات{% endblock %}
-{% block pageheader %}البيانات{% endblock %}
+{% block title %}المؤشرات{% endblock %}
+{% block pageheader %}المؤشرات{% endblock %}
 {% block pageheaderurl %}{% url 'indicators' %}{% endblock %}
 
 {% block content %}
@@ -12,17 +12,19 @@
     {% endfor %}
     </ul>
 {% else %}
-<h1>بيانات إنجاز</h1>
-<p>شاهد أيضا <a href="https://osamakhalid.com/mirror/enjaz_stats/">المؤشرات الحيوية لإنجاز</a>.</p>
+<h1>مؤشرات إنجاز</h1>
+<p>شاهد أيضا <a href="https://osamakhalid.com/mirror/enjaz_stats/">العلامات الحيوية لإنجاز</a>.</p>
 <div class="row">
     <h2>التسجيل في إنجاز</h2>
-    <div class="col-md-6">
+    <div class="col-md-12">
             <h3>المسجلون في البوابة بحسب الكليّة</h3>
             <table id="city-colleges" class="table datatable">
                 <thead>
                     <tr>
                         <th>الكلية</th>
                         <th>عدد المسجلين</th>
+                        <th>عدد المفعلين</th>
+                        <th>نسبة المفعلين</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,18 +32,25 @@
                     <tr>
                         <td>{{ college }}</td>
                         <td>{{ college.commonprofile_set.count }}</td>
+                        <td>{{ college.active_count }}</td>
+                        <td>{{ college.active_percentage }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
     </div>
-    <div class="col-md-6">
-        <h3>الأندية بحسب عدد الأعضاء</h3>
+</div>
+<div class="row">
+    <h2>الأندية في إنجاز</h2>
+    <div class="col-md-12">
+        <h3>الأندية بحسب الأعضاء</h3>
         <table id="club-members" class="table datatable">
             <thead>
                 <tr>
                     <th>النادي</th>
                     <th>الأعضاء</th>
+                    <th>التسجيل مفتوح؟</th>
+                    <th>له ممثل إعلامي؟</th>
                 </tr>
             </thead>
             <tbody>
@@ -49,6 +58,8 @@
                 <tr>
                     <td><a href="{% url 'clubs:show' club.id %}">{{ club }}</a></td>
                     <td>{{ club.member_count }}</td>
+                    <td>{% if club.registration_is_open %}نعم{% else %}لا{% endif %}</td>
+                    <td>{% if club.media_representatives.exists %}نعم{% else %}لا{% endif %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -56,7 +67,7 @@
     </div>
 </div>
 <div class="row">
-    <h2>نقاطي</h2>
+    <h2>نقاطي في إنجاز</h2>
     <div class="col-md-6">
         <h3>أكثر الطلاب حيازة للنقاط</h3>
         <table id="niqati-students" class="table datatable">
@@ -89,7 +100,7 @@
 </div>
 <div class="row">
     <div class="col-md-12">
-        <h3>الأندية بحسب نقاطي لأنشطة الشهر المنصرم</h3>
+        <h3>نقاطي بحسب الأندية لأنشطة الشهر المنصرم</h3>
         <table id="niqati-code-count" class="table datatable">
             <thead>
                 <tr>

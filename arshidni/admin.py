@@ -27,7 +27,7 @@ original Django code."""
             # If the user isn't in the arshidni group and isn't a
             # system administrator, they must not be able to use the
             # arshidni admin interface.
-            elif is_arshindi_coordinator_or_deputy(self.user_cache) and\
+            elif not is_arshindi_coordinator_or_deputy(self.user_cache) and\
                  not self.user_cache.is_superuser:
                 raise forms.ValidationError(message, code='invalid', params=params)
         return self.cleaned_data

@@ -17,7 +17,7 @@ original Django code."""
     def clean(self):
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
-        message = admin.forms.ERROR_MESSAGE
+        message = admin.forms.AdminAuthenticationForm.error_messages['invalid_login']
         params = {'username': self.username_field.verbose_name}
 
         if username and password:

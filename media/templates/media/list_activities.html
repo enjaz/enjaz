@@ -38,7 +38,7 @@
             </a>
         </h4>
     </div>
-    <div id="collapse{{ club.pk }}" class="panel-collapse collapse in">
+    <div id="collapse{{ club.pk }}" class="panel-collapse collapse {% if clubs.count > 1 %}out{% else %}in{% endif %}">
         <div class="panel-body"><div class="row">
             <table class="display activity_list">
                 <thead>

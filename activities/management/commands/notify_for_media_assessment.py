@@ -15,7 +15,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         domain = Site.objects.get_current().domain
         end_date_target = timezone.now().date() - datetime.timedelta(5)
-        for activity in Activity.objects.current_year().approved().done().filter(episode__end_date=end_date_target)\
+        for activity in Activity.objects.current_year().approved().done().exclude(episode__end_date__gt=end_date_target)\
+                                                                         .filter(episode__end_date=end_date_target)\
                                                                          .exclude(assessment__criterionvalue__criterion__category='M')\
                                                                          .exclude(primary_club__media_assessor__isnull=True):
             email_context = {'activity': activity}

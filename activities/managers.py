@@ -85,7 +85,7 @@ class ActivityQuerySet(models.QuerySet):
         activities_end_today_pks = []
         activities_end_today = self.filter(episode__end_date=timezone.now().date())
         for activity in activities_end_today:
-            if activity.episode_set.filter(episode__end_date=timezone.now().date(), episode__end_time__gt=timezone.now().time()).exists():
+            if activity.episode_set.filter(end_date=timezone.now().date(), end_time__gt=timezone.now().time()).exists():
                 continue
             activities_end_today_pks.append(activity.pk)
         return self.exclude(episode__end_date__gte=timezone.now().date()).exclude() | self.filter(pk__in=activities_end_today_pks)

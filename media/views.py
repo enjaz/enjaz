@@ -1,5 +1,6 @@
 # -*- coding: utf-8  -*-
 import random
+from datetime import timedelta
 
 from django.contrib.auth.decorators import permission_required, login_required, user_passes_test
 from django.contrib.auth.models import User
@@ -107,14 +108,24 @@ def submit_report(request, episode_pk):
             instance = form.save()
             image_formset.instance = instance
             image_formset.save()
-            
 
-            if episode.activity.primary_club.media_assessor:
+            # Only send a mail notification if the activity is done,
+            # but not more than five days ago (in that case, we should
+            # have already sent a notification through the cronjon),
+            # and we have a media assessor for the club.
+            activity_end_date = episode.activity.episode_set.order_by('end_date').last().end_date
+            five_days_after_end = activity_end_date + timedelta(5)
+            if episode.activity.is_done() and \
+               five_days_after_end > timezone.now().date() and \
+               episode.activity.primary_club.media_assessor:
                 assess_activity_url = reverse('activities:assess', args=(episode.activity.pk, 'm'))
                 full_url = request.build_absolute_uri(assess_activity_url)
                 email_context = {'full_url': full_url,
                                  'assessor': episode.activity.primary_club.media_assessor,
                                  'report': instance}
+                mail.send([episode.activity.primary_club.media_assessor.email],
+                           template="media_report_submit",
+                           context=email_context)
 
             return HttpResponseRedirect(reverse('activities:show',
                                                 args=(episode.activity.pk, )

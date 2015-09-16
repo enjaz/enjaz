@@ -157,9 +157,20 @@ def indicators(request, city=""):
         male_total_intervals = 0
         female_total_intervals = 0
         for order in male_orders:
-            male_total_intervals += (order.review_set.first().date_reviewed.date() - order.date_ordered.date()).days
+            # To skip orders without reviews (i.e. created through the admin interface)
+            try:
+                date_reviewed = order.review_set.first().date_reviewed.date()
+            except AttributeError:
+                continue
+            male_total_intervals += (date_reviewed - order.date_ordered.date()).days
         for order in female_orders:
-            female_total_intervals += (order.review_set.first().date_reviewed.date() - order.date_ordered.date()).days
+            # To skip orders without reviews (i.e. created through the admin interface)
+            try:
+                date_reviewed = order.review_set.first().date_reviewed.date()
+            except AttributeError:
+                continue
+
+            female_total_intervals += (date_reviewed - order.date_ordered.date()).days
 
         if male_orders.exists():
             male_niqati_approval_interval = male_total_intervals / male_orders.count()

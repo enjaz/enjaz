@@ -166,12 +166,15 @@ var data = {
   series: [{{ female_count }}, {{ male_count }}]
 };
 
+var sum = function(total, num) { return total + num };
+count = 0;
 var options = {
     labelInterpolationFnc: function(value) {
-      return value;
+      percentage = Math.round(data.series[count] / data.series.reduce(sum) * 100) + '%';
+      count += 1;
+      return value + " " + percentage;
     }
 };
-    
 var responsiveOptions = [
   ['screen and (min-width: 640px)', {
     chartPadding: 30,

@@ -109,6 +109,8 @@
                     <th>طلبات النقاط لأنشطة الشهر</th>
                     <th>النقاط المُولدة لأنشطة الشهر</th>
                     <th>النقاط المُدخلة لأنشطة الشهر</th>
+                    <th>معدل الأيام الفاصلة بين انعقاد النشاط وطلب النقاط</th>
+                    <th>استخدم الإدخال المباشر لأنشطة الشهر؟</th>
                 </tr>
             </thead>
             <tbody>
@@ -119,10 +121,21 @@
                     <td>{{ club.month_code_orders }}</td>
                     <td>{{ club.month_generated_codes }}</td>
                     <td>{{ club.month_entered_codes }}</td>
+                    <td>{{ club.niqati_order_interval }}</td>
+                    <td>{% if club.used_direct_entry %}نعم{% else %}لا{% endif %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h3>الأيام التي تطلبها اعتماد النقاط لأتشطة الشهر المنصرم</h3>
+        <ul>
+            <li>للطلاب: {{ male_niqati_approval_interval }}</li>
+            <li>للطالبات: {{ female_niqati_approval_interval }}</li>
+        </ul>
     </div>
 </div>
 {% endif %}

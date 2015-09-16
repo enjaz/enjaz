@@ -79,24 +79,46 @@ def indicators(request, city=""):
         city_codes = [city_pair[0] for city_pair in city_choices]
         if not city in city_codes:
             raise Http404
-        last_month = timezone.now() - timedelta(30)
+        last_month = timezone.now().date() - timedelta(30)
 
         clubs_by_niqati = Club.objects.current_year()\
                                               .visible()\
                                               .filter(city=city)
         # It gets funky if we try to do it through Django's ORM
         for club in clubs_by_niqati:
-            club.month_activities = club.primary_activity.approved().filter(episode__start_date__gte=last_month).count()
-            club.month_code_orders = Code_Order.objects.filter(episode__activity__is_approved=True,
-                                                               episode__activity__primary_club=club,
-                                                               episode__start_date__gte=last_month).count()
+            club.month_activities = club.primary_activity.approved().filter(episode__start_date__gte=last_month,
+                                                                            episode__start_date__lt=timezone.now().date()).count()
+            month_orders = Code_Order.objects.distinct().filter(episode__activity__is_approved=True,
+                                                                episode__activity__primary_club=club,
+                                                                episode__start_date__gte=last_month,
+                                                                episode__start_date__lt=timezone.now().date())
+
+            total_order_interval_days = 0
+            for order in month_orders:
+                total_order_interval_days += (order.episode.start_date - order.date_ordered.date()).days
+
+            club.month_code_orders = month_orders.count()
+
+            if club.month_code_orders: # Not zero
+                club.niqati_order_interval = total_order_interval_days / club.month_code_orders
+            else:
+                club.niqati_order_interval = '-'
+
             club.month_generated_codes = Code.objects.distinct().filter(collection__parent_order__episode__activity__is_approved=True,
                                                                         collection__parent_order__episode__activity__primary_club=club,
-                                                                        collection__parent_order__episode__start_date__gte=last_month).count()
+                                                                        collection__parent_order__episode__start_date__gte=last_month,
+                                                                        collection__parent_order__episode__start_date__lt=timezone.now().date())\
+                                                                .count()
             club.month_entered_codes = Code.objects.distinct().filter(collection__parent_order__episode__activity__is_approved=True,
                                                                       collection__parent_order__episode__activity__primary_club=club,
                                                                       collection__parent_order__episode__start_date__gte=last_month,
+                                                                      collection__parent_order__episode__start_date__lt=timezone.now().date(),
                                                                       user__isnull=False).count()
+            club.used_direct_entry = Code_Order.objects.distinct().filter(episode__activity__is_approved=True,
+                                                                          episode__activity__primary_club=club,
+                                                                          episode__start_date__gte=last_month,
+                                                                          episode__start_date__lt=timezone.now().date(),
+                                                                          code_collection__students__isnull=True).exists()
         clubs_by_members = Club.objects.current_year()\
                                        .visible()\
                                        .filter(city=city)\
@@ -123,13 +145,39 @@ def indicators(request, city=""):
                 male_count += 1
             elif gender == 'F':
                 female_count += 1
-                
+
+
+        # Order review interval
+        month_orders = Code_Order.objects.distinct().filter(is_approved=True,
+                                                            episode__start_date__gte=last_month,
+                                                            episode__start_date__lt=timezone.now().date(),
+                                                            episode__activity__primary_club__city=city)
+        male_orders = month_orders.filter(episode__activity__primary_club__gender='M')
+        female_orders = month_orders.filter(episode__activity__primary_club__gender='F')
+        male_total_intervals = 0
+        female_total_intervals = 0
+        for order in male_orders:
+            male_total_intervals += (order.review_set.first().date_reviewed.date() - order.date_ordered.date()).days
+        for order in female_orders:
+            female_total_intervals += (order.review_set.first().date_reviewed.date() - order.date_ordered.date()).days
+
+        if male_orders.exists():
+            male_niqati_approval_interval = male_total_intervals / male_orders.count()
+        else:
+            male_niqati_approval_interval = '-'
+        if female_orders.exists():
+            female_niqati_approval_interval = female_total_intervals / female_orders.count()
+        else:
+            female_niqati_approval_interval = '-'
+
         context = {'male_count': male_count,
                    'female_count': female_count,
                    'users_by_niqati_points': users_by_niqati_points,
                    'clubs_by_niqati': clubs_by_niqati,
                    'city_colleges': city_colleges,
                    'clubs_by_members': clubs_by_members,
+                   'male_niqati_approval_interval': male_niqati_approval_interval,
+                   'female_niqati_approval_interval': female_niqati_approval_interval,
                    }
     else:
         context = {'city_choices':

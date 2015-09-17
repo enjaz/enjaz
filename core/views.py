@@ -10,10 +10,11 @@ from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 
 from clubs.models import Club, College, city_choices
-from activities.models import Activity
+from activities.models import Activity, Episode
 from books.models import Book
 from .models import Announcement, Publication, StudentClubYear
 from niqati.models import Code_Order, Code
+from media.models import FollowUpReport, Story
 from accounts.utils import get_user_gender
 
 
@@ -80,27 +81,58 @@ def indicators(request, city=""):
         if not city in city_codes:
             raise Http404
         last_month = timezone.now().date() - timedelta(30)
+        city_clubs = Club.objects.current_year()\
+                                 .visible()\
+                                 .filter(city=city)
+        clubs_by_media = city_clubs
+        for club in clubs_by_media:
+            club.episode_count = Episode.objects.filter(activity__primary_club=club,
+                                                        activity__is_approved=True,
+                                                        activity__is_deleted=False,
+                                                        start_date__gte=last_month,
+                                                        start_date__lt=timezone.now().date()).count()
+            month_reports = FollowUpReport.objects.filter(episode__activity__primary_club=club,
+                                                          episode__end_date__gte=last_month,
+                                                          episode__end_date__lt=timezone.now().date())
+            club.report_count = month_reports.count()
+            total_report_interval = 0
+            for report in month_reports:
+                total_report_interval += (report.date_submitted.date() - report.episode.end_date).days
+            if club.report_count:
+                club.report_interval = total_report_interval / club.report_count
+            else:
+                club.report_interval = '-'
+            month_stories = Story.objects.filter(episode__activity__primary_club=club,
+                                                 episode__end_date__gte=last_month,
+                                                 episode__end_date__lt=timezone.now().date())
+            club.story_count = month_stories.count()
+            total_story_interval = 0
+            for story in month_stories:
+                total_report_interval += (story.date_submitted.date() - story.episode.end_date).days
+            if club.story_count:
+                club.story_interval = total_story_interval / club.story_count
+            else:
+                club.story_interval = '-'
 
-        clubs_by_niqati = Club.objects.current_year()\
-                                              .visible()\
-                                              .filter(city=city)
-        # It gets funky if we try to do it through Django's ORM
+        clubs_by_niqati = city_clubs
         for club in clubs_by_niqati:
-            club.month_activities = club.primary_activity.approved().filter(episode__start_date__gte=last_month,
-                                                                            episode__start_date__lt=timezone.now().date()).count()
+            club.month_episodes = Episode.objects.filter(activity__primary_club=club,
+                                                         activity__is_approved=True,
+                                                         activity__is_deleted=False,
+                                                         start_date__gte=last_month,
+                                                         start_date__lt=timezone.now().date()).count()
             month_orders = Code_Order.objects.distinct().filter(episode__activity__is_approved=True,
                                                                 episode__activity__primary_club=club,
                                                                 episode__start_date__gte=last_month,
                                                                 episode__start_date__lt=timezone.now().date())
-
-            total_order_interval_days = 0
+            total_order_interval = 0
             for order in month_orders:
-                total_order_interval_days += (order.episode.start_date - order.date_ordered.date()).days
+                total_order_interval += (order.episode.start_date - order.date_ordered.date()).days
 
             club.month_code_orders = month_orders.count()
 
             if club.month_code_orders: # Not zero
-                club.niqati_order_interval = total_order_interval_days / club.month_code_orders
+                club.niqati_order_interval = total_order_interval / club.month_code_orders
             else:
                 club.niqati_order_interval = '-'
 
@@ -119,11 +151,8 @@ def indicators(request, city=""):
                                                                           episode__start_date__gte=last_month,
                                                                           episode__start_date__lt=timezone.now().date(),
                                                                           code_collection__students__isnull=True).exists()
-        clubs_by_members = Club.objects.current_year()\
-                                       .visible()\
-                                       .filter(city=city)\
-                                       .annotate(member_count=Count('members'))\
-                                       .order_by('-member_count')
+        clubs_by_members = city_clubs.annotate(member_count=Count('members'))\
+                                     .order_by('-member_count')
         users_by_niqati_points = User.objects.filter(common_profile__city=city,
                                                      code__year=current_year)\
                                              .annotate(point_sum=Sum('code__points'))\
@@ -185,6 +214,7 @@ def indicators(request, city=""):
                    'female_count': female_count,
                    'users_by_niqati_points': users_by_niqati_points,
                    'clubs_by_niqati': clubs_by_niqati,
+                   'clubs_by_media': clubs_by_media,
                    'city_colleges': city_colleges,
                    'clubs_by_members': clubs_by_members,
                    'male_niqati_approval_interval': male_niqati_approval_interval,

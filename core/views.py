@@ -150,7 +150,7 @@ def indicators(request, city=""):
                                                                           episode__activity__primary_club=club,
                                                                           episode__start_date__gte=last_month,
                                                                           episode__start_date__lt=timezone.now().date(),
-                                                                          code_collection__students__isnull=True).exists()
+                                                                          code_collection__students__isnull=False).exists()
         clubs_by_members = city_clubs.annotate(member_count=Count('members'))\
                                      .order_by('-member_count')
         users_by_niqati_points = User.objects.filter(common_profile__city=city,

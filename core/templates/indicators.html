@@ -50,7 +50,7 @@
                     <th>النادي</th>
                     <th>الأعضاء</th>
                     <th>التسجيل مفتوح؟</th>
-                    <th>له ممثل إعلامي؟</th>
+                    <th>له نواب؟</th>
                 </tr>
             </thead>
             <tbody>
@@ -59,7 +59,34 @@
                     <td><a href="{% url 'clubs:show' club.id %}">{{ club }}</a></td>
                     <td>{{ club.member_count }}</td>
                     <td>{% if club.registration_is_open %}نعم{% else %}لا{% endif %}</td>
+                    <td>{% if club.deputies.exists %}نعم{% else %}لا{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h3>الأندية والمركز الإعلامي</h3>
+        <table id="club-media" class="table datatable">
+            <thead>
+                <tr>
+                    <th>النادي</th>
+                    <th>أحداث الشهر</th>
+                    <th>له ممثل إعلامي؟</th>
+                    <th>تقارير الشهر</th>
+                    <th>معدل الأيام الفاصلة بين انتهاء أنشطة الشهر ورفع التقرير</th>
+                    <th>تغطيات الشهر</th>
+                    <th>معدل الأيام الفاصلة بين انتهاء أنشطة الشهر ورفع التغطية</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for club in clubs_by_media %}
+                <tr>
+                    <td><a href="{% url 'clubs:show' club.id %}">{{ club }}</a></td>
+                    <td>{{ club.episode_count }}</td>
                     <td>{% if club.media_representatives.exists %}نعم{% else %}لا{% endif %}</td>
+                    <td>{{ club.report_count }}</td>
+                    <td>{{ club.report_interval }}</td>
+                    <td>{{ club.story_count }}</td>
+                    <td>{{ club.story_interval }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -105,7 +132,7 @@
             <thead>
                 <tr>
                     <th>النادي</th>
-                    <th>أنشطة الشهر</th>
+                    <th>أحداث الشهر</th>
                     <th>طلبات النقاط لأنشطة الشهر</th>
                     <th>النقاط المُولدة لأنشطة الشهر</th>
                     <th>النقاط المُدخلة لأنشطة الشهر</th>
@@ -117,7 +144,7 @@
                 {% for club in clubs_by_niqati %}
                 <tr>
                     <td><a href="{% url 'clubs:show' club.id %}">{{ club }}</a></td>
-                    <td>{{ club.month_activities }}</td>
+                    <td>{{ club.month_episodes }}</td>
                     <td>{{ club.month_code_orders }}</td>
                     <td>{{ club.month_generated_codes }}</td>
                     <td>{{ club.month_entered_codes }}</td>
@@ -127,10 +154,6 @@
                 {% endfor %}
             </tbody>
         </table>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
         <h3>الأيام التي تطلبها اعتماد النقاط لأتشطة الشهر المنصرم</h3>
         <ul>
             <li>للطلاب: {{ male_niqati_approval_interval }}</li>
@@ -156,7 +179,7 @@
             "order": [[ 1, "desc" ]],
             "language": language,
         });
-        $("#niqati-code-count").DataTable({
+        $("#niqati-code-count, #club-media").DataTable({
             "order": [[ 4, "desc" ]],
             "language": language,
         });

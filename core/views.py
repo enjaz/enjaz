@@ -108,7 +108,7 @@ def indicators(request, city=""):
             club.story_count = month_stories.count()
             total_story_interval = 0
             for story in month_stories:
-                total_report_interval += (story.date_submitted.date() - story.episode.end_date).days
+                total_story_interval += (story.date_submitted.date() - story.episode.end_date).days
             if club.story_count:
                 club.story_interval = total_story_interval / club.story_count
             else:

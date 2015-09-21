@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from activities.models import Activity, Episode
+from activities.models import Category as ActivityCategory
 from clubs.models import Club
 from media.models import Buzz, BuzzView
 from niqati.models import Code, Category, Code_Collection, Code_Order
@@ -14,13 +15,19 @@ class ClubSerializer(serializers.ModelSerializer):
         model = Club
         fields = ('pk', 'name', 'english_name', 'email', 'coordinator', 'gender', 'city')
 
+class ActivityCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityCategory
+        fields = ('pk', 'ar_name')
+
 class ActivitySerializer(serializers.ModelSerializer):
     primary_club = ClubSerializer(read_only=True)
+    category = ActivityCategorySerializer(read_only=True)
     secondary_clubs = ClubSerializer(many=True, read_only=True)
     episode_set = EpisodeSerializer(many=True, read_only=True)
     class Meta:
         model = Activity
-        fields = ('pk', 'name', 'primary_club', 'secondary_clubs', 'public_description', 'episode_set', 'gender')
+        fields = ('pk', 'name', 'primary_club', 'secondary_clubs', 'public_description', 'episode_set', 'gender', 'category')
 
 class BuzzSerializer(serializers.ModelSerializer):
     class Meta:

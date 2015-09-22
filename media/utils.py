@@ -124,7 +124,9 @@ def get_clubs_for_assessment_by_user(user):
     if user_assessing_clubs.exists(): # Media or Presidency
         user_assessing_club = user_assessing_clubs.first()
         clubs_for_user = current_year_clubs.filter(city=user_assessing_club.city)
-        if is_media_member(user):
+        # For MC members (and not coordinators or deputies), filter
+        # the clubs based on the assigned clubs.
+        if is_media_member(user) and not is_media_coordinator_or_deputy(user):
             # If the Media Center member is linked to specific clubs,
             # only show them the ones that they are linked to.  If
             # not, only show them the clubs that don't have anyone

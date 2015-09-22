@@ -121,6 +121,10 @@ class Club(models.Model):
                                      verbose_name=u"يستطيع تقييم لأنشطة؟")
     can_view_assessments = models.BooleanField(default=False,
                                                verbose_name=u"يستطيع مشاهدة تقييمات الأنشطة؟")
+    is_assessed =  models.BooleanField(default=True,
+                                       verbose_name=u"هل يخضع للتقييم؟")
+    can_submit_activities =  models.BooleanField(default=True,
+                                                 verbose_name=u"هل يستطيع رفع أنشطة؟")
 
     forms = GenericRelation(Form)
     objects = ClubQuerySet.as_manager()

@@ -18,7 +18,9 @@ class Command(BaseCommand):
         end_time_since = (timezone.now() - datetime.timedelta(minutes=10)).time()
         end_time_until = timezone.now().time()
         for activity in Activity.objects.current_year().approved().done().filter(episode__end_date=end_date_target)\
-                                                                         .exclude(assessment__criterionvalue__criterion__category='P'):
+                                                                         .exclude(assessment__criterionvalue__criterion__category='P')\
+                                                                         .exclude(primary_club__is_assessed=False)\
+                                                                         .distinct():
             # If the activity didn't end within the past ten minutes,
             # skip, because another proccess would have sent a
             # notification about it.

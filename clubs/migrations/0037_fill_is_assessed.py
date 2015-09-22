@@ -10,6 +10,7 @@ def add_is_assessed(apps, schema_editor):
                                                  end_date__year=2016)
     unassessed_clubs = Club.objects.filter(english_name__contains="Presidency", year=year2015_2016) | \
                        Club.objects.filter(english_name__contains="Arshidni", year=year2015_2016) | \
+                       Club.objects.filter(english_name__contains="Arshidny", year=year2015_2016) | \
                        Club.objects.filter(english_name__contains="Media Center", year=year2015_2016) | \
                        Club.objects.filter(english_name__contains="Deanship", year=year2015_2016)
     unassessed_clubs.update(is_assessed=False)

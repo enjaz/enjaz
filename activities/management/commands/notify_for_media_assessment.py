@@ -18,7 +18,9 @@ class Command(BaseCommand):
         for activity in Activity.objects.current_year().approved().done().exclude(episode__end_date__gt=end_date_target)\
                                                                          .filter(episode__end_date=end_date_target)\
                                                                          .exclude(assessment__criterionvalue__criterion__category='M')\
-                                                                         .exclude(primary_club__media_assessor__isnull=True):
+                                                                         .exclude(primary_club__is_assessed=False)\
+                                                                         .exclude(primary_club__media_assessor__isnull=True)\
+                                                                         .distinct():
             email_context = {'activity': activity}
             if activity.primary_club.media_assessor:
                 full_url = "https://{}{}".format(domain,

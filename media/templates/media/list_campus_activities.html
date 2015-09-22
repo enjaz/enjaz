@@ -1,0 +1,42 @@
+{% extends 'media_base.html' %}{% load staticfiles %}
+
+{% block content %}
+<style>
+	tr {
+		height: 30px;
+	}
+</style>
+<h2>{% if not city %}جميع ال{% endif %}أنشطة {% if city == 'R' %}{% if gender == 'F' %}طالبات{% elif gender == 'M' %}طلاب{% endif %} الرياض{% elif city == 'J' %}طلاب وطالبات جدة{% elif city == 'A' %}طلاب وطالبات الأحساء{% endif %}</h2>
+<p>تعرض هذه الصفحة الأنشطة المتاحة ل{% if city == 'R' %}{% if gender == 'F' %}طالبات{% elif gender == 'M' %}طلاب{% endif %} الرياض{% elif city == 'J' %}طلاب وطالبات جدة{% elif city == 'A' %}طلاب وطالبات الأحساء{% else %}جميع الطالب والطالبات في كل المدن{% endif %}.  تستخدم هذه الصفحة لتجهيز الإعلانات، كالرسالة البريدية الأسبوعية.</p>
+<hr>
+
+{% with table_type='approved' %}
+    {% include 'activities/components/activities_table.html' %}
+{% endwith %}
+
+<link rel="stylesheet" href="{% static 'neon/assets/js/datatables/responsive/css/datatables.responsive.css' %}">
+{% endblock %}
+
+{% block customscript %}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+	<script src="{% static 'js/dataTables.tableTools.min.js' %}"></script>
+<script>
+$(function () {
+	$('.datatable').dataTable({
+        "order": [[ 2, "asc" ]],
+		"language": {% include 'js/dataTables-arabic.json' %}
+	});
+    var unix_seconds = Math.round(+new Date()/1000);
+    var approved_table = $('.datatable').DataTable();
+    var approved_table_nodes = approved_table.column(2, {order: 'current'}).nodes();
+    for (i=0; i < approved_table_nodes.length; i++) {
+       if ($(approved_table_nodes[i]).data('order') > unix_seconds) {
+            var page_number = Math.floor( i / approved_table.page.info().length );
+            approved_table.page(page_number).draw(false);
+            break
+       }
+    }
+});
+</script>
+{% endblock %}

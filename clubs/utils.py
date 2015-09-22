@@ -27,15 +27,19 @@ def is_coordinator(club, user):
 
 def is_deputy(club, user):
     """Return whether the user is a member of a given club."""
+    if not user.is_authenticated():
+        return False
     return user in club.deputies.filter(pk=user.pk)
 
 def is_member(club, user):
     """Return whether the user is a member of a given club."""
+    if not user.is_authenticated():
+        return False
     return user in club.members.filter(pk=user.pk)
 
 def is_coordinator_or_member(club, user):
     """Return whether the user is the coordinator, a deputy or a member of a given club."""
-    return is_coordinator(club, user) or is_deputy(club, user) or is_member(club, user)
+    return is_coordinator(club, user) or is_member(club, user)
 
 def is_coordinator_or_deputy(club, user):
     """Return whether the user is the coordinator or a deputy of a given club."""
@@ -49,6 +53,8 @@ def has_coordination_to_activity(user, activity):
     """Return whether the user is the coordinator or deputy assigned to
     any of the primry or secondary clubs of a given activity.
     """
+    if not user.is_authenticated():
+        return False
     # First get clubs associated with the activity.  We need both of
     # them to be QuerySets
     activity_primary_club = Club.objects.filter(
@@ -73,11 +79,15 @@ def get_media_center():
                                            city='R', gender='M')
 
 def get_user_clubs(user):
+    if not user.is_authenticated():
+        return Club.objects.none()
     return user.memberships.current_year() | user.coordination.current_year()
 
 def get_user_coordination_and_deputyships(user):
     """Return the clubs in which the given user is the coordinator or
     deputy.  Returns None if no clubs are found."""
+    if not user.is_authenticated():
+        return Club.objects.none()
 
     coordination = user.coordination.current_year()
     deputyships = user.deputyships.current_year()
@@ -97,7 +107,9 @@ def forms_editor_check(user, object):
     return is_coordinator_or_deputy(object, user) or user.is_superuser
 
 def can_review_activity(user, activity):
-    if user.has_perm('activities.add_review'): # e.g. superuser
+    if not user.is_authenticated():
+        return False
+    elif user.has_perm('activities.add_review'): # e.g. superuser
         return True
     reviewing_parents = Club.objects.activity_reviewing_parents(activity)
     user_clubs = reviewing_parents.filter(coordinator=user) | \
@@ -112,7 +124,9 @@ def can_delete_activity(user, activity):
     # * If they are the coordinator or deputy of any club that can
     #   review the activity, if that club has can_delete=True.  In
     #   real life, this means vice presidents.
-    if user.has_perm('activities.change_activity'):
+    if not user.is_authenticated():
+        return False
+    elif user.has_perm('activities.change_activity'):
         return True
     elif activity.is_editable and \
        not activity.review_set.exists() and \
@@ -133,7 +147,9 @@ def can_edit_activity(user, activity):
     # * If they are the coordinator or deputy of any club that can
     #   review the activity, if that club has can_edit=True.  In
     #   real life, this means vice presidents.
-    if user.has_perm('activities.change_activity'):
+    if not user.is_authenticated():
+        return False
+    elif user.has_perm('activities.change_activity'):
         return True
     elif activity.is_approved == False and \
          (activity.submitter == user or \
@@ -152,7 +168,9 @@ def can_edit_activity(user, activity):
         return user_clubs.exists()
 
 def can_review_any_niqati(user):
-    if user.has_perm('activities.change_code'): # e.g. superuser
+    if not user.is_authenticated():
+        return False
+    elif user.has_perm('activities.change_code'): # e.g. superuser
         return True
     niqati_reviewers = Club.objects.filter(can_review_niqati=True)
     user_clubs = niqati_reviewers.filter(coordinator=user) | \
@@ -160,6 +178,8 @@ def can_review_any_niqati(user):
     return user_clubs.exists()
 
 def get_order_reviewing_clubs_by_user(user, order):
+    if not user.is_authenticated():
+        return Club.objects.none()
     niqati_reviewers = Club.objects.niqati_reviewing_parents(order)
     user_clubs = niqati_reviewers.filter(coordinator=user) | \
                  niqati_reviewers.filter(deputies=user)

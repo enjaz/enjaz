@@ -1,0 +1,224 @@
+{% extends "base.html" %}{% load staticfiles %}
+{% block navbutton %}{% endblock %}
+{% block title %}المؤشرات{% endblock %}
+{% block pageheader %}المؤشرات{% endblock %}
+{% block pageheaderurl %}{% url 'indicators' %}{% endblock %}
+
+{% block content %}
+{% if city_choices %}
+    <ul>
+    {% for city in city_choices %}
+        <li><a href="{% url 'indicators_for_city' city.0 %}">{{ city.1 }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+<h1>مؤشرات إنجاز</h1>
+<p>شاهد أيضا <a href="https://osamakhalid.com/mirror/enjaz_stats/">العلامات الحيوية لإنجاز</a>.</p>
+<div class="row">
+    <h2>التسجيل في إنجاز</h2>
+    <div class="col-md-12">
+            <h3>المسجلون في البوابة بحسب الكليّة</h3>
+            <table id="city-colleges" class="table datatable">
+                <thead>
+                    <tr>
+                        <th>الكلية</th>
+                        <th>عدد المسجلين</th>
+                        <th>عدد المفعلين</th>
+                        <th>نسبة المفعلين</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for college in city_colleges %}
+                    <tr>
+                        <td>{{ college }}</td>
+                        <td>{{ college.commonprofile_set.count }}</td>
+                        <td>{{ college.active_count }}</td>
+                        <td>{{ college.active_percentage }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>
+</div>
+<div class="row">
+    <h2>الأندية في إنجاز</h2>
+    <div class="col-md-12">
+        <h3>الأندية بحسب الأعضاء</h3>
+        <table id="club-members" class="table datatable">
+            <thead>
+                <tr>
+                    <th>النادي</th>
+                    <th>الأعضاء</th>
+                    <th>التسجيل مفتوح؟</th>
+                    <th>له نواب؟</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for club in clubs_by_members %}
+                <tr>
+                    <td><a href="{% url 'clubs:show' club.id %}">{{ club }}</a></td>
+                    <td>{{ club.member_count }}</td>
+                    <td>{% if club.registration_is_open %}نعم{% else %}لا{% endif %}</td>
+                    <td>{% if club.deputies.exists %}نعم{% else %}لا{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h3>الأندية والمركز الإعلامي</h3>
+        <table id="club-media" class="table datatable">
+            <thead>
+                <tr>
+                    <th>النادي</th>
+                    <th>أحداث الشهر</th>
+                    <th>له ممثل إعلامي؟</th>
+                    <th>تقارير الشهر</th>
+                    <th>معدل الأيام الفاصلة بين انتهاء أنشطة الشهر ورفع التقرير</th>
+                    <th>تغطيات الشهر</th>
+                    <th>معدل الأيام الفاصلة بين انتهاء أنشطة الشهر ورفع التغطية</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for club in clubs_by_media %}
+                <tr>
+                    <td><a href="{% url 'clubs:show' club.id %}">{{ club }}</a></td>
+                    <td>{{ club.episode_count }}</td>
+                    <td>{% if club.media_representatives.exists %}نعم{% else %}لا{% endif %}</td>
+                    <td>{{ club.report_count }}</td>
+                    <td>{{ club.report_interval }}</td>
+                    <td>{{ club.story_count }}</td>
+                    <td>{{ club.story_interval }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <h2>نقاطي في إنجاز</h2>
+    <div class="col-md-6">
+        <h3>أكثر الطلاب حيازة للنقاط</h3>
+        <table id="niqati-students" class="table datatable">
+            <thead>
+                <tr>
+                    <th>الطالب</th>
+                    <th>الكلية</th>
+                    <th>مجموع النقاط</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for niqati_user in users_by_niqati_points %}
+                <tr>
+                    <td><a href="{% url 'niqati:student_report_with_username' niqati_user.username %}">{{ niqati_user.common_profile.get_ar_full_name|default:niqati_user }}</a></td>
+                    <td>{{ niqati_user.common_profile.college }}</td>
+                    <td>{{ niqati_user.point_sum }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <h3>توزيع النقاط بين الطلاب والطالبات</h3>
+        {% if male_count or female_count %}
+        <div id="niqati-gender" class="ct-chart ct-perfect-fourth"></div>
+        {% else %}
+        <p>لم تسجّل أي نقاط.</p>
+        {% endif %}
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h3>نقاطي بحسب الأندية لأنشطة الشهر المنصرم</h3>
+        <table id="niqati-code-count" class="table datatable">
+            <thead>
+                <tr>
+                    <th>النادي</th>
+                    <th>أحداث الشهر</th>
+                    <th>طلبات النقاط لأنشطة الشهر</th>
+                    <th>النقاط المُولدة لأنشطة الشهر</th>
+                    <th>النقاط المُدخلة لأنشطة الشهر</th>
+                    <th>معدل الأيام الفاصلة بين انعقاد النشاط وطلب النقاط</th>
+                    <th>استخدم الإدخال المباشر لأنشطة الشهر؟</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for club in clubs_by_niqati %}
+                <tr>
+                    <td><a href="{% url 'clubs:show' club.id %}">{{ club }}</a></td>
+                    <td>{{ club.month_episodes }}</td>
+                    <td>{{ club.month_code_orders }}</td>
+                    <td>{{ club.month_generated_codes }}</td>
+                    <td>{{ club.month_entered_codes }}</td>
+                    <td>{{ club.niqati_order_interval }}</td>
+                    <td>{% if club.used_direct_entry %}نعم{% else %}لا{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h3>الأيام التي تطلبها اعتماد النقاط لأتشطة الشهر المنصرم</h3>
+        <ul>
+            <li>للطلاب: {{ male_niqati_approval_interval }}</li>
+            <li>للطالبات: {{ female_niqati_approval_interval }}</li>
+        </ul>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'css/chartist.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/chartist.min.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        language = {% include 'js/dataTables-arabic.json' %};
+        $("#niqati-students, #niqati-orders").DataTable({
+            "order": [[ 2, "desc" ]],
+            "language": language,
+        });
+        $("#city-colleges, #club-members").DataTable({
+            "order": [[ 1, "desc" ]],
+            "language": language,
+        });
+        $("#niqati-code-count, #club-media").DataTable({
+            "order": [[ 4, "desc" ]],
+            "language": language,
+        });
+    });
+var data = {
+  labels: ['طالبات', 'طلاب'],
+  series: [{{ female_count }}, {{ male_count }}]
+};
+
+var sum = function(total, num) { return total + num };
+count = 0;
+var options = {
+    labelInterpolationFnc: function(value) {
+      percentage = Math.round(data.series[count] / data.series.reduce(sum) * 100) + '%';
+      count += 1;
+      return value + " " + percentage;
+    }
+};
+var responsiveOptions = [
+  ['screen and (min-width: 640px)', {
+    chartPadding: 30,
+    labelDirection: 'explode',
+  }],
+  ['screen and (min-width: 1024px)', {
+    chartPadding: 20
+  }]
+];
+    
+new Chartist.Pie('#niqati-gender', data, options, responsiveOptions);
+
+</script>
+<style>
+    .ct-label{
+        font-size: 20px;
+    }
+    h2, h3{
+        background-color: rgb(250, 250, 250);
+        padding: 5px;
+        margin-top: 25px;
+    }
+</style>
+{% endblock %}

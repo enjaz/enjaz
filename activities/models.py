@@ -1,5 +1,6 @@
 # -*- coding: utf-8  -*-
 import os
+from datetime import datetime, timedelta
 
 from django.contrib.contenttypes.generic import GenericRelation
 from django.db import models
@@ -7,7 +8,8 @@ from django.db.models import Avg, F, Sum
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from datetime import datetime, timedelta
+from django.utils import timezone
+
 
 from activities.managers import ActivityQuerySet
 from core.models import StudentClubYear
@@ -213,8 +215,8 @@ class Activity(models.Model):
         Return the next scheduled episode for this activity.
         """
         sorted_episodes = self.episode_set.order_by('start_date', 'start_time')
-        next_episodes = sorted_episodes.filter(start_date__gt=datetime.today()) \
-        | sorted_episodes.filter(start_date=datetime.today(), start_time__gte=datetime.now())
+        next_episodes = sorted_episodes.filter(start_date__gt=datetime.now().date()) \
+        | sorted_episodes.filter(start_date=datetime.now().date(), start_time__gte=datetime.now())
         # episodes from tomorrow onward +  episodes that are today but later in the day
         return next_episodes.first()
 
@@ -307,6 +309,24 @@ class Activity(models.Model):
                                         city=self.primary_club.city,
                                         gender=media_center_gender)
         return media_center
+
+    def is_done(self):
+        # If any episode is happening in a future date, that's enough
+        # to consider the activity not done.
+        future_episodes = self.episode_set.filter(end_date__gt=timezone.now().date())
+        if future_episodes.exists():
+            return False
+
+        # If one of today's episode is yet to happen, consider the
+        # activity not done.
+        episodes_ending_today = self.episode_set.filter(end_date=timezone.now().date())
+        for episode in episodes_ending_today:
+            if episode.end_time > timezone.now().time():
+                return False
+
+        # Otherwise, the activity is considered done.
+        return True
+
 
     class Meta:
         permissions = (

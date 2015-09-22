@@ -17,7 +17,7 @@ original Django code."""
     def clean(self):
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
-        message = admin.forms.ERROR_MESSAGE
+        message = admin.forms.AdminAuthenticationForm.error_messages['invalid_login']
         params = {'username': self.username_field.verbose_name}
 
         if username and password:
@@ -27,7 +27,7 @@ original Django code."""
             # If the user isn't in the arshidni group and isn't a
             # system administrator, they must not be able to use the
             # arshidni admin interface.
-            elif is_arshindi_coordinator_or_deputy(self.user_cache) and\
+            elif not is_arshindi_coordinator_or_deputy(self.user_cache) and\
                  not self.user_cache.is_superuser:
                 raise forms.ValidationError(message, code='invalid', params=params)
         return self.cleaned_data

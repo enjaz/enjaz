@@ -47,7 +47,7 @@
 					{% if activity.secondary_clubs.all %}
 					    <ul>
 					    {% for club in activity.secondary_clubs.all %}
-					    <li><a href="{% url 'clubs:show' club.pk %}">{{ club.name }}</a></li>
+					    <li><a href="{% url 'clubs:show' club.pk %}">{{ club }}</a></li>
 					    {% endfor %}
 					    </ul>
 					{% else %}
@@ -65,9 +65,13 @@
 						<a href="#">
 							<div>
 								<i class="entypo-calendar"></i>
+                                {% if episode.start_date == episode.end_date %}
+                                    {{ episode.start_date }}
+                                {% else %}
 								{{ episode.start_date }}
 								-
 								{{ episode.end_date }}
+                                {% endif %}
 							</div>
 							<div>
 								<i class="entypo-clock"></i>

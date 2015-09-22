@@ -16,6 +16,6 @@ class UserAutocomplete(autocomplete_light.AutocompleteModelTemplate):
          'placeholder': 'أَضف طالبا',
          'data-autocomplete-minimum-characters': 1}
     widget_attrs = {'class': 'modern-style'}
-    choices = User.objects.filter(common_profile__is_student=True, coordination__isnull=True)
+    choices = User.objects.filter(common_profile__is_student=True, coordination__isnull=True, is_active=True)
 
 autocomplete_light.register(UserAutocomplete)

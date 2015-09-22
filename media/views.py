@@ -27,6 +27,7 @@ from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleF
     TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm, \
     FollowUpReportImageFormset, ReportCommentForm, BuzzForm
 from media.utils import is_media_coordinator_or_member, is_club_coordinator_or_member, is_media_or_club_coordinator_or_member, proper_poll_type, get_poll_type_url, media_coordinator_or_member_test, get_user_media_center, get_clubs_for_assessment_by_user, can_submit_followupreport, get_club_media_center, media_user_test, is_media_coordinator_or_deputy
+from accounts.utils import get_user_gender, get_user_city
 
 # Keywords
 ACTIVE = "active"
@@ -59,6 +60,18 @@ def list_activities(request):
     else:
         clubs_for_user = get_clubs_for_assessment_by_user(request.user)
     return render(request, 'media/list_activities.html', {'clubs': clubs_for_user})
+
+@login_required
+@user_passes_test(media_user_test)
+def list_campus_activities(request):
+    """
+    Show a list of activities within the user's campus only.  To be
+    used to prepare the weekly email.
+    """
+    context = {'city': get_user_city(request.user),
+               'gender': get_user_gender(request.user)}
+    context['activities'] = Activity.objects.approved().current_year().for_user_city(request.user).for_user_gender(request.user)
+    return render(request, 'media/list_campus_activities.html', context)
 
 # --- Follow-up Reports ---
 

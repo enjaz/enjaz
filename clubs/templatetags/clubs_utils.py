@@ -79,3 +79,7 @@ def can_review_any_niqati(user):
 @register.filter
 def can_assess_any_club(user):
     return activity_utils.can_assess_any_club(user)
+
+@register.filter
+def can_submit_activities(user):
+    return club_utils.can_submit_activities(user)

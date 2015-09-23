@@ -19,7 +19,7 @@ from clubs.utils import is_coordinator_or_member, is_coordinator_or_deputy_of_an
     is_coordinator_of_any_club, get_media_center, \
     is_member_of_any_club, is_employee_of_any_club, is_coordinator, is_coordinator_or_deputy, get_user_clubs, \
     get_user_coordination_and_deputyships, has_coordination_to_activity, get_deanship, is_employee, \
-    can_review_activity, can_delete_activity, can_edit_activity
+    can_review_activity, can_delete_activity, can_edit_activity, can_submit_activities
 from media.utils import MAX_OVERDUE_REPORTS, can_assess_club_as_media_coordinator, can_assess_club_as_media_member, can_assess_club_as_media, is_media_coordinator_or_deputy, get_user_media_center, get_clubs_for_assessment_by_user
 from media.models import FollowUpReport, FollowUpReportImage, Story
 
@@ -199,14 +199,15 @@ def create(request):
     # more dynamic to check whether the user is a coordinator of any
     # club, or has the permission to add activities (i.e. part of the
     # presidency group)
-    user_coordination = get_user_coordination_and_deputyships(request.user)
-    if not request.user.has_perm("activities.add_activity") and not user_coordination:
-        raise PermissionDenied        
-    
+    if not request.user.has_perm("activities.add_activity") and \
+       not can_submit_activities(request.user):
+        raise PermissionDenied
+
     # (2) Check if the user's club has no more than 3 overdue
     # follow-up reports.  If any club coordinated by the user exceeds
     # the 3-report threshold, prevent new activity submission (again
     # in reality the user will only coordinate one club)
+    user_coordination = get_user_coordination_and_deputyships(request.user)
     if any([club.get_overdue_report_count() > MAX_OVERDUE_REPORTS for club in user_coordination]):
         raise PermissionDenied
 
@@ -619,7 +620,7 @@ def assessment_list(request):
     context = {}
     user_assessing_clubs = get_user_clubs(request.user).filter(can_assess=True)
     user_media_center = get_user_media_center(request.user)
-    clubs_for_user = get_clubs_for_assessment_by_user(request.user)
+    clubs_for_user = get_clubs_for_assessment_by_user(request.user).filter(is_assessed=True)
 
     approved_activvities = Activity.objects.current_year().approved().done().filter(primary_club__in=clubs_for_user).distinct()
     # 'done' has different meanings for the Media Center, the

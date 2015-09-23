@@ -170,7 +170,7 @@ def can_edit_activity(user, activity):
 def can_review_any_niqati(user):
     if not user.is_authenticated():
         return False
-    elif user.has_perm('activities.change_code'): # e.g. superuser
+    elif user.has_perm('activities.change_activity'): # e.g. superuser
         return True
     niqati_reviewers = Club.objects.filter(can_review_niqati=True)
     user_clubs = niqati_reviewers.filter(coordinator=user) | \
@@ -185,3 +185,12 @@ def get_order_reviewing_clubs_by_user(user, order):
                  niqati_reviewers.filter(deputies=user)
     return user_clubs
 
+
+def can_submit_activities(user):
+    if not user.is_authenticated():
+        return False
+    elif user.has_perm('activities.add_activity'): # e.g. superuser
+        return True
+    else:
+        coordination_and_deputyships = get_user_coordination_and_deputyships(user)
+        return coordination_and_deputyships.filter(can_submit_activities=True).exists()

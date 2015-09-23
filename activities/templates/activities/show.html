@@ -107,7 +107,7 @@
                         {% for episode in activity.episode_set.all %}
                         <li>
                         {# if the user has privileges to add a follow-up report... #}
-						{% if  user|is_employee_of_any_club or user|has_coordination_to_activity:activity or perms.media.add_followupreport %}
+						{% if  user|is_employee_of_any_club or user|has_coordination_to_activity:activity or user|can_submit_followupreport:activity or perms.media.add_followupreport %}
 						{# group the activity info in a div to make #}
 						{# space for the report button #}
 						<div class="col-md-10">

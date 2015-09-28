@@ -352,6 +352,7 @@ def control_request(request):
                                                   user=book.submitter,
                                                   is_counted=True)
             if not request_points.exists():
+                current_year = StudentClubYear.objects.get_current()
                 Point.objects.create(year=current_year,
                                      request=book_request,
                                      user=book.submitter,

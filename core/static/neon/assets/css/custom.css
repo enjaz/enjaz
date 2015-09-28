@@ -451,3 +451,12 @@ body.login-page .login-content .alert-warning a {
 .profile-env>header .profile-info-sections .profile-name strong .activity-name {
     font-size: 30px;
 }
+
+.row-flex{
+    display: flex;
+}
+
+.vcenter{
+    margin-top: auto;
+    margin-bottom: auto;
+}

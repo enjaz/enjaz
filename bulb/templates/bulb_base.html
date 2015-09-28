@@ -1,0 +1,19 @@
+{% extends 'base.html' %}{% load bulb_tags %}{% load staticfiles %}
+
+{% block title %}سراج{% endblock %}
+
+{% block pageheaderurl %}
+    {% url 'bulb:index' %}
+{% endblock %}
+{% block pageheader %}سراج{% endblock %}
+
+{% block navbar %}
+    <li><a href="{% url 'bulb:list_book_categories' %}"><i class="fa fa-book"></i> تبادل الكتب</a></li>
+    <li><a href=""><i class="fa fa-comments"></i> مجموعات القراءة</a></li>
+    <li><a href=""><i class="entypo-users"></i> قراء الجامعة</a></li>
+{% endblock %}
+
+{% block content %}{% endblock %}
+
+{% block customscript %}
+{% endblock %}

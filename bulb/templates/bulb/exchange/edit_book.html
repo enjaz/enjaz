@@ -1,0 +1,127 @@
+{% load bootstrap3 %}{% load staticfiles %}
+<form enctype="multipart/form-data" id="edit-book-form" action="post">
+{% csrf_token %}
+{% bootstrap_form form %}
+</form>
+{% if form.instance.pk %}
+<hr>
+<div class="col-md-3">
+<button id="delete-book" class="btn btn-xs btn-danger btn-icon">
+    <i class="entypo-cancel"></i>
+    احذف الكتاب
+</button>
+</div>
+<div class="col-md-9">
+<form style="display: none;" id="confirm-delete-form" class="form form-inline">
+    {% csrf_token %}
+    <label>هل أنت متأكد؟ سيتم حذف كل المعلومات المتعلقة بالكتاب.</label>
+    <button class="btn btn-xs btn-danger" type="submit">نعم</button>
+    <button id="abort-delete" class="btn btn-xs btn-default">لا</button>
+</form>
+</div>
+{% endif %}
+<script type="text/javascript">
+$(function () {
+    $(".dynamic-form").each(function () {
+        var deleteColumn = $(this).find("td:last-child");
+        console.log(deleteColumn.find(".delete-row"));
+        console.log(deleteColumn.find(".delete-row").length == 0);
+        if (deleteColumn.find(".delete-row").length == 0) {
+            // insert a delete button
+            var button = '<a class="delete-row btn btn-xs btn-default" href="javascript:void(0)">احذف</a>';
+            deleteColumn.append(button);
+            console.log("appended a button");
+        };
+    });
+
+    // modify form submission behaviour to be ajaxy
+    $("form#edit-book-form").submit(function (event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var formData = new FormData($(this)[0]); 
+        {% if book %}{# if a book is passed, then post to edit_book url, otherwise to add_book #}
+        var url = "{% url 'bulb:edit_book' book.pk %}";
+        {% else %}
+        var url = "{% url 'bulb:add_book' %}";
+        {% endif %}
+
+        /* Send the data */
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (data) {
+                if (data.message == "success") {
+
+                    // show success message (using toastr)
+                    toastr.options.positionClass = "toast-top-left";
+                    {% if book %}
+                    toastr.success("عُدّل {{ book.title }} بنجاح.");
+                    {% else %}
+                    toastr.success("أضيف كتاب جديد بنجاح.");
+                    {% endif %}
+
+                    // hide modal
+                    var $modal = $("#edit-book-modal")
+                    $modal.modal('hide');
+
+                    // refresh book lists
+                    loadBooks()
+
+                } else {
+                    $("#edit-book-modal .modal-body").html(data);
+                }}
+        });
+
+    });
+
+    {% if form.instance.pk %}
+    $deleteForm = $('#confirm-delete-form');
+    $("button#delete-book").click(function () {
+        $deleteForm.slideDown();
+    });
+    $("button#abort-delete").click(function (event) {
+        event.preventDefault();
+        $deleteForm.slideUp();
+    });
+    $deleteForm.submit(function (event) {
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var data = {
+                action: 'delete',
+                pk: {{ book.pk }}
+        }
+        var url = "{% url 'bulb:control_book' %}";
+
+        /* Send the data using post */
+        var posting = $.post(url, data);
+
+        posting.done(function (data) {
+            if (data.message == "success") {
+
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                toastr.info("حُذف {{ book.title }} بنجاح.");
+
+                // hide modal
+                var $modal = $("#edit-book-modal")
+                $modal.modal('hide');
+
+                // refresh book lists
+                loadBooks()
+
+            }
+        });
+    });
+    {% endif %}
+});
+</script>

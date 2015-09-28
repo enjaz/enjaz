@@ -49,24 +49,3 @@
     </div>
     </div>
 </div>
-<script type="text/javascript">
-    // attach function to edit book button
-    $(function () {
-        $("button.edit-book").click(function () {
-            var pk = $(this).data('pk');
-            // show the edit book modal {# you can find it in bulb/exchange/home.html #}
-            $("#edit-book-modal").modal('show');
-
-            $("#edit-book-modal .modal-title").html("عدّل كتاب");
-            $("#edit-book-modal .modal-body").load("{% url 'bulb:list_book_categories' %}/books/" + pk + "/edit/");
-
-            var $submitButton = $("#edit-book-modal button#submit-button");
-            // Unbind any handlers previously attached to the submit button
-            // This is necessary to avoid multiple submissions of the form
-            $submitButton.off('click');
-            $submitButton.click(function () {
-                $("form#edit-book-form").submit();
-            });
-        });
-    });
-</script>

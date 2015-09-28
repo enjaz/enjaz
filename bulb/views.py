@@ -24,9 +24,13 @@ def index(request):
 
 # TODO
 # * Send emails in case of failed indirect request.
+# * In case of failed indirect requests, cancel requester points.
 # * Don't hard-cord the editing URL in JavaScript.
 # * Don't Repeat Yourself when it comes to JavaScript delete, edit and
 #   order buttons.
+# * If the request was marked as done by the owner, should we hide it
+#   for the requester (propbably not)
+
 @login_required
 def list_book_categories(request):
     categories = Category.objects.distinct().filter(book__isnull=False,
@@ -232,6 +236,8 @@ def pending_request(request):
 @decorators.ajax_only
 @login_required
 def list_my_pending_requests(request):
+    # Exclude done requests and indirect requested with failed
+    # communication attempt.
     done_pks = (
         Request.objects.filter(requester=request.user,
                                owner_status='D',
@@ -241,7 +247,10 @@ def list_my_pending_requests(request):
                                requester_status='') |\
         Request.objects.filter(requester=request.user,
                                owner_status='',
-                               requester_status='D')\
+                               requester_status='D') |\
+        Request.objects.filter(requester=request.user,
+                               owner_status='F',
+                               delivery='I')\
                ).values_list('book__pk', flat=True)
     books = Book.objects.current_year()\
                         .filter(is_available=False, is_deleted=False)\
@@ -326,10 +335,10 @@ def control_book(request):
         pass
     return {"message": "success"}
 
-@login_required
-@csrf.csrf_exempt
 @decorators.ajax_only
 @decorators.post_only
+@login_required
+@csrf.csrf_exempt
 def control_request(request):
     action = request.POST.get('action')
     request_pk = request.POST.get('pk')
@@ -347,16 +356,9 @@ def control_request(request):
             book_request.save()
 
             # If no previous points have been created (i.e. by
-            # requested confirmation), create one.
-            request_points = Point.objects.filter(request=book_request,
-                                                  user=book.submitter,
-                                                  is_counted=True)
-            if not request_points.exists():
-                current_year = StudentClubYear.objects.get_current()
-                Point.objects.create(year=current_year,
-                                     request=book_request,
-                                     user=book.submitter,
-                                     value=1)
+            # requester's confirmation), create one.
+            book_request.create_related_points()
+            
 
         elif action == 'owner_failed':
             book.is_available = False
@@ -400,10 +402,36 @@ def control_request(request):
 
     if action.startswith('requester_'):
         if not request.user == book_request.requester and \
-           not request.user.is_superuser:
+           not request.user.is_superuser and \
+           not utils.is_bulb_coordinator_or_deputy(request.user):
             raise PermissionDenied
 
-        if action == 'requester_canceled':
+        if action == 'requester_done':
+            book.is_available = False
+            book.save()
+            book_request.requester_status = 'D'
+            book_request.requester_status_date = timezone.now()
+            book_request.save()
+
+            # If no previous points have been created (i.e. by
+            # requester's confirmation), create one.
+            book_request.create_related_points()
+            
+        elif action == 'requester_failed':
+            book.is_available = False
+            book.save()
+            book_request.requester_status = 'F'
+            book_request.requester_status_date = timezone.now()
+            book_request.save()
+            my_books_url = reverse('bulb:my_books')
+            full_url = request.build_absolute_uri(my_books_url)
+            email_context = {'book': book,
+                             'book_request': book_request,
+                             'full_url': full_url}
+            mail.send([book.submitter.email],
+                       template="book_request_failed_to_owner",
+                       context=email_context)
+        elif action == 'requester_canceled':
             # You cannot delete a request after it has been approved
             # by both parties.
             if book_request.owner_status == 'D' or\
@@ -429,6 +457,7 @@ def control_request(request):
                     mail.send([bulb_coordinator.email],
                               template="indirect_book_request_canceled_to_coordinator",
                               context=email_context)
+
     return {"message": "success"}
 
 @login_required

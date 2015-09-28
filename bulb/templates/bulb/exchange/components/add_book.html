@@ -1,0 +1,87 @@
+{% load staticfiles %}
+<script type="text/javascript">
+    $(function () {
+        
+        
+        // initialize book edit modal
+        $('#edit-book-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        });
+        $("button#add-book").click(function () {
+            $("#edit-book-modal").modal('show');
+
+            $("#edit-book-modal .modal-title").html("أضف كتابًا");
+            $("#edit-book-modal .modal-body").load("{% url 'bulb:add_book' %}");
+
+            var $submitButton = $("#edit-book-modal button#submit-button");
+            // Unbind any handlers previously attached to the submit button
+            // This is necessary to avoid multiple submissions of the form
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-book-form").submit();
+            });
+        });
+        {% if from_category or from_my_books  %}
+        // load books
+        loadBooks();
+        {% endif %}
+    });
+    {% if from_category %}
+    function loadBooks() {
+    $("#category-books").load("{% url 'bulb:list_book_previews' 'category' category.code_name %}", function() {
+        $(".order-book").click(function () {
+            $("#order-book-modal").modal('show');
+            var pk = $(this).data('pk');
+
+            $("#order-book-modal .modal-body").load("{% url 'bulb:order_instructions' %}", {pk: pk});
+
+            var $submitButton = $("#order-book-modal button#submit-button");
+            // Unbind any handlers previously attached to the submit button
+            // This is necessary to avoid multiple submissions of the form
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#order-book-form").submit();
+                loadBooks();
+            });
+        });
+    });
+    }
+    {% elif from_my_books %}
+    function loadBooks() {
+        var url = "{% url 'bulb:list_book_previews' 'user' user.username %}";
+        $("#available-books").load(url, {condition: 'available'});
+        $("#done-books").load(url, {condition: 'done'});
+    }
+    {% endif %}
+  // ----
+  // enable scrolling in modal body due to its length
+  // script source: http://stackoverflow.com/a/20765540/4249696
+  $(document).ready(ajustamodal);
+  $(window).resize(ajustamodal);
+  function ajustamodal() {
+    var altura = $(window).height() - 155; //value corresponding to the modal heading + footer
+    $(".ativa-scroll").css({"height":altura,"overflow-y":"auto"});
+  }
+  // ----
+</script>
+
+<!-- book adding/editing modal -->
+<div class="modal fade" id="edit-book-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">أغلق</span></button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body ativa-scroll">
+        {% include "media/polls/ajax-loader.html" %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">أغلق</button>
+        <button type="button" class="btn btn-primary" id="submit-button">احفظ</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

@@ -1,0 +1,12 @@
+{% for book in books %}
+    {% autoescape off %}{% cycle '<div class="row">' '' %}{% endautoescape %}
+    {% include "bulb/exchange/components/book_preview.html" %}
+    {% autoescape off %}
+    {% cycle '' '</div>' %}
+{% if not forloop.last %}
+    <hr {% cycle 'class="visible-xs"' '' %}>
+{% endif %}
+    {% endautoescape %}
+{% empty %}
+    <p>لا توجد كتب هنا.</p>
+{% endfor %}

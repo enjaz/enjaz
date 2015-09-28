@@ -1,0 +1,15 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}
+{% block title %}{{ book.title }}{% endblock %}
+{% block navbar %}
+    {% include "bulb/exchange/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+    {% include "bulb/exchange/components/book_preview.html" %}
+{% endblock %}
+
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+
+{% include "bulb/exchange/components/add_book.html" %}
+{% endblock %}

@@ -1,0 +1,12 @@
+<div class="row" style="margin-left: 0">
+    <div style="float: left;">
+        <button id="add-book" class="btn btn-icon btn-success">
+            <i class="entypo-plus"></i>
+            أضف كتابًا
+        </button>
+        <a href="{% url 'bulb:student_report' %}" class="btn btn-icon btn-warning">
+            <i class="entypo-tag"></i>
+            رصيدك: {{ user.book_points.count_total }}
+        </a>
+    </div>
+</div>

@@ -1,0 +1,27 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}
+{% block title %}كتب {{ category.name }}{% endblock %}
+{% block navbar %}
+    {% include "bulb/exchange/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        {% include "bulb/exchange/components/critical_buttons.html" %}
+        <h1>كتب {{ category.name }}</h1>
+        <div class="panel panel-success panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="category-books">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+
+{% with from_category=True %}
+    {% include "bulb/exchange/components/add_book.html" %}
+    {% include "bulb/exchange/components/order_modal.html" %}
+{% endwith %}
+{% endblock %}

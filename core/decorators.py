@@ -53,7 +53,7 @@ def ajax_only(view_func):
             else:
                 message = unicode(e)
             if message == '':
-                message = _('Oops, apologies - there was some error')
+                message = 'Oops, apologies - there was some error'
             logging.debug(message)
             data = {
                 'message': message,

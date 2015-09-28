@@ -24,7 +24,9 @@ def index(request):
 
 # TODO
 # * Send emails in case of failed indirect request.
-
+# * Don't hard-cord the editing URL in JavaScript.
+# * Don't Repeat Yourself when it comes to JavaScript delete, edit and
+#   order buttons.
 @login_required
 def list_book_categories(request):
     categories = Category.objects.distinct().filter(book__isnull=False,

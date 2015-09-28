@@ -1,15 +1,96 @@
-{% extends "bulb_base.html" %}{% load staticfiles %}
+{% extends "bulb_base.html" %}{% load staticfiles %}{% load bulb_tags %}
 {% block title %}{{ book.title }}{% endblock %}
 {% block navbar %}
     {% include "bulb/exchange/components/navbar.html" %}
 {% endblock %}
 {% block content %}
-    {% include "bulb/exchange/components/book_preview.html" %}
+<div class="row">
+    <div class="col-sm-4">
+        <div style="text-align: center; border-left: solid 1px #eee;">
+            <style>
+                #book-{{ book.pk }}-img {
+                    display: block;
+                    width:90%;
+                    padding-bottom:90%;
+                    margin:10px;
+                    background:url('{{ book.cover.url }}') center center no-repeat;
+                    background-size: auto 100%;
+                }
+            </style>
+            <div id="book-{{ book.pk }}-img" style="max-width: 100%;"></div>
+            تأليف: {{ book.authors }}
+        </div>
+    </div>
+    <div class="col-sm-8">
+       <h2>{{ book.title }}</h2>
+        <p>
+            {{ book.description|linebreaksbr }}
+        </p>
+        <p>أضاف هذا الكتاب {{ book.submitter.common_profile.get_ar_full_name }} في {{ book.submission_date|date:"" }}.</p>
+        <span style="float: left">
+            {% if user|can_edit_book:book %}
+            <button data-pk="{{ book.pk }}" class="edit-book btn btn-xs btn-icon btn-gold">
+                <i class="entypo-pencil"></i>
+                عدل
+            </button>
+            <button data-pk="{{ book.pk }}" class="delete-book btn btn-xs btn-icon btn-danger">
+                <i class="entypo-block"></i>
+                احذف
+            </button>
+            {% endif %}
+            {% if user|can_order_book:book %}
+            <button data-pk="{{ book.pk }}" class="order-book btn btn-xs btn-icon btn-success">
+                <i class="entypo-flag"></i>
+                اطلب
+            </button>
+            {% endif %}
+        </span>
+    </div>
+</div>
 {% endblock %}
 
 
 {% block customscript %}
-<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<style>
+p{
+    font-size: 17px;
+}
+</style>
+<script type="text/javascript">
+    $(function(){
+        $(".order-book").click(function () {
+            $("#order-book-modal").modal('show');
+            var pk = $(this).data('pk');
 
+            $("#order-book-modal .modal-body").load("{% url 'bulb:order_instructions' %}", {pk: pk});
+
+            var $submitButton = $("#order-book-modal button#submit-button");
+            // Unbind any handlers previously attached to the submit button
+            // This is necessary to avoid multiple submissions of the form
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#order-book-form").submit();
+            });
+        });
+        $(".edit-book").click(function () {
+            var pk = $(this).data('pk');
+            // show the edit book modal {# you can find it in bulb/exchange/home.html #}
+            $("#edit-book-modal").modal('show');
+
+            $("#edit-book-modal .modal-title").html("عدّل كتاب");
+            $("#edit-book-modal .modal-body").load("{% url 'bulb:list_book_categories' %}books/" + pk + "/edit/");
+
+            var $submitButton = $("#edit-book-modal button#submit-button");
+            // Unbind any handlers previously attached to the submit button
+            // This is necessary to avoid multiple submissions of the form
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-book-form").submit();
+            });
+        });
+    });
+</script>
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
 {% include "bulb/exchange/components/add_book.html" %}
+{% include "bulb/exchange/components/order_modal.html" %}
 {% endblock %}

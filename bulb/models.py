@@ -3,6 +3,7 @@ from datetime import timedelta
 from django.db import models
 from django.contrib.auth.models import User
 
+from core.models import StudentClubYear
 from bulb.managers import BookQuerySet, RequestQuerySet, PointQuerySet
 
 
@@ -104,6 +105,25 @@ class Request(models.Model):
                                      user=user,
                                      is_counted=True)\
                              .update(is_counted=False)
+
+    def create_related_points(self):
+        current_year = StudentClubYear.objects.get_current()
+        owner_points = Point.objects.filter(request=self,
+                                            user=self.book.submitter,
+                                            is_counted=True)
+        if not owner_points.exists():
+            Point.objects.create(year=current_year,
+                                 request=self,
+                                 user=self.book.submitter,
+                                 value=1)
+        requester_points = Point.objects.filter(request=self,
+                                                user=self.requester,
+                                                is_counted=True)
+        if not requester_points.exists():
+            Point.objects.create(year=current_year,
+                                 request=self,
+                                 user=self.requester,
+                                 value=-1)
 
     def __unicode__(self):
         return self.book.title

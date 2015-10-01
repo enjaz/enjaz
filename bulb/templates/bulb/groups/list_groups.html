@@ -1,0 +1,28 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}
+{% block title %}مجموعات القراءة{% endblock %}
+{% block content %}
+    <div class="row" style="margin-left: 0">
+        <div style="float: left;">
+            <button id="add-group" class="btn btn-icon btn-success">
+                <i class="entypo-plus"></i>
+                أنشئ مجموعة
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <h1>مجموعات القراءة</h1>
+        <div class="panel panel-success panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="groups">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+{% include "bulb/groups/add_group_asset.html" %}
+{% include "bulb/groups/membership_modals.html" %}
+{% endblock %}

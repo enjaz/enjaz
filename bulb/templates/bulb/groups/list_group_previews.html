@@ -1,0 +1,14 @@
+{% for group in groups %}
+    {% autoescape off %}{% cycle '<div class="row">' '' '' %}{% endautoescape %}
+    {% include "bulb/groups/preview_group.html" %}
+    {% autoescape off %}
+    {% cycle '' '' '</div>' %}
+{% if not forloop.last %}
+    <hr {% cycle 'class="visible-xs"' 'class="visible-xs"' '' %}>
+{% elif not forloop.counter|divisibleby:3 %}
+    </div>
+{% endif %}
+    {% endautoescape %}
+{% empty %}
+    <p>لا توجد مجموعات قراءة.</p>
+{% endfor %}

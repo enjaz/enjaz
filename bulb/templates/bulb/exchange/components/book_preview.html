@@ -28,6 +28,7 @@
     <p>
         {{ book.description|truncatechars:100 }}
     </p>
+        {% if not from_home %}
         <span style="float: left">
             {% if user|can_edit_book:book %}
             <button data-pk="{{ book.pk }}" class="edit-book btn btn-xs btn-icon btn-gold">
@@ -46,6 +47,7 @@
             </button>
             {% endif %}
         </span>
+        {% endif %}
     </div>
     </div>
 </div>

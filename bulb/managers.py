@@ -12,22 +12,16 @@ class BookQuerySet(models.QuerySet):
         """
         Return a queryset of approved books.
         """
-        return self.filter(is_available=True, is_deleted=False)
+        return self.undeleted().filter(is_available=True)
 
     def deleted(self):
         return self.filter(is_deleted=True)
 
+    def undeleted(self):
+        return self.filter(is_deleted=False)
+
     def of_user(self, user):
         return self.filter(submitter=user)
-    
-    def for_user_gender(self, user=None):
-        gender_condition = models.Q()
-
-        if user and user.is_authenticated():
-            gender = get_user_gender(user)
-            if gender:
-                gender_condition = models.Q(submitter__common_profile__college__gender=gender)
-        return self.filter(gender_condition)
 
     def for_user_city(self, user=None):
         city_condition = models.Q()
@@ -80,4 +74,46 @@ class PointQuerySet(models.QuerySet):
         if total is None:
             return 0
         else:
-            return total 
+            return total
+
+class GroupQuerySet(models.QuerySet):
+    def current_year(self):
+        year = StudentClubYear.objects.get_current()
+        return self.filter(year=year)
+
+    def available(self):
+        """
+        Return a queryset of approved books.
+        """
+        return self.filter(is_deleted=False)
+
+    def for_user_gender(self, user=None):
+        gender_condition = models.Q()
+
+        if user and user.is_authenticated():
+            gender = get_user_gender(user)
+            if gender:
+                gender_condition = models.Q(coordinator__common_profile__college__gender=gender)
+        return self.filter(gender_condition)
+
+    def for_user_city(self, user=None):
+        city_condition = models.Q()
+
+        if user and user.is_authenticated():
+            city = get_user_city(user)
+            if city:
+                city_condition = models.Q(coordinator__common_profile__city=city)
+        return self.filter(city_condition)
+
+class SessionQuerySet(models.QuerySet):
+    def undeleted(self):
+        return self.filter(is_deleted=False)
+
+class MembershipQuerySet(models.QuerySet):
+    def current_year(self):
+        year = StudentClubYear.objects.get_current()
+        return self.filter(group__year=year)
+ 
+    def active(self):
+        return self.filter(is_active=True)
+

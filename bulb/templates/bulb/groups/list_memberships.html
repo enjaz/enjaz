@@ -1,0 +1,84 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}{% load bulb_tags %}
+{% block title %}أعضاء {{ group.name }}{% endblock %}
+{% block content %}
+
+<h1>أعضاء <a href="{% url 'bulb:show_group' group.pk %}">{{ group.name }}</a></h1>
+<table class="datatable display dt-responsive">
+    <thead>
+        <th>اسم العضو</th>
+        <th class="not-mobile">الكلية</th>
+        <th class="not-mobile">البريد</th>
+        <th class="not-mobile">الجوال</th>
+        <th class="not-mobile">تاريخ الانضمام</th>
+        <th>الخيارات</th>
+    </thead>
+    <tbody>
+        {% for membership in group.membership_set.all %}
+            <td>{{ membership.user.common_profile.get_ar_full_name }}</td>
+            <td>{{ membership.user.common_profile.college.get_college_display }}</td>
+            <td><a href="mailto:{{ membership.user.email }}">{{ membership.user.email }}</a></td>
+            <td>{{ membership.user.common_profile.mobile_number }}</td>
+            <td data-order="{{ membership.submission_date|date:'U' }}">{{ membership.submission_date|date:"j F Y" }}</td>
+            <td>
+                {% if membership.is_active %}
+                <a class="btn-membership btn btn-block  btn-xs btn-icon btn-danger" data-group-pk="{{ group.pk }}" data-user-pk="{{ membership.user.pk }}" data-action="deactivate">
+                    <i class="fa fa-times"></i>تجميد العضوية
+                </a>
+                {% else %}
+                <a class="btn-membership btn btn-block btn-xs btn-icon btn-success" data-group-pk="{{ group.pk }}" data-user-pk="{{ membership.user.pk }}" data-action="activate">
+                    <i class="fa fa-plus"></i>تفعيل العضوية
+                </a>
+                {% endif %}
+            </td>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+
+<script type="text/javascript">
+    $('.datatable').DataTable({
+        "order": [[ 4, "desc" ]],
+        "language": {% include 'js/dataTables-arabic.json' %}
+    });
+    $(function(){
+        $(".btn-membership").click(function () {
+        /* get some values from elements on the page: */
+        button = this;
+        var url = "{% url 'bulb:control_membership' %}";
+        var action = $(this).data('action');
+        var data = {
+            group_pk: $(this).data('group-pk'),
+            user_pk: $(this).data('user-pk'),
+            action: $(this).data('action'),
+        };
+        /* Send the data using post */
+        var posting = $.post(url, data);
+        posting.done(function (data) {
+            if (data.message == "success") {
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                if (action == 'deactivate'){
+                    toastr.info("حُذفت عضوية {{ group.name }} بنجاح.");
+                    $(button).html('<i class="fa fa-plus"></i>تفعيل العضوية');
+                    $(button).data('action', 'activate');
+                    $(button).addClass('btn-success')
+                    $(button).removeClass('btn-danger')
+                } else if (action == 'activate'){
+                    toastr.info("فُعّلت عضوية {{ group.name }} بنجاح.");
+                    $(button).html('<i class="fa fa-times"></i>تجميد العضوية');
+                    $(button).data('action', 'deactivate');
+                    $(button).addClass('btn-danger')
+                    $(button).removeClass('btn-success')
+                }
+            }
+        });
+    });
+    });
+</script>
+{% endblock %}

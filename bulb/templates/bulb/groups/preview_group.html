@@ -1,0 +1,6 @@
+{% load bulb_tags %}
+<div class="col-sm-4">
+    <div class="group-image" style="background-image: url('{{ group.image.url }}');"></div>
+    <div class="group-overlay"></div>
+    <a class="group-link" href="{% url 'bulb:show_group' group.pk %}"><div class="group-name"><span>{{ group.name }}</span></div></a>
+</div>

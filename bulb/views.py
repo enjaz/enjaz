@@ -13,14 +13,24 @@ from post_office import mail
 from accounts.utils import get_user_gender
 from core.models import StudentClubYear
 from core import decorators
-from bulb.models import Category, Book, Request, Point
-from bulb.forms import BookForm
+from bulb.models import Category, Book, Request, Point, Group, Membership, Session, Report, ReaderProfile
+from bulb.forms import BookForm, GroupForm, SessionForm, ReportForm, ReaderProfileForm
 from bulb import utils
 
 
 @login_required
 def index(request):
-    return render(request, "bulb/index.html")
+    groups = Group.objects.current_year().available().order_by("?")[:6]
+    group_count = Group.objects.current_year().available().count()
+    books = Book.objects.current_year().available().order_by("?")[:6]
+    book_count = Book.objects.current_year().available().count()
+    reader_profiles = ReaderProfile.objects.order_by("?")[:10]
+    reader_profile_count = ReaderProfile.objects.count()
+    context = {'groups': groups, 'group_count': group_count,
+               'books': books, 'book_count': book_count,
+               'reader_profiles': reader_profiles,
+               'reader_profile_count': reader_profile_count}
+    return render(request, "bulb/index.html", context)
 
 # TODO
 # * Send emails in case of failed indirect request.
@@ -161,7 +171,7 @@ def edit_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
 
     if not utils.can_edit_book(request.user, book):
-        raise PermissionDenied
+        raise Exception(u"لا تستطيع تعديل الكتاب")
 
     context = {'book': book}
     if request.method == 'POST':
@@ -474,3 +484,318 @@ def student_report(request, username=None):
 
     return render(request, 'bulb/exchange/student_report.html',
                   {'bulb_user': bulb_user})
+
+# Reading Groups
+
+@login_required
+def list_groups(request):
+    return render(request, 'bulb/groups/list_groups.html')
+
+@decorators.ajax_only
+@csrf.csrf_exempt
+@login_required
+def list_group_previews(request):
+    groups = Group.objects.current_year().available().order_by('?')
+    if not utils.is_bulb_coordinator_or_deputy(request.user):
+        groups = groups.for_user_city(request.user).for_user_gender(request.user)
+    return render(request, "bulb/groups/list_group_previews.html",
+                  {'groups': groups})
+
+@decorators.ajax_only
+@login_required
+def add_group(request):
+    if request.method == 'POST':
+        current_year = StudentClubYear.objects.get_current()
+        instance = Group(coordinator=request.user,
+                         year=current_year)
+        form = GroupForm(request.POST, request.FILES, instance=instance, user=request.user)
+        if form.is_valid():
+            group = form.save()
+            show_group_url = reverse('bulb:show_group', args=(group.pk,))
+            full_url = request.build_absolute_uri(show_group_url)
+            return {"message": "success", "show_url": full_url}
+    elif request.method == 'GET':
+        form = GroupForm(user=request.user)
+
+    context = {'form': form}
+    return render(request, 'bulb/groups/edit_group_form.html', context)
+
+@decorators.ajax_only
+@login_required
+def edit_group(request, group_pk):
+    group = get_object_or_404(Group, pk=group_pk)
+
+    if not utils.can_edit_group(request.user, group):
+        raise Exception(u"لا تستطيع تعديل المجموعة")
+
+    context = {'group': group}
+    if request.method == 'POST':
+        form = GroupForm(request.POST, request.FILES, instance=group, user=request.user)
+        if form.is_valid():
+            group = form.save()
+            show_group_url = reverse('bulb:show_group', args=(group.pk,))
+            full_url = request.build_absolute_uri(show_group_url)
+            return {"message": "success", "show_url": full_url}
+    elif request.method == 'GET':
+        form = GroupForm(instance=group, user=request.user)
+
+    context['form'] = form
+    return render(request, 'bulb/groups/edit_group_form.html', context)
+
+@login_required
+def show_group(request, group_pk):
+    group = get_object_or_404(Group, pk=group_pk, is_deleted=False)
+    return render(request, "bulb/groups/show_group.html",
+                  {'group': group})
+
+@decorators.ajax_only
+@decorators.post_only
+@login_required
+@csrf.csrf_exempt
+def delete_group(request, group_pk):
+    group = get_object_or_404(Group, pk=group_pk, is_deleted=False)
+    if not utils.can_edit_group(request.user, group):
+        raise Exception(u"لا تستطيع حذف المجموعة")    
+
+    group.is_deleted = True
+    group.save()
+    list_groups_url = reverse('bulb:list_groups')
+    full_url = request.build_absolute_uri(list_groups_url)
+    return {"message": "success", "list_url": full_url}
+
+@login_required
+def list_memberships(request, group_pk):
+    group = get_object_or_404(Group, pk=group_pk, is_deleted=False)
+
+    if not utils.can_edit_group(request.user, group):
+        raise PermissionDenied
+
+    return render(request, "bulb/groups/list_memberships.html",
+                  {'group': group})
+
+@decorators.ajax_only
+@login_required
+def add_session(request, group_pk, is_online=False):
+    group = get_object_or_404(Group, pk=group_pk, is_deleted=False)
+    if not utils.can_edit_group(request.user, group):
+        raise Exception(u"لا تستطيع تعديل المجموعة")    
+
+    if request.method == 'POST':
+        instance = Session(group=group, is_online=is_online)
+        form = SessionForm(request.POST, request.FILES, instance=instance)
+        if form.is_valid():
+            session = form.save()
+            show_group_url = reverse('bulb:show_group', args=(group.pk,))
+            full_url = request.build_absolute_uri(show_group_url)
+            return {"message": "success", "show_url": full_url}
+    elif request.method == 'GET':
+        form = SessionForm(is_online=is_online)
+
+    context = {'form': form, 'group': group}
+    return render(request, 'bulb/groups/edit_session_form.html', context)
+
+@decorators.ajax_only
+@login_required
+def edit_session(request, group_pk, session_pk):
+    group = get_object_or_404(Group, pk=group_pk, is_deleted=False)
+    session = get_object_or_404(Session, pk=session_pk,
+                                is_deleted=False, group__pk=group_pk)
+    if not utils.can_edit_group(request.user, session.group):
+        raise Exception(u"لا تستطيع تعديل المجموعة")
+
+    response = {"message": "success"}
+    context = {'session': session, 'group': group}
+
+    if request.method == 'POST':
+        form = SessionForm(request.POST, request.FILES, instance=session)
+        if form.is_valid():
+            session = form.save()
+            show_group_url = reverse('bulb:show_group', args=(group.pk,))
+            full_url = request.build_absolute_uri(show_group_url)
+            response['show_url'] = full_url
+            return response
+    elif request.method == 'GET':
+        form = SessionForm(instance=session)
+
+    context['form'] = form
+    return render(request, 'bulb/groups/edit_session_form.html', context)
+
+@decorators.ajax_only
+@decorators.post_only
+@login_required
+@csrf.csrf_exempt
+def delete_session(request, group_pk, session_pk):
+    session = get_object_or_404(Session, pk=session_pk,
+                                is_deleted=False, group__pk=group_pk,
+                                group__is_deleted=False)
+    if not utils.can_edit_group(request.user, session.group):
+        raise Exception(u"لا تستطيع حذف المجموعة")    
+
+    session.is_deleted = True
+    session.save()
+
+    show_group_url = reverse('bulb:show_group', args=(session.group.pk,))
+    full_url = request.build_absolute_uri(show_group_url)
+
+    return {"message": "success", "show_url": full_url}
+
+@decorators.ajax_only
+@login_required
+def add_report(request, group_pk, session_pk):
+    session = get_object_or_404(Session, pk=session_pk,
+                                group__pk=group_pk,
+                                group__is_deleted=False)
+
+    if not utils.can_edit_group(request.user, session.group):
+        raise Exception(u"لا تستطيع تعديل المجموعة")
+
+    response = {"message": "success"}
+
+    if request.method == 'POST':
+        instance = Report(session=session)
+        form = ReportForm(request.POST, request.FILES, instance=instance)
+        if form.is_valid():
+            report = form.save()
+            show_group_url = reverse('bulb:show_group', args=(session.group.pk,))
+            full_url = request.build_absolute_uri(show_group_url)
+            response['show_url'] = full_url
+            return response
+    elif request.method == 'GET':
+        form = ReportForm()
+
+    context = {'form': form, 'session': session}
+    return render(request, 'bulb/groups/edit_report_form.html', context)
+
+@decorators.ajax_only
+@login_required
+def edit_report(request, group_pk, session_pk):
+    report = get_object_or_404(Report, session__pk=session_pk,
+                               session__group__pk=group_pk,
+                               session__group__is_deleted=False)
+    if not utils.can_edit_group(request.user, report.session.group):
+        raise Exception(u"لا تستطيع تعديل المجموعة")
+
+    response = {"message": "success"}
+    context = {'report': report}
+    if request.method == 'POST':
+        form = ReportForm(request.POST, request.FILES, instance=report)
+        if form.is_valid():
+            report = form.save()
+            show_group_url = reverse('bulb:show_group', args=(report.session.group.pk,))
+            full_url = request.build_absolute_uri(show_group_url)
+            response['show_url'] = full_url
+            return response
+    elif request.method == 'GET':
+        form = ReportForm(instance=report)
+
+    context['form'] = form
+    return render(request, 'bulb/groups/edit_report_form.html', context)
+
+@decorators.ajax_only
+@decorators.post_only
+@login_required
+@csrf.csrf_exempt
+def control_membership(request):
+    action = request.POST.get('action')
+    group_pk = request.POST.get('group_pk')
+    group = get_object_or_404(Group, pk=group_pk)
+    user_pk = request.POST.get('user_pk')
+    if user_pk:
+        user = get_object_or_404(User, pk=user_pk)
+
+    response = {"message": "success"}
+
+    if action == 'deactivate':
+        if not utils.can_edit_group(request.user, group):
+            return Exception("You cannot deactivate users.")
+        Membership.objects.filter(group=group, user=user).update(is_active=False)
+    elif action == 'activate':
+        if not utils.can_edit_group(request.user, group):
+            return Exception("You cannot activate users.")
+        Membership.objects.filter(group=group, user=user).update(is_active=True)
+    elif action == 'join':
+        # Make sure that the user can indeed be added to the group
+        if not utils.can_join_group(request.user, group):
+            return Exception(u"لا تستطيع الانضمام لهذه المجموعة.")
+        Membership.objects.create(group=group, user=request.user)
+        show_group_url = reverse('bulb:show_group', args=(group.pk,))
+        full_url = request.build_absolute_uri(show_group_url)
+        response['show_url'] = full_url
+    elif action == 'leave':
+        # Make sure that the user can indeed be added to the group
+        if not Membership.objects.filter(group=group, user=request.user).exists():
+            return Exception("لا تستطيع مغادرة هذه المجموعة.")
+        Membership.objects.get(group=group, user=request.user).delete()
+        show_group_url = reverse('bulb:show_group', args=(group.pk,))
+        full_url = request.build_absolute_uri(show_group_url)
+        response['show_url'] = full_url
+
+    return response
+
+@decorators.ajax_only
+@login_required
+@csrf.csrf_exempt
+def new_member_introduction(request, group_pk):
+    group = get_object_or_404(Group, pk=group_pk)
+    return render(request, 'bulb/groups/new_member_introduction.html',
+                  {'group': group})
+
+# Readers
+
+@login_required
+def list_reader_profiles(request):
+    reader_profiles = ReaderProfile.objects.all()
+    return render(request, 'bulb/readers/list_reader_profiles.html',
+                  {'reader_profiles': reader_profiles})
+
+@login_required
+def show_reader_profile(request, reader_pk):
+    reader_profile = get_object_or_404(ReaderProfile, pk=reader_pk)
+    group_coordination = Group.objects.current_year().available().filter(coordinator=reader_profile.user)
+    group_membership_pks = Membership.objects.current_year().active().filter(user=reader_profile.user).values_list('group__pk', flat=True)
+    group_memberships = Group.objects.current_year().available().filter(pk__in=group_membership_pks)
+    return render(request, 'bulb/readers/show_reader_profile.html',
+                  {'reader_profile': reader_profile,
+                   'group_coordination': group_coordination,
+                   'group_memberships': group_memberships})
+
+@decorators.ajax_only
+@login_required
+def add_reader_profile(request):
+    if request.method == 'POST':
+        instance = ReaderProfile(user=request.user)
+        form = ReaderProfileForm(request.POST, instance=instance)
+        if form.is_valid():
+            reader_profile = form.save()
+            show_reader_profile_url = reverse('bulb:show_reader_profile', args=(reader_profile.pk,))
+            full_url = request.build_absolute_uri(show_reader_profile_url)
+            return {"message": "success", "show_url": full_url}
+    elif request.method == 'GET':
+        form = ReaderProfileForm()
+
+    context = {'form': form}
+    return render(request, 'bulb/readers/edit_reader_profile_form.html', context)
+
+@decorators.ajax_only
+@login_required
+def edit_reader_profile(request, pk):
+    reader_profile = get_object_or_404(ReaderProfile, pk=pk)
+
+    if not reader_profile.user == request.user and \
+       not utils.is_bulb_coordinator_or_deputy(request.user) and \
+       not request.user.is_superuser:
+        raise Exception(u"لا تستطيع تعديل المجموعة")
+
+    context = {'reader_profile': reader_profile}
+    if request.method == 'POST':
+        form = ReaderProfileForm(request.POST, instance=group)
+        if form.is_valid():
+            form.save()
+            show_reader_profile_url = reverse('bulb:show_reader_profile', args=(reader_profile.pk,))
+            full_url = request.build_absolute_uri(show_reader_profile_url)
+            return {"message": "success", "show_url": full_url}
+    elif request.method == 'GET':
+        form = ReaderProfileForm(instance=reader_profile)
+
+    context['form'] = form
+    return render(request, 'bulb/readers/edit_reader_profile_form.html', context)

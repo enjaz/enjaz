@@ -1,0 +1,59 @@
+{% load bootstrap3 %}{% load staticfiles %}
+<form enctype="multipart/form-data" id="edit-session-form" action="post">
+{% csrf_token %}
+{% bootstrap_form form %}
+</form>
+
+<script src="{% static 'neon/assets/js/bootstrap-timepicker.min.js' %}"></script>
+<script type="text/javascript">
+$(function () {
+    $('#id_date').attr('data-start-view', '1').datepicker({isRTL: true, minDate: 5});
+    // Configure time pickers
+    $('#id_start_time, #id_end_time').timepicker({showMeridian: false})
+        .on('show.timepicker', function(e) {
+        $('.bootstrap-timepicker-widget').attr('dir', 'ltr'); // It appears reversed in rtl
+    });
+
+    // modify form submission behaviour to be ajaxy
+    $("form#edit-session-form").submit(function (event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var formData = new FormData($(this)[0]); 
+        {% if session %}{# if a session is passed, then post to edit_session url, otherwise to add_session #}
+        var url = "{% url 'bulb:edit_session' group.pk session.pk %}";
+        {% else %}
+        var url = "{% url 'bulb:add_session' group.pk %}";
+        {% endif %}
+
+        /* Send the data */
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (data) {
+                if (data.message == "success") {
+
+                    // show success message (using toastr)
+                    toastr.options.positionClass = "toast-top-left";
+                    {% if session %}
+                    toastr.success("عُدّلت {{ session.title }} بنجاح.");
+                    {% else %}
+                    toastr.success("أضيفت الجلسة بنجاح.");
+                    {% endif %}
+
+                    window.location.href= data.show_url;
+                } else {
+                    $("#edit-session-modal .modal-body").html(data);
+                }}
+        });
+
+    });
+});
+</script>

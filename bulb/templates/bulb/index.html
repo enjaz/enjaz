@@ -26,7 +26,7 @@
                 أسس مجموعة!
             </a>
 {% endif %}
-{% if not not user.book_giveaways.exists %}
+{% if not user.book_giveaways.exists %}
             <a  href="{% url 'bulb:list_book_categories' %}"  class="btn btn-block btn-icon btn-danger">
                 <i class="fa fa-book"></i>
                 ساهم بكتاب!

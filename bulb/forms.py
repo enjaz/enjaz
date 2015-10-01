@@ -59,12 +59,6 @@ class GroupForm(forms.ModelForm):
                   'category']
 
 class SessionForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(GroupForm, self).__init__(*args, **kwargs)
-        if self.instance and self.instance.is_online:
-            del self.fields['location']
-        else:
-            self.fields['location'].required = True
 
     class Meta:
         model = Session

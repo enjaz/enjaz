@@ -575,21 +575,22 @@ def list_memberships(request, group_pk):
 
 @decorators.ajax_only
 @login_required
-def add_session(request, group_pk, is_online=False):
+def add_session(request, group_pk):
     group = get_object_or_404(Group, pk=group_pk, is_deleted=False)
     if not utils.can_edit_group(request.user, group):
         raise Exception(u"لا تستطيع تعديل المجموعة")    
 
     if request.method == 'POST':
-        instance = Session(group=group, is_online=is_online)
-        form = SessionForm(request.POST, request.FILES, instance=instance)
+        instance = Session(group=group)
+        form = SessionForm(request.POST, instance=instance)
         if form.is_valid():
+            print "a"
             session = form.save()
             show_group_url = reverse('bulb:show_group', args=(group.pk,))
             full_url = request.build_absolute_uri(show_group_url)
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
-        form = SessionForm(is_online=is_online)
+        form = SessionForm()
 
     context = {'form': form, 'group': group}
     return render(request, 'bulb/groups/edit_session_form.html', context)
@@ -607,7 +608,7 @@ def edit_session(request, group_pk, session_pk):
     context = {'session': session, 'group': group}
 
     if request.method == 'POST':
-        form = SessionForm(request.POST, request.FILES, instance=session)
+        form = SessionForm(request.POST, instance=session)
         if form.is_valid():
             session = form.save()
             show_group_url = reverse('bulb:show_group', args=(group.pk,))

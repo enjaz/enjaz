@@ -190,9 +190,7 @@ $(function () {
         $("#edit-session-modal").modal('show');
 
         $("#edit-session-modal .modal-title").html("أضف جلسة");
-        $("#edit-session-modal .modal-body").load("{% url 'bulb:add_session_introduction' group.pk %}", function(){
-            
-        });
+        $("#edit-session-modal .modal-body").load("{% url 'bulb:add_session' group.pk %}");
 
         var $submitButton = $("#edit-session-modal button.submit-button");
         // Unbind any handlers previously attached to the submit button

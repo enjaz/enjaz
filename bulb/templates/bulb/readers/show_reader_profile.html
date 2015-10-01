@@ -1,0 +1,50 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}{% load bulb_tags %}
+{% block title %}{{ group.name }}{% endblock %}
+{% block content %}
+<h1>{{ reader_profile.user.common_profile.get_ar_full_name }}</h1>
+<table class="table table-hover">
+    <colgroup>
+      <col class="col-xs-4">
+      <col class="col-xs-8">
+    </colgroup>
+    <tr>
+        <th>الكلية</th>
+        <td>{{ reader_profile.user.common_profile.college.get_name_display }}</td>
+    </tr>{% if reader_profile.user.book_giveaways.undeleted.exists %}
+    <tr>
+        <th>كتب ساهمت بها</th>
+        <td>
+                <ul>
+                {% for book in reader_profile.user.book_giveaways.undeleted %}
+                    <li><a href="{% url 'bulb:show_book' book.pk %}">{{ book.title }}</a></li>
+                {% endfor %}
+                </ul>
+        </td>
+    </tr>{% endif %}{% if group_coordination.exists %}
+    <tr>
+        <th>مجموعات أسستها</th>
+        <td>
+                {% with groups=group_coordination %}
+                    {% include "bulb/groups/list_group_previews.html" %}
+                {% endwith %}
+        </td>
+    </tr>{% endif %}{% if group_memberships.exists %}
+    <tr>
+        <th>مجموعات أنا عضو فيها</th>
+        <td>
+                {% with groups=group_memberships %}
+                    {% include "bulb/groups/list_group_previews.html" %}
+                {% endwith %}
+        </td>
+    </tr>{% endif %}
+</table>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<style>
+p{
+    font-size: 17px;
+}
+</style>
+{% endblock %}

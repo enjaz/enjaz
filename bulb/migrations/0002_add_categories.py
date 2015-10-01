@@ -21,16 +21,17 @@ def add_categories(apps, schema_editor):
                                 name="تجارة وأعمال")
         Category.objects.create(code_name="self_help",
                                 name="تطوير ذات")
+        Category.objects.create(code_name="scientific",
+                                name="علمية")
 
 def remove_categories(apps, schema_editor):
     Category = apps.get_model('bulb', 'Category')
     Category.objects.filter(code_name__in=["intellectual",
-                                           "historical",
-                                           "religious",
+                                           "historical", "religious",
                                            "literature",
-                                           "biographical",
-                                           "business",
-                                           "self_help"]).delete()
+                                           "biographical", "business",
+                                           "self_help", "scientific"
+    ]).delete()
 
 class Migration(migrations.Migration):
 

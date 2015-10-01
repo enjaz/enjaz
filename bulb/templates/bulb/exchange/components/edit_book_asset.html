@@ -15,7 +15,7 @@
             $("#edit-book-modal .modal-title").html("أضف كتابًا");
             $("#edit-book-modal .modal-body").load("{% url 'bulb:add_book' %}");
 
-            var $submitButton = $("#edit-book-modal button#submit-button");
+            var $submitButton = $("#edit-book-modal button.submit-button");
             // Unbind any handlers previously attached to the submit button
             // This is necessary to avoid multiple submissions of the form
             $submitButton.off('click');
@@ -37,7 +37,7 @@
 
             $("#order-book-modal .modal-body").load("{% url 'bulb:order_instructions' %}", {pk: pk});
 
-            var $submitButton = $("#order-book-modal button#submit-button");
+            var $submitButton = $("#order-book-modal button.submit-button");
             // Unbind any handlers previously attached to the submit button
             // This is necessary to avoid multiple submissions of the form
             $submitButton.off('click');
@@ -54,7 +54,7 @@
             $("#edit-book-modal .modal-title").html("عدّل كتاب");
             $("#edit-book-modal .modal-body").load("{% url 'bulb:list_book_categories' %}books/" + pk + "/edit/");
 
-            var $submitButton = $("#edit-book-modal button#submit-button");
+            var $submitButton = $("#edit-book-modal button.submit-button");
             // Unbind any handlers previously attached to the submit button
             // This is necessary to avoid multiple submissions of the form
             $submitButton.off('click');
@@ -96,7 +96,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">أغلق</button>
-        <button type="button" class="btn btn-primary" id="submit-button">احفظ</button>
+        <button type="button" class="submit-button btn btn-primary">احفظ</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

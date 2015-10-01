@@ -1,0 +1,102 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}{% load bulb_tags %}
+{% block title %}قارئات وقراء الجامعة{% endblock %}
+{% block content %}
+
+<h1>قارئات وقراء الجامعة</h1>
+{% if not user.reader_profile %}
+<div class="row" style="margin-left: 0">
+    <div style="float: left;">
+        <button id="add-reader-profile" class="btn btn-icon btn-success">
+            <i class="entypo-plus"></i>
+            سجل نفسك قارئًا
+        </button>
+    </div>
+</div>
+{% endif %}
+<table class="datatable display dt-responsive">
+    <thead>
+        <th>الاسم</th>
+        <th class="not-mobile">الكلية</th>
+        <th>عدد الكتب المساهم بها</th>
+        <th class="not-mobile">مجموعات القراءة</th>
+    </thead>
+    <tbody>
+        {% for reader_profile in reader_profiles %}
+        <tr>
+            <td><a href="{% url 'bulb:show_reader_profile' reader_profile.pk %}">{{ reader_profile.user.common_profile.get_ar_full_name }}</a></td>
+            <td>{{ reader_profile.user.common_profile.college.get_name_display }}</td>
+            <td>{{ reader_profile.user.book_giveaways.undeleted.count }}</td>
+            <td>
+                {% if reader_profile.user.reading_group_coordination.available.exists or reader_profile.user.reading_group_memberships.active.exists  %}
+                <ul>
+                    {% for group in reader_profile.user.reading_group_coordination.available %}
+                    <li><a href="{% url 'bulb:show_group' group.pk %}">{{ group.name }}</a></li>
+                    {% endfor %}
+                    {% for membership in reader_profile.user.reading_group_memberships.active %}
+                    <li><a href="{% url 'bulb:show_group' membership.group.pk %}">{{ membership.group.name }}</a></li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                -
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+
+<script type="text/javascript">
+    $('.datatable').DataTable({
+        "order": [[ 2, "desc" ]],
+        "language": {% include 'js/dataTables-arabic.json' %}
+    });
+    $(function () {
+        // initialize reader profile edit modal
+        $('#edit-reader-profile-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        });
+        $("button#add-reader-profile").click(function () {
+            $("#edit-reader-profile-modal").modal('show');
+
+            $("#edit-reader-profile-modal .modal-title").html("سجّل نفسك قارئًا");
+            $("#edit-reader-profile-modal .modal-body").load("{% url 'bulb:add_reader_profile_introduction' %}", function(){
+                $('.end-reader-profile-introduction').click(function() {
+                    $("#edit-reader-profile-modal .modal-body").load("{% url 'bulb:add_reader_profile' %}");
+            });
+            });
+
+            var $submitButton = $("#edit-reader-profile-modal button.submit-button");
+            // Unbind any handlers previously attached to the submit button
+            // This is necessary to avoid multiple submissions of the form
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-reader-profile-form").submit();
+            });
+        });
+    });
+    // ----
+    // enable scrolling in modal body due to its length
+    // script source: http://stackoverflow.com/a/20765540/4249696
+    $(document).ready(ajustamodal);
+    $(window).resize(ajustamodal);
+    function ajustamodal() {
+        var altura = $(window).height() - 155; //value corresponding to the modal heading + footer
+        $(".ativa-scroll").css({"height":altura,"overflow-y":"auto"});
+    }
+// ----
+</script>
+
+{% with modal_id='edit-reader-profile-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}
+
+{% endblock %}

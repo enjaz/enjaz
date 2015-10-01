@@ -54,28 +54,11 @@
     bottom: 5px;
     z-index: 1;
 }
-    
-.order-intro{
-    text-align: justify;
-    color: rgb(65, 65, 65);
-}
-    
-p.order-intro{
-        font-size: 20px;
-}
-    
-ul.order-intro{
-    font-size: 16px;
-}
-   
-.modal-content h2{
-    text-align: center;
-    margin-bottom: 20px;
-}
 
 #order-{{ book.pk }}-img {
     display: block;
     width:90%;
+    max-width: 100%;
     padding-bottom:90%;
     margin:10px;
     background:url('{{ book.cover.url }}') center center no-repeat;
@@ -84,11 +67,11 @@ ul.order-intro{
 </style>
 {% if not delivery_type and not user.book_points.count_total %}
 <h2>يتعّذّر عليك الطلب! <i class="entypo-emoji-sad"></i></h2>
-<p class="alert alert-warning order-intro"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <a href="{% url 'bulb:student_report' %}" >رصيدك</a> الآن يبلغ صفرًا، ولذا لن تتمكن من الطلب.  أضف كتابًا، وساعدنا في بناء مكتبة عامرة! </p>
+<p class="alert alert-warning modal-intro"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <a href="{% url 'bulb:student_report' %}" >رصيدك</a> الآن يبلغ صفرًا، ولذا لن تتمكن من الطلب.  أضف كتابًا، وساعدنا في بناء مكتبة عامرة! </p>
 {% elif delivery_type %}
     <h2>تهانينا، تم الطلب!</h2>
     {% if delivery_type == 'direct' %}
-    <ul class="order-intro">
+    <ul class="modal-intro">
         <li>عليك التواصل مع {{ book.submitter.common_profile.ar_first_name }} واستلام الكتاب خلال فترة لا تتجاوز 7 أيام من تاريخ الطلب:
             <table class="table-hover table">
                 <tr>
@@ -114,7 +97,7 @@ ul.order-intro{
         <li>في حال عدم تأكيد الاستلام خلال أسبوع، ستصلك رسالة على البريد الإلكتروني الجامعي تذكّرك بتأكيد استلام الكتاب. يُرجى التفاعل مع رسالة التأكيد حتى لا يتم إلغاء طلبك.</li>
     </ul>
     {% elif delivery_type == 'indirect' %}
-        <ul class="order-intro">
+        <ul class="modal-intro">
             <li>سنتواصل مع {{ book.submitter.common_profile.ar_first_name }} لاستلام الكتاب، ثم سنتواصل معك لتستلم الكتاب. (تتطلب هذه العملية قرابة الأسبوع).</li>
             <li> في حال وجود أي استفسار، يمكنك التواصل مع مُنسّق سِراج:
                 <table class="table table-hover">
@@ -130,6 +113,13 @@ ul.order-intro{
                         <th>البريد</th>
                         <td class="english-field"><a href="mailto:{{ bulb_coordinator.email }}">{{ bulb_coordinator.email }}</a></td>
                     </tr>
+                    {# Per Dhabiah's request, no mobile number of her. #}
+                    {% if bulb_coordinator.common_profile.college == 'F' %}
+                    <tr>
+                        <th>رقم الجوال</th>
+                        <td>{{ bulb_coordinator.common_profile.mobile_number }}</td>
+                    </tr>
+                    {% endif %}
                 </table>
             </li>
             <li>يمكنك الرجوع لتفاصيل الطلب وتعديله في صفحة "<a href="{% url 'bulb:requests_by_me' %}">طلباتي</a>".</li>
@@ -138,12 +128,12 @@ ul.order-intro{
 {% elif not delivery_type %}
         <div class="row">
             <div class="col-sm-5 col-xs-6">
-                <a id="order-{{ book.pk }}-img" href="{% url 'bulb:show_book' book.pk %}" style="max-width: 100%;"></a>
+                <a id="order-{{ book.pk }}-img" href="{% url 'bulb:show_book' book.pk %}"></a>
             </div>
             <div class="col-sm-7 col-xs-6 vcenter">
-                <p class="order-intro">يمكنك الآن طلب كتاب <strong>{{ book.title }}</strong> من {{ book.submitter.common_profile.get_ar_full_name }}، من {{ book.submitter.common_profile.college.get_name_display }}.</p>
+                <p class="modal-intro">يمكنك الآن طلب كتاب <strong>{{ book.title }}</strong> من {{ book.submitter.common_profile.get_ar_full_name }}، من {{ book.submitter.common_profile.college.get_name_display }}.</p>
     {% if user.common_profile.college.gender == book.submitter.common_profile.college.gender %}
-                <p class="order-intro">لديك خياران للطلب:</p>
+                <p class="modal-intro">لديك خياران للطلب:</p>
             </div>
         </div>
         <div class="row">
@@ -151,7 +141,7 @@ ul.order-intro{
                 <button data-pk="{{ book.pk }}" class="order-option direct">
                     <div class="icon"><i class="fa fa-rocket"></i></div>			
                     <h3>استلام مباشر</h3>
-                    <p>ستصلك معلومات التواصل مع {{ book.submitter.common_profile.ar_first_name }} لتُحدّد موعدًا لمقابلته خلال أسبوع. بعد ذلك سيتعيّن عليك تأكيد التسليم، وعليه تأكيد الاستلام لإنهاء إجراءات الطلب.</p>
+                    <p>ستصلك معلومات التواصل مع {{ book.submitter.common_profile.ar_first_name }} لتُحدّد موعدًا لمقابلته خلال أسبوع. بعد ذلك سيتعيّن عليك تأكيد الاستلام، وعليه تأكيد التسليم لإنهاء إجراءات الطلب.</p>
                 </button>
             </div>
             <div class="col-sm-6 vcenter">

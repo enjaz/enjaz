@@ -5,6 +5,8 @@
     {% cycle '' '</div>' %}
 {% if not forloop.last %}
     <hr {% cycle 'class="visible-xs"' '' %}>
+{% elif not forloop.counter|divisibleby:2 %}
+    </div>
 {% endif %}
     {% endautoescape %}
 {% empty %}

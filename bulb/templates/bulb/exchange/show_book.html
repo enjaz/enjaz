@@ -23,10 +23,10 @@
     </div>
     <div class="col-sm-8">
        <h2>{{ book.title }}</h2>
-        <p>
+        <p class="book-description">
             {{ book.description|linebreaksbr }}
         </p>
-        <p>أضاف هذا الكتاب {{ book.submitter.common_profile.get_ar_full_name }} في {{ book.submission_date|date:"" }}.</p>
+        <p>أضاف هذا الكتاب {% reader_profile_link book.submitter %} في {{ book.submission_date|date:"" }}.</p>
         <span style="float: left">
             {% if user|can_edit_book:book %}
             <button data-pk="{{ book.pk }}" class="edit-book btn btn-xs btn-icon btn-gold">
@@ -64,7 +64,7 @@ p{
 
             $("#order-book-modal .modal-body").load("{% url 'bulb:order_instructions' %}", {pk: pk});
 
-            var $submitButton = $("#order-book-modal button#submit-button");
+            var $submitButton = $("#order-book-modal button.submit-button");
             // Unbind any handlers previously attached to the submit button
             // This is necessary to avoid multiple submissions of the form
             $submitButton.off('click');
@@ -80,7 +80,7 @@ p{
             $("#edit-book-modal .modal-title").html("عدّل كتاب");
             $("#edit-book-modal .modal-body").load("{% url 'bulb:list_book_categories' %}books/" + pk + "/edit/");
 
-            var $submitButton = $("#edit-book-modal button#submit-button");
+            var $submitButton = $("#edit-book-modal button.submit-button");
             // Unbind any handlers previously attached to the submit button
             // This is necessary to avoid multiple submissions of the form
             $submitButton.off('click');
@@ -91,6 +91,6 @@ p{
     });
 </script>
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
-{% include "bulb/exchange/components/add_book.html" %}
+{% include "bulb/exchange/components/edit_book_asset.html" %}
 {% include "bulb/exchange/components/order_modal.html" %}
 {% endblock %}

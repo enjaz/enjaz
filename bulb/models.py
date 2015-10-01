@@ -4,8 +4,9 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from core.models import StudentClubYear
-from bulb.managers import BookQuerySet, RequestQuerySet, PointQuerySet
+from bulb.managers import BookQuerySet, RequestQuerySet, PointQuerySet, GroupQuerySet, SessionQuerySet, MembershipQuerySet
 
+MAXIMUM_GROUP_MEMBERS = 20
 
 class Category(models.Model):
     name = models.CharField(max_length=50,
@@ -35,8 +36,8 @@ class Book(models.Model):
         )
     condition = models.CharField(max_length=2, verbose_name=u"حالة الكتاب",
                                  choices=condition_choices,
-                                 help_text=u"هل من صفحات ناقصة أو ممزقة مثلا؟ (اختياري)")
-    description = models.TextField(verbose_name=u"وصف الكتاب", help_text=u"اختياري")
+                                 help_text=u"هل من صفحات ناقصة أو ممزقة مثلا؟")
+    description = models.TextField(verbose_name=u"وصف الكتاب")
     submitter = models.ForeignKey(User,
                                   related_name='book_giveaways')
     cover = models.FileField(u"الغلاف", upload_to='bulb/covers/')
@@ -155,3 +156,126 @@ class Point(models.Model):
 
     def __unicode__(self):
         return "%s (%s)" % (self.user.username, self.value)
+    
+class Group(models.Model):
+    year = models.ForeignKey('core.StudentClubYear', null=True,
+                             on_delete=models.SET_NULL)
+    image = models.FileField(u"الصورة", upload_to='bulb/groups/')
+    name = models.CharField(max_length=200, verbose_name=u"الاسم")
+    description = models.TextField(verbose_name=u"وصف")
+    coordinator = models.ForeignKey(User, null=True,
+                                    verbose_name=u"المنسق",
+                                    related_name="reading_group_coordination",
+                                    on_delete=models.SET_NULL,
+                                    limit_choices_to={'common_profile__is_student':
+                                                        True})
+    gender_choices = (
+        ('', u'الطلاب والطالبات'),
+        ('F', u'الطالبات'),
+        ('M', u'الطلاب'),
+        )
+    gender = models.CharField(max_length=1,verbose_name=u"المجموعة موجّهة إلى",
+                              choices=gender_choices, default="",
+                              blank=True)
+    category = models.ForeignKey(Category,
+                                 verbose_name=u"التصنيفات",
+                                 null=True,
+                                 on_delete=models.SET_NULL)
+    submission_date = models.DateTimeField(u"تاريخ الإرسال",
+                                           auto_now_add=True)
+    modifiation_date = models.DateTimeField(u"تاريخ التعديل",
+                                           auto_now=True)
+    is_deleted = models.BooleanField(default=False,
+                                     verbose_name=u"محذوفة؟")
+
+    objects = GroupQuerySet.as_manager()
+
+    def is_mixed_gender(self):
+        """Check if any active membership"""
+        return not self.membership_set.active()\
+                                      .exclude(user__commmon_profile__college__gender=self.coordinator.common_profile.college.gender)\
+                                      .exists()
+
+    def __unicode__(self):
+        return self.name
+
+class Membership(models.Model):
+    group = models.ForeignKey(Group, verbose_name=u"المجموعة")
+    user = models.ForeignKey(User, null=True,
+                             blank=True,
+                             verbose_name=u"المنسق",
+                             related_name="reading_group_memberships",
+                             on_delete=models.SET_NULL,
+                             limit_choices_to={'common_profile__is_student':
+                                               True})
+    is_active = models.BooleanField(default=True,
+                                     verbose_name=u"مفعلة؟")
+    submission_date = models.DateTimeField(u"تاريخ الإرسال",
+                                           auto_now_add=True)
+    modifiation_date = models.DateTimeField(u"تاريخ التعديل",
+                                           auto_now=True)
+
+    objects = MembershipQuerySet.as_manager()
+
+    def __unicode__(self):
+        return "%s - %s" % (self.group.name, self.user.username)
+
+class Session(models.Model):
+    group = models.ForeignKey(Group, null=True,
+                              on_delete=models.SET_NULL,
+                              verbose_name=u"المجموعة")
+    title = models.CharField(max_length=200, verbose_name=u"عنوان الجلسة")
+    agenda = models.TextField(verbose_name=u"محاور الجلسة")
+    location = models.CharField(blank=True, default="",
+                                max_length=200,
+                                verbose_name=u"المكان")
+    date = models.DateField(u"التاريخ")
+    start_time = models.TimeField(u"وقت البداية")
+    end_time = models.TimeField(u"وقت النهاية")
+    is_deleted = models.BooleanField(default=False,
+                                     verbose_name=u"محذوفة؟")
+    submission_date = models.DateTimeField(u"تاريخ الإرسال",
+                                           auto_now_add=True)
+    is_online = models.BooleanField(default=False,
+                                    verbose_name=u"جلسة الإنترنت؟")
+    objects = SessionQuerySet.as_manager()
+
+    def __unicode__(self):
+        return "%s (%s)" % (self.group.name, self.title)
+
+class Report(models.Model):
+    session = models.OneToOneField(Session, null=True,
+                                   on_delete=models.SET_NULL,
+                                   verbose_name=u"الجلسة")
+    attendees = models.ManyToManyField(User, blank=True,
+                                     related_name="reading_group_attendance",
+                                     limit_choices_to={'common_profile__is_student': True})
+    description = models.TextField(verbose_name=u"مجريات الجلسة")
+    submission_date = models.DateTimeField(u"تاريخ الإرسال",
+                                           auto_now_add=True)
+
+    def __unicode__(self):
+        return "%s %d" % (self.session.group.name, self.pk)
+
+
+class ReaderProfile(models.Model):
+    user = models.OneToOneField(User, verbose_name=u"المستخدم",
+                                related_name="reader_profile")
+    favorite_books = models.TextField(verbose_name=u"كتبك المفضّلة.",
+                                      help_text=u"من أفضل الكتب التي قرأت، اختر ثلاثة!")
+    favorite_writers = models.TextField(verbose_name=u"كُتابك وكاتباتك المفضلين",
+                                        help_text=u"من أفضل الذين قرأت لهم، اختر ثلاثة!")
+    areas_of_interests = models.TextField(verbose_name=u"مجالات اهتمامك",
+                                          help_text=u"فيم تفضل القراءة؟")
+    average_reading = models.CharField(max_length=200, verbose_name=u"معدل القراءة",
+                                       help_text=u"كم كتابا تقرأ في السنة؟")
+    goodreads = models.CharField(max_length=200, verbose_name=u"حساب Goodreads؟",
+                                 help_text=u"هل لديك حساب على موقع Goodreads؟ (اختياري)",
+                                 blank=True)
+    twitter = models.CharField(max_length=200, verbose_name=u"حساب تويتر؟",
+                                      help_text=u"هل لديك حساب على تويتر؟ (اختياري)",
+                                      blank=True)
+    
+
+    def __unicode__(self):
+        return self.user.username

@@ -1,0 +1,251 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}{% load bulb_tags %}
+{% block title %}{{ group.name }}{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-sm-4">
+        <div style="text-align: center; border-left: solid 1px #eee;">
+            <style>
+                #group-{{ group.pk }}-img {
+                    display: block;
+                    width:90%;
+                    padding-bottom:90%;
+                    margin:10px;
+                    background:url('{{ group.image.url }}') center center no-repeat;
+                    background-size: auto 100%;
+                }
+            </style>
+            <div id="group-{{ group.pk }}-img" style="max-width: 100%;"></div>
+        </div>
+    </div>
+    <div class="col-sm-8">
+        {% if user|can_edit_group:group and not group|group_can_have_sessions %}
+        <p class="alert alert-warning">لا يمكنك عقد جلسات قبل أن يبلغ عدد أعضاء المجموعة أربعة أعضاء (شاملا رئيس المجموعة). هيا، أعلن! بإمكانك إحضار أربعة!</p>
+        {% endif %}
+       <h2>{{ group.name }}</h2>
+        <p class="group-description">
+            {{ group.description|linebreaksbr }}
+        </p>
+        <table class="table table-hover">
+            <tr>
+                <th>المُنسّق</th>
+                <td>{% reader_profile_link group.coordinator %}</td>
+            </tr>
+            <tr>
+                <th>أسست في</th>
+                <td>{{ group.submission_date|date:"j F Y" }}</td>
+            </tr>
+            <tr>
+                <th>الأعضاء</th>
+                <td>
+                    {% if group.membership_set.active.exists %}
+                        <ul>
+                        {% for membership in group.membership_set.active %}
+                            <li>{% reader_profile_link membership.user %}</li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                    لا يوجد أعضاء في المجموعة حتى الآن. كن عضوًا!
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+        <span style="float: left">
+            {% if user|can_edit_group:group %}
+            <a href="{% url 'bulb:list_memberships' group.pk %}" class="btn btn-xs btn-icon btn-success">
+            <i class="entypo-users"></i>
+            تحكّم بالأعضاء
+            </a>
+            {% if group|group_can_have_sessions %}
+            <button id="add-session" class="btn btn-xs btn-icon btn-success">
+            <i class="entypo-flag"></i>
+            اعقد جلسة جديدة
+            </button>
+            {% endif %}
+            <button id="edit-group" class="btn btn-xs btn-icon btn-gold">
+                <i class="entypo-pencil"></i>
+                عدل المجموعة
+            </button>
+            <button id="confirm-delete-group" class="btn btn-xs btn-icon btn-danger">
+                <i class="entypo-block"></i>
+                احذف المجموعة
+            </button>
+            {% endif %}
+            {% if user|can_join_group:group %}
+            <button data-action="join" data-pk="{{ group.pk }}" class="confirm-join btn btn-xs btn-icon btn-success">
+                <i class="entypo-flag"></i>
+                كن عضوًا
+            </button>
+            {% elif user|is_active_group_member:group %}
+            <button data-action="leave" data-pk="{{ group.pk }}" class="confirm-leave btn btn-xs btn-icon btn-danger">
+                <i class="entypo-mute"></i>
+                غادر
+            </button>
+            {% endif %}
+        </span>
+    </div>
+</div>
+<h2>الجلسات</h2>
+    {% for session in group.session_set.undeleted %}
+<div class="row">
+    <h3>{{ session.date|date:"j F" }}: {{ session.title }}</h3>
+    {% if user|can_edit_group:group %}
+    <div class="col-md-2">
+    {% if not session.report %}
+    <button data-url="{% url 'bulb:add_report' group.pk session.pk %}" class="add-report btn btn-block  btn-xs btn-icon btn-success">
+    <i class="entypo-flag"></i>
+        ارفع محضرًا
+    </button>
+    {% else %}
+    <button data-url="{% url 'bulb:edit_report' group.pk session.pk %}" class="add-report btn btn-block  btn-xs btn-icon btn-success">
+    <i class="entypo-flag"></i>
+        عدل المحضر
+    </button>
+    {% endif %}
+    <button data-url="{% url 'bulb:edit_session' group.pk session.pk %}" class="edit-session btn btn-block btn-xs btn-icon btn-gold">
+        <i class="entypo-pencil"></i>
+        عدل
+    </button>
+    <button data-url="{% url 'bulb:delete_session' group.pk session.pk %}" class="confirm-delete-session btn btn-block  btn-xs btn-icon btn-danger">
+        <i class="entypo-block"></i>
+        احذف
+    </button>
+    </div>
+    <div class="col-md-9">
+    {% else %}
+    <div class="col-md-11 col-md-offset-1">
+    {% endif %}
+        <table class="table table-hover">
+            <tr>
+                <th>الوقت والمكان</th>
+                <td>
+                    <div>
+                        <i class="entypo-calendar"></i>
+                        {{ session.date }}
+                    </div>
+                    <div>
+                        <i class="entypo-clock"></i>
+                        {{ session.start_time }}
+                        -
+                        {{ session.end_time }}
+                    </div>
+                    <div>
+                        <i class="entypo-location"></i>
+                        {{ session.location }}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>المحاور</th>
+                <td>{{ session.agenda|linebreaksbr }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+    {% empty %}
+    <p>لم تعقد أي جلسات حتى الآن.</p>
+    {% endfor %}
+{% endblock %}
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<style>
+p{
+    font-size: 17px;
+}
+</style>
+<script type="text/javascript">
+// ----
+// enable scrolling in modal body due to its length
+// script source: http://stackoverflow.com/a/20765540/4249696
+$(document).ready(ajustamodal);
+$(window).resize(ajustamodal);
+function ajustamodal() {
+    var altura = $(window).height() - 155; //value corresponding to the modal heading + footer
+    $(".ativa-scroll").css({"height":altura,"overflow-y":"auto"});
+}
+// ----
+   
+$(function () {
+    {% include "bulb/groups/membership_buttons_initialization.js" %} 
+    initialize_membership_buttons();
+    $('#edit-group-modal, #edit-session-modal, #edit-report-modal').modal({
+      keyboard: false,
+      backdrop: 'static',
+      show    : false,
+    });
+    $("button#edit-group").click(function () {
+        $("#edit-group-modal").modal('show');
+
+        $("#edit-group-modal .modal-title").html("عدّل المجموعة");
+        $("#edit-group-modal .modal-body").load("{% url 'bulb:edit_group' group.pk %}");
+
+        var $submitButton = $("#edit-group-modal button.submit-button");
+        // Unbind any handlers previously attached to the submit button
+        // This is necessary to avoid multiple submissions of the form
+        $submitButton.off('click');
+        $submitButton.click(function () {
+            $("form#edit-group-form").submit();
+        });
+    });
+    $("button#add-session").click(function () {
+        $("#edit-session-modal").modal('show');
+
+        $("#edit-session-modal .modal-title").html("أضف جلسة");
+        $("#edit-session-modal .modal-body").load("{% url 'bulb:add_session_introduction' group.pk %}", function(){
+            
+        });
+
+        var $submitButton = $("#edit-session-modal button.submit-button");
+        // Unbind any handlers previously attached to the submit button
+        // This is necessary to avoid multiple submissions of the form
+        $submitButton.off('click');
+        $submitButton.click(function () {
+            $("form#edit-session-form").submit();
+        });
+    });
+    $(".add-report").click(function () {
+        var url = $(this).data('url');
+
+        $("#edit-report-modal").modal('show');
+
+        $("#edit-report-modal .modal-title").html("أضف تقريرا");
+        $("#edit-report-modal .modal-body").load(url);
+
+        var $submitButton = $("#edit-report-modal button.submit-button");
+        // Unbind any handlers previously attached to the submit button
+        // This is necessary to avoid multiple submissions of the form
+        $submitButton.off('click');
+        $submitButton.click(function () {
+            $("form#edit-report-form").submit();
+        });
+    });
+    $(".edit-session").click(function () {
+        var url = $(this).data('url');
+
+        $("#edit-session-modal").modal('show');
+
+        $("#edit-session-modal .modal-title").html("عدل الجلسة");
+        $("#edit-session-modal .modal-body").load(url);
+
+        var $submitButton = $("#edit-session-modal button.submit-button");
+        // Unbind any handlers previously attached to the submit button
+        // This is necessary to avoid multiple submissions of the form
+        $submitButton.off('click');
+        $submitButton.click(function () {
+            $("form#edit-session-form").submit();
+        });
+    });
+});
+</script>
+aaa{{ group.pk }}
+{% include "bulb/groups/membership_modals.html" %}
+{% with modal_id='edit-group-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}
+{% with modal_id='edit-session-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}
+{% with modal_id='edit-report-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}
+{% include "bulb/groups/delete_modal.html" %}
+{% endblock %}

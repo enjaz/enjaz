@@ -1,4 +1,192 @@
 {% extends 'bulb_base.html' %}{% load staticfiles %}
 {% block content %}
-Hi!
+<h1>مبادرة سراج</h1>
+<div class="row row-flex">
+    <div class="col-sm-9">
+        <p style="
+            width: 90%;
+            text-align: justify;
+            font-size: 18px;
+            margin-right: auto;
+            margin-left: auto;">مبادرة تدعو إلى إحياء روح "اقرأ" في المجتمع الطلابي، وخلق بيئة للتبادل المعرفي والثقافي والفكري بإنشاء مجموعات نقاش تقام على أرض الواقع أو عبر الإنترنت حيث يتاح للجميع المشاركة في هذه الجلسات. علاوة على ذلك، تتيح هذه المبادرة تبادل الكتب، حيث تستطيع استبدال كتابك بأحد الكتب التي يقوم الطلاب والطالبات بعرضها في القسم المخصص بذلك من خلال رصيد يزيد وينقص بناء على عدد الكتب التي تقوم بعرضها واستبدالها. كن أحد المشاركين في مبادرة سِراج و انضم إلى نخبة من قراء وقارئات الجامعة!</p>
+    </div>
+{% if not user.reader_profile or not user.reading_group_coordination.exists and not user.reading_group_memberships or not user.book_giveaways.exists %}
+<div class="col-sm-3 vcenter">
+{% if not user.reader_profile %}
+
+            <a  href="{% url 'bulb:list_reader_profiles' %}" class="btn btn-block  btn-icon btn-danger">
+                <i class="fa fa-user"></i>
+                سجل نفسك قارئًا!
+            </a>
+{% endif %}
+{% if not user.reading_group_coordination.exists and not user.reading_group_memberships %}
+
+            <a  href="{% url 'bulb:list_groups' %}" class="btn btn-block btn-icon btn-danger">
+                <i class="fa fa-users"></i>
+                أسس مجموعة!
+            </a>
+{% endif %}
+{% if not not user.book_giveaways.exists %}
+            <a  href="{% url 'bulb:list_book_categories' %}"  class="btn btn-block btn-icon btn-danger">
+                <i class="fa fa-book"></i>
+                ساهم بكتاب!
+            </a>
+{% endif %}
+</div>
+{% endif %}
+</div>
+<div class="row">
+    <div class="panel minimal minimal-gray">
+        <div class="panel-heading">
+            <div class="panel-title">
+                <h2>مجموعات القراءة</h2>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="col-md-9">
+            <div class="panel panel-warning panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+
+                <!-- panel head -->
+                <div class="panel-heading">
+                    <div class="panel-title">من المجموعات</div>
+
+                    <div class="panel-options">
+                        <a href="{% url 'bulb:list_groups' %}" type="button" class="btn btn-default">
+                             المزيد
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- panel body -->
+                <div class="panel-body">
+                    {% include "bulb/groups/list_group_previews.html" %}
+                </div>
+
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="tile-stats tile-orange">
+                <div class="icon"><i class="entypo-book"></i></div>
+                <div class="num" data-start="0" data-end="{{ group_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+
+                <h3>عدد مجموعات القراءة</h3>
+                <p>مجموع المجموعات المعروضة في بوابة إنجاز</p>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+{# Book exchange #}
+
+<div class="row">
+    <div class="panel minimal minimal-gray">
+        <div class="panel-heading">
+            <div class="panel-title">
+                <h2>تبادل الكتب</h2>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="col-md-9">
+            <div class="panel panel-success panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+
+                <!-- panel head -->
+                <div class="panel-heading">
+                    <div class="panel-title">من الكتب</div>
+
+                    <div class="panel-options">
+                        <a href="{% url 'bulb:list_book_categories' %}" type="button" class="btn btn-default">
+                             المزيد
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- panel body -->
+                <div class="panel-body">
+                    {% with from_home=True %}
+                    {% include "bulb/exchange/list_books.html" %}
+                    {% endwith %}
+
+                </div>
+
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="tile-stats tile-green">
+                <div class="icon"><i class="entypo-book"></i></div>
+                <div class="num" data-start="0" data-end="{{ book_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+
+                <h3>عدد الكتب</h3>
+                <p>مجموع الكتب المعروضة في بوابة إنجاز</p>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+{# Reader #}
+
+<div class="row">
+    <div class="panel minimal minimal-gray">
+        <div class="panel-heading">
+            <div class="panel-title">
+                <h2>قارئات وقراء الجامعة</h2>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="col-md-9">
+            <div class="panel panel-info panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+
+                <!-- panel head -->
+                <div class="panel-heading">
+                    <div class="panel-title">من القراء</div>
+
+                    <div class="panel-options">
+                        <a href="{% url 'bulb:list_reader_profiles' %}" type="button" class="btn btn-default">
+                             المزيد
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- panel body -->
+                <div class="panel-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>الاسم</th>
+                                <th class="hidden-xs">الكلية</th>
+                                <th>عدد الكتب المساهم بها</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for reader_profile in reader_profiles %}
+                            <tr>
+                                <td><a href="{% url 'bulb:show_reader_profile' reader_profile.pk %}">{{ reader_profile.user.common_profile.get_ar_full_name }}</a></td>
+                                <td class="hidden-xs">{{ reader_profile.user.common_profile.college.get_name_display }}</td>
+                                <td>{{ reader_profile.user.book_giveaways.undeleted.count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="tile-stats tile-blue">
+                <div class="icon"><i class="entypo-book"></i></div>
+                <div class="num" data-start="0" data-end="{{ reader_profile_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+
+                <h3>عدد القارئات والقراء</h3>
+                <p>مجموع القارئات والقراء المسجلين في بوابة إنجاز</p>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

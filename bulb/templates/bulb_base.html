@@ -9,8 +9,8 @@
 
 {% block navbar %}
     <li><a href="{% url 'bulb:list_book_categories' %}"><i class="fa fa-book"></i> تبادل الكتب</a></li>
-    <li><a href=""><i class="fa fa-comments"></i> مجموعات القراءة</a></li>
-    <li><a href=""><i class="entypo-users"></i> قراء الجامعة</a></li>
+    <li><a href="{% url 'bulb:list_groups' %}"><i class="fa fa-comments"></i> مجموعات القراءة</a></li>
+    <li><a href="{% url 'bulb:list_reader_profiles' %}"><i class="entypo-users"></i> قارئات وقراء الجامعة</a></li>
 {% endblock %}
 
 {% block content %}{% endblock %}

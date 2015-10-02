@@ -35,10 +35,12 @@
                 <i class="entypo-pencil"></i>
                 عدل
             </button>
+            {% comment %}
             <button data-pk="{{ book.pk }}" class="delete-book btn btn-xs btn-icon btn-danger">
                 <i class="entypo-block"></i>
                 احذف
             </button>
+            {% endcomment %}
             {% endif %}
             {% if user|can_order_book:book %}
             <button data-pk="{{ book.pk }}" class="order-book btn btn-xs btn-icon btn-success">

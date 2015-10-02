@@ -31,7 +31,7 @@
         {% if book.last_pending_request.delivery == 'D' %}
         <tr>
             <th>البريد</th>
-            <td class="english-field"><a href="mailto:{{ book.last_pending_request.requester.email }}">{{ book.last_pending_request.requester.email }}</a></td>
+            <td class="english-field"><a href="mailto:{{ book.submitter.email }}">{{ book.submitter.email }}</a></td>
         </tr>
         <tr>
             <th>رقم الجوال</th>

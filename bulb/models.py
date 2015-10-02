@@ -261,12 +261,12 @@ class Report(models.Model):
 class ReaderProfile(models.Model):
     user = models.OneToOneField(User, verbose_name=u"المستخدم",
                                 related_name="reader_profile")
+    areas_of_interests = models.TextField(verbose_name=u"مجالات اهتمامك",
+                                          help_text=u"فيم تفضل القراءة؟")
     favorite_books = models.TextField(verbose_name=u"كتبك المفضّلة.",
                                       help_text=u"من أفضل الكتب التي قرأت، اختر ثلاثة!")
     favorite_writers = models.TextField(verbose_name=u"كُتابك وكاتباتك المفضلين",
                                         help_text=u"من أفضل الذين قرأت لهم، اختر ثلاثة!")
-    areas_of_interests = models.TextField(verbose_name=u"مجالات اهتمامك",
-                                          help_text=u"فيم تفضل القراءة؟")
     average_reading = models.CharField(max_length=200, verbose_name=u"معدل القراءة",
                                        help_text=u"كم كتابا تقرأ في السنة؟")
     goodreads = models.CharField(max_length=200, verbose_name=u"حساب Goodreads؟",

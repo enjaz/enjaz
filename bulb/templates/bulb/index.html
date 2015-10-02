@@ -1,7 +1,7 @@
 {% extends 'bulb_base.html' %}{% load staticfiles %}
 {% block content %}
 <h1>مبادرة سِراج</h1>
-<div class="row row-flex">
+<div class="row">
     <div class="col-sm-9">
         <p style="
             width: 90%;
@@ -11,7 +11,7 @@
             margin-left: auto;">مبادرة تدعو إلى إحياء روح "اقرأ" في المجتمع الطلابي، وخلق بيئة للتبادل المعرفي والثقافي والفكري! يكون ذلك بإنشاء مجموعات نقاش عن مختلف المواضيع والاهتمامات؛ وتبادل الكتب، حيث تستطيع استبدال كتابك بأحد الكتب التي يعرضها الطلاب والطالبات من خلال رصيد يزيد وينقص بناء على عدد الكتب التي تقوم بعرضها واستبدالها. كن أحد المشاركين في مبادرة سِراج و انضم إلى نخبة من قراء وقارئات الجامعة!</p>
     </div>
 {% if not user.reader_profile or not user.reading_group_coordination.exists and not user.reading_group_memberships.exists or not user.book_giveaways.exists %}
-<div class="col-sm-3 vcenter">
+<div class="col-sm-3">
 {% if not user.reader_profile %}
 
             <a  href="{% url 'bulb:list_reader_profiles' %}" class="btn btn-block  btn-icon btn-danger">

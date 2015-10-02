@@ -115,12 +115,15 @@ you?
 					<span>أرشدني</span>
 				</a>
 			</li>
+            {# Limit the access to students from Riyadh #}
+            {% if user.common_profile.college.city == 'R'  %}
 			<li>
 				<a href="{% url 'bulb:index' %}">
 					<i class="fa fa-fire"></i>
 					<span>سراج</span>
 				</a>
 			</li>
+            {% endif %}
             {% endif %}
 			<li>
 				<a href="{% url 'media:index' %}">

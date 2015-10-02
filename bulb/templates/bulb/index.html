@@ -1,6 +1,6 @@
 {% extends 'bulb_base.html' %}{% load staticfiles %}
 {% block content %}
-<h1>مبادرة سراج</h1>
+<h1>مبادرة سِراج</h1>
 <div class="row row-flex">
     <div class="col-sm-9">
         <p style="
@@ -8,7 +8,7 @@
             text-align: justify;
             font-size: 18px;
             margin-right: auto;
-            margin-left: auto;">مبادرة تدعو إلى إحياء روح "اقرأ" في المجتمع الطلابي، وخلق بيئة للتبادل المعرفي والثقافي والفكري بإنشاء مجموعات نقاش تقام على أرض الواقع أو عبر الإنترنت حيث يتاح للجميع المشاركة في هذه الجلسات. علاوة على ذلك، تتيح هذه المبادرة تبادل الكتب، حيث تستطيع استبدال كتابك بأحد الكتب التي يقوم الطلاب والطالبات بعرضها في القسم المخصص بذلك من خلال رصيد يزيد وينقص بناء على عدد الكتب التي تقوم بعرضها واستبدالها. كن أحد المشاركين في مبادرة سِراج و انضم إلى نخبة من قراء وقارئات الجامعة!</p>
+            margin-left: auto;">مبادرة تدعو إلى إحياء روح "اقرأ" في المجتمع الطلابي، وخلق بيئة للتبادل المعرفي والثقافي والفكري! يكون ذلك بإنشاء مجموعات نقاش عن مختلف المواضيع والاهتمامات؛ وتبادل الكتب، حيث تستطيع استبدال كتابك بأحد الكتب التي يعرضها الطلاب والطالبات من خلال رصيد يزيد وينقص بناء على عدد الكتب التي تقوم بعرضها واستبدالها. كن أحد المشاركين في مبادرة سِراج و انضم إلى نخبة من قراء وقارئات الجامعة!</p>
     </div>
 {% if not user.reader_profile or not user.reading_group_coordination.exists and not user.reading_group_memberships or not user.book_giveaways.exists %}
 <div class="col-sm-3 vcenter">
@@ -22,7 +22,7 @@
 {% if not user.reading_group_coordination.exists and not user.reading_group_memberships %}
 
             <a  href="{% url 'bulb:list_groups' %}" class="btn btn-block btn-icon btn-danger">
-                <i class="fa fa-users"></i>
+                <i class="fa fa-comments"></i>
                 أسس مجموعة!
             </a>
 {% endif %}
@@ -67,7 +67,7 @@
         </div>
         <div class="col-md-3">
             <div class="tile-stats tile-orange">
-                <div class="icon"><i class="entypo-book"></i></div>
+                <div class="icon"><i class="fa fa-comments"></i></div>
                 <div class="num" data-start="0" data-end="{{ group_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
 
                 <h3>عدد مجموعات القراءة</h3>
@@ -178,7 +178,7 @@
         </div>
         <div class="col-md-3">
             <div class="tile-stats tile-blue">
-                <div class="icon"><i class="entypo-book"></i></div>
+                <div class="icon"><i class="fa fa-users"></i></div>
                 <div class="num" data-start="0" data-end="{{ reader_profile_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
 
                 <h3>عدد القارئات والقراء</h3>

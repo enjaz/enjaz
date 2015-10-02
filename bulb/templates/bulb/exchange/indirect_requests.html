@@ -1,0 +1,66 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}
+{% block title %}طلبات غير مباشرة{% endblock %}
+{% block navbar %}
+    {% include "bulb/exchange/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        {% include "bulb/exchange/components/critical_buttons.html" %}
+        <h1>طلبات غير مباشرة</h1>
+        <h2>طلبات للاستلام</h2>
+        <div class="panel panel-warning panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="requests-to-receive">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
+        <h2>طلبات للتسليم</h2>
+        <div class="panel panel-warning panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="requests-to-give">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+
+{% with from_my_books=True %}
+    {% include "bulb/exchange/components/edit_book_asset.html" %}
+{% endwith %}
+
+<script type="text/javascript">
+    function refreshIndirectRequests(){
+        $("#requests-to-receive").load("{% url 'bulb:list_indirect_requests' %}", {condition: 'to_receive'}, initialize_buttons);
+        $("#requests-to-give").load("{% url 'bulb:list_indirect_requests' %}", {condition: 'to_give'}, initialize_buttons);
+    }
+    function initialize_buttons(){
+        control_url = "{% url 'bulb:control_request' %}";
+        list_url = "{% url 'bulb:list_indirect_requests' %}";
+        $('button.done, button.failed').click(function() {
+            pk = $(this).data('pk');
+            action = $(this).data('action');
+            data = {pk: pk, action: action};
+            $.ajax({
+                url: control_url,
+                type: 'POST',
+                data: data,
+                cache: false,
+                success: function (data) {
+                    if (data.message == "success") {
+                        $("#pending-"+pk).hide('slow');
+                        refreshIndirectRequests();
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            });
+        });
+    }
+    $(refreshIndirectRequests);
+</script>
+{% endblock %}

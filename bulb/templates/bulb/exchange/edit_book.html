@@ -1,0 +1,57 @@
+{% load bootstrap3 %}{% load staticfiles %}
+<form enctype="multipart/form-data" id="edit-book-form" action="post">
+{% csrf_token %}
+{% bootstrap_form form %}
+</form>
+<script type="text/javascript">
+$(function () {
+
+    // modify form submission behaviour to be ajaxy
+    $("form#edit-book-form").submit(function (event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var formData = new FormData($(this)[0]); 
+        {% if book %}{# if a book is passed, then post to edit_book url, otherwise to add_book #}
+        var url = "{% url 'bulb:edit_book' book.pk %}";
+        {% else %}
+        var url = "{% url 'bulb:add_book' %}";
+        {% endif %}
+
+        /* Send the data */
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (data) {
+                if (data.message == "success") {
+
+                    // show success message (using toastr)
+                    toastr.options.positionClass = "toast-top-left";
+                    {% if book %}
+                    toastr.success("عُدّل {{ book.title }} بنجاح.");
+                    {% else %}
+                    toastr.success("أضيف كتاب جديد بنجاح.");
+                    {% endif %}
+
+                    // hide modal
+                    var $modal = $("#edit-book-modal")
+                    $modal.modal('hide');
+
+                    // refresh book lists
+                    loadBooks()
+
+                } else {
+                    $("#edit-book-modal .modal-body").html(data);
+                }}
+        });
+
+    });
+});
+</script>

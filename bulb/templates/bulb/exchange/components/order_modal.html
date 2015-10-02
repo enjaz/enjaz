@@ -1,0 +1,98 @@
+{% load staticfiles %}
+<script type="text/javascript">
+    $(function () {
+        // initialize book edit modal
+        $('#order-book-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        });
+        $('#confirm-order').modal({
+            show    : false,
+            keyboard: false,
+            backdrop: 'static',
+        });
+        $('#order-book-modal').on('shown.bs.modal', function (e) {
+            direct_height = $('.order-option.direct').height();
+            indirect_height = $('.order-option.indirect').height();
+            if (direct_height > indirect_height){
+                $('.order-option.indirect').height(direct_height);
+            }
+            $('.order-option').click(function() {
+                if ($(this).hasClass('direct')){
+                    $("#confirm-order-modal .confirm").data('delivery', 'direct');
+                } else if ($(this).hasClass('indirect')){
+                    $("#confirm-order-modal button.confirm").data('delivery', 'indirect');
+                }
+                $("#confirm-order-modal").modal('show');
+            });            
+        });
+        $('#confirm-order-modal button.confirm').click(function() {
+            var delivery_type = $("#confirm-order-modal .confirm").data('delivery');
+            var pk = $(".order-option").data('pk');
+            $("#order-book-modal .modal-body").load("{% url 'bulb:order_instructions' %}", {pk: pk, delivery_type: delivery_type}{% if from_category %}, loadBooks{% endif %});
+            $('button.order-book[data-pk=' + pk + ']').hide();
+            $("#confirm-order-modal").modal('hide');
+            // If we are in the book details page, we need to hide the order option after one order has been submitted.
+        });
+    });
+
+    
+// This sill allow overlapping modals.
+$(document).on('show.bs.modal', '.modal', function () {
+    var zIndex = 1040 + (10 * $('.modal:visible').length);
+    $(this).css('z-index', zIndex);
+    setTimeout(function() {
+        $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+    }, 0);
+});
+
+  // ----
+  // enable scrolling in modal body due to its length
+  // script source: http://stackoverflow.com/a/20765540/4249696
+  $(document).ready(ajustamodal);
+  $(window).resize(ajustamodal);
+  function ajustamodal() {
+    var altura = $(window).height() - 155; //value corresponding to the modal heading + footer
+    $(".ativa-scroll").css({"height":altura,"overflow-y":"auto"});
+  }
+  // ----
+</script>
+
+<!-- book adding/editing modal -->
+<div class="modal fade" id="order-book-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">أغلق</span></button>
+        <h4 class="modal-title">تعليمات طلب الكتاب</h4>
+      </div>
+      <div class="modal-body ativa-scroll">
+        {% include "media/polls/ajax-loader.html" %}
+      </div>
+      <div class="modal-footer">
+        <!--<button type="button" class="btn btn-default" data-dismiss="modal">أغلق</button>
+        <button type="button" class="btn btn-primary" id="submit-button">احفظ</button>-->
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<div class="modal fade" id="confirm-order-modal">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">تأكيد الطلب</h4>
+      </div>
+      <div class="modal-body">
+        <p>هل تريد تأكيد هذا الطلب؟</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">ألغِ</button>
+        <button type="button" class="btn btn-primary confirm">أكّد</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

@@ -1,0 +1,53 @@
+{% load bulb_tags %}
+<div class="col-sm-6">
+    <div class="row row-flex">
+    {% if book.cover %}
+        <div class="col-sm-4">
+            <div style="text-align: center; border-left: solid 1px #eee;">
+                <style>
+                    #book-{{ book.pk }}-img {
+                        display: block;
+                        width:90%;
+                        padding-bottom:90%;
+                        margin:10px;
+                        background:url('{{ book.cover.url }}') center center no-repeat;
+                        background-size: auto 100%;
+                    }
+                </style>
+                <a id="book-{{ book.pk }}-img" href="{% url 'bulb:show_book' book.pk %}" style="max-width: 100%;"></a>
+                تأليف: {{ book.authors }}
+            </div>
+        </div>
+        <div class="col-sm-8 vcenter">
+    {% else %}
+        <div class="col-sm-12">
+    {% endif %}
+    <h2>
+        <a href="{% url 'bulb:show_book' book.pk %}">{{ book.title }}</a>
+    </h2>
+    <p>
+        {{ book.description|truncatechars:100 }}
+    </p>
+        {% if not from_home %}
+        <span style="float: left">
+            {% if user|can_edit_book:book %}
+            <button data-pk="{{ book.pk }}" class="edit-book btn btn-xs btn-icon btn-gold">
+                <i class="entypo-pencil"></i>
+                عدل
+            </button>
+            <button data-pk="{{ book.pk }}" class="delete-book btn btn-xs btn-icon btn-danger">
+                <i class="entypo-block"></i>
+                احذف
+            </button>
+            {% endif %}
+            {% if user|can_order_book:book %}
+            <button data-pk="{{ book.pk }}" class="order-book btn btn-xs btn-icon btn-success">
+                <i class="entypo-flag"></i>
+                اطلب
+            </button>
+            {% endif %}
+        </span>
+        {% endif %}
+    </div>
+    </div>
+</div>

@@ -7,7 +7,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from userena.forms import SignupForm
 from clubs.models import College, city_choices, college_choices, section_choices, gender_choices
 from accounts.models import CommonProfile
-
+from bulb.models import Point
+from core.models import StudentClubYear
 
 class StudentSignupForm(SignupForm):
     """
@@ -117,8 +118,6 @@ class StudentSignupForm(SignupForm):
         new_user = super(StudentSignupForm, self).save()
 
         # Add default permissions
-        add_book = Permission.objects.get(codename='add_book')
-        add_bookrequest = Permission.objects.get(codename='add_bookrequest')
 
         # Student Voice:
         add_vote = Permission.objects.get(codename='add_vote')
@@ -138,8 +137,7 @@ class StudentSignupForm(SignupForm):
         add_colleagueprofile = Permission.objects.get(codename='add_colleagueprofile')
         add_supervisionrequest = Permission.objects.get(codename='add_supervisionrequest')
 
-        new_user.user_permissions.add(add_book, add_bookrequest,
-                                      add_vote, add_voice,
+        new_user.user_permissions.add(add_vote, add_voice,
                                       submit_niqati_code,
                                       view_niqati_report,
                                       add_studygroup, add_question,
@@ -149,6 +147,13 @@ class StudentSignupForm(SignupForm):
                                       add_colleagueprofile,
                                       add_supervisionrequest)
         new_user.save()
+
+        # Add initial Bulb balance.
+        current_year = StudentClubYear.objects.get_current()
+        Point.objects.create(year=current_year,
+                             user=new_user,
+                             note=u"رصيد مبدئي.",
+                             value=1)
 
         # Append the extra fields to the Student Profile
         #user_profile = new_user.get_profile()

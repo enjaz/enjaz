@@ -1,0 +1,86 @@
+
+<div class="modal fade" id="confirm-delete-group-modal">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">حذف المجموعة</h4>
+      </div>
+      <div class="modal-body">
+          <form id="confirm-delete-group-form">
+              <label>هل أنت متأكد؟ سيتم حذف كل المعلومات المتعلقة بالمجموعة.</label>
+          </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">ألغِ</button>
+        <button id="delete-group" type="button" class="btn btn-danger confirm">أكّد</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="confirm-delete-session-modal">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">حذف جلسة</h4>
+      </div>
+      <div class="modal-body">
+          <form id="confirm-delete-session-form">
+              <label>هل أنت متأكد؟ سيتم إبلاغ أعضاء المجموعة بإلغاء هذا الموعد.</label>
+          </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">ألغِ</button>
+        <button id="delete-session" type="button" class="btn btn-danger confirm">أكّد</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<script type="text/javascript">
+$(function() {
+    $("button#confirm-delete-group").click(function(){
+        $("#confirm-delete-group-modal").modal('show');
+    });
+    $("button.confirm-delete-session").click(function(){
+        var url = $(this).data('url');
+        $("#delete-session").data('url', url);
+        $("#confirm-delete-session-modal").modal('show');
+    });
+    $("#delete-group").click(function () {
+        /* get some values from elements on the page: */
+        var url = "{% url 'bulb:delete_group' group.pk %}";
+        /* Send the data using post */
+        var posting = $.post(url);
+        posting.done(function (data) {
+            if (data.message == "success") {
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                toastr.info("حُذفت مجموعة {{ group.name }} بنجاح.");
+                
+                // return to the group list page.
+                window.location.href = data.list_url;
+            }
+        });
+    });
+    $("#delete-session").click(function () {
+        /* get some values from elements on the page: */
+        var url = $(this).data('url');
+        /* Send the data using post */
+        var posting = $.post(url);
+        posting.done(function (data) {
+            if (data.message == "success") {
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                toastr.info("حُذفت جلسة {{ group.name }} بنجاح.");
+                
+                // return to the group list page.
+                window.location.href = data.show_url;
+            }
+        });
+    });
+});
+</script>

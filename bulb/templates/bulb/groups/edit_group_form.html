@@ -1,0 +1,57 @@
+{% load bootstrap3 %}{% load staticfiles %}
+{% include 'autocomplete_light/static.html' %}
+
+<form enctype="multipart/form-data" id="edit-group-form" action="post">
+{% csrf_token %}
+{% bootstrap_form form %}
+</form>
+<script type="text/javascript">
+$(function () {
+    // modify form submission behaviour to be ajaxy
+    $("form#edit-group-form").submit(function (event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var formData = new FormData($(this)[0]); 
+        {% if group %}{# if a group is passed, then post to edit_group url, otherwise to add_group #}
+        var url = "{% url 'bulb:edit_group' group.pk %}";
+        {% else %}
+        var url = "{% url 'bulb:add_group' %}";
+        {% endif %}
+
+        /* Send the data */
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (data) {
+                if (data.message == "success") {
+
+                    // show success message (using toastr)
+                    toastr.options.positionClass = "toast-top-left";
+                    {% if group %}
+                    toastr.success("عُدّلت {{ group.name }} بنجاح.");
+                    {% else %}
+                    toastr.success("أضيفت المجموعة بنجاح.");
+                    {% endif %}
+
+                     {% if group %}
+                     $("#edit-group-modal").modal('hide');
+                     window.location.href= data.show_url;
+                     {% else %}
+                     $("#edit-group-modal .modal-body").load("{% url 'bulb:add_group_thanks' %}");
+                      loadGroups();
+                     {% endif %}
+                } else {
+                    $("#edit-group-modal .modal-body").html(data);
+                }}
+        });
+    });
+});
+</script>

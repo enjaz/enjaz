@@ -1,0 +1,10 @@
+{% for book in books %}
+<div style="display: flex;" id="pending-{{ book.last_pending_request.pk }}" class="row">
+    {% include "bulb/exchange/indirect_request.html" %}
+</div>
+{% if not forloop.last %}
+<hr>
+{% endif %}
+{% empty %}
+    <p>لا توجد كتب.</p>
+{% endfor %}

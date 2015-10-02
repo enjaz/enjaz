@@ -1,0 +1,48 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}
+{% block title %}{% if user == bulb_user %}تقرير رصيدي{% else %}تقرير رصيد {{ bulb_user.common_profile.get_ar_full_name }}{% endif %}{% endblock %}
+{% block navbar %}
+    {% include "bulb/exchange/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#ccc;}
+.tg td{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;}
+.tg th{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
+</style>
+{% include "bulb/exchange/components/critical_buttons.html" %}
+<h1>تقرير {% if user != bulb_user %}رصيد {{ bulb_user.common_profile.get_ar_full_name }}{% else %}رصيدك{% endif %}</h1>
+<table id="points" class="datatable display">
+    <thead>
+      <tr>
+        <th>التاريخ</th>
+        <th>الكتاب</th>
+        <th>القيمة</th>
+        <th>التفاصيل</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for point in bulb_user.book_points.current_year.counted %}
+        <tr>
+            <td data-order="{{ point.submission_date|date:"U" }}">{{ point.submission_date }}</td>
+            <td>{% if point.request %}<a href="{% url 'bulb:show_book' point.request.book.pk %}">{{ point.request.book.title }}</a>{% else %}-{% endif %}</td>
+            <td>{{ point.value }}</td>
+            <td>{{ point.get_details }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script>
+$(function () {
+	$('#points').DataTable({
+        "order": [[ 0, "desc" ]],
+        "language": {% include 'js/dataTables-arabic.json' %}
+    });
+});
+</script>
+{% include "bulb/exchange/components/edit_book_asset.html" %}
+{% endblock %}

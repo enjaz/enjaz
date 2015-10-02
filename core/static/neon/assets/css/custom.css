@@ -380,7 +380,7 @@ span.unpublished {
     background-color: rgb(254, 215, 215);
 }
 
-.book-description {
+.book-description, .group-description {
     text-align: justify;
 }
 
@@ -450,4 +450,84 @@ body.login-page .login-content .alert-warning a {
 
 .profile-env>header .profile-info-sections .profile-name strong .activity-name {
     font-size: 30px;
+}
+
+.row-flex{
+    display: flex;
+}
+
+.vcenter{
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.autocomplete-light-widget{
+	display: block !important;
+}
+
+.group-overlay{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    background-color: rgba(255,255,255,0.3);
+}
+
+.group-link{
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    text-align: center;
+}
+
+.group-image {
+    display: block;
+    padding-bottom:90%;
+    background-position-x: 50%;
+    background-position-y: 50%;
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+    border-radius: 10%;
+    border: #dbdbd4 1px solid;
+}
+
+.group-name{
+    font-size: 24px;
+    color: white;
+    bottom: 8px;
+    left: 0;
+    right: 0;
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.group-name span{
+     background-color: rgba(0, 0, 0, 0.8);
+     padding: 10px;
+}
+
+.modal-intro{
+    text-align: justify;
+    color: rgb(65, 65, 65);
+}
+    
+p.modal-intro{
+        font-size: 20px;
+}
+    
+ul.modal-intro{
+    font-size: 16px;
+}
+   
+.modal-content h2{
+    text-align: center;
+    margin-bottom: 20px;
 }

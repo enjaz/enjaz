@@ -1,0 +1,49 @@
+{% load staticfiles %}
+<script type="text/javascript">
+    function loadGroups() {
+        $("#groups").load("{% url 'bulb:list_group_previews' %}");
+    }
+    $(function () {
+        // initialize group edit modal
+        $('#edit-group-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        });
+        $("button#add-group").click(function () {
+            $("#edit-group-modal").modal('show');
+
+            $("#edit-group-modal .modal-title").html("أنشئ مجموعة");
+            $("#edit-group-modal .modal-body").load("{% url 'bulb:add_group_introduction' %}", function(){
+                $('.end-group-introduction').click(function() {
+                    $("#edit-group-modal .modal-body").load("{% url 'bulb:add_group' %}");
+            });
+            });
+
+            var $submitButton = $("#edit-group-modal button.submit-button");
+            // Unbind any handlers previously attached to the submit button
+            // This is necessary to avoid multiple submissions of the form
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-group-form").submit();
+                loadGroups();
+            });
+        });
+        // load groups
+        loadGroups();
+    });
+    // ----
+    // enable scrolling in modal body due to its length
+    // script source: http://stackoverflow.com/a/20765540/4249696
+    $(document).ready(ajustamodal);
+    $(window).resize(ajustamodal);
+    function ajustamodal() {
+        var altura = $(window).height() - 155; //value corresponding to the modal heading + footer
+        $(".ativa-scroll").css({"height":altura,"overflow-y":"auto"});
+    }
+// ----
+</script>
+
+{% with modal_id='edit-group-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}

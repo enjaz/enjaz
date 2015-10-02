@@ -1,0 +1,82 @@
+{% load bulb_tags %}
+<div class="col-sm-2 vcenter">
+    <div class="screenshot">
+        <div style="text-align: center; border-left: solid 1px #eee;">
+            <style>
+                #book-{{ book.pk }}-img {
+                    display: block;
+                    width:90%;
+                    padding-bottom:90%;
+                    margin:10px;
+                    background:url('{{ book.cover.url }}') center center no-repeat;
+                    background-size: auto 100%;
+                }
+            </style>
+            <a id="book-{{ book.pk }}-img" href="{% url 'bulb:show_book' book.pk %}" style="max-width: 100%;"></a>
+            <a href="{% url 'bulb:show_book' book.pk %}">{{ book.title }}</a>
+        </div>
+    </div>
+</div>
+<div class="col-sm-5 vcenter">
+    {% if book.last_pending_request.owner_status == 'D' and book.last_pending_request.requester_status == '' %}
+    <p>مُقدّم الطلب:</p>
+    <table class="table table-hover">
+        <tr>
+            <th>الاسم</th>
+            <td>{{ book.last_pending_request.requester.common_profile.get_ar_full_name }}</td>
+        </tr>
+        <tr>
+            <th>الكلية</th>
+            <td>{{ book.last_pending_request.requester.common_profile.college.get_name_display }}</td>
+        </tr>
+        <tr>
+            <th>البريد</th>
+            <td class="english-field"><a href="mailto:{{ book.last_pending_request.requester.email }}">{{ book.last_pending_request.requester.email }}</a></td>
+        </tr>
+        <tr>
+            <th>رقم الجوال</th>
+            <td>{{ book.last_pending_request.requester.common_profile.mobile_number }}</td>
+        </tr>
+        <tr>
+            <th>تاريخ الطلب</th>
+            <td>{{ book.last_pending_request.submission_date|date:"l j F" }}</td>
+        </tr>
+    </table>
+    {% elif book.last_pending_request.owner_status == '' %}
+    <p>صاحب الكتاب:</p>
+    <table class="table table-hover">
+        <tr>
+            <th>الاسم</th>
+            <td>{{ book.submitter.common_profile.get_ar_full_name }}</td>
+        </tr>
+        <tr>
+            <th>الكلية</th>
+            <td>{{ book.submitter.common_profile.college.get_name_display }}</td>
+        </tr>
+        <tr>
+            <th>البريد</th>
+            <td class="english-field"><a href="mailto:{{ book.last_pending_request.requester.email }}">{{ book.last_pending_request.requester.email }}</a></td>
+        </tr>
+        <tr>
+            <th>رقم الجوال</th>
+            <td>{{ book.submitter.common_profile.mobile_number }}</td>
+        </tr>
+        <tr>
+            <th>تاريخ الطلب</th>
+            <td>{{ book.last_pending_request.submission_date|date:"l j F" }}</td>
+        </tr>
+    </table>
+    {% endif %}
+</div>
+<div class="col-sm-5 vcenter">
+        <button data-pk="{{ book.last_pending_request.pk }}" data-action="{{ side }}_done" class="done btn-block btn-icon btn btn-success">
+            <i class="entypo-flag"></i>
+            سُلّم الكتاب
+        </button>
+        {% if not book.last_pending_request.owner_status == 'F' %}
+        <button data-pk="{{ book.last_pending_request.pk }}" data-action="{{ side }}_failed" class="failed btn-block btn-icon btn btn-warning">
+            <i class="fa fa-exclamation-circle"></i>
+            تعذّر التواصل
+        </button>
+        {% endif %}
+</div>

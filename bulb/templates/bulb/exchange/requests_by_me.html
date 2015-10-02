@@ -1,0 +1,90 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}
+{% block title %}طلباتي{% endblock %}
+{% block navbar %}
+    {% include "bulb/exchange/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        {% include "bulb/exchange/components/critical_buttons.html" %}
+        <h1>طلباتي المُعلّقة</h1>
+        <div class="panel panel-warning panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="pending-requests">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+
+{% with from_my_books=True %}
+    {% include "bulb/exchange/components/edit_book_asset.html" %}
+{% endwith %}
+
+<script type="text/javascript">
+    function initialize_buttons(){
+        control_url = "{% url 'bulb:control_request' %}";
+        display_url = "{% url 'bulb:pending_book' %}";
+        list_url = "{% url 'bulb:list_book_previews' 'user' user.username %}";
+        $('button.done').click(function() {
+            pk = $(this).data('pk');
+            data = {pk: pk, action: 'requester_done'}
+            $.ajax({
+                url: control_url,
+                type: 'POST',
+                data: data,
+                cache: false,
+                success: function (data) {
+                    if (data.message == "success") {
+                        $("#pending-"+pk).hide('slow');
+                        $("#done-books").load(list_url, {condition: 'done'});
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            });
+        });
+        $('button.failed').click(function() {
+            pk = $(this).data('pk');
+            data = {pk: pk, action: 'requester_failed'}
+            $.ajax({
+                url: control_url,
+                type: 'POST',
+                data: data,
+                cache: false,
+                success: function (data) {
+                    if (data.message == "success") {
+                        $("#pending-"+pk).load(display_url, {pk: pk}, initialize_buttons);
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            });
+        });
+        $('button.canceled').click(function() {
+            pk = $(this).data('pk');
+            data = {pk: pk, action: 'requester_canceled'}
+            $.ajax({
+                url: control_url,
+                type: 'POST',
+                data: data,
+                cache: false,
+                success: function (data) {
+                    if (data.message == "success") {
+                        $("#pending-"+pk).hide('slow');
+                        $("#available-books").load(list_url, {condition: 'available'});
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            });
+        });
+    }
+    $(function(){
+        $("#pending-requests").load("{% url 'bulb:list_my_pending_requests' %}", initialize_buttons);
+    });
+</script>
+{% endblock %}

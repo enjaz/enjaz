@@ -1,0 +1,52 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}
+{% block title %}تصنيفات الكتب{% endblock %}
+{% block navbar %}
+    {% include "bulb/exchange/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+{% include "bulb/exchange/components/critical_buttons.html" %}
+{% if categories.exists %}
+    {% for category in categories %}
+    {% autoescape off %}{% cycle '<div class="row">' '' %}{% endautoescape %}
+    <div class="col-sm-6">
+        <div class="row row-flex">
+            <div class="col-sm-4 col-xs-6">
+                <div class="screenshot">
+                    <div style="text-align: center; border-left: solid 1px #eee;">
+                        <style>
+                            #category-{{ category.pk }}-img {
+                                display: block;
+                                width:90%;
+                                padding-bottom:90%;
+                                margin:10px;
+                                background:url({% if category.image %}'{{ category.image.url }}'{% endif %}) center center no-repeat;
+                                background-size: auto 100%;
+                            }
+                        </style>
+                        <a id="category-{{ category.pk }}-img" href="{% url 'bulb:show_category' category.code_name %}" style="max-width: 100%;"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-8 vcenter">
+                <h2>
+                    <a href="{% url 'bulb:show_category' category.code_name %}">{{ category.name }}</a>
+                </h2>
+            </div>
+        </div>
+    </div>
+    {% autoescape off %}
+    {% cycle '' '</div>' %}
+    <hr {% cycle 'class="visible-xs"' '' %}>
+    {% endautoescape %}
+
+    {% endfor %}
+{% else %}
+    <p>لا توجد كتب. كن أول من يضيف كتابًا.</p>
+{% endif %}
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+
+{% include "bulb/exchange/components/edit_book_asset.html" %}
+{% endblock %}

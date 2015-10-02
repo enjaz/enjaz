@@ -74,6 +74,6 @@ class ReportForm(forms.ModelForm):
 class ReaderProfileForm(forms.ModelForm):
     class Meta:
         model = ReaderProfile
-        fields = ['favorite_books', 'favorite_writers',
-                  'areas_of_interests', 'average_reading',
+        fields = ['areas_of_interests', 'favorite_books',
+                  'favorite_writers', 'average_reading',
                   'goodreads', 'twitter']

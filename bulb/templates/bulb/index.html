@@ -10,7 +10,7 @@
             margin-right: auto;
             margin-left: auto;">مبادرة تدعو إلى إحياء روح "اقرأ" في المجتمع الطلابي، وخلق بيئة للتبادل المعرفي والثقافي والفكري! يكون ذلك بإنشاء مجموعات نقاش عن مختلف المواضيع والاهتمامات؛ وتبادل الكتب، حيث تستطيع استبدال كتابك بأحد الكتب التي يعرضها الطلاب والطالبات من خلال رصيد يزيد وينقص بناء على عدد الكتب التي تقوم بعرضها واستبدالها. كن أحد المشاركين في مبادرة سِراج و انضم إلى نخبة من قراء وقارئات الجامعة!</p>
     </div>
-{% if not user.reader_profile or not user.reading_group_coordination.exists and not user.reading_group_memberships or not user.book_giveaways.exists %}
+{% if not user.reader_profile or not user.reading_group_coordination.exists and not user.reading_group_memberships.exists or not user.book_giveaways.exists %}
 <div class="col-sm-3 vcenter">
 {% if not user.reader_profile %}
 
@@ -19,7 +19,7 @@
                 سجل نفسك قارئًا!
             </a>
 {% endif %}
-{% if not user.reading_group_coordination.exists and not user.reading_group_memberships %}
+{% if not user.reading_group_coordination.exists and not user.reading_group_memberships.exists %}
 
             <a  href="{% url 'bulb:list_groups' %}" class="btn btn-block btn-icon btn-danger">
                 <i class="fa fa-comments"></i>

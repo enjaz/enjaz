@@ -22,8 +22,8 @@
         </div>
     </div>
     <div class="col-sm-8">
-       <h2>{{ book.title }}</h2>
-        <p class="book-description">
+       <h2 dir="auto">{{ book.title }}</h2>
+        <p dir="auto" class="book-description">
             {{ book.description|linebreaksbr }}
         </p>
         <p>أضاف هذا الكتاب {% reader_profile_link book.submitter %} في {{ book.submission_date|date:"" }}.</p>
@@ -32,10 +32,6 @@
             <button data-pk="{{ book.pk }}" class="edit-book btn btn-xs btn-icon btn-gold">
                 <i class="entypo-pencil"></i>
                 عدل
-            </button>
-            <button data-pk="{{ book.pk }}" class="delete-book btn btn-xs btn-icon btn-danger">
-                <i class="entypo-block"></i>
-                احذف
             </button>
             {% endif %}
             {% if user|can_order_book:book %}

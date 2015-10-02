@@ -30,12 +30,11 @@
     <tr>
         <th>تويتر</th>
         <td class="english-field">{{ reader_profile.twitter }}</td>
-    </tr>{% endif %}
+    </tr>{% endif %}{% if reader_profile.goodreads %}
     <tr>
         <th class="english-field">Goodreads</th>
         <td class="english-field">{{ reader_profile.goodreads }}</td>
-    </tr>
-    {% if reader_profile.user.book_giveaways.undeleted.exists %}
+    </tr>{% endif %}{% if reader_profile.user.book_giveaways.undeleted.exists %}
     <tr>
         <th>كتب ساهمت بها</th>
         <td>

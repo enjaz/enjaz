@@ -449,14 +449,14 @@ def control_request(request):
                 raise Exception(u'لا يمكنك إلغاء طلب منجز.')
             book.is_available = True
             book.save()
-            book_request.owner_status = 'C'
-            book_request.owner_status_date = timezone.now()
+            book_request.requester_status = 'C'
+            book_request.requester_status_date = timezone.now()
             book_request.cancel_related_user_point(request.user)
             book_request.save()
 
             email_context = {'book': book,
                              'book_request': book_request}
-            mail.send([book_request.requester.email],
+            mail.send([book.submitter.email],
                        template="book_request_canceled_to_owner",
                        context=email_context)
             # Also, email Bulb coordinator.

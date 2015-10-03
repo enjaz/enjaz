@@ -1,5 +1,5 @@
 {% extends "bulb_base.html" %}{% load staticfiles %}{% load bulb_tags %}
-{% block title %}{{ group.name }}{% endblock %}
+{% block title %}{{ reader_profile.user.common_profile.get_ar_full_name }}{% endblock %}
 {% block content %}
 <h1>{{ reader_profile.user.common_profile.get_ar_full_name }}</h1>
 <table class="table table-hover">

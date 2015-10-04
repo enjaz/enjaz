@@ -779,17 +779,15 @@ def add_reader_profile(request):
 
 @decorators.ajax_only
 @login_required
-def edit_reader_profile(request, pk):
-    reader_profile = get_object_or_404(ReaderProfile, pk=pk)
+def edit_reader_profile(request, reader_pk):
+    reader_profile = get_object_or_404(ReaderProfile, pk=reader_pk)
 
-    if not reader_profile.user == request.user and \
-       not utils.is_bulb_coordinator_or_deputy(request.user) and \
-       not request.user.is_superuser:
+    if not utils.can_edit_reader_profile(request.user, reader_profile):
         raise Exception(u"لا تستطيع تعديل المجموعة")
 
     context = {'reader_profile': reader_profile}
     if request.method == 'POST':
-        form = ReaderProfileForm(request.POST, instance=group)
+        form = ReaderProfileForm(request.POST, instance=reader_profile)
         if form.is_valid():
             form.save()
             show_reader_profile_url = reverse('bulb:show_reader_profile', args=(reader_profile.pk,))

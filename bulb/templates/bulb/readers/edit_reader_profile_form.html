@@ -18,8 +18,6 @@ $(function () {
         {% else %}
         var url = "{% url 'bulb:add_reader_profile' %}";
         {% endif %}
-        
-        console.log(url);
 
         /* Send the data */
         $.ajax({
@@ -41,10 +39,10 @@ $(function () {
                     toastr.success("أضفت السجل بنجاح بنجاح.");
                     {% endif %}
 
-                    $("#edit-reader_profile-modal").modal('hide');
+                    $("#edit-reader-profile-modal").modal('hide');
                      window.location.href= data.show_url;
                     } else {
-                    $("#edit-reader_profile-modal .modal-body").html(data);
+                    $("#edit-reader-profile-modal .modal-body").html(data);
                 }}
         });
     });

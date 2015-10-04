@@ -2,6 +2,17 @@
 {% block title %}{{ reader_profile.user.common_profile.get_ar_full_name }}{% endblock %}
 {% block content %}
 <h1>{{ reader_profile.user.common_profile.get_ar_full_name }}</h1>
+
+{% if user|can_edit_reader_profile:reader_profile %}
+<div class="row" style="margin-left: 0">
+    <div style="float: left;">
+        <button id="edit-reader-profile" class="btn btn-icon btn-success">
+            <i class="entypo-pencil"></i>
+            عدّل سجل القارئ
+        </button>
+    </div>
+</div>
+{% endif %}
 <table class="table table-hover">
     <colgroup>
       <col class="col-xs-4 col-md-2 col-sm-3">
@@ -28,12 +39,16 @@
         <td>{{ reader_profile.average_reading }}</td>
     </tr>{% if reader_profile.twitter %}
     <tr>
+        <th>البريد</th>
+        <td class="english-field"><a href="mailto:{{ reader_profile.user.email }}">{{ reader_profile.user.email }}</a></td>
+    </tr>
+    <tr>
         <th>تويتر</th>
-        <td dir="auto" class="english-field">{{ reader_profile.twitter }}</td>
+        <td class="english-field"><a href="https://twitter.com/{{ reader_profile.twitter }}">@{{ reader_profile.twitter }}</a></td>
     </tr>{% endif %}{% if reader_profile.goodreads %}
     <tr>
         <th class="english-field">Goodreads</th>
-        <td dir="auto" class="english-field">{{ reader_profile.goodreads }}</td>
+        <td class="english-field">{{ reader_profile.goodreads|urlize }}</td>
     </tr>{% endif %}{% if reader_profile.user.book_giveaways.undeleted.exists %}
     <tr>
         <th>كتب ساهمت بها</th>
@@ -66,9 +81,35 @@
 
 {% block customscript %}
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<script type="text/javascript">
+$(function(){
+    $('#edit-reader-profile-modal').modal({
+      keyboard: false,
+      backdrop: 'static',
+      show    : false,
+    });
+    $("button#edit-reader-profile").click(function () {
+        $("#edit-reader-profile-modal").modal('show');
+
+        $("#edit-reader-profile-modal .modal-title").html("عدّل ملف {{ reader_profile.user.common_profile.ar_first_name }}");
+        $("#edit-reader-profile-modal .modal-body").load("{% url 'bulb:edit_reader_profile' reader_profile.pk %}");
+
+        var $submitButton = $("#edit-reader-profile-modal button.submit-button");
+        // Unbind any handlers previously attached to the submit button
+        // This is necessary to avoid multiple submissions of the form
+        $submitButton.off('click');
+        $submitButton.click(function () {
+            $("form#edit-reader-profile-form").submit();
+        });
+    });
+});
+</script>
 <style>
 p{
     font-size: 17px;
 }
 </style>
+{% with modal_id='edit-reader-profile-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}
 {% endblock %}

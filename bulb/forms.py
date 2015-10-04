@@ -1,4 +1,6 @@
 # -*- coding: utf-8  -*-
+import re
+
 from django import forms
 import autocomplete_light
 
@@ -72,6 +74,26 @@ class ReportForm(forms.ModelForm):
         fields = ['attendees', 'description']
 
 class ReaderProfileForm(forms.ModelForm):
+
+    def clean_twitter(self):
+        data = self.cleaned_data['twitter']
+        data = re.sub(u'^(?:https?://(?:m\.)?twitter\.com/)?@?', '', data)
+        if not re.match(u'[A-Za-z\d_]+', data):
+            raise  forms.ValidationError(u"أدخل اسم المستخدم على تويتر فقط.")
+        else:
+            return data
+
+    def clean_goodreads(self):
+        data = self.cleaned_data['goodreads']
+        if not re.match(u'^(?:https?://)?(?:www.)?goodreads\.com/user/show/', data):
+            raise  forms.ValidationError(u"أدخل رابط صفحتك على Goodreads.")
+        else:
+            # Because!
+            data = re.sub('^http://', 'https://', data)
+            if not re.match('^https?://', data):
+                data = u"https://" + data
+            return data
+
     class Meta:
         model = ReaderProfile
         fields = ['areas_of_interests', 'favorite_books',

@@ -85,8 +85,8 @@
 						<tr>
 							<td><a href="{% url 'activities:show' a.pk %}">{{ a.name }}</a></td>
 							<td class="hidden-xs">{{ a.primary_club }}</td>
-							<td>{{ a.get_first_date }}</td>
-							<td class="hidden-md hidden-xs">{{ a.get_first_location }}</td>
+							<td>{{ a.get_next_episode.start_date }}</td>
+							<td class="hidden-md hidden-xs">{{ a.get_next_episode.location }}</td>
 						</tr>
 						{% endfor %}
 					</tbody>

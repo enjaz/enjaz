@@ -531,3 +531,23 @@ ul.modal-intro{
     text-align: center;
     margin-bottom: 20px;
 }
+
+li.highlighted-section {
+    -webkit-animation-name: example; /* Chrome, Safari, Opera */
+    -webkit-animation-duration: 4s; /* Chrome, Safari, Opera */
+    animation-name: red-highlighting;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+}
+
+/* Chrome, Safari, Opera */
+@-webkit-keyframes red-highlighting {
+    0%   {background-color: transparent;}
+    50%  {background-color: #A91E1E;}
+}
+
+/* Standard syntax */
+@keyframes red-highlighting {
+    0%   {background-color: transparent;}
+    50%  {background-color: #A91E1E;}
+}

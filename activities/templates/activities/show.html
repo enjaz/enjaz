@@ -43,7 +43,7 @@
 				<li>
 					<div class="profile-name">
 						<strong>
-							<a class="activity-name" href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a>
+							<a dir="auto" class="activity-name" href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a>
 							{# if the user can view unapproved activity, show the activity status #}
 							{# is-online = approved, is-idle = pending, is-busy = rejected #}
 							
@@ -95,13 +95,13 @@
 			<div class="col-sm-offset-2 col-sm-10">
                     <ul class="user-details">{# if the user is privileged, show them the internal description #}
                         {% if user|has_coordination_to_activity:activity or user|can_assess_any_club %}
-                        <li class="activity-description">
+                        <li dir="auto" class="activity-description">
                             <i class="entypo-info-circled"></i>
                             {{ activity.description|linebreaksbr }}
                         </li>
                         {% endif %}
                         <li class="activity-description">
-                            <i class="entypo-megaphone"></i>
+                            <i dir="auto" class="entypo-megaphone"></i>
                             {{ activity.public_description|linebreaksbr }}
                         </li>
                         {% for episode in activity.episode_set.all %}

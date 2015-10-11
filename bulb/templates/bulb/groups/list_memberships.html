@@ -19,7 +19,7 @@
         <tr>
             <td>{{ membership.user.common_profile.get_ar_full_name }}</td>
             <td>{{ membership.user.common_profile.college.get_college_display }}</td>
-            <td><a href="mailto:{{ membership.user.email }}">{{ membership.user.email }}</a></td>
+            <td class="english-field"><a href="mailto:{{ membership.user.email }}">{{ membership.user.email }}</a></td>
             <td>{{ membership.user.common_profile.mobile_number }}</td>
             <td data-order="{{ membership.submission_date|date:'U' }}">{{ membership.submission_date|date:"j F Y" }}</td>
             <td>

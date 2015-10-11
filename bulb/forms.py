@@ -85,6 +85,10 @@ class ReaderProfileForm(forms.ModelForm):
 
     def clean_goodreads(self):
         data = self.cleaned_data['goodreads']
+
+        if not data:
+            return data
+
         if not re.match(u'^(?:https?://)?(?:www.)?goodreads\.com/user/show/', data):
             raise  forms.ValidationError(u"أدخل رابط صفحتك على Goodreads.")
         else:

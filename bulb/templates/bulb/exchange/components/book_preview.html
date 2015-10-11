@@ -31,16 +31,14 @@
         {% if not from_home %}
         <span style="float: left">
             {% if user|can_edit_book:book %}
-            <button data-pk="{{ book.pk }}" class="edit-book btn btn-xs btn-icon btn-gold">
+            <button data-url="{% url 'bulb:edit_book' book.pk %}" class="edit-book btn btn-xs btn-icon btn-gold">
                 <i class="entypo-pencil"></i>
                 عدل
             </button>
-            {% comment %}
-            <button data-pk="{{ book.pk }}" class="delete-book btn btn-xs btn-icon btn-danger">
+            <button data-confirm-url="{% url 'bulb:confirm_book_deletion' book.pk %}" data-pk="{{ book.pk }}" data-deletion-url="{% url 'bulb:delete_book' book.pk %}" class="confirm-delete-book btn btn-xs btn-icon btn-danger">
                 <i class="entypo-block"></i>
                 احذف
             </button>
-            {% endcomment %}
             {% endif %}
             {% if user|can_order_book:book %}
             <button data-pk="{{ book.pk }}" class="order-book btn btn-xs btn-icon btn-success">

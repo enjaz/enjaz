@@ -32,22 +32,16 @@ $(function () {
             processData: false,
             success: function (data) {
                 if (data.message == "success") {
-
                     // show success message (using toastr)
                     toastr.options.positionClass = "toast-top-left";
                     {% if group %}
                     toastr.success("عُدّلت {{ group.name }} بنجاح.");
+                     window.location.href= data.show_url;
                     {% else %}
                     toastr.success("أضيفت المجموعة بنجاح.");
-                    {% endif %}
-
-                     {% if group %}
-                     $("#edit-group-modal").modal('hide');
-                     window.location.href= data.show_url;
-                     {% else %}
                      $("#edit-group-modal .modal-body").load("{% url 'bulb:add_group_thanks' %}");
-                      loadGroups();
-                     {% endif %}
+                    loadGroups();
+                    {% endif %}
                 } else {
                     $("#edit-group-modal .modal-body").html(data);
                 }}

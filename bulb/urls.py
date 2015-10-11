@@ -4,6 +4,7 @@ from bulb import views
 
 urlpatterns = patterns('',
     url(r'^$', views.index, name="index"),
+    url(r'^indicators/$', views.indicators, name="indicators"),
 
     # Books exchange
     url(r'^exchange/$', views.list_book_categories, name="list_book_categories"),
@@ -18,7 +19,8 @@ urlpatterns = patterns('',
     url(r'^exchange/books/order/$', views.order_instructions, name="order_instructions"),
     url(r'^exchange/books/(?P<pk>\d+)/$', views.show_book, name="show_book"),
     url(r'^exchange/books/(?P<pk>\d+)/edit/$', views.edit_book, name="edit_book"),
-    url(r'^exchange/ajax/control_book$', views.control_book, name="control_book"),
+    url(r'^exchange/books/(?P<pk>\d+)/delete/$', views.delete_book, name="delete_book"),
+    url(r'^exchange/books/(?P<pk>\d+)/delete/confirm/$', views.confirm_book_deletion, name="confirm_book_deletion"),
     url(r'^exchange/ajax/pending_book$', views.pending_book, name="pending_book"),
     url(r'^exchange/ajax/pending_request$', views.pending_request, name="pending_request"),
     url(r'^exchange/ajax/list_indirect_requests$', views.list_indirect_requests, name="list_indirect_requests"),

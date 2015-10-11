@@ -1,0 +1,40 @@
+<div class="modal fade" id="confirm-delete-book-modal">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">حذف المجموعة</h4>
+      </div>
+      <div class="modal-body">
+          {% include "media/polls/ajax-loader.html" %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">ألغِ</button>
+        <button id="delete-book" type="button" class="btn btn-danger confirm">أكّد</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script type="text/javascript">
+$(function() {
+    $("#delete-book").click(function () {
+        /* get some values from elements on the page: */
+        var deletion_url = $(this).data('deletion-url');
+        /* Send the data using post */
+        var posting = $.post(deletion_url);
+        posting.done(function (data) {
+            if (data.message == "success") {
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                toastr.info("حُذف الكتاب بنجاح.");
+                
+                // return to the group list page.
+                window.location.href = data.list_url;
+            } else {
+                $('#confirm-delete-book-modal .modal-body').html(data);
+            }
+        });
+    });
+});
+</script>

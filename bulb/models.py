@@ -57,7 +57,7 @@ class Book(models.Model):
 
 
     def last_pending_request(self):
-        pending_requests = self.request_set.filter(owner_status__in=['', 'F']).order_by('-submission_date')
+        pending_requests = self.request_set.filter(status="", owner_status__in=['', 'F']).order_by('-submission_date')
         if pending_requests.exists():
             return pending_requests.first()
 
@@ -77,17 +77,21 @@ class Request(models.Model):
     delivery = models.CharField(max_length=1, verbose_name=u"نوع التسليم",
                                 choices=delivery_choices)
     status_choices = (
+        ('', u'معلقة'),
         ('D', u'تم'),
         ('F', u'تعذّر'),
         ('C', u'ملغى')
         )
-    requester_status = models.CharField(max_length=1, verbose_name=u"نوع التسليم",
+    status = models.CharField(max_length=1, verbose_name=u"الحالة العامة",
+                              choices=status_choices, default="",
+                              blank=True)
+    requester_status = models.CharField(max_length=1, verbose_name=u"حالة مقدم الطلب",
                                         choices=status_choices, default="",
                                         blank=True)
     requester_status_date = models.DateTimeField(u"تاريخ تأكيد مقدم الطلب",
                                              blank=True, default=None,
                                              null=True)
-    owner_status = models.CharField(max_length=1, verbose_name=u"نوع التسليم",
+    owner_status = models.CharField(max_length=1, verbose_name=u"حالة صاحب الكتاب",
                                     choices=status_choices, default="",
                                     blank=True)
     owner_status_date = models.DateTimeField(u"تاريخ تأكيد صاحب الكتاب",

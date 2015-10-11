@@ -51,3 +51,7 @@ def reader_profile_link(user):
     return u"<a href='{}'>{}</a>".format(reverse('bulb:show_reader_profile',
                                                  args=(user.reader_profile.pk,)),
                                          common_profile.get_ar_full_name())
+
+@register.filter
+def can_edit_reader_profile(user, reader_profile):
+    return utils.can_edit_reader_profile(user, reader_profile)

@@ -5,15 +5,18 @@
 <h1>أعضاء <a href="{% url 'bulb:show_group' group.pk %}">{{ group.name }}</a></h1>
 <table class="datatable display dt-responsive">
     <thead>
-        <th>اسم العضو</th>
-        <th class="not-mobile">الكلية</th>
-        <th class="not-mobile">البريد</th>
-        <th class="not-mobile">الجوال</th>
-        <th class="not-mobile">تاريخ الانضمام</th>
-        <th>الخيارات</th>
+        <tr>
+            <th>اسم العضو</th>
+            <th class="not-mobile">الكلية</th>
+            <th class="not-mobile">البريد</th>
+            <th class="not-mobile">الجوال</th>
+            <th class="not-mobile">تاريخ الانضمام</th>
+            <th>الخيارات</th>
+        </tr>
     </thead>
     <tbody>
         {% for membership in group.membership_set.all %}
+        <tr>
             <td>{{ membership.user.common_profile.get_ar_full_name }}</td>
             <td>{{ membership.user.common_profile.college.get_college_display }}</td>
             <td><a href="mailto:{{ membership.user.email }}">{{ membership.user.email }}</a></td>
@@ -30,6 +33,7 @@
                 </a>
                 {% endif %}
             </td>
+        </tr>
         {% endfor %}
     </tbody>
 </table>

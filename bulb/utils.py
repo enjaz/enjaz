@@ -71,3 +71,10 @@ def can_join_group(user, group):
 def is_active_group_member(user, group):
     return group.membership_set.filter(user=user, is_active=True).exists()
     
+def can_edit_reader_profile(user, reader_profile):
+    if is_bulb_coordinator_or_deputy(user) or \
+       user.is_superuser or \
+       reader_profile.user == user:
+        return True
+    else:
+        return False

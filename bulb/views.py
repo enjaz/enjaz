@@ -36,8 +36,6 @@ def index(request):
 # * Send emails in case of failed indirect request.
 # * In case of failed indirect requests, cancel requester points.
 # * Don't hard-cord the editing URL in JavaScript.
-# * Don't Repeat Yourself when it comes to JavaScript delete, edit and
-#   order buttons.
 # * If the request was marked as done by the owner, should we hide it
 #   for the requester (propbably not)
 
@@ -150,6 +148,52 @@ def show_book(request, pk):
 
 @decorators.ajax_only
 @login_required
+@decorators.get_only
+def confirm_book_deletion(request, pk):
+    book = get_object_or_404(Book, pk=pk, is_deleted=False)
+    if not utils.can_edit_book(request.user, book):
+        raise PermissionDenied
+
+    return render(request, "bulb/exchange/confirm_book_deletion.html",
+                  {'book': book})
+
+@decorators.ajax_only
+@decorators.post_only
+@login_required
+@csrf.csrf_exempt
+def delete_book(request, pk):
+    book = get_object_or_404(Book, pk=pk, is_deleted=False)
+    if not utils.can_edit_book(request.user, book):
+        raise Exception(u"لا تستطيع حذف الكتاب")
+
+    # Book owners cannot delete a book if it has any pending requests,
+    # but superusers and Bulb coordinators can, and in that case,
+    # notify the book owner, then check for pending requests notify
+    # the requester accordingly.
+    if request.user != book.submitter:
+        pending_request = book.last_pending_request()
+        bulb_coordinator = utils.get_bulb_club_for_user(book.submitter).coordinator
+        email_context = {'book': book,
+                         'book_request': pending_request,
+                         'bulb_coordinator': bulb_coordinator}
+        mail.send([book.submitter.email],
+                   template="book_deleted_to_owner",
+                   context=email_context)
+        if pending_request:
+            pending_request.cancel_related_user_point(pending_request.requester)
+            mail.send([pending_request.requester.email],
+                       template="book_deleted_to_requester",
+                       context=email_context)
+
+    book.is_deleted = True
+    book.save()
+    show_category_url = reverse('bulb:show_category',
+                                args=(book.category.code_name,))
+    full_url = request.build_absolute_uri(show_category_url)
+    return {"message": "success", "list_url": full_url}
+
+@decorators.ajax_only
+@login_required
 def add_book(request):
     if request.method == 'POST':
         current_year = StudentClubYear.objects.get_current()
@@ -158,7 +202,9 @@ def add_book(request):
         form = BookForm(request.POST, request.FILES, instance=instance)
         if form.is_valid():
             book = form.save()
-            return {"message": "success"}
+            show_book_url = reverse('bulb:show_book', args=(book.pk,))
+            full_url = request.build_absolute_uri(show_book_url)
+            return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
         form = BookForm()
 
@@ -178,7 +224,9 @@ def edit_book(request, pk):
         form = BookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
             book = form.save()
-            return {"message": "success"}
+            show_book_url = reverse('bulb:show_book', args=(book.pk,))
+            full_url = request.build_absolute_uri(show_book_url)
+            return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
         form = BookForm(instance=book)
 
@@ -278,6 +326,13 @@ def indicators(request):
        not request.user.is_superuser:
         raise PermissionDenied
 
+    books = Book.objects.current_year()
+    book_requests = Request.objects.current_year()
+    
+    context = {'books': book,
+               'book_requests': book_requests}
+    return render(request, 'bulb/indicators.html', context)
+
 @decorators.ajax_only
 @csrf.csrf_exempt
 @login_required
@@ -331,19 +386,6 @@ def disputed_requests(request):
     if not utils.is_bulb_coordinator_or_deputy(request.user) and \
        not request.user.is_superuser:
         raise PermissionDenied
-
-@login_required
-@csrf.csrf_exempt
-@decorators.ajax_only
-@decorators.post_only
-def control_book(request):
-    action = request.POST.get('action')
-    book_pk = request.POST.get('book_pk')
-    book = get_object_or_404(Book, pk=book_pk)
-    if action == 'delete':
-        # TODO: Notify pending requests.
-        pass
-    return {"message": "success"}
 
 @decorators.ajax_only
 @decorators.post_only
@@ -779,17 +821,15 @@ def add_reader_profile(request):
 
 @decorators.ajax_only
 @login_required
-def edit_reader_profile(request, pk):
-    reader_profile = get_object_or_404(ReaderProfile, pk=pk)
+def edit_reader_profile(request, reader_pk):
+    reader_profile = get_object_or_404(ReaderProfile, pk=reader_pk)
 
-    if not reader_profile.user == request.user and \
-       not utils.is_bulb_coordinator_or_deputy(request.user) and \
-       not request.user.is_superuser:
+    if not utils.can_edit_reader_profile(request.user, reader_profile):
         raise Exception(u"لا تستطيع تعديل المجموعة")
 
     context = {'reader_profile': reader_profile}
     if request.method == 'POST':
-        form = ReaderProfileForm(request.POST, instance=group)
+        form = ReaderProfileForm(request.POST, instance=reader_profile)
         if form.is_valid():
             form.save()
             show_reader_profile_url = reverse('bulb:show_reader_profile', args=(reader_profile.pk,))

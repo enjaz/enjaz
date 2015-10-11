@@ -40,12 +40,7 @@ $(function () {
                     toastr.success("أضيف كتاب جديد بنجاح.");
                     {% endif %}
 
-                    // hide modal
-                    var $modal = $("#edit-book-modal")
-                    $modal.modal('hide');
-
-                    // refresh book lists
-                    loadBooks()
+                     window.location.href= data.show_url;
 
                 } else {
                     $("#edit-book-modal .modal-body").html(data);

@@ -1,0 +1,12 @@
+هل أنت متأكد أنك ترغب في تأكيد حذف <a href="{% url 'bulb:show_book' book.pk %}">{{ book.title }}</a>؟
+
+{% if user != book.submitter or book.last_pending_request %}
+<ul>
+{% if user != book.submitter %}
+    <li>سوف نبلغ {{ book.last_pending_request.requester.common_profile.get_ar_full_name }} بأن الكتاب حُذف. لا حاجة لأي إجراء منك.</li>
+{% endif %}
+{% if book.last_pending_request %}
+    <li>سنلغي إلغاء الطلب المعلق الذي قدّمه {{ book.last_pending_request.requester.common_profile.get_ar_full_name }}. سنبلغه بذلك، ولا حاجة لأي إجراء منك.</li>
+{% endif %}
+</ul>
+{% endif %}

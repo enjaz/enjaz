@@ -35,10 +35,10 @@
 
 <script type="text/javascript">
     function refreshIndirectRequests(){
-        $("#requests-to-receive").load("{% url 'bulb:list_indirect_requests' %}", {condition: 'to_receive'}, initialize_buttons);
-        $("#requests-to-give").load("{% url 'bulb:list_indirect_requests' %}", {condition: 'to_give'}, initialize_buttons);
+        $("#requests-to-receive").load("{% url 'bulb:list_indirect_requests' %}", {condition: 'to_receive'}, initialize_request_buttons);
+        $("#requests-to-give").load("{% url 'bulb:list_indirect_requests' %}", {condition: 'to_give'}, initialize_request_buttons);
     }
-    function initialize_buttons(){
+    function initialize_request_buttons(){
         control_url = "{% url 'bulb:control_request' %}";
         list_url = "{% url 'bulb:list_indirect_requests' %}";
         $('button.done, button.failed').click(function() {

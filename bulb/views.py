@@ -537,9 +537,7 @@ def list_groups(request):
 @csrf.csrf_exempt
 @login_required
 def list_group_previews(request):
-    groups = Group.objects.current_year().available().order_by('?')
-    if not utils.is_bulb_coordinator_or_deputy(request.user):
-        groups = groups.for_user_city(request.user).for_user_gender(request.user)
+    groups = Group.objects.current_year().available().for_user_city(request.user).order_by('?')
     return render(request, "bulb/groups/list_group_previews.html",
                   {'groups': groups})
 

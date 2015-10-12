@@ -77,6 +77,10 @@ class ReaderProfileForm(forms.ModelForm):
 
     def clean_twitter(self):
         data = self.cleaned_data['twitter']
+
+        if not data:
+            return data
+
         data = re.sub(u'^(?:https?://(?:m\.)?twitter\.com/)?@?', '', data)
         if not re.match(u'^[A-Za-z\d_]+$', data):
             raise  forms.ValidationError(u"أدخل اسم مستخدم صحيح.")

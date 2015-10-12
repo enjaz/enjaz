@@ -21,8 +21,8 @@
         {% if user|can_edit_group:group and not group|group_can_have_sessions %}
         <p class="alert alert-warning">لا يمكنك عقد جلسات قبل أن يبلغ عدد أعضاء المجموعة أربعة أعضاء (شاملا رئيس المجموعة). هيا، أعلن! بإمكانك إحضار أربعة!</p>
         {% endif %}
-       <h2>{{ group.name }}</h2>
-        <p class="group-description">
+       <h2 dir="auto" >{{ group.name }}</h2>
+        <p dir="auto" class="group-description">
             {{ group.description|linebreaksbr }}
         </p>
         <table class="table table-hover">

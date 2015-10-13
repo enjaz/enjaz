@@ -30,9 +30,9 @@ supervision_request_status_choices = (
     ('P', u'تنتظر المراجعة'),
     ('A', u'مقبول'), # Currently accepted
     ('R', u'مرفوض'), # Never been accepted
-    ('D', u'ألغاه الطالب المستجد قبل أن يراجعه الزميل الطلابي'), # Never been accepted
+    ('D', u'ألغاه الطالب المستجد قبل أن يراجعه المرشد الطلابي'), # Never been accepted
     ('WN', u'ألغاه الطالب المستجد'), # After it has been accepted
-    ('WC', u'ألغاه الزميل الطلابي'), # After it has been accepted
+    ('WC', u'ألغاه المرشد الطلابي'), # After it has been accepted
 )
 
 class ArshidniProfile(models.Model):
@@ -238,10 +238,12 @@ class ColleagueProfile(ArshidniProfile):
     year = models.ForeignKey(StudentClubYear, null=True,
                              on_delete=models.SET_NULL, default=None,
                              verbose_name=u"السنة")
+    tags = models.ManyToManyField('Tag', verbose_name=u"الوسوم",
+                                  related_name="colleague_profiles")
     objects = ColleagueQuerySet.as_manager()
     class Meta:
-        verbose_name = u"ملف زميل طلابي"
-        verbose_name_plural = u"ملفات الزملاء الطلابيين"
+        verbose_name = u"ملف مرشد طلابي"
+        verbose_name_plural = u"ملفات المرشدين الطلابيين"
 
     def __unicode__(self):
         return self.user.common_profile.get_ar_full_name()
@@ -254,7 +256,7 @@ class SupervisionRequest(models.Model):
                              related_name="supervision_requests")
     colleague = models.ForeignKey(ColleagueProfile, null=True,
                                   on_delete=models.SET_NULL,
-                                  verbose_name=u"الزميل",
+                                  verbose_name=u"المرشد الطلابي",
                                   related_name="supervision_requests")
     status = models.CharField(max_length=2, verbose_name=u"الحالة",
                               default='P',
@@ -276,5 +278,42 @@ class SupervisionRequest(models.Model):
         return self.user.common_profile.get_en_full_name()
 
     class Meta:
-        verbose_name = u"طلب زمالة"
-        verbose_name_plural = u"طلبات الزمالة"
+        verbose_name = u"طلب إرشاد"
+        verbose_name_plural = u"طلبات الإرشاد"
+
+class Report(models.Model):
+    colleague = models.ForeignKey(ColleagueProfile, null=True,
+                                  on_delete=models.SET_NULL,
+                                  verbose_name=u"المرشد الطلابي",
+                                  related_name="student_guide_reports")
+    text = models.TextField(u"المحضر")
+    submission_date = models.DateTimeField(u'تاريخ الإرسال',
+                                           auto_now_add=True)
+    was_revised = models.BooleanField(u"روجع؟", default=False)
+    revision_date = models.DateTimeField(u'تاريخ المراجعة', null=True,
+                                         default=None)
+    def __unicode__(self):
+        return self.colleague.user.common_profile.get_ar_full_name()
+
+class Feedback(models.Model):
+    submitter = models.ForeignKey(User, null=True,
+                                  on_delete=models.SET_NULL,
+                                  verbose_name=u"المستخدم",
+                                  related_name="student_guide_feedback")
+    submission_date = models.DateTimeField(u'تاريخ الإرسال',
+                                           auto_now_add=True)
+    text = models.TextField(u"المحضر")
+    colleague = models.ForeignKey(ColleagueProfile, null=True,
+                                  on_delete=models.SET_NULL,
+                                  verbose_name=u"المرشد الطلابي")
+    def __unicode__(self):
+        return self.submitter.common_profile.get_ar_full_name()
+
+class Tag(models.Model):
+    name = models.CharField(max_length=100,
+                            verbose_name=u"الاسم")
+    submission_date = models.DateTimeField(u'تاريخ الإرسال',
+                                           auto_now_add=True)
+    
+    def __unicode__(self):
+        return self.name

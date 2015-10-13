@@ -6,7 +6,7 @@
             <th class="not-mobile">الكلية</th>
             <th class="not-mobile">الدفعة</th>
             <th class="not-mobile">تاريخ الإضافة</th>
-            <th class="not-mobile"></th>
+            <th class="not-mobile">ماذا يقدم؟</th>
         </tr>
     </thead>
      <tbody>
@@ -15,8 +15,8 @@
             <td><a href="{% url 'arshidni:show_colleague_profile' c.pk %}">{{ c.user.common_profile.get_ar_full_name|default:c.user.username }}</a></td>
             <td>{{ c.user.common_profile.college }}</a></td>
             <td>{{ c.batch }}</td>
-                        <td data-order="{{ c.submission_date|date:"U" }}">{{ c.submission_date|date:"j F Y" }}</td>
-                        <td> {% if not user|has_current_colleague_profile and not user|is_arshindi_coordinator_or_deputy  %}<a href="{% url 'arshidni:submit_supervision_request' c.pk %}">اختر</a>{% endif %}</td>
+            <td data-order="{{ c.submission_date|date:"U" }}">{{ c.submission_date|date:"j F Y" }}</td>
+            <td><ul>{% for tag in c.tags.all %}<li>{{ tag.name }}</li>{% endfor %}</ul></td>
         </tr>
         {% endfor %}
     </tbody>

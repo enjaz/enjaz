@@ -12,21 +12,6 @@
             keyboard: false,
             backdrop: 'static',
         });
-        $('#order-book-modal').on('shown.bs.modal', function (e) {
-            direct_height = $('.order-option.direct').height();
-            indirect_height = $('.order-option.indirect').height();
-            if (direct_height > indirect_height){
-                $('.order-option.indirect').height(direct_height);
-            }
-            $('.order-option').click(function() {
-                if ($(this).hasClass('direct')){
-                    $("#confirm-order-modal .confirm").data('delivery', 'direct');
-                } else if ($(this).hasClass('indirect')){
-                    $("#confirm-order-modal button.confirm").data('delivery', 'indirect');
-                }
-                $("#confirm-order-modal").modal('show');
-            });            
-        });
         $('#confirm-order-modal button.confirm').click(function() {
             var delivery_type = $("#confirm-order-modal .confirm").data('delivery');
             var pk = $(".order-option").data('pk');

@@ -2,7 +2,21 @@ function initialize_book_buttons(){
     $(".order-book").click(function () {
         $("#order-book-modal").modal('show');
         var pk = $(this).data('pk');
-        $("#order-book-modal .modal-body").load("{% url 'bulb:order_instructions' %}", {pk: pk});
+        $("#order-book-modal .modal-body").load("{% url 'bulb:order_instructions' %}", {pk: pk}, function(){
+            direct_height = $('.order-option.direct').height();
+            indirect_height = $('.order-option.indirect').height();
+            if (direct_height > indirect_height){
+                $('.order-option.indirect').height(direct_height);
+            }
+            $('.order-option').click(function() {
+                if ($(this).hasClass('direct')){
+                    $("#confirm-order-modal .confirm").data('delivery', 'direct');
+                } else if ($(this).hasClass('indirect')){
+                    $("#confirm-order-modal button.confirm").data('delivery', 'indirect');
+                }
+                $("#confirm-order-modal").modal('show');
+            });
+        });
 
         var $submitButton = $("#order-book-modal button.submit-button");
         // Unbind any handlers previously attached to the submit button

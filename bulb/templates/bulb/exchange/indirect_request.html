@@ -17,8 +17,7 @@
         </div>
     </div>
 </div>
-<div class="col-sm-5 vcenter">
-    {% if book.last_pending_request.owner_status == 'D' and book.last_pending_request.requester_status == '' %}
+<div class="col-sm-4 vcenter">
     <p>مُقدّم الطلب:</p>
     <table class="table table-hover">
         <tr>
@@ -42,7 +41,8 @@
             <td>{{ book.last_pending_request.submission_date|date:"l j F" }}</td>
         </tr>
     </table>
-    {% elif book.last_pending_request.owner_status == '' %}
+</div>
+<div class="col-sm-4 vcenter">
     <p>صاحب الكتاب:</p>
     <table class="table table-hover">
         <tr>
@@ -55,7 +55,7 @@
         </tr>
         <tr>
             <th>البريد</th>
-            <td class="english-field"><a href="mailto:{{ book.last_pending_request.requester.email }}">{{ book.last_pending_request.requester.email }}</a></td>
+            <td class="english-field"><a href="mailto:{{ book.submitter.email }}">{{ book.submitter.email }}</a></td>
         </tr>
         <tr>
             <th>رقم الجوال</th>
@@ -66,12 +66,15 @@
             <td>{{ book.last_pending_request.submission_date|date:"l j F" }}</td>
         </tr>
     </table>
-    {% endif %}
 </div>
-<div class="col-sm-5 vcenter">
+<div class="col-sm-2 vcenter">
         <button data-pk="{{ book.last_pending_request.pk }}" data-action="{{ side }}_done" class="done btn-block btn-icon btn btn-success">
             <i class="entypo-flag"></i>
-            سُلّم الكتاب
+    {% if book.last_pending_request.owner_status == 'D' %}
+            أعطي الكتاب إلى طالبِه
+    {% else %}
+            استلم الكتاب من صاحبه
+    {% endif %}
         </button>
         {% if not book.last_pending_request.owner_status == 'F' %}
         <button data-pk="{{ book.last_pending_request.pk }}" data-action="{{ side }}_failed" class="failed btn-block btn-icon btn btn-warning">

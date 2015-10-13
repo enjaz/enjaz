@@ -2,10 +2,8 @@
     <li><a href="{% url 'arshidni:list_colleagues' %}"><span class="entypo-users"></span> المرشدون الطلابيون</a></li>
  	{% if user.common_profile.is_student %}
         {% if user|has_current_colleague_profile %}
-            <li><a href="{% url 'arshidni:register_colleague_profile' %}"><span class="glyphicon glyphicon-plus"></span> عدّل سجلّك الطلابي</a></li>
             <li><a href="{% url 'arshidni:supervision_requests_to_me' %}"><span class="glyphicon glyphicon-star"></span> طلبات موجهة إليّ</a></li>
         {% else %}
-            <li><a href="{% url 'arshidni:register_colleague_profile' %}"><span class="glyphicon glyphicon-plus"></span> سجّل نفسك زميلا طلابيا</a></li>
      		<li><a href="{% url 'arshidni:my_supervision_requests' %}"><span class="glyphicon glyphicon-star"></span> طلبات وجهتَها</a></li>
 
         {% endif %}

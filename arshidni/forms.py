@@ -95,7 +95,7 @@ class StudyGroupForm(forms.ModelForm):
 class ColleagueProfileForm(forms.ModelForm):
     class Meta:
         model = ColleagueProfile
-        fields = ['batch', 'contacts', 'bio', 'interests']
+        fields = ['batch', 'contacts', 'bio', 'interests', 'tags']
 
 class SupervisionRequestForm(forms.ModelForm):
     class Meta:

@@ -56,7 +56,7 @@
         </p>
         {% elif book.last_pending_request.requester_status == '' %}
         <p class="alert">
-            تواصل مع {{ book.last_pending_request.requester.common_profile.ar_first_name }}. ينبغي إنجاز الطلب قبل {{ book.last_pending_request.get_expected_delivery_date|date:"l j F" }} لتفادي إلغائه.
+            تواصل مع {{ book.submitter.common_profile.ar_first_name }}. ينبغي إنجاز الطلب قبل {{ book.last_pending_request.get_expected_delivery_date|date:"l j F" }} لتفادي إلغائه.
         </p>
         {% endif %}
         <button data-pk="{{ book.last_pending_request.pk }}" class="done btn-block btn-icon btn btn-success">

@@ -23,13 +23,17 @@ from bulb import utils
 def index(request):
     groups = Group.objects.current_year().undeleted().order_by("?")[:6]
     group_count = Group.objects.current_year().undeleted().count()
+    group_user_count = (User.objects.filter(reading_group_memberships__isnull=False) | \
+                        User.objects.filter(reading_group_coordination__isnull=False)).count()
     books = Book.objects.current_year().available().order_by("?")[:6]
     book_count = Book.objects.current_year().available().count()
-    book_request_count = Book.objects.current_year().count()
+    book_request_count = Request.objects.current_year().count()
     reader_profiles = ReaderProfile.objects.order_by("?")[:10]
     reader_profile_count = ReaderProfile.objects.count()
     context = {'groups': groups, 'group_count': group_count,
+               'group_user_count': group_user_count,
                'books': books, 'book_count': book_count,
+               'book_request_count': book_request_count,
                'reader_profiles': reader_profiles,
                'reader_profile_count': reader_profile_count}
     return render(request, "bulb/index.html", context)

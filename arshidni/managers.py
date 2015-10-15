@@ -4,6 +4,10 @@ from accounts.utils import get_user_city, get_user_gender
 from core.models import StudentClubYear
 
 class SupervisionRequestQuerySet(models.QuerySet):
+    def current_year(self):
+        current_year = StudentClubYear.objects.get_current()
+        return self.filter(colleague__year=current_year)
+
     def accepted(self):
         return self.filter(status='A')
 

@@ -70,6 +70,8 @@
 
 <script>
 $(document).ready(function () {
+// Rely on the browser detection of direct for all text fields
+$('input[type=text], textarea').attr('dir', 'auto');
 
 // Move the episode panel to the 6th position in the form
 // (after the description field)

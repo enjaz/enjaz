@@ -83,10 +83,10 @@
 					<tbody>
 						{% for a in upcoming_activities %}
 						<tr>
-							<td><a href="{% url 'activities:show' a.pk %}">{{ a.name }}</a></td>
+							<td dir="auto"><a href="{% url 'activities:show' a.pk %}">{{ a.name }}</a></td>
 							<td class="hidden-xs">{{ a.primary_club }}</td>
-							<td>{{ a.get_first_date }}</td>
-							<td class="hidden-md hidden-xs">{{ a.get_first_location }}</td>
+							<td>{{ a.get_next_episode.start_date }}</td>
+							<td dir="auto" class="hidden-md hidden-xs">{{ a.get_next_episode.location }}</td>
 						</tr>
 						{% endfor %}
 					</tbody>
@@ -161,7 +161,7 @@
 					<tbody>
 						{% for c in latest_entries %}
 						<tr>
-							<td>{% if c.collection %}<a href="{% url 'activities:show' c.collection.parent_order.episode.activity.pk %}">{{ c.collection.parent_order.episode }}</a>{% else %}مخصّصة{% endif %}</td>
+							<td dir="auto">{% if c.collection %}<a href="{% url 'activities:show' c.collection.parent_order.episode.activity.pk %}">{{ c.collection.parent_order.episode }}</a>{% else %}مخصّصة{% endif %}</td>
 							<td>{{ c.points }}</td>
 							<td>{{ c.redeem_date }}</td>
 						</tr>

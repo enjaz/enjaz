@@ -11,6 +11,23 @@
 		<p class="alert  arshidni-intro">هذه حلقة التواصل بين الطلاب المستجدين والطلاب الأقدم في الجامعة. يقدم المرشد الطلابي المشورة للطالب المستجد بناء على تجربته الشخصية، كإعانته على الانتقال من النظام الدراسي المدرسي إلى النظام الدراسي الجامعي، ونقل خبراته في طرق الاستذكار المثلى لمختلف المواد والمواضيع، والمساعدة في حل الصعوبات الأكاديمية التي قد يواجهها الطالب المستجد.</p>
 	</div>
 </div>
+{% if user.common_profile.is_student and not user.supervision_requests.current_year.accepted.exists %}
+<div class="row" style="margin-left: 0; margin-bottom: 5px;">
+    <div style="float: left;">
+{% if not user|has_current_colleague_profile %}
+        <a href="{% url 'arshidni:register_colleague_profile' %}" class="btn btn-icon btn-success">
+            <i class="entypo-plus"></i>
+            سجّل نفسك مرشدًا طلابيًا
+        </a>
+{% else %}
+        <a href="{% url 'arshidni:register_colleague_profile' %}" class="btn btn-icon btn-success">
+            <i class="entypo-pencil"></i>
+            عدّل سجلّك الطلابي
+        </a>
+{% endif %}
+    </div>
+</div>
+{% endif %}
 <div class="panel-group" id="arshidni-accordion" role="tablist" aria-multiselectable="true">
     <div class="panel panel-success">
         <div class="panel-heading">

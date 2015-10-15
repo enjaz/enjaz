@@ -19,7 +19,7 @@
     <tbody>
     {% for activity in activities %}
         <tr>
-            <td><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}</a></td>
+            <td dir="auto"><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}</a></td>
             <td><a href="{% url 'clubs:show' activity.primary_club.id %}">{{ activity.primary_club }}</a></td>
             <td data-order="{{ activity.get_last_episode.end_date |date:'U' }}">{{ activity.get_last_episode.end_date|date:"j F" }}</td>
             {% if table_type == 'toreview' %}

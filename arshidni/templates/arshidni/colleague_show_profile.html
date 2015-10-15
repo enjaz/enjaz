@@ -18,12 +18,26 @@
 {% endif %}
 
 <h2>{{ colleague_profile.user.common_profile.get_ar_full_name|default:colleague_profile.user.username }}</h2>
+
+{% if user.common_profile.is_student and not user.supervision_requests.current_year.accepted.exists or user.is_superuser %}
+<div class="row" style="margin-left: 0; margin-bottom: 5px;">
+    <div style="float: left;">
+{% if user == colleague_profile.user or user|is_arshindi_coordinator_or_deputy or user.is_superuser %}
+        <a href="{% url 'arshidni:edit_colleague_profile' colleague_profile.pk %}" class="btn btn-icon btn-success">
+            <i class="entypo-pencil"></i>
+            عدّل سجلّك الطلابي
+        </a>
+{% elif not user|has_current_colleague_profile and colleague_profile.is_available and not user|is_arshindi_coordinator_or_deputy %}
+        <a href="{% url 'arshidni:register_colleague_profile' %}" class="btn btn-icon btn-success">
+            <i class="entypo-plus"></i>
+            اختر هذا المرشد
+        </a>
+{% endif %}
+    </div>
+</div>
+{% endif %}
+
 <div class="row">
-	{% if not user|has_current_colleague_profile and perms.arshidni.add_supervisionrequest and colleague_profile.is_available and not user|is_arshindi_coordinator_or_deputy %}
-		<div class="col-md-3">
-			<a href="{% url 'arshidni:submit_supervision_request' colleague_profile.pk %}" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> اختر</a>
-		</div>
-	{% endif %}
     <div class="col-md-9">
 	<table class="table-hover table">
 		<colgroup>

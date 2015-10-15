@@ -3,7 +3,7 @@ import autocomplete_light
 from django.contrib.auth.models import User
 
 
-class UserAutocomplete(autocomplete_light.AutocompleteModelTemplate):
+class NiqatiUserAutocomplete(autocomplete_light.AutocompleteModelTemplate):
     search_fields=['^email', '^common_profile__ar_first_name',
                    '^common_profile__ar_last_name',
                    '^common_profile__en_first_name',
@@ -18,4 +18,4 @@ class UserAutocomplete(autocomplete_light.AutocompleteModelTemplate):
     widget_attrs = {'class': 'modern-style'}
     choices = User.objects.filter(common_profile__is_student=True, coordination__isnull=True, is_active=True)
 
-autocomplete_light.register(UserAutocomplete)
+autocomplete_light.register(NiqatiUserAutocomplete)

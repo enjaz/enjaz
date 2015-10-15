@@ -8,7 +8,7 @@ from niqati.models import Code, Category, Code_Collection, Code_Order
 class EpisodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Episode
-        fields = ('pk', 'start_datetime', 'end_datetime')
+        fields = ('pk', 'start_datetime', 'end_datetime', 'location')
 
 class ClubSerializer(serializers.ModelSerializer):
     class Meta:

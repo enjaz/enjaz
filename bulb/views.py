@@ -337,12 +337,28 @@ def indicators(request):
     groups = Group.objects.current_year()
     sessions = Session.objects.current_year()
     users = User.objects.filter(common_profile__is_student=True, book_points__is_counted=True).annotate(point_count=Count('book_points')).filter(point_count__gte=2)
+    book_contributing_male_users = User.objects.filter(common_profile__college__gender='M',
+                                                       book_giveaways__isnull=False).count()
+    book_contributing_female_users = User.objects.filter(common_profile__college__gender='F',
+                                                         book_giveaways__isnull=False).count()
+    group_male_users = (User.objects.filter(reading_group_memberships__isnull=False,
+                                            common_profile__college__gender='M') | \
+                        User.objects.filter(reading_group_coordination__isnull=False,
+                                            common_profile__college__gender='M')).count()
+    group_female_users = (User.objects.filter(reading_group_memberships__isnull=False,
+                                              common_profile__college__gender='F') | \
+                          User.objects.filter(reading_group_coordination__isnull=False,
+                                              common_profile__college__gender='F')).count()
 
     context = {'groups': groups,
                'sessions': sessions,
                'books': books,
                'book_requests': book_requests,
-               'users': users}
+               'users': users,
+               'book_contributing_male_users': book_contributing_male_users,
+               'book_contributing_female_users': book_contributing_female_users,
+               'group_male_users': group_male_users,
+               'group_female_users': group_female_users}
     return render(request, 'bulb/indicators.html', context)
 
 @decorators.ajax_only

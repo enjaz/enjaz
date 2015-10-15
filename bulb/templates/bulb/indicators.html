@@ -88,6 +88,9 @@
                 </tbody>
             </table>
     </div>
+    <div class="col-md-6">
+        <div id="group-gender" class="ct-chart ct-perfect-fourth"></div>
+    </div>
 </div>
 <h2>تبادل الكتب</h2>
 <div class="row">
@@ -197,6 +200,9 @@
                 </tbody>
             </table>
     </div>
+    <div class="col-md-6">
+        <div id="book-gender" class="ct-chart ct-perfect-fourth"></div>
+    </div>
 </div>
 {% endblock %}
 {% block customscript %}
@@ -224,6 +230,49 @@
             "language": language,
         });
     });
+    
+labels = ['طالبات', 'طلاب'];
+
+var book_gender_data = {
+  labels: labels,
+  series: [{{ book_contributing_female_users }}, {{ book_contributing_male_users }}]
+};
+    
+var group_gender_data = {
+  labels: labels,
+  series: [{{ group_female_users }}, {{ group_male_users }}]
+};
+
+var sum = function(total, num) { return total + num };
+book_count = 0;
+var book_options = {
+    labelInterpolationFnc: function(value) {
+      percentage = Math.round(book_gender_data.series[book_count] / book_gender_data.series.reduce(sum) * 100) + '%';
+      book_count += 1;
+      return value + " " + percentage;
+    }
+};
+group_count = 0;
+var group_options = {
+    labelInterpolationFnc: function(value) {
+      percentage = Math.round(group_gender_data.series[group_count] / group_gender_data.series.reduce(sum) * 100) + '%';
+      group_count += 1;
+      return value + " " + percentage;
+    }
+};
+var responsiveOptions = [
+  ['screen and (min-width: 640px)', {
+    chartPadding: 30,
+    labelDirection: 'explode',
+  }],
+  ['screen and (min-width: 1024px)', {
+    chartPadding: 20
+  }]
+];
+
+new Chartist.Pie('#book-gender', book_gender_data, book_options, responsiveOptions);
+new Chartist.Pie('#group-gender', group_gender_data, group_options, responsiveOptions);
+
 </script>
 <style>
     .ct-label{

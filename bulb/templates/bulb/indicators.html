@@ -57,7 +57,7 @@
                     <tr>
                         <td>{{ session.title }}</td>
                         <td><a href="{% url 'bulb:show_group' session.group.pk %}">{{ session.group.name }}</a></td>
-                        <td data-order="{{ session.submission_date|date:"U" }}">{{ session.submission_date|date:"j F Y" }}</td>
+                        <td data-order="{{ session.submission_date|date:"U" }}">{{ session.submission_date|date:"g:i a؛ j F Y" }}</td>
                         <td data-order="{{ session.date|date:"U" }}">{{ session.date }}</td>
                         <td>{% if session.report %}<a href="{% url 'bulb:show_report' session.group.pk session.pk %}">نعم</a>{% else %}لا{% endif %}</td>
                     </tr>
@@ -92,7 +92,7 @@
 <h2>تبادل الكتب</h2>
 <div class="row">
     <div class="col-xs-12">
-            <h3>الكتب المتاحة</h3>
+            <h3>الكتب</h3>
             <table id="undeleted-books" class="table datatable">
                 <thead>
                     <tr>
@@ -101,6 +101,7 @@
                         <th>التصنيف</th>
                         <th>تاريخ الإضافة</th>
                         <th>عدد الطلبات</th>
+                        <td>متاح؟</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -109,8 +110,9 @@
                         <td><a href="{% url 'bulb:show_book' book.pk %}">{{ book.title }}</a></td>
                         <td>{{ book.submitter.common_profile.get_ar_full_name }}</td>
                         <td><a href="{% url 'bulb:show_category' book.category.code_name %}">{{ book.category.name }}</a></td>
-                        <td data-order="{{ book.submission_date|date:"U" }}">{{ book.submission_date|date:"j F Y" }}</td>
+                        <td data-order="{{ book.submission_date|date:"U" }}">{{ book.submission_date|date:"g:i a؛ j F Y" }}</td>
                         <td>{{ book.request_set.count }}</td>
+                        <td>{% if book.is_available %}نعم{% else %}لا{% endif %}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -137,15 +139,15 @@
                 <tbody>
                     {% for book_request in book_requests %}
                     <tr>
-                        <td data-order="{{ book_request.submission_date|date:"U" }}">{{ book_request.submission_date|date:"j F Y" }}</td>
+                        <td data-order="{{ book_request.submission_date|date:"U" }}">{{ book_request.submission_date|date:"g:i a؛ j F Y" }}</td>
                         <td>{{ book_request.requester.common_profile.get_ar_full_name }}</td>
                         <td><a href="{% url 'bulb:show_book' book_request.book.pk %}">{{ book_request.book.title }}</a></td>
                         <td>{{ book_request.book.submitter.common_profile.get_ar_full_name }}</td>
                         <td>{{ book_request.get_delivery_display }}</td>
                         <td>{{ book_request.get_requester_status_display }}</td>
-                        <td data-order="{{ book_request.requester_status_date|date:"U" }}">{{ book_request.requester_status_date|date:"j F Y"|default:"لا يوجد" }}</td>
+                        <td data-order="{{ book_request.requester_status_date|date:"U" }}">{{ book_request.requester_status_date|date:"g:i a؛ j F Y"|default:"لا يوجد" }}</td>
                         <td>{{ book_request.get_owner_status_display }}</td>
-                        <td data-order="{{ book_request.owner_status_date|date:"U" }}">{{ book_request.owner_status_date|date:"j F Y"|default:"لا يوجد" }}</td>
+                        <td data-order="{{ book_request.owner_status_date|date:"U" }}">{{ book_request.owner_status_date|date:"g:i a؛ j F Y"|default:"لا يوجد" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -189,7 +191,7 @@
                     <tr>
                         <td>{{ book.title }}</td>
                         <td>{{ book.submitter.common_profile.get_ar_full_name }}</td>
-                        <td data-order="{{ book.modification_date|date:"U" }}">{{ book.modification_date|date:"j F Y" }}</td>
+                        <td data-order="{{ book.modification_date|date:"U" }}">{{ book.modification_date|date:"g:i a؛ j F Y" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

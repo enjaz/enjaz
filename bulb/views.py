@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.db.models import Count
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
@@ -331,11 +332,13 @@ def indicators(request):
     book_requests = Request.objects.current_year()
     groups = Group.objects.current_year()
     sessions = Session.objects.current_year()
+    users = User.objects.filter(common_profile__is_student=True, book_points__is_counted=True).annotate(point_count=Count('book_points')).filter(point_count__gte=2)
 
     context = {'groups': groups,
                'sessions': sessions,
                'books': books,
-               'book_requests': book_requests}
+               'book_requests': book_requests,
+               'users': users}
     return render(request, 'bulb/indicators.html', context)
 
 @decorators.ajax_only

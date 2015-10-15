@@ -43,9 +43,10 @@ urlpatterns = patterns('',
     url(r'^groups/(?P<group_pk>\d+)/session/add/introduction/$', TemplateView.as_view(template_name='bulb/groups/add_session_introduction.html'),
         name='add_session_introduction'),
     url(r'^groups/(?P<group_pk>\d+)/session/(?P<session_pk>\d+)/edit/$', views.edit_session, name='edit_session'),
-    url(r'^groups/(?P<group_pk>\d+)/session/(?P<session_pk>\d+)/add_report/$', views.add_report, name='add_report'),
     url(r'^groups/(?P<group_pk>\d+)/session/(?P<session_pk>\d+)/delete/$', views.delete_session, name='delete_session'),
-    url(r'^groups/(?P<group_pk>\d+)/session/(?P<session_pk>\d+)/edit_report/$', views.edit_report, name='edit_report'),
+    url(r'^groups/(?P<group_pk>\d+)/session/(?P<session_pk>\d+)/report/$', views.show_report, name='show_report'),
+    url(r'^groups/(?P<group_pk>\d+)/session/(?P<session_pk>\d+)/report/add/$', views.add_report, name='add_report'),
+    url(r'^groups/(?P<group_pk>\d+)/session/(?P<session_pk>\d+)/report/edit/$', views.edit_report, name='edit_report'),
     url(r'^groups/ajax/membership$', views.control_membership, name="control_membership"),
 
     # Readers

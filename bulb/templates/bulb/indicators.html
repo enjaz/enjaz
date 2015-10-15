@@ -1,0 +1,214 @@
+{% extends "base.html" %}{% load staticfiles %}
+{% block navbutton %}{% endblock %}
+{% block title %}المؤشرات{% endblock %}
+{% block pageheader %}المؤشرات{% endblock %}
+{% block pageheaderurl %}{% url 'indicators' %}{% endblock %}
+
+{% block content %}
+<h1>مؤشرات سِراج</h1>
+<h2>مجموعات القراءة</h2>
+<div class="row">
+    <div class="col-md-12">
+            <h3>المجموعات القائمة</h3>
+            <table id="undeleted-groups" class="table datatable">
+                <thead>
+                    <tr>
+                        <th>اسم المجموعة</th>
+                        <th>المؤسس</th>
+                        <th>تاريخ التأسيس</th>
+                        <th># الأعضاء</th>
+                        <th># الجلسات</th>
+                        <th># المحاضر</th>
+                        <th>آخر جلسة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for group in groups.undeleted %}
+                    <tr>
+                        <td><a href="{% url 'bulb:show_group' group.pk %}">{{ group.name }}</a></td>
+                        <td>{{ group.coordinator.common_profile.get_ar_full_name }}</td>
+                        <td data-order="{{ group.submission_date|date:"U" }}">{{ group.submission_date|date:"j F Y" }}</td>
+                        <td>{{ group.membership_set.count }}</td>
+                        <td>{{ group.session_set.count }}</td>
+                        <td>{{ group.get_report_count }}</td>
+                        {% if group.get_last_session %}
+                        `<td data-order="{{ group.get_last_session.date|date:"U" }}">{{ group.get_last_session.date }}
+                        {% else %}
+                        <td>لا يوجد
+                        {% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+            <h3>جلسات النقاش</h3>
+            <table id="sessions" class="table datatable">
+                <thead>
+                    <tr>
+                        <th>عنوان الجلسة</th>
+                        <th>اسم المجموعة</th>
+                        <th>تاريخ الإعلان</th>
+                        <th>تاريخ الانعقاد</th>
+                        <th>لها محضر؟</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for session in sessions.undeleted %}
+                    <tr>
+                        <td>{{ session.title }}</td>
+                        <td><a href="{% url 'bulb:show_group' session.group.pk %}">{{ session.group.name }}</a></td>
+                        <td data-order="{{ session.submission_date|date:"U" }}">{{ session.submission_date|date:"j F Y" }}</td>
+                        <td data-order="{{ session.date|date:"U" }}">{{ session.date }}</td>
+                        <td>{% if session.report %}<a href="{% url 'bulb:show_report' session.group.pk session.pk %}">نعم</a>{% else %}لا{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+            <h3>مجموعات القراءة المحذوفة</h3>
+            <table id="deleted-groups" class="table datatable">
+                <thead>
+                    <tr>
+                        <th>اسم المجموعة</th>
+                        <th>المؤسس</th>
+                        <th>تاريخ آخر تعديل</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for group in groups.deleted %}
+                    <tr>
+                        <td>{{ group.name }}</td>
+                        <td>{{ group.coordinator.common_profile.get_ar_full_name }}</td>
+                        <td data-order="{{ group.modification_date|date:"U" }}">{{ group.modification_date|date:"j F Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>
+</div>
+<h2>تبادل الكتب</h2>
+<div class="row">
+    <div class="col-xs-12">
+            <h3>الكتب المتاحة</h3>
+            <table id="undeleted-books" class="table datatable">
+                <thead>
+                    <tr>
+                        <th>اسم الكتاب</th>
+                        <th>صاحب الكتاب</th>
+                        <th>التصنيف</th>
+                        <th>تاريخ الإضافة</th>
+                        <th>عدد الطلبات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in books.undeleted %}
+                    <tr>
+                        <td>{{ book.title }}</td>
+                        <td>{{ book.submitter.common_profile.get_ar_full_name }}</td>
+                        <td><a href="{% url 'bulb:show_category' book.category.code_name %}">{{ book.category.name }}</a></td>
+                        <td data-order="{{ group.submission_date|date:"U" }}">{{ book.submission_date|date:"j F Y" }}</td>
+                        <td>{{ book.request_set.count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+            <h3>طلبات الكتب</h3>
+            <table id="book-requests" class="table datatable">
+                <thead>
+                    <tr>
+                        <th>تاريخ الطلب</th>
+                        <th>مقدم الطلب</th>
+                        <th>اسم الكتاب</th>
+                        <th>صاحب الكتاب</th>
+                        <th>نوع التوصيل</th>
+                        <th>رد مقدم الطلب</th>
+                        <th>تاريخه</th>
+                        <th>رد صاحب الكتاب</th>
+                        <th>تاريخه</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book_request in book_requests %}
+                    <tr>
+                        <td data-order="{{ book_request.submission_date|date:"U" }}">{{ book_request.submission_date|date:"j F Y" }}</td>
+                        <td>{{ book_request.requester.common_profile.get_ar_full_name }}</td>
+                        <td><a href="{% url 'bulb:show_book' book_request.book.pk %}">{{ book_request.book.title }}</a></td>
+                        <td>{{ book_request.book.submitter.common_profile.get_ar_full_name }}</td>
+                        <td>{{ book_request.get_delivery_display }}</td>
+                        <td>{{ book_request.get_requester_status_display }}</td>
+                        <td data-order="{{ book_request.requester_status_date|date:"U" }}">{{ book_request.requester_status_date|date:"j F Y"|default:"لا يوجد" }}</td>
+                        <td>{{ book_request.get_owner_status_display }}</td>
+                        <td data-order="{{ book_request.owner_status_date|date:"U" }}">{{ book_request.owner_status_date|date:"j F Y"|default:"لا يوجد" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+            <h3>الكتب المحذوفة</h3>
+            <table id="deleted-books" class="table datatable">
+                <thead>
+                    <tr>
+                        <th>اسم المجموعة</th>
+                        <th>المؤسس</th>
+                        <th>تاريخ آخر تعديل</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in books.deleted %}
+                    <tr>
+                        <td>{{ book.title }}</td>
+                        <td>{{ book.submitter.common_profile.get_ar_full_name }}</td>
+                        <td data-order="{{ book.modification_date|date:"U" }}">{{ book.modification_date|date:"j F Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>
+</div>
+{% endblock %}
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'css/chartist.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/chartist.min.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        language = {% include 'js/dataTables-arabic.json' %};
+        $("#undeleted-groups, #deleted-groups, #deleted-books").DataTable({
+            "order": [[ 2, "desc" ]],
+            "language": language,
+        });
+        $("#book-requests").DataTable({
+            "order": [[ 0, "desc" ]],
+            "language": language,
+        });
+        $("#sessions, #undeleted-books").DataTable({
+            "order": [[ 3, "desc" ]],
+            "language": language,
+        });
+    });
+</script>
+<style>
+    .ct-label{
+        font-size: 20px;
+    }
+    h2, h3{
+        background-color: rgb(250, 250, 250);
+        padding: 5px;
+        margin-top: 25px;
+    }
+</style>
+{% endblock %}

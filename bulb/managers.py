@@ -35,7 +35,7 @@ class BookQuerySet(models.QuerySet):
 class RequestQuerySet(models.QuerySet):
     def current_year(self):
         year = StudentClubYear.objects.get_current()
-        return self.filter(book_year=year)
+        return self.filter(book__year=year)
 
     def to_user(self, user):
         return self.filter(book__submitter=user)
@@ -81,11 +81,17 @@ class GroupQuerySet(models.QuerySet):
         year = StudentClubYear.objects.get_current()
         return self.filter(year=year)
 
-    def available(self):
+    def undeleted(self):
         """
-        Return a queryset of approved books.
+        Return a queryset of undeleted groups.
         """
         return self.filter(is_deleted=False)
+
+    def deleted(self):
+        """
+        Return a queryset of deleted groups.
+        """
+        return self.filter(is_deleted=True)
 
     def for_user_gender(self, user=None):
         gender_condition = models.Q()
@@ -106,6 +112,10 @@ class GroupQuerySet(models.QuerySet):
         return self.filter(city_condition)
 
 class SessionQuerySet(models.QuerySet):
+    def current_year(self):
+        year = StudentClubYear.objects.get_current()
+        return self.filter(group__year=year)
+
     def undeleted(self):
         return self.filter(is_deleted=False)
 

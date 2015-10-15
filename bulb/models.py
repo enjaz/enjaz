@@ -2,6 +2,7 @@
 from datetime import timedelta
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 
 from core.models import StudentClubYear
 from bulb.managers import BookQuerySet, RequestQuerySet, PointQuerySet, GroupQuerySet, SessionQuerySet, MembershipQuerySet
@@ -43,7 +44,7 @@ class Book(models.Model):
     cover = models.FileField(u"الغلاف", upload_to='bulb/covers/')
     submission_date = models.DateTimeField(u"تاريخ الإرسال",
                                            auto_now_add=True)
-    modifiation_date = models.DateTimeField(u"تاريخ التعديل",
+    modification_date = models.DateTimeField(u"تاريخ التعديل",
                                            auto_now=True)
     category = models.ForeignKey(Category,
                                  verbose_name=u"التصنيفات",
@@ -187,7 +188,7 @@ class Group(models.Model):
                                  on_delete=models.SET_NULL)
     submission_date = models.DateTimeField(u"تاريخ الإرسال",
                                            auto_now_add=True)
-    modifiation_date = models.DateTimeField(u"تاريخ التعديل",
+    modification_date = models.DateTimeField(u"تاريخ التعديل",
                                            auto_now=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوفة؟")
@@ -195,10 +196,19 @@ class Group(models.Model):
     objects = GroupQuerySet.as_manager()
 
     def is_mixed_gender(self):
-        """Check if any active membership"""
+        """Check if the group has active memberships of different genders."""
         return not self.membership_set.active()\
                                       .exclude(user__commmon_profile__college__gender=self.coordinator.common_profile.college.gender)\
                                       .exists()
+
+    def get_last_session(self):
+        try:
+            return self.session_set.order_by('-date').first()
+        except Session.DoesNotExist:
+            return
+
+    def get_report_count(self):
+        return Report.objects.filter(session__group=self).count()
 
     def __unicode__(self):
         return self.name
@@ -216,7 +226,7 @@ class Membership(models.Model):
                                      verbose_name=u"مفعلة؟")
     submission_date = models.DateTimeField(u"تاريخ الإرسال",
                                            auto_now_add=True)
-    modifiation_date = models.DateTimeField(u"تاريخ التعديل",
+    modification_date = models.DateTimeField(u"تاريخ التعديل",
                                            auto_now=True)
 
     objects = MembershipQuerySet.as_manager()

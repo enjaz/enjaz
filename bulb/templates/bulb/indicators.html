@@ -109,7 +109,7 @@
                         <td><a href="{% url 'bulb:show_book' book.pk %}">{{ book.title }}</a></td>
                         <td>{{ book.submitter.common_profile.get_ar_full_name }}</td>
                         <td><a href="{% url 'bulb:show_category' book.category.code_name %}">{{ book.category.name }}</a></td>
-                        <td data-order="{{ group.submission_date|date:"U" }}">{{ book.submission_date|date:"j F Y" }}</td>
+                        <td data-order="{{ book.submission_date|date:"U" }}">{{ book.submission_date|date:"j F Y" }}</td>
                         <td>{{ book.request_set.count }}</td>
                     </tr>
                     {% endfor %}

@@ -343,17 +343,17 @@ def indicators(request):
     sessions = Session.objects.current_year()
     users = User.objects.filter(common_profile__is_student=True, book_points__is_counted=True).annotate(point_count=Count('book_points')).filter(point_count__gte=2)
     book_contributing_male_users = User.objects.filter(common_profile__college__gender='M',
-                                                       book_giveaways__isnull=False).count()
+                                                       book_giveaways__isnull=False).distinct().count()
     book_contributing_female_users = User.objects.filter(common_profile__college__gender='F',
-                                                         book_giveaways__isnull=False).count()
+                                                         book_giveaways__isnull=False).distinct().count()
     group_male_users = (User.objects.filter(reading_group_memberships__isnull=False,
                                             common_profile__college__gender='M') | \
                         User.objects.filter(reading_group_coordination__isnull=False,
-                                            common_profile__college__gender='M')).count()
+                                            common_profile__college__gender='M')).distinct().count()
     group_female_users = (User.objects.filter(reading_group_memberships__isnull=False,
                                               common_profile__college__gender='F') | \
                           User.objects.filter(reading_group_coordination__isnull=False,
-                                              common_profile__college__gender='F')).count()
+                                              common_profile__college__gender='F')).distinct().count()
 
     context = {'groups': groups,
                'sessions': sessions,

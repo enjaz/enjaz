@@ -24,7 +24,7 @@ def index(request):
     groups = Group.objects.current_year().undeleted().order_by("?")[:6]
     group_count = Group.objects.current_year().undeleted().count()
     group_user_count = (User.objects.filter(reading_group_memberships__isnull=False) | \
-                        User.objects.filter(reading_group_coordination__isnull=False)).count()
+                        User.objects.filter(reading_group_coordination__isnull=False)).distinct().count()
     books = Book.objects.current_year().available().order_by("?")[:6]
     book_count = Book.objects.current_year().available().count()
     book_request_count = Request.objects.current_year().count()

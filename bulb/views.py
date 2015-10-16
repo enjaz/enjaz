@@ -50,6 +50,9 @@ def list_book_categories(request):
     categories = Category.objects.distinct().filter(book__isnull=False,
                                                     book__is_available=True,
                                                     book__is_deleted=False)
+    # If we have books, show the All category.
+    if Book.objects.current_year().available().exists():
+        categories |= Category.objects.get(code_name="all")
     context = {'categories': categories}
     return render(request, "bulb/exchange/list_categories.html",
                   context)
@@ -66,7 +69,9 @@ def show_category(request, code_name):
 def list_book_previews(request, source, name):
     if source == "category":
         category = get_object_or_404(Category, code_name=name)
-        books = Book.objects.current_year().available().filter(category=category)
+        books = Book.objects.current_year().available()
+        if category.code_name != 'all':
+            books = books.filter(category=category)
     elif source == "user":
         done_pks = (Request.objects.filter(owner_status='D', requester_status='D') |\
                     Request.objects.filter(owner_status='D', requester_status='') |\

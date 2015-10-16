@@ -15,6 +15,8 @@ class Category(models.Model):
     code_name = models.CharField(max_length=50,
                                  verbose_name=u"الاسم البرمجي",
                                  help_text=u"حروف لاتينية صغيرة وأرقام")
+    is_meta = models.BooleanField(default=False,
+                                  verbose_name=u"تصنيف علوي؟")
     description = models.TextField(blank=True, verbose_name=u"وصف التصنيف")
     image = models.FileField(upload_to='bulb/categories/', blank=True, null=True)
     def __unicode__(self):
@@ -49,7 +51,8 @@ class Book(models.Model):
     category = models.ForeignKey(Category,
                                  verbose_name=u"التصنيفات",
                                  null=True,
-                                 on_delete=models.SET_NULL)
+                                 on_delete=models.SET_NULL,
+                                 limit_choices_to={'is_meta': False})
     is_available = models.BooleanField(default=True,
                                        verbose_name=u"متاح؟")
     is_deleted = models.BooleanField(default=False,

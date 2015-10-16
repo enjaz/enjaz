@@ -52,7 +52,7 @@ def list_book_categories(request):
                                                     book__is_deleted=False)
     # If we have books, show the All category.
     if Book.objects.current_year().available().exists():
-        categories |= Category.objects.filter(code_name="all")
+        categories |= Category.objects.filter(code_name="all").distinct()
     context = {'categories': categories}
     return render(request, "bulb/exchange/list_categories.html",
                   context)

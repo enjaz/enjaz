@@ -263,6 +263,7 @@ def my_books(request):
 @decorators.ajax_only
 @decorators.post_only
 @login_required
+@csrf.csrf_exempt
 def pending_book(request):
     pk = request.POST.get('pk')
     book = get_object_or_404(Book, pk=pk)
@@ -290,6 +291,7 @@ def list_my_pending_books(request):
 
 @decorators.ajax_only
 @decorators.post_only
+@csrf.csrf_exempt
 @login_required
 def pending_request(request):
     pk = request.POST.get('pk')

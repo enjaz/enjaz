@@ -91,7 +91,7 @@
             <td class="english-field"><a href="mailto:{{ bulb_coordinator.email }}">{{ bulb_coordinator.email }}</a></td>
         </tr>
         {# Per Dhabiah's request, no mobile number of her. #}
-        {% if bulb_coordinator.common_profile.college == 'F' %}
+        {% if not bulb_coordinator.common_profile.college == 'F' %}
         <tr>
             <th>رقم الجوال</th>
             <td>{{ bulb_coordinator.common_profile.mobile_number }}</td>

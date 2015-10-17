@@ -61,7 +61,7 @@ class Book(models.Model):
 
 
     def last_pending_request(self):
-        pending_requests = self.request_set.filter(status="", owner_status__in=['', 'F']).order_by('-submission_date')
+        pending_requests = self.request_set.filter(status="").order_by('-submission_date')
         if pending_requests.exists():
             return pending_requests.first()
 
@@ -292,7 +292,9 @@ class ReaderProfile(models.Model):
     twitter = models.CharField(max_length=200, verbose_name=u"حساب تويتر؟",
                                       help_text=u"هل لديك حساب على تويتر؟ (اختياري)",
                                       blank=True)
-    
+    submission_date = models.DateTimeField(u"تاريخ الإرسال",
+                                           auto_now_add=True,
+                                           null=True)
 
     def __unicode__(self):
         return self.user.username

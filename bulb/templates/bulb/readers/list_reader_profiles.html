@@ -27,9 +27,9 @@
             <td>{{ reader_profile.user.common_profile.college.get_name_display }}</td>
             <td>{{ reader_profile.user.book_giveaways.undeleted.count }}</td>
             <td>
-                {% if reader_profile.user.reading_group_coordination.available.exists or reader_profile.user.reading_group_memberships.active.exists  %}
+                {% if reader_profile.user.reading_group_coordination.undeleted.exists or reader_profile.user.reading_group_memberships.active.exists  %}
                 <ul>
-                    {% for group in reader_profile.user.reading_group_coordination.available %}
+                    {% for group in reader_profile.user.reading_group_coordination.undeleted %}
                     <li><a href="{% url 'bulb:show_group' group.pk %}">{{ group.name }}</a></li>
                     {% endfor %}
                     {% for membership in reader_profile.user.reading_group_memberships.active %}

@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.db.models import Count
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
@@ -20,14 +21,19 @@ from bulb import utils
 
 @login_required
 def index(request):
-    groups = Group.objects.current_year().available().order_by("?")[:6]
-    group_count = Group.objects.current_year().available().count()
+    groups = Group.objects.current_year().undeleted().order_by("?")[:6]
+    group_count = Group.objects.current_year().undeleted().count()
+    group_user_count = (User.objects.filter(reading_group_memberships__isnull=False) | \
+                        User.objects.filter(reading_group_coordination__isnull=False)).distinct().count()
     books = Book.objects.current_year().available().order_by("?")[:6]
     book_count = Book.objects.current_year().available().count()
+    book_request_count = Request.objects.current_year().count()
     reader_profiles = ReaderProfile.objects.order_by("?")[:10]
     reader_profile_count = ReaderProfile.objects.count()
     context = {'groups': groups, 'group_count': group_count,
+               'group_user_count': group_user_count,
                'books': books, 'book_count': book_count,
+               'book_request_count': book_request_count,
                'reader_profiles': reader_profiles,
                'reader_profile_count': reader_profile_count}
     return render(request, "bulb/index.html", context)
@@ -44,6 +50,9 @@ def list_book_categories(request):
     categories = Category.objects.distinct().filter(book__isnull=False,
                                                     book__is_available=True,
                                                     book__is_deleted=False)
+    # If we have books, show the All category.
+    if Book.objects.current_year().available().exists():
+        categories |= Category.objects.filter(code_name="all").distinct()
     context = {'categories': categories}
     return render(request, "bulb/exchange/list_categories.html",
                   context)
@@ -60,7 +69,9 @@ def show_category(request, code_name):
 def list_book_previews(request, source, name):
     if source == "category":
         category = get_object_or_404(Category, code_name=name)
-        books = Book.objects.current_year().available().filter(category=category)
+        books = Book.objects.current_year().available()
+        if category.code_name != 'all':
+            books = books.filter(category=category)
     elif source == "user":
         done_pks = (Request.objects.filter(owner_status='D', requester_status='D') |\
                     Request.objects.filter(owner_status='D', requester_status='') |\
@@ -328,9 +339,31 @@ def indicators(request):
 
     books = Book.objects.current_year()
     book_requests = Request.objects.current_year()
-    
-    context = {'books': book,
-               'book_requests': book_requests}
+    groups = Group.objects.current_year()
+    sessions = Session.objects.current_year()
+    users = User.objects.filter(common_profile__is_student=True, book_points__is_counted=True).annotate(point_count=Count('book_points')).filter(point_count__gte=2)
+    book_contributing_male_users = User.objects.filter(common_profile__college__gender='M',
+                                                       book_giveaways__isnull=False).distinct().count()
+    book_contributing_female_users = User.objects.filter(common_profile__college__gender='F',
+                                                         book_giveaways__isnull=False).distinct().count()
+    group_male_users = (User.objects.filter(reading_group_memberships__isnull=False,
+                                            common_profile__college__gender='M') | \
+                        User.objects.filter(reading_group_coordination__isnull=False,
+                                            common_profile__college__gender='M')).distinct().count()
+    group_female_users = (User.objects.filter(reading_group_memberships__isnull=False,
+                                              common_profile__college__gender='F') | \
+                          User.objects.filter(reading_group_coordination__isnull=False,
+                                              common_profile__college__gender='F')).distinct().count()
+
+    context = {'groups': groups,
+               'sessions': sessions,
+               'books': books,
+               'book_requests': book_requests,
+               'users': users,
+               'book_contributing_male_users': book_contributing_male_users,
+               'book_contributing_female_users': book_contributing_female_users,
+               'group_male_users': group_male_users,
+               'group_female_users': group_female_users}
     return render(request, 'bulb/indicators.html', context)
 
 @decorators.ajax_only
@@ -537,7 +570,7 @@ def list_groups(request):
 @csrf.csrf_exempt
 @login_required
 def list_group_previews(request):
-    groups = Group.objects.current_year().available().for_user_city(request.user).order_by('?')
+    groups = Group.objects.current_year().undeleted().for_user_city(request.user).order_by('?')
     return render(request, "bulb/groups/list_group_previews.html",
                   {'groups': groups})
 
@@ -680,6 +713,9 @@ def delete_session(request, group_pk, session_pk):
 
     return {"message": "success", "show_url": full_url}
 
+def show_report(request, group_pk, session_pk):
+    pass
+
 @decorators.ajax_only
 @login_required
 def add_report(request, group_pk, session_pk):
@@ -792,9 +828,9 @@ def list_reader_profiles(request):
 @login_required
 def show_reader_profile(request, reader_pk):
     reader_profile = get_object_or_404(ReaderProfile, pk=reader_pk)
-    group_coordination = Group.objects.current_year().available().filter(coordinator=reader_profile.user)
+    group_coordination = Group.objects.current_year().undeleted().filter(coordinator=reader_profile.user)
     group_membership_pks = Membership.objects.current_year().active().filter(user=reader_profile.user).values_list('group__pk', flat=True)
-    group_memberships = Group.objects.current_year().available().filter(pk__in=group_membership_pks)
+    group_memberships = Group.objects.current_year().undeleted().filter(pk__in=group_membership_pks)
     return render(request, 'bulb/readers/show_reader_profile.html',
                   {'reader_profile': reader_profile,
                    'group_coordination': group_coordination,

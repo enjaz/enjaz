@@ -266,13 +266,13 @@ def my_books(request):
 @csrf.csrf_exempt
 def pending_book(request):
     pk = request.POST.get('pk')
-    book = get_object_or_404(Book, pk=pk)
+    book_request = get_object_or_404(Request, pk=pk)
 
-    if not utils.can_edit_book(request.user, book):
+    if not utils.can_edit_book(request.user, book_request.book):
         raise PermissionDenied
 
     return render(request, 'bulb/exchange/pending_book.html',
-                  {'book': book})
+                  {'book': book_request.book})
 
 @decorators.ajax_only
 @login_required
@@ -288,20 +288,6 @@ def list_my_pending_books(request):
     context =  {'books': books,
                 'bulb_coordinator': bulb_coordinator}
     return render(request, 'bulb/exchange/list_my_pending_books.html', context)
-
-@decorators.ajax_only
-@decorators.post_only
-@csrf.csrf_exempt
-@login_required
-def pending_request(request):
-    pk = request.POST.get('pk')
-    book = get_object_or_404(Book, pk=pk)
-
-    if not utils.can_edit_book(request.user, book):
-        raise PermissionDenied
-
-    return render(request, 'bulb/exchange/pending_book.html',
-                  {'book': book, 'bulb_coordinator': bulb_coordinator})
 
 @decorators.ajax_only
 @login_required

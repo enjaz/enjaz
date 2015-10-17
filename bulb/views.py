@@ -484,9 +484,11 @@ def control_request(request):
             book_request.owner_status_date = timezone.now()
 
             # If one party canceled the request (in this case: the
-            # book owner), that's enough to consider the whole request
-            # canceled.
-            book_request.status = 'C'
+            # book owner), and ther other hasn't confirmed it, that's
+            # enough to consider the whole request canceled.
+            # Otherwise, it will be handled in the conflicts section.
+            if book_request.requester_status != 'D':
+                book_request.status = 'C'
 
             # Return the point to the book requester
             book_request.cancel_related_user_point(book_request.requester)
@@ -561,26 +563,28 @@ def control_request(request):
 
         elif action == 'requester_canceled':
             # You cannot delete a request after it has been approved
-            # by both parties.
-            if book_request.owner_status == 'D' or\
-               book_request.requester_status == 'D':
+            # by the requester.
+            if book_request.requester_status == 'D':
                 raise Exception(u'لا يمكنك إلغاء طلب منجز.')
+
             book.is_available = True
             book_request.requester_status = 'C'
             book_request.requester_status_date = timezone.now()
 
             # If one party canceled the request (in this case: the
-            # book owner), that's enough to consider the whole request
-            # canceled.
-            book_request.status = 'C'
+            # book requester), and ther other hasn't confirmed it,
+            # that's enough to consider the whole request canceled.
+            # Otherwise, it will be handled in the conflicts section.
+            if book_request.owner_status != 'D':
+                book_request.status = 'C'
 
             # Return the point to the book requester
             book_request.cancel_related_user_point(request.user)
 
-
             mail.send([book.submitter.email],
-                       template="book_request_canceled_to_owner",
-                       context=email_context)
+                      template="book_request_canceled_to_owner",
+                      context=email_context)
+
             # Also, email Bulb coordinator.
             if book_request.delivery == 'I' and bulb_coordinator:
                 mail.send([bulb_coordinator.email],

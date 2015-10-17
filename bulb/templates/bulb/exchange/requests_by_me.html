@@ -27,7 +27,7 @@
 <script type="text/javascript">
     function initialize_request_buttons(){
         control_url = "{% url 'bulb:control_request' %}";
-        display_url = "{% url 'bulb:pending_book' %}";
+        display_url = "{% url 'bulb:pending_request' %}";
         list_url = "{% url 'bulb:list_book_previews' 'user' user.username %}";
         $('button.done').click(function() {
             pk = $(this).data('pk');

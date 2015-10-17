@@ -38,13 +38,6 @@ def index(request):
                'reader_profile_count': reader_profile_count}
     return render(request, "bulb/index.html", context)
 
-# TODO
-# * Send emails in case of failed indirect request.
-# * In case of failed indirect requests, cancel requester points.
-# * Don't hard-cord the editing URL in JavaScript.
-# * If the request was marked as done by the owner, should we hide it
-#   for the requester (propbably not)
-
 @login_required
 def list_book_categories(request):
     categories = Category.objects.distinct().filter(book__isnull=False,
@@ -99,6 +92,7 @@ def order_instructions(request):
     pk = request.POST.get('pk')
     delivery_type = request.POST.get('delivery_type')
     book = get_object_or_404(Book, pk=pk, is_deleted=False)
+    bulb_coordinator = utils.get_bulb_club_for_user(book.submitter).coordinator
 
     if not utils.can_order_book(request.user, book):
         raise PermissionDenied
@@ -127,7 +121,7 @@ def order_instructions(request):
         my_books_url = reverse('bulb:my_books')
         my_books_full_url = request.build_absolute_uri(my_books_url)
         if delivery == 'I':
-            bulb_coordinator = utils.get_bulb_club_for_user(book.submitter).coordinator
+            owner_template = "book_requested_indirectly_to_owner"
             if bulb_coordinator:
                 indirect_requests_url = reverse('bulb:indirect_requests')
                 indirect_requests_full_url = request.build_absolute_uri(indirect_requests_url)
@@ -136,16 +130,13 @@ def order_instructions(request):
                 mail.send([bulb_coordinator.email],
                            template="book_requested_indirectly_to_coordinator",
                            context=email_context)
-            owner_template = "book_requested_indirectly_to_owner"
         elif delivery == 'D':
             owner_template = "book_requested_directly_to_owner"
 
         email_context['full_url'] = my_books_full_url
         mail.send([book.submitter.email],
-                   template=owner_template,
-                   context=email_context)
-
-    bulb_coordinator = utils.get_bulb_club_for_user(book.submitter).coordinator
+                  template=owner_template,
+                  context=email_context)
 
     return render(request, "bulb/exchange/components/order_body.html",
                   {'book': book, 'delivery_type': delivery_type,
@@ -184,17 +175,23 @@ def delete_book(request, pk):
     if request.user != book.submitter:
         pending_request = book.last_pending_request()
         bulb_coordinator = utils.get_bulb_club_for_user(book.submitter).coordinator
+        if bulb_coordinator:
+            cc_coordinator = [bulb_coordinator.email]
+        else:
+            cc_coordinator = []
         email_context = {'book': book,
                          'book_request': pending_request,
                          'bulb_coordinator': bulb_coordinator}
         mail.send([book.submitter.email],
-                   template="book_deleted_to_owner",
-                   context=email_context)
+                  cc=cc_coordinator,
+                  template="book_deleted_to_owner",
+                  context=email_context)
         if pending_request:
             pending_request.cancel_related_user_point(pending_request.requester)
             mail.send([pending_request.requester.email],
-                       template="book_deleted_to_requester",
-                       context=email_context)
+                      cc=cc_coordinator,
+                      template="book_deleted_to_requester",
+                      context=email_context)
 
     book.is_deleted = True
     book.save()
@@ -266,65 +263,53 @@ def my_books(request):
 @decorators.ajax_only
 @decorators.post_only
 @login_required
+@csrf.csrf_exempt
 def pending_book(request):
     pk = request.POST.get('pk')
-    book = get_object_or_404(Book, pk=pk)
+    book_request = get_object_or_404(Request, pk=pk)
 
-    if not utils.can_edit_book(request.user, book):
+    if not utils.can_edit_book(request.user, book_request.book):
         raise PermissionDenied
 
     return render(request, 'bulb/exchange/pending_book.html',
-                  {'book': book})
+                  {'book': book_request.book})
+
+@decorators.ajax_only
+@decorators.post_only
+@login_required
+@csrf.csrf_exempt
+def pending_request(request):
+    pk = request.POST.get('pk')
+    book_request = get_object_or_404(Request, pk=pk)
+
+    return render(request, 'bulb/exchange/pending_request.html',
+                  {'book': book_request.book})
 
 @decorators.ajax_only
 @login_required
 def list_my_pending_books(request):
-    done_pks = (Request.objects.filter(owner_status='D', requester_status='D') |\
-                Request.objects.filter(owner_status='D', requester_status='') |\
-                Request.objects.filter(owner_status='', requester_status='D'))\
-                .values_list('book__pk', flat=True)
-    books = Book.objects.current_year().exclude(pk__in=done_pks).filter(is_available=False, is_deleted=False).of_user(request.user).distinct()
+    # My book is pending when the overall status is "pending", and
+    # either 1) No action was taken by me, or 2) I failed to
+    # communicate with the book requester.
+    book_pks = Request.objects.filter(status="", owner_status__in=["", "F"])\
+                              .values_list('book__pk', flat=True)
+    books = Book.objects.current_year().filter(pk__in=book_pks, is_deleted=False)\
+                                       .of_user(request.user).distinct()
     bulb_coordinator = utils.get_bulb_club_for_user(request.user).coordinator
     context =  {'books': books,
                 'bulb_coordinator': bulb_coordinator}
     return render(request, 'bulb/exchange/list_my_pending_books.html', context)
 
 @decorators.ajax_only
-@decorators.post_only
-@login_required
-def pending_request(request):
-    pk = request.POST.get('pk')
-    book = get_object_or_404(Book, pk=pk)
-
-    if not utils.can_edit_book(request.user, book):
-        raise PermissionDenied
-
-    return render(request, 'bulb/exchange/pending_book.html',
-                  {'book': book, 'bulb_coordinator': bulb_coordinator})
-
-@decorators.ajax_only
 @login_required
 def list_my_pending_requests(request):
-    # Exclude done requests and indirect requested with failed
-    # communication attempt.
-    done_pks = (
-        Request.objects.filter(requester=request.user,
-                               owner_status='D',
-                               requester_status='D') |\
-        Request.objects.filter(requester=request.user,
-                               owner_status='D',
-                               requester_status='') |\
-        Request.objects.filter(requester=request.user,
-                               owner_status='',
-                               requester_status='D') |\
-        Request.objects.filter(requester=request.user,
-                               owner_status='F',
-                               delivery='I')\
-               ).values_list('book__pk', flat=True)
+    # My request is pending when the overall status is "pending", and
+    # either 1) No action was taken by me, or 2) I failed to
+    # communicate with the book owner.
+    book_pks = Request.objects.filter(requester=request.user, status="", requester_status__in=["", "F"])\
+                              .values_list('book__pk', flat=True)
     books = Book.objects.current_year()\
-                        .filter(is_available=False, is_deleted=False)\
-                        .filter(request__requester=request.user)\
-                        .exclude(pk__in=done_pks)\
+                        .filter(pk__in=book_pks, is_deleted=False)\
                         .distinct()
     bulb_coordinator = utils.get_bulb_club_for_user(request.user).coordinator
     context =  {'books': books,
@@ -383,8 +368,8 @@ def list_indirect_requests(request):
         # * have not been canceled nor received by requester.
         pks = Request.objects.filter(delivery='I',
                                      owner_status='',
+                                     requester_status='',
                                      book__submitter__common_profile__college__gender=bulb_club.gender)\
-                             .exclude(requester_status__in=['D', 'C'])\
                              .values_list('book__pk', flat=True)
         side = 'owner'
     elif condition == 'to_give':
@@ -429,120 +414,184 @@ def control_request(request):
     request_pk = request.POST.get('pk')
     book_request = get_object_or_404(Request, pk=request_pk)
     book = book_request.book
+    bulb_coordinator = utils.get_bulb_club_for_user(request.user).coordinator
+    if bulb_coordinator:
+        cc_coordinator = [bulb_coordinator.email]
+    else:
+        cc_coordinator = []
+    email_context = {'book': book,
+                     'book_request': book_request,
+                     'bulb_coordinator': bulb_coordinator}
 
     if action.startswith('owner_'):
         if not utils.can_edit_book(request.user, book):
-            raise PermissionDenied
+            raise Exception(u"لا يمكنك اتخاذ إجراء باسم صاحب الكتاب.")
         if action == 'owner_done':
             book.is_available = False
-            book.save()
             book_request.owner_status = 'D'
             book_request.owner_status_date = timezone.now()
-            book_request.save()
+
+            # If the book requester had already confirmed the request,
+            # consider the reuqest done.  Otherwise, keep it pending
+            # (to be shown in the requester's pending requests list).
+            # In that case, when seven days have passed since the
+            # request was submitted, a cron job would mark it as done
+            # (to be removed from the requester's pending requests
+            # list).
+            if book_request.requester_status == 'D':
+                book_request.status = 'D'
 
             # If no previous points have been created (i.e. by
             # requester's confirmation), create one.
             book_request.create_related_points()
-            
 
         elif action == 'owner_failed':
-            book.is_available = False
-            book.save()
             book_request.owner_status = 'F'
             book_request.owner_status_date = timezone.now()
-            book_request.save()
+
             requests_by_me_url = reverse('bulb:requests_by_me')
             full_url = request.build_absolute_uri(requests_by_me_url)
-            email_context = {'book': book,
-                             'book_request': book_request,
-                             'full_url': full_url}
-            mail.send([book_request.requester.email],
-                       template="book_request_failed_to_requester",
-                       context=email_context)
+            email_context['full_url'] = full_url
+
+            if book_request.delivery == 'I':
+                # If Bulb coordinator failed to comminicate with the
+                # owner, make the book available again and email both
+                # the owner and the requester that the request has
+                # been canceled.
+                book.is_available = True
+                book_request.status = 'C'
+                # Return the point to the book requester
+                book_request.cancel_related_user_point(book_request.requester)
+                mail.send([book_request.requester.email],
+                          cc=cc_coordinator,
+                          template="indirect_book_request_failed_to_requester",
+                          context=email_context)
+                mail.send([book.submitter.email],
+                          cc=cc_coordinator,
+                          template="indirect_book_request_failed_to_owner",
+                          context=email_context)
+            elif book_request.delivery == 'D':
+                # Just to make sure
+                book.is_available = False
+                mail.send([book_request.requester.email],
+                           template="book_request_failed_to_requester",
+                           context=email_context)
 
         elif action == 'owner_canceled':
             book.is_available = True
-            book.save()
             book_request.owner_status = 'C'
             book_request.owner_status_date = timezone.now()
-            # Return the poin to the requester
+
+            # If one party canceled the request (in this case: the
+            # book owner), and ther other hasn't confirmed it, that's
+            # enough to consider the whole request canceled.
+            # Otherwise, it will be handled in the conflicts section.
+            if book_request.requester_status != 'D':
+                book_request.status = 'C'
+
+            # Return the point to the book requester
             book_request.cancel_related_user_point(book_request.requester)
-            book_request.save()
             list_book_categories_url = reverse('bulb:list_book_categories')
             full_url = request.build_absolute_uri(list_book_categories_url)
-            email_context = {'book': book,
-                             'book_request': book_request,
-                             'full_url': full_url}
+            email_context['full_url'] = full_url
             mail.send([book_request.requester.email],
-                       template="book_request_canceled_to_requester",
-                       context=email_context)
+                      cc=cc_coordinator,
+                      template="book_request_canceled_to_requester",
+                      context=email_context)
             # Also, email Bulb coordinator.
-            if book_request.delivery == 'I':
-                bulb_coordinator = utils.get_bulb_club_for_user(request.user).coordinator
-                if bulb_coordinator:
-                    email_context['bulb_coordinator'] = bulb_coordinator
-                    mail.send([bulb_coordinator.email],
-                              template="indirect_book_request_canceled_to_coordinator",
-                              context=email_context)
-
-    if action.startswith('requester_'):
+            if book_request.delivery == 'I' and bulb_coordinator:
+                mail.send([bulb_coordinator.email],
+                          template="indirect_book_request_canceled_to_coordinator",
+                          context=email_context)
+    elif action.startswith('requester_'):
         if not request.user == book_request.requester and \
            not request.user.is_superuser and \
            not utils.is_bulb_coordinator_or_deputy(request.user):
-            raise PermissionDenied
+            raise Exception(u"لا يمكنك اتخاذ إجراء باسم مقدم الطلب.")
 
         if action == 'requester_done':
             book.is_available = False
-            book.save()
             book_request.requester_status = 'D'
             book_request.requester_status_date = timezone.now()
-            book_request.save()
+
+            # If the book owner had already confirmed the request,
+            # consider the reuqest done.  Otherwise, keep it pending
+            # (to be shown in the owner's pending books list).  In the
+            # case, when seven days have passed since the request was
+            # submitted, a cron job would mark it as done (to be
+            # removed from the owner's pending book list).
+            if book_request.owner_status == 'D':
+                book_request.status = 'D'
 
             # If no previous points have been created (i.e. by
             # requester's confirmation), create one.
             book_request.create_related_points()
             
         elif action == 'requester_failed':
-            book.is_available = False
-            book.save()
             book_request.requester_status = 'F'
             book_request.requester_status_date = timezone.now()
-            book_request.save()
+
             my_books_url = reverse('bulb:my_books')
             full_url = request.build_absolute_uri(my_books_url)
-            email_context = {'book': book,
-                             'book_request': book_request,
-                             'full_url': full_url}
-            mail.send([book.submitter.email],
-                       template="book_request_failed_to_owner",
-                       context=email_context)
+            email_context['full_url'] = full_url
+
+            if book_request.delivery == 'I':
+                # If Bulb coordinator failed to comminicate with the
+                # owner, make the book available again and email both
+                # the owner and the requester that the request has
+                # been canceled.
+                book.is_available = True
+                book_request.status = 'C'
+                # Return the point to the book requester
+                book_request.cancel_related_user_point(book.submitter)
+                mail.send([book_request.requester.email],
+                          cc=cc_coordinator,
+                          template="indirect_book_request_failed_to_requester",
+                          context=email_context)
+                mail.send([book.submitter.email],
+                          cc=cc_coordinator,
+                          template="indirect_book_request_failed_to_owner",
+                          context=email_context)
+            elif book_request.delivery == 'D':
+                # Just to make sure
+                book.is_available = False
+                mail.send([book.submitter.email],
+                          cc=cc_coordinator,
+                          template="book_request_failed_to_owner",
+                          context=email_context)
+
         elif action == 'requester_canceled':
             # You cannot delete a request after it has been approved
-            # by both parties.
-            if book_request.owner_status == 'D' or\
-               book_request.requester_status == 'D':
+            # by the requester.
+            if book_request.requester_status == 'D':
                 raise Exception(u'لا يمكنك إلغاء طلب منجز.')
+
             book.is_available = True
-            book.save()
             book_request.requester_status = 'C'
             book_request.requester_status_date = timezone.now()
+
+            # If one party canceled the request (in this case: the
+            # book requester), and ther other hasn't confirmed it,
+            # that's enough to consider the whole request canceled.
+            # Otherwise, it will be handled in the conflicts section.
+            if book_request.owner_status != 'D':
+                book_request.status = 'C'
+
+            # Return the point to the book requester
             book_request.cancel_related_user_point(request.user)
-            book_request.save()
 
-            email_context = {'book': book,
-                             'book_request': book_request}
             mail.send([book.submitter.email],
-                       template="book_request_canceled_to_owner",
-                       context=email_context)
-            # Also, email Bulb coordinator.
-            if book_request.delivery == 'I':
-                bulb_coordinator = utils.get_bulb_club_for_user(request.user).coordinator
-                if bulb_coordinator:
-                    email_context['bulb_coordinator'] = bulb_coordinator
-                    mail.send([bulb_coordinator.email],
-                              template="indirect_book_request_canceled_to_coordinator",
-                              context=email_context)
+                      template="book_request_canceled_to_owner",
+                      context=email_context)
 
+            # Also, email Bulb coordinator.
+            if book_request.delivery == 'I' and bulb_coordinator:
+                mail.send([bulb_coordinator.email],
+                          template="indirect_book_request_canceled_to_coordinator",
+                          context=email_context)
+
+    book.save()
+    book_request.save()
     return {"message": "success"}
 
 @login_required

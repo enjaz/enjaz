@@ -292,7 +292,9 @@ class ReaderProfile(models.Model):
     twitter = models.CharField(max_length=200, verbose_name=u"حساب تويتر؟",
                                       help_text=u"هل لديك حساب على تويتر؟ (اختياري)",
                                       blank=True)
-    
+    submission_date = models.DateTimeField(u"تاريخ الإرسال",
+                                           auto_now_add=True,
+                                           null=True)
 
     def __unicode__(self):
         return self.user.username

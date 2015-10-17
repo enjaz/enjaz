@@ -28,7 +28,7 @@
             عدّل سجلّك الطلابي
         </a>
 {% elif not user|has_current_colleague_profile and colleague_profile.is_available and not user|is_arshindi_coordinator_or_deputy %}
-        <a href="{% url 'arshidni:register_colleague_profile' %}" class="btn btn-icon btn-success">
+        <a href="{% url 'arshidni:submit_supervision_request' colleague_profile.pk %}" class="btn btn-icon btn-success">
             <i class="entypo-plus"></i>
             اختر هذا المرشد
         </a>

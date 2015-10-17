@@ -275,6 +275,17 @@ def pending_book(request):
                   {'book': book_request.book})
 
 @decorators.ajax_only
+@decorators.post_only
+@login_required
+@csrf.csrf_exempt
+def pending_request(request):
+    pk = request.POST.get('pk')
+    book_request = get_object_or_404(Request, pk=pk)
+
+    return render(request, 'bulb/exchange/pending_request.html',
+                  {'book': book_request.book})
+
+@decorators.ajax_only
 @login_required
 def list_my_pending_books(request):
     # My book is pending when the overall status is "pending", and

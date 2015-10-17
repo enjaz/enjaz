@@ -61,7 +61,7 @@ class Book(models.Model):
 
 
     def last_pending_request(self):
-        pending_requests = self.request_set.filter(status="", owner_status__in=['', 'F']).order_by('-submission_date')
+        pending_requests = self.request_set.filter(status="").order_by('-submission_date')
         if pending_requests.exists():
             return pending_requests.first()
 

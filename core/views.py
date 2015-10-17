@@ -33,8 +33,9 @@ def portal_home(request):
 
         today = date.today()
         next_week = today + timedelta(weeks=1)
-        next_week_activities = filtered_activities.filter(episode__start_date__gte=today,
-                                                          episode__start_date__lte=next_week).order_by('episode__start_date')
+        next_week_activities = filtered_activities.upcoming().filter(episode__start_date__gte=today,
+                                                                     episode__start_date__lte=next_week)\
+                                                             .order_by('episode__start_date')
         context['upcoming_activities'] = next_week_activities
 
         # --- niqati -------

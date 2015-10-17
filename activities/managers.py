@@ -90,6 +90,10 @@ class ActivityQuerySet(models.QuerySet):
             activities_end_today_pks.append(activity.pk)
         return self.exclude(episode__end_date__gte=timezone.now().date()) | self.filter(pk__in=activities_end_today_pks)
 
+    def upcoming(self):
+        done_activity_pks = self.done().values_list('pk', flat=True)
+        return self.exclude(pk__in=done_activity_pks)
+
     def for_user(self, user=None):
         """
         Return the queryset of activities the user is allowed to see.
@@ -158,3 +162,10 @@ class ActivityQuerySet(models.QuerySet):
 
         else:
             return self.approved()
+
+class EpisodeQuerySet(models.QuerySet):
+    def upcoming(self):
+        # episodes from tomorrow onward +  episodes that are today but later in the day
+        return self.filter(start_date__gt=timezone.now().date()) \
+             | self.filter(start_date=timezone.now().date(),
+                           start_time__gte=timezone.now().time())

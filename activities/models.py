@@ -215,7 +215,7 @@ class Activity(models.Model):
         Return the next scheduled episode for this activity.
         """
         upcoming_episodes = self.episode_set.upcoming().order_by('start_date', 'start_time')
-        return sorted_episodes.first()
+        return upcoming_episodes.first()
 
     def get_next_or_last_episode(self):
         """

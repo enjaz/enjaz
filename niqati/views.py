@@ -59,6 +59,9 @@ def redeem(request, code=""):
         context = {'user_club': user_club}
         return render(request, "niqati/submit_coordinators.html", context)
     else:
+        # Code string can be passed in the URL, or as a GET parameter.
+        if not code:
+            code = request.GET.get('code')
         form = RedeemCodeForm(request.user, initial={'string': code})
         eval_form = EvaluationForm()
         return render(request, "niqati/submit.html", {"form": form,  "eval_form": eval_form})

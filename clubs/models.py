@@ -53,15 +53,10 @@ class Club(models.Model):
                                     blank=True,
                                     verbose_name=u"المنسق",
                                     related_name="coordination",
-                                    on_delete=models.SET_NULL,
-                                    # To exclude AnonymousUser
-                                    limit_choices_to={'common_profile__is_student':
-                                                        True})
+                                    on_delete=models.SET_NULL)
     deputies = models.ManyToManyField(User, verbose_name=u"النواب",
                                       blank=True,
-                                      related_name="deputyships",
-                                      limit_choices_to={'common_profile__is_student':
-                                                        True})
+                                      related_name="deputyships")
     media_representatives = models.ManyToManyField(User,
                                                    verbose_name=u"الممثلين ال الإعلاميين",
                                                    blank=True,
@@ -77,9 +72,7 @@ class Club(models.Model):
                                                          True})
     members = models.ManyToManyField(User, verbose_name=u"الأعضاء",
                                      blank=True,
-                                     related_name="memberships",
-                                     limit_choices_to={'common_profile__is_student':
-                                                        True})
+                                     related_name="memberships")
     employee = models.ForeignKey(User, null=True, blank=True,
                                  related_name="employee",
                                  on_delete=models.SET_NULL,

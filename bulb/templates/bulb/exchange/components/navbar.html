@@ -1,5 +1,5 @@
 {% load bulb_tags %}
-    <li><a href="{% url 'bulb:list_book_categories' %}"><i class="fa fa-book"></i> تبادل الكتب</a></li>
+    <li><a href="{% url 'bulb:list_book_categories' %}"><i class="fa fa-book"></i> اقتناء الكتب</a></li>
     <li><a href="{% url 'bulb:my_books' %}"><span class="glyphicon glyphicon-list-alt"></span>  كتبي</a></li>
     <li><a href="{% url 'bulb:requests_by_me' %}"><span class="glyphicon glyphicon-star"></span> طلباتي</a></li>
     {% if user|is_bulb_coordinator_or_deputy or user.is_superuser %}

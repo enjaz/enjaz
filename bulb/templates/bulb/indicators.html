@@ -111,7 +111,7 @@
                 <tbody>
                     {% for book in books.undeleted %}
                     <tr>
-                        <td><a href="{% url 'bulb:show_book' book.pk %}">{{ book.title }}</a></td>
+                        <td dir="auto"><a href="{% url 'bulb:show_book' book.pk %}">{{ book.title }}</a></td>
                         <td>{{ book.submitter.common_profile.get_ar_full_name }}</td>
                         <td><a href="{% url 'bulb:show_category' book.category.code_name %}">{{ book.category.name }}</a></td>
                         <td data-order="{{ book.submission_date|date:"U" }}">{{ book.submission_date|date:"g:i a؛ j F Y" }}</td>
@@ -145,7 +145,7 @@
                     <tr>
                         <td data-order="{{ book_request.submission_date|date:"U" }}">{{ book_request.submission_date|date:"g:i a؛ j F Y" }}</td>
                         <td>{{ book_request.requester.common_profile.get_ar_full_name }}</td>
-                        <td><a href="{% url 'bulb:show_book' book_request.book.pk %}">{{ book_request.book.title }}</a></td>
+                        <td dir="auto"><a href="{% url 'bulb:show_book' book_request.book.pk %}">{{ book_request.book.title }}</a></td>
                         <td>{{ book_request.book.submitter.common_profile.get_ar_full_name }}</td>
                         <td>{{ book_request.get_delivery_display }}</td>
                         <td>{{ book_request.get_requester_status_display }}</td>
@@ -185,15 +185,15 @@
             <table id="deleted-books" class="table datatable">
                 <thead>
                     <tr>
-                        <th>اسم المجموعة</th>
-                        <th>المؤسس</th>
+                        <th>اسم الكتاب</th>
+                        <th>صاحب الكتاب</th>
                         <th>تاريخ آخر تعديل</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for book in books.deleted %}
                     <tr>
-                        <td>{{ book.title }}</td>
+                        <td dir="auto">{{ book.title }}</td>
                         <td>{{ book.submitter.common_profile.get_ar_full_name }}</td>
                         <td data-order="{{ book.modification_date|date:"U" }}">{{ book.modification_date|date:"g:i a؛ j F Y" }}</td>
                     </tr>

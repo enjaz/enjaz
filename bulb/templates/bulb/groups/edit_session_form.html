@@ -1,4 +1,4 @@
-{% load bootstrap3 %}{% load staticfiles %}
+{% load bootstrap3 %}{% load staticfiles %}{% load bulb_tags %}
 <form enctype="multipart/form-data" id="edit-session-form" action="post">
 {% csrf_token %}
 {% bootstrap_form form %}
@@ -7,7 +7,7 @@
 <script src="{% static 'neon/assets/js/bootstrap-timepicker.min.js' %}"></script>
 <script type="text/javascript">
 $(function () {
-    $('#id_date').attr('data-start-view', '1').datepicker({isRTL: true, minDate: 5});
+    $('#id_date').attr('data-start-view', '1').datepicker({isRTL: true{% if not user|is_bulb_coordinator_or_deputy and not user.is_superuser %}, minDate: 5{% endif %}});
     // Configure time pickers
     $('#id_start_time, #id_end_time').timepicker({showMeridian: false})
         .on('show.timepicker', function(e) {

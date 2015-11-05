@@ -95,6 +95,7 @@ class ObtainAuthToken(APIView):
                          'en_first_name': user.common_profile.en_first_name,
                          'en_middle_name': user.common_profile.en_middle_name,
                          'en_last_name': user.common_profile.en_last_name,
+                         'city': user.common_profile.city,
                          'college': user.common_profile.college.name,
                          'gender': user.common_profile.college.name,
                          'section': user.common_profile.college.section})

@@ -132,19 +132,19 @@ class RedeemCodeForm(forms.Form):
 
         return code_string
 
-    def clean(self):
-        """
-        Make sure that it hasn't been two weeks since the episode ended.
-        """
-        cleaned_data = super(RedeemCodeForm, self).clean()
-        # Check that we indeed have a valid string, and that the code
-        # is part of collection
-        if 'string' in cleaned_data and \
-           self.code.collection and \
-           timezone.now().date() > self.code.collection.parent_order.episode.end_date + datetime.timedelta(14):
-            raise forms.ValidationError(u"مضى أكثر من أسبوعين على انتهاء النشاط ولم يعد ممكنا إدخال نقاطي!", code="TwoWeeks")
+    # def clean(self):
+    #     """
+    #     Make sure that it hasn't been two weeks since the episode ended.
+    #     """
+    #     cleaned_data = super(RedeemCodeForm, self).clean()
+    #     # Check that we indeed have a valid string, and that the code
+    #     # is part of collection
+    #     if 'string' in cleaned_data and \
+    #        self.code.collection and \
+    #        timezone.now().date() > self.code.collection.parent_order.episode.end_date + datetime.timedelta(14):
+    #         raise forms.ValidationError(u"مضى أكثر من أسبوعين على انتهاء النشاط ولم يعد ممكنا إدخال نقاطي!", code="TwoWeeks")
 
-        return cleaned_data
+    #     return cleaned_data
     
     def process(self):
         """

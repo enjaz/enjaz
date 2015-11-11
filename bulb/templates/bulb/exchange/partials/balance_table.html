@@ -1,0 +1,20 @@
+<table class="datatable display">
+    <thead>
+      <tr>
+        <th>التاريخ</th>
+        <th>الكتاب</th>
+        <th>القيمة</th>
+        <th>التفاصيل</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for point in points %}
+        <tr>
+            <td data-order="{{ point.submission_date|date:"U" }}">{{ point.submission_date }}</td>
+            <td>{% if point.request %}<a href="{% url 'bulb:show_book' point.request.book.pk %}">{{ point.request.book.title }}</a>{% else %}-{% endif %}</td>
+            <td>{{ point.value }}</td>
+            <td>{{ point.get_details }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

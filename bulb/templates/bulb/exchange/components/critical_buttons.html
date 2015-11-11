@@ -4,9 +4,13 @@
             <i class="entypo-plus"></i>
             أضف كتابًا
         </button>
-        <a href="{% url 'bulb:student_report' %}" class="btn btn-icon btn-warning">
-            <i class="entypo-tag"></i>
-            رصيدك: {{ user.book_points.count_total }}
+        <a href="{% url 'bulb:student_report' %}#giving" class="btn btn-icon give btn-warning">
+            <i class="fa fa-star"></i>
+            رصيد الاقتناء: {{ user.book_points.count_total_giving }}
+        </a>
+        <a href="{% url 'bulb:student_report' %}#lending" class="btn btn-icon lend btn-warning ">
+            <i class="fa fa-retweet"></i>
+            رصيد الاستعارة: {{ user.book_points.count_total_lending }}
         </a>
     </div>
 </div>

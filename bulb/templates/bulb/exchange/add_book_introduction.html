@@ -1,0 +1,30 @@
+<style>
+.modal-footer{
+    display: none;
+}
+</style>
+
+<h2>ساهم بكتاب</h2>
+
+<div class="row">
+    <div class="col-xs-12">
+        <p class="modal-intro">معا نشيّد مكتبة عامرة، يجد فيها الطلاب والطالبات الكتب القيّمة!  يمكنك المساهمة لسِراج بـ:</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-6">
+        <button data-url="{% url 'bulb:add_book' 'give' %}" class="bulb-option contribution-option give">
+            <div class="icon"><i class="fa fa-star"></i></div>			
+            <h3>كتاب للاقتناء</h3>
+            <p>اعرض كتبك القيّمة للاقتناء لتنال -بعد أن تُطلب- رصيدًا لاقتناء كتابٍ آخر.</p>
+        </button>
+    </div>
+    <div class="col-sm-6">
+        <button data-url="{% url 'bulb:add_book' 'lend' %}" class="bulb-option contribution-option lend">
+            <div class="icon"><i class="fa fa-retweet"></i></div>			
+            <h3>كتاب للإعارة</h3>
+            <p>اعرض  كتبك القيّمة للإعارة لتنال -بعد أن تُطلب- رصيدًا لاستعارة كتابٍ آخر.</p>
+        </button>
+    </div>
+</div>

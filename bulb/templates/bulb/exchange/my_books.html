@@ -15,6 +15,14 @@
                 </div>
             </div>
         </div>
+        <h2>كتبي المُعارة</h2>
+        <div class="panel panel-success panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="borrowed-books">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
         <h2>كتبي المتاحة</h2>
         <div class="panel panel-success panel-shadow" data-collapsed="0">
             <div class="panel-body">
@@ -56,8 +64,7 @@
                 cache: false,
                 success: function (data) {
                     if (data.message == "success") {
-                        $("#pending-"+pk).hide('slow');
-                        $("#done-books").load(list_url, {condition: 'done'});
+                        refreshLists();
                     } else {
                         alert(data.message);
                     }
@@ -81,6 +88,23 @@
                 }
             });
         });
+        $('button.returned').click(function() {
+            pk = $(this).data('pk');
+            data = {pk: pk, action: 'owner_returned'}
+            $.ajax({
+                url: control_url,
+                type: 'POST',
+                data: data,
+                cache: false,
+                success: function (data) {
+                    if (data.message == "success") {
+                        refreshLists();
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            });
+        });
         $('button.canceled').click(function() {
             pk = $(this).data('pk');
             data = {pk: pk, action: 'owner_canceled'}
@@ -91,8 +115,7 @@
                 cache: false,
                 success: function (data) {
                     if (data.message == "success") {
-                        $("#pending-"+pk).hide('slow');
-                        $("#available-books").load(list_url, {condition: 'available'});
+                        refreshLists();
                     } else {
                         alert(data.message);
                     }
@@ -100,9 +123,18 @@
             });
         });
     }
+    function refreshLists(){
+        $("#pending-books").load("{% url 'bulb:list_my_books' %}", {condition: 'pending'}, initialize_request_buttons);
+        $("#borrowed-books").load("{% url 'bulb:list_my_books' %}", {condition: 'borrowed'}, initialize_request_buttons);
+        $("#done-books").load("{% url 'bulb:list_book_previews' 'user' user.username %}", {condition: 'done'}, initialize_book_buttons);
+        $("#available-books").load("{% url 'bulb:list_book_previews' 'user' user.username %}", {condition: 'available'}, initialize_book_buttons);
+    }
     $(function(){
-        $("#pending-books").load("{% url 'bulb:list_my_pending_books' %}", initialize_request_buttons);
+        {% include "bulb/exchange/initialize_book_buttons.js" %}
+        initialize_book_buttons();
+        refreshLists();
     });
 </script>
+{% include "bulb/exchange/components/edit_book_asset.html" %}
 {% include "bulb/exchange/delete_modal.html" %}
 {% endblock %}

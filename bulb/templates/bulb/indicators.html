@@ -17,6 +17,7 @@
                         <th># الجلسات</th>
                         <th># المحاضر</th>
                         <th>آخر جلسة</th>
+                        <th>خلال 3 أسابيع؟</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -33,6 +34,7 @@
                         {% else %}
                         <td>لا يوجد
                         {% endif %}</td>
+                        <td>{% if group.get_has_recent_sessions %}نعم{% else %}لا{% endif %}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -93,7 +95,7 @@
         <div id="group-gender" class="ct-chart ct-perfect-fourth"></div>
     </div>
 </div>
-<h2>اقتناء الكتب</h2>
+<h2>تبادل الكتب</h2>
 <div class="row">
     <div class="col-xs-12">
             <h3>الكتب</h3>
@@ -103,6 +105,7 @@
                         <th>اسم الكتاب</th>
                         <th>صاحب الكتاب</th>
                         <th>التصنيف</th>
+                        <th>المساهمة</th>
                         <th>تاريخ الإضافة</th>
                         <th>عدد الطلبات</th>
                         <td>متاح؟</td>
@@ -114,6 +117,7 @@
                         <td dir="auto"><a href="{% url 'bulb:show_book' book.pk %}">{{ book.title }}</a></td>
                         <td>{{ book.submitter.common_profile.get_ar_full_name }}</td>
                         <td><a href="{% url 'bulb:show_category' book.category.code_name %}">{{ book.category.name }}</a></td>
+                        <td>{{ book.get_contribution_display }}</td>
                         <td data-order="{{ book.submission_date|date:"U" }}">{{ book.submission_date|date:"g:i a؛ j F Y" }}</td>
                         <td>{{ book.request_set.count }}</td>
                         <td>{% if book.is_available %}نعم{% else %}لا{% endif %}</td>
@@ -135,9 +139,8 @@
                         <th>صاحب الكتاب</th>
                         <th>نوع التوصيل</th>
                         <th>رد مقدم الطلب</th>
-                        <th>تاريخه</th>
                         <th>رد صاحب الكتاب</th>
-                        <th>تاريخه</th>
+                        <th>انتهاء الإعارة</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -148,10 +151,9 @@
                         <td dir="auto"><a href="{% url 'bulb:show_book' book_request.book.pk %}">{{ book_request.book.title }}</a></td>
                         <td>{{ book_request.book.submitter.common_profile.get_ar_full_name }}</td>
                         <td>{{ book_request.get_delivery_display }}</td>
-                        <td>{{ book_request.get_requester_status_display }}</td>
-                        <td data-order="{{ book_request.requester_status_date|date:"U" }}">{{ book_request.requester_status_date|date:"g:i a؛ j F Y"|default:"لا يوجد" }}</td>
-                        <td>{{ book_request.get_owner_status_display }}</td>
-                        <td data-order="{{ book_request.owner_status_date|date:"U" }}">{{ book_request.owner_status_date|date:"g:i a؛ j F Y"|default:"لا يوجد" }}</td>
+                        <td>{{ book_request.get_requester_status_display }} ({{ book_request.requester_status_date|date:"g:i a؛ j F Y"|default:"لا يوجد" }})</td>
+                        <td>{{ book_request.get_owner_status_display }} ({{ book_request.owner_status_date|date:"g:i a؛ j F Y"|default:"لا يوجد" }})</td>
+                        <td data-order="{{ book_request.borrowing_end_date|date:"U" }}">{{ book_request.borrowing_end_date|date:"j F Y"|default:"لا يوجد" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -165,14 +167,16 @@
                 <thead>
                     <tr>
                         <th>الاسم</th>
-                        <th>الرصيد</th>
+                        <th>رصيد الاقتناء</th>
+                        <th>رصيد الاستعارة</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for bulb_user in users %}
                     <tr>
                         <td><a href="{% url 'bulb:student_report_with_username' bulb_user.username %}">{{ bulb_user.common_profile.get_ar_full_name }}</a></td>
-                        <td>{{ bulb_user.book_points.count_total }} </td>
+                        <td>{{ bulb_user.book_points.count_total_giving }}</td>
+                        <td>{{ bulb_user.book_points.count_total_lending }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -227,8 +231,12 @@
             "order": [[ 1, "desc" ]],
             "language": language,
         });
-        $("#sessions, #undeleted-books").DataTable({
+        $("#sessions").DataTable({
             "order": [[ 3, "desc" ]],
+            "language": language,
+        });
+        $("#undeleted-books").DataTable({
+            "order": [[ 4, "desc" ]],
             "language": language,
         });
     });

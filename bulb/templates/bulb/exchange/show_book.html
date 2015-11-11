@@ -7,17 +7,7 @@
 <div class="row">
     <div class="col-sm-4">
         <div style="text-align: center; border-left: solid 1px #eee;">
-            <style>
-                #book-{{ book.pk }}-img {
-                    display: block;
-                    width:90%;
-                    padding-bottom:90%;
-                    margin:10px;
-                    background:url('{{ book.cover.url }}') center center no-repeat;
-                    background-size: auto 100%;
-                }
-            </style>
-            <div id="book-{{ book.pk }}-img" style="max-width: 100%;"></div>
+            <div class="book-image" style="background-image:url('{{ book.cover.url }}');"></div>
             تأليف: {{ book.authors }}
         </div>
     </div>
@@ -26,7 +16,7 @@
         <p dir="auto" class="book-description">
             {{ book.description|linebreaksbr }}
         </p>
-        <p>أضاف هذا الكتاب {% reader_profile_link book.submitter %} في {{ book.submission_date|date:"" }}.</p>
+        <p>أضاف هذا الكتاب {% reader_profile_link book.submitter %} في {{ book.submission_date|date:"" }}. {% if book.contribution == 'G' %}هذا الكتاب <strong>للاقتناء</strong>{% else %}هذا الكتاب <strong>للإعارة</strong>{% if book.available_until%} وهو متوفر حتى {{ book.available_until|date:"l j F Y" }}{% endif %}{% endif %}.</p>
         <span style="float: left">
             {% if user|can_edit_book:book %}
             <button data-url="{% url 'bulb:edit_book' book.pk %}" class="edit-book btn btn-xs btn-icon btn-gold">
@@ -39,7 +29,7 @@
             </button>
             {% endif %}
             {% if user|can_order_book:book %}
-            <button data-pk="{{ book.pk }}" class="order-book btn btn-xs btn-icon btn-success">
+            <button data-instruction-url="{% url 'bulb:order_instructions' book.pk %}" class="order-book btn btn-xs btn-icon btn-success">
                 <i class="entypo-flag"></i>
                 اطلب
             </button>

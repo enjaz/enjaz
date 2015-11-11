@@ -1,15 +1,5 @@
 <style>
 
-.order-option{
-    border: 1px solid #ebebeb;
-    position: relative;
-    display: block;
-    padding: 20px;
-    margin-bottom: 10px;
-    overflow: hidden;
-    border-radius: 25px;
-}
-
 .order-option.direct{
     background: rgb(134, 213, 121);
 }
@@ -25,36 +15,6 @@
     color: rgb(56, 55, 30);
 }
     
-.order-option h3, .order-option p{
-    margin-top: 5px;
-    position: relative;
-    z-index: 5;
-    padding: 0;
-}
-    
-.order-option .icon{
-   font-size: 30px;
-    color: white;
-}
-
-.order-option h3{
-    font-size: 30px;
-    color: white;
-    text-align: center;
-}
-.order-option p{
-    font-size: 16px;
-    text-align: justify;
-}
-    
-.order-option .icon {
-    left: 5px;
-    right: auto;   
-    position: absolute;
-    bottom: 5px;
-    z-index: 1;
-}
-
 #order-{{ book.pk }}-img {
     display: block;
     width:90%;
@@ -65,12 +25,12 @@
     background-size: auto 100%;
 }
 </style>
-{% if not delivery_type and not user.book_points.count_total %}
+{% if book.is_available and book.contribution == 'G' and not user.book_points.count_total_giving or book.is_available and book.contribution == 'L' and not user.book_points.count_total_lending %}
 <h2>يتعّذّر عليك الطلب! <i class="entypo-emoji-sad"></i></h2>
-<p class="alert alert-warning modal-intro"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <a href="{% url 'bulb:student_report' %}" >رصيدك</a> الآن يبلغ صفرًا، ولذا لن تتمكن من الطلب.  أضف كتابًا، وساعدنا في بناء مكتبة عامرة! </p>
-{% elif delivery_type %}
+<p class="alert alert-warning modal-intro"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <a href="{% url 'bulb:student_report' %}" >رصيدك {% if book.contribution == 'G' %}لاقتناء الكتب{% else %}لاستعارة الكتب{% endif %}</a> الآن يبلغ صفرًا، ولذا لن تتمكن من الطلب.  أضف كتابًا، وساعدنا في بناء مكتبة عامرة! </p>
+{% elif not book.is_available and book.last_pending_request.requester == user %}
     <h2>تهانينا، تم الطلب!</h2>
-    {% if delivery_type == 'direct' %}
+    {% if book.last_pending_request.requester.delivery == 'D' %}
     <ul class="modal-intro">
         <li>عليك التواصل مع {{ book.submitter.common_profile.ar_first_name }} واستلام الكتاب خلال فترة لا تتجاوز 7 أيام من تاريخ الطلب:
             <table class="table-hover table">
@@ -96,62 +56,36 @@
         <li>إذا استلمت الكتاب، أكد الاستلام في صفحة "<a href="{% url 'bulb:requests_by_me' %}">طلباتي</a>".</li>
         <li>في حال عدم تأكيد الاستلام خلال أسبوع، ستصلك رسالة على البريد الإلكتروني الجامعي تذكّرك بتأكيد استلام الكتاب. يُرجى التفاعل مع رسالة التأكيد حتى لا يتم إلغاء طلبك.</li>
     </ul>
-    {% elif delivery_type == 'indirect' %}
+    {% elif book.last_pending_request.requester.delivery == 'I' %}
         <ul class="modal-intro">
             <li>سنتواصل مع {{ book.submitter.common_profile.ar_first_name }} لاستلام الكتاب، ثم سنتواصل معك لتستلم الكتاب. (تتطلب هذه العملية قرابة الأسبوع).</li>
             <li> في حال وجود أي استفسار، يمكنك التواصل مع مُنسّق سِراج:
-                <table class="table table-hover">
-                    <tr>
-                        <th>الاسم</th>
-                        <td>{{ bulb_coordinator.common_profile.get_ar_full_name }}</td>
-                    </tr>
-                    <tr>
-                        <th>الكلية</th>
-                        <td>{{ bulb_coordinator.common_profile.college.get_name_display }}</td>
-                    </tr>
-                    {# Per Dhabiah's request, no mobile number of her. #}
-                    <tr>
-                        <th>البريد</th>
-                        <td class="english-field">
-                            {% if bulb_coordinator.common_profile.college.gender == 'F' %}
-                            <a href="mailto:qdhabiah@gmail.com">qdhabiah@gmail.com</a>
-                            {% else %}
-                            <a href="mailto:{{ bulb_coordinator.email }}">{{ bulb_coordinator.email }}</a>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% if not bulb_coordinator.common_profile.college.gender == 'F' %}
-                    <tr>
-                        <th>رقم الجوال</th>
-                        <td>{{ bulb_coordinator.common_profile.mobile_number }}</td>
-                    </tr>
-                    {% endif %}
-                </table>
+                {% include 'bulb/exchange/partials/bulb_coordinator_contacts.html' %}
             </li>
             <li>يمكنك الرجوع لتفاصيل الطلب وتعديله في صفحة "<a href="{% url 'bulb:requests_by_me' %}">طلباتي</a>".</li>
         </ul>
     {% endif %}
-{% elif not delivery_type %}
+{% elif book.is_available %}
         <div class="row">
             <div class="col-sm-5 col-xs-6">
                 <a id="order-{{ book.pk }}-img" href="{% url 'bulb:show_book' book.pk %}"></a>
             </div>
             <div class="col-sm-7 col-xs-6 vcenter">
-                <p class="modal-intro">يمكنك الآن طلب كتاب <strong>{{ book.title }}</strong> من {{ book.submitter.common_profile.get_ar_full_name }}، من {{ book.submitter.common_profile.college.get_name_display }}.</p>
+                <p class="modal-intro">يمكنك الآن طلب كتاب <strong>{{ book.title }}</strong> من {{ book.submitter.common_profile.get_ar_full_name }}، من {{ book.submitter.common_profile.college.get_name_display }}. {% if book.contribution == 'G' %}هذا الكتاب للاقتناء{% else %}هذا الكتاب للإعارة {% if book.available_until%}وهو متوفر حتى {{ book.available_until|date:"l j F Y" }}{% endif %}.{% endif %}.</p>
     {% if user.common_profile.college.gender == book.submitter.common_profile.college.gender %}
                 <p class="modal-intro">لديك خياران للطلب:</p>
             </div>
         </div>
         <div class="row">
             <div class="col-sm-6">
-                <button data-pk="{{ book.pk }}" class="order-option direct">
+                <button data-instruction-url="{% url 'bulb:order_instructions' book.pk %}"  data-confirm-url="{% url 'bulb:confirm_book_order' book.pk %}" class="bulb-option order-option direct">
                     <div class="icon"><i class="fa fa-rocket"></i></div>			
                     <h3>استلام مباشر</h3>
                     <p>ستصلك معلومات التواصل مع {{ book.submitter.common_profile.ar_first_name }} لتُحدّد موعدًا لمقابلته خلال أسبوع. بعد ذلك سيتعيّن عليك تأكيد الاستلام، وعليه تأكيد التسليم لإنهاء إجراءات الطلب.</p>
                 </button>
             </div>
             <div class="col-sm-6 vcenter">
-                <button data-pk="{{ book.pk }}" class="order-option indirect">
+                <button data-instruction-url="{% url 'bulb:order_instructions' book.pk %}"  data-confirm-url="{% url 'bulb:confirm_book_order' book.pk %}" class="bulb-option order-option indirect">
                     <div class="icon"><i class="fa fa-truck"></i></div>			
                     <h3>توصيل فريق سِراج</h3>
                     <p>سنتواصل مع {{ book.submitter.common_profile.ar_first_name }} لنأخذ منه الكتاب، ثم سنتصل بك ليصلك الكتاب، يتم ذلك عادة خلال أسبوع.</p>
@@ -159,7 +93,7 @@
             </div>
         </div>
     {% elif not user.common_profile.college.gender == book.submitter.common_profile.college.gender %}
-                <button data-pk="{{ book.pk }}" class="order-option indirect">
+                <button data-instruction-url="{% url 'bulb:order_instructions' book.pk %}"  data-confirm-url="{% url 'bulb:confirm_book_order' book.pk %}" class="bulb-option order-option indirect">
                     <div class="icon"><i class="fa fa-truck"></i></div>			
                     <h3>إيصال بواسطة فريق سِراج</h3>
                     <p>سنتواصل مع {{ book.submitter.common_profile.ar_first_name }} لنأخذ منه الكتاب، ثم سنتصل بك ليصلك الكتاب، يتم ذلك عادة خلال أسبوع.</p>

@@ -1,52 +1,10 @@
 <style>
-.session-option{
-    border: 1px solid #ebebeb;
-    position: relative;
-    display: block;
-    padding: 20px;
-    margin: 10px 0;
-    overflow: hidden;
-    border-radius: 25px;
-    width: 100%;
-}
 
 .session-option.physical{
     background: rgb(134, 213, 121);
 }
 .session-option.online{
     background: rgb(134, 213, 121);
-}
-
-.session-option p{
-    color:  rgb(30, 71, 30);
-    font-size: 16px;
-    text-align: justify;
-}
-   
-.session-option h3, .session-option p{
-    margin-top: 5px;
-    position: relative;
-    z-index: 5;
-    padding: 0;
-}
-    
-.session-option .icon{
-   font-size: 30px;
-    color: white;
-}
-
-.session-option h3{
-    font-size: 30px;
-    color: white;
-    text-align: center;
-}
-    
-.session-option .icon {
-    left: 5px;
-    right: auto;   
-    position: absolute;
-    bottom: 5px;
-    z-index: 1;
 }
  
 #order-{{ book.pk }}-img {
@@ -73,7 +31,7 @@
     <div class="col-sm-7 col-xs-6 vcenter">
         <p class="modal-intro">يمكنك الدعوة لعقد جلسة لمجموعة <strong>{{ group.name }}</strong>.</p>
 {% if group.is_mixed_gender %}
-        <button data-url="{% url 'bulb:add_session' group.pk 'online' %}" class="session-option indirect">
+        <button data-url="{% url 'bulb:add_session' group.pk 'online' %}" class="bulb-option session-option indirect">
             <div class="icon"><i class="fa fa-truck"></i></div>			
             <h3>إيصال بواسطة فريق سِراج</h3>
             <p>سنتواصل مع {{ book.submitter.common_profile.ar_first_name }} لنأخذ منه الكتاب، ثم سنتصل بك ليصلك الكتاب، يتم ذلك عادة خلال أسبوع.</p>
@@ -87,14 +45,14 @@
         </div>
         <div class="row">
             <div class="col-sm-6 vcenter">
-                <button data-url="{% url 'bulb:add_session' group.pk %}" class="session-option physical">
+                <button data-url="{% url 'bulb:add_session' group.pk %}" class="bulb-option session-option physical">
                     <div class="icon"><i class="fa fa-users"></i></div>			
                     <h3>جلسة حضوية</h3>
                     <p>حدد مكانًا، لعقد الاجتماع.</p>
                 </button>
             </div>
             <div class="col-sm-6 vcenter">
-                <button data-url="{% url 'bulb:add_session' group.pk 'online' %}" class="session-option online">
+                <button data-url="{% url 'bulb:add_session' group.pk 'online' %}" class="bulb-option session-option online">
                     <div class="icon"><i class="fa fa-globe"></i></div>			
                     <h3>جلسة عبر الإنترنت</h3>
                     <p>يكون الاجتماع عبر جلسة مباشرة على Google Hangout في وقت تُحدّده.</p>

@@ -2,18 +2,8 @@
 <div class="col-sm-2 vcenter">
     <div class="screenshot">
         <div style="text-align: center; border-left: solid 1px #eee;">
-            <style>
-                #book-{{ book.pk }}-img {
-                    display: block;
-                    width:90%;
-                    padding-bottom:90%;
-                    margin:10px;
-                    background:url('{{ book.cover.url }}') center center no-repeat;
-                    background-size: auto 100%;
-                }
-            </style>
-            <a id="book-{{ book.pk }}-img" href="{% url 'bulb:show_book' book.pk %}" style="max-width: 100%;"></a>
-            <a href="{% url 'bulb:show_book' book.pk %}">{{ book.title }}</a>
+            <a class="book-image" style="background-image:url('{{ book_request.book.cover.url }}');" href="{% url 'bulb:show_book' book_request.book.pk %}"></a>
+            <a href="{% url 'bulb:show_book' book_request.book.pk %}">{{ book_request.book.title }}</a>
         </div>
     </div>
 </div>
@@ -22,23 +12,19 @@
     <table class="table table-hover">
         <tr>
             <th>الاسم</th>
-            <td>{{ book.submitter.common_profile.get_ar_full_name }}</td>
+            <td>{{ book_request.book.submitter.common_profile.get_ar_full_name }}</td>
         </tr>
         <tr>
             <th>الكلية</th>
-            <td>{{ book.submitter.common_profile.college.get_name_display }}</td>
+            <td>{{ book_request.book.submitter.common_profile.college.get_name_display }}</td>
         </tr>
         <tr>
             <th>البريد</th>
-            <td class="english-field"><a href="mailto:{{ book.submitter.email }}">{{ book.submitter.email }}</a></td>
+            <td class="english-field"><a href="mailto:{{ book_request.book.submitter.email }}">{{ book_request.book.submitter.email }}</a></td>
         </tr>
         <tr>
             <th>رقم الجوال</th>
-            <td>{{ book.submitter.common_profile.mobile_number }}</td>
-        </tr>
-        <tr>
-            <th>تاريخ الطلب</th>
-            <td>{{ book.last_pending_request.submission_date|date:"l j F" }}</td>
+            <td>{{ book_request.book.submitter.common_profile.mobile_number }}</td>
         </tr>
     </table>
 </div>
@@ -47,35 +33,55 @@
     <table class="table table-hover">
         <tr>
             <th>الاسم</th>
-            <td>{{ book.last_pending_request.requester.common_profile.get_ar_full_name }}</td>
+            <td>{{ book_request.requester.common_profile.get_ar_full_name }}</td>
         </tr>
         <tr>
             <th>الكلية</th>
-            <td>{{ book.last_pending_request.requester.common_profile.college.get_name_display }}</td>
+            <td>{{ book_request.requester.common_profile.college.get_name_display }}</td>
         </tr>
         <tr>
             <th>البريد</th>
-            <td class="english-field"><a href="mailto:{{ book.last_pending_request.requester.email }}">{{ book.last_pending_request.requester.email }}</a></td>
+            <td class="english-field"><a href="mailto:{{ book_request.requester.email }}">{{ book_request.requester.email }}</a></td>
         </tr>
         <tr>
             <th>رقم الجوال</th>
-            <td>{{ book.last_pending_request.requester.common_profile.mobile_number }}</td>
+            <td>{{ book_request.requester.common_profile.mobile_number }}</td>
         </tr>
+        {% if book_request.borrowing_end_date %}
+        <tr>
+            <th>تاريخ انتهاء مدة الاستعارة</th>
+            <td>{{ book_request.borrowing_end_date|date:"l j F" }}</td>
+        </tr>
+        {% endif %}
         <tr>
             <th>تاريخ الطلب</th>
-            <td>{{ book.last_pending_request.submission_date|date:"l j F" }}</td>
+            <td>{{ book_request.submission_date|date:"l j F" }}</td>
         </tr>
     </table>
 </div>
 <div class="col-sm-2 vcenter">
-        <button data-pk="{{ book.last_pending_request.pk }}" data-action="{{ side }}_done" class="done btn-block btn-icon btn btn-success">
+{% if side %}
+        <button data-pk="{{ book_request.pk }}" data-action="{{ side }}_done" class="done btn-block btn-icon btn btn-success">
             <i class="entypo-flag"></i>
             سُلّم الكتاب
         </button>
-        {% if not book.last_pending_request.owner_status == 'F' %}
-        <button data-pk="{{ book.last_pending_request.pk }}" data-action="{{ side }}_failed" class="failed btn-block btn-icon btn btn-warning">
+        {% if not book_request.owner_status == 'F' %}
+        <button data-pk="{{ book_request.pk }}" data-action="{{ side }}_failed" class="failed btn-block btn-icon btn btn-warning">
             <i class="fa fa-exclamation-circle"></i>
             تعذّر التواصل
         </button>
         {% endif %}
+{% else %}
+    {% if book_request.book.contribution == 'L' and book_request.requester_status == 'D' %}
+        <button data-pk="{{ book_request.pk }}" data-action="requester_returned" class="done btn-block btn-icon btn btn-success">
+            <i class="entypo-flag"></i>
+            أعاده المستعير
+        </button>
+    {% elif book_request.book.contribution == 'L' and book_request.owner_status == 'D' %}
+        <button data-pk="{{ book_request.pk }}" data-action="owner_returned" class="done btn-block btn-icon btn btn-success">
+            <i class="entypo-flag"></i>
+            أعيد إلى صاحبه
+        </button>
+    {% endif %}
+{% endif %}
 </div>

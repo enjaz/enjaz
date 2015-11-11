@@ -1,34 +1,32 @@
 function initialize_book_buttons(){
     $(".order-book").click(function () {
+        var instruction_url = $(this).data('instruction-url');
         $("#order-book-modal").modal('show');
-        var pk = $(this).data('pk');
-        $("#order-book-modal .modal-body").load("{% url 'bulb:order_instructions' %}", {pk: pk}, function(){
-            direct_height = $('.order-option.direct').height();
-            indirect_height = $('.order-option.indirect').height();
-            if (direct_height > indirect_height){
-                $('.order-option.indirect').height(direct_height);
-            }
-            $('.order-option').click(function() {
-                if ($(this).hasClass('direct')){
-                    $("#confirm-order-modal .confirm").data('delivery', 'direct');
-                } else if ($(this).hasClass('indirect')){
-                    $("#confirm-order-modal button.confirm").data('delivery', 'indirect');
+        $("#order-book-modal .modal-body").load(instruction_url, function(){
+            $(function(){
+                direct_height = $('.order-option.direct').height();
+                indirect_height = $('.order-option.indirect').height();
+                if (direct_height > indirect_height){
+                    $('.order-option.indirect').height(direct_height);
                 }
+            });
+
+            $('.order-option').click(function() {
+                order_button = this;
+                var confirm_url = $(order_button).data('confirm-url');
+                $("#confirm-order-modal .modal-body").load(confirm_url, function(){
+                    $("#id_borrowing_end_date").attr('data-start-view', '1').datepicker({isRTL: true, minDate: 1{% if book.available_until %},maxDate: new Date({{ book.available_until.year }}, {{ book.available_until.month }} - 1, {{ book.available_until.day }}){% endif %}});
+                    if ($(order_button).hasClass('direct')){
+                        $("#id_delivery").val('D');
+                    } else if ($(order_button).hasClass('indirect')){
+                        $("#id_delivery").val('I');
+                    }
+                });
                 $("#confirm-order-modal").modal('show');
             });
         });
-
-        var $submitButton = $("#order-book-modal button.submit-button");
-        // Unbind any handlers previously attached to the submit button
-        // This is necessary to avoid multiple submissions of the form
-        $submitButton.off('click');
-        $submitButton.click(function () {
-            $("form#order-book-form").submit();
-            loadBooks();
-        });
     });
     $(".edit-book").click(function () {
-        var pk = $(this).data('pk');
         // show the edit book modal {# you can find it in bulb/exchange/home.html #}
         $("#edit-book-modal").modal('show');
         var url = $(this).data('url'); 
@@ -45,7 +43,6 @@ function initialize_book_buttons(){
         });
     });
     $("button.confirm-delete-book").click(function(){
-        console.log(0);
         var confirm_url = $(this).data('confirm-url');
         var deletion_url = $(this).data('deletion-url');
         $('#confirm-delete-book-modal .modal-body').load(confirm_url);

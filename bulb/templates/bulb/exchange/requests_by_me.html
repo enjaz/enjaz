@@ -6,10 +6,27 @@
 {% block content %}
     <div class="row">
         {% include "bulb/exchange/components/critical_buttons.html" %}
-        <h1>طلباتي المُعلّقة</h1>
+        <h1>طلباتي</h1>
+        <h2>كتب مُعلّقة</h2>
         <div class="panel panel-warning panel-shadow" data-collapsed="0">
             <div class="panel-body">
                 <div id="pending-requests">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
+        <h2>كتب استعرتها</h2>
+        <div class="panel panel-warning panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="borrowing-requests">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
+        <h2>طلبات منجزة</h2>
+        <div class="panel panel-warning panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="done-requests">
                     {% include "media/polls/ajax-loader.html" %}
                 </div>
             </div>
@@ -28,7 +45,7 @@
     function initialize_request_buttons(){
         control_url = "{% url 'bulb:control_request' %}";
         display_url = "{% url 'bulb:pending_request' %}";
-        list_url = "{% url 'bulb:list_book_previews' 'user' user.username %}";
+        list_url = "{% url 'bulb:list_my_requests' %}";
         $('button.done').click(function() {
             pk = $(this).data('pk');
             data = {pk: pk, action: 'requester_done'}
@@ -39,8 +56,7 @@
                 cache: false,
                 success: function (data) {
                     if (data.message == "success") {
-                        $("#pending-"+pk).hide('slow');
-                        $("#done-books").load(list_url, {condition: 'done'});
+                        refreshLists();
                     } else {
                         alert(data.message);
                     }
@@ -64,6 +80,23 @@
                 }
             });
         });
+        $('button.returned').click(function() {
+            pk = $(this).data('pk');
+            data = {pk: pk, action: 'requester_returned'}
+            $.ajax({
+                url: control_url,
+                type: 'POST',
+                data: data,
+                cache: false,
+                success: function (data) {
+                    if (data.message == "success") {
+                        refreshLists();
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            });
+        });
         $('button.canceled').click(function() {
             pk = $(this).data('pk');
             data = {pk: pk, action: 'requester_canceled'}
@@ -74,8 +107,7 @@
                 cache: false,
                 success: function (data) {
                     if (data.message == "success") {
-                        $("#pending-"+pk).hide('slow');
-                        $("#available-books").load(list_url, {condition: 'available'});
+                        refreshLists();
                     } else {
                         alert(data.message);
                     }
@@ -83,8 +115,11 @@
             });
         });
     }
-    $(function(){
-        $("#pending-requests").load("{% url 'bulb:list_my_pending_requests' %}", initialize_request_buttons);
-    });
+    function refreshLists(){
+        $("#pending-requests").load("{% url 'bulb:list_my_requests' %}", {condition: 'pending'}, initialize_request_buttons);
+        $("#borrowing-requests").load("{% url 'bulb:list_my_requests' %}", {condition: 'borrowing'}, initialize_request_buttons);
+        $("#done-requests").load("{% url 'bulb:list_my_requests' %}", {condition: 'done'}, initialize_request_buttons);
+    }
+    $(refreshLists);
 </script>
 {% endblock %}

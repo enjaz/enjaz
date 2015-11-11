@@ -5,7 +5,18 @@
 </form>
 <script type="text/javascript">
 $(function () {
-
+    $("#id_available_until").attr('data-start-view', '1').datepicker({isRTL: true, minDate: 1});
+    if ($("#id_contribution").val() == 'G'){
+        $('#id_available_until').parent().hide();
+    }
+    $("#id_contribution").change(function(){
+        if ($(this).val() == 'G'){
+            $('#id_available_until').parent().hide();
+        } else {
+            $('#id_available_until').parent().show();
+        }
+    });
+    
     // modify form submission behaviour to be ajaxy
     $("form#edit-book-form").submit(function (event) {
 
@@ -17,7 +28,8 @@ $(function () {
         {% if book %}{# if a book is passed, then post to edit_book url, otherwise to add_book #}
         var url = "{% url 'bulb:edit_book' book.pk %}";
         {% else %}
-        var url = "{% url 'bulb:add_book' %}";
+        // This will change depending the lend/give choice.
+        var url = $("#edit-book-modal button.submit-button").data("url");
         {% endif %}
 
         /* Send the data */

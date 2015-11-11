@@ -10,18 +10,31 @@
           show    : false,
         });
         $("button#add-book").click(function () {
+
             $("#edit-book-modal").modal('show');
-
             $("#edit-book-modal .modal-title").html("أضف كتابًا");
-            $("#edit-book-modal .modal-body").load("{% url 'bulb:add_book' %}");
-
-            var $submitButton = $("#edit-book-modal button.submit-button");
-            // Unbind any handlers previously attached to the submit button
-            // This is necessary to avoid multiple submissions of the form
-            $submitButton.off('click');
-            $submitButton.click(function () {
-                $("form#edit-book-form").submit();
+            $("#edit-book-modal .modal-body").load("{% url 'bulb:add_book_introduction' %}", function(){
+                $('.contribution-option.give').ready(function(){
+                    give_height = $('.contribution-option.give').height();
+                    lend_height = $('.contribution-option.lend').height();
+                    if (give_height > lend_height){
+                        $('.contribution-option.lend').height(give_height);
+                    }
+                });
+                $('.contribution-option').click(function(){
+                    if ($(this).hasClass("give")){
+                        url = "{% url 'bulb:add_book' 'give' %}";
+                    } else if ($(this).hasClass("lend")){
+                        url = "{% url 'bulb:add_book' 'lend' %}";
+                    }
+                    $("#edit-book-modal .modal-body").load(url);  
+                    $("#edit-book-modal button.submit-button").data("url", url);
+                });
             });
+        });
+        // submission button
+        $("#edit-book-modal button.submit-button").click(function () {
+            $("form#edit-book-form").submit();
         });
         {% if from_category or from_my_books  %}
         // load books

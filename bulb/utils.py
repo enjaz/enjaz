@@ -7,6 +7,10 @@ def is_bulb_coordinator_or_deputy(user):
     coordination_and_deputyships = get_user_coordination_and_deputyships(user)
     return coordination_and_deputyships.filter(english_name='Bulb').exists()
 
+def is_bulb_member(user):
+    user_clubs = user.memberships.current_year()
+    return user_clubs.filter(english_name='Bulb').exists()
+
 def get_bulb_club_for_user(user):
     user_gender = get_user_gender(user)
     if user_gender == 'F':
@@ -25,13 +29,35 @@ def get_bulb_club_of_user(user):
         return None
 
 def can_edit_book(user, book):
-    if is_bulb_coordinator_or_deputy(user) or \
+    # If the book is unavailable the owner cannot edit it.
+    if not book.is_available and \
+       book.submitter == user:
+        return False
+    elif is_bulb_coordinator_or_deputy(user) or \
        user.is_superuser or \
        book.submitter == user:
         return True
     else:
         return False
 
+def can_edit_owner_status(user, book):
+    if is_bulb_coordinator_or_deputy(user) or \
+       is_bulb_member(user) or \
+       user.is_superuser or \
+       book.submitter == user:
+        return True
+    else:
+        return False
+
+def can_edit_requester_status(user, book_request):
+    if is_bulb_coordinator_or_deputy(user) or \
+       is_bulb_member(user) or \
+       user.is_superuser or \
+       user == book_request.requester:
+        return True
+    else:
+        return False
+    
 def can_order_book(user, book):
     if book.is_deleted or \
        user == book.submitter or \

@@ -12,7 +12,8 @@ class BookQuerySet(models.QuerySet):
         """
         Return a queryset of approved books.
         """
-        return self.undeleted().filter(is_available=True)
+        return self.undeleted().filter(is_available=True)\
+                               .exclude(available_until__lte=timezone.now().date())
 
     def deleted(self):
         return self.filter(is_deleted=True)
@@ -69,8 +70,21 @@ class PointQuerySet(models.QuerySet):
     def counted(self):
         return self.filter(is_counted=True)
 
-    def count_total(self):
-        total = self.current_year().counted().aggregate(total_points=models.Sum('value'))['total_points']
+    def giving(self):
+        return self.filter(category="G")
+    
+    def lending(self):
+        return self.filter(category="L")
+
+    def count_total_lending(self):
+        total = self.current_year().counted().lending().aggregate(total_points=models.Sum('value'))['total_points']
+        if total is None:
+            return 0
+        else:
+            return total
+
+    def count_total_giving(self):
+        total = self.current_year().counted().giving().aggregate(total_points=models.Sum('value'))['total_points']
         if total is None:
             return 0
         else:

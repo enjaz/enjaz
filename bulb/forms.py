@@ -5,15 +5,61 @@ from django import forms
 import autocomplete_light
 
 from accounts.utils import get_user_gender
-from bulb.models import Book, Group, Session, Report, Membership, ReaderProfile
+from bulb.models import Book, Request, Group, Session, Report, Membership, ReaderProfile
 from bulb import utils
 
-class BookForm(forms.ModelForm):
+class BookEditForm(forms.ModelForm):
+    """Form used to edit books. It allows changing contribution type from
+       giving to lending."""
     class Meta:
         model = Book
-        fields = ['title', 'authors', 'edition',
+        fields = ['title', 'authors', 'edition', 'pages',
+                  'condition', 'description', 'cover',
+                  'category', 'contribution',
+                  'available_until']
+
+class BookGiveForm(forms.ModelForm):
+    class Meta:
+        model = Book
+        fields = ['title', 'authors', 'edition', 'pages',
                   'condition', 'description', 'cover',
                   'category']
+
+class BookLendForm(forms.ModelForm):
+    class Meta:
+        model = Book
+        fields = ['title', 'authors', 'edition', 'pages', 'condition',
+                  'description', 'cover', 'category',
+                  'available_until']
+
+class RequestForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance', None)
+        super(RequestForm, self).__init__(*args, **kwargs)
+        if instance.book.contribution == 'L':
+            self.fields['borrowing_end_date'].required = True
+
+    def clean_delivery(self):
+        # You know the "males and females are not supposed to meet"
+        # bullshit? Yeah.
+        data = self.cleaned_data['delivery']
+
+        if not data:
+            return data
+
+        requester_gender = get_user_gender(self.instance.requester)
+        owner_gender = get_user_gender(self.instance.book.submitter)
+        if data == 'I' or  requester_gender != owner_gender:
+            delivery = 'I'
+        else:
+            delivery = 'D'
+
+        return delivery
+
+    class Meta:
+        model = Request
+        fields = ['delivery', 'borrowing_end_date']
+        widgets  = {'delivery': forms.HiddenInput()}
 
 class GroupForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -33,19 +79,20 @@ class GroupForm(forms.ModelForm):
             if user_gender == 'F':
                 initial_choice = 'F'
                 gender_choices = (
-                    ('', u'الطلاب والطالبات'),
+                    #('', u'الطلاب والطالبات'),
                     ('F', u'الطالبات'),
                     )
             elif user_gender == 'M':
                 initial_choice = 'M'
                 gender_choices = (
-                    ('', u'الطلاب والطالبات'),
+                    #('', u'الطلاب والطالبات'),
                     ('M', u'الطلاب'),
                     )
             else: # Just in case
-                initial_choice = ''
+                #initial_choice = ''
+                initial_choice = 'M'
                 gender_choices = (
-                    ('', u'الطلاب والطالبات'),
+                    #('', u'الطلاب والطالبات'),
                     ('F', u'الطالبات'),
                     ('M', u'الطلاب'),
                     )
@@ -61,7 +108,6 @@ class GroupForm(forms.ModelForm):
                   'category']
 
 class SessionForm(forms.ModelForm):
-
     class Meta:
         model = Session
         fields = ['title', 'agenda', 'location', 'date', 'start_time',

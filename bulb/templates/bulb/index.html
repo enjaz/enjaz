@@ -8,7 +8,7 @@
             text-align: justify;
             font-size: 18px;
             margin-right: auto;
-            margin-left: auto;">مبادرة تدعو إلى إحياء روح "اقرأ" في المجتمع الطلابي، وخلق بيئة للتبادل المعرفي والثقافي والفكري! يكون ذلك بإنشاء مجموعات نقاش عن مختلف المواضيع والاهتمامات؛ وباقتناء الكتب، حيث تستطيع استبدال كتابك بأحد الكتب التي يعرضها الطلاب والطالبات من خلال رصيد يزيد وينقص بناء على عدد الكتب التي تقوم بعرضها واستبدالها. كن جزءًا من مبادرة سِراج و انضم إلى نخبة من قراء وقارئات الجامعة، وتذكر دومًا أننا آذانُ صاغية لأفكارك ومقترحاتك فراسلنا على البريد <a href="mailto:bulb@enjazportal.com">bulb@enjazportal.com</a>.</p>
+            margin-left: auto;">مبادرة تدعو إلى إحياء روح "اقرأ" في المجتمع الطلابي، وخلق بيئة للتبادل المعرفي والثقافي والفكري! يكون ذلك بإنشاء مجموعات نقاش عن مختلف المواضيع والاهتمامات؛ وباقتناء الكتب واستعارتها، حيث تستطيع استبدال كتابك بأحد الكتب التي يعرضها الطلاب والطالبات من خلال رصيد يزيد وينقص بناء على عدد الكتب التي تقوم بعرضها واستبدالها. كن جزءًا من مبادرة سِراج و انضم إلى نخبة من قراء وقارئات الجامعة، وتذكر دومًا أننا آذانُ صاغية لأفكارك ومقترحاتك فراسلنا على البريد <a href="mailto:bulb@enjazportal.com">bulb@enjazportal.com</a>.</p>
     </div>
 {% if not user.reader_profile or not user.reading_group_coordination.exists and not user.reading_group_memberships.exists or not user.book_giveaways.exists %}
 <div class="col-sm-3">
@@ -80,6 +80,44 @@
             </div>
         </div>
         </div>
+        <div class="panel-body">
+            <div class="col-md-9">
+            <div class="panel panel-warning panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+
+                <!-- panel head -->
+                <div class="panel-heading">
+                    <div class="panel-title">جلسات القراءة والنقاش القادمة</div>
+                </div>
+
+                <!-- panel body -->
+                <div class="panel-body">
+                    {% if sessions %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th class="hidden-xs">عنوان الجلسة</th>
+                                <th>المجموعة</th>
+                                <th>التاريخ</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for session in sessions %}
+                            <tr>
+                                <td class="hidden-xs">{{ session.title }}</td>
+                                <td><a href="{% url 'bulb:show_group' session.group.pk %}">{{ session.group.name }}</a> ({{ session.group.get_gender_display }})</td>
+                                <td>{{ session.date|date:"l j F Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p>لا توجد جلسات نقاش وقراءة مستقبلية.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        </div>
     </div>
 </div>
 
@@ -89,7 +127,7 @@
     <div class="panel minimal minimal-gray">
         <div class="panel-heading">
             <div class="panel-title">
-                <h2>اقتناء الكتب</h2>
+                <h2>تبادل الكتب</h2>
             </div>
         </div>
         <div class="panel-body">

@@ -486,7 +486,7 @@ body.login-page .login-content .alert-warning a {
     text-align: center;
 }
 
-.group-image {
+.group-image{
     display: block;
     padding-bottom:90%;
     background-position-x: 50%;
@@ -496,6 +496,18 @@ body.login-page .login-content .alert-warning a {
     height: 100%;
     border-radius: 10%;
     border: #dbdbd4 1px solid;
+}
+
+.book-image{
+    display: block;
+    width:90%;
+    max-width: 100%;
+    padding-bottom:90%;
+    margin:10px;
+    background-repeat: no-repeat;
+    background-position-x: 50%;
+    background-position-y: 50%;
+    background-size: auto 100%;
 }
 
 .group-name{
@@ -514,15 +526,25 @@ body.login-page .login-content .alert-warning a {
      padding: 10px;
 }
 
-.group-gender{
+.group-gender, .book-contribution{
     position: absolute;
-    top: 25px;
-    left: 16px;
     background-color: rgba(255, 198, 0, 0.7);
     color: black;
-    padding: 5px;
-    font-size: 19px;
     border-radius: 10%;
+}
+
+.group-gender{
+    top: 25px;
+    padding: 5px;
+    left: 16px;
+    font-size: 19px;
+}
+
+.book-contribution{
+    top: 15px;
+    padding: 3px;
+    left: 15px;
+    font-size: 12px;
 }
 
 .modal-intro{
@@ -543,6 +565,64 @@ ul.modal-intro{
     margin-bottom: 20px;
 }
 
+
+.bulb-option{
+    border: 1px solid #ebebeb;
+    position: relative;
+    display: block;
+    padding: 20px;
+    margin: 10px 0;
+    overflow: hidden;
+    border-radius: 25px;
+    width: 100%;
+}
+
+.bulb-option p{
+    color:  rgb(30, 71, 30);
+    font-size: 16px;
+    text-align: justify;
+}
+    
+.bulb-option h3, .bulb-option p{
+    margin-top: 5px;
+    position: relative;
+    z-index: 5;
+    padding: 0;
+}
+
+.bulb-option .icon{
+    font-size: 30px;
+    color: white;
+    left: 5px;
+    right: auto;   
+    position: absolute;
+    bottom: 5px;
+    z-index: 1;
+}
+
+.bulb-option h3{
+    font-size: 30px;
+    color: white;
+    text-align: center;
+}
+
+.give.btn, .contribution-option.give{
+    background: rgb(115, 199, 199);
+}
+
+.give.btn-icon i, .give.btn:hover, .give.btn:active, .contribution-option.give:hover, .contribution-option.give:active {
+    background-color: rgb(88, 156, 131);
+}
+
+.lend.btn, .contribution-option.lend{
+    background: rgb(243, 184, 96);
+}
+
+.lend.btn-icon i, .lend.btn:hover, .lend.btn:active, .contribution-option.lend:hover, .contribution-option.lend:active {
+    background-color: rgb(199, 147, 70);
+}
+
+
 li.highlighted-section {
     -webkit-animation-name: example; /* Chrome, Safari, Opera */
     -webkit-animation-duration: 4s; /* Chrome, Safari, Opera */
@@ -561,4 +641,10 @@ li.highlighted-section {
 @keyframes red-highlighting {
     0%   {background-color: transparent;}
     50%  {background-color: #A91E1E;}
+}
+
+/* As per the official neon support forum, to solve modal position in
+   Firefox. */
+body.loaded{
+    perspective: none;
 }

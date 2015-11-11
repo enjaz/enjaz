@@ -3,7 +3,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">حذف المجموعة</h4>
+        <h4 class="modal-title">حذف الكتاب</h4>
       </div>
       <div class="modal-body">
           {% include "media/polls/ajax-loader.html" %}
@@ -29,7 +29,7 @@ $(function() {
                 toastr.options.positionClass = "toast-top-left";
                 toastr.info("حُذف الكتاب بنجاح.");
                 
-                // return to the group list page.
+                // return to the book list page.
                 window.location.href = data.list_url;
             } else {
                 $('#confirm-delete-book-modal .modal-body').html(data);

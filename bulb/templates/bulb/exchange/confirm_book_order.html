@@ -1,0 +1,9 @@
+{% load bootstrap3 %}
+
+<p>هل تريد تأكيد طلب <a href="{% url 'bulb:show_book' book.pk %}">{{ book.title }}</a>؟</p>
+{% if book.contribution == 'L' %}
+    <p>بما إن هذا الكتاب متاح للاستعارة، سيعيّن عليك تحديد التاريخ الذي ستعيد فيه الكتاب:</p>
+    {% bootstrap_field form.borrowing_end_date %}
+{% endif %}
+    {% csrf_token %}
+    {% bootstrap_field form.delivery %}

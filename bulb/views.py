@@ -14,13 +14,16 @@ from accounts.utils import get_user_gender
 from core.models import StudentClubYear
 from core import decorators
 from bulb.models import Category, Book, Request, Point, Group, Membership, Session, Report, ReaderProfile
-from bulb.forms import BookForm, GroupForm, SessionForm, ReportForm, ReaderProfileForm
+from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, RequestForm, GroupForm, SessionForm, ReportForm, ReaderProfileForm
 from bulb import utils
 
 
 @login_required
 def index(request):
     groups = Group.objects.current_year().undeleted().order_by("?")[:6]
+    sessions = Session.objects.current_year().undeleted()\
+                              .filter(date__gte=timezone.now().date())\
+                              .order_by("date")[:5]
     group_count = Group.objects.current_year().undeleted().count()
     group_user_count = (User.objects.filter(reading_group_memberships__isnull=False) | \
                         User.objects.filter(reading_group_coordination__isnull=False)).distinct().count()
@@ -31,6 +34,7 @@ def index(request):
     reader_profile_count = ReaderProfile.objects.count()
     context = {'groups': groups, 'group_count': group_count,
                'group_user_count': group_user_count,
+               'sessions': sessions,
                'books': books, 'book_count': book_count,
                'book_request_count': book_request_count,
                'reader_profiles': reader_profiles,
@@ -65,81 +69,99 @@ def list_book_previews(request, source, name):
         if category.code_name != 'all':
             books = books.filter(category=category)
     elif source == "user":
-        done_pks = (Request.objects.filter(owner_status='D', requester_status='D') |\
-                    Request.objects.filter(owner_status='D', requester_status='') |\
-                    Request.objects.filter(owner_status='', requester_status='D'))\
-                    .values_list('book__pk', flat=True)
         condition = request.POST.get('condition')
         user = get_object_or_404(User, username=name)
         if condition == 'available':
             books = Book.objects.current_year().available().of_user(user)
+        elif condition == 'borrowed':
+            book_pks = Request.objects.filter(book__contribution='L', owner_status='D')\
+                                      .values_list('book__pk', flat=True)
+            books = Book.objects.current_year().filter(pk__in=book_pks, is_deleted=False).of_user(user).distinct()
         elif condition == 'done':
-            book_pks = (Request.objects.filter(owner_status='D', requester_status='D') |\
-                        Request.objects.filter(owner_status='D', requester_status='') |\
-                        Request.objects.filter(owner_status='', requester_status='D'))\
-                        .values_list('book__pk', flat=True)
-            books = Book.objects.current_year().filter(pk__in=done_pks).of_user(user).distinct()
-            
+            book_pks = (Request.objects.filter(book__contribution="G",
+                                          owner_status="D") | \
+                        Request.objects.filter(book__contribution="L",
+                                          owner_status="R"))\
+                                       .values_list('book__pk', flat=True)
+            books = Book.objects.current_year().filter(pk__in=book_pks, is_deleted=False).of_user(user).distinct()
+
     return render(request, "bulb/exchange/list_books.html",
                   {'books': books})
 
 @decorators.ajax_only
-@decorators.post_only
-@csrf.csrf_exempt
+@decorators.get_only
 @login_required
-def order_instructions(request):
-    pk = request.POST.get('pk')
-    delivery_type = request.POST.get('delivery_type')
+def order_instructions(request, pk):
     book = get_object_or_404(Book, pk=pk, is_deleted=False)
     bulb_coordinator = utils.get_bulb_club_for_user(book.submitter).coordinator
-
-    if not utils.can_order_book(request.user, book):
+    last_request = book.last_pending_request()
+    
+    if not (last_request and last_request.requester == request.user) and \
+       not utils.can_order_book(request.user, book):
         raise PermissionDenied
 
-    if request.user.book_points.count_total() and \
-       delivery_type in ['direct', 'indirect']:
-        requester_gender = get_user_gender(request.user)
-        owner_gender = get_user_gender(book.submitter)
-        if delivery_type == 'indirect' or \
-           not requester_gender == owner_gender:
-            delivery = 'I'
-        elif delivery_type == 'direct':
-            delivery = 'D'
-        current_year = StudentClubYear.objects.get_current()
-        book_request = Request.objects.create(book=book,
-                                              delivery=delivery,
-                                              requester=request.user)
-        Point.objects.create(year=current_year,
-                             request=book_request,
-                             user=request.user,
-                             value=-1)
-        book.is_available = False
-        book.save()
-        email_context = {'book': book,
-                         'book_request': book_request}
-        my_books_url = reverse('bulb:my_books')
-        my_books_full_url = request.build_absolute_uri(my_books_url)
-        if delivery == 'I':
-            owner_template = "book_requested_indirectly_to_owner"
-            if bulb_coordinator:
-                indirect_requests_url = reverse('bulb:indirect_requests')
-                indirect_requests_full_url = request.build_absolute_uri(indirect_requests_url)
-                email_context['full_url'] = indirect_requests_full_url
-                email_context['bulb_coordinator'] = bulb_coordinator
-                mail.send([bulb_coordinator.email],
-                           template="book_requested_indirectly_to_coordinator",
-                           context=email_context)
-        elif delivery == 'D':
-            owner_template = "book_requested_directly_to_owner"
-
-        email_context['full_url'] = my_books_full_url
-        mail.send([book.submitter.email],
-                  template=owner_template,
-                  context=email_context)
+    context = {'book': book, 'bulb_coordinator': bulb_coordinator}
 
     return render(request, "bulb/exchange/components/order_body.html",
-                  {'book': book, 'delivery_type': delivery_type,
-                   'bulb_coordinator': bulb_coordinator})
+                  context)
+
+@decorators.ajax_only
+@login_required
+@csrf.csrf_exempt
+def confirm_book_order(request, pk):
+    book = get_object_or_404(Book, pk=pk, is_deleted=False)
+    bulb_coordinator = utils.get_bulb_club_for_user(book.submitter).coordinator
+    current_year = StudentClubYear.objects.get_current()
+    instance = Request(requester=request.user, book=book)
+    if request.method == 'POST':
+        form = RequestForm(request.POST, instance=instance)
+        # TODO: In case the user lost thier balance after this form
+        # was shown, no error message will be shown.  Show it?
+        if book.contribution == 'G':
+            balance_test = request.user.book_points.count_total_giving
+        elif book.contribution == 'L':
+            balance_test = request.user.book_points.count_total_lending
+
+        if form.is_valid() and balance_test():
+            book_request = form.save()
+            current_year = StudentClubYear.objects.get_current()
+            Point.objects.create(year=current_year,
+                                 category=book.contribution,
+                                 request=book_request,
+                                 user=request.user,
+                                 value=-1)
+            book.is_available = False
+            book.save()
+            email_context = {'book': book,
+                             'book_request': book_request}
+            my_books_url = reverse('bulb:my_books')
+            my_books_full_url = request.build_absolute_uri(my_books_url)
+            if book_request.delivery == 'I':
+                owner_template = "book_requested_indirectly_to_owner"
+                if bulb_coordinator:
+                    indirect_requests_url = reverse('bulb:indirect_requests')
+                    indirect_requests_full_url = request.build_absolute_uri(indirect_requests_url)
+                    email_context['full_url'] = indirect_requests_full_url
+                    email_context['bulb_coordinator'] = bulb_coordinator
+                    mail.send([bulb_coordinator.email],
+                               template="book_requested_indirectly_to_coordinator",
+                               context=email_context)
+            elif book_request.delivery == 'D':
+                owner_template = "book_requested_directly_to_owner"
+
+            email_context['full_url'] = my_books_full_url
+            mail.send([book.submitter.email],
+                      template=owner_template,
+                      context=email_context)
+            requests_by_me_url = reverse('bulb:requests_by_me')
+            full_url = request.build_absolute_uri(requests_by_me_url)
+            return {"message": "success", "list_url": full_url}            
+
+    elif request.method == 'GET':
+        form = RequestForm(instance=instance)
+
+    return render(request, "bulb/exchange/confirm_book_order.html",
+                  {'book': book, 'form': form})
 
 @login_required
 def show_book(request, pk):
@@ -201,11 +223,20 @@ def delete_book(request, pk):
 
 @decorators.ajax_only
 @login_required
-def add_book(request):
+def add_book(request, contribution):
+
+    if contribution  == 'lend':
+        BookForm = BookLendForm
+        contribution = 'L'
+    elif contribution  == 'give':
+        BookForm = BookGiveForm
+        contribution = 'G'
+
     if request.method == 'POST':
         current_year = StudentClubYear.objects.get_current()
         instance = Book(submitter=request.user,
-                        year=current_year)
+                        year=current_year,
+                        contribution=contribution)
         form = BookForm(request.POST, request.FILES, instance=instance)
         if form.is_valid():
             book = form.save()
@@ -216,7 +247,7 @@ def add_book(request):
         form = BookForm()
 
     context = {'form': form}
-    return render(request, 'bulb/exchange/edit_book.html', context)
+    return render(request, 'bulb/exchange/edit_book_form.html', context)
 
 @decorators.ajax_only
 @login_required
@@ -228,17 +259,17 @@ def edit_book(request, pk):
 
     context = {'book': book}
     if request.method == 'POST':
-        form = BookForm(request.POST, request.FILES, instance=book)
+        form = BookEditForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
             book = form.save()
             show_book_url = reverse('bulb:show_book', args=(book.pk,))
             full_url = request.build_absolute_uri(show_book_url)
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
-        form = BookForm(instance=book)
+        form = BookEditForm(instance=book)
 
     context['form'] = form
-    return render(request, 'bulb/exchange/edit_book.html', context)
+    return render(request, 'bulb/exchange/edit_book_form.html', context)
 
 @login_required
 def requests_by_me(request):
@@ -286,34 +317,63 @@ def pending_request(request):
 
 @decorators.ajax_only
 @login_required
-def list_my_pending_books(request):
-    # My book is pending when the overall status is "pending", and
-    # either 1) No action was taken by me, or 2) I failed to
-    # communicate with the book requester.
-    book_pks = Request.objects.filter(status="", owner_status__in=["", "F"])\
-                              .values_list('book__pk', flat=True)
-    books = Book.objects.current_year().filter(pk__in=book_pks, is_deleted=False)\
-                                       .of_user(request.user).distinct()
+@csrf.csrf_exempt
+def list_my_books(request):
     bulb_coordinator = utils.get_bulb_club_for_user(request.user).coordinator
+    condition = request.POST.get('condition')
+    if condition == 'pending':
+        pks = Request.objects.filter(status="",
+                                     owner_status__in=["", "F"])\
+                          .values_list('book__pk', flat=True)
+    elif condition == 'borrowed':
+        pks = Request.objects.filter(status__in=["", "D"],
+                                     book__contribution="L",
+                                     owner_status="D")\
+                          .values_list('book__pk', flat=True)
+    elif condition == 'done':
+        pks = (Request.objects.filter(book__contribution="G",
+                                      owner_status="D") | \
+               Request.objects.filter(book__contribution="L",
+                                      owner_status="R"))\
+                      .values_list('book__pk', flat=True)
+
+    books = Book.objects.filter(pk__in=pks, is_deleted=False).of_user(request.user).distinct()
+
     context =  {'books': books,
                 'bulb_coordinator': bulb_coordinator}
-    return render(request, 'bulb/exchange/list_my_pending_books.html', context)
+    return render(request, 'bulb/exchange/list_my_books.html', context)    
+
 
 @decorators.ajax_only
 @login_required
-def list_my_pending_requests(request):
-    # My request is pending when the overall status is "pending", and
-    # either 1) No action was taken by me, or 2) I failed to
-    # communicate with the book owner.
-    book_pks = Request.objects.filter(requester=request.user, status="", requester_status__in=["", "F"])\
-                              .values_list('book__pk', flat=True)
-    books = Book.objects.current_year()\
-                        .filter(pk__in=book_pks, is_deleted=False)\
-                        .distinct()
+@csrf.csrf_exempt
+def list_my_requests(request):
     bulb_coordinator = utils.get_bulb_club_for_user(request.user).coordinator
+    condition = request.POST.get('condition')
+    if condition == 'pending':
+        pks = Request.objects.filter(requester=request.user,
+                                     status="",
+                                     requester_status__in=["", "F"])\
+                          .values_list('book__pk', flat=True)
+    elif condition == 'borrowing':
+        pks = Request.objects.filter(requester=request.user,
+                                     status="",
+                                     requester_status="D")\
+                          .values_list('book__pk', flat=True)
+    elif condition == 'done':
+        pks = (Request.objects.filter(requester=request.user,
+                                      book__contribution="G",
+                                      requester_status="D") | \
+               Request.objects.filter(requester=request.user,
+                                      book__contribution="L",
+                                      requester_status="R"))\
+                      .values_list('book__pk', flat=True)
+
+    books = Book.objects.filter(pk__in=pks, is_deleted=False).distinct()
+
     context =  {'books': books,
                 'bulb_coordinator': bulb_coordinator}
-    return render(request, 'bulb/exchange/list_my_pending_requests.html', context)
+    return render(request, 'bulb/exchange/list_direct_requests.html', context)    
 
 @login_required
 def indicators(request):
@@ -325,7 +385,7 @@ def indicators(request):
     book_requests = Request.objects.current_year()
     groups = Group.objects.current_year()
     sessions = Session.objects.current_year()
-    users = User.objects.filter(common_profile__is_student=True, book_points__is_counted=True).annotate(point_count=Count('book_points')).filter(point_count__gte=2)
+    users = User.objects.filter(common_profile__is_student=True, book_points__is_counted=True).annotate(point_count=Count('book_points')).filter(point_count__gte=3)
     book_contributing_male_users = User.objects.filter(common_profile__college__gender='M',
                                                        book_giveaways__isnull=False).distinct().count()
     book_contributing_female_users = User.objects.filter(common_profile__college__gender='F',
@@ -355,6 +415,7 @@ def indicators(request):
 @login_required
 def list_indirect_requests(request):
     if not utils.is_bulb_coordinator_or_deputy(request.user) and \
+       not utils.is_bulb_member(request.user) and \
        not request.user.is_superuser:
         raise PermissionDenied
 
@@ -365,26 +426,68 @@ def list_indirect_requests(request):
         # * for indirect delivery,
         # * have not been acted upon for owner (i.e. not canceled nor given)
         # * have not been canceled nor received by requester.
-        pks = Request.objects.filter(delivery='I',
-                                     owner_status='',
-                                     requester_status='',
-                                     book__submitter__common_profile__college__gender=bulb_club.gender)\
-                             .values_list('book__pk', flat=True)
+        requests = Request.objects.filter(delivery='I',
+                                          owner_status='',
+                                          requester_status='',
+                                          book__submitter__common_profile__college__gender=bulb_club.gender)
         side = 'owner'
     elif condition == 'to_give':
         # Get all requests that are:
         # * for indirect delivery,
         # * have been received from owner,
         # * have not been acted upon for requester (i.e. not canceled nor received)
-        pks = Request.objects.filter(delivery='I',
-                                     owner_status='D',
-                                     requester_status='',
-                                     requester__common_profile__college__gender=bulb_club.gender)\
-                             .values_list('book__pk', flat=True)
+        requests = Request.objects.filter(delivery='I',
+                                          owner_status='D',
+                                          requester_status='',
+                                          requester__common_profile__college__gender=bulb_club.gender)
         side = 'requester'
-    books = Book.objects.filter(pk__in=pks, is_deleted=False).distinct()
+    elif condition == 'to_return_to_owner':
+        # Get all requesters that are:
+        # * for indirect delivery,
+        # * for lending,
+        # * have been returned by the requester but not to the owner
+        requests = Request.objects.filter(delivery='I',
+                                          book__contribution='L',
+                                          requester_status='R',
+                                          owner_status='D',
+                                          borrowing_end_date__lte=timezone.now(),
+                                          book__submitter__common_profile__college__gender=bulb_club.gender)
+        side = 'owner'
+    elif condition == 'to_claim_from_requester':
+        # Get all requesters that are:
+        # * for indirect delivery,
+        # * for lending,
+        # * haven't been returned by the requesters,
+        requests = Request.objects.filter(delivery='I',
+                                          book__contribution='L',
+                                          requester_status='D',
+                                          borrowing_end_date__lte=timezone.now(),
+                                          requester__common_profile__college__gender=bulb_club.gender)
+        side = 'owner'
+    elif condition == 'done':
+        # Get all requesters that are:
+        # * for indirect delivery,
+        # * either the requester's status is done and the requester's gender is the same as the bulb's,
+        # * or the owner's status is done and the owner's gender is the same as bulb's.
+        # * exclude requests that are supposed to be in the claim/return lists. 
+        requests = Request.objects.filter(delivery='I',
+                                          owner_status='D',
+                                           book__submitter__common_profile__college__gender=bulb_club.gender)\
+                                  .exclude(book__contribution='L',
+                                           borrowing_end_date__lte=timezone.now()) | \
+                   Request.objects.filter(delivery='I',
+                                          requester_status='D',
+                                          requester__common_profile__college__gender=bulb_club.gender)\
+                                  .exclude(book__contribution='L',
+                                           borrowing_end_date__lte=timezone.now()) | \
+                   Request.objects.filter(delivery='I',
+                                          book__contribution='L',
+                                          status='R',
+                                          requester__common_profile__college__gender=bulb_club.gender)
 
-    context = {'books': books,
+        side = None
+
+    context = {'requests': requests,
                'bulb_club': bulb_club,
                'side': side}
 
@@ -393,6 +496,7 @@ def list_indirect_requests(request):
 @login_required
 def indirect_requests(request):
     if not utils.is_bulb_coordinator_or_deputy(request.user) and \
+       not utils.is_bulb_member(request.user) and \
        not request.user.is_superuser:
         raise PermissionDenied
 
@@ -423,7 +527,7 @@ def control_request(request):
                      'bulb_coordinator': bulb_coordinator}
 
     if action.startswith('owner_'):
-        if not utils.can_edit_book(request.user, book):
+        if not utils.can_edit_owner_status(request.user, book):
             raise Exception(u"لا يمكنك اتخاذ إجراء باسم صاحب الكتاب.")
         if action == 'owner_done':
             book.is_available = False
@@ -443,6 +547,20 @@ def control_request(request):
             # If no previous points have been created (i.e. by
             # requester's confirmation), create one.
             book_request.create_related_points()
+
+        elif action == 'owner_returned':
+            book.is_available = True
+            book_request.owner_status = 'R'
+            book_request.owner_status_date = timezone.now()
+            # If the book requester had already confirmed returning
+            # the book, consider the reuqest returned.  Otherwise,
+            # keep it pending (to be shown in the requester's pending
+            # requests list).  In that case, when seven days have
+            # passed since the request was submitted, a cron job would
+            # mark it as done (to be removed from the requester's
+            # pending requests list).
+            if book_request.requester_status == 'R':
+                book_request.status = 'R'
 
         elif action == 'owner_failed':
             book_request.owner_status = 'F'
@@ -503,9 +621,7 @@ def control_request(request):
                           template="indirect_book_request_canceled_to_coordinator",
                           context=email_context)
     elif action.startswith('requester_'):
-        if not request.user == book_request.requester and \
-           not request.user.is_superuser and \
-           not utils.is_bulb_coordinator_or_deputy(request.user):
+        if not utils.can_edit_requester_status(user, book_request):
             raise Exception(u"لا يمكنك اتخاذ إجراء باسم مقدم الطلب.")
 
         if action == 'requester_done':
@@ -525,7 +641,21 @@ def control_request(request):
             # If no previous points have been created (i.e. by
             # requester's confirmation), create one.
             book_request.create_related_points()
-            
+
+        elif action == 'requester_returned':
+            book.is_available = True
+            book_request.requester_status = 'R'
+            book_request.requester_status_date = timezone.now()
+            # If the book requester had already confirmed returning
+            # the book, consider the reuqest returned.  Otherwise,
+            # keep it pending (to be shown in the requester's pending
+            # requests list).  In that case, when seven days have
+            # passed since the request was submitted, a cron job would
+            # mark it as done (to be removed from the requester's
+            # pending requests list).
+            if book_request.owner_status == 'R':
+                book_request.status = 'R'
+
         elif action == 'requester_failed':
             book_request.requester_status = 'F'
             book_request.requester_status_date = timezone.now()

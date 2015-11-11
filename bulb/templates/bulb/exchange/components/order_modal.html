@@ -12,18 +12,50 @@
             keyboard: false,
             backdrop: 'static',
         });
-        $('#confirm-order-modal button.confirm').click(function() {
-            var delivery_type = $("#confirm-order-modal .confirm").data('delivery');
-            var pk = $(".order-option").data('pk');
-            $("#order-book-modal .modal-body").load("{% url 'bulb:order_instructions' %}", {pk: pk, delivery_type: delivery_type}{% if from_category %}, loadBooks{% endif %});
-            $('button.order-book[data-pk=' + pk + ']').hide();
-            $("#confirm-order-modal").modal('hide');
-            // If we are in the book details page, we need to hide the order option after one order has been submitted.
+
+        // modify form submission behaviour to be ajaxy
+        $("form#confirm-order-form").submit(function (event) {
+            /* stop form from submitting normally */
+            event.preventDefault();
+
+            /* get some values from elements on the page: */
+            var formData = new FormData($(this)[0]); 
+            var confirm_url = $(".order-option").data('confirm-url');
+
+            /* Send the data */
+            $.ajax({
+                url: confirm_url,
+                type: 'POST',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    if (data.message == "success") {
+                        // show success message (using toastr)
+                        toastr.options.positionClass = "toast-top-left";
+                        toastr.success("طلبت الكتاب بنجاح.");
+                        $("#confirm-order-modal").modal('hide');
+                        var instruction_url = $(".order-option").data('instruction-url');
+                        $("#order-book-modal .modal-body").load(instruction_url{% if from_category %}, loadBooks{% endif %});
+                        $("#order-book-modal").on("hidden.bs.modal", function(){
+                            window.location.href= data.list_url;
+                        });
+                    } else {
+                        $("#confirm-order-form .modal-body").html(data);
+                        $("#id_borrowing_end_date").attr('data-start-view', '1').datepicker({isRTL: true, minDate: 1{% if book.available_until %},maxDate: new Date({{ book.available_until.year }}, {{ book.available_until.month }} - 1, {{ book.available_until.day }}){% endif %}});
+                    }}
+            });
+        });     
+        
+
+        $('#confirm-order-modal .confirm').click(function() {
+            // Confirmation button should trigger form submission.
+            $("form#confirm-order-form").submit();
         });
     });
-
     
-// This sill allow overlapping modals.
+// This allows overlapping modals.
 $(document).on('show.bs.modal', '.modal', function () {
     var zIndex = 1040 + (10 * $('.modal:visible').length);
     $(this).css('z-index', zIndex);
@@ -46,10 +78,6 @@ $(document).on('show.bs.modal', '.modal', function () {
       <div class="modal-body ativa-scroll">
         {% include "media/polls/ajax-loader.html" %}
       </div>
-      <div class="modal-footer">
-        <!--<button type="button" class="btn btn-default" data-dismiss="modal">أغلق</button>
-        <button type="button" class="btn btn-primary" id="submit-button">احفظ</button>-->
-      </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
@@ -62,12 +90,15 @@ $(document).on('show.bs.modal', '.modal', function () {
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">تأكيد الطلب</h4>
       </div>
-      <div class="modal-body">
-        <p>هل تريد تأكيد هذا الطلب؟</p>
-      </div>
+      <form id="confirm-order-form" action="post">
+        <div class="modal-body">
+          {% include "media/polls/ajax-loader.html" %}
+        </div>
+      </form>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">ألغِ</button>
-        <button type="button" class="btn btn-primary confirm">أكّد</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">ألغِ</button>
+          <button type="button" class="btn btn-primary confirm">أكّد</button>
+      </div>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

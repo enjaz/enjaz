@@ -3,6 +3,7 @@ from datetime import timedelta
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
 
 from core.models import StudentClubYear
 from bulb.managers import BookQuerySet, RequestQuerySet, PointQuerySet, GroupQuerySet, SessionQuerySet, MembershipQuerySet
@@ -40,6 +41,16 @@ class Book(models.Model):
     condition = models.CharField(max_length=2, verbose_name=u"حالة الكتاب",
                                  choices=condition_choices,
                                  help_text=u"هل من صفحات ناقصة أو ممزقة مثلا؟")
+    contribution_choices = (
+        ('L', u'إعارة'),
+        ('G', u'اقتناء'),
+    )
+    contribution = models.CharField(max_length=1, default='G',
+                                    verbose_name=u"نوع المساهمة",
+                                    choices=contribution_choices)
+    available_until = models.DateField(u"متاح حتى",
+                                      null=True, blank=True,
+                                      help_text=u"الكتاب متاح للاستعارة حتى تاريخ محدد (اختياري)")
     description = models.TextField(verbose_name=u"وصف الكتاب")
     submitter = models.ForeignKey(User,
                                   related_name='book_giveaways')
@@ -61,7 +72,10 @@ class Book(models.Model):
 
 
     def last_pending_request(self):
-        pending_requests = self.request_set.filter(status="").order_by('-submission_date')
+        if self.contribution == 'L':
+            pending_requests = self.request_set.filter(status="D").order_by('-submission_date')
+        elif self.contribution == 'G':
+            pending_requests = self.request_set.filter(status="").order_by('-submission_date')
         if pending_requests.exists():
             return pending_requests.first()
 
@@ -82,10 +96,11 @@ class Request(models.Model):
                                 choices=delivery_choices)
     status_choices = (
         ('', u'معلقة'),
-        ('D', u'تم'),
+        ('D', u'سلم لطالبه'),
         ('F', u'تعذّر'),
-        ('C', u'ملغى')
-        )
+        ('C', u'ملغى'),
+        ('R', u'أعيد بعد الإعارة'),
+    )
     status = models.CharField(max_length=1, verbose_name=u"الحالة العامة",
                               choices=status_choices, default="",
                               blank=True)
@@ -101,6 +116,9 @@ class Request(models.Model):
     owner_status_date = models.DateTimeField(u"تاريخ تأكيد صاحب الكتاب",
                                              blank=True, default=None,
                                              null=True)
+    borrowing_end_date = models.DateField(u"تاريخ انتهاء مدة الإعارة",
+                                          blank=True, default=None,
+                                          null=True)
     objects = RequestQuerySet.as_manager()
 
     def get_expected_delivery_date(self):
@@ -122,6 +140,7 @@ class Request(models.Model):
                                             is_counted=True)
         if not owner_points.exists():
             Point.objects.create(year=current_year,
+                                 category=self.book.contribution,
                                  request=self,
                                  user=self.book.submitter,
                                  value=1)
@@ -129,10 +148,15 @@ class Request(models.Model):
                                                 user=self.requester,
                                                 is_counted=True)
         if not requester_points.exists():
+            print self.book.contribution
             Point.objects.create(year=current_year,
+                                 category=self.book.contribution,
                                  request=self,
                                  user=self.requester,
                                  value=-1)
+
+    def is_due_returning(self):
+        return timezone.now().date() >= self.borrowing_end_date
 
     def __unicode__(self):
         return self.book.title
@@ -147,6 +171,13 @@ class Point(models.Model):
                                 verbose_name=u"الطلب")
     user = models.ForeignKey(User, verbose_name=u"المستخدم",
                              related_name="book_points")
+    category_choices = (
+        ('L', u'استعارة'),
+        ('G', u'اقتناء'),
+    )
+    category = models.CharField(u"التصنيف", max_length=1,
+                                choices=category_choices,
+                                default="G")
     is_counted = models.BooleanField(u"محسوبة؟", default=True)
     note = models.CharField(u"ملاحظة", max_length=50,
                             blank=True, default="")
@@ -178,7 +209,7 @@ class Group(models.Model):
                                     limit_choices_to={'common_profile__is_student':
                                                         True})
     gender_choices = (
-        ('', u'الطلاب والطالبات'),
+        #('', u'الطلاب والطالبات'),
         ('F', u'الطالبات'),
         ('M', u'الطلاب'),
         )
@@ -209,6 +240,10 @@ class Group(models.Model):
             return self.session_set.order_by('-date').first()
         except Session.DoesNotExist:
             return
+
+    def get_has_recent_sessions(self):
+        three_weeks_ago = timezone.now().date() - timedelta(21)
+        return self.session_set.filter(date__gte=three_weeks_ago).exists()
 
     def get_report_count(self):
         return Report.objects.filter(session__group=self).count()

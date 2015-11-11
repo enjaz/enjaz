@@ -11,26 +11,17 @@
 </style>
 {% include "bulb/exchange/components/critical_buttons.html" %}
 <h1>تقرير {% if user != bulb_user %}رصيد {{ bulb_user.common_profile.get_ar_full_name }}{% else %}رصيدك{% endif %}</h1>
-<table id="points" class="datatable display">
-    <thead>
-      <tr>
-        <th>التاريخ</th>
-        <th>الكتاب</th>
-        <th>القيمة</th>
-        <th>التفاصيل</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for point in bulb_user.book_points.current_year.counted %}
-        <tr>
-            <td data-order="{{ point.submission_date|date:"U" }}">{{ point.submission_date }}</td>
-            <td>{% if point.request %}<a href="{% url 'bulb:show_book' point.request.book.pk %}">{{ point.request.book.title }}</a>{% else %}-{% endif %}</td>
-            <td>{{ point.value }}</td>
-            <td>{{ point.get_details }}</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<h2 id="giving">رصيد الاقتناء</h2>
+<p>من خلال هذا الرصيد يمكنك اقناء أيٍ من الكتب المعروضة في سِراج.</p>
+{% with points=bulb_user.book_points.current_year.counted.giving %}
+    {% include 'bulb/exchange/partials/balance_table.html' %}
+{% endwith %}
+
+<h2 id="lending">رصيد الاستعارة</h2>
+<p>من خلال هذا الرصيد يمكنك استعارة أيٍ من الكتب المعروضة في سِراج.</p>
+{% with points=bulb_user.book_points.current_year.counted.lending %}
+    {% include 'bulb/exchange/partials/balance_table.html' %}
+{% endwith %}
 {% endblock %}
 {% block customscript %}
 <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
@@ -38,7 +29,7 @@
 <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 <script>
 $(function () {
-	$('#points').DataTable({
+	$('.datatable').DataTable({
         "order": [[ 0, "desc" ]],
         "language": {% include 'js/dataTables-arabic.json' %}
     });

@@ -27,7 +27,8 @@ def index(request):
     group_count = Group.objects.current_year().undeleted().count()
     group_user_count = (User.objects.filter(reading_group_memberships__isnull=False) | \
                         User.objects.filter(reading_group_coordination__isnull=False)).distinct().count()
-    books = Book.objects.current_year().available().order_by("?")[:6]
+    book_sample = Book.objects.current_year().available().order_by("?")[:6]
+    latest_books = Book.objects.current_year().available().order_by("-submission_date")[:5]
     book_count = Book.objects.current_year().available().count()
     book_request_count = Request.objects.current_year().count()
     reader_profiles = ReaderProfile.objects.order_by("?")[:10]
@@ -35,7 +36,8 @@ def index(request):
     context = {'groups': groups, 'group_count': group_count,
                'group_user_count': group_user_count,
                'sessions': sessions,
-               'books': books, 'book_count': book_count,
+               'book_sample': book_sample, 'latest_books': latest_books,
+               'book_count': book_count,
                'book_request_count': book_request_count,
                'reader_profiles': reader_profiles,
                'reader_profile_count': reader_profile_count}

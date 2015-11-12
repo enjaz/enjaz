@@ -73,7 +73,7 @@ class Book(models.Model):
 
     def last_pending_request(self):
         if self.contribution == 'L':
-            pending_requests = self.request_set.filter(status="D").order_by('-submission_date')
+            pending_requests = self.request_set.filter(status__in=["", "D"]).order_by('-submission_date')
         elif self.contribution == 'G':
             pending_requests = self.request_set.filter(status="").order_by('-submission_date')
         if pending_requests.exists():

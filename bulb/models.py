@@ -79,6 +79,12 @@ class Book(models.Model):
         if pending_requests.exists():
             return pending_requests.first()
 
+    def is_within_availability_period(self):
+        if self.available_until:
+            return self.available_until > timezone.now().date()
+        else:
+            return True
+
     def __unicode__(self):
         return self.title
 

@@ -28,7 +28,7 @@ def index(request):
     group_user_count = (User.objects.filter(reading_group_memberships__isnull=False) | \
                         User.objects.filter(reading_group_coordination__isnull=False)).distinct().count()
     book_sample = Book.objects.current_year().available().order_by("?")[:6]
-    latest_books = Book.objects.current_year().available().order_by("-submission_date")[:5]
+    latest_books = Book.objects.current_year().undeleted().order_by("-submission_date")[:6]
     book_count = Book.objects.current_year().available().count()
     book_request_count = Request.objects.current_year().count()
     reader_profiles = ReaderProfile.objects.order_by("?")[:10]
@@ -315,7 +315,7 @@ def pending_request(request):
     book_request = get_object_or_404(Request, pk=pk)
 
     return render(request, 'bulb/exchange/pending_request.html',
-                  {'book': book_request.book})
+                  {'book_request': book_request})
 
 @decorators.ajax_only
 @login_required
@@ -353,27 +353,21 @@ def list_my_requests(request):
     bulb_coordinator = utils.get_bulb_club_for_user(request.user).coordinator
     condition = request.POST.get('condition')
     if condition == 'pending':
-        pks = Request.objects.filter(requester=request.user,
-                                     status="",
-                                     requester_status__in=["", "F"])\
-                          .values_list('book__pk', flat=True)
+        requests = Request.objects.filter(requester=request.user,
+                                          status="",
+                                          requester_status__in=["", "F"])
     elif condition == 'borrowing':
-        pks = Request.objects.filter(requester=request.user,
-                                     status="",
-                                     requester_status="D")\
-                          .values_list('book__pk', flat=True)
+        requests = Request.objects.filter(requester=request.user,
+                                          status="", requester_status="D")
     elif condition == 'done':
-        pks = (Request.objects.filter(requester=request.user,
-                                      book__contribution="G",
-                                      requester_status="D") | \
-               Request.objects.filter(requester=request.user,
-                                      book__contribution="L",
-                                      requester_status="R"))\
-                      .values_list('book__pk', flat=True)
+        requests = Request.objects.filter(requester=request.user,
+                                          book__contribution="G",
+                                          requester_status="D") | \
+                   Request.objects.filter(requester=request.user,
+                                          book__contribution="L",
+                                          requester_status="R")
 
-    books = Book.objects.filter(pk__in=pks, is_deleted=False).distinct()
-
-    context =  {'books': books,
+    context =  {'requests': requests,
                 'bulb_coordinator': bulb_coordinator}
     return render(request, 'bulb/exchange/list_direct_requests.html', context)    
 
@@ -623,7 +617,7 @@ def control_request(request):
                           template="indirect_book_request_canceled_to_coordinator",
                           context=email_context)
     elif action.startswith('requester_'):
-        if not utils.can_edit_requester_status(user, book_request):
+        if not utils.can_edit_requester_status(request.user, book_request):
             raise Exception(u"لا يمكنك اتخاذ إجراء باسم مقدم الطلب.")
 
         if action == 'requester_done':

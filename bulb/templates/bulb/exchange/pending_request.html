@@ -2,8 +2,8 @@
 <div class="col-sm-2 vcenter">
     <div class="screenshot">
         <div style="text-align: center; border-left: solid 1px #eee;">
-            <a class="book-image" style="background-image:url('{{ book.cover.url }}');" href="{% url 'bulb:show_book' book.pk %}"></a>
-            <a href="{% url 'bulb:show_book' book.pk %}">{{ book.title }}</a>
+            <a class="book-image" style="background-image:url('{{ book_request.book.cover.url }}');" href="{% url 'bulb:show_book' book_request.book.pk %}"></a>
+            <a href="{% url 'bulb:show_book' book_request.book.pk %}">{{ book_request.book.title }}</a>
         </div>
     </div>
 </div>
@@ -12,99 +12,99 @@
     <table class="table table-hover">
         <tr>
             <th>الاسم</th>
-            <td>{{ book.submitter.common_profile.get_ar_full_name }}</td>
+            <td>{{ book_request.book.submitter.common_profile.get_ar_full_name }}</td>
         </tr>
         <tr>
             <th>الكلية</th>
-            <td>{{ book.submitter.common_profile.college.get_name_display }}</td>
+            <td>{{ book_request.book.submitter.common_profile.college.get_name_display }}</td>
         </tr>
-        {% if book.last_pending_request.delivery == 'D' %}
+        {% if book_request.delivery == 'D' %}
         <tr>
             <th>البريد</th>
-            <td class="english-field"><a href="mailto:{{ book.submitter.email }}">{{ book.submitter.email }}</a></td>
+            <td class="english-field"><a href="mailto:{{ book_request.book.submitter.email }}">{{ book_request.book.submitter.email }}</a></td>
         </tr>
         <tr>
             <th>رقم الجوال</th>
-            <td>{{ book.submitter.common_profile.mobile_number }}</td>
+            <td>{{ book_request.book.submitter.common_profile.mobile_number }}</td>
         </tr>
         {% endif %}
-        {% if book.last_pending_request.borrowing_end_date %}
+        {% if book_request.borrowing_end_date %}
         <tr>
             <th>تاريخ انتهاء مدة الاستعارة</th>
-            <td>{{ book.last_pending_request.borrowing_end_date|date:"l j F" }}</td>
+            <td>{{ book_request.borrowing_end_date|date:"l j F" }}</td>
         </tr>
         {% endif %}
         <tr>
             <th>تاريخ الطلب</th>
-            <td>{{ book.last_pending_request.submission_date|date:"l j F" }}</td>
+            <td>{{ book_request.submission_date|date:"l j F" }}</td>
         </tr>
     </table>
 </div>
 <div class="col-sm-5 vcenter">
-    {% if book.last_pending_request.delivery == 'D' %}
-        {% if book.last_pending_request.requester_status == 'F' %}
+    {% if book_request.delivery == 'D' %}
+        {% if book_request.requester_status == 'F' %}
         <p class="alert alert-danger">
-            حاولتَ التواصل مع صاحب الكتاب دون نجاح. إذا تعذّر التواصل بينكما فسيلغى الطلب يوم {{ book.last_pending_request.get_cancellation_date|date:"l j F" }}.
+            حاولتَ التواصل مع صاحب الكتاب دون نجاح. إذا تعذّر التواصل بينكما فسيلغى الطلب يوم {{ book_request.get_cancellation_date|date:"l j F" }}.
         </p>
-        {% elif book.last_pending_request.owner_status == 'F' %}
+        {% elif book_request.owner_status == 'F' %}
         <p class="alert alert-danger">
-            حاول صاحب الكتاب التواصل معك دون أن ينجح فيه ذلك.  إذا تعذّر التواصل بينكما فسيلغى الطلب يوم {{ book.last_pending_request.get_cancellation_date|date:"l j F" }}.
+            حاول صاحب الكتاب التواصل معك دون أن ينجح فيه ذلك.  إذا تعذّر التواصل بينكما فسيلغى الطلب يوم {{ book_request.get_cancellation_date|date:"l j F" }}.
         </p>
-        {% elif book.last_pending_request.requester_status == '' %}
+        {% elif book_request.requester_status == '' %}
         <p class="alert alert-warning">
-            تواصل مع {{ book.submitter.common_profile.ar_first_name }}. ينبغي إنجاز الطلب قبل {{ book.last_pending_request.get_expected_delivery_date|date:"l j F" }} لتفادي إلغائه.
+            تواصل مع {{ book_request.book.submitter.common_profile.ar_first_name }}. ينبغي إنجاز الطلب قبل {{ book_request.get_expected_delivery_date|date:"l j F" }} لتفادي إلغائه.
         </p>
-        {% elif book.last_pending_request.requester_status == 'D' and book.contribution == 'L' %}
-            {% if book.last_pending_request.is_due_returing %}
+        {% elif book_request.requester_status == 'D' and book_request.book.contribution == 'L' %}
+            {% if book_request.is_due_returing %}
             <p class="alert alert-danger">
-                حان موعد تسليم الكتاب! تواصل مع {{ book.submitter.common_profile.ar_first_name }}.
+                حان موعد تسليم الكتاب! تواصل مع {{ book_request.book.submitter.common_profile.ar_first_name }}.
             </p>
             {% else %}
             <p class="alert alert-warning">
-                أعد الكتاب إلى {{ book.submitter.common_profile.ar_first_name }} قبل {{ book.last_pending_request.borrowing_end_date|date:"l j F" }}.
+                أعد الكتاب إلى {{ book_request.book.submitter.common_profile.ar_first_name }} قبل {{ book_request.borrowing_end_date|date:"l j F" }}.
             </p>
             {% endif %}
         {% endif %}
-        {# Show the following button in case of no previous action, failed previous attempt or returned borrowed book. #}
-        {% if book.last_pending_request.requester_status == '' or book.last_pending_request.requester_status == 'F' %}
-        <button data-pk="{{ book.last_pending_request.pk }}" class="done btn-block btn-icon btn btn-success">
+        {# Show the following button in case of no previous action, failed previous attempt or returned borrowed book_request.book. #}
+        {% if book_request.requester_status == '' or book_request.requester_status == 'F' %}
+        <button data-pk="{{ book_request.pk }}" class="done btn-block btn-icon btn btn-success">
             <i class="entypo-flag"></i>
             سُلّم الكتاب
         </button>
-        {% elif book.last_pending_request.requester_status == 'D' and book.contribution == 'L' %}
-        <button data-pk="{{ book.last_pending_request.pk }}" class="returned btn-block btn-icon btn btn-success">
+        {% elif book_request.requester_status == 'D' and book_request.book.contribution == 'L' %}
+        <button data-pk="{{ book_request.pk }}" class="returned btn-block btn-icon btn btn-success">
             <i class="entypo-flag"></i>
             أعيد الكتاب
         </button>
         {% endif %}
-        {% if book.last_pending_request.requester_status == '' %}
-        <button data-pk="{{ book.last_pending_request.pk }}" class="failed btn-block btn-icon btn btn-warning">
+        {% if book_request.requester_status == '' %}
+        <button data-pk="{{ book_request.pk }}" class="failed btn-block btn-icon btn btn-warning">
             <i class="fa fa-exclamation-circle"></i>
             تعذّر التواصل
         </button>
         {% endif %}
-        {% if book.last_pending_request.requester_status == '' or book.last_pending_request.requester_status == 'F' %}
-        <button data-pk="{{ book.last_pending_request.pk }}" class="canceled btn-block btn-icon btn btn-danger">
+        {% if book_request.requester_status == '' or book_request.requester_status == 'F' %}
+        <button data-pk="{{ book_request.pk }}" class="canceled btn-block btn-icon btn btn-danger">
             <i class="fa fa-times"></i>
             ألغِ الطلب
         </button>
         {% endif %}
-    {% elif book.last_pending_request.delivery == 'I' %}
-        {% if book.last_pending_request.requester_status == 'D' and book.contribution == 'L' %}
-            {% if book.last_pending_request.is_due_returing %}
+    {% elif book_request.delivery == 'I' %}
+        {% if book_request.requester_status == 'D' and book_request.book.contribution == 'L' %}
+            {% if book_request.is_due_returing %}
             <p class="alert alert-danger">
                 حان موعد تسليم الكتاب! تواصل مع مُنسّق سراج {{ bulb_coordinator.common_profile.get_ar_full_name }} لإعادة الكتاب.
             </p>
             {% else %}
             <p class="alert alert-warning">
-                تواصل مع مُنسّق سراج {{ bulb_coordinator.common_profile.get_ar_full_name }} لإعادة الكتاب قبل {{ book.last_pending_request.borrowing_end_date|date:"l j F" }}.
+                تواصل مع مُنسّق سراج {{ bulb_coordinator.common_profile.get_ar_full_name }} لإعادة الكتاب قبل {{ book_request.borrowing_end_date|date:"l j F" }}.
             </p>
             {% endif %}
-        {% elif book.last_pending_request.requester_status != 'D' %}
+        {% elif book_request.requester_status != 'D' %}
         <p class="alert alert-warning">
         طلبتَ <strong>الإيصال عبر فريق سِراج</strong>. سيتواصل معكَ مُنسّق سِراج {{ bulb_coordinator.common_profile.get_ar_full_name }} فور حصوله على الكتاب.
         </p>
-        <button data-pk="{{ book.last_pending_request.pk }}" class="canceled btn-block btn-icon btn btn-danger">
+        <button data-pk="{{ book_request.pk }}" class="canceled btn-block btn-icon btn btn-danger">
             <i class="fa fa-times"></i>
             ألغِ الطلب
         </button>

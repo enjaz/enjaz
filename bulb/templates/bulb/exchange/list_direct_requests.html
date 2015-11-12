@@ -1,5 +1,5 @@
-{% for book in books %}
-<div style="display: flex;" id="pending-{{ book.last_pending_request.pk }}" class="row">
+{% for book_request in requests %}
+<div style="display: flex;" id="pending-{{ book_request.pk }}" class="row">
     {% include "bulb/exchange/pending_request.html" %}
 </div>
 {% if not forloop.last %}

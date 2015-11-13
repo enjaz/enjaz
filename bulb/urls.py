@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     # Books exchange
     url(r'^exchange/$', views.list_book_categories, name="list_book_categories"),
     url(r'^exchange/category/(?P<code_name>[\w_]+)/$', views.show_category, name="show_category"),
+    url(r'^exchange/books/by_date/$', views.books_by_date, name="books_by_date"),
     url(r'^exchange/books/list/(?P<source>(?:user|category))/(?P<name>[\d\w_]+)/$', views.list_book_previews, name="list_book_previews"),
     url(r'^exchange/books/add/intro/$', TemplateView.as_view(template_name='bulb/exchange/add_book_introduction.html'), name="add_book_introduction"),
     url(r'^exchange/books/add/(?P<contribution>(?:lend|give))/$', views.add_book, name="add_book"),

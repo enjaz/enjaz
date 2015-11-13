@@ -29,7 +29,7 @@ def index(request):
                         User.objects.filter(reading_group_coordination__isnull=False)).distinct().count()
     book_sample = Book.objects.current_year().available().order_by("?")[:6]
     latest_books = Book.objects.current_year().undeleted().order_by("-submission_date")[:6]
-    book_count = Book.objects.current_year().available().count()
+    book_count = Book.objects.current_year().undeleted().count()
     book_request_count = Request.objects.current_year().count()
     reader_profiles = ReaderProfile.objects.order_by("?")[:10]
     reader_profile_count = ReaderProfile.objects.count()
@@ -54,6 +54,12 @@ def list_book_categories(request):
     context = {'categories': categories}
     return render(request, "bulb/exchange/list_categories.html",
                   context)
+
+@login_required
+def books_by_date(request):
+    books =  Book.objects.current_year().undeleted().order_by("-submission_date")
+    return render(request, "bulb/exchange/books_by_date.html",
+                  {'books': books})
 
 @login_required
 def show_category(request, code_name):

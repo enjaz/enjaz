@@ -1,0 +1,53 @@
+{% load bootstrap3 %}
+<form enctype="multipart/form-data" id="edit-feedback-form" action="post">
+{% csrf_token %}
+{% bootstrap_form form %}
+</form>
+<script type="text/javascript">
+$(function () {
+
+    // modify form submission behaviour to be ajaxy
+    $("form#edit-feedback-form").submit(function (event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var formData = new FormData($(this)[0]); 
+        {% if feedback %}{# if a feedback is passed, then post to edit_feedback url, otherwise to add_feedback #}
+        var url = "{% url 'studentguide:edit_feedback' feedback.guide.pk feedback.pk %}";
+        {% else %}
+        var url = "{% url 'studentguide:add_feedback' guide.pk %}";
+        {% endif %}
+
+        /* Send the data */
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (data) {
+                if (data.message == "success") {
+
+                    // show success message (using toastr)
+                    toastr.options.positionClass = "toast-top-left";
+                    {% if feedback %}
+                    toastr.success("عدلت ملاحظاتك عن الإرشاد الطلابي بنجاح.");
+                    {% else %}
+                    toastr.success("أرسلت ملاحظة عن الإرشاد الطلابي بنجاح.");
+                    {% endif %}
+
+                    // hide modal
+                    $("#edit-feedback-modal").modal('hide');
+                     window.location.href= data.show_url;
+                } else {
+                    $("#edit-feedback-modal .modal-body").html(data);
+                }}
+        });
+
+    });
+});
+</script>

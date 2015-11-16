@@ -1,0 +1,41 @@
+<div class="modal fade" id="confirm-delete-report-modal">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">حذف تقرير</h4>
+      </div>
+      <div class="modal-body">
+          هل أنت متأكد أنك تريد حذف هذا التقرير
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">ألغِ</button>
+        <button id="delete-report" type="button" class="btn btn-danger confirm">أكّد</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script type="text/javascript">
+$(function() {
+    $("#confirm-delete-report").click(function(){
+        $("#confirm-delete-report-modal").modal('show');
+    });
+    $("#delete-report").click(function () {
+        /* Send the data using post */
+        var posting = $.post("{% url 'studentguide:delete_report' report.guide.pk report.pk %}");
+        posting.done(function (data) {
+            if (data.message == "success") {
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                toastr.info("حُذف التقرير بنجاح.");
+                
+                // return to the book list page.
+                window.location.href = data.list_url;
+            } else {
+                $('#confirm-delete-book-modal .modal-body').html(data);
+            }
+        });
+    });
+});
+</script>

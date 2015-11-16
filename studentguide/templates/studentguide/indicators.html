@@ -1,0 +1,149 @@
+{% extends "studentguide_base.html" %}{% load staticfiles %}
+{% block title %}المؤشرات{% endblock %}
+
+{% block content %}
+<h1>مؤشرات المرشد الطلابي</h1>
+<div class="row">
+    <div class="col-xs-12">
+            <h3>المرشدون الطلابيون</h3>
+            <table id="guides" class="table datatable">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>الكلية</th>
+                        <th># طلبات الإرشاد المعتمدة</th>
+                        <th># طلبات الإرشاد المعلقة</th>
+                        <th># المحاضر</th>
+                        <th>آخر تقرير</th>
+                        <th>متاح؟</th>
+                        <th>تاريخ الإضافة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for guide in guides %}
+                    <tr>
+                        <td><a href="{% url 'studentguide:show_guide' guide.pk %}">{{ guide.user.common_profile.get_ar_full_name }}</a></td>
+                        <td>{{ guide.user.common_profile.college.get_name_display }}</td>
+                        <td><a href="{% url 'studentguide:list_guide_requests' guide.pk %}">{{ guide.guide_requests.accepted.count }}</a></td>
+                        <td><a href="{% url 'studentguide:list_guide_requests' guide.pk %}">{{ guide.guide_requests.pending.count }}</a></td>
+                        <td><a href="{% url 'studentguide:list_reports' guide.pk %}">{{ guide.report_set.count }}</a></td>
+                        {% if guide.get_last_report %}
+                        <td data-order="{{ guide.get_last_report.date|date:"U" }}">{{ guide.get_last_report.submission_date|date:"j F Y" }}</td>
+                        {% else %}
+                        <td>لا يوجد</td>
+                        {% endif %}
+                        <td>{% if guide.is_available %}نعم{% else %}لا{% endif %}</td>
+                        <td data-order="{{ guide.submission_date|date:"U" }}">{{ guide.submission_date|date:"j F Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+            <h3>التقارير</h3>
+            <table id="reports" class="table datatable">
+                <thead>
+                    <tr>
+                        <th>المرشد</th>
+                        <th>تاريخ الإضافة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports.undeleted %}
+                    <tr>
+                        <td><a href="{% url 'studentguide:show_guide' report.guide.pk %}">{{ report.guide.user.common_profile.get_ar_full_name }}</a></td>
+                        <td data-order="{{ report.submission_date|date:"U" }}"><a href="{% url 'studentguide:show_report' report.guide.pk report.pk %}">{{ report.submission_date|date:"j F Y" }}</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+            <h3>طلبات الإرشاد</h3>
+            <table id="requests" class="table datatable">
+                <thead>
+                    <tr>
+                        <th>مقدم الطلب</th>
+                        <th>المرشد</th>
+                        <th>حالة مقدم الطلب</th>
+                        <th>حالة المرشد</th>
+                        <th>تاريخ الإضافة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for guide_request in requests %}
+                    <tr>
+                        <td>{{ guide_request.user.common_profile.get_ar_full_name }}</td>
+                        <td><a href="{% url 'studentguide:show_guide' guide_request.guide.pk %}">{{ guide_request.guide.user.common_profile.get_ar_full_name }}</a></td>
+                        <td>{{ guide_request.get_requester_status_display }}</td>
+                        <td>{{ guide_request.get_guide_status_display }}</td>
+                        <td data-order="{{ guide_request.submission_date|date:"U" }}">{{ guide_request.submission_date|date:"j F Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+            <h3>التغذية الراجعة</h3>
+            <table id="feedback" class="table datatable">
+                <thead>
+                    <tr>
+                        <th>تاريخ الإضافة</th>
+                        <th>المرسل</th>
+                        <th>المرشد</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in feedback %}
+                    <tr>
+                        <td data-order="{{ post.submission_date|date:"U" }}"><a href="{% url 'studentguide:show_feedback' post.guide.pk post.pk %}">{{ post.submission_date|date:"j F Y" }}</a></td>
+                        <td>{{ post.submitter.common_profile.get_ar_full_name }}</td>
+                        <td><a href="{% url 'studentguide:show_guide' post.guide.pk %}">{{ post.guide.user.common_profile.get_ar_full_name }}</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>
+</div>
+{% endblock %}
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'css/chartist.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/chartist.min.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        language = {% include 'js/dataTables-arabic.json' %};
+        $("#guides").DataTable({
+            "order": [[ 7, "desc" ]],
+            "language": language,
+        });
+        $("#feedback").DataTable({
+            "order": [[ 0, "desc" ]],
+            "language": language,
+        });
+        $("#reports").DataTable({
+            "order": [[ 1, "desc" ]],
+            "language": language,
+        });
+        $("#requests").DataTable({
+            "order": [[ 4, "desc" ]],
+            "language": language,
+        });
+    });
+</script>
+<style>
+
+    h2, h3{
+        background-color: rgb(250, 250, 250);
+        padding: 5px;
+        margin-top: 25px;
+    }
+</style>
+{% endblock %}

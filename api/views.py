@@ -68,23 +68,7 @@ class ActivityDetail(generics.RetrieveAPIView):
 
 class ClubList(generics.ListAPIView):
     serializer_class = ClubSerializer
-
-    def get_queryset(self):
-        queryset = Club.objects.current_year().visible()
-
-        city = self.request.query_params.get('city', None)
-        if city:
-            queryset = queryset.filter(city=city)
-        else:
-            queryset = queryset.for_user_city(self.request.user)
-
-        gender = self.request.query_params.get('gender', None)
-        if gender:
-            queryset = queryset.filter(gender=gender)
-        else:
-            queryset = queryset.for_user_gender(self.request.user)
-        
-        return queryset.distinct()
+    queryset = Club.objects.current_year().visible()
 
 class ClubDetail(generics.RetrieveAPIView):
     serializer_class = ClubSerializer
@@ -111,6 +95,7 @@ class ObtainAuthToken(APIView):
                          'en_first_name': user.common_profile.en_first_name,
                          'en_middle_name': user.common_profile.en_middle_name,
                          'en_last_name': user.common_profile.en_last_name,
+                         'city': user.common_profile.city,
                          'college': user.common_profile.college.name,
                          'gender': user.common_profile.college.name,
                          'section': user.common_profile.college.section})

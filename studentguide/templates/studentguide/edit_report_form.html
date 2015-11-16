@@ -1,0 +1,53 @@
+{% load bootstrap3 %}
+<form enctype="multipart/form-data" id="edit-report-form" action="post">
+{% csrf_token %}
+{% bootstrap_form form %}
+</form>
+<script type="text/javascript">
+$(function () {
+
+    // modify form submission behaviour to be ajaxy
+    $("form#edit-report-form").submit(function (event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var formData = new FormData($(this)[0]); 
+        {% if report %}{# if a report is passed, then post to edit_report url, otherwise to add_report #}
+        var url = "{% url 'studentguide:edit_report' report.guide.pk report.pk %}";
+        {% else %}
+        var url = "{% url 'studentguide:add_report' guide.pk %}";
+        {% endif %}
+
+        /* Send the data */
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (data) {
+                if (data.message == "success") {
+
+                    // show success message (using toastr)
+                    toastr.options.positionClass = "toast-top-left";
+                    {% if report %}
+                    toastr.success("عدلت تقرير الإرشاد الطلابي بنجاح.");
+                    {% else %}
+                    toastr.success("أرسلت تقرير الإرشاد الطلابي بنجاح.");
+                    {% endif %}
+
+                    // hide modal
+                    $("#edit-report-modal").modal('hide');
+                     window.location.href= data.show_url;
+                } else {
+                    $("#edit-report-modal .modal-body").html(data);
+                }}
+        });
+
+    });
+});
+</script>

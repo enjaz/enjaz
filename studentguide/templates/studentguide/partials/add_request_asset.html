@@ -1,0 +1,34 @@
+{% load staticfiles %}
+<script type="text/javascript">
+    $(function () {
+        // initialize request edit modal
+        $('#edit-request-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        });
+        $("button#add-request, button.edit-request").click(function () {
+            var introduction_url = $(this).data('introduction-url');
+            var form_url = $(this).data('form-url');
+            $("#edit-request-modal").modal('show');
+
+            $("#edit-request-modal .modal-title").html("اختر مرشدا طلابيًا");
+            $("#edit-request-modal .modal-body").load(introduction_url, function(){
+                $('.end-request-introduction').click(function() {
+                    $("#edit-request-modal .modal-body").load(form_url);
+            });
+            });
+
+            var $submitButton = $("#edit-request-modal button.submit-button");
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-request-form").submit();
+            });
+        });
+    });
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+
+{% with modal_id='edit-request-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}

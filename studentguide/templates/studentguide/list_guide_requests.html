@@ -1,0 +1,117 @@
+{% extends "studentguide_base.html" %}{% load staticfiles %}
+{% block title %}{% if guide.user == user %}طلبات موجّهة إلي{% else %}طلبات موجّهة إلى {{ guide.user.common_profile.get_ar_full_name }}{% endif %}{% endblock %}
+{% block content %}
+    <div class="row">
+        <h1>{% if guide.user == user %}طلبات موجّهة إلي{% else %}طلبات موجّهة إلى {{ guide.user.common_profile.get_ar_full_name }}{% endif %}</h1>
+        <h2>طلبات معلقة</h2>
+        <div class="panel panel-warning panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="pending-requests">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
+        <h2>طلبات معتمدة</h2>
+        <div class="panel panel-success panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="done-requests">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
+        <h2>طلبات رفضتها</h2>
+        <div class="panel panel-danger panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="rejected-requests">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
+        <h2>طلبات ألغها طلاب مستجدون</h2>
+        <div class="panel panel-danger panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="canceled-requests">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+
+{% with from_my_books=True %}
+    {% include "bulb/exchange/components/edit_book_asset.html" %}
+{% endwith %}
+
+<script type="text/javascript">
+    function initialize_request_buttons(){
+        control_url = "{% url 'studentguide:control_request' %}";
+        $('button.accept').click(function() {
+            // To prevent repeated action
+            $(this).attr('disabled', 'disabled');
+            pk = $(this).data('pk');
+            data = {pk: pk, action: 'guide_accepted'}
+            $.ajax({
+                url: control_url,
+                type: 'POST',
+                data: data,
+                cache: false,
+                success: function (data) {
+                    if (data.message == "success") {
+                        updateLists();
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            });
+        });
+        $('button.reject').click(function() {
+            // To prevent repeated action
+            $(this).attr('disabled', 'disabled');
+            pk = $(this).data('pk');
+            data = {pk: pk, action: 'guide_rejected'}
+            $.ajax({
+                url: control_url,
+                type: 'POST',
+                data: data,
+                cache: false,
+                success: function (data) {
+                    if (data.message == "success") {
+                        updateLists();
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            });
+        });
+        $('button.cancel').click(function() {
+            // To prevent repeated action
+            $(this).attr('disabled', 'disabled');
+            pk = $(this).data('pk');
+            data = {pk: pk, action: 'guide_rejected'}
+            $.ajax({
+                url: control_url,
+                type: 'POST',
+                data: data,
+                cache: false,
+                success: function (data) {
+                    if (data.message == "success") {
+                        updateLists();
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            });
+        });
+    }
+    function updateLists(){
+        $("#pending-requests").load("{% url 'studentguide:list_request_summaries' guide.pk %}", {source: 'guide', condition: 'pending'}, initialize_request_buttons);
+        $("#done-requests").load("{% url 'studentguide:list_request_summaries' guide.pk %}", {source: 'guide', condition: 'done'}, initialize_request_buttons);
+        $("#rejected-requests").load("{% url 'studentguide:list_request_summaries' guide.pk %}", {source: 'guide', condition: 'rejected'}, initialize_request_buttons);
+        $("#canceled-requests").load("{% url 'studentguide:list_request_summaries' guide.pk %}", {source: 'guide', condition: 'canceled'}, initialize_request_buttons);
+    }
+    $(updateLists);
+</script>
+{% endblock %}

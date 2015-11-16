@@ -1,0 +1,53 @@
+{% load bootstrap3 %}
+<form enctype="multipart/form-data" id="edit-guide-profile-form" action="post">
+{% csrf_token %}
+{% bootstrap_form form %}
+</form>
+<script type="text/javascript">
+$(function () {
+
+    // modify form submission behaviour to be ajaxy
+    $("form#edit-guide-profile-form").submit(function (event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var formData = new FormData($(this)[0]); 
+        {% if guide %}{# if a guide is passed, then post to edit_guide url, otherwise to add_guide #}
+        var url = "{% url 'studentguide:edit_guide' guide.pk %}";
+        {% else %}
+        var url = "{% url 'studentguide:add_guide' %}";
+        {% endif %}
+
+        /* Send the data */
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (data) {
+                if (data.message == "success") {
+
+                    // show success message (using toastr)
+                    toastr.options.positionClass = "toast-top-left";
+                    {% if report %}
+                    toastr.success("عدّلت صفحتك بنجاح.");
+                    {% else %}
+                    toastr.success("أضفت نفسك مرشدًا طلابيًا بنجاح.");
+                    {% endif %}
+
+                    // hide modal
+                    $("#edit-guide-profile-modal").modal('hide');
+                     window.location.href= data.show_url;
+                } else {
+                    $("#edit-guide-profile-modal .modal-body").html(data);
+                }}
+        });
+
+    });
+});
+</script>

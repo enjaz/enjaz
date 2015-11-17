@@ -48,8 +48,11 @@
             });
         });     
         
-
-        $('#confirm-order-modal .confirm').click(function() {
+        var $submitButton = $('#confirm-order-modal .confirm');
+        // Unbind any handlers previously attached to the submit button
+        // This is necessary to avoid multiple submissions of the form
+        $submitButton.off('click');
+        $submitButton.click(function() {
             // Confirmation button should trigger form submission.
             $("form#confirm-order-form").submit();
         });

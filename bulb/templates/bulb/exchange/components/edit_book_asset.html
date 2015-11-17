@@ -32,8 +32,11 @@
                 });
             });
         });
-        // submission button
-        $("#edit-book-modal button.submit-button").click(function () {
+        var $submitButton = $("#edit-book-modal button.submit-button");
+        // Unbind any handlers previously attached to the submit button
+        // This is necessary to avoid multiple submissions of the form
+        $submitButton.off('click');
+        $submitButton.click(function () {
             $("form#edit-book-form").submit();
         });
         {% if from_category or from_my_books  %}

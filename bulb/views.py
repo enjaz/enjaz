@@ -465,6 +465,20 @@ def list_indirect_requests(request):
                                           requester_status='D',
                                           borrowing_end_date__lte=timezone.now(),
                                           requester__common_profile__college__gender=bulb_club.gender)
+        side = 'requester'
+    elif condition == 'failed_requester':
+        # Get all requesters that are:
+        # * for indirect delivery,
+        # * for lending,
+        # * haven't been returned by the requesters,
+        requests = Request.objects.filter(delivery='I',
+                                          requester_status='F',
+                                          requester__common_profile__college__gender=bulb_club.gender)
+        side = 'requester'
+    elif condition == 'failed_owner':
+        requests = Request.objects.filter(delivery='I',
+                                          owner_status='F',
+                                          book__submitter__common_profile__college__gender=bulb_club.gender)
         side = 'owner'
     elif condition == 'done':
         # Get all requesters that are:

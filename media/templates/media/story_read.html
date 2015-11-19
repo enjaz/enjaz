@@ -1,8 +1,16 @@
-{% extends 'media_base.html' %}
+{% extends 'media_base.html' %}{% load staticfiles %}
 
 {% block title %}{{ story.title }}{% endblock %}
 
 {% block content %}
+
+<div class="row">
+    <div class="col-sm-offset-10 col-sm-2 pull-left">
+            <h3>تغطية #{{ story.episode.pk }}</h3>
+            <span>{{ story.date_submitted }}</span>
+    </div>
+</div>
+
 <div class="row">
 	<div class="col-md-12">
 		<h1>{{ story.title }} 

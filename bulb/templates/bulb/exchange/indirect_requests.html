@@ -39,6 +39,22 @@
                 </div>
             </div>
         </div>
+        <h2>كتب تعذّر التواصل مع صاحبها</h2>
+        <div class="panel panel-warning panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="failed-owner-requests">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
+        <h2>كتب تعذّر التواصل مع طالبها</h2>
+        <div class="panel panel-warning panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="failed-requester-requests">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
         <h2>كتب منجزة</h2>
         <div class="panel panel-warning panel-shadow" data-collapsed="0">
             <div class="panel-body">
@@ -65,6 +81,9 @@
         $("#requests-to-return-to-owner").load("{% url 'bulb:list_indirect_requests' %}", {condition: 'to_return_to_owner'}, initialize_request_buttons);
 
         $("#done-requests").load("{% url 'bulb:list_indirect_requests' %}", {condition: 'done'}, initialize_request_buttons);
+        $("#failed-requester-requests").load("{% url 'bulb:list_indirect_requests' %}", {condition: 'failed_requester'}, initialize_request_buttons);
+        $("#failed-owner-requests").load("{% url 'bulb:list_indirect_requests' %}", {condition: 'failed_owner'}, initialize_request_buttons);
+
     }
     function initialize_request_buttons(){
         control_url = "{% url 'bulb:control_request' %}";

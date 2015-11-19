@@ -65,7 +65,7 @@
             <i class="entypo-flag"></i>
             سُلّم الكتاب
         </button>
-        {% if not book_request.owner_status == 'F' %}
+        {% if not book_request.owner_status == 'F' and not book_request.requester_status == 'F' %}
         <button data-pk="{{ book_request.pk }}" data-action="{{ side }}_failed" class="failed btn-block btn-icon btn btn-warning">
             <i class="fa fa-exclamation-circle"></i>
             تعذّر التواصل

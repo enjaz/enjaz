@@ -100,7 +100,7 @@
                 تواصل مع مُنسّق سراج {{ bulb_coordinator.common_profile.get_ar_full_name }} لإعادة الكتاب قبل {{ book_request.borrowing_end_date|date:"l j F" }}.
             </p>
             {% endif %}
-        {% elif book_request.requester_status != 'D' %}
+        {% elif book_request.requester_status == '' or book_request.requester_status == 'F' %}
         <p class="alert alert-warning">
         طلبتَ <strong>الإيصال عبر فريق سِراج</strong>. سيتواصل معكَ مُنسّق سِراج {{ bulb_coordinator.common_profile.get_ar_full_name }} فور حصوله على الكتاب.
         </p>

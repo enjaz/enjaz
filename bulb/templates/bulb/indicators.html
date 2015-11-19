@@ -30,7 +30,7 @@
                         <td>{{ group.session_set.count }}</td>
                         <td>{{ group.get_report_count }}</td>
                         {% if group.get_last_session %}
-                        `<td data-order="{{ group.get_last_session.date|date:"U" }}">{{ group.get_last_session.date }}
+                        <td data-order="{{ group.get_last_session.date|date:"U" }}">{{ group.get_last_session.date }}
                         {% else %}
                         <td>لا يوجد
                         {% endif %}</td>

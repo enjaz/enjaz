@@ -265,10 +265,10 @@ def edit_report(request, episode_pk):
     else:
         form = FollowUpReportForm(instance=report)
         image_formset = FollowUpReportImageFormset(instance=report)
-        return render(request, "media/report_write.html", {'form': form,
-                                                           'image_formset': image_formset,
-                                                           'episode': episode,
-                                                           'edit': True})
+    return render(request, "media/report_write.html", {'form': form,
+                                                       'image_formset': image_formset,
+                                                       'episode': episode,
+                                                       'edit': True})
 
 @decorators.post_only
 @login_required

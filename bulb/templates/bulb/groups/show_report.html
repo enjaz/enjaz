@@ -1,0 +1,112 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}{% load bulb_tags %}
+{% block title %}{{ report.session.title }}{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-sm-4">
+        <div style="text-align: center; border-left: solid 1px #eee;">
+            <style>
+                #group-{{ report.session.group.pk }}-img {
+                    display: block;
+                    width:90%;
+                    padding-bottom:90%;
+                    margin:10px;
+                    background:url('{{ report.session.group.image.url }}') center center no-repeat;
+                    background-size: auto 100%;
+                }
+            </style>
+            <a href="{% url 'bulb:show_group' report.session.group.pk %}" id="group-{{ report.session.group.pk }}-img" style="max-width: 100%;"></a>
+        </div>
+    </div>
+    <div class="col-sm-8">
+       <h2><a href="{% url 'bulb:show_group' report.session.group.pk %}">{{ report.session.group.name }}</a> - {{ report.session.title }}</h2>
+        <table class="table table-hover">
+            <tr>
+                <th>محاور الجلسة</th>
+                <td dir="auto">{{ report.session.agenda|linebreaksbr }}</td>
+            </tr>
+            <tr>
+                <th>الوقت والمكان</th>
+                <td>
+                    <div>
+                        <i class="entypo-calendar"></i>
+                        {{ report.session.date }}
+                    </div>
+                    <div>
+                        <i class="entypo-clock"></i>
+                        {{ report.session.start_time }}
+                        -
+                        {{ report.session.end_time }}
+                    </div>
+                    <div>
+                        <i class="entypo-location"></i>
+                        {{ report.session.location }}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>مجريات الجلسة</th>
+                <td dir="auto">{{ report.description|linebreaksbr }}</td>
+            </tr>{% if report.attendees.exists %}
+            <tr>
+                <th>الحضور</th>
+                <td>
+                        <ul>
+                        {% for attendee in report.attendees.all %}
+                            <li>{% reader_profile_link attendee %}</li>
+                        {% endfor %}
+                        </ul>
+                </td>
+            </tr>{% endif %}
+            <tr>
+                <th>تاريخ المحضر</th>
+                <td>{{ report.submission_date|date:"j F Y" }}</td>
+            </tr>
+        </table>
+        <span style="float: left">
+            {% if user|can_edit_group:report.session.group %}
+                <button data-url="{% url 'bulb:edit_report' report.session.group.pk report.session.pk %}" class="add-report btn btn-block  btn-xs btn-icon btn-success" style="margin-bottom: 10px; padding-left: 5px;">
+                <i class="entypo-pencil"></i>
+                    عدل المحضر
+                </button>
+            {% endif %}
+        </span>
+    </div>
+</div>
+{% endblock %}
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<style>
+p{
+    font-size: 17px;
+}
+</style>
+<script type="text/javascript">   
+$(function () {
+    $('#edit-report-modal').modal({
+      keyboard: false,
+      backdrop: 'static',
+      show    : false,
+    });
+    $(".add-report").click(function () {
+        var url = $(this).data('url');
+
+        $("#edit-report-modal").modal('show');
+
+        $("#edit-report-modal .modal-title").html("أضف تقريرا");
+        $("#edit-report-modal .modal-body").load(url);
+
+        var $submitButton = $("#edit-report-modal button.submit-button");
+        // Unbind any handlers previously attached to the submit button
+        // This is necessary to avoid multiple submissions of the form
+        $submitButton.off('click');
+        $submitButton.click(function () {
+            $("form#edit-report-form").submit();
+        });
+    });
+});
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+{% with modal_id='edit-report-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}
+{% endblock %}

@@ -21,8 +21,7 @@
         <p dir="auto" class="book-description">
             {{ book.description|linebreaksbr }}
         </p>
-        <p>أضاف هذا الكتاب {% reader_profile_link book.submitter %} في {{ book.submission_date|date:"" }}. {% if book.contribution == 'G' %}هذا الكتاب <strong>للاقتناء</strong>{% else %}هذا الكتاب <strong>للإعارة</strong>{% if book.available_until%} وهو متوفر حتى {{ book.available_until|date:"l j F Y" }}{% endif %}{% endif %}.</p>
-        <span style="float: left">
+        <span style="margin-bottom: 10px; float: left">
             {% if user|can_edit_book:book %}
             <button data-url="{% url 'bulb:edit_book' book.pk %}" class="edit-book btn btn-xs btn-icon btn-gold">
                 <i class="entypo-pencil"></i>
@@ -40,6 +39,42 @@
             </button>
             {% endif %}
         </span>
+        <table class="table table-hover">
+            <colgroup>
+              <col class="col-xs-4 col-md-2 col-sm-3">
+              <col class="col-xs-8 col-md-10 col-sm-9">
+            </colgroup>
+            <tbody>
+                <tr>
+                    <th>أضافه</th>
+                    <td>{% reader_profile_link book.submitter %}</td>
+                </tr>
+                <tr>
+                    <th>نوع المساهمة</th>
+                    <td>لل{{ book.get_contribution_display }}</td>
+                </tr>
+                <tr>
+                    <th>التصنيف</th>
+                    <td><a href="{% url 'bulb:show_category' book.category.code_name %}">{{ book.category.name }}</a></td>
+                </tr>{% if book.pages %}
+                <tr>
+                    <th>عدد الصفحات</th>
+                    <td>{{ book.pages }}</td>
+                </tr>{% endif %}
+                <tr>
+                    <th>حالة الكتاب</th>
+                    <td>{{ book.get_condition_display }}</td>
+                </tr>
+                <tr>
+                    <th>تاريخ الإضافة</th>
+                    <td>{{ book.submission_date|date:"j F Y" }}</td>
+                </tr>{% if book.available_until%}
+                <tr>
+                    <th>الكتاب متاح حتى</th>
+                    <td>{{ book.available_until|date:"j F Y" }}</td>
+                </tr>{% endif %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}

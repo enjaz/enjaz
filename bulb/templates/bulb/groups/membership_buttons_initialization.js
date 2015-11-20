@@ -28,7 +28,7 @@ function initialize_membership_buttons(){
                         window.location.href = data.show_url;
                     });
                 } else {
-                    toastr.error(data);
+                    toastr.error(data.message);
                 }
             }
         });

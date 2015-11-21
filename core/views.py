@@ -16,6 +16,7 @@ from .models import Announcement, Publication, StudentClubYear
 from niqati.models import Code_Order, Code
 from media.models import FollowUpReport, Story
 from accounts.utils import get_user_gender
+import clubs.utils
 
 
 def portal_home(request):
@@ -73,7 +74,8 @@ def about_sc(request, template_name="about_sc.html"):
 
 @login_required
 def indicators(request, city=""):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and \
+       not clubs.utils.is_presidency_coordinator_or_deputy(request.user):
         raise PermissionDenied
 
     if city:

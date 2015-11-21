@@ -1,11 +1,11 @@
-{% extends "base.html" %}{% load staticfiles %}
+{% extends "base.html" %}{% load staticfiles %}{% load clubs_utils %}
 {% block navbutton %}
     {% if user.is_superuser %}
         {% include 'includes/nav-button.html' %}
     {% endif %}
 {% endblock %}
 {% block navbar %}
-     {% if user.is_superuser %}
+     {% if user.is_superuser or user|is_presidency_coordinator_or_deputy %}
         <li><a href="{% url 'indicators' %}"><span class="glyphicon glyphicon-stats"></span> مؤشرات إنجاز</a></li>
     {% endif %}
 {% endblock %}

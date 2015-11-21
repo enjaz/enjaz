@@ -47,7 +47,7 @@
 							{# if the user can view unapproved activity, show the activity status #}
 							{# is-online = approved, is-idle = pending, is-busy = rejected #}
 							
-							{% if perms.activities.view_activity or user|has_coordination_to_activity:activity or user|can_review_activity:activity %}
+							{% if perms.activities.view_activity or user|has_coordination_to_activity:activity or user|can_review_activity:activity or user|is_deanship_of_students_affairs_coordinator_or_member %}
 							<a href="#" class="user-status {% if activity.is_approved %}is-online{% elif activity.is_approved == None %}is-idle{% else %}is-busy{% endif %} tooltip-primary"
 							data-toggle="tooltip" data-placement="top"
 							data-original-title="{{ activity.get_approval_status_message }}"></a>
@@ -94,7 +94,7 @@
 		<div class="row">
 			<div class="col-sm-offset-2 col-sm-10">
                     <ul class="user-details">{# if the user is privileged, show them the internal description #}
-                        {% if user|has_coordination_to_activity:activity or user|can_assess_any_club %}
+                        {% if user|has_coordination_to_activity:activity or user|can_assess_any_club or user|is_deanship_of_students_affairs_coordinator_or_member %}
                         <li dir="auto" class="activity-description">
                             <i class="entypo-info-circled"></i>
                             {{ activity.description|linebreaksbr }}
@@ -107,7 +107,7 @@
                         {% for episode in activity.episode_set.all %}
                         <li>
                         {# if the user has privileges to add a follow-up report... #}
-						{% if  user|is_employee_of_any_club or user|has_coordination_to_activity:activity or user|can_submit_followupreport:activity or perms.media.add_followupreport %}
+						{% if user|is_employee_of_any_club or user|has_coordination_to_activity:activity or user|can_submit_followupreport:activity or perms.media.add_followupreport or user|is_deanship_of_students_affairs_coordinator_or_member %}
 						{# group the activity info in a div to make #}
 						{# space for the report button #}
 						<div class="col-md-10">
@@ -133,7 +133,7 @@
 								{{ episode.location }}
 							</div>
                         {# if the user has privileges to add or view a follow-up report... #}
-						{% if user|is_employee_of_any_club or user|can_submit_followupreport:activity or perms.media.add_followupreport %}
+						{% if user|is_employee_of_any_club or user|can_submit_followupreport:activity or perms.media.add_followupreport or user|is_deanship_of_students_affairs_coordinator_or_member %}
 						</div>
 						<div class="followupreport_zone col-md-2">
                             {# The particular logic for the following is described here: https://github.com/osamak/student-portal/issues/81 #}
@@ -141,10 +141,10 @@
 			            		<a href="{% url 'media:show_report' episode.pk %}"
 			            		class="btn btn-green btn-xs">استعرض التقرير</a>
                             {# show a special note for employees, that the report hasn't been submitted yet. #}
-                            {% elif not episode.report_is_submitted and user|is_employee_of_any_club %}
+                            {% elif not episode.report_is_submitted and user|is_employee_of_any_club or not episode.report_is_submitted and user|is_deanship_of_students_affairs_coordinator_or_member %}
 			            		<a class="btn btn-primary btn-xs disabled">لم يرفع التقرير بعد</a>
                             {# only show the link if the user is not an employee #}
-                            {% elif episode.requires_report and not user|is_employee_of_any_club %}
+                            {% elif episode.requires_report and not user|is_employee_of_any_club and not user|is_deanship_of_students_affairs_coordinator_or_member %}
 
                                 {% if episode.report_is_due %}
                                     <a href="{% url 'media:submit_report' episode.pk %}"
@@ -162,7 +162,7 @@
                                         <a class="btn btn-primary btn-xs disabled">بانتظار انتهاء النشاط</a>
                                     {% endif %}
                                 {% endif %}
-                            {% elif not user|is_employee_of_any_club %}
+                            {% elif not user|is_employee_of_any_club and not user|is_deanship_of_students_affairs_coordinator_or_member %}
                                 <a href="{% url 'media:submit_report' episode.pk %}"
                                 class="btn btn-info btn-xs">ارفع التقرير (اختياري)</a>
 			            	{% endif %}
@@ -176,7 +176,7 @@
         <div class="row">
 				<!-- tabs for the profile links -->
 				<ul class="nav nav-tabs">
-			{% if user|has_coordination_to_activity:activity or user|can_review_activity:activity or user|is_employee_of_any_club %}
+			{% if user|has_coordination_to_activity:activity or user|can_review_activity:activity or user|is_employee_of_any_club or user|is_deanship_of_students_affairs_coordinator_or_member %}
 				{% for reviewer in activity|get_activity_reviewing_parents %}
 					<li{% if active_tab == reviewer.pk %} class="active"{% endif %}>
 					<a href="{% url 'activities:review' activity.id reviewer.id %}">مراجعة {{ reviewer.name }}</a>

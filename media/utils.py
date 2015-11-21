@@ -5,8 +5,7 @@ from django.http import HttpResponseRedirect, Http404
 
 from core.models import StudentClubYear
 from clubs.models import Club
-from clubs.utils import is_coordinator_or_member, is_coordinator_of_any_club, is_member_of_any_club, is_coordinator_or_member, get_media_center, get_user_clubs, get_user_coordination_and_deputyships,  has_coordination_to_activity
-
+import clubs.utils
 
 current_year = StudentClubYear.objects.get_current()
 
@@ -14,7 +13,6 @@ WHAT_IF_URL = "whatif"
 HUNDRED_SAYS_URL = "100says"
 WHAT_IF = 0
 HUNDRED_SAYS = 1
-
 
 # Constants
 REPORT_DUE_AFTER = 7  # in days
@@ -46,7 +44,7 @@ def get_poll_type_url(poll_type):
         return HUNDRED_SAYS_URL
 
 def is_media_coordinator_or_deputy(user):
-    coordination_and_deputyships = get_user_coordination_and_deputyships(user)
+    coordination_and_deputyships = clubs.utils.get_user_coordination_and_deputyships(user)
     return coordination_and_deputyships.filter(english_name='Media Center').exists()
 
 def is_media_member(user):
@@ -54,7 +52,7 @@ def is_media_member(user):
     return user_clubs.filter(english_name='Media Center').exists()
 
 def is_media_coordinator_or_member(user):
-    user_clubs = get_user_clubs(user)
+    user_clubs = clubs.utils.get_user_clubs(user)
     return user_clubs.filter(english_name='Media Center').exists()
 
 def is_media_representative_of_club(user, club):
@@ -75,50 +73,56 @@ def media_user_test(user):
         return True    
     
 def is_club_coordinator_or_member(user):
-    if not ((is_coordinator_of_any_club(user) or is_member_of_any_club(user)
+    if not ((clubs.utils.is_coordinator_of_any_club(user) or clubs.utils.is_member_of_any_club(user)
              and not is_media_coordinator_or_member(user)) or user.is_superuser):
         raise PermissionDenied
     return True
 
 def is_media_or_club_coordinator_or_member(user):
-    if not (is_coordinator_of_any_club(user) or is_member_of_any_club(user) or user.is_superuser):
+    if not (clubs.utils.is_coordinator_of_any_club(user) or clubs.utils.is_member_of_any_club(user) or user.is_superuser):
         raise PermissionDenied
     return True
 
 def get_user_media_center(user):
-    user_media_centers = get_user_clubs(user).filter(english_name='Media Center')
+    user_media_centers = clubs.utils.get_user_clubs(user).filter(english_name='Media Center')
     if user_media_centers.exists():
         return user_media_centers.first()
     else:
         return None
 
 def can_assess_club_as_media_member(user, club):
-    user_media_centers = get_user_clubs(user).filter(english_name='Media Center',
+    user_media_centers = clubs.utils.get_user_clubs(user).filter(english_name='Media Center',
                                                      city=club.city)
 
     return user_media_centers.exists()
 
 def can_assess_club_as_media_coordinator(user, club):
-    user_media_centers = get_user_coordination_and_deputyships(user).filter(english_name='Media Center',
+    user_media_centers = clubs.utils.get_user_coordination_and_deputyships(user).filter(english_name='Media Center',
                                                                             city=club.city)
 
     return user_media_centers.exists()
 
 
 def can_assess_club_as_media(user, club):
-    user_media_centers = get_user_clubs(user).filter(english_name='Media Center',
+    user_media_centers = clubs.utils.get_user_clubs(user).filter(english_name='Media Center',
                                                      city=club.city)
 
     return user_media_centers.exists()
 
 def can_submit_followupreport(user, activity):
-    return has_coordination_to_activity(user, activity) or \
+    return clubs.utils.has_coordination_to_activity(user, activity) or \
            is_media_coordinator_or_member(user) or \
            is_media_representative_of_club(user, activity.primary_club) or\
            user.is_superuser
 
+def can_view_followupreport(user, activity):
+    return can_submit_followupreport(user, activity) or \
+        clubs.utils.is_member_of_any_club(user) or \
+        clubs.utils.is_employee(activity.primary_club, user) or \
+        clubs.utils.is_deanship_of_students_affairs_coordinator_or_member(user)
+
 def get_clubs_for_assessment_by_user(user):
-    user_assessing_clubs = get_user_clubs(user).filter(can_assess=True)
+    user_assessing_clubs = clubs.utils.get_user_clubs(user).filter(can_assess=True)
     current_year_clubs = Club.objects.current_year().visible()
     # Filter the targetted clubs based on city and gender.
     if user_assessing_clubs.exists(): # Media or Presidency

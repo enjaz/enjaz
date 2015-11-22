@@ -13,6 +13,10 @@ def is_bulb_coordinator_or_deputy(user):
     return utils.is_bulb_coordinator_or_deputy(user)
 
 @register.filter
+def is_bulb_member(user):
+    return utils.is_bulb_member(user)
+
+@register.filter
 def can_edit_book(user, book):
     return utils.can_edit_book(user, book)
 

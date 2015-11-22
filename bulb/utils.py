@@ -20,6 +20,15 @@ def get_bulb_club_for_user(user):
         return Club.objects.current_year().get(english_name="Bulb",
                                                gender="M")
 
+def get_indirect_request_cc(book):
+    """Bulb members are those who are assigned indirect requests."""
+    bulb_club = get_bulb_club_for_user(book.submitter)
+    return [member.email for member in bulb_club.members.all()]
+
+def get_session_submitted_cc(group):
+    bulb_club = get_bulb_club_for_user(group.coordinator)
+    return [deputy.email for deputy in bulb_club.deputies.all()]
+
 def get_bulb_club_of_user(user):
     coordination_and_deputyships = get_user_coordination_and_deputyships(user)
     bulb = coordination_and_deputyships.filter(english_name='Bulb')
@@ -75,6 +84,7 @@ def can_edit_group(user, group):
         return False
 
 def group_can_have_sessions(group):
+    return True
     if not group.is_deleted and \
        group.membership_set.filter(is_active=True).count() >= 3:
         return True

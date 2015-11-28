@@ -15,9 +15,7 @@ from django.utils import timezone
 
 from post_office import mail
 
-from clubs.utils import get_media_center,  is_member_of_any_club, \
-                        has_coordination_to_activity, \
-                        is_employee_of_any_club
+from clubs.utils import get_media_center
 from core import decorators
 from clubs.models import Club
 from activities.models import Activity, Episode
@@ -26,7 +24,7 @@ from media.models import FollowUpReport, Story, Article, StoryReview, ArticleRev
 from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
     TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm, \
     FollowUpReportImageFormset, ReportCommentForm, BuzzForm
-from media.utils import is_media_coordinator_or_member, is_club_coordinator_or_member, is_media_or_club_coordinator_or_member, proper_poll_type, get_poll_type_url, media_coordinator_or_member_test, get_user_media_center, get_clubs_for_assessment_by_user, can_submit_followupreport, get_club_media_center, media_user_test, is_media_coordinator_or_deputy
+from media.utils import is_media_coordinator_or_member, is_club_coordinator_or_member, is_media_or_club_coordinator_or_member, proper_poll_type, get_poll_type_url, media_coordinator_or_member_test, get_user_media_center, get_clubs_for_assessment_by_user, can_submit_followupreport, get_club_media_center, media_user_test, is_media_coordinator_or_deputy, can_view_followupreport
 from accounts.utils import get_user_gender, get_user_city
 
 # Keywords
@@ -232,7 +230,7 @@ def show_report(request, episode_pk):
     report = get_object_or_404(FollowUpReport, episode=episode)
 
     # Permission checks
-    if not can_submit_followupreport(request.user, episode.activity):
+    if not can_view_followupreport(request.user, episode.activity):
         raise PermissionDenied
 
     return render(request, 'media/report_read.html', {'report': report, 'comment_form': ReportCommentForm()})
@@ -265,10 +263,10 @@ def edit_report(request, episode_pk):
     else:
         form = FollowUpReportForm(instance=report)
         image_formset = FollowUpReportImageFormset(instance=report)
-        return render(request, "media/report_write.html", {'form': form,
-                                                           'image_formset': image_formset,
-                                                           'episode': episode,
-                                                           'edit': True})
+    return render(request, "media/report_write.html", {'form': form,
+                                                       'image_formset': image_formset,
+                                                       'episode': episode,
+                                                       'edit': True})
 
 @decorators.post_only
 @login_required
@@ -374,7 +372,7 @@ def show_story(request, episode_pk):
     story = get_object_or_404(Story, episode=episode)
 
     # --- Permission Checks ---
-    if not can_submit_followupreport(request.user, episode.activity):
+    if not can_view_followupreport(request.user, episode.activity):
         raise PermissionDenied    
 
     try:

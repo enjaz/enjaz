@@ -17,7 +17,7 @@
     <tbody>
         {% for book in books %}
         <tr>
-            <td>{% if not book.is_available  %}<span class="badge badge-warning">طُلب!</span>{% else %}<span class="badge badge-success">متاح</span>{% endif %}<a href="{% url 'bulb:show_book' book.pk %}">{{ book.title }}</td>
+            <td data-order="{{ book.title }}">{% if not book.is_available  %}<span class="badge badge-warning">طُلب!</span>{% else %}<span class="badge badge-success">متاح</span>{% endif %}<a href="{% url 'bulb:show_book' book.pk %}">{{ book.title }}</td>
             <td>{% reader_profile_link book.submitter %}</td>
             <td data-order="{{ book.submission_date|date:"U" }}">{{ book.submission_date|date:"l j F Y" }}</td>
         </tr>

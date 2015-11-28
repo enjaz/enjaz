@@ -19,7 +19,7 @@ from clubs.utils import is_coordinator_or_member, is_coordinator_or_deputy_of_an
     is_coordinator_of_any_club, get_media_center, \
     is_member_of_any_club, is_employee_of_any_club, is_coordinator, is_coordinator_or_deputy, get_user_clubs, \
     get_user_coordination_and_deputyships, has_coordination_to_activity, get_deanship, is_employee, \
-    can_review_activity, can_delete_activity, can_edit_activity, can_submit_activities
+    can_review_activity, can_delete_activity, can_edit_activity, can_submit_activities, is_deanship_of_students_affairs_coordinator_or_member
 from media.utils import MAX_OVERDUE_REPORTS, can_assess_club_as_media_coordinator, can_assess_club_as_media_member, can_assess_club_as_media, is_media_coordinator_or_deputy, get_user_media_center, get_clubs_for_assessment_by_user
 from media.models import FollowUpReport, FollowUpReportImage, Story
 
@@ -448,7 +448,8 @@ def review(request, activity_id, reviewer_id):
     # deputy of a parent reviewer other than the ``reviewer_club``; or
     # an employee responsible for the activity owning club.
     can_read = has_coordination_to_activity(request.user, activity) or user_is_any_reviewer or \
-               is_employee(activity.primary_club, request.user)
+               is_employee(activity.primary_club, request.user) or \
+               is_deanship_of_students_affairs_coordinator_or_member(request.user)
 
     # If the user has no read or write permissions, then they can't
     # access the view.

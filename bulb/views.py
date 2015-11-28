@@ -151,9 +151,11 @@ def confirm_book_order(request, pk):
                     indirect_requests_full_url = request.build_absolute_uri(indirect_requests_url)
                     email_context['full_url'] = indirect_requests_full_url
                     email_context['bulb_coordinator'] = bulb_coordinator
+                    cc = utils.get_indirect_request_cc(book)
                     mail.send([bulb_coordinator.email],
-                               template="book_requested_indirectly_to_coordinator",
-                               context=email_context)
+                              cc=cc,
+                              template="book_requested_indirectly_to_coordinator",
+                              context=email_context)
             elif book_request.delivery == 'D':
                 owner_template = "book_requested_directly_to_owner"
 
@@ -465,6 +467,20 @@ def list_indirect_requests(request):
                                           requester_status='D',
                                           borrowing_end_date__lte=timezone.now(),
                                           requester__common_profile__college__gender=bulb_club.gender)
+        side = 'requester'
+    elif condition == 'failed_requester':
+        # Get all requesters that are:
+        # * for indirect delivery,
+        # * for lending,
+        # * haven't been returned by the requesters,
+        requests = Request.objects.filter(delivery='I',
+                                          requester_status='F',
+                                          requester__common_profile__college__gender=bulb_club.gender)
+        side = 'requester'
+    elif condition == 'failed_owner':
+        requests = Request.objects.filter(delivery='I',
+                                          owner_status='F',
+                                          book__submitter__common_profile__college__gender=bulb_club.gender)
         side = 'owner'
     elif condition == 'done':
         # Get all requesters that are:
@@ -619,7 +635,9 @@ def control_request(request):
                       context=email_context)
             # Also, email Bulb coordinator.
             if book_request.delivery == 'I' and bulb_coordinator:
+                cc = utils.get_indirect_request_cc(book)
                 mail.send([bulb_coordinator.email],
+                          cc=cc,
                           template="indirect_book_request_canceled_to_coordinator",
                           context=email_context)
     elif action.startswith('requester_'):
@@ -717,7 +735,9 @@ def control_request(request):
 
             # Also, email Bulb coordinator.
             if book_request.delivery == 'I' and bulb_coordinator:
+                cc = utils.get_indirect_request_cc(book)
                 mail.send([bulb_coordinator.email],
+                          cc=cc,
                           template="indirect_book_request_canceled_to_coordinator",
                           context=email_context)
 
@@ -837,10 +857,29 @@ def add_session(request, group_pk):
         instance = Session(group=group)
         form = SessionForm(request.POST, instance=instance)
         if form.is_valid():
-            print "a"
             session = form.save()
             show_group_url = reverse('bulb:show_group', args=(group.pk,))
             full_url = request.build_absolute_uri(show_group_url)
+            email_context = {'session': session, 'full_url': full_url}
+            # If the coordinator is not already a group member, email
+            # them as well.
+            bulb_coordinator = utils.get_bulb_club_for_user(session.group.coordinator).coordinator
+            for membership in group.membership_set.filter(is_active=True):
+                # Bulb coordinator will be handled later.
+                if bulb_coordinator == membership.user:
+                    continue
+                email_context['member'] = membership.user
+                mail.send([membership.user.email],
+                           template="reading_group_session_just_submitted",
+                           context=email_context)
+
+            # Notify Bulb coordinator and their deputies.
+            email_context['member'] = bulb_coordinator
+            cc = utils.get_session_submitted_cc(group)
+            mail.send([bulb_coordinator.email],
+                      cc=cc,
+                      template="reading_group_session_just_submitted",
+                      context=email_context)
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
         form = SessionForm()
@@ -894,7 +933,10 @@ def delete_session(request, group_pk, session_pk):
     return {"message": "success", "show_url": full_url}
 
 def show_report(request, group_pk, session_pk):
-    pass
+    report = get_object_or_404(Report, session__group__pk=group_pk,
+                               session__pk=session_pk)
+    return render(request, "bulb/groups/show_report.html",
+                  {'report': report})
 
 @decorators.ajax_only
 @login_required
@@ -913,8 +955,8 @@ def add_report(request, group_pk, session_pk):
         form = ReportForm(request.POST, request.FILES, instance=instance)
         if form.is_valid():
             report = form.save()
-            show_group_url = reverse('bulb:show_group', args=(session.group.pk,))
-            full_url = request.build_absolute_uri(show_group_url)
+            show_report_url = reverse('bulb:show_report', args=(session.group.pk, session.pk))
+            full_url = request.build_absolute_uri(show_report_url)
             response['show_url'] = full_url
             return response
     elif request.method == 'GET':
@@ -938,8 +980,9 @@ def edit_report(request, group_pk, session_pk):
         form = ReportForm(request.POST, request.FILES, instance=report)
         if form.is_valid():
             report = form.save()
-            show_group_url = reverse('bulb:show_group', args=(report.session.group.pk,))
-            full_url = request.build_absolute_uri(show_group_url)
+            show_report_url = reverse('bulb:show_report', args=(report.session.group.pk,
+                                                               report.session.pk))
+            full_url = request.build_absolute_uri(show_report_url)
             response['show_url'] = full_url
             return response
     elif request.method == 'GET':
@@ -964,24 +1007,35 @@ def control_membership(request):
 
     if action == 'deactivate':
         if not utils.can_edit_group(request.user, group):
-            return Exception("You cannot deactivate users.")
+            raise Exception("You cannot deactivate users.")
         Membership.objects.filter(group=group, user=user).update(is_active=False)
     elif action == 'activate':
         if not utils.can_edit_group(request.user, group):
-            return Exception("You cannot activate users.")
+            raise Exception("You cannot activate users.")
         Membership.objects.filter(group=group, user=user).update(is_active=True)
     elif action == 'join':
         # Make sure that the user can indeed be added to the group
         if not utils.can_join_group(request.user, group):
-            return Exception(u"لا تستطيع الانضمام لهذه المجموعة.")
+            raise Exception(u"لا تستطيع الانضمام لهذه المجموعة.")
         Membership.objects.create(group=group, user=request.user)
+
+        # Notify group coordinator
+        list_memberships_url = reverse('bulb:list_memberships', args=(group.pk,))
+        full_list_memberships_url = request.build_absolute_uri(list_memberships_url)
+        email_context = {'member': request.user,
+                         'group': group,
+                         'full_url': full_list_memberships_url}
+        mail.send([group.coordinator.email],
+                   template="new_reading_group_member_to_group_coordinator",
+                   context=email_context)
+
         show_group_url = reverse('bulb:show_group', args=(group.pk,))
-        full_url = request.build_absolute_uri(show_group_url)
-        response['show_url'] = full_url
+        full_show_url = request.build_absolute_uri(show_group_url)
+        response['show_url'] = full_show_url
     elif action == 'leave':
         # Make sure that the user can indeed be added to the group
         if not Membership.objects.filter(group=group, user=request.user).exists():
-            return Exception("لا تستطيع مغادرة هذه المجموعة.")
+            raise Exception("لا تستطيع مغادرة هذه المجموعة.")
         Membership.objects.get(group=group, user=request.user).delete()
         show_group_url = reverse('bulb:show_group', args=(group.pk,))
         full_url = request.build_absolute_uri(show_group_url)

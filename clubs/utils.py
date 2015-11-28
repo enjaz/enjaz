@@ -81,7 +81,7 @@ def get_media_center():
 def get_user_clubs(user):
     if not user.is_authenticated():
         return Club.objects.none()
-    return user.memberships.current_year() | user.coordination.current_year()
+    return user.memberships.current_year() | user.deputyships.current_year() | user.coordination.current_year()
 
 def get_user_coordination_and_deputyships(user):
     """Return the clubs in which the given user is the coordinator or
@@ -93,6 +93,14 @@ def get_user_coordination_and_deputyships(user):
     deputyships = user.deputyships.current_year()
     # Return a QuerySet to allow further filtering
     return (coordination | deputyships)
+
+def is_presidency_coordinator_or_deputy(user):
+    coordination_and_deputyships = get_user_coordination_and_deputyships(user)
+    return coordination_and_deputyships.filter(english_name__contains='Presidency').exists()
+
+def is_deanship_of_students_affairs_coordinator_or_member(user):
+    """Return whether the user is an employee of any club."""
+    return get_user_clubs(user).filter(english_name__contains='Deanship of Student Affairs').exists()
 
 def is_coordinator_or_deputy_of_any_club(user):
     """Return whether the user is a coordinator of any club."""

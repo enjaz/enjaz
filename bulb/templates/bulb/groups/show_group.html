@@ -87,27 +87,28 @@
 <h2>الجلسات</h2>
     {% for session in group.session_set.undeleted %}
 <div class="row">
-    <h3>{{ session.date|date:"j F" }}: {{ session.title }}</h3>
-    {% if user|can_edit_group:group %}
+    <h3 id="session-{{ session.pk }}">{{ session.date|date:"j F" }}: {% if session.report %}<a href="{% url 'bulb:show_report' group.pk session.pk %}">{% endif %}{{ session.title }}{% if session.report %}</a>{% endif %}</h3>
     <div class="col-md-2">
+    {% if session.report %}
+    <a href="{% url 'bulb:show_report' group.pk session.pk %}" class="btn btn-block btn-xs btn-icon btn-success">
+    <i class="entypo-flag"></i>
+        اقرأ المحضر
+    </a>
+    {% endif %}
+    {% if user|can_edit_group:group %}
     {% if not session.report %}
     <button data-url="{% url 'bulb:add_report' group.pk session.pk %}" class="add-report btn btn-block  btn-xs btn-icon btn-success">
     <i class="entypo-flag"></i>
         ارفع محضرًا
     </button>
-    {% else %}
-    <button data-url="{% url 'bulb:edit_report' group.pk session.pk %}" class="add-report btn btn-block  btn-xs btn-icon btn-success">
-    <i class="entypo-flag"></i>
-        عدل المحضر
-    </button>
     {% endif %}
     <button data-url="{% url 'bulb:edit_session' group.pk session.pk %}" class="edit-session btn btn-block btn-xs btn-icon btn-gold">
         <i class="entypo-pencil"></i>
-        عدل
+        عدل الجلسة
     </button>
     <button data-url="{% url 'bulb:delete_session' group.pk session.pk %}" class="confirm-delete-session btn btn-block  btn-xs btn-icon btn-danger">
         <i class="entypo-block"></i>
-        احذف
+        احذف الجلسة
     </button>
     </div>
     <div class="col-md-9">

@@ -21,8 +21,17 @@
         <p dir="auto" class="book-description">
             {{ book.description|linebreaksbr }}
         </p>
-        <p>أضاف هذا الكتاب {% reader_profile_link book.submitter %} في {{ book.submission_date|date:"" }}. {% if book.contribution == 'G' %}هذا الكتاب <strong>للاقتناء</strong>{% else %}هذا الكتاب <strong>للإعارة</strong>{% if book.available_until%} وهو متوفر حتى {{ book.available_until|date:"l j F Y" }}{% endif %}{% endif %}.</p>
-        <span style="float: left">
+        <ul class="list-unstyled" style="padding-right: 0;">
+            <li><span style="color: black;">أضافه</span>: {% reader_profile_link book.submitter %}</li>
+            <li><span style="color: black;">تاريخ الإضافة</span>: {{ book.submission_date|date:"j F Y" }}</li>
+
+            <li><span style="color: black;">نوع المساهمة</span>: لل{{ book.get_contribution_display }}</li>
+            {% if book.available_until%}<li><span style="color: black;">الكتاب متاح حتى</span>: {{ book.available_until|date:"j F Y" }}</li>{% endif %}
+            <li><span style="color: black;">التصنيف</span>: <a href="{% url 'bulb:show_category' book.category.code_name %}">{{ book.category.name }}</a></li>
+            {% if book.pages %}<li><span style="color: black;">عدد الصفحات</span>: {{ book.pages }}</li>{% endif %}
+            <li><span style="color: black;">حالة الكتاب</span>: {{ book.get_condition_display }}</li>
+        </ul>
+        <span style="margin-bottom: 10px; float: left">
             {% if user|can_edit_book:book %}
             <button data-url="{% url 'bulb:edit_book' book.pk %}" class="edit-book btn btn-xs btn-icon btn-gold">
                 <i class="entypo-pencil"></i>
@@ -49,6 +58,10 @@
 <style>
 p{
     font-size: 17px;
+}
+dt{
+    color: black;
+    font-weight: 400;
 }
 </style>
 <script type="text/javascript">

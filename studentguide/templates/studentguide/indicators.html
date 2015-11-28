@@ -1,64 +1,18 @@
 {% extends "studentguide_base.html" %}{% load staticfiles %}
-{% block title %}المؤشرات{% endblock %}
+{% block title %}مؤشرات الإرشاد الطلابي{% endblock %}
 
 {% block content %}
-<h1>مؤشرات المرشد الطلابي</h1>
+<h1>مؤشرات الإرشاد الطلابي</h1>
 <div class="row">
     <div class="col-xs-12">
             <h3>المرشدون الطلابيون</h3>
-            <table id="guides" class="table datatable">
-                <thead>
-                    <tr>
-                        <th>الاسم</th>
-                        <th>الكلية</th>
-                        <th># طلبات الإرشاد المعتمدة</th>
-                        <th># طلبات الإرشاد المعلقة</th>
-                        <th># المحاضر</th>
-                        <th>آخر تقرير</th>
-                        <th>متاح؟</th>
-                        <th>تاريخ الإضافة</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for guide in guides %}
-                    <tr>
-                        <td><a href="{% url 'studentguide:show_guide' guide.pk %}">{{ guide.user.common_profile.get_ar_full_name }}</a></td>
-                        <td>{{ guide.user.common_profile.college.get_name_display }}</td>
-                        <td><a href="{% url 'studentguide:list_guide_requests' guide.pk %}">{{ guide.guide_requests.accepted.count }}</a></td>
-                        <td><a href="{% url 'studentguide:list_guide_requests' guide.pk %}">{{ guide.guide_requests.pending.count }}</a></td>
-                        <td><a href="{% url 'studentguide:list_reports' guide.pk %}">{{ guide.report_set.count }}</a></td>
-                        {% if guide.get_last_report %}
-                        <td data-order="{{ guide.get_last_report.date|date:"U" }}">{{ guide.get_last_report.submission_date|date:"j F Y" }}</td>
-                        {% else %}
-                        <td>لا يوجد</td>
-                        {% endif %}
-                        <td>{% if guide.is_available %}نعم{% else %}لا{% endif %}</td>
-                        <td data-order="{{ guide.submission_date|date:"U" }}">{{ guide.submission_date|date:"j F Y" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            {% include "studentguide/partials/guide_table.html" %}
     </div>
 </div>
 <div class="row">
     <div class="col-xs-12">
             <h3>التقارير</h3>
-            <table id="reports" class="table datatable">
-                <thead>
-                    <tr>
-                        <th>المرشد</th>
-                        <th>تاريخ الإضافة</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for report in reports.undeleted %}
-                    <tr>
-                        <td><a href="{% url 'studentguide:show_guide' report.guide.pk %}">{{ report.guide.user.common_profile.get_ar_full_name }}</a></td>
-                        <td data-order="{{ report.submission_date|date:"U" }}"><a href="{% url 'studentguide:show_report' report.guide.pk report.pk %}">{{ report.submission_date|date:"j F Y" }}</a></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            {% include "studentguide/partials/report_table.html" %}
     </div>
 </div>
 <div class="row">

@@ -5,6 +5,7 @@ from studentguide import views
 urlpatterns = patterns('',
     url(r'^$', views.index, name="index"),
     url(r'^indicators/$', views.indicators, name="indicators"),
+    url(r'^supervisions/$', views.list_supervised_guides, name="list_supervised_guides"),
     url(r'^my_profile/$', views.my_profile, name="my_profile"),
     url(r'^requests_to_me/$', views.requests_to_me, name="requests_to_me"),
 

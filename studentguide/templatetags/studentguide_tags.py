@@ -5,6 +5,10 @@ from studentguide import utils
 register = template.Library()
 
 @register.filter
+def is_studentguide_member(user):
+    return utils.is_studentguide_member(user)
+
+@register.filter
 def is_studentguide_coordinator_or_deputy(user):
     return utils.is_studentguide_coordinator_or_deputy(user)
 

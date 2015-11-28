@@ -25,6 +25,7 @@ def index(request):
 @login_required
 def indicators(request):
     if not utils.is_studentguide_coordinator_or_deputy(request.user) and\
+       not utils.is_studentguide_member(request.user) and\
        not request.user.is_superuser:
         raise PermissionDenied
 
@@ -39,8 +40,30 @@ def indicators(request):
     return render(request, "studentguide/indicators.html", context)
 
 @login_required
+def list_supervised_guides(request):
+    if not utils.is_studentguide_coordinator_or_deputy(request.user) and\
+       not utils.is_studentguide_member(request.user) and\
+       not request.user.studentguide_assessments.exists() and\
+       not request.user.is_superuser:
+        raise PermissionDenied
+
+    
+
+    if request.user.studentguide_assessments.exists():
+        guides = GuideProfile.objects.current_year().filter(assessor=request.user)
+        reports = Report.objects.filter(guide__in=guides)
+    else:
+        guides = GuideProfile.objects.current_year().for_user_gender(request.user)
+        reports = Report.objects.filter(guide__in=guides)
+
+    context = {'guides': guides,
+               'reports': reports}
+
+    return render(request, "studentguide/list_supervised_guides.html", context)
+
+@login_required
 def new_student_index(request):
-    tags = Tag.objects.filter(guide_profiles__isnull=False).distinct()#.order_by("?")
+    tags = Tag.objects.filter(guide_profiles__isnull=False).distinct()
     # Only show tags currently available for the user's gender
     gender = get_user_gender(request.user)
     if gender:
@@ -85,7 +108,7 @@ def show_guide(request, guide_pk):
                   {'guide': guide})
 
 @login_required
-def list_guide_requests(request, guide_pk=None):
+def list_guide_requests(request, guide_pk):
     guide = get_object_or_404(GuideProfile, pk=guide_pk, is_deleted=False)
 
     if not utils.can_edit_guide(request.user, guide):
@@ -94,7 +117,7 @@ def list_guide_requests(request, guide_pk=None):
     return render(request, "studentguide/list_guide_requests.html",
                   {'guide': guide})
 
-#@decorators.ajax_only
+@decorators.ajax_only
 @csrf.csrf_exempt
 @login_required
 def list_request_summaries(request, guide_pk=None):
@@ -138,10 +161,20 @@ def list_request_summaries(request, guide_pk=None):
 def add_guide(request):
     if request.method == 'POST':
         current_year = StudentClubYear.objects.get_current()
-        instance = GuideProfile(user=request.user, year=current_year)
+        studentguide_club = utils.get_studentguide_club_for_user(request.user)
+        random_assessor = studentguide_club.members.order_by('?').first()
+        instance = GuideProfile(user=request.user, year=current_year, assessor=random_assessor)
         form = GuideForm(request.POST, request.FILES, instance=instance)
         if form.is_valid() and not utils.has_guide_profile(request.user):
             guide = form.save()
+            list_supervised_guides_url = reverse('studentguide:list_supervised_guides')
+            full_url = request.build_absolute_uri(list_supervised_guides_url)
+            email_context = {'assessor': random_assessor,
+                             'guide': guide,
+                             'full_url': full_url}
+            mail.send([random_assessor.email],
+                      template="guide_assigned_randomly_to_assessor",
+                      context=email_context)
             show_guide_url = reverse('studentguide:show_guide', args=(guide.pk,))
             full_url = request.build_absolute_uri(show_guide_url)
             return {"message": "success", "show_url": full_url}
@@ -270,6 +303,13 @@ def add_report(request, guide_pk):
             report = form.save()
             show_report_url = reverse('studentguide:show_report', args=(guide.pk, report.pk))
             full_url = request.build_absolute_uri(show_report_url)
+            if guide.assessor:
+                email_context = {'assessor': guide.assessor,
+                                 'guide': guide,
+                                 'full_url': full_url}
+                mail.send([guide.assessor.email],
+                          template="report_submitted_to_assessor",
+                          context=email_context)
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
         form = ReportForm()
@@ -341,6 +381,14 @@ def add_feedback(request, guide_pk):
             feedback = form.save()
             show_feedback_url = reverse('studentguide:show_feedback', args=(guide.pk, feedback.pk))
             full_url = request.build_absolute_uri(show_feedback_url)
+            if guide.assessor:
+                email_context = {'assessor': guide.assessor,
+                                 'submitter': request.user,
+                                 'guide': guide,
+                                 'full_url': full_url}
+                mail.send([guide.assessor.email],
+                          template="feedback_submitted_to_assessor",
+                          context=email_context)
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
         form = FeedbackForm()
@@ -354,6 +402,7 @@ def show_feedback(request, guide_pk, feedback_pk):
                                  pk=feedback_pk)
 
     if not utils.is_studentguide_coordinator_or_deputy(request.user) and\
+       not utils.is_studentguide_member(request.user) and\
        not request.user.is_superuser and \
        feedback.submitter != request.user:
         raise PermissionDenied
@@ -377,7 +426,8 @@ def control_request(request):
     if action.startswith('guide_'):
         if not guide.user == request.user and\
            not user.is_superuser and\
-           not utils.is_studentguide_coordinator_or_deputy(request.user):
+           not utils.is_studentguide_coordinator_or_deputy(request.user) and\
+           not utils.is_studentguide_member(request.user):
             raise Exception(u"لا يمكنك اتخاذ إجراء باسم المرشد الطلابي.")
         if action == 'guide_accepted':
             guide_request.guide_status = 'A'

@@ -1,0 +1,134 @@
+{% extends 'studentguide_base.html' %}{% load studentguide_tags %}{% load staticfiles %}
+{% block title %}{{ guide.user.common_profile.get_ar_full_name|default:guide.user.username }}{% endblock %}
+
+{% block content %}
+
+<h1>{{ guide.user.common_profile.get_ar_full_name|default:guide.user.username }}</h1>
+
+<div class="row" style="margin-left: 0; margin-bottom: 5px;">
+    <div style="float: left;">
+{% if user|can_edit_guide:guide %}
+        <button id="edit-guide-profile" class="btn btn-icon btn-success">
+            <i class="entypo-pencil"></i>
+            عدّل سجلّك الطلابي
+        </button>
+        <a href="{% url 'studentguide:list_reports' guide.pk %}" class="btn btn-icon btn-success">
+            <i class="entypo-list"></i>
+            التقارير
+        </a>
+{% endif %}
+{% if user|can_add_request:guide %}
+        <button id="add-request" data-introduction-url="{% url 'studentguide:add_request_introduction' guide.pk %}" data-form-url="{% url 'studentguide:add_request' guide.pk %}" class="btn btn-icon btn-success">
+            <i class="entypo-plus"></i>
+            اختر هذا المرشد
+        </button>
+{% endif %}
+{% if guide|is_guide_of_user:user %}
+        <button id="add-feedback"  class="btn btn-icon btn-success">
+            <i class="entypo-plus"></i>
+            أرسل ملاحظاتك عن هذا المرشد
+        </button>
+{% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-4">
+        <div style="text-align: center; border-left: solid 1px #eee;">
+            <div class="book-image" {% if guide.avatar %}style="background-image:url('{{ guide.avatar.url }}');"{% endif %}></div>
+        </div>
+    </div>
+    <div class="col-sm-8">
+        {% if guide|is_guide_of_user:user %}
+        <p class="alert alert-success"><i class="fa fa-check-square-o "></i> {{ guide.user.common_profile.ar_first_name }} مرشد لك.</p>
+        {% elif user.common_profile.college.gender != guide.user.common_profile.college.gender and not user.is_superuser %}
+        <p class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i> الإرشاد لا يكون بين الطالبات والطلاب.</p>
+        {% elif user|has_pending_request:guide %}
+        <p class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i> قدّمت طلبًا وهو الآن معلق وينتظر أن يراجعه {{ guide.user.common_profile.ar_first_name }}.</p>
+        {% elif not guide.is_available %}
+        <p class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i> هذا المرشد غير متوفّر.</p>
+        {% endif %}
+        <table class="table-hover table">
+            <colgroup>
+                <col class="col-xs-2">
+                <col class="col-xs-6">
+            </colgroup>
+            <tr>
+                <th>الدفعة</th>
+                <td>{{ guide.batch }}</td>
+            </tr>
+            <tr>
+                <th>الكلية</th>
+                <td>{{ guide.user.common_profile.college }}</td>
+            </tr>
+            <tr>
+                <th>الأنشطة والمشاريع السابقة</th>
+                <td dir="auto">{{ guide.activities }}</td>
+            </tr>
+            <tr>
+                <th>الاهتمامات الأكاديمية</th>
+                <td dir="auto">{{ guide.academic_interests|linebreaksbr }}</td>
+            </tr>
+            <tr>
+                <th>الاهتمامات غير الأكاديمية</th>
+                <td dir="auto">{{ guide.nonacademic_interests|linebreaksbr }}</td>
+            </tr>
+            <tr>
+                <th>تاريخ الإضافة</th>
+                <td>{{ guide.submission_date|date:"j F Y" }}</td>
+            </tr>
+            <tr>
+                <th>الطلاب المستجدون</th>
+                <td>
+                    {% if guide.guide_requests.accepted.exists %}
+                        <ul>
+                        {% for guide_request in guide.guide_requests.accepted %}
+                            <li>{{ guide_request.user.common_profile.get_ar_full_name }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        لا طلاب مستجدين حتى الآن. {% if not user|has_current_guide_profile %}كن أنت الأول!{% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+	</div>
+</div>
+{% endblock %}
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<script type="text/javascript">
+$(function(){
+    $('#edit-guide-profile-modal').modal({
+      keyboard: false,
+      backdrop: 'static',
+      show    : false,
+    });
+    $("button#edit-guide-profile").click(function () {
+        $("#edit-guide-profile-modal").modal('show');
+
+        $("#edit-guide-profile-modal .modal-title").html("عدّل ملف {{ guide.user.common_profile.ar_first_name }}");
+        $("#edit-guide-profile-modal .modal-body").load("{% url 'studentguide:edit_guide' guide.pk %}");
+
+        var $submitButton = $("#edit-guide-profile-modal button.submit-button");
+        $submitButton.off('click');
+        $submitButton.click(function () {
+            $("form#edit-guide-profile-form").submit();
+        });
+    });
+});
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+<style>
+p{
+    font-size: 17px;
+}
+</style>
+{% with modal_id='edit-guide-profile-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}
+{% include "studentguide/partials/add_request_asset.html" %}
+{% include "studentguide/partials/add_feedback_asset.html" %}
+
+{% endblock %}
+

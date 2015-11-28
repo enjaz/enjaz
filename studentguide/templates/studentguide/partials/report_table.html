@@ -1,0 +1,16 @@
+<table id="reports" class="table datatable">
+    <thead>
+        <tr>
+            <th>المرشد</th>
+            <th>تاريخ الإضافة</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in reports.undeleted %}
+        <tr>
+            <td><a href="{% url 'studentguide:show_guide' report.guide.pk %}">{{ report.guide.user.common_profile.get_ar_full_name }}</a></td>
+            <td data-order="{{ report.submission_date|date:"U" }}"><a href="{% url 'studentguide:show_report' report.guide.pk report.pk %}">{{ report.submission_date|date:"j F Y" }}</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

@@ -1,0 +1,46 @@
+{% extends "studentguide_base.html" %}{% load staticfiles %}
+{% block title %}قائمة تقارير {{ guide.user.common_profile.get_ar_full_name }}{% endblock %}
+{% block content %}
+<h1>قائمة تقارير <a href="{% url 'studentguide:show_guide' guide.pk %}">{{ guide.user.common_profile.get_ar_full_name }}</a></h1>
+
+<div class="row" style="margin-left: 0; margin-bottom: 5px;">
+    <div style="float: left;">
+        <button id="add-report" class="btn btn-icon btn-success">
+            <i class="entypo-pencil"></i>
+            أضف تقريرا
+        </button>
+    </div>
+</div>
+
+<table id="guide-table" class="display datatable dt-responsive">
+    <thead>
+        <tr>
+            <th>التاريخ</th>
+        </tr>
+    </thead>
+     <tbody>
+        {% for report in reports %}
+        <tr>
+            <td data-order="{{ report.submission_date|date:"U" }}"><a href="{% url 'studentguide:show_report' report.guide.pk report.pk %}">{{ report.submission_date|date:"j F Y" }}</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        language = {% include 'js/dataTables-arabic.json' %};
+        $(".datatable").DataTable({
+            "order": [[ 0, "desc" ]],
+            "language": language,
+        });
+    });
+</script>
+{% include "studentguide/partials/add_report_asset.html" %}
+{% endblock %}

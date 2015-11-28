@@ -1,0 +1,32 @@
+{% load staticfiles %}
+<script type="text/javascript">
+    $(function () {
+        // initialize report edit modal
+        $('#edit-report-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        });
+        $("button#add-report").click(function () {
+            $("#edit-report-modal").modal('show');
+
+            $("#edit-report-modal .modal-title").html("تقرير المرشد الطلابي");
+            $("#edit-report-modal .modal-body").load("{% url 'studentguide:add_report_introduction' guide.pk %}", function(){
+                $('.end-report-introduction').click(function() {
+                    $("#edit-report-modal .modal-body").load("{% url 'studentguide:add_report' guide.pk %}");
+            });
+            });
+
+            var $submitButton = $("#edit-report-modal button.submit-button");
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-report-form").submit();
+            });
+        });
+    });
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+
+{% with modal_id='edit-report-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}

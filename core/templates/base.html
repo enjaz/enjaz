@@ -1,4 +1,4 @@
-{% load staticfiles %}{% load bulb_tags %}
+{% load staticfiles %}{% load studentguide_tags %}
 <!DOCTYPE html>
 <html lang="en" dir="rtl">
 <!--
@@ -109,15 +109,15 @@ you?
 					<span>نقاطي</span>
 				</a>
 			</li>
-			<li>
-				<a href="{% url 'arshidni:home' %}">
-					<i class="entypo-graduation-cap"></i>
-					<span>أرشدني</span>
-				</a>
-			</li>
             {# Limit the access to students from Riyadh #}
             {% if user.common_profile.college.city == 'R' or user.is_superuser %}
-			<li {% if not user.reader_profile and not user.reading_group_coordination.exists and not user.reading_group_memberships.exists and not user.book_giveaways.exists or user|is_bulb_coordinator_or_deputy or user.is_superuser%} class="highlighted-section" {% endif %}>
+			<li {% if not user.guide_profiles.exists and not user.guide_requests.exists or user|is_studentguide_coordinator_or_deputy or user.is_superuser%}class="highlighted-section"{% endif %}>
+				<a href="{% url 'studentguide:index' %}">
+					<i class="entypo-graduation-cap"></i>
+					<span>الإرشاد الطلابي</span>
+				</a>
+			</li>
+			<li>
 				<a href="{% url 'bulb:index' %}">
 					<i class="fa fa-fire"></i>
 					<span>سراج</span>

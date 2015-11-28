@@ -1,0 +1,38 @@
+{% extends 'studentguide_base.html' %}{% load studentguide_tags %}{% load staticfiles %}
+{% block title %}ملاحظة عن {{ feedback.guide.user.common_profile.get_ar_full_name }}{% endblock %}
+
+{% block content %}
+
+<h1>ملاحظة عن <a href="{% url 'studentguide:show_guide' feedback.guide.pk %}">{{ feedback.guide.user.common_profile.get_ar_full_name }}</a></h1>
+
+
+<div class="row">
+    <div class="col-sm-8 col-sm-offset-2">
+        <table class="table-hover table">
+            <colgroup>
+                <col class="col-xs-2">
+                <col class="col-xs-6">
+            </colgroup>
+            <tr>
+                <th>وقت الإرسال</th>
+                <td>{{ feedback.submission_date }}</td>
+            </tr>
+            <tr>
+                <th>المرسل</th>
+                <td>{{ feedback.submitter.common_profile.get_ar_full_name }}</td>
+            </tr>
+            <tr>
+                <th></th>
+                <td>{{ feedback.text }}</td>
+            </tr>
+        </table>
+	</div>
+</div>
+{% endblock %}
+{% block customscript %}
+<style>
+p{
+    font-size: 17px;
+}
+</style>
+{% endblock %}

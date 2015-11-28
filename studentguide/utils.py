@@ -1,5 +1,6 @@
 from accounts.utils import get_user_gender
 from studentguide.models import GuideProfile
+from clubs.models import Club
 import clubs.utils
 
 def is_studentguide_member(user):

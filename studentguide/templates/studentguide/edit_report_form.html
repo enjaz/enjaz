@@ -5,6 +5,8 @@
 </form>
 <script type="text/javascript">
 $(function () {
+    $("#id_session_date").attr('data-start-view', '1').datepicker({isRTL: true});
+    $("#id_next_session_date").attr('data-start-view', '1').datepicker({isRTL: true});
 
     // modify form submission behaviour to be ajaxy
     $("form#edit-report-form").submit(function (event) {

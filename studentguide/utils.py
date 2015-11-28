@@ -1,12 +1,33 @@
-from clubs.utils import get_user_coordination_and_deputyships
 from accounts.utils import get_user_gender
 from studentguide.models import GuideProfile
+import clubs.utils
 
+def is_studentguide_member(user):
+    user_clubs = user.memberships.current_year()
+    return user_clubs.filter(english_name='Student Guide').exists()
 
 def is_studentguide_coordinator_or_deputy(user):
-    coordination_and_deputyships = get_user_coordination_and_deputyships(user)
+    coordination_and_deputyships = clubs.utils.get_user_coordination_and_deputyships(user)
     return coordination_and_deputyships.filter(english_name='Student Guide').exists()
 
+def get_studentguide_club_of_user(user):
+    user_clubs = clubs.utils.get_user_clubs(user)
+    studentguide = user_clubs.filter(english_name='Student Guide')
+    if studentguide.exists():
+        return studentguide.first()
+    else:
+        return None
+
+def get_studentguide_club_for_user(user):
+    user_gender = get_user_gender(user)
+    if user_gender == 'F':
+        return Club.objects.current_year().get(english_name="Student Guide",
+                                               gender="F")
+    else:
+        return Club.objects.current_year().get(english_name="Student Guide",
+                                               gender="M")
+
+    
 def has_guide_profile(user):
     return GuideProfile.objects.current_year().filter(user=user).exists()
 

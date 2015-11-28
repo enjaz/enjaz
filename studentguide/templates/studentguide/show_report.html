@@ -30,8 +30,40 @@
                 <td>{{ report.submission_date }}</td>
             </tr>
             <tr>
-                <th></th>
-                <td>{{ report.text }}</td>
+                <th>تاريخ الجلسة</th>
+                <td>{{ report.session_date }}</td>
+            </tr>
+            <tr>
+                <th>مكان الجلسة</th>
+                <td>{{ report.session_location }}</td>
+            </tr>
+            <tr>
+                <th>مدة الجلسة</th>
+                <td>{{ report.session_duration }}</td>
+            </tr>
+            <tr>
+                <th>وسيلة التواصل المعتمدة مع الطلبة المستفيدين</th>
+                <td>{{ report.means_of_communication }}</td>
+            </tr>
+            <tr>
+                <th>المشكلات والقضايا التي نوقشت</th>
+                <td>{{ report.points_discussed }}</td>
+            </tr>
+            <tr>
+                <th>الخطط والحلول التي وضعت</th>
+                <td>{{ report.plans_suggested }}</td>
+            </tr>
+            <tr>
+                <th>هل من صعوبات في عقد الجلسة؟</th>
+                <td>{{ report.issues_faced|default:"لا يوجد" }}</td>
+            </tr>
+            <tr>
+                <th>ملاحظات أخرى</th>
+                <td>{{ report.other_comments|default:"لا يوجد" }}</td>
+            </tr>
+            <tr>
+                <th>تاريخ الجلسة القادمة</th>
+                <td>{{ report.next_session_date|default:"لا يوجد" }}</td>
             </tr>
         </table>
 	</div>

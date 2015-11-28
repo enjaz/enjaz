@@ -109,14 +109,14 @@ you?
 					<span>نقاطي</span>
 				</a>
 			</li>
+            {# Limit the access to students from Riyadh #}
+            {% if user.common_profile.college.city == 'R' or user.is_superuser %}
 			<li {% if not user.guide_profiles.exists and not user.guide_requests.exists or user|is_studentguide_coordinator_or_deputy or user.is_superuser%}class="highlighted-section"{% endif %}>
 				<a href="{% url 'studentguide:index' %}">
 					<i class="entypo-graduation-cap"></i>
-					<span>المرشد الطلابي</span>
+					<span>الإرشاد الطلابي</span>
 				</a>
 			</li>
-            {# Limit the access to students from Riyadh #}
-            {% if user.common_profile.college.city == 'R' or user.is_superuser %}
 			<li>
 				<a href="{% url 'bulb:index' %}">
 					<i class="fa fa-fire"></i>

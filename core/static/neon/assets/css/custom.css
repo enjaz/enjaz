@@ -546,26 +546,35 @@ body.login-page .login-content .alert-warning a {
     font-size: 12px;
 }
 
-.modal-intro{
+.modal-intro, .studentguide-intro{
     text-align: justify;
     color: rgb(65, 65, 65);
 }
     
 p.modal-intro{
-        font-size: 20px;
+    font-size: 20px;
 }
-    
+
 ul.modal-intro{
     font-size: 16px;
 }
-   
+
 .modal-content h2{
     text-align: center;
     margin-bottom: 20px;
 }
 
+p.studentguide-intro{
+    font-size: 18px;
+}
+
+ul.studentguide-intro{
+    font-size: 18px;
+}
+
 .modal-content h3 span{
-    background-color: rgb(169, 255, 159);
+    font-weight: 700;
+    text-decoration: underline;
     padding: 5px;
 }
 
@@ -583,11 +592,18 @@ ul.modal-intro{
 .studentguide-option.guide{
     background-color: #C5E8F7;
     border-color: #A6E8F3;
+    /*
+    background-color: #F5BCA9;
+    border-color: #FFFFFF;
+*/
 }
 
 .studentguide-option.new-student{
     background-color: #FFEFA4;
-    border-color: #FFD78A;    
+    border-color: #FFD78A;
+    /*
+    background-color: #D0F5A9;
+    border-color: #DAE4D0;*/
 }
 
 .bulb-option p, .studentguide-option p{
@@ -600,12 +616,38 @@ ul.modal-intro{
 }
 
 .studentguide-option.new-student p, .studentguide-option.new-student .icon, .studentguide-option.new-student h3{
-    color:  #574802;
+    color:  #243E08;
 }
 
 .studentguide-option.guide p, .studentguide-option.guide .icon, .studentguide-option.guide h3{
-    color:  #00618A;
+    color:  #05271E;
 }
+
+
+.tile-stats.tile-brown{
+    background: #C5E8F7;
+}
+
+
+.tile-stats.tile-brown:hover{
+    background: #DCEDF5;
+}
+
+.tile-stats.tile-brown .num, .tile-stats.tile-brown h3, .tile-stats.tile-brown p{
+    color: #100F08
+}
+
+/*
+
+.tile-stats.tile-brown{
+    background: #F3E2A9;
+}
+
+.tile-stats.tile-brown:hover{
+    background: #E0CF97;
+}
+
+*/
 
 .bulb-option h3, .bulb-option p, .studentguide-option h3, .studentguide-option p{
     margin-top: 5px;

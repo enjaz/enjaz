@@ -15,6 +15,12 @@ class GuideProfile(models.Model):
                              on_delete=models.SET_NULL,
                              verbose_name=u"المستخدم",
                              related_name="guide_profiles")
+    assessor = models.ForeignKey(User, null=True, blank=True,
+                                 related_name="studentguide_assessments",
+                                 on_delete=models.SET_NULL,
+                                 default=None, verbose_name=u"المُقيّم",
+                                 limit_choices_to={'common_profile__is_student':
+                                                   True})
     avatar = models.ImageField(u"صورة رمزية", upload_to='studentguide/avatar/')
     activities = models.TextField(u"المشاريع والنشاطات السابقة", help_text=u"ما أبرز الأنشطة والمشاريع التي سبق أن عملت عليها؟ هذا يتضمن أي أبحاث، أو أعمال كان لك دورٌ أساسيٌ فيها.")
     academic_interests = models.TextField(u"الاهتمامات الأكاديمية", help_text=u"في السياق الأكاديمي، ما الذي يستهويك؟")
@@ -115,7 +121,20 @@ class Report(models.Model):
                                   on_delete=models.SET_NULL,
                                   verbose_name=u"المرشد الطلابي",
                                   related_name="student_guide_reports")
-    text = models.TextField(u"المحضر")
+    session_date = models.DateField(u"تاريخ الجلسة")
+    session_location = models.CharField(max_length=200,
+                                        verbose_name=u"مكان الجلسة")
+    session_duration = models.CharField(max_length=200,
+                                        verbose_name=u"مدة الجلسة")
+    means_of_communication = models.CharField(max_length=200,
+                                              verbose_name=u"وسيلة التواصل المعتمدة مع الطلبة المستفيدين")
+    points_discussed = models.TextField(u"المشكلات والقضايا التي نوقشت")
+    plans_suggested = models.TextField(u"الخطط والحلول التي وُضعت")
+    issues_faced = models.TextField(u"هل من صعوبات في عقد الجلسة؟",
+                                    blank=True, default="", help_text=u"اختياري")
+    other_comments = models.TextField(u"ملاحظات أخرى", blank=True, help_text=u"اختياري")
+    next_session_date = models.DateField(u"تاريخ الجلسة القادمة", blank=True,
+                                         null=True, help_text=u"اختياري")
     submission_date = models.DateTimeField(u'تاريخ الإرسال',
                                            auto_now_add=True)
     was_revised = models.BooleanField(u"روجع؟", default=False)

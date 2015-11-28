@@ -16,7 +16,10 @@ class RequestForm(forms.ModelForm):
 class ReportForm(forms.ModelForm):
     class Meta:
         model = Report
-        fields = ['text']
+        fields = ['session_date', 'session_location',
+                  'session_duration', 'means_of_communication',
+                  'points_discussed', 'plans_suggested',
+                  'issues_faced', 'other_comments', 'next_session_date']
 
 class FeedbackForm(forms.ModelForm):
     class Meta:

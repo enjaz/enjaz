@@ -78,7 +78,7 @@
                 <td>{{ guide.submission_date|date:"j F Y" }}</td>
             </tr>
             <tr>
-                <th>الطلاب المستجدون</th>
+                <th>الطلاب المستفيدون</th>
                 <td>
                     {% if guide.guide_requests.accepted.exists %}
                         <ul>
@@ -87,7 +87,7 @@
                         {% endfor %}
                         </ul>
                     {% else %}
-                        لا طلاب مستجدين حتى الآن. {% if not user|has_current_guide_profile %}كن أنت الأول!{% endif %}
+                        لا طلاب مستفيدين حتى الآن. {% if not user|has_current_guide_profile %}كن أنت الأول!{% endif %}
                     {% endif %}
                 </td>
             </tr>

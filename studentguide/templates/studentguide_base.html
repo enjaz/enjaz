@@ -19,7 +19,7 @@
     <li><a href="{% url 'studentguide:my_profile' %}"><i class="glyphicon glyphicon-star"></i> صفحتي</a></li>
     {% endif %}
     <li><a href="{% url 'studentguide:list_guides' %}"><i class="fa fa-users"></i> قائمة المرشدين الطلابيين</a></li>
-    {% if user|is_studentguide_coordinator_or_deputy or user.is_superuser %}
+    {% if user|is_studentguide_coordinator_or_deputy or user|is_studentguide_member or user.is_superuser %}
     <li><a href="{% url 'studentguide:indicators' %}"><span class="glyphicon glyphicon-stats"></span> مؤشرات الإرشاد الطلابي</a></li>
     {% endif %}
 {% endblock %}

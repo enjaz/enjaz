@@ -53,6 +53,16 @@
                 <col class="col-xs-2">
                 <col class="col-xs-6">
             </colgroup>
+            {% if user|is_studentguide_coordinator_or_deputy or user|is_studentguide_member or user.is_superuser %}
+            <tr>
+                <th>رقم الجوال</th>
+                <td>{{ guide.user.common_profile.mobile_number }}</td>
+            </tr>
+            {% endif %}
+            <tr>
+                <th>البريد الإلكتروني</th>
+                <td class="english-field"><a href="mailto:{{ guide.user.email }}">{{ guide.user.email }}</a></td>
+            </tr>
             <tr>
                 <th>الدفعة</th>
                 <td>{{ guide.batch }}</td>

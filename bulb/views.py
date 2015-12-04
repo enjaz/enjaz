@@ -366,7 +366,8 @@ def list_my_requests(request):
                                           requester_status__in=["", "F"])
     elif condition == 'borrowing':
         requests = Request.objects.filter(requester=request.user,
-                                          status="", requester_status="D")
+                                          status__in=["", "D"],
+                                          requester_status="D")
     elif condition == 'done':
         requests = Request.objects.filter(requester=request.user,
                                           book__contribution="G",

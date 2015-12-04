@@ -3,10 +3,12 @@ from datetime import datetime
 from django.db.models import Sum
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
+from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth import authenticate
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import parsers, renderers
+from rest_framework import parsers, renderers, exceptions
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.views import APIView
@@ -82,6 +84,33 @@ class ObtainAuthToken(APIView):
     parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.JSONParser,)
     renderer_classes = (renderers.JSONRenderer,)
     serializer_class = AuthTokenSerializer
+
+    def validate(self, attrs):
+        """Allow both usernames and emails."""
+        identification = attrs.get('username')
+        password = attrs.get('password')
+
+        if identification and password:
+            if '@' in identification:
+                username = identification.split('@')[0]
+            else:
+                username = identification
+
+            user = authenticate(username=username, password=password)
+
+            if user:
+                if not user.is_active:
+                    msg = _('User account is disabled.')
+                    raise exceptions.ValidationError(msg)
+            else:
+                msg = _('Unable to log in with provided credentials.')
+                raise exceptions.ValidationError(msg)
+        else:
+            msg = _('Must include "username" and "password".')
+            raise exceptions.ValidationError(msg)
+
+        attrs['user'] = user
+        return attrs
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

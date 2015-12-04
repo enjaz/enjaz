@@ -1,0 +1,68 @@
+{% extends 'studentguide_base.html' %}{% load staticfiles %}
+{% block title %}متابعة المرشدين والمرشدات{% endblock %}
+{% block content %}
+<style>
+	tr {
+		height: 30px;
+	}
+</style>
+<h2>متابعة المرشدين والمرشدات</h2>
+
+<hr>
+
+<div class="panel-group" id="accordion-test">
+    
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a data-toggle="collapse" href="#my-guides" data-target="#my-guides" class="collapsed">
+                مرشدين ومرشدات أشرف عليهم
+            </a>
+        </h4>
+    </div>
+    <div id="my-guides" class="panel-collapse collapse">
+        <div class="panel-body"><div class="row">
+            {% include "studentguide/partials/guide_table.html" %}
+        </div></div>
+    </div>
+</div>
+    
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a data-toggle="collapse" href="#my-reports" data-target="#my-reports" class="collapsed">
+                تقارير المرشدين والمرشدات الذين أشرف عليهم
+            </a>
+        </h4>
+    </div>
+    <div id="my-reports" class="panel-collapse collapse">
+        <div class="panel-body"><div class="row">
+            {% include "studentguide/partials/report_table.html" %}
+        </div></div>
+    </div>
+</div>
+
+</div>
+
+<link rel="stylesheet" href="{% static 'neon/assets/js/datatables/responsive/css/datatables.responsive.css' %}">
+{% endblock %}
+
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'css/chartist.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/chartist.min.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        language = {% include 'js/dataTables-arabic.json' %};
+        $("#guides").DataTable({
+            "order": [[ 7, "desc" ]],
+            "language": language,
+        });
+        $("#reports").DataTable({
+            "order": [[ 1, "desc" ]],
+            "language": language,
+        });
+    });
+</script>
+{% endblock %}

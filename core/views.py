@@ -16,6 +16,7 @@ from .models import Announcement, Publication, StudentClubYear
 from niqati.models import Code_Order, Code
 from media.models import FollowUpReport, Story
 from accounts.utils import get_user_gender
+import clubs.utils
 
 
 def portal_home(request):
@@ -33,8 +34,9 @@ def portal_home(request):
 
         today = date.today()
         next_week = today + timedelta(weeks=1)
-        next_week_activities = filtered_activities.filter(episode__start_date__gte=today,
-                                                          episode__start_date__lte=next_week).order_by('episode__start_date')
+        next_week_activities = filtered_activities.upcoming().filter(episode__start_date__gte=today,
+                                                                     episode__start_date__lte=next_week)\
+                                                             .order_by('episode__start_date')
         context['upcoming_activities'] = next_week_activities
 
         # --- niqati -------
@@ -72,7 +74,8 @@ def about_sc(request, template_name="about_sc.html"):
 
 @login_required
 def indicators(request, city=""):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and \
+       not clubs.utils.is_presidency_coordinator_or_deputy(request.user):
         raise PermissionDenied
 
     if city:

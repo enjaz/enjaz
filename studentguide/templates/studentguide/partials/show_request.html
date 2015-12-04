@@ -1,0 +1,107 @@
+{% load studentguide_tags %}
+<div class="col-sm-7 col-xs-12 vcenter">
+    {% if source == 'requester' %}
+    <p>المرشد الطلابي:</p>
+    <table class="table table-hover">
+        <tr>
+            <th>الاسم</th>
+            <td><a href="{% url 'studentguide:show_guide' guide_request.guide.pk %}">{{ guide_request.guide.user.common_profile.get_ar_full_name }}</a></td>
+        </tr>
+        <tr>
+            <th>الكلية</th>
+            <td>{{ guide_request.guide.user.common_profile.college.get_name_display }}</td>
+        </tr>
+        {% if guide_request.guide_status == 'A' %}
+        <tr>
+            <th>البريد</th>
+            <td class="english-field"><a href="mailto:{{ guide_request.guide.user.email }}">{{ guide_request.guide.user.email }}</a></td>
+        </tr>
+        <tr>
+            <th>رقم الجوال</th>
+            <td>{{ guide_request.guide.user.common_profile.mobile_number }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <th>تاريخ الطلب</th>
+            <td>{{ guide_request.submission_date|date:"l j F" }}</td>
+        </tr>
+    </table>
+    {% elif source == 'guide'%}
+    <p>الطالب المستجد:</p>
+    <table class="table table-hover">
+        <tr>
+            <th>الاسم</th>
+            <td>{{ guide_request.user.common_profile.get_ar_full_name }}</a></td>
+        </tr>
+        <tr>
+            <th>الكلية</th>
+            <td>{{ guide_request.user.common_profile.college.get_name_display }}</td>
+        </tr>
+        <tr>
+            <th>الدفعة</th>
+            <td>{{ guide_request.batch }}</td>
+        </tr>
+        <tr>
+            <th>الاهتمامات</th>
+            <td>{{ guide_request.interests }}</td>
+        </tr>
+        <tr>
+            <th>البريد</th>
+            <td class="english-field"><a href="mailto:{{ guide_request.user.email }}">{{ guide_request.user.email }}</a></td>
+        </tr>
+        <tr>
+            <th>رقم الجوال</th>
+            <td>{{ guide_request.user.common_profile.mobile_number }}</td>
+        </tr>
+        <tr>
+            <th>تاريخ الطلب</th>
+            <td>{{ guide_request.submission_date|date:"l j F" }}</td>
+        </tr>
+    </table>
+    {% endif %}
+</div>
+<div class="col-sm-5 col-xs-12 vcenter">
+    {% if source == 'requester' %}
+       {% if guide_request.requester_status == 'C' %}
+        <p class="alert alert-danger"><i class="fa fa-exclamation-triangle"></i> ألغيتَ هذا الطلب يوم {{ guide_request.requester_status_date|date:"l j F" }}.</p>
+       {% elif guide_request.guide_status == 'R' %}
+       <p class="alert alert-danger"><i class="fa fa-exclamation-triangle"></i> رفض المرشد الطلابي هذا الطلب.</p>
+       {% elif guide_request.guide_status == 'P' %}
+       <p class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i> لا يزال هذا الطلب معلقا.</p>
+       {% elif guide_request.guide_status == 'A' %}
+       <p class="alert alert-success"><i class="fa fa-check-square-o "></i> قبل المرشد الطلابي هذا الطلب.</p>
+       {% endif %}
+       {% if not guide_request.guide_status == 'R' and not guide_request.requester_status == 'C' %}
+        <button data-pk="{{ guide_request.pk }}" class="cancel btn-block btn-icon btn btn-danger">
+            <i class="fa fa-times"></i>
+            ألغِ الطلب
+        </button>
+       {% endif %}
+    {% elif source == 'guide' %}
+       {% if guide_request.requester_status == 'C' %}
+       <p class="alert alert-danger"><i class="fa fa-exclamation-triangle"></i> ألغى الطالب المستجد هذا الطلب.</p>
+       {% elif guide_request.guide_status == 'R' %}
+        <p class="alert alert-danger"><i class="fa fa-exclamation-triangle"></i> رفضتَ هذا الطلب</p>
+       {% elif guide_request.guide_status == 'P' %}
+       <p class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i> لا يزال هذا الطلب معلقا وينتظر ردّك.</p>
+       {% elif guide_request.guide_status == 'A' %}
+       <p class="alert alert-success"><i class="fa fa-check-square-o "></i> قَبِلت هذا الطلب.</p>
+       {% endif %}
+       {% if not guide_request.requester_status == 'C' and not guide_request.guide_status == 'A' %}
+        <button data-pk="{{ guide_request.pk }}" class="accept btn-block btn-icon btn btn-success">
+            <i class="entypo-flag"></i>
+            اقبل الطلب
+        </button>
+       {% endif %}
+       {% if not guide_request.requester_status == 'C' and not guide_request.guide_status == 'R' %}
+        <button data-pk="{{ guide_request.pk }}" class="reject btn-block btn-icon btn btn-danger">
+            <i class="fa fa-times"></i>
+            {% if guide_request.guide_status == 'A' %}
+            ألغِ الطلب
+            {% elif guide_request.guide_status == 'P' %}
+            ارفض الطلب
+            {% endif %}
+        </button>
+       {% endif %}
+   {% endif %}
+</div>

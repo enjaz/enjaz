@@ -1,0 +1,30 @@
+{% extends 'base.html' %}{% load studentguide_tags %}
+
+{% block title %}الإرشاد الطلابي{% endblock %}
+
+{% block pageheaderurl %}
+    {% url 'studentguide:index' %}
+{% endblock %}
+{% block pageheader %}الإرشاد الطلابي{% endblock %}
+
+{% block navbar %}
+    {% if user.studentguide_assessments.exists %}
+    <li><a href="{% url 'studentguide:list_supervised_guides' %}"><i class="glyphicon glyphicon-pencil"></i> مرشدون ومرشدات أشرف عليهم</a></li>
+    {% endif %}
+    {% if user.guide_requests.current_year.exists %}
+    <li><a href="{% url 'studentguide:list_my_requests' %}"><i class="glyphicon glyphicon-star"></i> طلباتي</a></li>
+    {% endif %}
+    {% if user|has_guide_profile %}
+    <li {% if user|has_pending_requests %}class="action-required"{% endif %}><a href="{% url 'studentguide:requests_to_me' %}"><i class="glyphicon glyphicon-list"></i> طلبات موجّهة إلي</a></li>
+    <li><a href="{% url 'studentguide:my_profile' %}"><i class="glyphicon glyphicon-star"></i> صفحتي</a></li>
+    {% endif %}
+    <li><a href="{% url 'studentguide:list_guides' %}"><i class="fa fa-users"></i> قائمة المرشدين الطلابيين</a></li>
+    {% if user|is_studentguide_coordinator_or_deputy or user.is_superuser %}
+    <li><a href="{% url 'studentguide:indicators' %}"><span class="glyphicon glyphicon-stats"></span> مؤشرات الإرشاد الطلابي</a></li>
+    {% endif %}
+{% endblock %}
+
+{% block content %}{% endblock %}
+
+{% block customscript %}
+{% endblock %}

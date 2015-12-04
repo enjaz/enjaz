@@ -1,0 +1,10 @@
+{% for guide_request in requests %}
+<div style="display: flex;" id="request-{{ guide_request.pk }}" class="row">
+    {% include "studentguide/partials/show_request.html" %}
+</div>
+{% if not forloop.last %}
+<hr>
+{% endif %}
+{% empty %}
+    <p>لا توجد طلبات.</p>
+{% endfor %}

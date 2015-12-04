@@ -9,6 +9,14 @@ register = template.Library()
 # (in terms of order)
 
 @register.filter
+def is_presidency_coordinator_or_deputy(user):
+    return club_utils.is_presidency_coordinator_or_deputy(user)
+
+@register.filter
+def is_deanship_of_students_affairs_coordinator_or_member(user):
+    return club_utils.is_deanship_of_students_affairs_coordinator_or_member(user)
+
+@register.filter
 def is_coordinator_of_any_club(user):
     return club_utils.is_coordinator_of_any_club(user)
 

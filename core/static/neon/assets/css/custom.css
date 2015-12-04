@@ -498,16 +498,15 @@ body.login-page .login-content .alert-warning a {
     border: #dbdbd4 1px solid;
 }
 
-.book-image{
+.book-image, .category-image, .tag-image{
     display: block;
     width:90%;
     max-width: 100%;
     padding-bottom:90%;
     margin:10px;
     background-repeat: no-repeat;
-    background-position-x: 50%;
-    background-position-y: 50%;
     background-size: auto 100%;
+    background-position: center center;
 }
 
 .group-name{
@@ -547,26 +546,39 @@ body.login-page .login-content .alert-warning a {
     font-size: 12px;
 }
 
-.modal-intro{
+.modal-intro, .studentguide-intro{
     text-align: justify;
     color: rgb(65, 65, 65);
 }
     
 p.modal-intro{
-        font-size: 20px;
+    font-size: 20px;
 }
-    
+
 ul.modal-intro{
     font-size: 16px;
 }
-   
+
 .modal-content h2{
     text-align: center;
     margin-bottom: 20px;
 }
 
+p.studentguide-intro{
+    font-size: 18px;
+}
 
-.bulb-option{
+ul.studentguide-intro{
+    font-size: 18px;
+}
+
+.modal-content h3 span{
+    font-weight: 700;
+    text-decoration: underline;
+    padding: 5px;
+}
+
+.bulb-option, .studentguide-option{
     border: 1px solid #ebebeb;
     position: relative;
     display: block;
@@ -577,22 +589,75 @@ ul.modal-intro{
     width: 100%;
 }
 
-.bulb-option p{
-    color:  rgb(30, 71, 30);
+.studentguide-option.guide{
+    background-color: #C5E8F7;
+    border-color: #A6E8F3;
+    /*
+    background-color: #F5BCA9;
+    border-color: #FFFFFF;
+*/
+}
+
+.studentguide-option.new-student{
+    background-color: #FFEFA4;
+    border-color: #FFD78A;
+    /*
+    background-color: #D0F5A9;
+    border-color: #DAE4D0;*/
+}
+
+.bulb-option p, .studentguide-option p{
     font-size: 16px;
     text-align: justify;
 }
-    
-.bulb-option h3, .bulb-option p{
+
+.bulb-option p{
+    color:  rgb(30, 71, 30);
+}
+
+.studentguide-option.new-student p, .studentguide-option.new-student .icon, .studentguide-option.new-student h3{
+    color:  #243E08;
+}
+
+.studentguide-option.guide p, .studentguide-option.guide .icon, .studentguide-option.guide h3{
+    color:  #05271E;
+}
+
+
+.tile-stats.tile-brown{
+    background: #C5E8F7;
+}
+
+
+.tile-stats.tile-brown:hover{
+    background: #DCEDF5;
+}
+
+.tile-stats.tile-brown .num, .tile-stats.tile-brown h3, .tile-stats.tile-brown p{
+    color: #100F08
+}
+
+/*
+
+.tile-stats.tile-brown{
+    background: #F3E2A9;
+}
+
+.tile-stats.tile-brown:hover{
+    background: #E0CF97;
+}
+
+*/
+
+.bulb-option h3, .bulb-option p, .studentguide-option h3, .studentguide-option p{
     margin-top: 5px;
     position: relative;
     z-index: 5;
     padding: 0;
 }
 
-.bulb-option .icon{
+.bulb-option .icon, .studentguide-option .icon{
     font-size: 30px;
-    color: white;
     left: 5px;
     right: auto;   
     position: absolute;
@@ -600,10 +665,13 @@ ul.modal-intro{
     z-index: 1;
 }
 
-.bulb-option h3{
+.bulb-option h3, .studentguide-option h3{
     font-size: 30px;
-    color: white;
     text-align: center;
+}
+
+.bulb-option .icon, .bulb-option h3{
+   color: white;
 }
 
 .give.btn, .contribution-option.give{
@@ -622,25 +690,45 @@ ul.modal-intro{
     background-color: rgb(199, 147, 70);
 }
 
-
-li.highlighted-section {
-    -webkit-animation-name: example; /* Chrome, Safari, Opera */
-    -webkit-animation-duration: 4s; /* Chrome, Safari, Opera */
-    animation-name: red-highlighting;
+li.highlighted-section, li.action-required, .navbar-default .navbar-nav>li.action-required>a{
+    -webkit-animation-duration: 4s;
     animation-duration: 4s;
     animation-iteration-count: infinite;
 }
 
-/* Chrome, Safari, Opera */
+li.highlighted-section {
+    -webkit-animation-name: red-highlighting;
+    animation-name: red-highlighting;
+}
+
+p.section-intro{
+    width: 90%;
+    text-align: justify;
+    font-size: 18px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
 @-webkit-keyframes red-highlighting {
     0%   {background-color: transparent;}
     50%  {background-color: #A91E1E;}
 }
-
-/* Standard syntax */
 @keyframes red-highlighting {
     0%   {background-color: transparent;}
     50%  {background-color: #A91E1E;}
+}
+
+li.action-required, .navbar-default .navbar-nav>li.action-required>a{
+    -webkit-animation-name: action-required;
+    animation-name: action-required;
+}
+@-webkit-keyframes action-required {
+    0%   {background-color: transparent;}
+    50%  {background-color: #A91E1E; color: white;}
+}
+@keyframes action-required {
+    0%   {background-color: transparent;}
+    50%  {background-color: #A91E1E; color: white !important;}
 }
 
 /* As per the official neon support forum, to solve modal position in

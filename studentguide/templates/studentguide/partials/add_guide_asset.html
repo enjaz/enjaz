@@ -1,0 +1,32 @@
+{% load staticfiles %}
+<script type="text/javascript">
+    $(function () {
+        // initialize guide edit modal
+        $('#edit-guide-profile-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        });
+        $("button#add-guide").click(function () {
+            $("#edit-guide-profile-modal").modal('show');
+
+            $("#edit-guide-profile-modal .modal-title").html("سجّل نفسك مرشدًا طلابيًا");
+            $("#edit-guide-profile-modal .modal-body").load("{% url 'studentguide:add_guide_introduction' %}", function(){
+                $('.end-guide-introduction').click(function() {
+                    $("#edit-guide-profile-modal .modal-body").load("{% url 'studentguide:add_guide' %}");
+            });
+            });
+
+            var $submitButton = $("#edit-guide-profile-modal button.submit-button");
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-guide-profile-form").submit();
+            });
+        });
+    });
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+
+{% with modal_id='edit-guide-profile-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}

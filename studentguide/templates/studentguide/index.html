@@ -1,0 +1,46 @@
+{% extends 'studentguide_base.html' %}{% load staticfiles %}
+{% block content %}
+<h1>الإرشاد الطلابي</h1>
+
+<div class="row row-flex">
+    <div class="col-sm-6 col-sm-offset-1">
+        <p style="
+            width: 90%;
+            text-align: justify;
+            font-size: 18px;
+            margin-right: auto;
+            margin-left: auto;">
+الإرشاد الطلابي هو حلقة الوصل بين الطلاب المستجدين والطالبات المستجدّات والطلاب والطالبات الأقدم في الجامعة. يقدم المرشد الطلابي المشورة للطالب المستجد بناء على تجربته الشخصية، كالمساعدة في حل الصعوبات الأكاديمية التي قد يواجهها الطالب المستجد، ومساعدته في التميّز في الحياة الجامعية! راسلنا لأي استفسارات <a href="mailto:arshidny@ksau-hs.edu.sa">arshidny@ksau-hs.edu.sa</a>.
+        </p>
+    </div>
+    <div class="col-sm-3">
+        <div class="tile-stats tile-brown">
+            <div class="icon"><i class="entypo-users"></i></div>
+            <div class="num" data-start="0" data-end="{{ guide_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+            <h3>عدد المرشدات والمرشدين</h3>
+            <p>مجموع المرشدات والمرشدين على بوابة إنجاز</p>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6">
+        <a href="{% url 'studentguide:new_student_index' %}" class="studentguide-option new-student">
+
+            <div class="icon"><i class="fa fa-heart"></i></div>			
+            <h3>اختر لنفسك مرشدًا طلابيًا</h3>
+            <p>إذا كنَت من الطلاب والطالبات المستجدين في الجامعة، هذه فرصتك لتجد من يعينك من الطلاب القدامى.</p>
+        </a>
+    </div>
+        <div class="col-sm-6">
+        <button id="add-guide" class="studentguide-option guide">
+            <div class="icon"><i class="entypo-graduation-cap"></i></div>			
+            <h3>سجّل نفسك مرشدًا طلابيًا</h3>
+            <p>إذا كنتَ من الطلاب والطالبات الأقدم في الجامعة، هذه فرصتك لتعين الطلاب المستجدين! </p>
+        </button>
+    </div>
+</div>
+{% endblock %}
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+{% include "studentguide/partials/add_guide_asset.html" %}
+{% endblock %}

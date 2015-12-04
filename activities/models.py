@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 
 
-from activities.managers import ActivityQuerySet
+from activities.managers import ActivityQuerySet, EpisodeQuerySet
 from core.models import StudentClubYear
 from clubs.models import College, Club
 from clubs.utils import get_deanship, get_presidency
@@ -214,11 +214,21 @@ class Activity(models.Model):
         """
         Return the next scheduled episode for this activity.
         """
-        sorted_episodes = self.episode_set.order_by('start_date', 'start_time')
-        next_episodes = sorted_episodes.filter(start_date__gt=datetime.now().date()) \
-        | sorted_episodes.filter(start_date=datetime.now().date(), start_time__gte=datetime.now())
-        # episodes from tomorrow onward +  episodes that are today but later in the day
-        return next_episodes.first()
+        upcoming_episodes = self.episode_set.upcoming().order_by('start_date', 'start_time')
+        return upcoming_episodes.first()
+
+    def get_next_or_last_episode(self):
+        """
+        Return the next scheduled episode for this activity.
+        """
+
+        upcoming_episodes = self.episode_set.upcoming().order_by('start_date', 'start_time')
+
+        if upcoming_episodes.exists():
+            return upcoming_episodes.first()
+        else:
+            sorted_episodes = self.episode_set.order_by('start_date', 'start_time')
+            return sorted_episodes.last()
 
     # Evaluation-related
     def get_evaluations(self):
@@ -456,6 +466,8 @@ class Episode(models.Model):
     requires_report = models.BooleanField(default=True)
     can_report_early = models.BooleanField(default=False)
     requires_story = models.BooleanField(default=True)
+
+    objects = EpisodeQuerySet.as_manager()
 
     ### Methods ###
 

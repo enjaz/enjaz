@@ -3,10 +3,12 @@ from datetime import datetime
 from django.db.models import Sum
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
+from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth import authenticate
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import parsers, renderers
+from rest_framework import parsers, renderers, exceptions
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.views import APIView
@@ -68,23 +70,7 @@ class ActivityDetail(generics.RetrieveAPIView):
 
 class ClubList(generics.ListAPIView):
     serializer_class = ClubSerializer
-
-    def get_queryset(self):
-        queryset = Club.objects.current_year().visible()
-
-        city = self.request.query_params.get('city', None)
-        if city:
-            queryset = queryset.filter(city=city)
-        else:
-            queryset = queryset.for_user_city(self.request.user)
-
-        gender = self.request.query_params.get('gender', None)
-        if gender:
-            queryset = queryset.filter(gender=gender)
-        else:
-            queryset = queryset.for_user_gender(self.request.user)
-        
-        return queryset.distinct()
+    queryset = Club.objects.current_year().visible()
 
 class ClubDetail(generics.RetrieveAPIView):
     serializer_class = ClubSerializer
@@ -99,6 +85,33 @@ class ObtainAuthToken(APIView):
     renderer_classes = (renderers.JSONRenderer,)
     serializer_class = AuthTokenSerializer
 
+    def validate(self, attrs):
+        """Allow both usernames and emails."""
+        identification = attrs.get('username')
+        password = attrs.get('password')
+
+        if identification and password:
+            if '@' in identification:
+                username = identification.split('@')[0]
+            else:
+                username = identification
+
+            user = authenticate(username=username, password=password)
+
+            if user:
+                if not user.is_active:
+                    msg = _('User account is disabled.')
+                    raise exceptions.ValidationError(msg)
+            else:
+                msg = _('Unable to log in with provided credentials.')
+                raise exceptions.ValidationError(msg)
+        else:
+            msg = _('Must include "username" and "password".')
+            raise exceptions.ValidationError(msg)
+
+        attrs['user'] = user
+        return attrs
+
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -111,6 +124,7 @@ class ObtainAuthToken(APIView):
                          'en_first_name': user.common_profile.en_first_name,
                          'en_middle_name': user.common_profile.en_middle_name,
                          'en_last_name': user.common_profile.en_last_name,
+                         'city': user.common_profile.city,
                          'college': user.common_profile.college.name,
                          'gender': user.common_profile.college.name,
                          'section': user.common_profile.college.section})

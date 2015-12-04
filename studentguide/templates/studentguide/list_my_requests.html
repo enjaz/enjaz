@@ -1,0 +1,78 @@
+{% extends "studentguide_base.html" %}{% load staticfiles %}
+{% block title %}طلباتي{% endblock %}
+{% block content %}
+    <div class="row">
+        <h1>طلباتي</h1>
+        <h2>طلبات معلقة</h2>
+        <div class="panel panel-warning panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="pending-requests">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
+        <h2>طلبات معتمدة</h2>
+        <div class="panel panel-success panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="done-requests">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
+        <h2>طلبات رفضها المرشدون الطلابيون</h2>
+        <div class="panel panel-danger panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="rejected-requests">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
+        <h2>طلبات ألغيتها</h2>
+        <div class="panel panel-danger panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="canceled-requests">
+                    {% include "media/polls/ajax-loader.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+
+{% with from_my_books=True %}
+    {% include "bulb/exchange/components/edit_book_asset.html" %}
+{% endwith %}
+
+<script type="text/javascript">
+    function initialize_request_buttons(){
+        control_url = "{% url 'studentguide:control_request' %}";
+        list_url = "{% url 'studentguide:list_request_summaries' %}";
+        $('button.cancel').click(function() {
+            pk = $(this).data('pk');
+            data = {pk: pk, action: 'requester_canceled'}
+            $.ajax({
+                url: control_url,
+                type: 'POST',
+                data: data,
+                cache: false,
+                success: function (data) {
+                    if (data.message == "success") {
+                        updateLists();
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            });
+        });
+    }
+    function updateLists(){
+        $("#pending-requests").load("{% url 'studentguide:list_request_summaries' %}", {source: 'requester', condition: 'pending'}, initialize_request_buttons);
+        $("#done-requests").load("{% url 'studentguide:list_request_summaries' %}", {source: 'requester', condition: 'done'}, initialize_request_buttons);
+        $("#rejected-requests").load("{% url 'studentguide:list_request_summaries' %}", {source: 'requester', condition: 'rejected'}, initialize_request_buttons);
+        $("#canceled-requests").load("{% url 'studentguide:list_request_summaries' %}", {source: 'requester', condition: 'canceled'}, initialize_request_buttons);
+    }
+    $(updateLists);
+</script>
+{% endblock %}

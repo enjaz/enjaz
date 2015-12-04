@@ -1,0 +1,44 @@
+{% extends "studentguide_base.html" %}{% load staticfiles %}
+{% block title %}قائمة المرشدين الطلابييين{% endblock %}
+{% block content %}
+<h1>قائمة المرشدين الطلابيين</h1>
+<table id="guide-table" class="display datatable dt-responsive">
+    <thead>
+        <tr>
+            <th>المرشد</th>
+            <th class="not-mobile">الكلية</th>
+            <th class="not-mobile">الدفعة</th>
+            <th class="not-mobile">تاريخ الإضافة</th>
+            <th class="not-mobile">ماذا يقدم؟</th>
+        </tr>
+    </thead>
+     <tbody>
+        {% for guide in guides %}
+        <tr>
+            <td data-order="{{ guide.user.common_profile.get_ar_full_name|default:guide.user.username }}">{% if not guide.is_available  %}<span class="badge badge-warning">غير متاح!</span>{% else %}<span class="badge badge-success">متاح</span>{% endif %}<a href="{% url 'studentguide:show_guide' guide.pk %}">{{ guide.user.common_profile.get_ar_full_name|default:guide.user.username }}</a></td>
+            <td>{{ guide.user.common_profile.college }}</a></td>
+            <td>{{ guide.batch }}</td>
+            <td data-order="{{ guide.submission_date|date:"U" }}">{{ guide.submission_date|date:"j F Y" }}</td>
+            <td><ul>{% for tag in guide.tags.all %}<li>{{ tag.name }}</li>{% endfor %}</ul></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        language = {% include 'js/dataTables-arabic.json' %};
+        $(".datatable").DataTable({
+            "order": [[ 3, "desc" ]],
+            "language": language,
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends 'studentguide_base.html' %}{% load studentguide_tags %}{% load staticfiles %}
+{% block title %}تقرير {{ report.guide.user.common_profile.get_ar_full_name }} في {{ report.submission_date|date:"j F" }}{% endblock %}
+
+{% block content %}
+
+<h1>تقرير <a href="{% url 'studentguide:show_guide' report.guide.pk %}">{{ report.guide.user.common_profile.get_ar_full_name }}</a> في {{ report.submission_date|date:"j F" }}</h1>
+
+<div class="row" style="margin-left: 0; margin-bottom: 5px;">
+    <div style="float: left;">
+        <button id="edit-report" class="btn btn-icon btn-success">
+            <i class="entypo-pencil"></i>
+            عدّل التقرير
+        </button>
+        <button id="confirm-delete-report" class="btn btn-icon btn-danger">
+            <i class="fa fa-times"></i>
+            احذف التقرير
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-8 col-sm-offset-2">
+        <table class="table-hover table">
+            <colgroup>
+                <col class="col-xs-2">
+                <col class="col-xs-6">
+            </colgroup>
+            <tr>
+                <th>وقت الإرسال</th>
+                <td>{{ report.submission_date }}</td>
+            </tr>
+            <tr>
+                <th>تاريخ الجلسة</th>
+                <td>{{ report.session_date }}</td>
+            </tr>
+            <tr>
+                <th>مكان الجلسة</th>
+                <td>{{ report.session_location }}</td>
+            </tr>
+            <tr>
+                <th>مدة الجلسة</th>
+                <td>{{ report.session_duration }}</td>
+            </tr>
+            <tr>
+                <th>وسيلة التواصل المعتمدة مع الطلبة المستفيدين</th>
+                <td>{{ report.means_of_communication }}</td>
+            </tr>
+            <tr>
+                <th>المشكلات والقضايا التي نوقشت</th>
+                <td>{{ report.points_discussed }}</td>
+            </tr>
+            <tr>
+                <th>الخطط والحلول التي وضعت</th>
+                <td>{{ report.plans_suggested }}</td>
+            </tr>
+            <tr>
+                <th>هل من صعوبات في عقد الجلسة؟</th>
+                <td>{{ report.issues_faced|default:"لا يوجد" }}</td>
+            </tr>
+            <tr>
+                <th>ملاحظات أخرى</th>
+                <td>{{ report.other_comments|default:"لا يوجد" }}</td>
+            </tr>
+            <tr>
+                <th>تاريخ الجلسة القادمة</th>
+                <td>{{ report.next_session_date|default:"لا يوجد" }}</td>
+            </tr>
+        </table>
+	</div>
+</div>
+{% endblock %}
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<script type="text/javascript">
+$(function(){
+    $('#edit-report-modal').modal({
+      keyboard: false,
+      backdrop: 'static',
+      show    : false,
+    });
+    $("button#edit-report").click(function () {
+        $("#edit-report-modal").modal('show');
+
+        $("#edit-report-modal .modal-title").html("عدّل تقرير {{ report.submission_date|date:"j F" }}");
+        $("#edit-report-modal .modal-body").load("{% url 'studentguide:edit_report' report.guide.pk report.pk %}");
+
+        var $submitButton = $("#edit-report-modal button.submit-button");
+        $submitButton.off('click');
+        $submitButton.click(function () {
+            $("form#edit-report-form").submit();
+        });
+    });
+});
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+<style>
+p{
+    font-size: 17px;
+}
+</style>
+{% with modal_id='edit-report-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}
+{% include "studentguide/partials/delete_report_asset.html" %}
+{% endblock %}

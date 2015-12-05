@@ -8,7 +8,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import parsers, renderers, exceptions
 from rest_framework.authtoken.models import Token
-from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.views import APIView
 from activities.models import Activity
 
@@ -81,7 +80,7 @@ class ObtainAuthToken(APIView):
     permission_classes = ()
     parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.JSONParser,)
     renderer_classes = (renderers.JSONRenderer,)
-    serializer_class = AuthTokenSerializer
+    serializer_class = ModifiedAuthTokenSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

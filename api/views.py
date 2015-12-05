@@ -3,8 +3,6 @@ from datetime import datetime
 from django.db.models import Sum
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth import authenticate
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -15,7 +13,7 @@ from rest_framework.views import APIView
 from activities.models import Activity
 
 from accounts.utils import get_user_college
-from api.serializers import ActivitySerializer, ClubSerializer, BuzzSerializer, BuzzViewSerializer, CodeSerializer
+from api.serializers import ActivitySerializer, ClubSerializer, BuzzSerializer, BuzzViewSerializer, CodeSerializer, ModifiedAuthTokenSerializer
 from clubs.models import Club
 from media.models import Buzz, BuzzView
 from niqati.models import Code
@@ -84,33 +82,6 @@ class ObtainAuthToken(APIView):
     parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.JSONParser,)
     renderer_classes = (renderers.JSONRenderer,)
     serializer_class = AuthTokenSerializer
-
-    def validate(self, attrs):
-        """Allow both usernames and emails."""
-        identification = attrs.get('username')
-        password = attrs.get('password')
-
-        if identification and password:
-            if '@' in identification:
-                username = identification.split('@')[0]
-            else:
-                username = identification
-
-            user = authenticate(username=username, password=password)
-
-            if user:
-                if not user.is_active:
-                    msg = _('User account is disabled.')
-                    raise exceptions.ValidationError(msg)
-            else:
-                msg = _('Unable to log in with provided credentials.')
-                raise exceptions.ValidationError(msg)
-        else:
-            msg = _('Must include "username" and "password".')
-            raise exceptions.ValidationError(msg)
-
-        attrs['user'] = user
-        return attrs
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

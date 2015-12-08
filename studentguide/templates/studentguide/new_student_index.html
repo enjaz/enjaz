@@ -2,8 +2,9 @@
 {% block title %}اختيار مرشد طلابي{% endblock %}
 {% block content %}
 <h1>اختيار مرشد طلابي</h1>
+
 <div class="row">
-    <div class="col-sm-8 col-sm-offset-2">
+    <div class="col-sm-6 col-sm-offset-2 col-md-6 col-md-offset-2">
         <p style="
             width: 90%;
             text-align: justify;
@@ -12,6 +13,12 @@
             margin-left: auto;">
 يقدّم المرشدون والمرشدات لك العون في مجالات اهتمام مختلفة، اختر إحداها لنوجّهك للمرشد المناسب، ولا تقلق، لن يكون الإرشاد مقتصرا على هذا الاهتمام! بل سيكون المرشد مستعدًا لتقديم العون في غير ذلك المجال أيضا.
         </p>
+    </div>
+    <div class="col-sm-4 col-md-4">
+        <a href="{% url 'studentguide:list_guides' %}" class="btn btn-icon btn-success" style="float: left;">
+            <i class="entypo-list"></i>
+            استعرض جميع المرشدين
+        </a>
     </div>
 </div>
 {% if tags.exists %}

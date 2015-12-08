@@ -27,7 +27,7 @@
         </tr>
     </table>
     {% elif source == 'guide'%}
-    <p>الطالب المستجد:</p>
+    <p>الطالب المستفيد:</p>
     <table class="table table-hover">
         <tr>
             <th>الاسم</th>
@@ -79,7 +79,7 @@
        {% endif %}
     {% elif source == 'guide' %}
        {% if guide_request.requester_status == 'C' %}
-       <p class="alert alert-danger"><i class="fa fa-exclamation-triangle"></i> ألغى الطالب المستجد هذا الطلب.</p>
+       <p class="alert alert-danger"><i class="fa fa-exclamation-triangle"></i> ألغى الطالب المستفيد هذا الطلب.</p>
        {% elif guide_request.guide_status == 'R' %}
         <p class="alert alert-danger"><i class="fa fa-exclamation-triangle"></i> رفضتَ هذا الطلب</p>
        {% elif guide_request.guide_status == 'P' %}

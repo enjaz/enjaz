@@ -37,6 +37,8 @@ def get_user_guide_profile(user):
 
 def can_edit_guide(user, guide):
     if is_studentguide_coordinator_or_deputy(user) or \
+       is_studentguide_member(user) or \
+       guide.assessor == user or \
        user.is_superuser or \
        guide.user == user:
         return True
@@ -55,6 +57,8 @@ def can_add_request(user, guide):
        not guide.is_available:
         return False
     elif is_studentguide_coordinator_or_deputy(user) or \
+         is_studentguide_member(user) or \
+         guide.assessor == user or \
          user.is_superuser or \
          not has_guide_profile(user):
         return True
@@ -63,8 +67,10 @@ def can_add_request(user, guide):
 
 def can_edit_request(user, guide_request):
     if is_studentguide_coordinator_or_deputy(user) or \
-       user.is_superuser or \
-       guide_request.user == user:
+       is_studentguide_member(user) or \
+       guide.assessor == user or \
+       guide_request.user == user or \
+       user.is_superuser:
         return True
     else:
         return False

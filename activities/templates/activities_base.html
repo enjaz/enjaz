@@ -10,7 +10,7 @@
 {% block navbar %}
     {# if the user is a coordinator of any club, or if they have the add_activity permission #}
     {% if perms.activities.add_activity or user|can_submit_activities %}
-        {% if not user.coordination.current_year.0.get_overdue_report_count > 3 %}
+        {% if user.coordination.current_year.0.can_skip_followup_reports or not user.coordination.current_year.0.get_overdue_report_count > 3 %}
 		<li><a href="{% url 'activities:create' %}"><span class="glyphicon glyphicon-plus"></span> أضف نشاطًا</a></li>
         {% endif %}
 	{% endif %}

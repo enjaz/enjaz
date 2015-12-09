@@ -114,6 +114,8 @@ class Club(models.Model):
                                      verbose_name=u"يستطيع تقييم لأنشطة؟")
     can_view_assessments = models.BooleanField(default=False,
                                                verbose_name=u"يستطيع مشاهدة تقييمات الأنشطة؟")
+    can_skip_followup_reports = models.BooleanField(default=False,
+                                                    verbose_name=u"يستطيع تجاوز التقارير الإعلامية؟")
     is_assessed =  models.BooleanField(default=True,
                                        verbose_name=u"هل يخضع للتقييم؟")
     can_submit_activities =  models.BooleanField(default=True,

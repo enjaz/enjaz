@@ -32,7 +32,7 @@ class ModifiedAuthTokenSerializer(AuthTokenSerializer):
                 # Currently, the app is only available for students.
                 try:
                     college = user.college
-                except ObjectDoesNotExist:
+                except (ObjectDoesNotExist, AttributeError):
                     raise exceptions.ValidationError(u"لم تسجل في بوابة إنجاز كطالب!")
             else:
                 msg = _('Unable to log in with provided credentials.')

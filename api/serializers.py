@@ -31,7 +31,7 @@ class ModifiedAuthTokenSerializer(AuthTokenSerializer):
 
                 # Currently, the app is only available for students.
                 try:
-                    college = user.college
+                    college = user.common_profile.college
                 except (ObjectDoesNotExist, AttributeError):
                     raise exceptions.ValidationError(u"لم تسجل في بوابة إنجاز كطالب!")
             else:

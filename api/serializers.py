@@ -2,7 +2,7 @@
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from activities.models import Activity, Episode
 from activities.models import Category as ActivityCategory

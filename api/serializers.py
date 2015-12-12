@@ -1,3 +1,4 @@
+# -*- coding: utf-8  -*-
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import authenticate
 from rest_framework import serializers
@@ -26,6 +27,8 @@ class ModifiedAuthTokenSerializer(AuthTokenSerializer):
                 if not user.is_active:
                     msg = _('User account is disabled.')
                     raise exceptions.ValidationError(msg)
+                if not user.college:
+                    raise exceptions.ValidationError(u"لم تسجل في بوابة إنجاز كطالب!")
             else:
                 msg = _('Unable to log in with provided credentials.')
                 raise exceptions.ValidationError(msg)

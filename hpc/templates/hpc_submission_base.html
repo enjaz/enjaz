@@ -6,7 +6,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta name="description" content="بوابة المستقبل لنادي الطلاب!" />
+	<meta name="description" content="HPC 2016 Abstract Submission" />
 	<meta name="author" content="" />
 	
 	<title>إنجاز | {% block title %}{% endblock %}</title>
@@ -17,7 +17,6 @@
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-core.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-theme.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-forms.css' %}?v=0001">
-	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/skins/green.css' %}">
 	<script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
@@ -48,11 +47,12 @@ var baseurl = '';
 	<div class="login-header login-caret">
 		
 		<div class="login-content">
-			
+            <a href="http://hpc.enjazportal.com">
+                <img src="http://hpc.enjazportal.com/wp-content/uploads/2015/12/hpc-logo-small.png" width="140" style="background: white;border-radius: 100%;">
+            </a>
 			<a href="{% url 'home' %}" class="logo">
-				<img src="{% static 'logo/enjaz_logo_shadow.png' %}" width="250" alt="" />
+				<img src="{% static 'logo/enjaz_logo_shadow.png' %}" width="140" alt="" />
 			</a>
-			
 			<p class="description dinar-light">{% block description %}{% endblock %}</p>
 			
 			<!-- progress bar indicator -->
@@ -101,7 +101,7 @@ var baseurl = '';
 	  (function() {
 	    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://enjazportal.com/stats/";
 	    _paq.push(['setTrackerUrl', u+'piwik.php']);
-	    _paq.push(['setSiteId', 1]);
+	    _paq.push(['setSiteId', 2]);
 	    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
 	    g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
 	  })();

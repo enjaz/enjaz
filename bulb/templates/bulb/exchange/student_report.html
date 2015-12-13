@@ -10,7 +10,32 @@
 .tg th{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
 </style>
 {% include "bulb/exchange/components/critical_buttons.html" %}
+
 <h1>تقرير {% if user != bulb_user %}رصيد {{ bulb_user.common_profile.get_ar_full_name }}{% else %}رصيدك{% endif %}</h1>
+{% if user == bulb_user %}
+<p class="section-intro">في سِراج نستخدم "الرصيد" كي نحافظ على مكتبة سِراج عامرة بأحسن الكتب! لكل طالب وطالبة رصيدان: أحدهما لاقتناء الكتب، والآخر لاستعارة الكتب. يمكن لجميع الطلاب والطالبات مبدئيا استعارة كتاب واحد واقتناء كتاب آخر، ويزداد الرصيد كلما طُلب كتاب رفعتَه. هكذا نضمن أن من يساهمون لمكتبة سِراج بكتب قيّمة يستفيدون بدورهم مما تتيحه المكتبة!  يمكنك أيضا تحويل رصيد الاقتناء إلى رصيد استعارة.</p>
+<h2>تحويل الرصيد</h2>
+{% if request.user.book_points.count_total_giving %}
+    <div class="well">        
+        <p>يمكنك تحويل رصيد الاقتناء إلى رصيد إعارة!  ستحصل على نقطتين إعارة مقابل كل نقطة اقتناء تُحوّلها.</p>
+        <div class="form-inline">
+          <div class="form-group">
+              <label for="giving">رصيد الاقتناء الذي تريد تحويله:</label>
+              <input class="form-control" id="giving"  type="number" max="{{ request.user.book_points.count_total_giving }}" min="0">
+          </div>
+          <div class="form-group">
+              <label for="lending">رصيد الاستعارة الذي ستحصل عليه:</label>
+              <input readonly class="form-control" id="lending"  type="number">
+          </div>
+          <button id="convertButton" type="submit" class="btn btn-success">حوّل</button>
+        </div>
+    </div>
+{% else %}
+    <p class="alert alert-warning">لا تملك حاليا رصيد اقتناء، ولذا لا يمكنك تحويل الاقتناء إلى استعارة.</p>
+{% endif %}
+
+{% endif %}
+
 <h2 id="giving">رصيد الاقتناء</h2>
 <p>من خلال هذا الرصيد يمكنك اقناء أيٍ من الكتب المعروضة في سِراج.</p>
 {% with points=bulb_user.book_points.current_year.counted.giving %}
@@ -29,6 +54,34 @@
 <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 <script>
 $(function () {
+    var max_giving = {{ request.user.book_points.count_total_giving }};
+    $("#giving").change(function(){
+        giving = $(this).val();
+        if (giving > max_giving){
+            $(this).val(max_giving);
+            giving = max_giving;
+        }
+        $("#lending").val(giving * 2);
+    });
+    $("#convertButton").click(function(){
+        $(this).prop('disabled', true);
+        giving = $("#giving").val();
+        data = {giving: giving};
+        $.ajax({
+            url: "{% url 'bulb:convert_balance' %}",
+            type: 'POST',
+            data: data,
+            cache: false,
+            success: function (data) {
+                if (data.message == "success") {
+                    window.location = "{% url 'bulb:student_report' %}";
+                } else {
+                    alert(data.message);
+                    $("#convertButton").prop('disabled', false);
+                }
+            }
+        });
+    });
 	$('.datatable').DataTable({
         "order": [[ 0, "desc" ]],
         "language": {% include 'js/dataTables-arabic.json' %}

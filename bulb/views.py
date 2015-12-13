@@ -764,6 +764,29 @@ def student_report(request, username=None):
     return render(request, 'bulb/exchange/student_report.html',
                   {'bulb_user': bulb_user})
 
+@decorators.ajax_only
+@decorators.post_only
+@login_required
+@csrf.csrf_exempt
+def convert_balance(request):
+    try:
+        giving = int(request.POST.get('giving'))
+    except ValueError:
+        raise Exception(u"أدخل رقما!")
+
+    if giving > request.user.book_points.count_total_giving():
+        raise Exception(u"لا تستطيع تحويل أكثر مما تملك من رصيد اقتناء")
+
+    # Start converting the last, counted, positive-one point.
+    for giving_point in request.user.book_points.current_year().giving().counted().filter(value=1).order_by("-submission_date")[:giving]:
+        giving_point.value = 2
+        giving_point.category = 'L'
+        giving_point.save()
+
+    return {"message": "success",
+            "total_lending": request.user.book_points.count_total_lending(),
+            "total_giving": request.user.book_points.count_total_giving()}
+
 # Reading Groups
 
 @login_required

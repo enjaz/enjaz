@@ -49,8 +49,9 @@
         display_url = "{% url 'bulb:pending_request' %}";
         list_url = "{% url 'bulb:list_my_requests' %}";
         $('button.done').click(function() {
-            $(this).prop('disabled', true);
-            pk = $(this).data('pk');
+            var button = this;
+            $(button).prop('disabled', true);
+            var pk = $(button).data('pk');
             data = {pk: pk, action: 'requester_done'}
             $.ajax({
                 url: control_url,
@@ -62,14 +63,15 @@
                         refreshLists();
                     } else {
                         alert(data.message);
-                        $(this).prop('disabled', false);
+                        $(button).prop('disabled', false);
                     }
                 }
             });
         });
         $('button.failed').click(function() {
-            $(this).prop('disabled', true);
-            pk = $(this).data('pk');
+            var button = this;
+            $(button).prop('disabled', true);
+            var pk = $(button).data('pk');
             data = {pk: pk, action: 'requester_failed'}
             $.ajax({
                 url: control_url,
@@ -82,14 +84,15 @@
                         $("#pending-"+pk).load(display_url, {pk: pk}, initialize_request_buttons);
                     } else {
                         alert(data.message);
-                        $(this).prop('disabled', false);
+                        $(button).prop('disabled', false);
                     }
                 }
             });
         });
         $('button.returned').click(function() {
-            $(this).prop('disabled', true);
-            pk = $(this).data('pk');
+            var button = this;
+            $(button).prop('disabled', true);
+            var pk = $(button).data('pk');
             data = {pk: pk, action: 'requester_returned'}
             $.ajax({
                 url: control_url,
@@ -101,14 +104,15 @@
                         refreshLists();
                     } else {
                         alert(data.message);
-                        $(this).prop('disabled', false);
+                        $(button).prop('disabled', false);
                     }
                 }
             });
         });
         $('button.canceled').click(function() {
-            $(this).prop('disabled', true);
-            pk = $(this).data('pk');
+            var button = this;
+            $(button).prop('disabled', true);
+            pk = $(button).data('pk');
             data = {pk: pk, action: 'requester_canceled'}
             $.ajax({
                 url: control_url,
@@ -120,7 +124,7 @@
                         refreshLists();
                     } else {
                         alert(data.message);
-                        $(this).prop('disabled', false);
+                        $(button).prop('disabled', false);
                     }
                 }
             });

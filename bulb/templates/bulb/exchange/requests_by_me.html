@@ -49,6 +49,7 @@
         display_url = "{% url 'bulb:pending_request' %}";
         list_url = "{% url 'bulb:list_my_requests' %}";
         $('button.done').click(function() {
+            $(this).prop('disabled', true);
             pk = $(this).data('pk');
             data = {pk: pk, action: 'requester_done'}
             $.ajax({
@@ -61,11 +62,13 @@
                         refreshLists();
                     } else {
                         alert(data.message);
+                        $(this).prop('disabled', false);
                     }
                 }
             });
         });
         $('button.failed').click(function() {
+            $(this).prop('disabled', true);
             pk = $(this).data('pk');
             data = {pk: pk, action: 'requester_failed'}
             $.ajax({
@@ -79,11 +82,13 @@
                         $("#pending-"+pk).load(display_url, {pk: pk}, initialize_request_buttons);
                     } else {
                         alert(data.message);
+                        $(this).prop('disabled', false);
                     }
                 }
             });
         });
         $('button.returned').click(function() {
+            $(this).prop('disabled', true);
             pk = $(this).data('pk');
             data = {pk: pk, action: 'requester_returned'}
             $.ajax({
@@ -96,11 +101,13 @@
                         refreshLists();
                     } else {
                         alert(data.message);
+                        $(this).prop('disabled', false);
                     }
                 }
             });
         });
         $('button.canceled').click(function() {
+            $(this).prop('disabled', true);
             pk = $(this).data('pk');
             data = {pk: pk, action: 'requester_canceled'}
             $.ajax({
@@ -113,6 +120,7 @@
                         refreshLists();
                     } else {
                         alert(data.message);
+                        $(this).prop('disabled', false);
                     }
                 }
             });

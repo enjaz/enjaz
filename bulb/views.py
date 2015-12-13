@@ -549,7 +549,8 @@ def control_request(request):
     if action.startswith('owner_'):
         if not utils.can_edit_owner_status(request.user, book):
             raise Exception(u"لا يمكنك اتخاذ إجراء باسم صاحب الكتاب.")
-        if action == 'owner_done':
+        previous_owner_status = book_request.owner_status
+        if action == 'owner_done' and previous_owner_status != 'D':
             book.is_available = False
             book_request.owner_status = 'D'
             book_request.owner_status_date = timezone.now()
@@ -568,7 +569,7 @@ def control_request(request):
             # requester's confirmation), create one.
             book_request.create_related_points()
 
-        elif action == 'owner_returned':
+        elif action == 'owner_returned' and previous_owner_status != 'R':
             book.is_available = True
             book_request.owner_status = 'R'
             book_request.owner_status_date = timezone.now()
@@ -582,7 +583,7 @@ def control_request(request):
             if book_request.requester_status == 'R':
                 book_request.status = 'R'
 
-        elif action == 'owner_failed':
+        elif action == 'owner_failed' and previous_owner_status != 'F':
             book_request.owner_status = 'F'
             book_request.owner_status_date = timezone.now()
 
@@ -614,7 +615,7 @@ def control_request(request):
                            template="book_request_failed_to_requester",
                            context=email_context)
 
-        elif action == 'owner_canceled':
+        elif action == 'owner_canceled' and previous_owner_status != 'C':
             book.is_available = True
             book_request.owner_status = 'C'
             book_request.owner_status_date = timezone.now()
@@ -646,7 +647,8 @@ def control_request(request):
         if not utils.can_edit_requester_status(request.user, book_request):
             raise Exception(u"لا يمكنك اتخاذ إجراء باسم مقدم الطلب.")
 
-        if action == 'requester_done':
+        previous_requester_status = book_request.requester_status
+        if action == 'requester_done' and previous_requester_status != 'D':
             book.is_available = False
             book_request.requester_status = 'D'
             book_request.requester_status_date = timezone.now()
@@ -664,7 +666,7 @@ def control_request(request):
             # requester's confirmation), create one.
             book_request.create_related_points()
 
-        elif action == 'requester_returned':
+        elif action == 'requester_returned' and previous_requester_status != 'R':
             book.is_available = True
             book_request.requester_status = 'R'
             book_request.requester_status_date = timezone.now()
@@ -678,7 +680,7 @@ def control_request(request):
             if book_request.owner_status == 'R':
                 book_request.status = 'R'
 
-        elif action == 'requester_failed':
+        elif action == 'requester_failed' and previous_requester_status != 'F':
             book_request.requester_status = 'F'
             book_request.requester_status_date = timezone.now()
 
@@ -711,7 +713,7 @@ def control_request(request):
                           template="book_request_failed_to_owner",
                           context=email_context)
 
-        elif action == 'requester_canceled':
+        elif action == 'requester_canceled' and previous_requester_status != 'C':
             # You cannot delete a request after it has been approved
             # by the requester.
             if book_request.requester_status == 'D':

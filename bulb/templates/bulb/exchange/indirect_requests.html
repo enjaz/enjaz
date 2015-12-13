@@ -89,6 +89,7 @@
         control_url = "{% url 'bulb:control_request' %}";
         list_url = "{% url 'bulb:list_indirect_requests' %}";
         $('button.done, button.failed').click(function() {
+            $(this).prop('disabled', true);
             pk = $(this).data('pk');
             action = $(this).data('action');
             data = {pk: pk, action: action};
@@ -103,6 +104,7 @@
                         refreshIndirectRequests();
                     } else {
                         alert(data.message);
+                        $(this).prop('disabled', false);
                     }
                 }
             });

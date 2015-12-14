@@ -7,5 +7,5 @@ class AbstractForm(forms.ModelForm):
     class Meta:
         model = Abstract
         fields = ['title', 'authors', 'university', 'college',
-                  'presenting_author', 'email', 'phone',
+                  'presenting_author', 'email', 'phone', 'level',
                   'presentation_preference', 'attachment']

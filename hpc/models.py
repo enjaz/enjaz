@@ -8,6 +8,12 @@ class Abstract(models.Model):
     presenting_author = models.CharField(verbose_name="Presenting author", max_length=128)
     email = models.EmailField(verbose_name="Email")
     phone = models.CharField(verbose_name="Phone number", max_length=128)
+    level_choices = (
+        ('U', 'Undergraduate'),
+        ('G', 'Graduate')
+        )
+    level = models.CharField(verbose_name="Level", max_length=1,
+                             default='', choices=level_choices)
     presentation_preference_choices = (
         ('O', 'Oral'),
         ('P', 'Poster')

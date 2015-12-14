@@ -9,14 +9,16 @@ from django.views.decorators import csrf
 from django.utils import timezone
 from post_office import mail
 
-from accounts.utils import get_user_city, get_user_gender
+from accounts.utils import get_user_gender
 from core import decorators
 from core.models import StudentClubYear
 from studentguide import utils
+from studentguide.decorators import riyadh_only
 from studentguide.models import GuideProfile, Request, Report, Feedback, Tag
 from studentguide.forms import GuideForm, RequestForm, ReportForm, FeedbackForm
 
 @login_required
+@riyadh_only
 def index(request):
     guide_count = GuideProfile.objects.current_year().undeleted().count()
     context = {'guide_count': guide_count}
@@ -62,6 +64,7 @@ def list_supervised_guides(request):
     return render(request, "studentguide/list_supervised_guides.html", context)
 
 @login_required
+@riyadh_only
 def new_student_index(request):
     tags = Tag.objects.filter(guide_profiles__isnull=False).distinct()
     # Only show tags currently available for the user's gender
@@ -72,6 +75,7 @@ def new_student_index(request):
                   {'tags': tags})
 
 @login_required
+@riyadh_only
 def choose_random_guide(request, tag_code_name):
     tag = get_object_or_404(Tag, code_name=tag_code_name)
     if not tag.guide_profiles.exists():
@@ -81,18 +85,21 @@ def choose_random_guide(request, tag_code_name):
                                 args=(guide.pk,)))
 
 @login_required
+@riyadh_only
 def list_guides(request):
     guides = GuideProfile.objects.current_year().undeleted().for_user_gender(request.user).for_user_city(request.user)
     return render(request, "studentguide/list_guides.html",
                   {'guides': guides})
 
 @login_required
+@riyadh_only
 def my_profile(request):
     guide = get_object_or_404(GuideProfile, user=request.user)
     return HttpResponseRedirect(reverse('studentguide:show_guide',
                                 args=(guide.pk,)))
 
 @login_required
+@riyadh_only
 def requests_to_me(request):
     if utils.has_guide_profile(request.user):
         guide = utils.get_user_guide_profile(request.user)
@@ -102,12 +109,14 @@ def requests_to_me(request):
         raise Http404
 
 @login_required
+@riyadh_only
 def show_guide(request, guide_pk):
     guide = get_object_or_404(GuideProfile, pk=guide_pk, is_deleted=False)
     return render(request, "studentguide/show_guide.html",
                   {'guide': guide})
 
 @login_required
+@riyadh_only
 def list_guide_requests(request, guide_pk):
     guide = get_object_or_404(GuideProfile, pk=guide_pk, is_deleted=False)
 
@@ -276,6 +285,7 @@ def edit_request(request, guide_pk, request_pk):
     return render(request, 'studentguide/edit_request_form.html', context)
 
 @login_required
+@riyadh_only
 def list_reports(request, guide_pk):
     guide = get_object_or_404(GuideProfile, pk=guide_pk, is_deleted=False)
 
@@ -359,6 +369,7 @@ def delete_report(request, guide_pk, report_pk):
     return {"message": "success", "list_url": full_url}
 
 @login_required
+@riyadh_only
 def show_report(request, guide_pk, report_pk):
     report = get_object_or_404(Report, guide__pk=guide_pk,
                                pk=report_pk, is_deleted=False)
@@ -397,6 +408,7 @@ def add_feedback(request, guide_pk):
     return render(request, 'studentguide/edit_feedback_form.html', context)
 
 @login_required
+@riyadh_only
 def show_feedback(request, guide_pk, feedback_pk):
     feedback = get_object_or_404(Feedback, guide__pk=guide_pk,
                                  pk=feedback_pk)

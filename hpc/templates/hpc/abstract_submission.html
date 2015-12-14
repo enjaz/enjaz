@@ -66,6 +66,20 @@
 					{% endif %}
 				</div>
 			</div>
+			<div class="form-group" id="level-group">
+				<div class="input-group{% if form.level.errors %} validate-has-error{% endif %}" style="text-align: left; color: #ffffff;">
+					<div class="input-group-addon">
+						<i class="entypo-address"></i>
+					</div>
+                    <input class="english-field" type="radio" name="level" value="U" style="margin-left: 10px;margin-right: 5px;" checked required>Undergraduate<br>
+                    <input class="english-field" type="radio" name="level" value="G" style="margin-left: 10px; margin-right: 5px;" required>Graduate
+					{% if form.level.errors %}
+					    {% for error in form.level.errors %}
+					        <label class='error' for='level' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
 			<div class="form-group">
 				<div class="english-field input-group{% if form.presenting_author.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">

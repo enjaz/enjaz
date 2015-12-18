@@ -88,8 +88,8 @@
     {% for session in group.session_set.undeleted %}
 <div class="row">
     <h3 id="session-{{ session.pk }}">{{ session.date|date:"j F" }}: {% if session.report %}<a href="{% url 'bulb:show_report' group.pk session.pk %}">{% endif %}{{ session.title }}{% if session.report %}</a>{% endif %}</h3>
-    <div class="col-md-2">
     {% if session.report %}
+    <div class="col-md-2">
     <a href="{% url 'bulb:show_report' group.pk session.pk %}" class="btn btn-block btn-xs btn-icon btn-success">
     <i class="entypo-flag"></i>
         اقرأ المحضر

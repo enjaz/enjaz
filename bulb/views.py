@@ -391,7 +391,16 @@ def indicators(request):
     book_requests = Request.objects.current_year()
     groups = Group.objects.current_year()
     sessions = Session.objects.current_year()
-    users = User.objects.filter(common_profile__is_student=True, book_points__is_counted=True).annotate(point_count=Count('book_points')).filter(point_count__gte=3)
+    users = (User.objects.filter(book_giveaways__isnull=False) |
+             User.objects.filter(request__isnull=False) |
+             User.objects.filter(reading_group_coordination__isnull=False) |
+             User.objects.filter(reading_group_memberships__isnull=False) |
+             User.objects.filter(reader_profile__isnull=False)
+    ).filter(common_profile__is_student=True).distinct()
+    book_users = User.objects.filter(common_profile__is_student=True,
+                                     book_points__is_counted=True)\
+                             .annotate(point_count=Count('book_points'))\
+                             .filter(point_count__gte=3)
     book_contributing_male_users = User.objects.filter(common_profile__college__gender='M',
                                                        book_giveaways__isnull=False).distinct().count()
     book_contributing_female_users = User.objects.filter(common_profile__college__gender='F',
@@ -409,6 +418,7 @@ def indicators(request):
                'sessions': sessions,
                'books': books,
                'book_requests': book_requests,
+               'book_users': book_users,
                'users': users,
                'book_contributing_male_users': book_contributing_male_users,
                'book_contributing_female_users': book_contributing_female_users,

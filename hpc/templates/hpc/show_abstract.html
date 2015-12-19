@@ -1,0 +1,97 @@
+{% extends 'hpc_evaluation_base.html' %}{% load staticfiles %}{% load bootstrap3 %}
+
+{% block title %}Abstract list{% endblock %}
+
+{% block content %}
+<div class="english-field">
+
+	<table class="table table-bordered">
+          <colgroup>
+            <col class="col-xs-4">
+            <col class="col-xs-8">
+          </colgroup>
+		<thead>
+			<tr>
+				<th colspan="2" class="text-center">{{ abstract.title }}</th>
+			</tr>
+		</thead>
+		
+		<tbody>
+            <tr>
+                <th class="text-center">Presentation preference</th>
+                <td>{{ abstract.get_presentation_preference_display }}</td>
+            </tr>
+			<tr>
+				<th class="text-center">Authors</th>
+				<td class="activity-description">{{ abstract.authors|linebreaksbr }}</td>
+			</tr>
+			<tr>
+				<th class="text-center">Presenting author</th>
+				<td>{{ abstract.presenting_author }}</td>
+            </tr>
+			<tr>
+				<th class="text-center">University</th>
+				<td>{{ abstract.university }}</td>
+			</tr>
+			<tr>
+				<th class="text-center">College</th>
+				<td>{{ abstract.college }}</td>
+			</tr>
+            <tr>
+                <th class="text-center">Level</th>
+				<td>{{ abstract.get_level_display }}</td>
+			</tr>
+            <tr>
+				<th class="text-center">Email</th>
+				<td><a href="mailto:{{ abstract.email }}">{{ abstract.email }}</a></td>
+			</tr>
+			
+			<tr>
+				<th class="text-center">Phone</th>
+				<td>{{ abstract.phone }}</td>
+            </tr>
+            <tr>
+                <th class="text-center">Attachment</th>
+                <td>
+                    <a href="{{ abstract.attachment.url }}" class="english-field">
+                        <i class="entypo-documents"></i>
+                        {{ abstract.attachment.name }}
+                    </a>
+                </td>
+            </tr>
+		</tbody>
+	</table>
+    <h2>Evaluate</h2>
+{% if form.errors %}
+        <p class="alert alert-danger"><i class="entypo-flag"></i>Make sure that you have filled all questions.</p>
+{% endif %}
+    {% if abstract.evaluation.pk %}
+    <p class="alert alert-success"><i class="entypo-flag"></i>This abstract was evaluated by {{ abstract.evaluation.evaluator.en_last_name|default:abstract.evaluation.evaluator }} on {{ abstract.evaluation.date_submitted|date:"Y-m-d" }}.</p>
+    {% endif %}
+    <form class="form" method="post">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="form-group">
+            <h4 class="english-field">{{ field.label }}</h4>
+              {% for choice in field %}
+               {% if not forloop.first %}
+                 {{ choice }}
+               {% endif %}
+              {% endfor %}
+        </div>
+        {% endfor %}
+          <div class="form-group">
+              <button type="submit" class="btn btn-success">Submit</button>
+          </div>
+    </form>
+
+</div>
+{% endblock %}
+
+{% block customscript %}
+	<script>
+    $(function(){
+
+    });
+    </script>
+{% endblock %}

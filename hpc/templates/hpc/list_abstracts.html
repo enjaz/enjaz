@@ -1,0 +1,104 @@
+{% extends 'hpc_evaluation_base.html' %}{% load staticfiles %}
+
+{% block title %}Abstract list{% endblock %}
+
+{% block content %}
+<div class="english-field">
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseThree-2" class="english-field notcollapsed">
+                    Pending abstracts ({{ pending_abstracts|length }})
+                </a>
+            </h4>
+        </div>
+        <div id="collapseThree-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <div class="row">
+                    <table id="pending" class="display datatable dt-responsive">
+                        <thead>
+                            <tr>
+                                <th class="all">Title</th>
+                                <th class="not-mobile">Presenting author</th>
+                                <th class="not-mobile">Presentation preference</th>
+                                <th class="not-mobile">Submission date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for abstract in pending_abstracts %}
+                            <tr>
+                                <td><a href="{% url 'hpc:show_abstract' abstract.pk %}">{{ abstract.title }}</a></td>
+                                <td>{{ abstract.presenting_author }}</td>
+                                <td>{{ abstract.get_presentation_preference_display }}</td>
+                                <td data-order="{{ abstract.date_submitted|date:"U" }}">{{ abstract.date_submitted|date:"Y-m-d" }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseTwo-2" class="english-field collapsed">
+                    Evaluated abstracts ({{ evaluated_abstracts|length}} )
+                </a>
+            </h4>
+        </div>
+        <div id="collapseTwo-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <div class="row">
+                    <table id="evaluated" class="display datatable dt-responsive">
+                        <thead>
+                            <tr>
+                                <th class="all">Title</th>
+                                <th class="not-mobile">Presenting author</th>
+                                <th class="not-mobile">Presentation preference</th>
+                                <th class="not-mobile">Score</th>
+                                <th class="not-mobile">Evaluation date</th>
+                                <th class="not-mobile">Evaluator</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for abstract in evaluated_abstracts %}
+                            <tr>
+                                <td><a href="{% url 'hpc:show_abstract' abstract.pk %}">{{ abstract.title }}</a></td>
+                                <td>{{ abstract.presenting_author }}</td>
+                                <td>{{ abstract.get_presentation_preference_display }}</td>
+                                <td>ِ{{ abstract.evaluation.get_total_score }}</td>
+                                <td data-order="{{ abstract.evaluation.date_submitted|date:"U" }}">{{ abstract.evaluation.date_submitted|date:"Y-m-d" }}</td>
+                                <td>ِ{{ abstract.evaluation.evaluator.common_profile.en_last_name|default:abstract.evaluation.evaluator }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block customscript %}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<style type="text/css">
+    th, td{
+        text-align: left;
+    }
+</style>
+	<script>
+    $(function(){
+        $("#pending").dataTable({
+            "order": [[ 3, "asc" ]]
+        });
+        $("#evaluated").dataTable({
+            "order": [[ 4, "desc" ]]
+        });
+    });
+    </script>
+{% endblock %}

@@ -1,4 +1,4 @@
-{% load staticfiles %}{% load studentguide_tags %}
+{% load staticfiles %}{% load studentguide_tags %}{% load hpc_tags %}
 <!DOCTYPE html>
 <html lang="en" dir="rtl">
 <!--
@@ -90,6 +90,14 @@ you?
 		<ul id="main-menu" class="">
 			<!-- add class "multiple-expanded" to allow multiple submenus to open -->
 			<!-- class "auto-inherit-active-class" will automatically add "active" class for parent elements who are marked already with class "active" -->
+            {% if user.is_superuser or user|is_organizing_committee_member or user|is_research_committee_member %}
+            <li>
+				<a href="{% url 'hpc:list_abstracts' %}">
+					<i class="entypo-calendar"></i>
+					<span class="english-field">HPC 2016</span>
+				</a>
+            </li>
+            {% endif %}
 			<li>
 				<a href="{% url 'clubs:list' %}">
 					<i class="entypo-users"></i>

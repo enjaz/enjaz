@@ -10,8 +10,8 @@ def add_clubs(apps, schema_editor):
     year_2015_2016 = StudentClubYear.objects.get(start_date__year=2015,
                                                  end_date__year=2016)
     presidency = Club.objects.get(english_name="Presidency", year=year_2015_2016)
-    Club.objects.create(english_name="ٌResearch Committee of the HPC",
-                        name="لجنة الأبحاث في مؤتمر التخصصات الصحية",
+    Club.objects.create(english_name="Research Committee of the HPC",
+                        name="لجنة أبحاث مؤتمر التخصصات الصحية",
                         gender="",
                         parent=presidency,
                         email="hpp@ksau-hs.edu.sa",
@@ -20,8 +20,8 @@ def add_clubs(apps, schema_editor):
                         can_view_assessments=False,
                         is_assessed=False,
                         can_submit_activities=False)
-    Club.objects.create(english_name="ٌOrganizing Committee of the HPC",
-                        name="لجنة الأبحاث في مؤتمر التخصصات الصحية",
+    Club.objects.create(english_name="Organizing Committee of the HPC",
+                        name="لجنة تنظيم مؤتمر التخصصات الصحية",
                         gender="",
                         parent=presidency,
                         email="hpp@ksau-hs.edu.sa",

@@ -214,8 +214,8 @@
 <div class="row">
     <div class="col-md-12">
         <h3>عناوين البريد</h3>
-        <p>أدناه قائمة بعناوين المستخدمين والمستخدمات الذين سبق أن تفاعلوا مع قسم سراج سواءً بإنشاء مجموعة أو بالانضمام إلى مجموعة أو بالمسافة بكتاب أو بطلب كتاب أو بالتسجيل في سجل القارئات والقراء. <strong>عددهم الآن: {{ users|length }}.</strong></p>
-        <textarea style="margin-bottom: 10px;" readonly class="form-control">{% for user in users %} {{ user.email }}; {% endfor %}</textarea>
+        <p>أدناه قائمة بعناوين المستخدمين والمستخدمات الذين سبق أن تفاعلوا مع قسم سراج سواءً بإنشاء مجموعة أو بالانضمام إلى مجموعة أو بالمساهمة بكتاب أو بطلب كتاب أو بالتسجيل في سجل القارئات والقراء. <strong>عددهم الآن: {{ users|length }}.</strong></p>
+        <textarea style="margin-bottom: 10px;" readonly class="english-field form-control">{% for user in users %} {{ user.email }}; {% endfor %}</textarea>
     </div>
 </div>
 

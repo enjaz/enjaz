@@ -41,7 +41,7 @@
 					<div class="input-group-addon">
 						<i class="entypo-graduation-cap"></i>
 					</div>
-                    <input class="english-field" type="radio" id="ksauhs-university" name="university-radio" value="KSAU-HS" style="margin-left: 10px;margin-right: 5px;" checked required>KSAU-HS<br>
+                    <input class="english-field" type="radio" id="ksauhs-university" name="university-radio" value="KSAU-HS" style="margin-left: 10px;margin-right: 5px;" checked required>King Saud bin Abdulaziz University for Health Sciences<br>
                     <input class="english-field" type="radio" id="other-university" name="university-radio" value="Other" style="margin-left: 10px; margin-right: 5px;" required>Other
 					<input {% if form.university.value and not form.university.errors %}value="{{ form.university.value }}" {% endif %}type="text" class="form-control english-field" id="university-text-field" placeholder="Type university name" style="display: none"/>
 					{% if form.university.errors %}

@@ -37,11 +37,11 @@
     <tr>
         <th>معدّل القراءة السنوي</th>
         <td>{{ reader_profile.average_reading }}</td>
-    </tr>{% if reader_profile.twitter %}
+    </tr>
     <tr>
         <th>البريد</th>
         <td class="english-field"><a href="mailto:{{ reader_profile.user.email }}">{{ reader_profile.user.email }}</a></td>
-    </tr>
+    </tr>{% if reader_profile.twitter %}
     <tr>
         <th>تويتر</th>
         <td class="english-field"><a href="https://twitter.com/{{ reader_profile.twitter }}">@{{ reader_profile.twitter }}</a></td>

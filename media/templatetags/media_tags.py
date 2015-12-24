@@ -40,3 +40,7 @@ def can_review_media_assessment(user):
 @register.filter
 def can_submit_followupreport(user, activity):
     return utils.can_submit_followupreport(user, activity)
+
+@register.filter
+def can_view_followupreport(user, activity):
+    return utils.can_view_followupreport(user, activity)

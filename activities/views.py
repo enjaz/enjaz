@@ -75,14 +75,6 @@ def list_activities(request):
     if request.user.is_authenticated():
         template = 'activities/list_privileged.html'
 
-        # For users who cannot assess any clubs, only show
-        # city-specific and gender-specific activities.  Assessment,
-        # sometimes, require looking into other activities.
-        # Additionally, that's useful for members of the Media Center.
-        context['approved'] = Activity.objects.approved().current_year()
-        if not can_assess_any_club(request.user):
-            context['approved'] = context['approved'].for_user_city(request.user).for_user_gender(request.user)
-
         if request.user.is_superuser:
             # If the user is a super user or part of the presidency,
             # then show all activities
@@ -129,6 +121,7 @@ def list_activities(request):
 
             template = 'activities/list_employee.html'
         else: # For students and other normal users.
+            context['approved'] = context['approved'].for_user_city(request.user).for_user_gender(request.user)
             template = 'activities/list_normal.html'
     else: # For anonymous users
         template = 'activities/front/list.html'

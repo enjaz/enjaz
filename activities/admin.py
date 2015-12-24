@@ -88,6 +88,7 @@ class ActivityAdmin(admin.ModelAdmin):
                     'get_quality_score_average', 'get_evaluation_count')
     list_filter = [CategoryFilter, SubmissionFilter, StatusFilter, YearFilter]
     readonly_fields = ('get_relevance_score_average', 'get_quality_score_average', )
+    search_fields = ["name", "primary_club__name", ]
     inlines = [EpisodeInline, ReviewInline]
 
 class EvaluationAdmin(admin.ModelAdmin):

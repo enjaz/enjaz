@@ -2,7 +2,7 @@
 import datetime
 
 from django.contrib import admin
-from activities.models import Activity, Episode, Category, Evaluation, Review
+from activities.models import Activity, Episode, Category, Evaluation, Review, Assessment, Criterion
 from clubs.models import section_choices
 from clubs.utils import get_presidency, get_deanship
 from core.models import StudentClubYear
@@ -96,4 +96,6 @@ class EvaluationAdmin(admin.ModelAdmin):
 
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(Category)
+admin.site.register(Assessment)
+admin.site.register(Criterion)
 admin.site.register(Evaluation, EvaluationAdmin)

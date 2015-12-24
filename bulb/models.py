@@ -8,7 +8,7 @@ from django.utils import timezone
 from core.models import StudentClubYear
 from bulb.managers import BookQuerySet, RequestQuerySet, PointQuerySet, GroupQuerySet, SessionQuerySet, MembershipQuerySet
 
-MAXIMUM_GROUP_MEMBERS = 20
+#MAXIMUM_GROUP_MEMBERS = 20
 
 class Category(models.Model):
     name = models.CharField(max_length=50,

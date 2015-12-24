@@ -68,7 +68,7 @@
     {% if abstract.evaluation.pk %}
     <p class="alert alert-success"><i class="entypo-flag"></i>This abstract was evaluated by {{ abstract.evaluation.evaluator.en_last_name|default:abstract.evaluation.evaluator }} on {{ abstract.evaluation.date_submitted|date:"Y-m-d" }}.</p>
     {% endif %}
-    {% if abstract.evaluation.evaluator != user and not user.is_superuser %}
+    {% if abstract.evaluation.evaluator == user or user.is_superuser %}
     <form class="form" method="post">
         {% csrf_token %}
         {% for field in form %}

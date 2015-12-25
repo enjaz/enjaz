@@ -2,6 +2,14 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from clubs.models import College
+
+gender_choices = (
+    ('F', 'طالبة'),
+    ('M', 'طالب')
+)
+
+
 default_choices = [(i, i) for i in range(1, 6)]
 
 class Abstract(models.Model):
@@ -75,3 +83,51 @@ class Evaluation(models.Model):
                            self.good_english,
                            self.overall_evaluation])
         return total_score
+
+
+class Session(models.Model):
+    limit = models.PositiveSmallIntegerField(null=True,
+                                             default=None)
+    name = models.CharField(max_length=255)
+    time_slot = models.PositiveSmallIntegerField(null=True,
+                                                 default=None)
+    vma_id = models.PositiveSmallIntegerField()
+    gender = models.CharField(max_length=1,
+                              default='', choices=gender_choices)
+    date_submitted = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return self.name
+
+class NonUser(models.Model):
+    ar_name = models.CharField(max_length=255,
+                               verbose_name=u'الاسم العربي')
+    en_name = models.CharField(max_length=255,
+                               verbose_name=u'الاسم الإنجليزي')
+    gender = models.CharField(max_length=1, verbose_name=u'الجنس',
+                              default='', choices=gender_choices)
+    email = models.EmailField(verbose_name=u'البريد الإلكتروني')
+    mobile_number = models.CharField(max_length=20,
+                                     verbose_name=u'رقم الجوال')
+    university = models.CharField(verbose_name=u"الجامعة", max_length=255)
+    college = models.CharField(verbose_name=u"الكلية", max_length=255)
+    date_submitted = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return self.ar_name
+
+class Registration(models.Model):
+    user = models.OneToOneField(User, null=True, blank=True,
+                                related_name='hpc2016_registration')
+    nonuser = models.OneToOneField(NonUser, null=True, blank=True,
+                                    related_name='hpc2016_registration')
+    sessions  = models.ManyToManyField(Session, blank=True)
+
+
+    def __unicode__(self):
+        if self.user:
+            return self.user.common_profile.get_ar_full_name()
+        elif self.nonuser:
+            return self.nonuser.ar_name
+        else:
+            self.pk

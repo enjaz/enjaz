@@ -5,7 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 
 
-from hpc.forms import AbstractForm, EvaluationForm
+from hpc.forms import AbstractForm, EvaluationForm, NonUserForm, RegistrationForm
 from hpc.models import Abstract, Evaluation
 from hpc import utils
 
@@ -70,3 +70,38 @@ def show_abstract(request, pk):
 
     return render(request, "hpc/show_abstract.html",
                   {'abstract': abstract, 'form': form})
+
+def nonuser_registration(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('hpc:user_registration'))
+    if request.method == 'POST':
+        registration_form = RegistrationForm(request.POST)
+        nonuser_form = NonUserForm(request.POST)
+        if registration_form.is_valid() and nonuser_form.is_valid():
+            nonuser = nonuser_form.save()
+            registration_form.save(nonuser=nonuser)
+            return HttpResponseRedirect(reverse('hpc:registration_completed'))
+    elif request.method == 'GET':
+        registration_form = RegistrationForm()
+        nonuser_form = NonUserForm()
+
+    context = {'registration_form': registration_form,
+               'nonuser_form': nonuser_form}
+
+    return render(request, "hpc/register_nonuser.html", context)
+
+def user_registration(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('hpc:registration_introduction'))
+    elif request.user.hpc2016_registration:
+        return HttpResponseRedirect(reverse('hpc:registration_already'))
+    if request.method == 'POST':
+        registration_form = RegistrationForm(request.POST, user=request.user)
+        if registration_form.is_valid():
+            registration_form.save(user=request.user)
+            return HttpResponseRedirect(reverse('hpc:registration_completed'))
+    elif request.method == 'GET':
+        registration_form = RegistrationForm(user=request.user)
+
+    context = {'registration_form': registration_form}
+    return render(request, "hpc/register_user.html", context)

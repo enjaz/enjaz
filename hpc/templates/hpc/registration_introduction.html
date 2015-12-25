@@ -1,0 +1,22 @@
+{% extends 'hpc_submission_base.html' %}{% load staticfiles %}
+{% block title %}التسجيل في مؤتمر التخصّصات الصحيّة{% endblock %}
+{% block csssheet %}
+<link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.css' %}">
+{% endblock %}
+{% block description %}<h2 class="dinar-light">التسجيل في مؤتمر التخصّصات الصحيّة</h2>{% endblock %}
+
+{% block content %}
+<div class="form-register-success visible dinar-light">
+	<i class="entypo-flag"></i>
+    <p style="margin-top: 15px;">هل أنت من طلاب جامعة الملك سعود بن عبد العزيز للعلوم الصحيّة؟ يمكنك التسجيل في مؤتمر التخصّصات الصحيّة بعد <a href="{% url 'userena_signin' %}?next={% url 'hpc:user_registration' %}">الدخول إلى بوّابة إنجاز</a>.</p>
+    <hr>
+    <p>أما زملاؤنا من طلاب الجامعات والكليّات الصحيّة الأخرى فيمكنكم التسجيل <a href="{% url 'hpc:nonuser_registration' %}">عبر النموذج المخصص</a>.</p>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+{% endblock %}
+
+
+

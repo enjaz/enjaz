@@ -19,6 +19,7 @@
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-forms.css' %}?v=0001">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/skins/green.css' %}">
+    {% block csssheet %}{% endblock %}
 	<script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
 	<script src="{% static 'neon/assets/js/custom.js' %}"></script>
 	<!--[if lt IE 9]><script src="{% static 'neon/assets/js/ie8-responsive-file-warning.js' %}"></script><![endif]-->
@@ -53,7 +54,7 @@ var baseurl = '';
 			<a href="{% url 'home' %}" class="logo">
 				<img src="{% static 'logo/enjaz_logo_shadow.png' %}" width="140" alt="" />
 			</a>
-			<p class="description dinar-light">{% block description %}{% endblock %}</p>
+			{% block description %}{% endblock %}
 			
 			<!-- progress bar indicator -->
 			<div class="login-progressbar-indicator">
@@ -89,6 +90,47 @@ var baseurl = '';
 	<script src="{% static 'neon/assets/js/resizeable.js' %}"></script>
 	<script src="{% static 'neon/assets/js/neon-api.js' %}"></script>
 	<script src="{% static 'neon/assets/js/jquery.validate.min.js' %}"></script>
+    <style>
+    h2 {
+        color: white;
+        font-size: 2.5em;
+    }
+    .registration-form p{
+        text-align: justify;
+    }
+    .registration-form h3{
+        font-size: 2em;
+        color: white;
+    }
+    .day-section{
+        background: #00A651;
+        padding: 10px;
+        width: 90%;
+        margin-right: auto;
+        margin-left: auto;
+        margin-bottom: 20px;
+    }
+    .day-section h4{
+        text-align: center;
+        color: white;
+        font-size: 1.2em;
+    }
+    body.login-page {
+        background: #009549;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    .enjaz-warning{
+        background: rgba(203, 205, 50, 0.75);
+        color: #ffffff;
+        padding: 10px;
+    }
+    .enjaz-warning a {
+        text-decoration: underline;
+    }
+    .checkbox label{
+        display: inline-block;
+    }
+    </style>
 	{% block customscript %}{% endblock %}
 	<script src="{% static 'neon/assets/js/neon-custom.js' %}"></script>
 	<script src="{% static 'neon/assets/js/neon-demo.js' %}"></script>

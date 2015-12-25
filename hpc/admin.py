@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.core.exceptions import ObjectDoesNotExist
 
-from hpc.models import Abstract
+from hpc.models import Abstract, Session, Registration
 
 class UniversityFilter(admin.SimpleListFilter):
     title = "University"
@@ -49,3 +49,5 @@ class AbstractAdmin(admin.ModelAdmin):
     was_evaluated.boolean = True
 
 admin.site.register(Abstract, AbstractAdmin)
+admin.site.register(Session)
+admin.site.register(Registration)

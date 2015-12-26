@@ -4,11 +4,16 @@ from django.contrib.auth.models import User
 
 from clubs.models import College
 
-gender_choices = (
-    ('F', 'طالبة'),
-    ('M', 'طالب')
+user_gender_choices = (
+    ('F', u'طالبة'),
+    ('M', u'طالب')
 )
 
+session_gender_choices = (
+    ('', u'الجميع'),
+    ('F', u'طالبات'),
+    ('M', u'طلاب')
+)
 
 default_choices = [(i, i) for i in range(1, 6)]
 
@@ -86,26 +91,37 @@ class Evaluation(models.Model):
 
 
 class Session(models.Model):
-    limit = models.PositiveSmallIntegerField(null=True,
+    limit = models.PositiveSmallIntegerField(null=True, blank=True,
                                              default=None)
     name = models.CharField(max_length=255)
-    time_slot = models.PositiveSmallIntegerField(null=True,
+    time_slot = models.PositiveSmallIntegerField(null=True, blank=True,
                                                  default=None)
     vma_id = models.PositiveSmallIntegerField()
-    gender = models.CharField(max_length=1,
-                              default='', choices=gender_choices)
+    code_name = models.CharField(max_length=50, default="",
+                                 verbose_name=u"الاسم البرمجي",
+                                 help_text=u"حروف لاتينية صغيرة وأرقام")
+    gender = models.CharField(max_length=1, blank=True,
+                              default='', choices=session_gender_choices)
     date_submitted = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
         return self.name
 
 class NonUser(models.Model):
-    ar_name = models.CharField(max_length=255,
-                               verbose_name=u'الاسم العربي')
-    en_name = models.CharField(max_length=255,
-                               verbose_name=u'الاسم الإنجليزي')
+    ar_first_name = models.CharField(max_length=30,
+                                     verbose_name=u'الاسم الأول')
+    ar_middle_name = models.CharField(max_length=30,
+                                      verbose_name=u'الاسم الأوسط')
+    ar_last_name = models.CharField(max_length=30,
+                                    verbose_name=u'الاسم الأخير')
+    en_first_name = models.CharField(max_length=30,
+                                     verbose_name=u'الاسم الأول')
+    en_middle_name = models.CharField(max_length=30,
+                                      verbose_name=u'الاسم الأوسط')
+    en_last_name = models.CharField(max_length=30,
+                                    verbose_name=u'الاسم الأخير')
     gender = models.CharField(max_length=1, verbose_name=u'الجنس',
-                              default='', choices=gender_choices)
+                              default='', choices=user_gender_choices)
     email = models.EmailField(verbose_name=u'البريد الإلكتروني')
     mobile_number = models.CharField(max_length=20,
                                      verbose_name=u'رقم الجوال')
@@ -113,8 +129,36 @@ class NonUser(models.Model):
     college = models.CharField(verbose_name=u"الكلية", max_length=255)
     date_submitted = models.DateTimeField(auto_now_add=True)
 
+    def get_ar_full_name(self):
+        ar_fullname = ''
+        try:
+            # If the Arabic first name is missing, let's assume the
+            # rest is also missing.
+            if self.ar_first_name:
+                ar_fullname = " ".join([self.ar_first_name,
+                                     self.ar_middle_name,
+                                     self.ar_last_name])
+        except AttributeError: # If the user has their details missing
+            pass
+
+        return ar_fullname
+
+    def get_en_full_name(self):
+        en_fullname = ''
+        try:
+            # If the English first name is missing, let's assume the
+            # rest is also missing.
+            if self.en_first_name:
+                en_fullname = " ".join([self.en_first_name,
+                                     self.en_middle_name,
+                                     self.en_last_name])
+        except AttributeError: # If the user has their details missing
+            pass
+
+        return en_fullname
+
     def __unicode__(self):
-        return self.ar_name
+        return self.get_ar_full_name()
 
 class Registration(models.Model):
     user = models.OneToOneField(User, null=True, blank=True,
@@ -122,12 +166,12 @@ class Registration(models.Model):
     nonuser = models.OneToOneField(NonUser, null=True, blank=True,
                                     related_name='hpc2016_registration')
     sessions  = models.ManyToManyField(Session, blank=True)
-
+    date_submitted = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
         if self.user:
             return self.user.common_profile.get_ar_full_name()
         elif self.nonuser:
-            return self.nonuser.ar_name
+            return self.nonuser.get_ar_full_name()
         else:
             self.pk

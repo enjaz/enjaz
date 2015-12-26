@@ -7,36 +7,63 @@
 
 {% block content %}
 
-<p class="dinar-light enjaz-warning">إذا كنت من طلاب وطالبات جامعة الملك سعود بن عبد العزيز للعلوم الصحيّة، فينبغي التسجيل في مؤتمر التخصّصات الصحيّة عبر <a href="{% url 'userena_signin' %}?next={% url 'hpc:user_registration' %}">الدخول إلى بوّابة إنجاز</a>. هذا النموذج مخصص لطلاب الجامعات والكليّات الصحيّة الأخرى فقط.</p>
+<p class="dinar-light enjaz-warning"><i class="entypo-info"></i> إذا كنت من طلاب وطالبات جامعة الملك سعود بن عبد العزيز للعلوم الصحيّة، فينبغي التسجيل في مؤتمر التخصّصات الصحيّة عبر <a href="{% url 'userena_signin' %}?next={% url 'hpc:user_registration' %}">الدخول إلى بوّابة إنجاز</a>. هذا النموذج مخصص لطلاب وطالبات الجامعات والكليّات الصحيّة الأخرى فقط.</p>
 
 <form id="form_register" method="post">
     {% csrf_token %}
     <div class="dinar-light registration-form">
             <h3 class="dinar-light">سجّل معلوماتك</h3>
 			<div class="form-group">
-				<div class="input-group{% if nonuser_form.errors %} validate-has-error{% endif %}">
+                <label class="control-label">الاسم بالعربية</label>
+				<div class="input-group{% if nonuser_form.ar_first_name.errors or nonuser_form.ar_middle_name.errors or nonuser_form.ar_last_name.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-user"></i>
 					</div>
 					
-					<input {% if nonuser_form.ar_name.value and not nonuser_form.ar_name.errors %}value="{{ nonuser_form.ar_name.value }}" {% endif %}type="text" class="form-control" name="ar_name" id="ar_name" placeholder="{{ nonuser_form.ar_name.label }}" required="required"/>
-					{% if nonuser_form.ar_name.errors %}
-					    {% for error in nonuser_form.ar_name.errors %}
-					        <label class='error' for='ar_name' style='display: inline-block'>{{ error|escape }}</label>
+					<input {% if nonuser_form.ar_first_name.value and not nonuser_form.ar_first_name.errors %}value="{{ nonuser_form.ar_first_name.value }}" {% endif %}type="text" class="form-control" name="ar_first_name" id="ar_first_name" placeholder="{{ nonuser_form.ar_first_name.label }}" required="required"/>
+					{% if nonuser_form.ar_first_name.errors %}
+					    {% for error in nonuser_form.ar_first_name.errors %}
+					        <label class='error' for='ar_first_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if nonuser_form.ar_middle_name.value and not nonuser_form.ar_middle_name.errors %}value="{{ nonuser_form.ar_middle_name.value }}" {% endif %}type="text" class="form-control" name="ar_middle_name" id="ar_middle_name" placeholder="{{ nonuser_form.ar_middle_name.label }}" required="required"/>
+					{% if nonuser_form.ar_middle_name.errors %}
+					    {% for error in nonuser_form.ar_middle_name.errors %}
+					        <label class='error' for='ar_middle_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if nonuser_form.ar_last_name.value and not nonuser_form.ar_last_name.errors %}value="{{ nonuser_form.ar_last_name.value }}" {% endif %}type="text" class="form-control" name="ar_last_name" id="ar_last_name" placeholder="{{ nonuser_form.ar_last_name.label }}" required="required"/>
+					{% if nonuser_form.ar_last_name.errors %}
+					    {% for error in nonuser_form.ar_last_name.errors %}
+					        <label class='error' for='ar_last_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 				</div>
 			</div>
-			<div class="form-group english-field">
-				<div class="input-group{% if nonuser_form.errors %} validate-has-error{% endif %}">
+
+			<div class="form-group">
+                                <label class="control-label">الاسم بالإنجليزية</label>
+				<div class="english-field input-group{% if nonuser_form.en_first_name.errors or nonuser_form.en_middle_name.errors or nonuser_form.en_last_name.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-user"></i>
 					</div>
 					
-					<input {% if nonuser_form.en_name.value and not nonuser_form.en_name.errors %}value="{{ nonuser_form.en_name.value }}" {% endif %}type="text" class="form-control" name="en_name" id="en_name" placeholder="{{ nonuser_form.en_name.label }}" required="required"/>
-					{% if nonuser_form.en_name.errors %}
-					    {% for error in nonuser_form.en_name.errors %}
-					        <label class='error' for='en_name' style='display: inline-block'>{{ error|escape }}</label>
+					<input {% if nonuser_form.en_first_name.value and not nonuser_form.en_first_name.errors %}value="{{ nonuser_form.en_first_name.value }}" {% endif %}type="text" class="form-control" name="en_first_name" id="en_first_name" placeholder="{{ nonuser_form.en_first_name.label }}" required="required"/>
+					{% if nonuser_form.en_first_name.errors %}
+					    {% for error in nonuser_form.en_first_name.errors %}
+					        <label class='dinar-light error' for='en_first_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if nonuser_form.en_middle_name.value and not nonuser_form.en_middle_name.errors %}value="{{ nonuser_form.en_middle_name.value }}" {% endif %}type="text" class="form-control" name="en_middle_name" id="en_middle_name" placeholder="{{ nonuser_form.en_middle_name.label }}" required="required"/>
+					{% if nonuser_form.en_middle_name.errors %}
+					    {% for error in nonuser_form.en_middle_name.errors %}
+					        <label class='dinar-light error' for='en_middle_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if nonuser_form.en_last_name.value and not nonuser_form.en_last_name.errors %}value="{{ nonuser_form.en_last_name.value }}" {% endif %}type="text" class="form-control" name="en_last_name" id="en_last_name" placeholder="{{ nonuser_form.en_last_name.label }}" required="required"/>
+					{% if nonuser_form.en_last_name.errors %}
+					    {% for error in nonuser_form.en_last_name.errors %}
+					        <label class='dinar-light error' for='en_last_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 				</div>

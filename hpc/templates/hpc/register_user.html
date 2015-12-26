@@ -7,7 +7,7 @@
 {% block content %}
 <div class="form-register-success visible dinar-light">
 	<i class="entypo-flag"></i>
-    <p style="margin-top: 15px;">أهلا {{ user.common_profile.get_ar_full_name|default:user.username }}!  من هنا يمكنك التسجيل في مؤتمر التخصّصات الصحيّة والذي سيعقد في الفترة من 26 إلى 28 يناير.</p>
+    <p style="margin-top: 15px;">أهلا {{ user.common_profile.ar_first_name|default:user.username }} {{ user.common_profile.ar_last_name }}!  من هنا يمكنك التسجيل في مؤتمر التخصّصات الصحيّة والذي سيعقد في الفترة من 26 إلى 28 يناير.</p>
 </div>
 <form id="form_register" method="post">
     {% csrf_token %}

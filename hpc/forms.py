@@ -27,8 +27,10 @@ class EvaluationForm(forms.ModelForm):
 class NonUserForm(forms.ModelForm):
     class Meta:
         model = NonUser
-        fields = ['ar_name', 'en_name', 'email', 'mobile_number',
-                  'university', 'college', 'gender']
+        fields = ['ar_first_name', 'ar_middle_name', 'ar_last_name',
+                  'en_first_name', 'en_middle_name', 'en_last_name',
+                  'email', 'mobile_number', 'university', 'college',
+                  'gender']
         
 class RegistrationForm(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -39,40 +41,37 @@ class RegistrationForm(forms.Form):
             time_slot_sessions = Session.objects.filter(time_slot=time_slot)
             if user:
                 user_gender = get_user_gender(user)
-                print user_gender
                 time_slot_sessions = Session.objects.filter(time_slot=time_slot, gender__in=['', user_gender])
             self.fields['time_slot_%s' % time_slot] = forms.ModelChoiceField(time_slot_sessions, required=False)
             self.fields['time_slot_%s' % time_slot].widget.attrs['class'] = 'form-control'
 
-        nontime_sessions = Session.objects.filter(time_slot__isnull=True)
+        untimed_sessions = Session.objects.filter(time_slot__isnull=True)
 
-        for nontime_session in nontime_sessions:
-            self.fields['session_%s' % nontime_session.pk] = forms.BooleanField(label=nontime_session.name,
-                                                                                required=False)
+        for untimed_session in untimed_sessions:
+            self.fields['session_%s' % untimed_session.code_name] = forms.BooleanField(label=untimed_session.name,
+                                                                                       required=False)
 
-    def save(self, nonuser=None, user=None):
+    def save(self, nonuser=None, user=None):    
+        timed_session_fields = [field_name for field_name in self.cleaned_data
+                                if field_name.startswith('time_slot_') and self.cleaned_data[field_name]]
+        untimed_session_code_names = [field_name.split('_')[-1] for field_name in self.cleaned_data
+                               if field_name.startswith('session_') and self.cleaned_data[field_name]]
+
+        # If no sessions were selected, do not register.
+        if not untimed_session_code_names and \
+           not timed_session_fields:
+            return
+
         if user:
             registration = Registration.objects.create(user=user)
         elif nonuser:
             registration = Registration.objects.create(nonuser=nonuser)
-    
-        timed_session_fields = [field_name for field_name in self.cleaned_data
-                                if field_name.startswith('time_slot_')]
-        untimed_session_pks = [int(field_name.split('_')[-1]) for field_name in self.cleaned_data
-                               if field_name.startswith('session_') and self.cleaned_data[field_name]]
-
-        # Everyone will be registered in the main track and the
-        # resreach track:
-        main_track = Session.objects.get(pk=1)
-        registration.sessions.add(main_track)
-
-        # Then we will add sessions added by the user.
 
         for timed_session_field in timed_session_fields:
             session = self.cleaned_data[timed_session_field]
             if session:
                 registration.sessions.add(session)
 
-        for session_pk in untimed_session_pks:
-            session = Session.objects.get(pk=session_pk)
+        for session_code_name in untimed_session_code_names:
+            session = Session.objects.get(code_name=session_code_name)
             registration.sessions.add(session)

@@ -76,7 +76,7 @@ def add_sessions(apps, schema_editor):
     Session.objects.create(name="برنامج كلية الطب",
                            time_slot=3,
                            vma_id=419)
-    Session.objects.create(name="ورشة عمل: تجربة اختبار SMEL",
+    Session.objects.create(name="ورشة عمل: تجربة اختبار SMLE",
                            time_slot=None,
                            vma_id=0)
 

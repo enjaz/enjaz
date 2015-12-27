@@ -14,7 +14,7 @@ from hpc import utils
 
 
 def submit_abstract(request):
-    if datetime.now() >= datetime(2015, 12, 26):
+    if datetime.now() > datetime(2015, 12, 27, 23, 59):
         return render(request, 'hpc/abstract_closed.html')
     if request.method == 'POST':
         form = AbstractForm(request.POST, request.FILES)

@@ -1,0 +1,63 @@
+{% extends 'hpc_evaluation_base.html' %}{% load staticfiles %}
+
+{% block title %}Abstract list{% endblock %}
+
+{% block content %}
+<div class="panel-group" id="accordion-sessions">
+
+{% for session in sessions %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a data-toggle="collapse" href="#collapse{{ session.pk }}" data-target="#collapse{{ session.pk }}" class="collapsed">
+                {{ session }}
+            </a>
+        </h4>
+    </div>
+    <div id="collapse{{ session.pk }}" class="panel-collapse collapse {% if sessions.count > 1 %}out{% else %}in{% endif %}">
+        <div class="panel-body"><div class="row">
+            <table class="display datatable">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>الجامعة</th>
+                        <th>الكلية</th>
+                        <td>البريد</td>
+                        <th>تاريخ التسجيل</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for registration in session.registration_set.all %}
+                    <tr>
+                        <td>{{ registration }}</td>
+                        <td>{{ registration.get_university }}</td>
+                        <td>{{ registration.get_college }}</td>
+                        <td><a class="english-field" href="{{ registration.get_email }}">{{ registration.get_email }}</a></td>
+                        <td data-order='{{ registration.date_submitted|date:"U" }}'>{{ registration.date_submitted }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% endblock %}
+
+{% block customscript %}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+	<script>
+    $(function(){
+        $('.datatable').dataTable({
+            order: [[ 4, "desc" ]],
+            language: {% include 'js/dataTables-arabic.json' %},
+        });
+        // Allow the dropdown menus to cross the border of the panel without being cropped
+        $(".panel").css("overflow-x", "visible").css("overflow-y", "visible");
+    });
+    </script>
+{% endblock %}

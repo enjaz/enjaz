@@ -73,24 +73,24 @@ $(function(){
             $("#id_time_slot_2, #id_time_slot_3").prop("disabled", false);
             time_slot_2_workshop_choices ={
                 '': '---------',
-                {% for pk, name in female_time_slot_2_choices %}{{ pk }}: "{{ name }}",
+                {% for pk, name in female_time_slot_2_choices %}{{ pk }}: "{{ name|safe }}",
                 {% endfor %}
             };
             time_slot_3_workshop_choices ={
                 '': '---------',
-                {% for pk, name in female_time_slot_3_choices %}{{ pk }}: "{{ name }}",
+                {% for pk, name in female_time_slot_3_choices %}{{ pk }}: "{{ name|safe }}",
                 {% endfor %}
             }
         } else if ($(this).val() == 'M'){
             $("#id_time_slot_2, #id_time_slot_3").prop("disabled", false);
             time_slot_2_workshop_choices = {
                 '': '---------',
-                {% for pk, name in male_time_slot_2_choices %}{{ pk }}: "{{ name }}",
+                {% for pk, name in male_time_slot_2_choices %}{{ pk }}: "{{ name|safe }}",
                 {% endfor %}
             };
             time_slot_3_workshop_choices = {
                 '': '---------',
-                {% for pk, name in male_time_slot_3_choices %}{{ pk }}: "{{ name }}",
+                {% for pk, name in male_time_slot_3_choices %}{{ pk }}: "{{ name|safe }}",
                 {% endfor %}
             };   
         }

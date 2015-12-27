@@ -106,7 +106,10 @@ class Session(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
-        return u"%s (%s)" % (self.name, self.get_gender_display())
+        if self.gender:
+            return u"%s (%s)" % (self.name, self.get_gender_display())
+        else:
+            return self.name
 
 class NonUser(models.Model):
     ar_first_name = models.CharField(max_length=30,

@@ -114,12 +114,25 @@
 				</div>
 			</div>
 			<div class="form-group">
-				<div class="input-group{% if form.university.errors %} validate-has-error{% endif %}">
+				<div class="input-group{% if nonuser_form.university.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-graduation-cap"></i>
 					</div>
-					
-					<input {% if nonuser_form.university.value and not nonuser_form.university.errors %}value="{{ nonuser_form.university.value }}" {% endif %}type="text" class="form-control" name="university" id="university" placeholder="{{ nonuser_form.university.label }}" required="required"/>
+                    
+					<select {% if nonuser_form.university.value and not nonuser_form.university.errors %}value="{{ nonuser_form.university.value }}" {% endif %}class="form-control" id="university-list" title="{{ nonuser_form.university.label }}" required="required">
+                        <option value="">{{ nonuser_form.university.label }}</option>
+                        <option value="KSU">جامعة الملك سعود</option>
+                        <option value="ImamU">جامعة الإمام محمد بن سعود الإسلامية</option>
+                        <option value="Alfaisal">جامعة الفيصل</option>
+                        <option value="KAU">جامعة الملك عبدالعزيز</option>
+                        <option value="KFU">جامعة الملك فيصل</option>
+                        <option value="KKU">جامعة الملك خالد</option>
+                        <option value="PSAU">جامعة الأمير سطام بن عبد العزيز</option>
+                        <option value="QU">جامعة القصيم</option>
+                        <option value="MA">جامعة المجمعة</option>
+                        <option value="Other">جامعة أخرى</option>
+					</select>
+                    <input {% if nonuser_form.university.value and not nonuser_form.university.errors %}value="{{ nonuser_form.university.value }}" {% endif %}type="text" class="form-control" id="university-text-field" placeholder="اكتب جامعتك هنا" style="display: none"/>
 					{% if nonuser_form.university.errors %}
 					    {% for error in nonuser_form.university.errors %}
 					        <label class='error' for='university' style='display: inline-block'>{{ error|escape }}</label>
@@ -132,8 +145,14 @@
 					<div class="input-group-addon">
 						<i class="entypo-graduation-cap"></i>
 					</div>
-					
-					<input {% if nonuser_form.college.value and not nonuser_form.college.errors %}value="{{ nonuser_form.college.value }}" {% endif %}type="text" class="form-control" name="college" id="college" placeholder="{{ nonuser_form.college.label }}" required="required"/>
+                    
+					<select {% if nonuser_form.college.value and not nonuser_form.college.errors %}value="{{ nonuser_form.college.value }}" {% endif %}class="form-control" id="college-list" title="{{ nonuser_form.college.label }}" required="required">
+                        <option value="">{{ nonuser_form.college.label }}</option>
+                        {% for value, label in college_choices %}
+                        <option value="{{ label }}">{{ label }}</option>{% endfor %}
+                        <option value="Other">كليّة أخرى</option>
+					</select>
+                    <input {% if nonuser_form.college.value and not nonuser_form.college.errors %}value="{{ nonuser_form.college.value }}" {% endif %}type="text" class="form-control" id="college-text-field" placeholder="اكتب كليّتك هنا" style="display: none"/>
 					{% if nonuser_form.college.errors %}
 					    {% for error in nonuser_form.college.errors %}
 					        <label class='error' for='college' style='display: inline-block'>{{ error|escape }}</label>
@@ -141,7 +160,8 @@
 					{% endif %}
 				</div>
 			</div>
-        
+            <input type="hidden" name="college">
+            <input type="hidden" name="university">
             {% include 'hpc/partials/registration_form.html' %}
 			<div class="form-group">
 				<button type="submit" class="btn btn-success btn-block btn-login">
@@ -154,5 +174,39 @@
 {% endblock %}
 
 {% block customscript %}
+<script type="text/javascript">
+    $(function(){
+        $('#college-list').change(function(){
+            value = $(this).val();
+            if ($('#college-list option[value=Other]:checked').length){
+                $('#college-text-field').show();
+                $('#college-text-field').attr('required', 'required');
+            } else {
+                $('#college-text-field').hide();
+                $('#college-text-field').removeAttr('required');
+                $('input[name=college]').val(value);
+            }
+        });
+        $('#college-text-field').change(function(){
+            value = $(this).val();
+            $('input[name=college]').val(value);
+        });
+        $('#university-list').change(function(){
+            value = $(this).val();
+            if ($('#university-list option[value=Other]:checked').length){
+                $('#university-text-field').show();
+                $('#university-text-field').attr('required', 'required');
+            } else {
+                $('#university-text-field').hide();
+                $('#university-text-field').removeAttr('required');
+                $('input[name=university]').val(value);
+            }
+        });
+        $('#university-text-field').change(function(){
+            value = $(this).val();
+            $('input[name=university]').val(value);
+        });
+    });
+</script>
 <script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
 {% endblock %}

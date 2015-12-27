@@ -98,6 +98,7 @@ class Session(models.Model):
                                                  default=None)
     vma_id = models.PositiveSmallIntegerField()
     code_name = models.CharField(max_length=50, default="",
+                                 blank=True,
                                  verbose_name=u"الاسم البرمجي",
                                  help_text=u"حروف لاتينية صغيرة وأرقام")
     gender = models.CharField(max_length=1, blank=True,
@@ -105,7 +106,7 @@ class Session(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
-        return self.name
+        return u"%s (%s)" % (self.name, self.get_gender_display())
 
 class NonUser(models.Model):
     ar_first_name = models.CharField(max_length=30,
@@ -167,6 +168,36 @@ class Registration(models.Model):
                                     related_name='hpc2016_registration')
     sessions  = models.ManyToManyField(Session, blank=True)
     date_submitted = models.DateTimeField(auto_now_add=True)
+
+    def get_university(self):
+        if self.user:
+            try:
+                common_profile = self.user.common_profile
+                return "KSAU-HS"
+            except ObjectDoesNotExist:
+                return None
+        elif self.nonuser:
+            return self.nonuser.university
+    get_university.short_description = u"الجامعة"
+
+    def get_college(self):
+        if self.user:
+            try:
+                common_profile = self.user.common_profile
+                return common_profile.college.get_name_display()
+            except ObjectDoesNotExist:
+                return None
+        elif self.nonuser:
+            return self.nonuser.college
+    get_college.short_description = u"الكلية"
+
+    def get_email(self):
+        try:
+            if self.user:
+                return self.user.email
+        except ObjectDoesNotExist:
+            pass
+        return self.nonuser.email
 
     def __unicode__(self):
         if self.user:

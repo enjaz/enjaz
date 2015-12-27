@@ -5,6 +5,7 @@ from hpc import views
 urlpatterns = patterns('',
     url(r'^registration/$', views.introduce_registration, name="registration_introduction"),
     url(r'^registration/user/$', views.user_registration, name="user_registration"),
+    url(r'^registration/list/$', views.list_registrations, name="list_registrations"),
     url(r'^registration/nonuser/$', views.nonuser_registration, name="nonuser_registration"),
     url(r'^registration/thanks/$', TemplateView.as_view(template_name='hpc/registration_completed.html'), name="registration_completed"),
     url(r'^registration/already/$', TemplateView.as_view(template_name='hpc/registration_already.html'), name="registration_already"),

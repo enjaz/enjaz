@@ -102,28 +102,6 @@ class RegistrationAdmin(admin.ModelAdmin):
                     'nonuser__ar_middle_name',
                     'nonuser__ar_last_name')
 
-    def get_university(self, obj):
-        if obj.user:
-            try:
-                common_profile = obj.user.common_profile
-                return "KSAU-HS"
-            except ObjectDoesNotExist:
-                return None
-        elif obj.nonuser:
-            return obj.nonuser.university
-    get_university.short_description = u"الجامعة"
-
-    def get_college(self, obj):
-        if obj.user:
-            try:
-                common_profile = obj.user.common_profile
-                return common_profile.college.get_name_display()
-            except ObjectDoesNotExist:
-                return None
-        elif obj.nonuser:
-            return obj.nonuser.college
-    get_college.short_description = u"الكلية" 
-
 admin.site.register(Abstract, AbstractAdmin)
 admin.site.register(Session)
 admin.site.register(Registration, RegistrationAdmin)

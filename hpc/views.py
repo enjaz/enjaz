@@ -7,6 +7,7 @@ from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from post_office import mail
 
+from clubs.models import college_choices
 from hpc.forms import AbstractForm, EvaluationForm, NonUserForm, RegistrationForm
 from hpc.models import Abstract, Evaluation, Registration, Session
 from hpc import utils
@@ -101,15 +102,22 @@ def nonuser_registration(request):
         registration_form = RegistrationForm()
         nonuser_form = NonUserForm()
 
-    male_time_slot_2_choices = Session.objects.filter(time_slot=2, gender='M')\
+    male_time_slot_2_choices = Session.objects.filter(time_slot=2, gender__in=['', 'M'])\
                                               .values_list('pk', 'name')
-    female_time_slot_2_choices = Session.objects.filter(time_slot=2, gender='F')\
+    female_time_slot_2_choices = Session.objects.filter(time_slot=2, gender__in=['', 'F'])\
+                                                .values_list('pk', 'name')
+    male_time_slot_3_choices = Session.objects.filter(time_slot=3, gender__in=['', 'M'])\
+                                              .values_list('pk', 'name')
+    female_time_slot_3_choices = Session.objects.filter(time_slot=3, gender__in=['', 'F'])\
                                                 .values_list('pk', 'name')
 
     context = {'registration_form': registration_form,
                'nonuser_form': nonuser_form,
+               'college_choices': college_choices,
                'male_time_slot_2_choices': male_time_slot_2_choices,
-               'female_time_slot_2_choices': female_time_slot_2_choices}
+               'female_time_slot_2_choices': female_time_slot_2_choices,
+               'male_time_slot_3_choices': male_time_slot_3_choices,
+               'female_time_slot_3_choices': female_time_slot_3_choices}
 
     return render(request, "hpc/register_nonuser.html", context)
 
@@ -137,3 +145,13 @@ def user_registration(request):
 
     context = {'registration_form': registration_form}
     return render(request, "hpc/register_user.html", context)
+
+@login_required
+def list_registrations(request):
+    if not utils.is_organizing_committee_member(request.user) and \
+       not request.user.is_superuser:
+        raise PermissionDenied
+
+    sessions = Session.objects.all()
+    return render(request, "hpc/registration_list.html",
+                  {'sessions': sessions})

@@ -65,31 +65,49 @@
 <script type="text/javascript">
 $(function(){
     if ($("#gender").length){
-        $("#id_time_slot_2").prop("disabled", true);
+        $("#id_time_slot_2, #id_time_slot_3").prop("disabled", true);
+        
     }
     $("#gender").change(function(){
         if ($(this).val() == 'F'){
-            $("#id_time_slot_2").prop("disabled", false);
+            $("#id_time_slot_2, #id_time_slot_3").prop("disabled", false);
             time_slot_2_workshop_choices ={
                 '': '---------',
                 {% for pk, name in female_time_slot_2_choices %}{{ pk }}: "{{ name }}",
                 {% endfor %}
+            };
+            time_slot_3_workshop_choices ={
+                '': '---------',
+                {% for pk, name in female_time_slot_3_choices %}{{ pk }}: "{{ name }}",
+                {% endfor %}
             }
         } else if ($(this).val() == 'M'){
-            $("#id_time_slot_2").prop("disabled", false);
+            $("#id_time_slot_2, #id_time_slot_3").prop("disabled", false);
             time_slot_2_workshop_choices = {
                 '': '---------',
                 {% for pk, name in male_time_slot_2_choices %}{{ pk }}: "{{ name }}",
                 {% endfor %}
-            }   
+            };
+            time_slot_3_workshop_choices = {
+                '': '---------',
+                {% for pk, name in male_time_slot_3_choices %}{{ pk }}: "{{ name }}",
+                {% endfor %}
+            };   
         }
-        $("#id_time_slot_2").html("");
+        $("#id_time_slot_2, #id_time_slot_3").html("");
         $.each(time_slot_2_workshop_choices, function(key, value){
             $("#id_time_slot_2")
                 .append($("<option></option>")
                         .attr("value", key)
                         .text(value));
             $("#id_time_slot_2").val('');
+        });
+        $.each(time_slot_3_workshop_choices, function(key, value){
+            $("#id_time_slot_3")
+                .append($("<option></option>")
+                        .attr("value", key)
+                        .text(value));
+            $("#id_time_slot_3").val('');
         });
     });
     function medicine_sessions(){

@@ -89,6 +89,19 @@
 				</td>
 				<td>{{ form.criterion_type }}</td>
 			</tr>
+            <tr>
+                <th>تعاون مع الرئاسة</th>
+                <td>
+                    <label>
+                        <input type="radio" value="8" name="presidency_option"> نعم <span class="points">(8 نقاط)</span>
+                    </label>
+                    <br>
+                    <label>
+                        <input type="radio" value="0" name="presidency_option"> لا <span class="points">(لا نقاط)</span>
+                    </label>
+                </td>
+                <td>{{ form.criterion_presidency }}</td>
+            </tr>
 			<tr>
 				<th>أجزاء النشاط وسلاسل الأنشطة</th>
 				<td>
@@ -158,7 +171,7 @@
 				<td>{{ form.criterion_creative_idea }}</td>
 			</tr>
 			<tr>
-				<th>الوقت</th>
+				<th>الرفع المبكر</th>
 				<td>
 					<p class="alert alert-warning"><i class="entypo-eye"></i>
 					أرسل هذا النشاط قبل <span class="points">{{ submission_interval }} أيام</span> من عقده (أرسل يوم {{ activity.submission_date|date:"j F Y"  }} وعقد في {{ activity.get_first_date|date:"j F"  }}).
@@ -168,23 +181,35 @@
 					</label>
 					<br>
 					<label>
-						<input type="radio" value="-3" name="time_option"> تغيير موعد النشاط بدون سبب وجيه <span class="points">(حسم ثلاثة نقاط)</span>
+						<input type="radio" value="0" name="early_sumbission_option"> رُفع بعد الموعد المحدد <span class="points">(لا نقاط)</span>
 					</label>
 					<br>
 					<label>
-						<input type="radio" value="0" name="time_option"> رُفع بعد الموعد المحدد ولم يُغيّر موعده <span class="points">(لا نقاط)</span>
-					</label>
-					<br>
-					<label>
-						<input data-other='true' type="radio" value="" name="time_option"> أخرى
+						<input data-other='true' type="radio" value="" name="early_sumbission_option"> أخرى
 					</label>
 				</td>
-				<td>{{ form.criterion_time }}</td>
+				<td>{{ form.criterion_early_submission }}</td>
 			</tr>
+            <tr>
+                <th>
+                    تأجيل موعد النشاط بدون سبب وجيه
+                </th>
+                <td>
+					<label>
+						<input type="radio" value="-3" name="postponed_option"> تغيير موعد النشاط بدون سبب وجيه <span class="points">(حسم ثلاثة نقاط)</span>
+					</label>
+                    <br>
+                    <label>
+						<input type="radio" value="0" checked name="postponed_option"> لم يغير موعد النشاط <span class="points">(لا نقاط)</span>
+					</label>
+                </td>
+                <td>{{ form.criterion_postponed }}</td>
+            </tr>
 			<tr>
 				<th>الحضور</th>
 				<td>
 					<p class="alert alert-warning"><i class="entypo-eye"></i>
+                        
 					{% if activity.get_evaluations.count %}
 						{% if activity.get_evaluations.count >= 20 %}
 							قيّم هذا النشاط أكثر من 20 طالبا <span class="points">({{ activity.get_evaluations.count }} طالب)</span>)
@@ -335,7 +360,7 @@ $(function(){
     }
     // Time of submission
     if ({{ submission_interval }} >= 14 ){
-        $('input[data-choice=before_time][name=time_option]').prop('checked', 'checked').trigger('change');
+        $('input[data-choice=before_time][name=early_sumbission_option]').prop('checked', 'checked').trigger('change');
     }
     // Cooperation
     {% if activity.secondary_clubs.exists %}

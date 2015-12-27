@@ -8,7 +8,7 @@ from django.utils import timezone
 from core.models import StudentClubYear
 from bulb.managers import BookQuerySet, RequestQuerySet, PointQuerySet, GroupQuerySet, SessionQuerySet, MembershipQuerySet
 
-MAXIMUM_GROUP_MEMBERS = 20
+#MAXIMUM_GROUP_MEMBERS = 20
 
 class Category(models.Model):
     name = models.CharField(max_length=50,
@@ -193,11 +193,14 @@ class Point(models.Model):
 
     def get_details(self):
         if self.request and self.user == self.request.requester:
-            return u"طلبت الكتاب"
+            message =  u"طلبت الكتاب"
         elif self.request and self.user == self.request.book.submitter:
-            return u"ساهمت بالكتاب."
+            message = u"ساهمت بالكتاب."
         else:
-            return self.note
+            message = self.note
+        if self.value == 2:
+            message += u" (رصيد مُحوّل من الاقتناء للاستعارة)"
+        return message
 
     def __unicode__(self):
         return "%s (%s)" % (self.user.username, self.value)

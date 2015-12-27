@@ -2,7 +2,7 @@
 import datetime
 
 from django.contrib import admin
-from activities.models import Activity, Episode, Category, Evaluation, Review
+from activities.models import Activity, Episode, Category, Evaluation, Review, Assessment, Criterion
 from clubs.models import section_choices
 from clubs.utils import get_presidency, get_deanship
 from core.models import StudentClubYear
@@ -88,6 +88,7 @@ class ActivityAdmin(admin.ModelAdmin):
                     'get_quality_score_average', 'get_evaluation_count')
     list_filter = [CategoryFilter, SubmissionFilter, StatusFilter, YearFilter]
     readonly_fields = ('get_relevance_score_average', 'get_quality_score_average', )
+    search_fields = ["name", "primary_club__name", ]
     inlines = [EpisodeInline, ReviewInline]
 
 class EvaluationAdmin(admin.ModelAdmin):
@@ -96,4 +97,6 @@ class EvaluationAdmin(admin.ModelAdmin):
 
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(Category)
+admin.site.register(Assessment)
+admin.site.register(Criterion)
 admin.site.register(Evaluation, EvaluationAdmin)

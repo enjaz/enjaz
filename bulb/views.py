@@ -391,7 +391,16 @@ def indicators(request):
     book_requests = Request.objects.current_year()
     groups = Group.objects.current_year()
     sessions = Session.objects.current_year()
-    users = User.objects.filter(common_profile__is_student=True, book_points__is_counted=True).annotate(point_count=Count('book_points')).filter(point_count__gte=3)
+    users = (User.objects.filter(book_giveaways__isnull=False) |
+             User.objects.filter(request__isnull=False) |
+             User.objects.filter(reading_group_coordination__isnull=False) |
+             User.objects.filter(reading_group_memberships__isnull=False) |
+             User.objects.filter(reader_profile__isnull=False)
+    ).filter(common_profile__is_student=True).distinct()
+    book_users = User.objects.filter(common_profile__is_student=True,
+                                     book_points__is_counted=True)\
+                             .annotate(point_count=Count('book_points'))\
+                             .filter(point_count__gte=3)
     book_contributing_male_users = User.objects.filter(common_profile__college__gender='M',
                                                        book_giveaways__isnull=False).distinct().count()
     book_contributing_female_users = User.objects.filter(common_profile__college__gender='F',
@@ -409,6 +418,7 @@ def indicators(request):
                'sessions': sessions,
                'books': books,
                'book_requests': book_requests,
+               'book_users': book_users,
                'users': users,
                'book_contributing_male_users': book_contributing_male_users,
                'book_contributing_female_users': book_contributing_female_users,
@@ -549,7 +559,8 @@ def control_request(request):
     if action.startswith('owner_'):
         if not utils.can_edit_owner_status(request.user, book):
             raise Exception(u"لا يمكنك اتخاذ إجراء باسم صاحب الكتاب.")
-        if action == 'owner_done':
+        previous_owner_status = book_request.owner_status
+        if action == 'owner_done' and previous_owner_status != 'D':
             book.is_available = False
             book_request.owner_status = 'D'
             book_request.owner_status_date = timezone.now()
@@ -568,7 +579,7 @@ def control_request(request):
             # requester's confirmation), create one.
             book_request.create_related_points()
 
-        elif action == 'owner_returned':
+        elif action == 'owner_returned' and previous_owner_status != 'R':
             book.is_available = True
             book_request.owner_status = 'R'
             book_request.owner_status_date = timezone.now()
@@ -582,7 +593,7 @@ def control_request(request):
             if book_request.requester_status == 'R':
                 book_request.status = 'R'
 
-        elif action == 'owner_failed':
+        elif action == 'owner_failed' and previous_owner_status != 'F':
             book_request.owner_status = 'F'
             book_request.owner_status_date = timezone.now()
 
@@ -614,7 +625,7 @@ def control_request(request):
                            template="book_request_failed_to_requester",
                            context=email_context)
 
-        elif action == 'owner_canceled':
+        elif action == 'owner_canceled' and previous_owner_status != 'C':
             book.is_available = True
             book_request.owner_status = 'C'
             book_request.owner_status_date = timezone.now()
@@ -646,7 +657,8 @@ def control_request(request):
         if not utils.can_edit_requester_status(request.user, book_request):
             raise Exception(u"لا يمكنك اتخاذ إجراء باسم مقدم الطلب.")
 
-        if action == 'requester_done':
+        previous_requester_status = book_request.requester_status
+        if action == 'requester_done' and previous_requester_status != 'D':
             book.is_available = False
             book_request.requester_status = 'D'
             book_request.requester_status_date = timezone.now()
@@ -664,7 +676,7 @@ def control_request(request):
             # requester's confirmation), create one.
             book_request.create_related_points()
 
-        elif action == 'requester_returned':
+        elif action == 'requester_returned' and previous_requester_status != 'R':
             book.is_available = True
             book_request.requester_status = 'R'
             book_request.requester_status_date = timezone.now()
@@ -678,7 +690,7 @@ def control_request(request):
             if book_request.owner_status == 'R':
                 book_request.status = 'R'
 
-        elif action == 'requester_failed':
+        elif action == 'requester_failed' and previous_requester_status != 'F':
             book_request.requester_status = 'F'
             book_request.requester_status_date = timezone.now()
 
@@ -711,7 +723,7 @@ def control_request(request):
                           template="book_request_failed_to_owner",
                           context=email_context)
 
-        elif action == 'requester_canceled':
+        elif action == 'requester_canceled' and previous_requester_status != 'C':
             # You cannot delete a request after it has been approved
             # by the requester.
             if book_request.requester_status == 'D':
@@ -761,6 +773,29 @@ def student_report(request, username=None):
 
     return render(request, 'bulb/exchange/student_report.html',
                   {'bulb_user': bulb_user})
+
+@decorators.ajax_only
+@decorators.post_only
+@login_required
+@csrf.csrf_exempt
+def convert_balance(request):
+    try:
+        giving = int(request.POST.get('giving'))
+    except ValueError:
+        raise Exception(u"أدخل رقما!")
+
+    if giving > request.user.book_points.count_total_giving():
+        raise Exception(u"لا تستطيع تحويل أكثر مما تملك من رصيد اقتناء")
+
+    # Start converting the last, counted, positive-one point.
+    for giving_point in request.user.book_points.current_year().giving().counted().filter(value=1).order_by("-submission_date")[:giving]:
+        giving_point.value = 2
+        giving_point.category = 'L'
+        giving_point.save()
+
+    return {"message": "success",
+            "total_lending": request.user.book_points.count_total_lending(),
+            "total_giving": request.user.book_points.count_total_giving()}
 
 # Reading Groups
 

@@ -1,23 +1,25 @@
-{% extends "clubs_base.html" %}{% load staticfiles %}
+{% extends "clubs_base.html" %}{% load staticfiles %}{% load clubs_utils %}
 {% block title %}الأندية{% endblock %}
 
 {% block content %}
 <div class="row">
 <table id="club_list" class="display datatable dt-responsive">
   <thead>
+    <th>الترتيب</th>
     <th>الاسم</th>
     <th class="not-mobile"># الأعضاء</th>
     <th class="not-mobile">المنسق</th>
-    <th class="never">النقاط</th>
+    {% if user.is_superuser or user|is_presidency_coordinator_or_deputy %}<th class="not-mobile">النقاط</th>{% endif %}
     <th>حالة التسجيل</th>
   </thead>
   <tbody>
     {% for club in clubs %}
     <tr>
+        <td>{{ forloop.counter	}}</td>
         <td><a href="{% url 'clubs:show' club.id %}">{{ club }}</a></td>
         <td>{% if club.members.all|length %}{{ club.members.all|length }}{% else %}لا يوجد{% endif %}</td>
         <td>{% if club.coordinator %} {{ club.coordinator.common_profile.get_ar_full_name|default:club.coordinator.username }} {% else %} لا يوجد {% endif %}</td>
-        <td>{{ club.get_total_points }}</td>
+        {% if user.is_superuser or user|is_presidency_coordinator_or_deputy %}<td>{{ club.get_total_points }}</td>{% endif %}
         <td>{% if club.registration_is_open %} <a href="{% url 'clubs:join' club.id %}">مفتوح</a> {% else %} مغلق {% endif %}</td>
     </tr>
     {% endfor %}
@@ -34,7 +36,7 @@
 $(function () {
 	$('#club_list').DataTable({
 		"bPaginate": false,
-        "order": [[ 3, "desc" ]],
+        "order": [[ 0, "asc" ]],
         "language": {% include 'js/dataTables-arabic.json' %}
     });
 });

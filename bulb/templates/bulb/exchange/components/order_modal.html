@@ -12,6 +12,16 @@
             keyboard: false,
             backdrop: 'static',
         });
+        
+        var $submitButton = $('#confirm-order-modal .confirm');
+        // Unbind any handlers previously attached to the submit button
+        // This is necessary to avoid multiple submissions of the form
+        $submitButton.off('click');
+        $submitButton.click(function() {
+            $(this).prop('disabled', true);
+            // Confirmation button should trigger form submission.
+            $("form#confirm-order-form").submit();
+        });
 
         // modify form submission behaviour to be ajaxy
         $("form#confirm-order-form").submit(function (event) {
@@ -42,20 +52,15 @@
                             window.location.href= data.list_url;
                         });
                     } else {
+                        $submitButton.prop('disabled', false);
                         $("#confirm-order-form .modal-body").html(data);
                         $("#id_borrowing_end_date").attr('data-start-view', '1').datepicker({isRTL: true, minDate: 1{% if book.available_until %},maxDate: new Date({{ book.available_until.year }}, {{ book.available_until.month }} - 1, {{ book.available_until.day }}){% endif %}});
                     }}
             });
         });     
         
-        var $submitButton = $('#confirm-order-modal .confirm');
-        // Unbind any handlers previously attached to the submit button
-        // This is necessary to avoid multiple submissions of the form
-        $submitButton.off('click');
-        $submitButton.click(function() {
-            // Confirmation button should trigger form submission.
-            $("form#confirm-order-form").submit();
-        });
+        
+
     });
     
 // This allows overlapping modals.

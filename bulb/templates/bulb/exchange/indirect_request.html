@@ -60,28 +60,27 @@
     </table>
 </div>
 <div class="col-sm-2 vcenter">
-{% if side %}
-        <button data-pk="{{ book_request.pk }}" data-action="{{ side }}_done" class="done btn-block btn-icon btn btn-success">
-            <i class="entypo-flag"></i>
-            سُلّم الكتاب
-        </button>
-        {% if not book_request.owner_status == 'F' and not book_request.requester_status == 'F' %}
-        <button data-pk="{{ book_request.pk }}" data-action="{{ side }}_failed" class="failed btn-block btn-icon btn btn-warning">
-            <i class="fa fa-exclamation-circle"></i>
-            تعذّر التواصل
-        </button>
-        {% endif %}
-{% else %}
-    {% if book_request.book.contribution == 'L' and book_request.requester_status == 'D' %}
+{% if side == 'owner' and not book_request.owner_status == 'D' and not book_request.owner_status == 'R' or side == 'requester' and not book_request.requester_status == 'D' and not book_request.requester_status == 'R' %}
+    <button data-pk="{{ book_request.pk }}" data-action="{{ side }}_done" class="done btn-block btn-icon btn btn-success">
+        <i class="entypo-flag"></i>
+        سُلّم الكتاب
+    </button>
+    {% if not book_request.owner_status == 'F' and not book_request.requester_status == 'F' %}
+    <button data-pk="{{ book_request.pk }}" data-action="{{ side }}_failed" class="failed btn-block btn-icon btn btn-warning">
+        <i class="fa fa-exclamation-circle"></i>
+        تعذّر التواصل
+    </button>
+    {% endif %}
+{% endif %}
+     {% if book_request.book.contribution == 'L' and book_request.requester_status == 'D' %}
         <button data-pk="{{ book_request.pk }}" data-action="requester_returned" class="done btn-block btn-icon btn btn-success">
             <i class="entypo-flag"></i>
             أعاده المستعير
         </button>
-    {% elif book_request.book.contribution == 'L' and book_request.owner_status == 'D' %}
+    {% elif book_request.book.contribution == 'L' and book_request.owner_status == 'D' and not book_request.requester_status == '' %}
         <button data-pk="{{ book_request.pk }}" data-action="owner_returned" class="done btn-block btn-icon btn btn-success">
             <i class="entypo-flag"></i>
             أعيد إلى صاحبه
         </button>
     {% endif %}
-{% endif %}
 </div>

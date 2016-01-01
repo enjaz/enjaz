@@ -599,11 +599,8 @@ ul.studentguide-intro{
 }
 
 .studentguide-option.new-student{
-    background-color: #FFEFA4;
-    border-color: #FFD78A;
-    /*
-    background-color: #D0F5A9;
-    border-color: #DAE4D0;*/
+    background-color: #F1EF91;
+    border-color: #F1EF91;
 }
 
 .bulb-option p, .studentguide-option p{
@@ -615,26 +612,38 @@ ul.studentguide-intro{
     color:  rgb(30, 71, 30);
 }
 
-.studentguide-option.new-student p, .studentguide-option.new-student .icon, .studentguide-option.new-student h3{
-    color:  #243E08;
-}
-
 .studentguide-option.guide p, .studentguide-option.guide .icon, .studentguide-option.guide h3{
     color:  #05271E;
 }
 
-
-.tile-stats.tile-brown{
-    background: #C5E8F7;
+.studentguide-option.new-student p, .studentguide-option.new-student .icon, .studentguide-option.new-student h3{
+    color: black;
 }
 
-
-.tile-stats.tile-brown:hover{
-    background: #DCEDF5;
+.tile-stats.tile-mentor {
+    background: #F1EF91;
 }
 
-.tile-stats.tile-brown .num, .tile-stats.tile-brown h3, .tile-stats.tile-brown p{
-    color: #100F08
+.tile-stats.tile-mentor:hover{
+    background: #E2DD82;
+}
+
+.tile-stats.tile-mentor .num, .tile-stats.tile-mentor h3, .tile-stats.tile-mentor p{
+    color: #5B5A5C;
+}
+
+.mentor-section-header{
+    font-size: 3em;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.feature-list p{
+    color: #5B5A5B;
+}
+
+.feature-list i{
+    color: black;
 }
 
 /*
@@ -735,4 +744,22 @@ li.action-required, .navbar-default .navbar-nav>li.action-required>a{
    Firefox. */
 body.loaded{
     perspective: none;
+}
+
+.enjaz-warning{
+    background: rgba(203, 205, 50, 0.75);
+    color: #ffffff;
+    padding: 10px;
+    text-align: justify;
+}
+.registration-form a, .enjaz-warning a {
+    text-decoration: underline;
+}
+
+body.login-page .login-content a{
+    color: #ffffff;
+}
+
+body.login-page .checkbox label{
+    display: inline-block;
 }

@@ -32,7 +32,7 @@
                         <td>{{ registration }}</td>
                         <td>{{ registration.get_university }}</td>
                         <td>{{ registration.get_college }}</td>
-                        <td><a class="english-field" href="{{ registration.get_email }}">{{ registration.get_email }}</a></td>
+                        <td><a class="english-field" href="mailto:{{ registration.get_email }}">{{ registration.get_email }}</a></td>
                         <td data-order='{{ registration.date_submitted|date:"U" }}'>{{ registration.date_submitted }}</td>
                     </tr>
                     {% endfor %}

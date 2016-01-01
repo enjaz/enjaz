@@ -1,8 +1,10 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView
+from django.views.generic.base import RedirectView
 from hpc import views
 
 urlpatterns = patterns('',
+    url(r'^$', RedirectView.as_view(url="https://hpc.enjazportal.com", permanent=True)),
     url(r'^registration/$', views.introduce_registration, name="registration_introduction"),
     url(r'^registration/user/$', views.user_registration, name="user_registration"),
     url(r'^registration/list/$', views.list_registrations, name="list_registrations"),

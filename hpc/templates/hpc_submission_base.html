@@ -17,8 +17,8 @@
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-core.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-theme.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-forms.css' %}?v=0001">
-	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/skins/green.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
     {% block csssheet %}{% endblock %}
 	<script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
 	<script src="{% static 'neon/assets/js/custom.js' %}"></script>
@@ -123,23 +123,8 @@ var baseurl = '';
         background: #009549;
         color: rgba(255, 255, 255, 0.9);
     }
-    .enjaz-warning{
-        background: rgba(203, 205, 50, 0.75);
-        color: #ffffff;
-        padding: 10px;
-        text-align: justify;
-    }
      .login-page .form-register-success p.enjaz-intro{
         font-size: 1.2em;
-    }
-    body.login-page .login-content a{
-        color: #ffffff;
-    }
-    .registration-form a, .enjaz-warning a {
-        text-decoration: underline;
-    }
-    .checkbox label{
-        display: inline-block;
     }
     </style>
 	{% block customscript %}{% endblock %}

@@ -1,7 +1,7 @@
 {% extends 'userena/base_userena.html' %}{% load staticfiles %}
 
-{% block title %}التسجيل{% endblock %}
-{% block description %}فضلًا املأ النموذج التالي لإتمام عملية التسجيل.<br/><span style="font-size: 1.6em;"> إذا لم تكن طالبا <a href="{% url 'nonstudent_signup' %}">سجّل هنا</a>.</span>{% endblock %}
+{% block title %}تسجيل الطلاب والطالبات{% endblock %}
+{% block description %}فضلًا املأ النموذج التالي لإتمام عملية التسجيل.{% endblock %}
 
 {% block content %}
 {% comment %}
@@ -14,6 +14,10 @@
 </div>
 {% endif %}
 {% endcomment %}
+
+<p class="dinar-light enjaz-warning"><i class="entypo-info"></i> بوابة إنجاز مُخصّصة لمنسوبي جامعة الملك سعود بن عبد العزيز للعلوم الصحيّة.<br>النموذج أدناه لتسجيل الطلاب والطالبات.  إذا لم تكن طالبا فينبغي التسجيل في بوّابة إنجاز من خلال <a href="{% url 'nonstudent_signup' %}">النموذج المخصص</a>.</p>
+
+
 <form method="post" role="form" id="form_register">	
         {% csrf_token %}
 	<div class="dinar-light">

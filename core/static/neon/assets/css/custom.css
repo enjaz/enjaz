@@ -638,14 +638,20 @@ ul.studentguide-intro{
     margin-bottom: 40px;
 }
 
+.mentor-section-intro{
+    border: 2px solid #D5CD7F;
+    margin-bottom: 40px;
+    border-bottom: none;
+    border-top: none;
+}
+
 .feature-list p{
     color: #5B5A5B;
 }
 
-.feature-list i{
-    color: black;
+.feature-list h3{
+    margin-top: -10px;
 }
-
 /*
 
 .tile-stats.tile-brown{

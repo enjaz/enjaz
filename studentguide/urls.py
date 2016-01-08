@@ -5,12 +5,12 @@ from studentguide import views
 urlpatterns = patterns('',
     url(r'^$', views.index, name="index"),
     url(r'^indicators/$', views.indicators, name="indicators"),
+    url(r'^edit_mentor_of_the_month/$', views.edit_mentor_of_the_month, name="edit_mentor_of_the_month"),
     url(r'^supervisions/$', views.list_supervised_guides, name="list_supervised_guides"),
     url(r'^my_profile/$', views.my_profile, name="my_profile"),
     url(r'^requests_to_me/$', views.requests_to_me, name="requests_to_me"),
 
     # New Students URLs
-    url(r'^new_students/$', views.new_student_index, name="new_student_index"),
     url(r'^new_students/requests/$', TemplateView.as_view(template_name='studentguide/list_my_requests.html'), name="list_my_requests"),
     url(r'^new_students/requests/summaries/$', views.list_request_summaries, name="list_request_summaries"),
     url(r'^new_students/random/(?P<tag_code_name>[\d\w_]+)/$', views.choose_random_guide, name="choose_random_guide"),

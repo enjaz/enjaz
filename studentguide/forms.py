@@ -1,6 +1,6 @@
 from django import forms
 
-from studentguide.models import GuideProfile, Request, Report, Feedback
+from studentguide.models import GuideProfile, Request, Report, Feedback, MentorOfTheMonth
 
 class GuideForm(forms.ModelForm):
     class Meta:

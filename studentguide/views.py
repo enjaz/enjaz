@@ -1,10 +1,11 @@
 # -*- coding: utf-8  -*-
-from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect, Http404
+from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
 from django.utils import timezone
 from post_office import mail
@@ -14,15 +15,54 @@ from core import decorators
 from core.models import StudentClubYear
 from studentguide import utils
 from studentguide.decorators import riyadh_only
-from studentguide.models import GuideProfile, Request, Report, Feedback, Tag
+from studentguide.models import GuideProfile, Request, Report, Feedback, Tag, MentorOfTheMonth
 from studentguide.forms import GuideForm, RequestForm, ReportForm, FeedbackForm
 
 @login_required
 @riyadh_only
 def index(request):
     guide_count = GuideProfile.objects.current_year().undeleted().count()
-    context = {'guide_count': guide_count}
+    latest_guides = GuideProfile.objects.order_by("-submission_date")[:10]
+    tags = Tag.objects.filter(guide_profiles__isnull=False).distinct()
+    # Only show tags currently available for the user's gender
+    gender = get_user_gender(request.user)
+    if gender:
+        tags = tags.filter(guide_profiles__user__common_profile__college__gender=gender)
+        mentor_of_the_month = MentorOfTheMonth.objects.get(gender=gender)
+    # If no gender, pick a random gender
+    mentor_of_the_month = MentorOfTheMonth.objects.order_by("?").first()
+    context = {'guide_count': guide_count,
+               'latest_guides': latest_guides,
+               'tags': tags,
+               'mentor_of_the_month': mentor_of_the_month}
     return render(request, "studentguide/index.html", context)
+
+@login_required
+def edit_mentor_of_the_month(request):
+    if not utils.is_studentguide_coordinator_or_deputy(request.user) and\
+       not utils.is_studentguide_member(request.user) and\
+       not request.user.is_superuser:
+        raise PermissionDenied
+
+    male_mentor = MentorOfTheMonth.objects.get(gender='M')
+    female_mentor = MentorOfTheMonth.objects.get(gender='F')
+
+    MentorOfTheMonthFormset = modelformset_factory(MentorOfTheMonth,
+                                                   fields=['guide', 'month', 'avatar'],
+                                                   extra=0)
+
+    if request.method == 'POST':
+        formset = MentorOfTheMonthFormset(request.POST, request.FILES)
+        if formset.is_valid():
+            print "valid!"
+            formset.save()
+            return HttpResponseRedirect(reverse('studentguide:index'))
+    elif request.method == 'GET':
+        formset = MentorOfTheMonthFormset(queryset=MentorOfTheMonth.objects.all())
+
+    context = {'formset': formset}
+
+    return render(request, "studentguide/edit_mentor_of_the_month.html", context)
 
 @login_required
 def indicators(request):
@@ -49,8 +89,6 @@ def list_supervised_guides(request):
        not request.user.is_superuser:
         raise PermissionDenied
 
-    
-
     if request.user.studentguide_assessments.exists():
         guides = GuideProfile.objects.current_year().filter(assessor=request.user)
         reports = Report.objects.filter(guide__in=guides)
@@ -62,17 +100,6 @@ def list_supervised_guides(request):
                'reports': reports}
 
     return render(request, "studentguide/list_supervised_guides.html", context)
-
-@login_required
-@riyadh_only
-def new_student_index(request):
-    tags = Tag.objects.filter(guide_profiles__isnull=False).distinct()
-    # Only show tags currently available for the user's gender
-    gender = get_user_gender(request.user)
-    if gender:
-        tags = tags.filter(guide_profiles__user__common_profile__college__gender=gender)
-    return render(request, "studentguide/new_student_index.html",
-                  {'tags': tags})
 
 @login_required
 @riyadh_only

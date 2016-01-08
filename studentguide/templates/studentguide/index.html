@@ -19,17 +19,16 @@
                     </div>
                 </div>
             </div>
+            {% if mentor_of_the_month.guide %}
             <div class="col-sm-5" style="text-align: center;">
-                
                 <img src="{% if mentor_of_the_month.gender == 'M' %}{% static 'images/mentorship/month-male.png' %}{% elif mentor_of_the_month.gender == 'F' %}{% static 'images/mentorship/month-female.png' %}{% endif %}" class="img-responsive">
                 {% if mentor_of_the_month.avatar %}
                 <a href="{% url 'studentguide:show_guide' mentor_of_the_month.guide.pk %}"><img style="border-radius: 2%; width: 80%; margin: 0 auto 5px auto;" src="{{ mentor_of_the_month.avatar.url }}" class="img-responsive"></a>
                 {% endif %}
                 <p style="font-size: 1.3em; margin-bottom: 0;"><a href="{% url 'studentguide:show_guide' mentor_of_the_month.guide.pk %}">{{ mentor_of_the_month.guide.user.common_profile.get_ar_full_name }}</a></p>
                 <p style="margin-bottom: 20px;">{% if mentor_of_the_month.gender == 'M' %}مرشد{% elif mentor_of_the_month.gender == 'F' %}مرشدة{% endif %} الشهر لشهر {{ mentor_of_the_month.month }}</p>
-                
-
             </div>
+            {% endif %}
         </div>
     </div>
 </div>

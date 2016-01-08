@@ -1,10 +1,10 @@
 from clubs.models import Club
-from clubs.utils import get_user_coordination_and_deputyships
+import clubs.utils
 from accounts.utils import get_user_gender
-from bulb.models import MAXIMUM_GROUP_MEMBERS
+#from bulb.models import MAXIMUM_GROUP_MEMBERS
 
 def is_bulb_coordinator_or_deputy(user):
-    coordination_and_deputyships = get_user_coordination_and_deputyships(user)
+    coordination_and_deputyships = clubs.utils.get_user_coordination_and_deputyships(user)
     return coordination_and_deputyships.filter(english_name='Bulb').exists()
 
 def is_bulb_member(user):
@@ -30,8 +30,8 @@ def get_session_submitted_cc(group):
     return [deputy.email for deputy in bulb_club.deputies.all()]
 
 def get_bulb_club_of_user(user):
-    coordination_and_deputyships = get_user_coordination_and_deputyships(user)
-    bulb = coordination_and_deputyships.filter(english_name='Bulb')
+    user_clubs = clubs.utils.get_user_clubs(user)
+    bulb = user_clubs.filter(english_name='Bulb')
     if bulb.exists():
         return bulb.first()
     else:
@@ -94,7 +94,6 @@ def group_can_have_sessions(group):
 def can_join_group(user, group):
     if group.is_deleted or \
        group.membership_set.filter(user=user).exists() or \
-       group.membership_set.active().count() > MAXIMUM_GROUP_MEMBERS or \
        group.coordinator == user or \
        (group.gender and get_user_gender(user) != group.gender) or \
        group.membership_set.filter(user=user).exists():

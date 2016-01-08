@@ -68,7 +68,7 @@ class CommonProfile(models.Model):
     def get_en_full_name(self):
         en_fullname = None
         try:
-            # If the Arabic first name is missing, let's assume the
+            # If the English first name is missing, let's assume the
             # rest is also missing.
             if self.en_first_name:
                 en_fullname = " ".join([self.en_first_name,

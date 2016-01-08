@@ -75,14 +75,6 @@ def list_activities(request):
     if request.user.is_authenticated():
         template = 'activities/list_privileged.html'
 
-        # For users who cannot assess any clubs, only show
-        # city-specific and gender-specific activities.  Assessment,
-        # sometimes, require looking into other activities.
-        # Additionally, that's useful for members of the Media Center.
-        context['approved'] = Activity.objects.approved().current_year()
-        if not can_assess_any_club(request.user):
-            context['approved'] = context['approved'].for_user_city(request.user).for_user_gender(request.user)
-
         if request.user.is_superuser:
             # If the user is a super user or part of the presidency,
             # then show all activities
@@ -105,16 +97,18 @@ def list_activities(request):
                 # action.
                 user_coordination = get_user_coordination_and_deputyships(request.user)
                 context['todo'] = Activity.objects.current_year().filter(assignee__in=user_coordination).undeleted()
-                # Media-related
-                context['due_report_count'] = user_coordination.all()[0].get_due_report_count()
-                context['overdue_report_count'] = user_coordination.all()[0].get_overdue_report_count()
-                # In activity templates, the MAX_OVERDUE_REPORTS
-                # variable is used to check whether the current user
-                # is a coordinator or a deputy.  This is to aviod
-                # passing duplicated variables.  In case the following
-                # variable is changed, the templates need to be
-                # changed as well.
-                context['MAX_OVERDUE_REPORTS'] = MAX_OVERDUE_REPORTS
+                user_club = user_coordination.first()
+                if not user_club.can_skip_followup_reports:
+                    # Media-related
+                    context['due_report_count'] = user_club.get_due_report_count()
+                    context['overdue_report_count'] = user_club.get_overdue_report_count()
+                    # In activity templates, the MAX_OVERDUE_REPORTS
+                    # variable is used to check whether the current user
+                    # is a coordinator or a deputy.  This is to aviod
+                    # passing duplicated variables.  In case the following
+                    # variable is changed, the templates need to be
+                    # changed as well.
+                    context['MAX_OVERDUE_REPORTS'] = MAX_OVERDUE_REPORTS
 
         elif is_employee_of_any_club(request.user):
             # For employees, display all approved activities, as well
@@ -127,6 +121,7 @@ def list_activities(request):
 
             template = 'activities/list_employee.html'
         else: # For students and other normal users.
+            context['approved'] = context['approved'].for_user_city(request.user).for_user_gender(request.user)
             template = 'activities/list_normal.html'
     else: # For anonymous users
         template = 'activities/front/list.html'
@@ -208,7 +203,8 @@ def create(request):
     # the 3-report threshold, prevent new activity submission (again
     # in reality the user will only coordinate one club)
     user_coordination = get_user_coordination_and_deputyships(request.user)
-    if any([club.get_overdue_report_count() > MAX_OVERDUE_REPORTS for club in user_coordination]):
+    if any([not club.can_skip_followup_reports and club.get_overdue_report_count() > MAX_OVERDUE_REPORTS
+            for club in user_coordination]):
         raise PermissionDenied
 
     if user_coordination.exists():

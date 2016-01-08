@@ -1,9 +1,48 @@
-from rest_framework import serializers
+# -*- coding: utf-8  -*-
+from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth import authenticate
+from rest_framework import serializers, exceptions
+from rest_framework.authtoken.serializers import AuthTokenSerializer
 from activities.models import Activity, Episode
 from activities.models import Category as ActivityCategory
 from clubs.models import Club
 from media.models import Buzz, BuzzView
 from niqati.models import Code, Category, Code_Collection, Code_Order
+
+class ModifiedAuthTokenSerializer(AuthTokenSerializer):
+    def validate(self, attrs):
+        """Allow both usernames and emails."""
+        identification = attrs.get('username')
+        password = attrs.get('password')
+
+        if identification and password:
+            if '@' in identification:
+                username = identification.split('@')[0]
+            else:
+                username = identification
+
+            user = authenticate(username=username, password=password)
+
+            if user:
+                if not user.is_active:
+                    msg = _('User account is disabled.')
+                    raise exceptions.ValidationError(msg)
+
+                # Currently, the app is only available for students.
+                try:
+                    college = user.common_profile.college
+                except (ObjectDoesNotExist, AttributeError):
+                    raise exceptions.ValidationError(u"لم تسجل في بوابة إنجاز كطالب!")
+            else:
+                msg = _('Unable to log in with provided credentials.')
+                raise exceptions.ValidationError(msg)
+        else:
+            msg = _('Must include "username" and "password".')
+            raise exceptions.ValidationError(msg)
+
+        attrs['user'] = user
+        return attrs
 
 class EpisodeSerializer(serializers.ModelSerializer):
     class Meta:

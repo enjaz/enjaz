@@ -1,0 +1,137 @@
+            <h3 class="dinar-light">اختر جدولك</h3>
+            <p>يتكون مؤتمر التخصّصات الصحيّة من فعاليات حافلة تمتد لثلاثة أيام!  يمكنك أدناه اختيار الفعاليات التي تودّ المشاركة فيها خلال الأيام الثلاثة. يمكنك الاطلاع على <a href="https://hpc.enjazportal.com/programs/">تفاصيل جدول المؤتمر</a>.</p>
+            <div class="day-section">
+                <h4 class="dinar-light">البرنامج العام وبرنامج الأبحاث<br>(26 و 27 يناير)</h4>
+                <p>في اليوم الأول والثاني للمؤتمر يقام البرنامج العام وفيه نستضيف نخبة من روّاد التخصّصات الصحيّة، كما يقام برنامج الأبحاث  وفيه يُقدّم طلاب وطالبات التخصّصات الصحيّة أهم أبحاثهم. إذا كنت ترغب في حضورهما، فاختر الخيار التالي:</p>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label class="remember_me_label">
+                            <input type="checkbox" id="id_session_main" name="session_main"> {{ registration_form.session_main.label }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="day-section">
+                <h4 class="dinar-light">الورش وبرامج الكليّات في اليوم الثاني<br>(27 يناير)</h4>
+                <p>بعد انتهاء برنامج الأبحاث، تنطلق برامج الكليّات وورش عمل البحث العلمي. يمكنك اختيار برنامج الكليّة أو ورشة العمل التي تودّ حضورها في اليوم الثاني:</p>
+                <div class="form-group">
+                    <div class="input-group{% if registration_form.time_slot_2.errors %} validate-has-error{% endif %}">
+                        <div class="input-group-addon">
+                            <i class="entypo-calendar"></i>
+                        </div>
+                        {{ registration_form.time_slot_2 }}
+                    </div>
+                    <div id="nursing-sessions">
+                        <p>يمكن لطالبات التمريض أيضا حضور جلسة المجموعات العلاجية، علمًا بأن المقاعد محدودة وسيتم التواصل مع المقبولات.</p>
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label class="remember_me_label">
+                                    <input type="checkbox" id="id_session_therapy" name="session_therapy"> {{ registration_form.session_therapy.label }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="day-section">
+                <h4 class="dinar-light">الورش وبرامج الكليّات في اليوم الثالث<br>(28 يناير)</h4>
+                <p>في اليوم الثالث نكمل بقيّة برامج الكليات وورش العمل، اختر منها ما تريد:</p>
+                <div class="form-group">
+                    <div class="input-group{% if registration_form.time_slot_3.errors %} validate-has-error{% endif %}">
+                        <div class="input-group-addon">
+                            <i class="entypo-calendar"></i>
+                        </div>
+                        {{ registration_form.time_slot_3 }}
+                    </div>
+                    <div id="medicine-sessions">
+                        <p>ضمن برنامج كليّة الطب ستقام محاضرتان مختصّتان بالتزامن.  اختر أيهما تريد أن تحضر، علمًا بأن المقاعد محدودة وسيتم التواصل مع المقبولين والمقبولات.</p>
+                        <div class="input-group{% if registration_form.time_slot_4.errors %} validate-has-error{% endif %}">
+                            <div class="input-group-addon">
+                                <i class="entypo-calendar"></i>
+                            </div>
+                            {{ registration_form.time_slot_4 }}
+                        </div>
+                        <p>يمكن لطلاب وطالبات الطب أيضا حضور محاضرة How to Pass SMLE والتي ستقام في وقت لا يتعارض مع سير بقيّة البرنامج.</p>
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label class="remember_me_label">
+                                    <input type="checkbox" id="id_session_smle" name="session_smle"> {{ registration_form.session_smle.label }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<script type="text/javascript">
+$(function(){
+    if ($("#gender").length){
+        $("#id_time_slot_2, #id_time_slot_3").prop("disabled", true);
+        
+    }
+    $("#gender").change(function(){
+        if ($(this).val() == 'F'){
+            $("#id_time_slot_2, #id_time_slot_3").prop("disabled", false);
+            time_slot_2_workshop_choices ={
+                '': '---------',
+                {% for pk, name in female_time_slot_2_choices %}{{ pk }}: "{{ name|safe }}",
+                {% endfor %}
+            };
+            time_slot_3_workshop_choices ={
+                '': '---------',
+                {% for pk, name in female_time_slot_3_choices %}{{ pk }}: "{{ name|safe }}",
+                {% endfor %}
+            }
+        } else if ($(this).val() == 'M'){
+            $("#id_time_slot_2, #id_time_slot_3").prop("disabled", false);
+            time_slot_2_workshop_choices = {
+                '': '---------',
+                {% for pk, name in male_time_slot_2_choices %}{{ pk }}: "{{ name|safe }}",
+                {% endfor %}
+            };
+            time_slot_3_workshop_choices = {
+                '': '---------',
+                {% for pk, name in male_time_slot_3_choices %}{{ pk }}: "{{ name|safe }}",
+                {% endfor %}
+            };   
+        }
+        $("#id_time_slot_2, #id_time_slot_3").html("");
+        $.each(time_slot_2_workshop_choices, function(key, value){
+            $("#id_time_slot_2")
+                .append($("<option></option>")
+                        .attr("value", key)
+                        .text(value));
+            $("#id_time_slot_2").val('');
+        });
+        $.each(time_slot_3_workshop_choices, function(key, value){
+            $("#id_time_slot_3")
+                .append($("<option></option>")
+                        .attr("value", key)
+                        .text(value));
+            $("#id_time_slot_3").val('');
+        });
+    });
+    function medicine_sessions(){
+        if ($('#id_time_slot_3 option:selected').text() == 'برنامج كلية الطب'){
+            $("#medicine-sessions").show();
+        } else {
+            $("#medicine-sessions").hide();
+        }
+    }
+    // When the document is ready, check if College of Medicine is selected and act accordingly.
+    medicine_sessions();
+    // When the 3rd time slot is changed, check if College of Medicine is selected and act accordingly.
+    $("#id_time_slot_3").change(medicine_sessions);
+    
+    function nursing_sessions(){
+        if ($('#id_time_slot_2 option:selected').text() == 'برنامج كلية التمريض'){
+            $("#nursing-sessions").show();
+        } else {
+            $("#nursing-sessions").hide();
+        }
+    }
+    // When the document is ready, check if College of Medicine is selected and act accordingly.
+    nursing_sessions();
+    // When the 3rd time slot is changed, check if College of Medicine is selected and act accordingly.
+    $("#id_time_slot_2").change(nursing_sessions);
+});
+</script>

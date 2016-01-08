@@ -6,14 +6,13 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import parsers, renderers
+from rest_framework import parsers, renderers, exceptions
 from rest_framework.authtoken.models import Token
-from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.views import APIView
 from activities.models import Activity
 
 from accounts.utils import get_user_college
-from api.serializers import ActivitySerializer, ClubSerializer, BuzzSerializer, BuzzViewSerializer, CodeSerializer
+from api.serializers import ActivitySerializer, ClubSerializer, BuzzSerializer, BuzzViewSerializer, CodeSerializer, ModifiedAuthTokenSerializer
 from clubs.models import Club
 from media.models import Buzz, BuzzView
 from niqati.models import Code
@@ -81,7 +80,7 @@ class ObtainAuthToken(APIView):
     permission_classes = ()
     parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.JSONParser,)
     renderer_classes = (renderers.JSONRenderer,)
-    serializer_class = AuthTokenSerializer
+    serializer_class = ModifiedAuthTokenSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -97,7 +96,7 @@ class ObtainAuthToken(APIView):
                          'en_last_name': user.common_profile.en_last_name,
                          'city': user.common_profile.city,
                          'college': user.common_profile.college.name,
-                         'gender': user.common_profile.college.name,
+                         'gender': user.common_profile.college.gender,
                          'section': user.common_profile.college.section})
 
 class BuzzList(generics.ListAPIView):

@@ -20,6 +20,8 @@
     {% endif %}
     {% if user|is_studentguide_coordinator_or_deputy or user|is_studentguide_member or user.is_superuser %}
     <li><a href="{% url 'studentguide:indicators' %}"><span class="glyphicon glyphicon-stats"></span> مؤشرات الإرشاد الطلابي</a></li>
+    <li><a href="{% url 'studentguide:edit_mentor_of_the_month' %}"><span class="glyphicon glyphicon-pencil"></span> حدّث مرشد الشهر</a></li>
+
     {% endif %}
 {% endblock %}
 

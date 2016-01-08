@@ -1,42 +1,111 @@
 {% extends 'studentguide_base.html' %}{% load staticfiles %}
 {% block content %}
-<h1>الإرشاد الطلابي</h1>
-
 <div class="row">
-    <div class="col-sm-6 col-sm-offset-1">
-        <p style="
-            width: 90%;
-            text-align: justify;
-            font-size: 18px;
-            margin-right: auto;
-            margin-left: auto;">
-الإرشاد الطلابي هو حلقة الوصل بين الطلاب المستفيدين والطالبات المستفيدّات والطلاب والطالبات الأقدم في الجامعة. يقدم المرشد الطلابي المشورة للطالب المستفيد بناء على تجربته الشخصية، كالمساعدة في حل الصعوبات الأكاديمية التي قد يواجهها الطالب المستفيد، ومساعدته في التميّز في الحياة الجامعية! راسلنا لأي استفسارات <a href="mailto:arshidny@ksau-hs.edu.sa">arshidny@ksau-hs.edu.sa</a>.
-        </p>
-    </div>
-    <div class="col-sm-3">
-        <div class="tile-stats tile-brown">
-            <div class="icon"><i class="entypo-users"></i></div>
-            <div class="num" data-start="0" data-end="{{ guide_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
-            <h3>عدد المرشدات والمرشدين</h3>
-            <p>مجموع المرشدات والمرشدين على بوابة إنجاز</p>
+    <div class="col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
+        <img src="{% static 'images/mentorship/name.png' %}" class="img-responsive">
+        <div class="row">
+            <div class="col-sm-7">
+                <p style="margin-top: 50px" class="section-intro">
+        الإرشاد الطلابي هو حلقة الوصل بينك وبين الطلاب والطالبات الأقدم في الجامعة. يقدم المرشد الطلابي المشورة للطالب المستفيد بناء على تجربته الشخصية، كالمساعدة في حل الصعوبات الأكاديمية التي قد يواجهها الطالب المستفيد، ومساعدته في التميّز في الحياة الجامعية! راسلنا لأي استفسارات <a href="mailto:arshidny@ksau-hs.edu.sa">arshidny@ksau-hs.edu.sa</a>.
+                </p>
+                <div class="row">
+                    <div class="col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
+                        <div class="tile-stats tile-mentor">
+                            <div class="icon"><i class="entypo-users"></i></div>
+                            <div class="num" data-start="0" data-end="{{ guide_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+                            <h3>عدد المرشدات والمرشدين</h3>
+                            <p>مجموع المرشدات والمرشدين على بوابة إنجاز</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-5" style="text-align: center;">
+                
+                <img src="{% if mentor_of_the_month.gender == 'M' %}{% static 'images/mentorship/month-male.png' %}{% elif mentor_of_the_month.gender == 'F' %}{% static 'images/mentorship/month-female.png' %}{% endif %}" class="img-responsive">
+                {% if mentor_of_the_month.avatar %}
+                <a href="{% url 'studentguide:show_guide' mentor_of_the_month.guide.pk %}"><img style="border-radius: 2%; width: 80%; margin: 0 auto 5px auto;" src="{{ mentor_of_the_month.avatar.url }}" class="img-responsive"></a>
+                {% endif %}
+                <p style="font-size: 1.3em; margin-bottom: 0;"><a href="{% url 'studentguide:show_guide' mentor_of_the_month.guide.pk %}">{{ mentor_of_the_month.guide.user.common_profile.get_ar_full_name }}</a></p>
+                <p style="margin-bottom: 20px;">{% if mentor_of_the_month.gender == 'M' %}مرشد{% elif mentor_of_the_month.gender == 'F' %}مرشدة{% endif %} الشهر لشهر {{ mentor_of_the_month.month }}</p>
+                
+
+            </div>
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-sm-6">
-        <a href="{% url 'studentguide:new_student_index' %}" class="studentguide-option new-student">
 
-            <div class="icon"><i class="fa fa-heart"></i></div>			
-            <h3>اختر لنفسك مرشدًا طلابيًا</h3>
-            <p>هذه فرصتك لتجد من يعينك من الطلاب القدامى!</p>
-        </a>
+
+<hr>
+<div class="row">
+    <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
+        <h2 class="mentor-section-header">كن طالبا مستفيدا</h2>
+        <p class="section-intro">يقدّم المرشدون والمرشدات لك العون في مجالات اهتمام مختلفة، اختر إحداها لنوجّهك للمرشد المناسب، ولا تقلق، لن يكون الإرشاد مقتصرا على هذا الاهتمام! بل سيكون المرشد مستعدًا لتقديم العون في غير ذلك المجال أيضا.</p>
     </div>
-        <div class="col-sm-6">
-        <button id="add-guide" class="studentguide-option guide">
-            <div class="icon"><i class="entypo-graduation-cap"></i></div>			
-            <h3>سجّل نفسك مرشدًا طلابيًا</h3>
-            <p>هذه فرصتك لتعين الطلاب!</p>
-        </button>
+</div>
+<div class="row">
+    <div class="col-sm-7 col-md-9 feature-list">
+        <div class="row text-center">
+        {% if tags.exists %}
+            {% for tag in tags %}
+            {% autoescape off %}{% cycle '<div class="row">' '' '' '' %}{% endautoescape %}
+            <div class="col-md-3 col-sm-6">
+                <a {% if tag.image %}style="background-image:url('{{ tag.image.url }}')"{% endif %} href="{% url 'studentguide:choose_random_guide' tag.code_name %}" class="tag-image"></a>
+                <h3><a href="{% url 'studentguide:choose_random_guide' tag.code_name %}">{{ tag.name }}</a></h3>
+            </div>
+            {% autoescape off %}
+            {% cycle '' '' '' '</div>' %}
+            {%  if forloop.last and not forloop.counter|divisibleby:4 %}</div>{% endif %}
+            {% endautoescape %}
+            {% endfor %}
+        {% else %}
+            <p>لا يوجد مرشدين طلابيين حاليا.</p>
+        {% endif %}
+        </div>
+    </div>
+    <div class="col-sm-5 col-md-3">
+        <img src="{% static 'images/mentorship/new-student.png' %}" class="img-responsive">
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
+        <h2 class="mentor-section-header">كن مرشدًا طلابيًا</h2>
+        <p class="section-intro">كن عونًا لزملائك، وانضمّ إلى ركب المرشدين الطلابيين.  الإرشاد الطلابي فرصتك لتمدّ يد العون لمن لحقك إلى الجامعة، كما ينال المرشدون المتميّزون جوائز قيّمة بنهاية السنّة!</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-4 col-md-3">
+        <img src="{% static 'images/mentorship/mentor-student.png' %}" class="img-responsive">
+    </div>
+    <div class="col-sm-8 col-md-9 feature-list">
+        <div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+            <button id="add-guide" class="studentguide-option new-student">
+                <div class="icon"><i class="entypo-graduation-cap"></i></div>			
+                <h3>سجّل نفسك مرشدًا طلابيًا</h3>
+            </button>
+        </div>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <h3 style="margin-top: 10px; font-size: 25px; text-align: center;">آخر المرشدين والمرشدات الطلابيين المنضمين</h3>
+    <div class="col-md-8 col-md-offset-2">
+        <table class="table">
+            <thead>
+                <th>المرشد</th>
+                <th>الكلية</th>
+                <th>تاريخ الانضمام</th>
+            </thead>
+            <tbody>
+                {% for guide in latest_guides %}
+                <tr>
+                    <td>{{ guide.user.common_profile.get_ar_full_name }}</td>
+                    <td>{{ guide.user.common_profile.college.get_name_display }}</td>
+                    <td>{{ guide.submission_date|date:"l j F Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}

@@ -24,13 +24,13 @@ def index(request):
     guide_count = GuideProfile.objects.current_year().undeleted().count()
     latest_guides = GuideProfile.objects.order_by("-submission_date")[:10]
     tags = Tag.objects.filter(guide_profiles__isnull=False).distinct()
+    # If no gender, pick a random gender
+    mentor_of_the_month = MentorOfTheMonth.objects.order_by("?").first()
     # Only show tags currently available for the user's gender
     gender = get_user_gender(request.user)
     if gender:
         tags = tags.filter(guide_profiles__user__common_profile__college__gender=gender)
         mentor_of_the_month = MentorOfTheMonth.objects.get(gender=gender)
-    # If no gender, pick a random gender
-    mentor_of_the_month = MentorOfTheMonth.objects.order_by("?").first()
     context = {'guide_count': guide_count,
                'latest_guides': latest_guides,
                'tags': tags,

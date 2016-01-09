@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from clubs.models import College
+from hpc.managers import RegistrationQuerySet
 
 user_gender_choices = (
     ('F', u'طالبة'),
@@ -171,6 +172,10 @@ class Registration(models.Model):
                                     related_name='hpc2016_registration')
     sessions  = models.ManyToManyField(Session, blank=True)
     date_submitted = models.DateTimeField(auto_now_add=True)
+    is_deleted = models.BooleanField(default=False,
+                                     verbose_name=u"محذوف؟")
+
+    objects = RegistrationQuerySet.as_manager()
 
     def get_university(self):
         if self.user:

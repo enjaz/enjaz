@@ -27,7 +27,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for registration in session.registration_set.all %}
+                    {% for registration in session.registration_set.undeleted %}
                     <tr>
                         <td>{{ registration }}</td>
                         <td>{{ registration.get_university }}</td>
@@ -48,11 +48,22 @@
 {% block customscript %}
 	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
 	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/datatables/buttons/buttons.dataTables.min.css' %}">
 	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/jszip.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/vfs_fonts.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/buttons.html5.min.js' %}"></script>
 	<script>
     $(function(){
         $('.datatable').dataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copyHtml5',
+                'excelHtml5',
+                'csvHtml5',
+            ],
             order: [[ 4, "desc" ]],
             language: {% include 'js/dataTables-arabic.json' %},
         });

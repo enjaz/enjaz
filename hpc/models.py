@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 
 from clubs.models import College
 from hpc.managers import RegistrationQuerySet
@@ -193,7 +194,7 @@ class Registration(models.Model):
             try:
                 common_profile = self.user.common_profile
                 return common_profile.college.get_name_display()
-            except ObjectDoesNotExist:
+            except (ObjectDoesNotExist, AttributeError):
                 return None
         elif self.nonuser:
             return self.nonuser.college

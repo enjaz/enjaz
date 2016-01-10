@@ -910,6 +910,11 @@ def add_session(request, group_pk):
                     mail.send([membership.user.email],
                                template="reading_group_session_just_submitted",
                                context=email_context)
+                # Notify coordinators
+                email_context['member'] = group.coordinator
+                mail.send([group.coordinator.email],
+                           template="reading_group_session_just_submitted",
+                           context=email_context)
 
                 # Notify Bulb coordinator and their deputies.
                 email_context['member'] = bulb_coordinator

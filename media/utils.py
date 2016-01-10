@@ -113,13 +113,16 @@ def can_submit_followupreport(user, activity):
     return clubs.utils.has_coordination_to_activity(user, activity) or \
            is_media_coordinator_or_member(user) or \
            is_media_representative_of_club(user, activity.primary_club) or\
+           clubs.utils.is_presidency_coordinator_or_deputy(user) or \
+           user.has_perms('media.add_followupreport') or \
            user.is_superuser
 
 def can_view_followupreport(user, activity):
     return can_submit_followupreport(user, activity) or \
-        clubs.utils.is_member_of_any_club(user) or \
-        clubs.utils.is_employee(activity.primary_club, user) or \
-        clubs.utils.is_deanship_of_students_affairs_coordinator_or_member(user)
+        clubs.utils.is_member(activity.primary_club, user) or \
+        clubs.utils.is_employee_of_any_club(user) or \
+        clubs.utils.is_deanship_of_students_affairs_coordinator_or_member(user) or \
+        user.is_superuser
 
 def get_clubs_for_assessment_by_user(user):
     user_assessing_clubs = clubs.utils.get_user_clubs(user).filter(can_assess=True)

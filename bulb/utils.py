@@ -1,7 +1,7 @@
 from clubs.models import Club
 import clubs.utils
 from accounts.utils import get_user_gender
-from bulb.models import MAXIMUM_GROUP_MEMBERS
+#from bulb.models import MAXIMUM_GROUP_MEMBERS
 
 def is_bulb_coordinator_or_deputy(user):
     coordination_and_deputyships = clubs.utils.get_user_coordination_and_deputyships(user)
@@ -94,7 +94,6 @@ def group_can_have_sessions(group):
 def can_join_group(user, group):
     if group.is_deleted or \
        group.membership_set.filter(user=user).exists() or \
-       group.membership_set.active().count() > MAXIMUM_GROUP_MEMBERS or \
        group.coordinator == user or \
        (group.gender and get_user_gender(user) != group.gender) or \
        group.membership_set.filter(user=user).exists():

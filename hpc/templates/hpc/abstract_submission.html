@@ -1,0 +1,205 @@
+{% extends 'hpc_submission_base.html' %}{% load staticfiles %}
+{% block meta_description %}HPC 2016 Abstract Submission{% endblock %}
+{% block title %}Abstract submission{% endblock %}
+{% block description %}<span class="english-field">Please fill in the following form.  Make sure that you have read <a href="http://hpc.enjazportal.com/research/">the regulations carefully</a>.</span>{% endblock %}
+
+{% block content %}
+<form method="post" role="form" id="form_register" enctype="multipart/form-data">	
+        {% csrf_token %}
+	<div class="english-field">
+			<div class="form-group">
+				<div class="english-field input-group{% if form.title.errors or form.ar_middle_name.errors or form.ar_last_name.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-flag"></i>
+					</div>
+					
+					<input {% if form.title.value and not form.title.errors %}value="{{ form.title.value }}" {% endif %}type="text" class="form-control english-field" name="title" id="title" placeholder="Abstract title" required="required"/>
+					{% if form.title.errors %}
+					    {% for error in form.title.errors %}
+					        <label class='error' for='title' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>  
+			</div>
+			<div class="form-group">
+				<div class="input-group{% if form.authors.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-users"></i>
+					</div>
+					
+					<textarea {% if form.authors.value and not form.authors.errors %}value="{{ form.authors.value }}" {% endif %}type="text" class="form-control english-field" name="authors" id="authors" placeholder="Authors' names" required="required"></textarea>
+					{% if form.authors.errors %}
+					    {% for error in form.authors.errors %}
+					        <label class='error' for='authors' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>  
+			</div>
+
+			<div class="form-group" id="university-group">
+				<div class="input-group{% if form.university.errors %} validate-has-error{% endif %}" style="text-align: left; color: #ffffff;">
+					<div class="input-group-addon">
+						<i class="entypo-graduation-cap"></i>
+					</div>
+                    <input class="english-field" type="radio" id="ksauhs-university" name="university-radio" value="KSAU-HS" style="margin-left: 10px;margin-right: 5px;" checked required>King Saud bin Abdulaziz University for Health Sciences<br>
+                    <input class="english-field" type="radio" id="other-university" name="university-radio" value="Other" style="margin-left: 10px; margin-right: 5px;" required>Other
+					<input {% if form.university.value and not form.university.errors %}value="{{ form.university.value }}" {% endif %}type="text" class="form-control english-field" id="university-text-field" placeholder="Type university name" style="display: none"/>
+					{% if form.university.errors %}
+					    {% for error in form.university.errors %}
+					        <label class='error' for='university' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+        
+			<div class="form-group">
+				<div class="english-field input-group{% if form.college.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-graduation-cap"></i>
+					</div>
+					
+					<input {% if form.college.value and not form.college.errors %}value="{{ form.college.value }}" {% endif %}type="text" class="form-control english-field" name="college" id="college" placeholder="College" required="required"/>
+					{% if form.college.errors %}
+					    {% for error in form.college.errors %}
+					        <label class='error' for='college' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group" id="level-group">
+				<div class="input-group{% if form.level.errors %} validate-has-error{% endif %}" style="text-align: left; color: #ffffff;">
+					<div class="input-group-addon">
+						<i class="entypo-address"></i>
+					</div>
+                    <input class="english-field" type="radio" name="level" value="U" style="margin-left: 10px;margin-right: 5px;" checked required>Undergraduate<br>
+                    <input class="english-field" type="radio" name="level" value="G" style="margin-left: 10px; margin-right: 5px;" required>Graduate
+					{% if form.level.errors %}
+					    {% for error in form.level.errors %}
+					        <label class='error' for='level' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="english-field input-group{% if form.presenting_author.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-user"></i>
+					</div>
+					
+					<input {% if form.presenting_author.value and not form.presenting_author.errors %}value="{{ form.presenting_author.value }}" {% endif %}type="text" class="form-control english-field" name="presenting_author" id="presenting_author" placeholder="Presenting author" required="required"/>
+					{% if form.presenting_author.errors %}
+					    {% for error in form.presenting_author.errors %}
+					        <label class='error' for='presenting_author' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="english-field input-group{% if form.email.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-mail"></i>
+					</div>
+					
+					<input {% if form.email.value and not form.email.errors %}value="{{ form.email.value }}" {% endif %}type="text" class="form-control english-field" name="email" id="email" {% if not form.email.errors %}placeholder="Email address"{% endif %} required="required"/>
+					{% if form.email.errors %}
+					    {% for error in form.email.errors %}
+					        <label class='error' for='email' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="english-field input-group{% if form.phone.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-mobile"></i>
+					</div>
+					
+					<input {% if form.phone.value and not form.phone.errors %}value="{{ form.phone.value }}" {% endif %}type="text" class="form-control english-field" name="phone" id="phone" placeholder="Contact number" required="required"/>
+					{% if form.phone.errors %}
+					    {% for error in form.phone.errors %}
+					        <label class='error' for='phone' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group" id="presentation_preference-group">
+				<div class="input-group{% if form.presentation_preference.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-docs"></i>
+					</div>
+					<select {% if form.presentation_preference.value and not form.presentation_preference.errors %}value="{{ form.presentation_preference.value }}" {% endif %}class="form-control english-field" id="presentation_preference" name="presentation_preference" required title="Presentation preference">
+                                                <option value="">Presentation preference</option>
+                                                <option value="O">Oral presentation</option>
+                                                <option value="P">Poster</option>
+					</select>
+					{% if form.presentation_preference.errors %}
+					    {% for error in form.presentation_preference.errors %}
+					        <label class='error' for='presentation_preference' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group" id="attachment-group">
+                <label class="control-label">Attach your abstract</label>
+				<div class="input-group{% if form.attachment.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-docs"></i>
+					</div>
+					<input {% if form.attachment.value and not form.attachment.errors %}value="{{ form.attachment.value }}" {% endif %}class="form-control english-field" id="attachment" required name="attachment" type="file" title="Attachment">
+					{% if form.attachment.errors %}
+					    {% for error in form.attachment.errors %}
+					        <label class='error' for='attachment' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+            <div class="form-group" style="text-align: justify;">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="agree">I read the guidelines and I certify that all provided information on this application is vild and correct. I understand that withholding of information or giving false information
+will result in a refusal of my application.
+                    </label>
+                </div>
+            </div>
+            <input type="hidden" name="university" value="KSAU-HS">
+			<div class="form-group">
+				<button disabled type="submit" class="btn btn-success btn-block btn-login">
+					<i class="entypo-right-open-mini"></i>
+					Submit
+				</button>
+			</div>
+	</div>
+</form>
+
+{% endblock %}
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.css' %}" id="style-resource-3">
+<script src="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.min.js' %}" id="script-resource-11"></script>
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+<script src="{% static 'neon/assets/js/jquery.inputmask.bundle.min.js' %}"></script>
+<script type="text/javascript">
+    $(function(){
+        $('#agree').change(function(){
+            if (this.checked){
+                $('button').removeAttr('disabled')
+            } else {
+                $('button').attr('disabled', 'disabled')
+            }
+        });
+        $('input[name=university-radio]').change(function(){
+            if ($('input[name=university-radio][value=Other]').prop('checked')){
+                $('#university-text-field').show();
+                $('#university-text-field').attr('required', 'required');
+            } else {
+                $('#university-text-field').hide();
+                $('#university-text-field').removeAttr('required');
+                $('input[name=university]').val('KSAU-HS');
+            }
+        });
+        $('#university-text-field').change(function(){
+            value = $(this).val();
+            $('input[name=university]').val(value);
+        });
+    });
+</script>
+{% endblock %}

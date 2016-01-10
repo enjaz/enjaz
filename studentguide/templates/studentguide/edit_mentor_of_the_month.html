@@ -1,0 +1,20 @@
+{% extends "studentguide_base.html" %}{% load bootstrap3 %}
+{% block title %}تحديث مرشد ومرشدة الشهر{% endblock %}
+
+{% block content %}
+
+<form class="form" enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    <h3>مرشد الشهر</h3>
+    {% bootstrap_form formset.0 %}
+    <h3>مرشدة الشهر</h3>
+    {% bootstrap_form formset.1 %}
+    {% buttons %}
+    	<button type="submit" class="btn btn-primary">
+    		{% bootstrap_icon "ok-sign" %} احفظ
+    	</button>
+    {% endbuttons %}
+</form>    
+
+{% endblock %}

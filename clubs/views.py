@@ -29,8 +29,10 @@ FORMS_CURRENT_APP = "club_forms"
 @login_required
 def list_clubs(request):
     clubs = Club.objects.visible().current_year().for_user_gender(request.user).for_user_city(request.user)
-    order = []
-    context = {'clubs':clubs}
+    def get_club_points(club):
+        return club.get_total_points()
+    ordered_clubs = sorted(clubs, key=get_club_points, reverse=True)
+    context = {'clubs': ordered_clubs}
     return render(request, 'clubs/list.html', context)
 
 @login_required

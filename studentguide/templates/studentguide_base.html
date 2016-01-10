@@ -18,9 +18,10 @@
     <li {% if user|has_pending_requests %}class="action-required"{% endif %}><a href="{% url 'studentguide:requests_to_me' %}"><i class="glyphicon glyphicon-list"></i> طلبات موجّهة إلي</a></li>
     <li><a href="{% url 'studentguide:my_profile' %}"><i class="glyphicon glyphicon-star"></i> صفحتي</a></li>
     {% endif %}
-    <li><a href="{% url 'studentguide:list_guides' %}"><i class="fa fa-users"></i> قائمة المرشدين الطلابيين</a></li>
-    {% if user|is_studentguide_coordinator_or_deputy or user.is_superuser %}
+    {% if user|is_studentguide_coordinator_or_deputy or user|is_studentguide_member or user.is_superuser %}
     <li><a href="{% url 'studentguide:indicators' %}"><span class="glyphicon glyphicon-stats"></span> مؤشرات الإرشاد الطلابي</a></li>
+    <li><a href="{% url 'studentguide:edit_mentor_of_the_month' %}"><span class="glyphicon glyphicon-pencil"></span> حدّث مرشد الشهر</a></li>
+
     {% endif %}
 {% endblock %}
 

@@ -118,6 +118,7 @@ class RedeemCodeForm(forms.Form):
             # the same episode, unless the episode allows this to
             # happen.  If they do have another code, but the new one
             # has higher point, replace it.
+            self.other_code = None
             if not self.code.collection.parent_order.episode.allow_multiple_niqati:
                 other_codes = Code.objects.filter(collection__parent_order__episode=self.code.collection.parent_order.episode,
                                                   user=self.user)
@@ -127,8 +128,6 @@ class RedeemCodeForm(forms.Form):
                         raise forms.ValidationError(u"لديك رمز آخر في نفس النشاط، وبنقاط أعلى.", code="HasOtherCode")
                     elif self.other_code.points == self.code.points:
                         raise forms.ValidationError(u"لديك رمز آخر في نفس النشاط، وبنفس مقدار النقاط.", code="HasOtherCode")
-                else:
-                    self.other_code = None
 
         return code_string
 

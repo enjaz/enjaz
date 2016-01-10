@@ -173,3 +173,14 @@ class Tag(models.Model):
 
     def __unicode__(self):
         return self.name
+
+class MentorOfTheMonth(models.Model):
+    guide = models.ForeignKey(GuideProfile, null=True,
+                                  on_delete=models.SET_NULL,
+                                  verbose_name=u"المرشد الطلابي")
+    month = models.CharField(max_length=100,
+                             verbose_name=u"الشهر")
+    gender = models.CharField(max_length=1,
+                             verbose_name=u"الجندر")
+    avatar = models.ImageField(u"صورة رمزية", upload_to='studentguide/mentor_of_the_month/')
+    edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)

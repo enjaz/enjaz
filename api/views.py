@@ -96,7 +96,7 @@ class ObtainAuthToken(APIView):
                          'en_last_name': user.common_profile.en_last_name,
                          'city': user.common_profile.city,
                          'college': user.common_profile.college.name,
-                         'gender': user.common_profile.college.name,
+                         'gender': user.common_profile.college.gender,
                          'section': user.common_profile.college.section})
 
 class BuzzList(generics.ListAPIView):

@@ -1,0 +1,19 @@
+{% extends "studentguide_base.html" %}
+{% block title %}برنامج الإرشاد الطلابي{% endblock %}
+{% block content %}
+<div class="page-error-404">
+
+
+	<div class="error-symbol">
+		<i class="entypo-address"></i>
+	</div>
+
+	<div class="error-text">
+		<h2>برنامج الإرشاد الطلابي ليس متاحًا في {{ user.common_profile.get_city_display }}!</h2>
+        <p>في الوقت الراهن، برنامج الإرشاد الطلابي متاح في الرياض فقط!</p>
+    </div>
+
+	<hr />
+
+</div>
+{% endblock %}

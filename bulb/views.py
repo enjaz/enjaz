@@ -898,25 +898,26 @@ def add_session(request, group_pk):
             show_group_url = reverse('bulb:show_group', args=(group.pk,))
             full_url = request.build_absolute_uri(show_group_url)
             email_context = {'session': session, 'full_url': full_url}
-            # If the coordinator is not already a group member, email
-            # them as well.
-            bulb_coordinator = utils.get_bulb_club_for_user(session.group.coordinator).coordinator
-            for membership in group.membership_set.filter(is_active=True):
-                # Bulb coordinator will be handled later.
-                if bulb_coordinator == membership.user:
-                    continue
-                email_context['member'] = membership.user
-                mail.send([membership.user.email],
-                           template="reading_group_session_just_submitted",
-                           context=email_context)
+            if session.date >= timezone.now().date():
+                # If the coordinator is not already a group member, email
+                # them as well.
+                bulb_coordinator = utils.get_bulb_club_for_user(session.group.coordinator).coordinator
+                for membership in group.membership_set.filter(is_active=True):
+                    # Bulb coordinator will be handled later.
+                    if bulb_coordinator == membership.user:
+                        continue
+                    email_context['member'] = membership.user
+                    mail.send([membership.user.email],
+                               template="reading_group_session_just_submitted",
+                               context=email_context)
 
-            # Notify Bulb coordinator and their deputies.
-            email_context['member'] = bulb_coordinator
-            cc = utils.get_session_submitted_cc(group)
-            mail.send([bulb_coordinator.email],
-                      cc=cc,
-                      template="reading_group_session_just_submitted",
-                      context=email_context)
+                # Notify Bulb coordinator and their deputies.
+                email_context['member'] = bulb_coordinator
+                cc = utils.get_session_submitted_cc(group)
+                mail.send([bulb_coordinator.email],
+                          cc=cc,
+                          template="reading_group_session_just_submitted",
+                          context=email_context)
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
         form = SessionForm()

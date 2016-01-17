@@ -1,0 +1,19 @@
+{% extends 'hpc_submission_base.html' %}{% load staticfiles %}
+{% block csssheet %}
+<link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.css' %}">
+{% endblock %}
+{% block meta_description %}التسجيل في مؤتمر التخصّصات الصحيّة{% endblock %}
+{% block title %}التسجيل في مؤتمر التخصّصات الصحيّة{% endblock %}
+{% block description %}<h2 class="dinar-light">التسجيل في مؤتمر التخصّصات الصحيّة</h2>{% endblock %}
+
+{% block content %}
+<div class="form-register-success visible dinar-light">
+	<i class="entypo-info"></i>
+	<h3 class="dinar-light">انتهى التسجيل</h3>
+<p style="text-align: justify;">انتهى التسجيل في مؤتمر التخصّصات الصحيّة 2016.  يمكنك الاطلاع على مستجدات المؤتمر عبر <a href="https://twitter.com/KSAU_Events">حسابنا على تويتر</a> و<a href="https://telegram.me/HPC2016">قناتنا على تلغرام</a> و<a href="https://hpc.enjazportal.com/">موقع المؤتمر</a>!</p>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+{% endblock %}

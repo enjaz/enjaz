@@ -78,6 +78,8 @@ def show_abstract(request, pk):
                   {'abstract': abstract, 'form': form})
 
 def introduce_registration(request):
+    if datetime.now() > datetime(2016, 1, 17, 23, 59):
+        return HttpResponseRedirect(reverse('hpc:registration_closed'))
     if request.user.is_authenticated() and \
        not utils.is_organizing_committee_member(request.user) and \
        not request.user.is_superuser:
@@ -86,6 +88,8 @@ def introduce_registration(request):
         return render(request, "hpc/registration_introduction.html")
 
 def nonuser_registration(request):
+    if datetime.now() > datetime(2016, 1, 17, 23, 59):
+        return HttpResponseRedirect(reverse('hpc:registration_closed'))
     if request.user.is_authenticated():
         return HttpResponseRedirect(reverse('hpc:user_registration'))
     if request.method == 'POST':
@@ -122,6 +126,8 @@ def nonuser_registration(request):
     return render(request, "hpc/register_nonuser.html", context)
 
 def user_registration(request):
+    if datetime.now() > datetime(2016, 1, 17, 23, 59):
+        return HttpResponseRedirect(reverse('hpc:registration_closed'))
     if not request.user.is_authenticated():
         return HttpResponseRedirect(reverse('hpc:registration_introduction'))
 

@@ -108,6 +108,12 @@ class Session(models.Model):
                                  help_text=u"حروف لاتينية صغيرة وأرقام")
     gender = models.CharField(max_length=1, blank=True,
                               default='', choices=session_gender_choices)
+    location = models.CharField(blank=True, default="",
+                                max_length=200,
+                                verbose_name=u"المكان")
+    date = models.DateField(u"التاريخ", null=True)
+    start_time = models.TimeField(u"وقت البداية", null=True, blank=True, default=None)
+    end_time = models.TimeField(u"وقت النهاية", null=True, blank=True, default=None)
     date_submitted = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):

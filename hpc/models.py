@@ -186,6 +186,8 @@ class Registration(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
+    confirmation_sent = models.BooleanField(default=False,
+                                            verbose_name=u"أرسلت رسالة التأكيد؟")
     was_moved_to_vma = models.BooleanField(default=False,
                                            verbose_name=u"نقل إلى الأكاديمية؟")
 

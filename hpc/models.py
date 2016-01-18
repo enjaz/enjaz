@@ -99,7 +99,9 @@ class Session(models.Model):
     time_slot = models.PositiveSmallIntegerField(null=True, blank=True,
                                                  default=None)
     vma_id = models.PositiveSmallIntegerField()
-    vma_time_code = models.PositiveSmallIntegerField()
+    vma_time_code = models.PositiveSmallIntegerField(null=True,
+                                                     blank=True,
+                                                     default=None)
     code_name = models.CharField(max_length=50, default="",
                                  blank=True,
                                  verbose_name=u"الاسم البرمجي",

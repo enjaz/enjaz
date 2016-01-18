@@ -210,13 +210,19 @@ class Registration(models.Model):
 
     def get_ar_full_name(self):
         if self.user:
-            return self.user.common_profile.get_ar_full_name()
+            try:
+                return self.user.common_profile.get_ar_full_name()
+            except ObjectDoesNotExist:
+                return self.user.username
         elif self.nonuser:
             return self.nonuser.get_ar_full_name()
 
     def get_en_full_name(self):
         if self.user:
-            return self.user.common_profile.get_en_full_name()
+            try:
+                return self.user.common_profile.get_en_full_name()
+            except ObjectDoesNotExist:
+                return self.user.username
         elif self.nonuser:
             return self.nonuser.get_en_full_name()
 

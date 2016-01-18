@@ -175,6 +175,8 @@ class Registration(models.Model):
     nonuser = models.OneToOneField(NonUser, null=True, blank=True,
                                     related_name='hpc2016_registration')
     sessions  = models.ManyToManyField(Session, blank=True)
+    moved_sessions  = models.ManyToManyField(Session, blank=True,
+                                             related_name="moved_registrations")
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")

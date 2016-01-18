@@ -175,8 +175,8 @@ class Registration(models.Model):
     nonuser = models.OneToOneField(NonUser, null=True, blank=True,
                                     related_name='hpc2016_registration')
     sessions  = models.ManyToManyField(Session, blank=True)
-    moved_sessions  = models.ManyToManyField(Session, blank=True,
-                                             related_name="moved_registrations")
+    moved_sessions = models.ManyToManyField(Session, blank=True,
+                                            related_name="moved_registrations")
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
@@ -221,7 +221,10 @@ class Registration(models.Model):
                 return self.user.common_profile.mobile_number
         except ObjectDoesNotExist:
             pass
-        return self.nonuser.phone
+        try:
+            return self.nonuser.mobile_number
+        except AttributeError:
+            return ''
 
     def get_ar_full_name(self):
         if self.user:

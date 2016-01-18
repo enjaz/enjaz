@@ -208,10 +208,17 @@ class Registration(models.Model):
             pass
         return self.nonuser.email
 
-    def __unicode__(self):
+    def get_ar_full_name(self):
         if self.user:
             return self.user.common_profile.get_ar_full_name()
         elif self.nonuser:
             return self.nonuser.get_ar_full_name()
-        else:
-            self.pk
+
+    def get_en_full_name(self):
+        if self.user:
+            return self.user.common_profile.get_en_full_name()
+        elif self.nonuser:
+            return self.nonuser.get_en_full_name()
+
+    def __unicode__(self):
+        return self.get_ar_full_name()

@@ -31,13 +31,7 @@
 <script type="text/javascript">
 $(function(){
     $('.datatable').dataTable({
-        dom: 'Bfrtip',
-        buttons: [
-            'copyHtml5',
-            'excelHtml5',
-            'csvHtml5',
-        ],
-        order: [[ 0, "desc" ]],
+        order: [[ 0, "asc" ]],
         language: {% include 'js/dataTables-arabic.json' %},
     });
 });

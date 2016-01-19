@@ -1,5 +1,5 @@
 {% extends 'front/front_base.html' %}{% load staticfiles %}
-{% block title %}الصفحة الرئيسية{% endblock %}
+{% block title %}{{ session.name }}{% endblock %}
 {% block content %}
 <div class="row">
     <div class="col-sm-8 col-sm-offset-2">

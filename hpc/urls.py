@@ -5,6 +5,8 @@ from hpc import views
 
 urlpatterns = patterns('',
     url(r'^$', RedirectView.as_view(url="https://hpc.enjazportal.com", permanent=True)),
+    url(r'^sessions/$', views.list_sessions, name="list_sessions"),
+    url(r'^sessions/(?P<pk>\d+)/$', views.show_session, name="show_session"),
     url(r'^registration/$', views.introduce_registration, name="registration_introduction"),
     url(r'^registration/user/$', views.user_registration, name="user_registration"),
     url(r'^registration/list/$', views.list_registrations, name="list_registrations"),

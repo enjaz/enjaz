@@ -235,7 +235,16 @@ class Registration(models.Model):
             return self.nonuser.mobile_number
         except AttributeError:
             return ''
+    def get_ar_first_name(self):
+        if self.user:
+            try:
+                return self.user.common_profile.ar_first_name
+            except ObjectDoesNotExist:
+                return self.user.username
+        elif self.nonuser:
+            return self.nonuser.ar_first_name
 
+        
     def get_ar_full_name(self):
         if self.user:
             try:

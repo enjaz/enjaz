@@ -133,7 +133,8 @@ you?
 							</a>
 						</li>
 {% endcomment %}
-                                                <span class="visible-xs">
+                        <span class="visible-xs">
+                        {% if not user.is_authenticated %}
 						<li>
 							<a href="{% url 'userena_signin' %}">
 								<span>ادخل</span>
@@ -144,7 +145,14 @@ you?
 								<span>سجّل</span>
 							</a>
 						</li>
-						</span>
+                        {% else %}
+                        <li>
+                            <a href="{% url 'userena_signout' %}">
+                                <span>اخرج</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        </span>
 					</ul>
 					
 				
@@ -155,7 +163,8 @@ you?
 						</a>
 						
 					</div>
-					<ul class="login-menu hidden-xs dinar-light">
+            <ul class="login-menu hidden-xs dinar-light">
+            {% if not user.is_authenticated %}
 						<li>
 							<a href="{% url 'userena_signin' %}">
 								<span>ادخل</span>
@@ -166,7 +175,14 @@ you?
 								<span>سجّل</span>
 							</a>
 						</li>
-					</ul>
+            {% else %}
+                        <li>
+                            <a href="{% url 'userena_signout' %}">
+                                <span>اخرج</span>
+                            </a>
+                        </li>
+            {% endif %}
+            </ul>
 				</nav>
 				
 				

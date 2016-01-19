@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 
 from clubs.models import College
-from hpc.managers import RegistrationQuerySet
+from hpc.managers import RegistrationQuerySet, SessionQuerySet
 
 user_gender_choices = (
     ('F', u'طالبة'),
@@ -115,6 +115,8 @@ class Session(models.Model):
     start_time = models.TimeField(u"وقت البداية", null=True, blank=True, default=None)
     end_time = models.TimeField(u"وقت النهاية", null=True, blank=True, default=None)
     date_submitted = models.DateTimeField(auto_now_add=True)
+
+    objects = SessionQuerySet.as_manager()
 
     def __unicode__(self):
         if self.gender:

@@ -52,6 +52,15 @@ def list_abstracts(request):
 
     return render(request, 'hpc/list_abstracts.html', context)
 
+def list_sessions(request):
+    return render(request, 'hpc/session_list.html',
+                  {'sessions': Session.objects.all()})
+
+def show_session(request, pk):
+    session = get_object_or_404(Session, pk=pk)
+    return render(request, 'hpc/session_show.html',
+                  {'session': session})
+
 @login_required
 def show_abstract(request, pk):
     if not utils.is_research_committee_member(request.user) and \

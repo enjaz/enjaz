@@ -1,0 +1,45 @@
+{% extends 'front/front_base.html' %}{% load staticfiles %}
+{% block title %}الصفحة الرئيسية{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-offset-2">
+        <h1><a href="{% url 'hpc:list_sessions' %}">المقبولون في مؤتمر التخصّصات الصحيّة</a>: {{ session.name }}</h1>
+        <table class="display datatable">
+            <thead>
+                <tr>
+                    <th>الاسم العربي</th>
+                    <th>الاسم الإنجليزي</th>
+                    <th>الجامعة</th>
+                    <th>الكلية</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registration in session.moved_registrations.undeleted %}
+                <tr>
+                    <td>{{ registration.get_ar_full_name }}</td>
+                    <td class="english-field">{{ registration.get_en_full_name }}</td>
+                    <td>{{ registration.get_university }}</td>
+                    <td>{{ registration.get_college }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript">
+$(function(){
+    $('.datatable').dataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'copyHtml5',
+            'excelHtml5',
+            'csvHtml5',
+        ],
+        order: [[ 0, "desc" ]],
+        language: {% include 'js/dataTables-arabic.json' %},
+    });
+});
+</script>
+{% endblock %}

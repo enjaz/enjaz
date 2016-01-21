@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.core.exceptions import ObjectDoesNotExist
 
-from hpc.models import Abstract, Session, Registration
+from hpc.models import Abstract, Session, Registration, NonUser
 
 class AbstractUniversityFilter(admin.SimpleListFilter):
     title = "University"
@@ -102,6 +102,30 @@ class RegistrationAdmin(admin.ModelAdmin):
                     'nonuser__ar_middle_name',
                     'nonuser__ar_last_name')
 
+class RegistrationInline(admin.StackedInline):
+    model = Registration
+    extra = 1
+    max_num = 1
+    fields = ['sessions']
+    
+class NonUserAdmin(admin.ModelAdmin):
+    list_display = ['__unicode__', 'university', 'college',
+                    'with_deleted_registration', 'date_submitted']
+    search_fields= ('nonuser__email',
+                    'nonuser__en_first_name',
+                    'nonuser__en_middle_name',
+                    'nonuser__en_last_name',
+                    'nonuser__ar_first_name',
+                    'nonuser__ar_middle_name',
+                    'nonuser__ar_last_name')
+
+    def with_deleted_registration(self, obj):
+        return obj.hpc2016_registration.is_deleted
+    with_deleted_registration.boolean = True
+
+    inlines = [RegistrationInline]
+
 admin.site.register(Abstract, AbstractAdmin)
 admin.site.register(Session)
 admin.site.register(Registration, RegistrationAdmin)
+admin.site.register(NonUser, NonUserAdmin)

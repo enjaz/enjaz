@@ -61,14 +61,6 @@ def show_session(request, pk):
     return render(request, 'hpc/session_show.html',
                   {'session': session})
 
-def show_full_session(request, pk):
-    if not utils.is_organizing_committee_member(request.user) and \
-       not request.user.is_superuser:
-        raise PermissionDenied
-    session = get_object_or_404(Session, pk=pk)
-    return render(request, 'hpc/session_full_show.html',
-                  {'session': session})
-
 @login_required
 def show_abstract(request, pk):
     if not utils.is_research_committee_member(request.user) and \

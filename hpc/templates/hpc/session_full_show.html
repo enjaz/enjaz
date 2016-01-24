@@ -1,0 +1,56 @@
+{% extends 'front/front_base.html' %}{% load staticfiles %}
+{% block title %}{{ session.name }}{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-offset-2">
+        <h1><a href="{% url 'hpc:list_sessions' %}">المقبولون في مؤتمر التخصّصات الصحيّة</a>: {{ session.name }}</h1>
+        <table class="display datatable  dt-responsive">
+            <thead>
+                <tr>
+                    <th>الاسم العربي</th>
+                    <th>الاسم الإنجليزي</th>
+                    <th class="not-mobile">الجامعة</th>
+                    <th class="not-mobile">الكلية</th>
+                    <th class="not-mobile">البريد</th>
+                    <th class="not-mobile">الجوال</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registration in session.moved_registrations.undeleted %}
+                <tr>
+                    <td>{{ registration.get_ar_full_name }}</td>
+                    <td class="english-field">{{ registration.get_en_full_name }}</td>
+                    <td>{{ registration.get_university }}</td>
+                    <td>{{ registration.get_college }}</td>
+                    <td>{{ registration.get_email }}</td>
+                    <td>{{ registration.get_phone }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/buttons/buttons.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/jszip.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/vfs_fonts.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/buttons.html5.min.js' %}"></script>
+<script type="text/javascript">
+$(function(){
+    $('.datatable').dataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'copyHtml5',
+            'excelHtml5',
+            'csvHtml5',
+        ],
+        order: [[ 0, "asc" ]],
+        language: {% include 'js/dataTables-arabic.json' %},
+    });
+});
+</script>
+{% endblock %}

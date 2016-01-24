@@ -1,4 +1,4 @@
-{% extends 'front/front_base.html' %}{% load staticfiles %}
+{% extends 'front/front_base.html' %}{% load staticfiles %}{% load hpc_tags %}
 {% block title %}المقبولون في مؤتمر التخصّصات الصحيّة{% endblock %}
 {% block content %}
 <div class="row">
@@ -9,19 +9,19 @@
         <h2>البرنامج العام وبرامج الكليات</h2>
         <ul>
         {% for session in sessions.programs %}
-            <li><a href="{% url 'hpc:show_session' session.pk %}">{{ session }}</a></li>
+            <li><a href="{% url 'hpc:show_session' session.pk %}">{{ session }}</a>{% if user.is_superuser or user|is_organizing_committee_member %} <a style="font-size: 0.8em; color: rgb(171, 50, 50);" href="{% url 'hpc:show_full_session' session.pk %}">(كامل التفاصيل)</a>{% endif %}</li>
         {% endfor %}
         </ul>
         <h2>ورش العمل</h2>
         <ul>
         {% for session in sessions.workshops %}
-            <li><a href="{% url 'hpc:show_session' session.pk %}">{{ session }}</a></li>
+            <li><a href="{% url 'hpc:show_session' session.pk %}">{{ session }}</a>{% if user.is_superuser or user|is_organizing_committee_member %} <a style="font-size: 0.8em; color: rgb(171, 50, 50);" href="{% url 'hpc:show_full_session' session.pk %}">(بكامل التفاصيل)</a>{% endif %}</li>
         {% endfor %}
         </ul>
         <h2>مناشط أخرى</h2>
         <ul>
         {% for session in sessions.others %}
-            <li><a href="{% url 'hpc:show_session' session.pk %}">{{ session }}</a></li>
+            <li><a href="{% url 'hpc:show_session' session.pk %}">{{ session }}</a>{% if user.is_superuser or user|is_organizing_committee_member %} <a style="font-size: 0.8em; color: rgb(171, 50, 50);" href="{% url 'hpc:show_full_session' session.pk %}">(بكامل التفاصيل)</a>{% endif %}</li>
         {% endfor %}
         </ul>
 

@@ -190,6 +190,8 @@ class Registration(models.Model):
                                      verbose_name=u"محذوف؟")
     confirmation_sent = models.BooleanField(default=False,
                                             verbose_name=u"أرسلت رسالة التأكيد؟")
+    reminder_sent = models.BooleanField(default=False,
+                                            verbose_name=u"أرسلت رسالة التذكير؟")
     was_moved_to_vma = models.BooleanField(default=False,
                                            verbose_name=u"نقل إلى الأكاديمية؟")
 

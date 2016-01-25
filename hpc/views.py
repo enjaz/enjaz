@@ -87,8 +87,8 @@ def show_abstract(request, pk):
                   {'abstract': abstract, 'form': form})
 
 def introduce_registration(request):
-    if datetime.now() > datetime(2016, 1, 17, 23, 59):
-        return HttpResponseRedirect(reverse('hpc:registration_closed'))
+    #if datetime.now() > datetime(2016, 1, 17, 23, 59):
+    #    return HttpResponseRedirect(reverse('hpc:registration_closed'))
     if request.user.is_authenticated() and \
        not utils.is_organizing_committee_member(request.user) and \
        not request.user.is_superuser:
@@ -96,9 +96,9 @@ def introduce_registration(request):
     else:
         return render(request, "hpc/registration_introduction.html")
 
-def nonuser_registration(request):
-    if datetime.now() > datetime(2016, 1, 17, 23, 59):
-        return HttpResponseRedirect(reverse('hpc:registration_closed'))
+def nonuser_registration(request, onsite=False):
+    #if not onsite and datetime.now() > datetime(2016, 1, 17, 23, 59):
+    #    return HttpResponseRedirect(reverse('hpc:registration_closed'))
     if request.user.is_authenticated():
         return HttpResponseRedirect(reverse('hpc:user_registration'))
     if request.method == 'POST':
@@ -106,22 +106,28 @@ def nonuser_registration(request):
         nonuser_form = NonUserForm(request.POST)
         if registration_form.is_valid() and nonuser_form.is_valid():
             nonuser = nonuser_form.save()
-            registration_form.save(nonuser=nonuser)
-            mail.send([nonuser.email],
-                      template="hpc_registration_submitted",
-                      context={'name': nonuser.ar_first_name})
+            registration = registration_form.save(nonuser=nonuser)
+            for session in registration.sessions.all():
+                utils.register_in_vma(session, registration)
+            #mail.send([nonuser.email],
+            #          template="hpc_registration_submitted",
+            #          context={'name': nonuser.ar_first_name})
             return HttpResponseRedirect(reverse('hpc:registration_completed'))
     elif request.method == 'GET':
         registration_form = RegistrationForm()
         nonuser_form = NonUserForm()
 
-    male_time_slot_2_choices = Session.objects.filter(time_slot=2, gender__in=['', 'M'])\
+    male_time_slot_2_choices = Session.objects.filter(time_slot=2, gender__in=['', 'M'],
+                                                      for_onsite_registration=True)\
                                               .values_list('pk', 'name')
-    female_time_slot_2_choices = Session.objects.filter(time_slot=2, gender__in=['', 'F'])\
+    female_time_slot_2_choices = Session.objects.filter(time_slot=2, gender__in=['', 'F'],
+                                                        for_onsite_registration=True)\
                                                 .values_list('pk', 'name')
-    male_time_slot_3_choices = Session.objects.filter(time_slot=3, gender__in=['', 'M'])\
+    male_time_slot_3_choices = Session.objects.filter(time_slot=3, gender__in=['', 'M'],
+                                                      for_onsite_registration=True)\
                                               .values_list('pk', 'name')
-    female_time_slot_3_choices = Session.objects.filter(time_slot=3, gender__in=['', 'F'])\
+    female_time_slot_3_choices = Session.objects.filter(time_slot=3, gender__in=['', 'F'],
+                                                        for_onsite_registration=True)\
                                                 .values_list('pk', 'name')
 
     context = {'registration_form': registration_form,
@@ -132,11 +138,11 @@ def nonuser_registration(request):
                'male_time_slot_3_choices': male_time_slot_3_choices,
                'female_time_slot_3_choices': female_time_slot_3_choices}
 
-    return render(request, "hpc/register_nonuser.html", context)
+    return render(request, "hpc/register_nonuser_onsite.html", context)
 
 def user_registration(request):
-    if datetime.now() > datetime(2016, 1, 17, 23, 59):
-        return HttpResponseRedirect(reverse('hpc:registration_closed'))
+    #if datetime.now() > datetime(2016, 1, 17, 23, 59):
+    #    return HttpResponseRedirect(reverse('hpc:registration_closed'))
     if not request.user.is_authenticated():
         return HttpResponseRedirect(reverse('hpc:registration_introduction'))
 
@@ -149,17 +155,19 @@ def user_registration(request):
     if request.method == 'POST':
         registration_form = RegistrationForm(request.POST, user=request.user)
         if registration_form.is_valid():
-            registration_form.save(user=request.user)
-            mail.send([request.user.email],
-                      template="hpc_registration_submitted",
-                      context={'name': request.user.common_profile.ar_first_name})
+            registration = registration_form.save(user=request.user)
+            for session in registration.sessions.all():
+                utils.register_in_vma(session, registration)
+            #mail.send([request.user.email],
+            #          template="hpc_registration_submitted",
+            #          context={'name': request.user.common_profile.ar_first_name})
 
             return HttpResponseRedirect(reverse('hpc:registration_completed'))
     elif request.method == 'GET':
         registration_form = RegistrationForm(user=request.user)
 
     context = {'registration_form': registration_form}
-    return render(request, "hpc/register_user.html", context)
+    return render(request, "hpc/register_user_onsite.html", context)
 
 @login_required
 def list_registrations(request):

@@ -115,6 +115,8 @@ class Session(models.Model):
     start_time = models.TimeField(u"وقت البداية", null=True, blank=True, default=None)
     end_time = models.TimeField(u"وقت النهاية", null=True, blank=True, default=None)
     date_submitted = models.DateTimeField(auto_now_add=True)
+    for_onsite_registration = models.BooleanField(default=False,
+                                                  verbose_name=u"متاح التسجيل في يوم الحدث؟")
 
     objects = SessionQuerySet.as_manager()
 
@@ -125,18 +127,21 @@ class Session(models.Model):
             return self.name
 
 class NonUser(models.Model):
-    ar_first_name = models.CharField(max_length=30,
+    ar_first_name = models.CharField(max_length=30, default="",
+                                     blank=True,
                                      verbose_name=u'الاسم الأول')
-    ar_middle_name = models.CharField(max_length=30,
+    ar_middle_name = models.CharField(max_length=30, default="",
+                                      blank=True,
                                       verbose_name=u'الاسم الأوسط')
-    ar_last_name = models.CharField(max_length=30,
+    ar_last_name = models.CharField(max_length=30, default="",
+                                    blank=True,
                                     verbose_name=u'الاسم الأخير')
     en_first_name = models.CharField(max_length=30,
-                                     verbose_name=u'الاسم الأول')
+                                     verbose_name='First name')
     en_middle_name = models.CharField(max_length=30,
-                                      verbose_name=u'الاسم الأوسط')
+                                      verbose_name='Middle name')
     en_last_name = models.CharField(max_length=30,
-                                    verbose_name=u'الاسم الأخير')
+                                    verbose_name='Last name')
     gender = models.CharField(max_length=1, verbose_name=u'الجنس',
                               default='', choices=user_gender_choices)
     email = models.EmailField(verbose_name=u'البريد الإلكتروني')

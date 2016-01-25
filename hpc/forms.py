@@ -27,7 +27,7 @@ class EvaluationForm(forms.ModelForm):
 class NonUserForm(forms.ModelForm):
     class Meta:
         model = NonUser
-        fields = ['ar_first_name', 'ar_middle_name', 'ar_last_name',
+        fields = [#'ar_first_name', 'ar_middle_name', 'ar_last_name',
                   'en_first_name', 'en_middle_name', 'en_last_name',
                   'email', 'mobile_number', 'university', 'college',
                   'gender']
@@ -41,7 +41,9 @@ class RegistrationForm(forms.Form):
             time_slot_sessions = Session.objects.filter(time_slot=time_slot)
             if user:
                 user_gender = get_user_gender(user)
-                time_slot_sessions = Session.objects.filter(time_slot=time_slot, gender__in=['', user_gender])
+                time_slot_sessions = Session.objects.filter(for_onsite_registration=True,
+                                                            time_slot=time_slot,
+                                                            gender__in=['', user_gender])
             self.fields['time_slot_%s' % time_slot] = forms.ModelChoiceField(time_slot_sessions, required=False)
             self.fields['time_slot_%s' % time_slot].widget.attrs['class'] = 'form-control'
 
@@ -75,3 +77,5 @@ class RegistrationForm(forms.Form):
         for session_code_name in untimed_session_code_names:
             session = Session.objects.get(code_name=session_code_name)
             registration.sessions.add(session)
+
+        return registration

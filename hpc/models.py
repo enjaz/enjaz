@@ -180,7 +180,7 @@ class NonUser(models.Model):
         return en_fullname
 
     def __unicode__(self):
-        return self.get_ar_full_name()
+        return self.get_en_full_name()
 
 class Registration(models.Model):
     user = models.OneToOneField(User, null=True, blank=True,
@@ -271,4 +271,4 @@ class Registration(models.Model):
             return self.nonuser.get_en_full_name()
 
     def __unicode__(self):
-        return self.get_ar_full_name()
+        return self.get_en_full_name()

@@ -4,6 +4,8 @@
 <div class="row">
     <div class="col-sm-8 col-sm-offset-2">
         <h1><a href="{% url 'hpc:list_sessions' %}">المقبولون في مؤتمر التخصّصات الصحيّة</a>: {{ session.name }}</h1>
+        {% if user.is_superuser or user|is_organizing_committee_member %}
+        <h2>طالبات</h2>
         <table class="display datatable  dt-responsive">
             <thead>
                 <tr>
@@ -11,14 +13,12 @@
                     <th>الاسم الإنجليزي</th>
                     <th class="not-mobile">الجامعة</th>
                     <th class="not-mobile">الكلية</th>
-                    {% if user.is_superuser or user|is_organizing_committee_member %}
                     <th class="not-mobile">البريد</th>
                     <th class="not-mobile">الجوال</th>
-                    {% endif %}
                 </tr>
             </thead>
             <tbody>
-                {% for registration in session.moved_registrations.undeleted %}
+                {% for registration in session.moved_registrations.female %}
                 <tr>
                     <td>{{ registration.get_ar_full_name }}</td>
                     <td class="english-field">{{ registration.get_en_full_name }}</td>
@@ -32,6 +32,53 @@
                 {% endfor %}
             </tbody>
         </table>
+        <h2>طلاب</h2>
+        <table class="display datatable  dt-responsive">
+            <thead>
+                <tr>
+                    <th>الاسم العربي</th>
+                    <th>الاسم الإنجليزي</th>
+                    <th class="not-mobile">الجامعة</th>
+                    <th class="not-mobile">الكلية</th>
+                    <th class="not-mobile">البريد</th>
+                    <th class="not-mobile">الجوال</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registration in session.moved_registrations.male %}
+                <tr>
+                    <td>{{ registration.get_ar_full_name }}</td>
+                    <td class="english-field">{{ registration.get_en_full_name }}</td>
+                    <td>{{ registration.get_university }}</td>
+                    <td>{{ registration.get_college }}</td>
+                    <td><a class="english-field" href="mailto:{{ registration.get_email }}">{{ registration.get_email }}</a></td>
+                    <td>{{ registration.get_phone }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <table class="display datatable  dt-responsive">
+            <thead>
+                <tr>
+                    <th>الاسم العربي</th>
+                    <th>الاسم الإنجليزي</th>
+                    <th class="not-mobile">الجامعة</th>
+                    <th class="not-mobile">الكلية</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registration in session.moved_registrations.undeleted %}
+                <tr>
+                    <td>{{ registration.get_ar_full_name }}</td>
+                    <td class="english-field">{{ registration.get_en_full_name }}</td>
+                    <td>{{ registration.get_university }}</td>
+                    <td>{{ registration.get_college }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+       {% endif %}
     </div>
 </div>
 <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">

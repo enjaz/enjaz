@@ -1,5 +1,7 @@
 # -*- coding: utf-8  -*-
 import urllib2
+import json
+from post_office import mail
 
 def is_research_committee_member(user):
     return user.memberships.current_year().filter(english_name="Research Committee of the HPC").exists()
@@ -45,3 +47,25 @@ def register_in_vma(session, registration):
         registration.moved_sessions.add(session)
     else:
         print "response was", response
+
+
+def send_onsite_confirmation(registration):
+    programs = []
+    for session in registration.moved_sessions.all():
+        url = "http://medicalacademy.org/portal/list/registration/get/data?event_id=" + str(session.vma_id)
+        data = urllib2.urlopen(url)
+        processed_data = json.load(data)
+
+        for user in processed_data:
+            if user['email'].lower() == registration.get_email().lower():
+                programs.append((session, user['confirmation_link']))
+                break
+
+    email_context = {'registration': registration,
+                     'programs': programs}
+
+    mail.send([registration.get_email()],
+               template="hpc_registration_confirmed",
+               context=email_context)
+    registration.confirmation_sent = True
+    registration.save()

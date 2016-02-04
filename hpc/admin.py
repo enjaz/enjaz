@@ -75,7 +75,7 @@ class AbstractAdmin(admin.ModelAdmin):
     was_evaluated.boolean = True
 
 class RegistrationAdmin(admin.ModelAdmin):
-    list_display = ['__unicode__', 'get_university', 'get_college',
+    list_display = ['pk', '__unicode__', 'get_university', 'get_college',
                     'date_submitted']
     list_filter = [RegistrationUniversityFilter, SessionFilter]
     search_fields= ('user__username', 'user__email',
@@ -95,6 +95,7 @@ class RegistrationAdmin(admin.ModelAdmin):
                     'user__common_profile__ar_middle_name',
                     'user__common_profile__ar_last_name',
                     'nonuser__email',
+                    'nonuser__mobile_number',
                     'nonuser__en_first_name',
                     'nonuser__en_middle_name',
                     'nonuser__en_last_name',
@@ -109,15 +110,15 @@ class RegistrationInline(admin.StackedInline):
     fields = ['sessions']
     
 class NonUserAdmin(admin.ModelAdmin):
-    list_display = ['__unicode__', 'university', 'college',
+    list_display = ['pk', '__unicode__', 'university', 'college',
                     'with_deleted_registration', 'date_submitted']
-    search_fields= ('nonuser__email',
-                    'nonuser__en_first_name',
-                    'nonuser__en_middle_name',
-                    'nonuser__en_last_name',
-                    'nonuser__ar_first_name',
-                    'nonuser__ar_middle_name',
-                    'nonuser__ar_last_name')
+    search_fields= ('email',
+                    'en_first_name',
+                    'en_middle_name',
+                    'en_last_name',
+                    'ar_first_name',
+                    'ar_middle_name',
+                    'ar_last_name')
 
     def with_deleted_registration(self, obj):
         return obj.hpc2016_registration.is_deleted

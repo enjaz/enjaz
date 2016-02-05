@@ -15,7 +15,7 @@
 {% endif %}
 {% endcomment %}
 
-<p class="dinar-light enjaz-warning"><i class="entypo-info"></i> بوابة إنجاز مُخصّصة لمنسوبي جامعة الملك سعود بن عبد العزيز للعلوم الصحيّة.<br>النموذج أدناه لتسجيل الطلاب والطالبات.  إذا لم تكن طالبا فينبغي التسجيل في بوّابة إنجاز من خلال <a href="{% url 'nonstudent_signup' %}">النموذج المخصص</a>.</p>
+<p class="dinar-light enjaz-warning"><i class="entypo-info"></i> أدناه معلوماتكم المسجّلة على بوابة إنجاز.  تستخدم هذه المعلومات عند التسجيل في أنشطة نادي الطلاب، ولاستصدار الشهادات، وتعرض في مختلف أجزاء البوابة مثل برنامج نقاطي ومبادرة سِراج.</p>
 
 
 <form method="post" role="form" id="form_register">	
@@ -76,22 +76,9 @@
 					{% endif %}
 				</div>
 			</div>
-			
+
 			<div class="form-group">
-				<div class="english-field input-group{% if form.email.errors %} validate-has-error{% endif %}">
-					<div class="input-group-addon">
-						<i class="entypo-mail"></i>
-					</div>
-					
-					<input {% if form.email.value and not form.email.errors %}value="{{ form.email.value }}" {% endif %}type="text" class="form-control" name="email" id="email" {% if not form.email.errors %}placeholder="البريد الإلكتروني الجامعي"{% endif %} required="required"/>
-					{% if form.email.errors %}
-					    {% for error in form.email.errors %}
-					        <label class='dinar-light error' for='email' style='display: inline-block'>{{ error|escape }}</label>
-					    {% endfor %}
-					{% endif %}
-				</div>
-			</div>
-			<div class="form-group">
+                <label class="control-label">{{ form.mobile_number.label }}</label>
 				<div class="input-group{% if form.mobile_number.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-mobile"></i>
@@ -106,12 +93,13 @@
 				</div>
 			</div>
 			<div class="form-group">
+                <label class="control-label">{{ form.badge_number.label }}</label>
 				<div class="input-group{% if form.badge_number.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-vcard"></i>
 					</div>
 					
-					<input {% if form.badge_number.value and not form.badge_number.errors %}value="{{ form.badge_number.value }}" {% endif %}type="text" class="form-control" name="badge_number" id="badge_number" placeholder="{{ form.badge_number.label }}"/>
+					<input {% if form.badge_number.value and not form.badge_number.errors %}value="{{ form.badge_number.value }}" {% endif %}type="text" class="form-control" name="badge_number" id="badge_number" placeholder="{{ form.badge_number.label }}" required="required"/>
 					{% if form.badge_number.errors %}
 					    {% for error in form.badge_number.errors %}
 					        <label class='error' for='badge_number' style='display: inline-block'>{{ error|escape }}</label>
@@ -120,12 +108,13 @@
 				</div>
 			</div>
 			<div class="form-group">
+                <label class="control-label">{{ form.student_id.label }}</label>
 				<div class="input-group{% if form.student_id.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-graduation-cap"></i>
 					</div>
 					
-					<input {% if form.student_id.value and not form.student_id.errors %}value="{{ form.student_id.value }}" {% endif %}type="text" class="form-control" name="student_id" id="student_id" placeholder="{{ form.student_id.label }}" />
+					<input {% if form.student_id.value and not form.student_id.errors %}value="{{ form.student_id.value }}" {% endif %}type="text" class="form-control" name="student_id" id="student_id" placeholder="{{ form.student_id.label }}" required="required" />
 					{% if form.student_id.errors %}
 					    {% for error in form.student_id.errors %}
 					        <label class='error' for='student_id' style='display: inline-block'>{{ error|escape }}</label>
@@ -157,8 +146,8 @@
 					</div>
 					<select {% if form.section.value and not form.section.errors %}value="{{ form.section.value }}" {% endif %}class="form-control" id="section" name="section"  title="{{ form.section.label }}">
                                                 <option value="">{{ form.section.label }}</option>
-                                                <option value="NG">الحرس الوطني</option>
-                                                <option value="KF">مدينة الملك فهد الطبية</option>
+                                                <option {% if form.instance.college.section == 'NG' %}selected="selected"{% endif %} value="NG">الحرس الوطني</option>
+                                                <option {% if form.instance.college.section == 'KF' %}selected="selected"{% endif %} value="KF">مدينة الملك فهد الطبية</option>
 					</select>
 					{% if form.section.errors %}
 					    {% for error in form.section.errors %}
@@ -175,7 +164,7 @@
 					<select {% if form.college.value and not form.college.errors %}value="{{ form.college.value }}" {% endif %}class="form-control" id="college" name="college" title="{{ form.college.label }}" required="required">
                                                 <option value="">{{ form.college.label }}</option>
                                                 {% for value, label in form.fields.college.widget.choices %}
-                                                <option {% if form.college.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
+                                                <option {% if form.college.value == value or form.instance.college.name == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
 					</select>
 					{% if form.college.errors %}
 					    {% for error in form.college.errors %}
@@ -192,23 +181,13 @@
 					<select {% if form.gender.value and not form.gender.errors %}value="{{ form.gender.value }}" {% endif %}class="form-control" id="gender" name="gender"  title="{{ form.gender.label }}" required="required">
                                                 <option value="">{{ form.gender.label }}</option>
                                                 {% for value, label in form.fields.gender.widget.choices %}
-                                                <option {% if form.gender.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
+                                                <option {% if form.gender.value == value or form.instance.college.gender == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
 					</select>
 					{% if form.gender.errors %}
 					    {% for error in form.gender.errors %}
 					        <label class='error' for='gender' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
-				</div>
-			</div>
-			<div class="form-group">
-				<div class="input-group{% if form.password1.errors or form.password2.errors %} validate-has-error{% endif %}">
-					<div class="input-group-addon">
-						<i class="entypo-key"></i>
-					</div>
-					
-					<input type="password" class="form-control" name="password1" id="password1" placeholder="اختر كلمة سر" autocomplete="off" required="required"/>
-					<input type="password" class="form-control" name="password2" id="password2" placeholder="أكّد كلمة السر" autocomplete="off" required="required"/>
 				</div>
 			</div>
 			

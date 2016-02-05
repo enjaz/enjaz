@@ -1,19 +1,9 @@
 {% extends 'userena/base_userena.html' %}{% load staticfiles %}
 
-{% block title %}تسجيل الطلاب والطالبات{% endblock %}
-{% block description %}فضلًا املأ النموذج التالي لإتمام عملية التسجيل.{% endblock %}
+{% block title %}تحديث المعلومات على إنجاز{% endblock %}
+{% block description %}فضلًا استخدم النموذج التالي لتحديث بياناتك على بوّابة إنجاز.{% endblock %}
 
 {% block content %}
-{% comment %}
-{% if form.errors %}
-<div class="form-login-error visible dinar-light">
-       <h3 class="dinar-medium">عفوًا، نرجو التأكد من الحقول التالية</h3>
-       {% for err in form.errors %}
-       <p>{{ err }}</p>
-       {% endfor %}
-</div>
-{% endif %}
-{% endcomment %}
 
 <p class="dinar-light enjaz-warning"><i class="entypo-info"></i> أدناه معلوماتكم المسجّلة على بوابة إنجاز.  تستخدم هذه المعلومات عند التسجيل في أنشطة نادي الطلاب، ولاستصدار الشهادات، وتعرض في مختلف أجزاء البوابة مثل برنامج نقاطي ومبادرة سِراج.</p>
 

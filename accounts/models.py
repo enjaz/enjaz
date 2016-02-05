@@ -50,7 +50,8 @@ class CommonProfile(models.Model):
     job_description = models.CharField(max_length=50,
                                        blank=True,
                                        verbose_name=u"المسمى الوظيفي")
-    
+    modification_date = models.DateTimeField(auto_now=True, null=True)
+
     def get_ar_full_name(self):
         ar_fullname = None
         try:

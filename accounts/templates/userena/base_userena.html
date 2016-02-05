@@ -96,6 +96,9 @@ var baseurl = '';
 	<!-- Piwik -->
 	<script type="text/javascript">
 	  var _paq = _paq || [];
+      {% if user.is_authenticated %}
+      _paq.push(['setUserId', '{{ user.username }}']);
+      {% endif %}
 	  _paq.push(['trackPageView']);
 	  _paq.push(['enableLinkTracking']);
 	  (function() {

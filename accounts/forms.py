@@ -1,19 +1,17 @@
 # -*- coding: utf-8  -*-
 from django import forms
-from django.utils.translation import ugettext as _
-from django.contrib.auth.models import Permission
 from django.contrib.auth import authenticate
-from django.core.exceptions import ObjectDoesNotExist
-from userena.forms import SignupForm
-from clubs.models import College, city_choices, college_choices, section_choices, gender_choices
+from django.utils.translation import ugettext as _
+
 from accounts.models import CommonProfile
 from bulb.models import Point
+from clubs.models import College, city_choices, college_choices, section_choices, gender_choices
 from core.models import StudentClubYear
+import core.utils
+from userena.forms import SignupForm
 
-class StudentSignupForm(SignupForm):
-    """
-    A form that includes extra student-related fields.
-    """
+
+class EnjazSignupForm(SignupForm):
     # FIXME: Dirty 'verbose_name' hack?
     ar_first_name = forms.CharField(label=CommonProfile._meta.get_field('ar_first_name').verbose_name,
                                 max_length=30)
@@ -28,196 +26,17 @@ class StudentSignupForm(SignupForm):
     en_last_name = forms.CharField(label=CommonProfile._meta.get_field('en_last_name').verbose_name,
                                 max_length=30)
     badge_number = forms.IntegerField(label=CommonProfile._meta.get_field('badge_number').verbose_name, required=False)
-    student_id = forms.IntegerField(label=CommonProfile._meta.get_field('student_id').verbose_name, required=False)
-    # Since the mobile number starts with a zero, store it as a
-    # string.
-    mobile_number = forms.CharField(label=CommonProfile._meta.get_field('mobile_number').verbose_name)
     city = forms.CharField(label=u"المدينة", max_length=1, widget=forms.Select(choices=city_choices))
-    section = forms.CharField(label=u"القسم", max_length=2, widget=forms.Select(choices=section_choices), required=False)
-    college = forms.CharField(label=CommonProfile._meta.get_field('college').verbose_name, max_length=1, widget=forms.Select(choices=college_choices))
-    gender = forms.CharField(label=u"الجنس", max_length=1, widget=forms.Select(choices=gender_choices))
 
     def __init__(self, *args, **kw):
-        """
-
-        A bit of hackery to get the first name and last name at the top of the
-        form instead at the end.
-
-        """
-        super(StudentSignupForm, self).__init__(*args, **kw)
+        super(EnjazSignupForm, self).__init__(*args, **kw)
         # We don't want usernames (We could have inherited userena's
         # SignupFormOnlyEmail, but it's more tricky to modify.)
         del self.fields['username']
 
     def clean(self):
         # Call the parent class's clean function.
-        cleaned_data = super(StudentSignupForm, self).clean()
-
-        # Remove spaces at the start and end of all text fields.
-        for field in cleaned_data:
-            if isinstance(cleaned_data[field], unicode):
-                cleaned_data[field] = cleaned_data[field].strip()
-
-        # Make sure that the email is of the university.
-        if 'email' in cleaned_data and not cleaned_data['email'].endswith('@ksau-hs.edu.sa'):
-            email_msg = u"أدخل عنوانا جامعيا"
-            self._errors['email'] = self.error_class([email_msg])
-            del cleaned_data['email']
-
-        # Make sure that the mobile numbers contain only digits and
-        # pluses:
-        if 'mobile_number' in cleaned_data:
-            mobile_number_msg = ""
-            if len(cleaned_data['mobile_number']) < 10:
-                mobile_number_msg = u"الرقم الذي أدخلت ناقص"
-            for char in cleaned_data['mobile_number']:
-                if not char in '1234567890+':
-                    mobile_number_msg = u"أدخل أرقاما فقط"
-                    break
-            if mobile_number_msg:
-                self._errors['mobile_number'] = self.error_class([mobile_number_msg])
-                del cleaned_data['mobile_number']
-
-        # Since Jeddah and Al-Hasa have only one campus, the section
-        # equals the city.
-        if 'city' in cleaned_data and \
-           cleaned_data['city'] in ['J', 'A']:
-            cleaned_data['section'] = cleaned_data['city']
-
-        # Make sure that the college/section choice is actually valid.
-        try:
-            College.objects.get(
-            name=self.cleaned_data['college'],
-            city=self.cleaned_data['city'],
-            section=self.cleaned_data['section'],
-            gender=self.cleaned_data['gender'])
-        except ObjectDoesNotExist:
-            college_msg = u"ليست كلية مسجلة."
-            # Add an error message to specific fields.
-            self._errors['college'] = self.error_class([college_msg])
-            self._errors['section'] = self.error_class([college_msg])
-            self._errors['gender'] = self.error_class([college_msg])
-            # Remove invalid fields
-            del cleaned_data['college']
-            del cleaned_data['section']
-            del cleaned_data['gender']
-
-        return cleaned_data
-
-    def save(self):
-        """
-        Override the save method to save the first and last name to the user
-        field.
-
-        """
-
-        self.cleaned_data['username'] = self.cleaned_data['email'].split('@')[0]
-        # All username names should be lower-case.
-        self.cleaned_data['username'] = self.cleaned_data['username'].lower()
-        # Save the parent form and get the user
-        new_user = super(StudentSignupForm, self).save()
-
-        # Add default permissions
-
-        # Student Voice:
-        add_vote = Permission.objects.get(codename='add_vote')
-        add_voice = Permission.objects.get(codename='add_voice')
-
-        # Niqati:
-        submit_niqati_code = Permission.objects.get(codename='submit_code')
-        view_niqati_report = Permission.objects.get(codename='view_student_report')
-
-        # Arshidni:
-        add_studygroup = Permission.objects.get(codename='add_studygroup')
-        add_question = Permission.objects.get(codename='add_question')
-        add_answer = Permission.objects.get(codename='add_answer')
-        add_graduateprofile = Permission.objects.get(codename='add_graduateprofile')
-        add_learningobjective = Permission.objects.get(codename='add_learningobjective')
-        add_joinstudygrouprequest = Permission.objects.get(codename='add_joinstudygrouprequest')
-        add_colleagueprofile = Permission.objects.get(codename='add_colleagueprofile')
-        add_supervisionrequest = Permission.objects.get(codename='add_supervisionrequest')
-
-        new_user.user_permissions.add(add_vote, add_voice,
-                                      submit_niqati_code,
-                                      view_niqati_report,
-                                      add_studygroup, add_question,
-                                      add_answer, add_graduateprofile,
-                                      add_learningobjective,
-                                      add_joinstudygrouprequest,
-                                      add_colleagueprofile,
-                                      add_supervisionrequest)
-        new_user.save()
-
-        # Add initial Bulb balance.
-        current_year = StudentClubYear.objects.get_current()
-        Point.objects.create(year=current_year,
-                             user=new_user,
-                             note=u"رصيد مبدئي.",
-                             value=1)
-
-        # Append the extra fields to the Student Profile
-        #user_profile = new_user.get_profile()
-        student_college = College.objects.get(
-            name=self.cleaned_data['college'],
-            section=self.cleaned_data['section'],
-            gender=self.cleaned_data['gender'])
-        CommonProfile.objects.create(user=new_user,
-                                     is_student=True,
-                                     ar_first_name=self.cleaned_data['ar_first_name'],
-                                     ar_middle_name=self.cleaned_data['ar_middle_name'],
-                                     ar_last_name=self.cleaned_data['ar_last_name'],
-                                     en_first_name=self.cleaned_data['en_first_name'],
-                                     en_middle_name=self.cleaned_data['en_middle_name'],
-                                     en_last_name=self.cleaned_data['en_last_name'],
-                                     badge_number=self.cleaned_data.get('badge_number'),
-                                     city=self.cleaned_data['city'],
-                                     student_id=self.cleaned_data.get('student_id'),
-                                     mobile_number=self.cleaned_data['mobile_number'],
-                                     college=student_college,
-                                     job_description="")
-        return new_user
-
-class NonStudentSignupForm(SignupForm):
-    """
-    A form that includes extra student-related fields.
-    """
-    ar_first_name = forms.CharField(label=CommonProfile._meta.get_field('ar_first_name').verbose_name,
-                                max_length=30)
-    ar_middle_name = forms.CharField(label=CommonProfile._meta.get_field('ar_middle_name').verbose_name,
-                                max_length=30)
-    ar_last_name = forms.CharField(label=CommonProfile._meta.get_field('ar_last_name').verbose_name,
-                                max_length=30)
-    en_first_name = forms.CharField(label=CommonProfile._meta.get_field('en_first_name').verbose_name,
-                                max_length=30)
-    en_middle_name = forms.CharField(label=CommonProfile._meta.get_field('en_middle_name').verbose_name,
-                                max_length=30)
-    en_last_name = forms.CharField(label=CommonProfile._meta.get_field('en_last_name').verbose_name,
-                                max_length=30)
-    badge_number = forms.IntegerField(label=CommonProfile._meta.get_field('badge_number').verbose_name)
-
-    # Since the mobile number starts with a zero, store it as a
-    # string.  For non-students, this field is going to be optional.
-    mobile_number = forms.CharField(label=CommonProfile._meta.get_field('mobile_number').verbose_name,
-                                     required=False)
-    city = forms.CharField(label=u"المدينة", max_length=1, widget=forms.Select(choices=city_choices))
-    job_description = forms.CharField(label=CommonProfile._meta.get_field('job_description').verbose_name,
-                                max_length=50)
-
-    def __init__(self, *args, **kw):
-        """
-
-        A bit of hackery to get the first name and last name at the top of the
-        form instead at the end.
-
-        """
-        super(NonStudentSignupForm, self).__init__(*args, **kw)
-        # We don't want usernames (We could have inherited userena's
-        # SignupFormOnlyEmail, but it's more tricky to modify.)
-        del self.fields['username']
-
-    def clean(self):
-        # Call the parent class's clean function.
-        cleaned_data = super(NonStudentSignupForm, self).clean()
+        cleaned_data = super(EnjazSignupForm, self).clean()
 
         # Remove spaces at the start and end of all text fields.
         for field in cleaned_data:
@@ -236,12 +55,11 @@ class NonStudentSignupForm(SignupForm):
         # pluses:
         if 'mobile_number' in cleaned_data:
             mobile_number_msg = ""
-            if 0 < len(cleaned_data['mobile_number']) < 10 :
+            cleaned_data['mobile_number'] = core.utils.hindi_to_arabic(cleaned_data['mobile_number'])
+            if len(cleaned_data['mobile_number']) < 10:
                 mobile_number_msg = u"الرقم الذي أدخلت ناقص"
-            for char in cleaned_data['mobile_number']:
-                if not char in '1234567890+':
-                    mobile_number_msg = u"أدخل أرقاما فقط"
-                    break
+            if not all([number in '1234567890+' for number in cleaned_data['mobile_number']]):
+                mobile_number_msg = u"أدخل أرقاما فقط"
             if mobile_number_msg:
                 self._errors['mobile_number'] = self.error_class([mobile_number_msg])
                 del cleaned_data['mobile_number']
@@ -249,26 +67,98 @@ class NonStudentSignupForm(SignupForm):
         return cleaned_data
 
     def save(self):
-        """
-        Override the save method to save the first and last name to the user
-        field.
-
-        """
-
-        self.cleaned_data['username'] = self.cleaned_data['email'].split('@')[0]
         # All username names should be lower-case.
-        self.cleaned_data['username'] = self.cleaned_data['username'].lower()
+        self.cleaned_data['email'] = self.cleaned_data['email'].lower()
+        self.cleaned_data['username'] = self.cleaned_data['email'].split('@')[0]
+        self.cleaned_data['username'] = self.cleaned_data['username']
+        new_user = super(EnjazSignupForm, self).save()
+        return new_user
+
+class StudentSignupForm(EnjazSignupForm):
+    """
+    A form that includes extra student-related fields.
+    """
+    student_id = forms.IntegerField(label=CommonProfile._meta.get_field('student_id').verbose_name, required=False)
+    # Since the mobile number starts with a zero, store it as a
+    # string.
+    mobile_number = forms.CharField(label=CommonProfile._meta.get_field('mobile_number').verbose_name)
+    section = forms.CharField(label=u"القسم", max_length=2, widget=forms.Select(choices=section_choices), required=False)
+    college = forms.CharField(label=CommonProfile._meta.get_field('college').verbose_name, max_length=1, widget=forms.Select(choices=college_choices))
+    gender = forms.CharField(label=u"الجنس", max_length=1, widget=forms.Select(choices=gender_choices))
+
+    def clean(self):
+        # Call the parent class's clean function.
+        cleaned_data = super(StudentSignupForm, self).clean()
+
+        # Since Jeddah and Al-Hasa have only one campus, the section
+        # equals the city.
+        if 'city' in cleaned_data and \
+           cleaned_data['city'] in ['J', 'A']:
+            cleaned_data['section'] = cleaned_data['city']
+
+        # Make sure that the college/section choice is actually valid.
+        try:
+            self.college = College.objects.get(
+                name=cleaned_data['college'],
+                city=cleaned_data['city'],
+                section=cleaned_data['section'],
+                gender=cleaned_data['gender'])
+        except College.DoesNotExist:
+            college_msg = u"ليست كلية مسجلة."
+            # Add an error message to specific fields.
+            self._errors['college'] = self.error_class([college_msg])
+            self._errors['section'] = self.error_class([college_msg])
+            self._errors['gender'] = self.error_class([college_msg])
+            # Remove invalid fields
+            del cleaned_data['college']
+            del cleaned_data['section']
+            del cleaned_data['gender']
+
+        return cleaned_data
+
+    def save(self):
+        # Save the parent form and get the user
+        new_user = super(StudentSignupForm, self).save()
+
+        # Add initial Bulb balance.
+        current_year = StudentClubYear.objects.get_current()
+        Point.objects.create(year=current_year,
+                             user=new_user,
+                             note=u"رصيد مبدئي.",
+                             value=1)
+
+        CommonProfile.objects.create(user=new_user,
+                                     is_student=True,
+                                     ar_first_name=self.cleaned_data['ar_first_name'],
+                                     ar_middle_name=self.cleaned_data['ar_middle_name'],
+                                     ar_last_name=self.cleaned_data['ar_last_name'],
+                                     en_first_name=self.cleaned_data['en_first_name'],
+                                     en_middle_name=self.cleaned_data['en_middle_name'],
+                                     en_last_name=self.cleaned_data['en_last_name'],
+                                     badge_number=self.cleaned_data.get('badge_number'),
+                                     city=self.cleaned_data['city'],
+                                     student_id=self.cleaned_data.get('student_id'),
+                                     mobile_number=self.cleaned_data['mobile_number'],
+                                     college=self.college,
+                                     job_description="")
+        return new_user
+
+class NonStudentSignupForm(EnjazSignupForm):
+    """
+    A form that includes extra non-student-related fields.
+    """
+    # Since the mobile number starts with a zero, store it as a
+    # string.  For non-students, this field is going to be optional.
+    mobile_number = forms.CharField(label=CommonProfile._meta.get_field('mobile_number').verbose_name,
+                                    required=False)
+    job_description = forms.CharField(label=CommonProfile._meta.get_field('job_description').verbose_name,
+                                       max_length=50)
+
+    def save(self):
         # Save the parent form and get the user
         new_user = super(NonStudentSignupForm, self).save()
 
-        # TODO: Add default permissions
-
-        # Append the extra fields to the non-Student Profile
-        if 'mobile_number' in self.cleaned_data:
-            mobile_number = self.cleaned_data['mobile_number']
-        else:
-            mobile_number = ""
-
+        mobile_number = self.cleaned_data.get('mobile_number', '')
         CommonProfile.objects.create(user=new_user,
                                      is_student=False,
                                      ar_first_name=self.cleaned_data['ar_first_name'],
@@ -325,3 +215,52 @@ class ModifiedAuthenticationForm(forms.Form):
                 return self.cleaned_data
 
         raise forms.ValidationError(_(u"الرجاء إدخال عنوان بريد وكلمة سر صحيحين."))
+
+class EditStudentCommonProfile(forms.ModelForm):
+    section = forms.CharField(label=u"القسم", max_length=2, widget=forms.Select(choices=section_choices), required=False)
+    college = forms.CharField(label=CommonProfile._meta.get_field('college').verbose_name, max_length=1, widget=forms.Select(choices=college_choices))
+    gender = forms.CharField(label=u"الجنس", max_length=1, widget=forms.Select(choices=gender_choices))
+
+    class Meta:
+        model = CommonProfile
+        fields = ['ar_first_name', 'ar_middle_name', 'ar_last_name',
+                  'en_first_name', 'en_middle_name', 'en_last_name',
+                  'student_id', 'badge_number', 'mobile_number',
+                  'city']
+
+    def clean(self):
+        cleaned_data = super(EditStudentCommonProfile, self).clean()
+        # Since Jeddah and Al-Hasa have only one campus, the section
+        # equals the city.
+        if 'city' in cleaned_data and \
+           cleaned_data['city'] in ['J', 'A']:
+            cleaned_data['section'] = cleaned_data['city']
+
+        # Make sure that the college/section choice is actually valid.
+        try:
+            print cleaned_data['college'], cleaned_data['city'], cleaned_data['section'], cleaned_data['gender']
+            self.college = College.objects.get(
+                name=cleaned_data['college'],
+                city=cleaned_data['city'],
+                section=cleaned_data['section'],
+                gender=cleaned_data['gender'])
+        except College.DoesNotExist:
+            college_msg = u"ليست كلية مسجلة."
+            # Add an error message to specific fields.
+            self._errors['college'] = self.error_class([college_msg])
+            self._errors['section'] = self.error_class([college_msg])
+            self._errors['gender'] = self.error_class([college_msg])
+            # Remove invalid fields
+            del cleaned_data['college']
+            del cleaned_data['section']
+            del cleaned_data['gender']
+
+        return cleaned_data
+
+    def save(self):
+        common_profile = super(EditStudentCommonProfile, self).save()
+        common_profile.college = self.college
+        common_profile.save()
+
+class ResendForm(forms.Form):
+    email = forms.EmailField()

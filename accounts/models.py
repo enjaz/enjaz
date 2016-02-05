@@ -33,7 +33,7 @@ class CommonProfile(models.Model):
     en_last_name = models.CharField(max_length=30,
                                     verbose_name=u'الاسم الأخير')
     badge_number = models.IntegerField(null=True,
-                                       verbose_name=u'رقم البطاقة')
+                                       verbose_name=u'رقم البطاقة الجامعية')
     mobile_number = models.CharField(max_length=20,
                                      verbose_name=u'رقم الجوال')
     city = models.CharField(max_length=1, choices=city_choices,

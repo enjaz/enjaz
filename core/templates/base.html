@@ -186,7 +186,7 @@ you?
 					<span>أنشطة</span>
 				</a>
 			</li>
-            {% if user.is_superuser %}
+            {% if user.common_profile.is_student or user.is_superuser %}
 			<li>
 				<a href="{% url 'niqati:index' %}">
 					<i class="entypo-chart-bar"></i>

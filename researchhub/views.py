@@ -186,9 +186,6 @@ def control_supervisors(request):
 
     supervisor.save()
 
-def signup_supervisor(request):
-    pass
-
 @login_required
 @decorators.ajax_only
 def add_supervisor(request):

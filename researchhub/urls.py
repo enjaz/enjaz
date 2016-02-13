@@ -20,8 +20,6 @@ urlpatterns = patterns('',
     # Supervisors
     url(r'^supervisors/$', views.list_supervisors, name="list_supervisors"),
     url(r'^supervisors/control/$', views.control_supervisors, name="control_supervisors"),
-    url(r'^supervisors/signup/$', views.signup_supervisor, name="signup_supervisor"),
-    url(r'^supervisors/signup/thanks/$', TemplateView.as_view(template_name='researchhub/signup_supervisor_thanks.html'), name="signup_supervisor_thanks"),
     url(r'^supervisors/add/$', views.add_supervisor, name="add_supervisor"),
     url(r'^supervisors/(?P<pk>\d+)/$', views.show_supervisor, name="show_supervisor"),
     url(r'^supervisors/(?P<pk>\d+)/rate/$', views.rate_supervisor, name="rate_supervisor"),

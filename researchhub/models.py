@@ -39,7 +39,6 @@ class Supervisor(models.Model):
     specialty = models.CharField(max_length=100)
     avatar = models.FileField(upload_to='researchhub/supervisors/',
                               blank=True, help_text="Optional")
-    position = models.CharField("Position/Title", max_length=100)
     user = models.OneToOneField(User,
                                 limit_choices_to={'common_profile__is_student': False})
     interests = models.TextField("Research areas of interest")

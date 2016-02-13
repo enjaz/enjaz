@@ -1,0 +1,18 @@
+{% extends 'base.html' %}{% load researchhub_tags %}
+{% block rtlcss %}{% endblock %}
+{% block title %}ResearchHub{% endblock %}
+
+{% block pageheaderurl %}
+    {% url 'researchhub:index' %}
+{% endblock %}
+{% block pageheader %}<span class="english-field">ResearchHub</span>{% endblock %}
+
+{% block navbar %}
+    <li class="english-field"><a href="{% url 'researchhub:how_it_works' %}"><i class="fa fa-cogs"></i> How it works</a></li>
+    <li class="english-field"><a href="{% url 'researchhub:faq' %}"><i class="fa fa-question-circle"></i> FAQ</a></li>
+{% endblock %}
+
+{% block content %}{% endblock %}
+
+{% block customscript %}
+{% endblock %}

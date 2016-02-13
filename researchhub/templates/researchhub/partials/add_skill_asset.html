@@ -1,0 +1,34 @@
+{% load staticfiles %}
+<script type="text/javascript">
+    $(function () {
+        // initialize skill edit modal
+        $('#edit-skill-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        });
+        $("a#add-skill").click(function () {
+            $("#edit-skill-modal").modal('show');
+
+            $("#edit-skill-modal .modal-title").html("Add a skill!");
+            $("#edit-skill-modal .modal-body").load("{% url 'researchhub:add_skill_introduction' %}", function(){
+                $('.end-skill-introduction').click(function() {
+                    $("#edit-skill-modal .modal-body").load("{% url 'researchhub:add_skill' %}", function(){
+                        $("#id_available_until").attr('data-start-view', '1').datepicker({minDate: 1});
+                    });
+            });
+            });
+
+            var $submitButton = $("#edit-skill-modal button.submit-button");
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-skill-form").submit();
+            });
+        });
+    });
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+
+{% with modal_id='edit-skill-modal' %}
+    {% include "researchhub/partials/common_edit_modal.html" %}
+{% endwith %}

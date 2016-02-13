@@ -1,0 +1,325 @@
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.urlresolvers import reverse
+from django.shortcuts import render, get_object_or_404
+from django.views.decorators import csrf
+from django.utils import timezone
+
+from core import decorators
+from core.models import StudentClubYear
+from post_office import mail
+from researchhub.models import Supervisor, Project, SkilledStudent
+from researchhub.forms import ProjectForm, MemberProjectForm, SupervisorForm, SkilledStudentForm
+from researchhub import utils
+
+def index(request):
+    latest_supervisors = Supervisor.objects.undeleted().order_by("-submission_date")[:10]
+    supervisor_count =  Supervisor.objects.undeleted().count()
+    latest_projects = Project.objects.undeleted().order_by("-submission_date")[:10]
+    project_count = Project.objects.undeleted().count()
+    latest_skills = SkilledStudent.objects.undeleted().order_by("-submission_date")[:10]
+    skill_count = SkilledStudent.objects.undeleted().count()
+    context = {'latest_projects': latest_projects,
+               'latest_supervisors': latest_supervisors,
+               'latest_skills': latest_skills,
+               'supervisor_count': supervisor_count,
+               'project_count': project_count,
+               'skill_count': skill_count}
+    return render(request, "researchhub/index.html", context)
+
+def indicators(request):
+    if not utils.is_researchhub_coordinator_or_member(request.user) and\
+       not request.user.is_superuser:
+        raise PermissionDenied
+
+def list_projects(request):
+    if utils.is_researchhub_coordinator_or_member(request.user) or\
+       request.user.is_superuser:
+        shown_projects = Project.objects.shown().order_by("-submission_date")
+        hidden_projects = Project.objects.hidden().order_by("-submission_date")
+        return render(request, "researchhub/list_projects_privileged.html",
+                      {'shown_projects': shown_projects,
+                       'hidden_projects': hidden_projects})
+    else:
+        projects = Project.objects.shown().order_by("-submission_date")
+        return render(request, "researchhub/list_projects.html",
+                      {'projects': projects})
+
+@login_required
+@csrf.csrf_exempt
+@decorators.ajax_only
+@decorators.post_only
+def control_projects(request):
+    if not utils.is_researchhub_coordinator_or_member(request.user) and\
+       not request.user.is_superuser:
+        raise Exception('Permission denied!')
+    pk = request.POST.get('pk')
+    action = request.POST.get('action')
+
+    if not pk or not action:
+        raise Exception('Incomplete request!')
+
+    project = Project.objects.get(pk=pk)
+
+    if action == 'hide':
+        if project.is_hidden:
+            raise Exception(u'Project is already hidden!')
+        else:
+            project.is_hidden = True
+    elif action == 'show':
+        if not project.is_hidden:
+            raise Exception(u'Project is already shown!')
+        else:
+            project.is_hidden = False
+
+    project.save()
+    
+@decorators.ajax_only
+@login_required
+def add_project(request):
+    if utils.is_researchhub_coordinator_or_member(request.user) or \
+       request.user.is_superuser:
+        Form = MemberProjectForm
+    else:
+        Form = ProjectForm
+    if request.method == 'POST':
+        current_year = StudentClubYear.objects.get_current()
+        instance = Project(submitter=request.user, year=current_year)
+        form = Form(request.POST, instance=instance)
+        if form.is_valid():
+            project = form.save()
+            show_project_url = reverse('researchhub:show_project', args=(project.pk,))
+            full_url = request.build_absolute_uri(show_project_url)
+            return {"message": "success", "show_url": full_url}
+    elif request.method == 'GET':
+        form = Form()
+
+    context = {'form': form}
+    return render(request, 'researchhub/edit_project_form.html', context)
+
+def show_project(request, pk):
+    project = get_object_or_404(Project, pk=pk, is_deleted=False)
+    return render(request, "researchhub/show_project.html",
+                  {'project': project})
+
+@decorators.ajax_only
+@login_required
+def edit_project(request, pk):
+    if utils.is_researchhub_coordinator_or_member(request.user) or \
+       request.user.is_superuser:
+        Form = MemberProjectForm
+    else:
+        Form = ProjectForm
+
+    project = get_object_or_404(Project, pk=pk, is_deleted=False)
+    if not utils.can_edit_project(request.user, project):
+        raise Exception("You cannot edit the project.")
+
+    context = {'project': project}
+    if request.method == 'POST':
+        form = Form(request.POST, instance=project)
+        if form.is_valid():
+            project = form.save()
+            show_project_url = reverse('researchhub:show_project', args=(project.pk,))
+            full_url = request.build_absolute_uri(show_project_url)
+            return {"message": "success", "show_url": full_url}
+    elif request.method == 'GET':
+        form = Form(instance=project)
+
+    context['form'] = form
+    return render(request, 'researchhub/edit_project_form.html', context)
+
+@login_required
+@decorators.ajax_only
+@decorators.post_only
+@csrf.csrf_exempt
+def delete_project(request, pk):
+    project = get_object_or_404(Project, pk=pk, is_deleted=False)
+    if not utils.can_edit_project(request.user, project):
+        raise Exception("You cannot delete the project.")
+
+    project.is_deleted = True
+    project.save()
+    list_projects_url = reverse('researchhub:list_projects')
+    full_url = request.build_absolute_uri(list_projects_url)
+    return {"message": "success", "list_url": full_url}
+
+def list_supervisors(request):
+    if utils.is_researchhub_coordinator_or_member(request.user) or\
+       request.user.is_superuser:
+        available_supervisors = Supervisor.objects.available().order_by("-submission_date")
+        unavailable_supervisors = Supervisor.objects.unavailable().order_by("-submission_date")
+        return render(request, "researchhub/list_supervisors_privileged.html",
+                      {'available_supervisors': available_supervisors,
+                       'unavailable_supervisors': unavailable_supervisors})
+    else:
+        supervisors = Supervisor.objects.available().order_by("-submission_date")
+        return render(request, "researchhub/list_supervisors.html",
+                      {'supervisors': supervisors})
+
+@login_required
+@csrf.csrf_exempt
+@decorators.ajax_only
+@decorators.post_only
+def control_supervisors(request):
+    if not utils.is_researchhub_coordinator_or_member(request.user) and\
+       not request.user.is_superuser:
+        raise Exception('Permission denied!')
+    pk = request.POST.get('pk')
+    action = request.POST.get('action')
+
+    if not pk or not action:
+        raise Exception('Incomplete request!')
+
+    supervisor = Supervisor.objects.get(pk=pk)
+
+    if action == 'hide':
+        if supervisor.is_hidden:
+            raise Exception(u'Supervisor is already hidden!')
+        else:
+            supervisor.is_hidden = True
+    elif action == 'show':
+        if not supervisor.is_hidden:
+            raise Exception(u'Supervisor is already shown!')
+        else:
+            supervisor.is_hidden = False
+
+    supervisor.save()
+
+def signup_supervisor(request):
+    pass
+
+@login_required
+@decorators.ajax_only
+def add_supervisor(request):
+    if not utils.is_researchhub_coordinator_or_member(request.user) and\
+       not request.user.is_superuser:
+        raise PermissionDenied
+
+    if request.method == 'POST':
+        current_year = StudentClubYear.objects.get_current()
+        instance = Supervisor(year=current_year)
+        form = SupervisorForm(request.POST, request.FILES, instance=instance)
+        if form.is_valid():
+            supervisor = form.save()
+            show_supervisor_url = reverse('researchhub:show_supervisor', args=(supervisor.pk,))
+            full_url = request.build_absolute_uri(show_supervisor_url)
+            return {"message": "success", "show_url": full_url}
+    elif request.method == 'GET':
+        form = SupervisorForm()
+
+    context = {'form': form}
+    return render(request, 'researchhub/edit_supervisor_form.html', context)
+
+def show_supervisor(request, pk):
+    supervisor = get_object_or_404(Supervisor, pk=pk, is_deleted=False)
+    return render(request, "researchhub/show_supervisor.html",
+                  {'supervisor': supervisor})
+
+@login_required
+@decorators.ajax_only
+@decorators.post_only
+@csrf.csrf_exempt
+def rate_supervisor(request, pk):
+    supervisor = get_object_or_404(Supervisor, pk=pk, is_deleted=False)
+
+@login_required
+@decorators.ajax_only
+def edit_supervisor(request, pk):
+    supervisor = get_object_or_404(Supervisor, pk=pk, is_deleted=False)
+    if not utils.can_edit_supervisor(request.user, supervisor):
+        raise Exception("You cannot edit the supervisor.")
+
+    context = {'supervisor': supervisor}
+    if request.method == 'POST':
+        form = SupervisorForm(request.POST, instance=supervisor)
+        if form.is_valid():
+            supervisor = form.save()
+            show_supervisor_url = reverse('researchhub:show_supervisor', args=(supervisor.pk,))
+            full_url = request.build_absolute_uri(show_supervisor_url)
+            return {"message": "success", "show_url": full_url}
+    elif request.method == 'GET':
+        form = SupervisorForm(instance=supervisor)
+
+    context['form'] = form
+    return render(request, 'researchhub/edit_supervisor_form.html', context)
+
+@login_required
+@decorators.ajax_only
+@decorators.post_only
+@csrf.csrf_exempt
+def delete_supervisor(request, pk):
+    supervisor = get_object_or_404(Supervisor, pk=pk, is_deleted=False)
+    if not utils.can_edit_supervisor(request.user, supervisor):
+        raise Exception("You cannot delete the supervisor.")
+
+    supervisor.is_deleted = True
+    supervisor.save()
+    list_supervisors_url = reverse('researchhub:list_supervisors')
+    full_url = request.build_absolute_uri(list_supervisors_url)
+    return {"message": "success", "list_url": full_url}
+
+def list_skills(request):
+    available_skills = SkilledStudent.objects.available().order_by("-submission_date")
+    return render(request, "researchhub/list_skills.html",
+                  {'available_skills': available_skills})
+
+@login_required
+@decorators.ajax_only
+def add_skill(request):
+    if request.method == 'POST':
+        current_year = StudentClubYear.objects.get_current()
+        instance = SkilledStudent(user=request.user,
+                         year=current_year)
+        form = SkilledStudentForm(request.POST, instance=instance)
+        if form.is_valid():
+            skill = form.save()
+            show_skill_url = reverse('researchhub:show_skill', args=(skill.pk,))
+            full_url = request.build_absolute_uri(show_skill_url)
+            return {"message": "success", "show_url": full_url}
+    elif request.method == 'GET':
+        form = SkilledStudentForm()
+
+    context = {'form': form}
+    return render(request, 'researchhub/edit_skill_form.html', context)
+
+def show_skill(request, pk):
+    skill = get_object_or_404(SkilledStudent, pk=pk, is_deleted=False)
+    return render(request, "researchhub/show_skill.html",
+                  {'skill': skill})
+
+@decorators.ajax_only
+@login_required
+def edit_skill(request, pk):
+    skill = get_object_or_404(SkilledStudent, pk=pk, is_deleted=False)
+    if not utils.can_edit_skill(request.user, skill):
+        raise Exception("You cannot edit the skill.")
+
+    context = {'skill': skill}
+    if request.method == 'POST':
+        form = SkilledStudentForm(request.POST, instance=skill)
+        if form.is_valid():
+            skill = form.save()
+            show_skill_url = reverse('researchhub:show_skill', args=(skill.pk,))
+            full_url = request.build_absolute_uri(show_skill_url)
+            return {"message": "success", "show_url": full_url}
+    elif request.method == 'GET':
+        form = SkilledStudentForm(instance=skill)
+
+    context['form'] = form
+    return render(request, 'researchhub/edit_skill_form.html', context)
+
+@login_required
+@decorators.ajax_only
+@decorators.post_only
+@csrf.csrf_exempt
+def delete_skill(request, pk):
+    skill = get_object_or_404(SkilledStudent, pk=pk, is_deleted=False)
+    if not utils.can_edit_skill(request.user, skill):
+        raise Exception("You cannot delete the skill.")
+
+    skill.is_deleted = True
+    skill.save()
+    list_skills_url = reverse('researchhub:list_skills')
+    full_url = request.build_absolute_uri(list_skills_url)
+    return {"message": "success", "list_url": full_url}

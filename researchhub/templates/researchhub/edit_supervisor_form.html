@@ -1,0 +1,53 @@
+{% load bootstrap3 %}
+<form enctype="multipart/form-data" id="edit-supervisor-form" action="post">
+{% csrf_token %}
+{% bootstrap_form form %}
+</form>
+<script type="text/javascript">
+$(function () {
+
+    // modify form submission behaviour to be ajaxy
+    $("form#edit-supervisor-form").submit(function (event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var formData = new FormData($(this)[0]); 
+        {% if supervisor %}{# if a supervisor is passed, then post to edit_supervisor url, otherwise to add_supervisor #}
+        var url = "{% url 'researchhub:edit_supervisor' supervisor.pk %}";
+        {% else %}
+        var url = "{% url 'researchhub:add_supervisor' %}";
+        {% endif %}
+
+        /* Send the data */
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (data) {
+                if (data.message == "success") {
+
+                    // show success message (using toastr)
+                    toastr.options.positionClass = "toast-top-left";
+                    {% if supervisor %}
+                    toastr.success("The supervisor has been successfully edited");
+                    {% else %}
+                    toastr.success("The supervisor has been successfully added.");
+                    {% endif %}
+
+                    // hide modal
+                    $("#edit-supervisor-modal").modal('hide');
+                     window.location.href= data.show_url;
+                } else {
+                    $("#edit-supervisor-modal .modal-body").html(data);
+                }}
+        });
+
+    });
+});
+</script>

@@ -1,0 +1,132 @@
+{% extends "researchhub_base.html" %}{% load staticfiles %}{% load researchhub_tags %}{% load l10n %}
+{% block title %}ResearchHub Projects{% endblock %}
+{% block content %}
+<div class="english-field">
+    <h1 class="english-field">ResearchHub Projects</h1>
+    <p>Below you is the list of our projects that need help.</p>
+    <div class="row" style="margin-left: 0; margin-bottom: 5px;">
+        <div style="float: right;">
+            <a id="add-project" class="btn btn-icon btn-success">
+                <i class="entypo-plus"></i>
+               Add project
+            </a>
+        </div>
+    </div>
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a data-toggle="collapse" href="#collapse-available" data-target="#collapse-available" class="english-field collapsed">
+                Shown projects
+            </a>
+        </h4>
+    </div>
+    <div id="collapse-available" class="panel-collapse collapse in">
+        <div class="panel-body"><div class="row">
+            <table class="display datatable dt-responsive">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Field</th>
+                        <th class="not-mobile">Supervisor</th>
+                        <td class="not-mobile">Date added</td>
+                        <td>Action</td>
+                    </tr>
+                </thead>
+                 <tbody>
+                    {% for project in shown_projects %}
+                    <tr>
+                        <td><a href="{% url 'researchhub:show_project' project.pk %}">{{ project.title }}</a></td>
+                        <td>{{ project.field }}</td>
+                        <td>{{ project.supervisor }}</td>
+                        <td data-order="{{ project.submission_date|date:"U" }}">{{ project.submission_date|date:"Y-n-j" }}</td>
+                        <td>
+                            {% if project.is_hidden %}
+                                <button class="btn btn-success btn-xs btn-project" data-pk="{{ project.pk }}" data-action="show">Show</button>
+                            {% else %}
+                                <button class="btn btn-danger btn-xs btn-project" data-pk="{{ project.pk }}" data-action="hide">Hide</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+</div>
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a data-toggle="collapse" href="#collapse-unavailable" data-target="#collapse-unavailable" class="english-field collapsed">
+                Hidden projects
+            </a>
+        </h4>
+    </div>
+    <div id="collapse-unavailable" class="panel-collapse collapse in">
+        <div class="panel-body"><div class="row">
+            <table class="display datatable dt-responsive">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Field</th>
+                        <th class="not-mobile">Supervisor</th>
+                        <td class="not-mobile">Date added</td>
+                        <td>Action</td>
+                    </tr>
+                </thead>
+                 <tbody>
+                    {% for project in hidden_projects %}
+                    <tr>
+                        <td><a href="{% url 'researchhub:show_project' project.pk %}">{{ project.title }}</a></td>
+                        <td>{{ project.field }}</td>
+                        <td>{{ project.supervisor }}</td>
+                        <td data-order="{{ project.submission_date|date:"U" }}">{{ project.submission_date|date:"Y-n-j" }}</td>
+                        <td>
+                            {% if project.is_hidden %}
+                                <button class="btn btn-success btn-xs btn-project" data-pk="{{ project.pk }}" data-action="show">Show</button>
+                            {% else %}
+                                <button class="btn btn-danger btn-xs btn-project" data-pk="{{ project.pk }}" data-action="hide">Hide</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+</div>
+
+</div>
+
+{% endblock %}
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        $(".datatable").DataTable({
+            "order": [[ 3, "desc" ]],
+        });
+        $('.btn-project').click(function(){
+            var btn = this;
+            var data = {'pk': $(this).data('pk'), 'action': $(this).data('action')};
+            $.ajax({
+                type: 'POST',
+                data: data,
+                dataType: 'json',
+                url: '{% url 'researchhub:control_projects' %}',
+                cache: false,
+                success: function(data){
+                    if (data['success'] == true){
+                        $(btn).html('Done!');
+                        $(btn).attr('disabled','disabled');
+                    } else {
+                        alert(data['message']);
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% include "researchhub/partials/add_project_asset.html" %}
+{% endblock %}

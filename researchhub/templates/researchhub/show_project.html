@@ -1,0 +1,96 @@
+{% extends 'researchhub_base.html' %}{% load researchhub_tags %}{% load staticfiles %}{% load l10n %}
+{% block title %}{{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="english-field">
+    <h1>{{ project.title }}</h1>
+
+    <div class="row" style="margin-left: 0; margin-bottom: 5px;">
+        <div style="float: right;">
+    {% if user|can_edit_project:project %}
+            <button id="edit-project" class="btn btn-sm btn-icon btn-success">
+                <i class="entypo-pencil"></i>
+                Edit
+            </button>
+        </div>
+    </div>
+    {% endif %}
+    <div class="row">
+        {% if project.is_available %}
+        <p class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i> This project is no longer available.</p>
+        {% endif %}
+        <div class="col-sm-8">
+            <table class="table">
+                <colgroup>
+                    <col class="col-xs-2">
+                    <col class="col-xs-6">
+                </colgroup>
+                <tr>
+                    <th>Supervisor</th>
+                    <td>{{ project.supervisor }}</td>
+                </tr>
+                <tr>
+                    <th>Description</th>
+                    <td>{{ project.description|linebreaksbr }}</td>
+                </tr>
+                <tr>
+                    <th>Required role</th>
+                    <td>{{ project.required_role|linebreaksbr }}</td>
+                </tr>{% if project.prerequisites %}
+                <tr>
+                    <th>Prerequisites</th>
+                    <td>{{ project.prerequisites|linebreaksbr }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th>Duration</th>
+                    <td>{{ project.duration }}</td>
+                </tr>
+                <tr>
+                    <th>Communication</th>
+                    <td>{{ project.communication }}</td>
+                </tr>
+                <tr>
+                    <th>Date added</th>
+                    <td>{{ project.submission_date|date:"Y-n-j" }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<script type="text/javascript">
+$(function(){
+    $('#edit-project-modal').modal({
+      keyboard: false,
+      backdrop: 'static',
+      show    : false,
+    });
+    $("button#edit-project").click(function () {
+        $("#edit-project-modal").modal('show');
+
+        $("#edit-project-modal .modal-title").html("Edit {{ project.title }}");
+        $("#edit-project-modal .modal-body").load("{% url 'researchhub:edit_project' project.pk %}");
+
+        var $submitButton = $("#edit-project-modal button.submit-button");
+        $submitButton.off('click');
+        $submitButton.click(function () {
+            $("form#edit-project-form").submit();
+        });
+    });
+});
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+<style>
+p{
+    font-size: 17px;
+}
+</style>
+{% with modal_id='edit-project-modal' %}
+    {% include "researchhub/partials/common_edit_modal.html" %}
+{% endwith %}
+
+{% endblock %}
+

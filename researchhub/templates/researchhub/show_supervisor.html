@@ -1,0 +1,105 @@
+{% extends 'researchhub_base.html' %}{% load researchhub_tags %}{% load staticfiles %}{% load l10n %}
+{% block title %}{{ supervisor.user.common_profile.get_en_full_name }}{% endblock %}
+
+{% block content %}
+<div class="english-field">
+    <h1>{{ supervisor.user.common_profile.get_en_full_name }}</h1>
+    {% if user|can_edit_supervisor:supervisor %}
+    <div class="row" style="margin-left: 0; margin-bottom: 5px;">
+        <div style="float: right;">
+            <button id="edit-supervisor" class="btn btn-icon btn-success">
+                <i class="entypo-pencil"></i>
+                Edit
+            </button>
+        </div>
+    </div>
+    {% endif %}
+    <div class="row">
+        {% if supervisor.avatar %}
+        <div class="col-sm-4">
+            <div style="text-align: center; border-left: solid 1px #eee;">
+                <div class="book-image" style="background-image:url('{{ supervisor.avatar.url }}');"></div>
+            </div>
+        </div>
+        {% endif %}
+        <div class="col-sm-8">
+            <table class="table-hover table">
+                <colgroup>
+                    <col class="col-xs-2">
+                    <col class="col-xs-6">
+                </colgroup>
+                <tr>
+                    <th>Specialty</th>
+                    <td>{{ supervisor.specialty }}</td>
+                </tr>
+                <tr>
+                    <th>Position</th>
+                    <td>{{ supervisor.position }}</td>
+                </tr>
+                <tr>
+                    <th>Interests</th>
+                    <td>{{ supervisor.interests|linebreaksbr }}</td>
+                </tr>
+                <tr>
+                    <th>Communication</th>
+                    <td>{{ supervisor.communication|linebreaksbr }}</td>
+                </tr>
+                {% if supervisor.available_from %}
+                <tr>
+                    <th>Available until</th>
+                    <td>{{ supervisor.available_from|date:"Y-n-j" }}</td>
+                </tr>
+                {% endif %}
+                {% if supervisor.available_until %}
+                <tr>
+                    <th>Available until</th>
+                    <td>{{ supervisor.available_until|date:"Y-n-j" }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th>Date added</th>
+                    <td>{{ supervisor.submission_date|date:"Y-n-j" }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<script type="text/javascript">
+$(function(){
+    $('#edit-supervisor-modal').modal({
+      keyboard: false,
+      backdrop: 'static',
+      show    : false,
+    });
+    $("button#edit-supervisor").click(function () {
+        $("#edit-supervisor-modal").modal('show');
+
+        $("#edit-supervisor-modal .modal-title").html("Edit {{ supervisor.user.common_profile.get_en_full_name }}");
+        $("#edit-supervisor-modal .modal-body").load("{% url 'researchhub:edit_supervisor' supervisor.pk %}", function(){
+            $("#id_available_from").attr('data-start-view', '1').datepicker({minDate: 1});
+            $("#id_available_until").attr('data-start-view', '1').datepicker({minDate: 1});
+        });
+
+        var $submitButton = $("#edit-supervisor-modal button.submit-button");
+        $submitButton.off('click');
+        $submitButton.click(function () {
+            $("form#edit-supervisor-form").submit();
+        });
+    });
+});
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+<style>
+p{
+    font-size: 17px;
+}
+</style>
+{% with modal_id='edit-supervisor-modal' %}
+    {% include "researchhub/partials/common_edit_modal.html" %}
+{% endwith %}
+
+{% endblock %}
+

@@ -1,0 +1,51 @@
+{% extends "researchhub_base.html" %}{% load staticfiles %}{% load researchhub_tags %}
+{% block title %}ResearchHub Skilled Students{% endblock %}
+{% block content %}
+<div class="english-field">
+    <h1 class="english-field">ResearchHub Skilled Students</h1>
+
+    <p>Below you is the list of our super-helpful supervisors who are willing to oversee student-initiated projects</p>
+    {% if not user|has_current_skill_profile %}
+    <div class="row" style="margin-left: 0; margin-bottom: 5px;">
+        <div style="float: right;">
+            <a id="add-skill" class="btn btn-icon btn-success">
+                <i class="entypo-plus"></i>
+               Add yourself!
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    <table class="display datatable dt-responsive">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Skill description</th>
+                <td class="not-mobile">Date added</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for skill in skills %}
+            <tr>
+                <td><a href="{% url 'researchhub:show_skill' skill.pk %}">{{ skill.user.common_profile.get_en_full_name }}</a></td>
+                <td>{{ skill.description|truncatechars:100 }}</td>
+                <td data-order="{{ project.submission_date|date:"U" }}"><a href="{% url 'researchhub:show_project' project.pk %}">{{ project.submission_date|date:"Y-n-j" }}</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        $(".datatable").DataTable({
+            "order": [[ 2, "desc" ]],
+        });
+    });
+</script>
+{% include "researchhub/partials/add_skill_asset.html" %}
+{% endblock %}

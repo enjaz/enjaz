@@ -1,9 +1,9 @@
 {% extends 'researchhub_base.html' %}{% load researchhub_tags %}{% load staticfiles %}{% load l10n %}
-{% block title %}{{ supervisor.user.common_profile.get_en_full_name }}{% endblock %}
+{% block title %}Dr. {{ supervisor.user.common_profile.get_en_full_name }}{% endblock %}
 
 {% block content %}
 <div class="english-field">
-    <h1>{{ supervisor.user.common_profile.get_en_full_name }}</h1>
+    <h1>Dr. {{ supervisor.user.common_profile.get_en_full_name }}</h1>
     {% if user|can_edit_supervisor:supervisor %}
     <div class="row" style="margin-left: 0; margin-bottom: 5px;">
         <div style="float: right;">
@@ -46,7 +46,7 @@
                 </tr>
                 {% if supervisor.available_from %}
                 <tr>
-                    <th>Available until</th>
+                    <th>Available from</th>
                     <td>{{ supervisor.available_from|date:"Y-n-j" }}</td>
                 </tr>
                 {% endif %}

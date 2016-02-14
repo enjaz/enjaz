@@ -4,8 +4,8 @@
 <div class="english-field">
 <div style="margin-top:20px;" class="row">
     <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1">
-        <h1 style="display: inline; font-family: 'Candal', sans-serif; font-size: 55px;" class="researchhub-name english-field">ResearchHub</h1>
-        <p style="font-size: 20px; display: inline;  color: rgb(55, 62, 74);"><span> </span> is a research opportunity initiative for the students of King Saud bin Abdulaziz University for Health Sciences, aiming at connecting students and easing the path towards research.  Read more on "<a href="{% url 'researchhub:how_it_works' %}">How it works</a>".</p>
+        <h1 class="hidden-xs" style="display: inline; font-family: 'Candal', sans-serif; font-size: 55px;" class="researchhub-name english-field">ResearchHub</h1>
+        <p style="font-size: 20px; display: inline;  color: rgb(55, 62, 74);"><strong class="visible-xs">ResearchHub</strong> is a research opportunity initiative for the students of King Saud bin Abdulaziz University for Health Sciences, aiming at connecting students and easing the path towards research.  Read more on "<a href="{% url 'researchhub:how_it_works' %}">How it works</a>".</p>
     </div>
 </div>
 
@@ -19,7 +19,7 @@
         <div class="tile-stats tile-orange">
             <div class="icon"><i class="fa fa-hand-o-right"></i></div>
             <div class="num" data-start="0" data-end="{{ supervisor_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
-            <h3>Supervisors</h3>
+            <h3 class="english-field">Supervisors</h3>
             <p>Supervisors enlisted on Enjaz</p>
         </div>
     </div>
@@ -52,16 +52,16 @@
                         <tr>
                             <th>Name</th>
                             <th>Specialty</th>
-                            <th>Date added</th>
+                            <th class="hidden-xs">Date added</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         {% for supervisor in latest_supervisors %}
                         <tr>
-                            <td><a href="{% url 'researchhub:show_supervisor' supervisor.pk %}">{{ supervisor.user.common_profile.get_en_full_name }}</a></td>
+                            <td><a href="{% url 'researchhub:show_supervisor' supervisor.pk %}">Dr. {{ supervisor.user.common_profile.get_en_full_name }}</a></td>
                             <td>{{ supervisor.specialty }}</td>
-                            <td>{{ supervisor.submission_date|date:"Y-n-j" }}</td>
+                            <td class="hidden-xs">{{ supervisor.submission_date|date:"Y-n-j" }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -81,7 +81,7 @@
             <div class="icon"><i class="fa fa-lightbulb-o"></i></div>
             <div class="num" data-start="0" data-end="{{ project_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
 
-            <h3>Projects</h3>
+            <h3 class="english-field">Projects</h3>
             <p>Projects enlisted on Enjaz.</p>
         </div>
     </div>
@@ -116,7 +116,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Field</th>
-                            <th>Date added</th>
+                            <th class="hidden-xs">Date added</th>
                         </tr>
                     </thead>
 
@@ -125,7 +125,7 @@
                         <tr>
                             <td><a href="{% url 'researchhub:show_project' project.pk %}">{{ project.title }}</a></td>
                             <td>{{ project.field }}</td>
-                            <td>{{ project.submission_date|date:"Y-n-j" }}</td>
+                            <td class="hidden-xs">{{ project.submission_date|date:"Y-n-j" }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -149,7 +149,7 @@
             <div class="icon"><i class="fa fa-magic"></i></div>
             <div class="num" data-start="0" data-end="{{ skill_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
 
-            <h3>Skilled students</h3>
+            <h3 class="english-field">Skilled students</h3>
             <p>Skilled students enlisted on Enjaz.</p>
         </div>
     </div>

@@ -36,9 +36,9 @@
                  <tbody>
                     {% for supervisor in available_supervisors %}
                     <tr>
-                        <td><a href="{% url 'researchhub:show_supervisor' supervisor.pk %}">{{ supervisor.user.common_profile.get_en_full_name }}</a></td>
+                        <td><a href="{% url 'researchhub:show_supervisor' supervisor.pk %}">Dr. {{ supervisor.user.common_profile.get_en_full_name }}</a></td>
                         <td>{{ supervisor.specialty }}</td>
-                        <td>{{ supervisor.interests }}</td>
+                        <td>{{ supervisor.interests|linebreaksbr }}</td>
                         <td data-order="{{ supervisor.submission_date|date:"U" }}">{{ supervisor.submission_date|date:"Y-n-j" }}</td>
                         <td>
                             {% if supervisor.is_hidden %}
@@ -77,9 +77,9 @@
                  <tbody>
                     {% for supervisor in unavailable_supervisors %}
                     <tr>
-                        <td><a href="{% url 'researchhub:show_supervisor' supervisor.pk %}">{{ supervisor.user.common_profile.get_en_full_name }}</a></td>
+                        <td><a href="{% url 'researchhub:show_supervisor' supervisor.pk %}">Dr. {{ supervisor.user.common_profile.get_en_full_name }}</a></td>
                         <td>{{ supervisor.specialty }}</td>
-                        <td>{{ supervisor.interests }}</td>
+                        <td>{{ supervisor.interests|linebreaksbr }}</td>
                         <td data-order="{{ supervisor.submission_date|date:"U" }}">{{ supervisor.submission_date|date:"Y-n-j" }}</td>
                         <td>
                             {% if supervisor.is_hidden %}

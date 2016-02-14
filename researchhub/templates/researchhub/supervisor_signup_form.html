@@ -19,19 +19,19 @@
 						<i class="entypo-user"></i>
 					</div>
 					
-					<input {% if form.en_first_name.value and not form.en_first_name.errors %}value="{{ form.en_first_name.value }}" {% endif %}type="text" class="english-field form-control" name="en_first_name" id="en_first_name" placeholder="First name" data-mask="[A-Za-z']+" data-is-regex="true" required="required"/>
+					<input {% if form.en_first_name.value and not form.en_first_name.errors %}value="{{ form.en_first_name.value }}" {% endif %}type="text" class="english-field form-control" name="en_first_name" id="en_first_name" placeholder="First name" data-mask="[\-\. A-Za-z']+" data-is-regex="true" required="required"/>
 					{% if form.en_first_name.errors %}
 					    {% for error in form.en_first_name.errors %}
 					        <label class='english-field error' for='en_first_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
-					<input {% if form.en_middle_name.value and not form.en_middle_name.errors %}value="{{ form.en_middle_name.value }}" {% endif %}type="text" class="english-field form-control" name="en_middle_name" id="en_middle_name" placeholder="Middle name" data-mask="[A-Za-z']+" data-is-regex="true" required="required"/>
+					<input {% if form.en_middle_name.value and not form.en_middle_name.errors %}value="{{ form.en_middle_name.value }}" {% endif %}type="text" class="english-field form-control" name="en_middle_name" id="en_middle_name" placeholder="Middle name" data-mask="[\-\. A-Za-z']+" data-is-regex="true" required="required"/>
 					{% if form.en_middle_name.errors %}
 					    {% for error in form.en_middle_name.errors %}
 					        <label class='english-field error' for='en_middle_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
-					<input {% if form.en_last_name.value and not form.en_last_name.errors %}value="{{ form.en_last_name.value }}" {% endif %}type="text" class="english-field form-control" name="en_last_name" id="en_last_name" placeholder="Last name" data-mask="[A-Za-z']+" data-is-regex="true" required="required"/>
+					<input {% if form.en_last_name.value and not form.en_last_name.errors %}value="{{ form.en_last_name.value }}" {% endif %}type="text" class="english-field form-control" name="en_last_name" id="en_last_name" placeholder="Last name" data-mask="[\-\. A-Za-z']+" data-is-regex="true" required="required"/>
 					{% if form.en_last_name.errors %}
 					    {% for error in form.en_last_name.errors %}
 					        <label class='english-field error' for='en_last_name' style='display: inline-block'>{{ error|escape }}</label>
@@ -215,6 +215,7 @@
             if (this.checked){
                 $("#available-from-group").hide();
                 $("#available_from").removeAttr("required")
+                $("#available_from").val("");
             } else {
                 $("#available-from-group").show();
                 $("#available_from").attr('required', 'required')

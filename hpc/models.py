@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 
 from clubs.models import College
-from hpc.managers import RegistrationQuerySet
+from hpc.managers import RegistrationQuerySet, SessionQuerySet
 
 user_gender_choices = (
     ('F', u'طالبة'),
@@ -99,13 +99,26 @@ class Session(models.Model):
     time_slot = models.PositiveSmallIntegerField(null=True, blank=True,
                                                  default=None)
     vma_id = models.PositiveSmallIntegerField()
+    vma_time_code = models.PositiveSmallIntegerField(null=True,
+                                                     blank=True,
+                                                     default=None)
     code_name = models.CharField(max_length=50, default="",
                                  blank=True,
                                  verbose_name=u"الاسم البرمجي",
                                  help_text=u"حروف لاتينية صغيرة وأرقام")
     gender = models.CharField(max_length=1, blank=True,
                               default='', choices=session_gender_choices)
+    location = models.CharField(blank=True, default="",
+                                max_length=200,
+                                verbose_name=u"المكان")
+    date = models.DateField(u"التاريخ", null=True)
+    start_time = models.TimeField(u"وقت البداية", null=True, blank=True, default=None)
+    end_time = models.TimeField(u"وقت النهاية", null=True, blank=True, default=None)
     date_submitted = models.DateTimeField(auto_now_add=True)
+    for_onsite_registration = models.BooleanField(default=False,
+                                                  verbose_name=u"متاح التسجيل في يوم الحدث؟")
+
+    objects = SessionQuerySet.as_manager()
 
     def __unicode__(self):
         if self.gender:
@@ -114,18 +127,21 @@ class Session(models.Model):
             return self.name
 
 class NonUser(models.Model):
-    ar_first_name = models.CharField(max_length=30,
+    ar_first_name = models.CharField(max_length=30, default="",
+                                     blank=True,
                                      verbose_name=u'الاسم الأول')
-    ar_middle_name = models.CharField(max_length=30,
+    ar_middle_name = models.CharField(max_length=30, default="",
+                                      blank=True,
                                       verbose_name=u'الاسم الأوسط')
-    ar_last_name = models.CharField(max_length=30,
+    ar_last_name = models.CharField(max_length=30, default="",
+                                    blank=True,
                                     verbose_name=u'الاسم الأخير')
     en_first_name = models.CharField(max_length=30,
-                                     verbose_name=u'الاسم الأول')
+                                     verbose_name='First name')
     en_middle_name = models.CharField(max_length=30,
-                                      verbose_name=u'الاسم الأوسط')
+                                      verbose_name='Middle name')
     en_last_name = models.CharField(max_length=30,
-                                    verbose_name=u'الاسم الأخير')
+                                    verbose_name='Last name')
     gender = models.CharField(max_length=1, verbose_name=u'الجنس',
                               default='', choices=user_gender_choices)
     email = models.EmailField(verbose_name=u'البريد الإلكتروني')
@@ -164,7 +180,7 @@ class NonUser(models.Model):
         return en_fullname
 
     def __unicode__(self):
-        return self.get_ar_full_name()
+        return self.get_en_full_name()
 
 class Registration(models.Model):
     user = models.OneToOneField(User, null=True, blank=True,
@@ -172,9 +188,19 @@ class Registration(models.Model):
     nonuser = models.OneToOneField(NonUser, null=True, blank=True,
                                     related_name='hpc2016_registration')
     sessions  = models.ManyToManyField(Session, blank=True)
+    moved_sessions = models.ManyToManyField(Session, blank=True,
+                                            related_name="moved_registrations")
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
+    confirmation_sent = models.BooleanField(default=False,
+                                            verbose_name=u"أرسلت رسالة التأكيد؟")
+    reminder_sent = models.BooleanField(default=False,
+                                            verbose_name=u"أرسلت رسالة التذكير؟")
+    certificate_sent = models.BooleanField(default=False,
+                                            verbose_name=u"أرسلت الشهادة؟")
+    was_moved_to_vma = models.BooleanField(default=False,
+                                           verbose_name=u"نقل إلى الأكاديمية؟")
 
     objects = RegistrationQuerySet.as_manager()
 
@@ -208,10 +234,43 @@ class Registration(models.Model):
             pass
         return self.nonuser.email
 
-    def __unicode__(self):
+    def get_phone(self):
+        try:
+            if self.user:
+                return self.user.common_profile.mobile_number
+        except ObjectDoesNotExist:
+            pass
+        try:
+            return self.nonuser.mobile_number
+        except AttributeError:
+            return ''
+    def get_ar_first_name(self):
         if self.user:
-            return self.user.common_profile.get_ar_full_name()
+            try:
+                return self.user.common_profile.ar_first_name
+            except ObjectDoesNotExist:
+                return self.user.username
+        elif self.nonuser:
+            return self.nonuser.ar_first_name
+
+        
+    def get_ar_full_name(self):
+        if self.user:
+            try:
+                return self.user.common_profile.get_ar_full_name()
+            except ObjectDoesNotExist:
+                return self.user.username
         elif self.nonuser:
             return self.nonuser.get_ar_full_name()
-        else:
-            self.pk
+
+    def get_en_full_name(self):
+        if self.user:
+            try:
+                return self.user.common_profile.get_en_full_name()
+            except ObjectDoesNotExist:
+                return self.user.username
+        elif self.nonuser:
+            return self.nonuser.get_en_full_name()
+
+    def __unicode__(self):
+        return self.get_en_full_name()

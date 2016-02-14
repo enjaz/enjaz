@@ -29,13 +29,16 @@ you?
 	<link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/entypo/css/entypo.css' %}">
     <link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/font-awesome/css/font-awesome.min.css' %}">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:400,700,400italic">
-	<link rel="stylesheet" href="{% static 'neon/assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/bootstrap.min.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-core.min.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-theme.min.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-forms.min.css' %}">
+    {% block rtlcss %}
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.min.css' %}">
+    {% endblock %}
 	<link rel="stylesheet" href="{% static 'neon/assets/css/skins/green.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
+    {% block customstyles %}{% endblock %}
 
 	<script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
 	<script src="{% static 'neon/assets/js/custom.js' %}"></script>
@@ -91,6 +94,63 @@ you?
 		<ul id="main-menu" class="">
 			<!-- add class "multiple-expanded" to allow multiple submenus to open -->
 			<!-- class "auto-inherit-active-class" will automatically add "active" class for parent elements who are marked already with class "active" -->
+            {% if user.is_authenticated %}
+			<li>
+                <a>
+                    <i class="entypo-user"></i>
+                    <span>حسابي</span>
+                </a>
+                <ul>
+                    {% if user.common_profile.is_student or user.is_superuser %}
+                    <li>
+                        <a href="{% url 'bulb:my_books' %}">
+                            <i class="fa fa-book"></i>
+                            <span>كتبي على سِراج</span>
+                        </a>
+                    </li>
+                    {% if user.guide_requests.current_year.exists %}
+                    <li>
+                        <a href="{% url 'studentguide:list_my_requests' %}">
+                            <i class="glyphicon glyphicon-star"></i>
+                            طلباتي للإرشاد
+                        </a>
+                    </li>
+                    {% elif user|has_guide_profile %}
+                    <li {% if user|has_pending_requests %}class="action-required"{% endif %}>
+                        <a href="{% url 'studentguide:requests_to_me' %}">
+                            <i class="glyphicon glyphicon-star"></i>
+                            طلبات إرشاد موجّهة إلي
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{% url 'niqati:student_report' %}">
+                            <i class="fa fa-tag"></i>
+                            تقرير نقاطي
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'edit_common_profile' %}">
+                            <i class="entypo-cw"></i>
+                            <span>حدّث معلوماتي</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{% url 'userena_password_change' user.username %}">
+                            <i class="entypo-pencil"></i>
+                            <span>غيّر كلمة السر</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'userena_signout' %}">
+                            <i class="entypo-export"></i>
+                            <span>اخرج</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            {% endif %}
             {% if user.is_superuser or user|is_organizing_committee_member or user|is_research_committee_member %}
             <li>
 				<a>
@@ -138,19 +198,27 @@ you?
 			</li>
             {# Limit the access to students from Riyadh #}
             {% if user.common_profile.college.city == 'R' or user.is_superuser %}
-			<li {% if not user.guide_profiles.exists and not user.guide_requests.exists or user|is_studentguide_coordinator_or_deputy or user.is_superuser%}class="highlighted-section"{% endif %}>
+			<li>
+				<a href="{% url 'bulb:index' %}">
+					<i class="fa fa-fire"></i>
+					<span>سِراج</span>
+				</a>
+			</li>
+			<li>
 				<a href="{% url 'studentguide:index' %}">
 					<i class="entypo-graduation-cap"></i>
 					<span>الإرشاد الطلابي</span>
 				</a>
 			</li>
-			<li>
-				<a href="{% url 'bulb:index' %}">
-					<i class="fa fa-fire"></i>
-					<span>سراج</span>
+            {% endif %}
+            {% endif %}
+            {% if user.common_profile.city == 'R' or user.is_superuser %}
+			<li class="highlighted-section">
+				<a href="{% url 'researchhub:index' %}">
+					<i class="fa fa-search"></i>
+					<span class="english-field">ResearchHub</span>
 				</a>
 			</li>
-            {% endif %}
             {% endif %}
 			<li>
 				<a href="{% url 'media:index' %}">
@@ -197,20 +265,6 @@ you?
                     {% endcomment %}
                 </ul>
 			</li>
-            {% if user.is_authenticated %}
-			<li>
-				<a href="{% url 'userena_password_change' user.username %}">
-					<i class="entypo-pencil"></i>
-					<span>غيّر كلمة السر</span>
-				</a>
-			</li>
-			<li>
-				<a href="{% url 'userena_signout' %}">
-					<i class="entypo-export"></i>
-					<span>اخرج</span>
-				</a>
-			</li>
-            {% endif %}
             {% comment %}
 			<li>
 				<a href="{% url 'studentvoice:home' %}">

@@ -33,7 +33,7 @@ class CommonProfile(models.Model):
     en_last_name = models.CharField(max_length=30,
                                     verbose_name=u'الاسم الأخير')
     badge_number = models.IntegerField(null=True,
-                                       verbose_name=u'رقم البطاقة')
+                                       verbose_name=u'رقم البطاقة الجامعية')
     mobile_number = models.CharField(max_length=20,
                                      verbose_name=u'رقم الجوال')
     city = models.CharField(max_length=1, choices=city_choices,
@@ -47,10 +47,9 @@ class CommonProfile(models.Model):
                                 on_delete=models.SET_NULL,
                                 verbose_name=u'الكلية')
     # Fields specific for non-students.
-    job_description = models.CharField(max_length=50,
-                                       blank=True,
-                                       verbose_name=u"المسمى الوظيفي")
-    
+    job_description = models.TextField(u"المسمى الوظيفي", blank=True)
+    modification_date = models.DateTimeField(auto_now=True, null=True)
+
     def get_ar_full_name(self):
         ar_fullname = None
         try:

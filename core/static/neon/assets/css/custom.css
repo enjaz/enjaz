@@ -578,7 +578,7 @@ ul.studentguide-intro{
     padding: 5px;
 }
 
-.bulb-option, .studentguide-option{
+.bulb-option, .studentguide-option, .researchhub-option{
     border: 1px solid #ebebeb;
     position: relative;
     display: block;
@@ -587,6 +587,10 @@ ul.studentguide-intro{
     overflow: hidden;
     border-radius: 25px;
     width: 100%;
+}
+.researchhub-option{
+    margin: -10px 10px 10px 10px;
+    padding: 15px;
 }
 
 .studentguide-option.guide{
@@ -598,9 +602,10 @@ ul.studentguide-intro{
 */
 }
 
-.studentguide-option.new-student{
+.studentguide-option.new-student, .researchhub-option.new-project, .end-introduction{
     background-color: #F1EF91;
     border-color: #F1EF91;
+    color: black;
 }
 
 .bulb-option p, .studentguide-option p{
@@ -616,7 +621,7 @@ ul.studentguide-intro{
     color:  #05271E;
 }
 
-.studentguide-option.new-student p, .studentguide-option.new-student .icon, .studentguide-option.new-student h3{
+.studentguide-option.new-student p, .studentguide-option.new-student .icon, .studentguide-option.new-student h3, .researchhub-option.new-project p, .researchhub-option.new-project .icon, .researchhub-option.new-project h3{
     color: black;
 }
 
@@ -632,10 +637,23 @@ ul.studentguide-intro{
     color: #5B5A5C;
 }
 
-.mentor-section-header{
+.mentor-section-header, .researchhub-section-header{
     font-size: 3em;
     text-align: center;
     margin-bottom: 40px;
+}
+
+.researchhub-section-header{
+    font-size: 2.5em;
+}
+
+.researchhub-section-header i{
+    font-size: 1.5em;
+}
+
+
+.mentor-section-header i{
+    font-size: 1.8em;
 }
 
 .mentor-section-intro{
@@ -644,6 +662,7 @@ ul.studentguide-intro{
     border-bottom: none;
     border-top: none;
 }
+
 
 .feature-list p{
     color: #5B5A5B;
@@ -664,14 +683,14 @@ ul.studentguide-intro{
 
 */
 
-.bulb-option h3, .bulb-option p, .studentguide-option h3, .studentguide-option p{
+.bulb-option h3, .bulb-option p, .studentguide-option h3, .studentguide-option p, .researchhub-option h3, .researchhub-option p{
     margin-top: 5px;
     position: relative;
     z-index: 5;
     padding: 0;
 }
 
-.bulb-option .icon, .studentguide-option .icon{
+.bulb-option .icon, .studentguide-option .icon, .researchhub-option .icon{
     font-size: 30px;
     left: 5px;
     right: auto;   
@@ -680,9 +699,18 @@ ul.studentguide-intro{
     z-index: 1;
 }
 
-.bulb-option h3, .studentguide-option h3{
+.researchhub-option .icon{
+    left: auto;
+    right: 5px;
+}
+
+.bulb-option h3, .studentguide-option h3, .researchhub-option h3{
     font-size: 30px;
     text-align: center;
+}
+
+.researchhub-option h3{
+    margin-right: 15px;
 }
 
 .bulb-option .icon, .bulb-option h3{
@@ -768,4 +796,21 @@ body.login-page .login-content a{
 
 body.login-page .checkbox label{
     display: inline-block;
+}
+
+.researchhub-modal .checkbox input[type="checkbox"]{
+    float: left;
+}
+
+.researchhub-modal .help-block, .researchhub-modal label{
+    color: #393939;
+}
+
+.panel-researchhub > .panel-heading{
+    background-color: #D5CD7F;
+    border-color: #D5CD7F;
+}
+
+.panel-researchhub{
+    border-color: #D5CD7F;
 }

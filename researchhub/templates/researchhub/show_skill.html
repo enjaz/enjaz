@@ -1,0 +1,104 @@
+{% extends 'researchhub_base.html' %}{% load researchhub_tags %}{% load staticfiles %}{% load l10n %}
+{% block title %}{{ skill.user.common_profile.get_en_full_name }}{% endblock %}
+
+{% block content %}
+<div class="english-field">
+    <h1>{{ skill.user.common_profile.get_en_full_name }}</h1>
+
+    <div class="row" style="margin-left: 0; margin-bottom: 5px;">
+        <div style="float: right;">
+    {% if user|can_edit_skill:skill %}
+            <button id="edit-skill" class="btn btn-icon btn-success">
+                <i class="entypo-pencil"></i>
+                Edit
+            </button>
+        </div>
+    </div>
+    {% endif %}
+    <div class="row">
+        <div class="col-sm-8">
+            <table class="table">
+                <colgroup>
+                    <col class="col-xs-2">
+                    <col class="col-xs-6">
+                </colgroup>
+                <tr>
+                    <th>Description</th>
+                    <td>{{ skill.description|linebreaksbr }}</td>
+                </tr>
+                <tr>
+                    <th>Previous experience</th>
+                    <td>{{ skill.previous_experience|linebreaksbr }}</td>
+                </tr>
+                <tr>
+                    <th>Ongoing projects</th>
+                    <td>{{ skill.ongoing_projects|linebreaksbr }}</td>
+                </tr>{% if skill.condition %}
+                <tr>
+                    <th>Condition</th>
+                    <td>{{ skill.condition }}</td>
+                </tr>
+                {% endif %}
+                {% if skill.available_from %}
+                <tr>
+                    <th>Available until</th>
+                    <td>{{ skill.available_from|date:"Y-n-j" }}</td>
+                </tr>
+                {% endif %}
+                {% if skill.available_until %}
+                <tr>
+                    <th>Available until</th>
+                    <td>{{ skill.available_until|date:"Y-n-j" }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th>Email</th>
+                    <td><a href="mailto:{{ skill.user.email }}">{{ skill.user.email }}</a></td>
+                </tr>
+                <tr>
+                    <th>Date added</th>
+                    <td>{{ skill.submission_date|date:"Y-n-j" }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<script type="text/javascript">
+$(function(){
+    $('#edit-skill-modal').modal({
+      keyboard: false,
+      backdrop: 'static',
+      show    : false,
+    });
+    $("button#edit-skill").click(function () {
+        $("#edit-skill-modal").modal('show');
+
+        $("#edit-skill-modal .modal-title").html("Edit {{ skill.user.common_profile.get_en_full_name }}");
+        $("#edit-skill-modal .modal-body").load("{% url 'researchhub:edit_skill' skill.pk %}", function(){
+            $("#id_available_from").attr('data-start-view', '1').datepicker({minDate: 1});
+            $("#id_available_until").attr('data-start-view', '1').datepicker({minDate: 1});
+        });
+
+        var $submitButton = $("#edit-skill-modal button.submit-button");
+        $submitButton.off('click');
+        $submitButton.click(function () {
+            $("form#edit-skill-form").submit();
+        });
+    });
+});
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+<style>
+p{
+    font-size: 17px;
+}
+</style>
+{% with modal_id='edit-skill-modal' %}
+    {% include "researchhub/partials/common_edit_modal.html" %}
+{% endwith %}
+
+{% endblock %}
+

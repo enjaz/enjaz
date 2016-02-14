@@ -1,6 +1,6 @@
 {% extends 'hpc_evaluation_base.html' %}{% load staticfiles %}
 
-{% block title %}Abstract list{% endblock %}
+{% block title %}قائمة المسجلين{% endblock %}
 
 {% block content %}
 <div class="panel-group" id="accordion-sessions">
@@ -19,7 +19,8 @@
             <table class="display datatable">
                 <thead>
                     <tr>
-                        <th>الاسم</th>
+                        <th>الاسم العربي</th>
+                        <th>الاسم الإنجليزي</th>
                         <th>الجامعة</th>
                         <th>الكلية</th>
                         <td>البريد</td>
@@ -29,7 +30,8 @@
                 <tbody>
                     {% for registration in session.registration_set.undeleted %}
                     <tr>
-                        <td>{{ registration }}</td>
+                        <td>{{ registration.get_ar_full_name }}</td>
+                        <td class="english-field" s>{{ registration.get_en_full_name }}</td>
                         <td>{{ registration.get_university }}</td>
                         <td>{{ registration.get_college }}</td>
                         <td><a class="english-field" href="mailto:{{ registration.get_email }}">{{ registration.get_email }}</a></td>
@@ -64,7 +66,7 @@
                 'excelHtml5',
                 'csvHtml5',
             ],
-            order: [[ 4, "desc" ]],
+            order: [[ 5, "desc" ]],
             language: {% include 'js/dataTables-arabic.json' %},
         });
         // Allow the dropdown menus to cross the border of the panel without being cropped

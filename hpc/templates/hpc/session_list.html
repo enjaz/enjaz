@@ -1,0 +1,30 @@
+{% extends 'front/front_base.html' %}{% load staticfiles %}{% load hpc_tags %}
+{% block title %}المقبولون في مؤتمر التخصّصات الصحيّة{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-offset-2">
+        <h1>المقبولون في مؤتمر التخصّصات الصحيّة</h1>
+        <p style="text-align: justify; color: #373E4A; font-size: 1.2em;">أهلا بكم في مؤتمر التخصّصات الصحيّة 2016!  أدناه قائمة بالمقبولين والمقبولات في الفعاليات التي يتضمّنها المؤتمر.  في حال لم تعثر على اسمك، فهذا يعني أن المقاعد اكتملت قبل أن نتمكّن من ضمّ اسمك، مع تطلّعنا لأن تمضي وقتا ماتعًا ومفيدا في المؤتمر!</p>
+        <p></p>
+        <h2>البرنامج العام وبرامج الكليات</h2>
+        <ul>
+        {% for session in sessions.programs %}
+            <li><a href="{% url 'hpc:show_session' session.pk %}">{{ session }}</a></li>
+        {% endfor %}
+        </ul>
+        <h2>ورش العمل</h2>
+        <ul>
+        {% for session in sessions.workshops %}
+            <li><a href="{% url 'hpc:show_session' session.pk %}">{{ session }}</a></li>
+        {% endfor %}
+        </ul>
+        <h2>مناشط أخرى</h2>
+        <ul>
+        {% for session in sessions.others %}
+            <li><a href="{% url 'hpc:show_session' session.pk %}">{{ session }}</a></li>
+        {% endfor %}
+        </ul>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,217 @@
+{% extends 'researchhub_base.html' %}{% load staticfiles %}{% load researchhub_tags %}{% load l10n %}
+{% block content %}
+{% localize on %}
+<div class="english-field">
+<div style="margin-top:20px;" class="row">
+    <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1">
+        <h1 class="hidden-xs" style="display: inline; font-family: 'Candal', sans-serif; font-size: 55px;" class="researchhub-name english-field">ResearchHub</h1>
+        <p style="font-size: 20px; display: inline;  color: rgb(55, 62, 74);"><strong class="visible-xs">ResearchHub</strong> is a research opportunity initiative for the students of King Saud bin Abdulaziz University for Health Sciences, aiming at connecting students and easing the path towards research.  Read more on "<a href="{% url 'researchhub:how_it_works' %}">How it works</a>".</p>
+    </div>
+</div>
+
+<hr style="margin: 50px 0 50px 0;">
+<div class="row">
+    <div style="border-color: #ffd78a;" class="col-sm-6 col-sm-offset-2 mentor-section-intro">
+        <h2 class="english-field mentor-section-header"><i class="fa fa-hand-o-right"></i><br>Meet our supervisors!</h2>
+        <p class="section-intro">Our super-helpful supervisors are willing to take you into a whole new level of research participation!</p>
+    </div>
+    <div class="col-md-3">
+        <div class="tile-stats tile-orange">
+            <div class="icon"><i class="fa fa-hand-o-right"></i></div>
+            <div class="num" data-start="0" data-end="{{ supervisor_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+            <h3 class="english-field">Supervisors</h3>
+            <p>Supervisors enlisted on Enjaz</p>
+        </div>
+    </div>
+</div>    
+<div class="row">
+    <div class="panel-body">
+        <div class="col-md-10 col-md-offset-1 ">
+        <div class="panel panel-warning panel-shadow" data-collapsed="0">
+
+            <!-- panel head -->
+            <div class="panel-heading">
+                <div class="panel-title">Latest supervisors</div>
+                <div class="panel-options">
+                    <a href="{% url 'researchhub:list_supervisors' %}" type="button" class="btn btn-default">
+                         All supervisors
+                    </a>
+                    {% if user|is_researchhub_coordinator_or_member or user.is_superuser %}
+                    <a id="add-supervisor" type="button" class="btn btn-default">
+                         <i class="entypo-plus"></i> Add supervisor
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- panel body -->
+            <div class="panel-body">
+                {% if latest_supervisors %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Specialty</th>
+                            <th class="hidden-xs">Date added</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for supervisor in latest_supervisors %}
+                        <tr>
+                            <td><a href="{% url 'researchhub:show_supervisor' supervisor.pk %}">Dr. {{ supervisor.user.common_profile.get_en_full_name }}</a></td>
+                            <td>{{ supervisor.specialty }}</td>
+                            <td class="hidden-xs">{{ supervisor.submission_date|date:"Y-n-j" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No supervisors listed yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<hr style="margin: 50px 0 50px 0;">
+<div class="row">
+    <div class="col-md-3 col-sm-offset-1">
+        <div class="tile-stats tile-blue">
+            <div class="icon"><i class="fa fa-lightbulb-o"></i></div>
+            <div class="num" data-start="0" data-end="{{ project_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+
+            <h3 class="english-field">Projects</h3>
+            <p>Projects enlisted on Enjaz.</p>
+        </div>
+    </div>
+    <div style="border-color: #2c7ea1;" class="col-sm-6 mentor-section-intro">
+        <h2 class="english-field mentor-section-header"><i class="fa fa-lightbulb-o"></i><br>Explore open research projects!</h2>
+        <p class="section-intro">Open research projects for you to explore and join!  Oh, and you could post your project, too!</p>
+    </div>
+</div>
+<div class="row">
+    <div class="panel-body">
+        <div class="col-md-10 col-md-offset-1 ">
+        <div class="panel panel-info panel-shadow" data-collapsed="0">
+
+            <!-- panel head -->
+            <div class="panel-heading">
+                <div class="panel-title">Latest projects</div>
+                <div class="panel-options">
+                    <a href="{% url 'researchhub:list_projects' %}" type="button" class="btn btn-default">
+                         All projects
+                    </a>
+                    <a id="add-project" type="button" class="btn btn-default">
+                         <i class="entypo-graduation-cap"></i> Add your project!
+                    </a>
+                </div>
+            </div>
+
+            <!-- panel body -->
+            <div class="panel-body">
+                {% if latest_projects %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Field</th>
+                            <th class="hidden-xs">Date added</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for project in latest_projects %}
+                        <tr>
+                            <td><a href="{% url 'researchhub:show_project' project.pk %}">{{ project.title }}</a></td>
+                            <td>{{ project.field }}</td>
+                            <td class="hidden-xs">{{ project.submission_date|date:"Y-n-j" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No projects listed yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<hr style="margin: 50px 0 50px 0;">
+<div class="row">
+    <div class="col-sm-6 col-sm-offset-2 mentor-section-intro">
+        <h2 class="english-field mentor-section-header"><i class="fa fa-magic"></i><br>Meet our skilled students!</h2>
+        <p class="section-intro">Open research projects for you to explore and join!  Oh, and you could post your project, too!</p>
+    </div>
+    <div class="col-md-3">
+        <div class="tile-stats tile-mentor">
+            <div class="icon"><i class="fa fa-magic"></i></div>
+            <div class="num" data-start="0" data-end="{{ skill_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+
+            <h3 class="english-field">Skilled students</h3>
+            <p>Skilled students enlisted on Enjaz.</p>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="panel-body">
+        <div class="col-md-10 col-md-offset-1">
+        <div class="panel panel-researchhub panel-warning panel-shadow" data-collapsed="0">
+            <!-- panel head -->
+            <div class="panel-heading">
+                <div class="panel-title">Latest skilled students</div>
+                <div class="panel-options">
+                    <a href="{% url 'researchhub:list_skills' %}" type="button" class="btn btn-default">
+                         All skilled students
+                    </a>
+                    {% if not user|has_current_skill_profile %}
+                    <a id="add-skill" type="button" class="btn btn-default">
+                         <i class="fa fa-paperclip"></i> Add yourself!
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- panel body -->
+            <div class="panel-body">
+                {% if latest_skills %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Date added</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for skill in latest_skills %}
+                        <tr>
+                            <td><a href="{% url 'researchhub:show_skill' skill.pk %}">{{ skill.user.common_profile.get_en_full_name|default:skill.user.username }}</a></td>
+                            <td>{{ skill.submission_date|date:"Y-n-j" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No skilled students listed yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<div class="row">
+</div>
+</div>
+{% endlocalize %}
+{% endblock %}
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+{% include "researchhub/partials/add_project_asset.html" %}
+{% include "researchhub/partials/add_supervisor_asset.html" %}
+{% include "researchhub/partials/add_skill_asset.html" %}
+{% endblock %}
+{% block customstyles %}
+    <link href='https://fonts.googleapis.com/css?family=Candal' rel='stylesheet' type='text/css'>
+{% endblock %}

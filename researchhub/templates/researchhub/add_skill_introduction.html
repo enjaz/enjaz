@@ -1,0 +1,18 @@
+{% load researchhub_tags %}
+<style>
+.modal-footer{
+    display: none;
+}
+</style>
+
+<h2 class="english-field">Add your skill!</h2>
+
+{% if has_current_skill_profile %}
+<p style="text-align:center;" class="studentguide-intro">Thanks! You have already signed up as a skilled student!</p>
+{% else %}
+<p class="studentguide-intro">ResearchHub a student-initiated project to connect students with each others and with researchers.  Here, we would like to know the skills that you have that you can utilize in research projects so we can connect you to those who have these projects!   Please note that by submitting this form, you agree to enlist yourself in public for students to see your skill!</p>
+
+<button style="float:right;" class="english-field btn btn-lg end-skill-introduction end-introduction">
+    Next! <i class="fa fa-angle-double-right "></i>
+</button>
+{% endif %}

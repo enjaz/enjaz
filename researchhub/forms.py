@@ -46,8 +46,7 @@ class ResearchHubSignupForm(SignupForm):
     en_middle_name = forms.CharField(max_length=30)
     en_last_name = forms.CharField(max_length=30)
     badge_number = forms.IntegerField(required=False)
-    job_description = forms.CharField(label=CommonProfile._meta.get_field('job_description').verbose_name,
-                                       max_length=50)
+    job_description = forms.CharField(widget=forms.Textarea)
     specialty = forms.CharField(max_length=100)
     interests = forms.CharField(widget=forms.Textarea)
     communication = forms.CharField(widget=forms.Textarea)

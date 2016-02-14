@@ -150,6 +150,19 @@ you?
                     </li>
                 </ul>
             </li>
+            {% else %}
+            <li>
+                <a href="{% url 'userena_signin' %}">
+                    <i class="fa fa-sign-in"></i>
+                    <span>ادخل</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'userena_signup' %}">
+                    <i class="fa fa-plus-square-o"></i>
+                    <span>سجّل</span>
+                </a>
+            </li>
             {% endif %}
             {% if user.is_superuser or user|is_organizing_committee_member or user|is_research_committee_member %}
             <li>

@@ -13,11 +13,11 @@ from researchhub.forms import ProjectForm, MemberProjectForm, SupervisorForm, Sk
 from researchhub import utils
 
 def index(request):
-    latest_supervisors = Supervisor.objects.undeleted().order_by("-submission_date")[:10]
+    latest_supervisors = Supervisor.objects.available().order_by("-submission_date")[:10]
     supervisor_count =  Supervisor.objects.undeleted().count()
-    latest_projects = Project.objects.undeleted().order_by("-submission_date")[:10]
+    latest_projects = Project.objects.shown().order_by("-submission_date")[:10]
     project_count = Project.objects.undeleted().count()
-    latest_skills = SkilledStudent.objects.undeleted().order_by("-submission_date")[:10]
+    latest_skills = SkilledStudent.objects.available().order_by("-submission_date")[:10]
     skill_count = SkilledStudent.objects.undeleted().count()
     context = {'latest_projects': latest_projects,
                'latest_supervisors': latest_supervisors,

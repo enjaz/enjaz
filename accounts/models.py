@@ -47,9 +47,7 @@ class CommonProfile(models.Model):
                                 on_delete=models.SET_NULL,
                                 verbose_name=u'الكلية')
     # Fields specific for non-students.
-    job_description = models.CharField(max_length=50,
-                                       blank=True,
-                                       verbose_name=u"المسمى الوظيفي")
+    job_description = models.TextField(u"المسمى الوظيفي", blank=True)
     modification_date = models.DateTimeField(auto_now=True, null=True)
 
     def get_ar_full_name(self):

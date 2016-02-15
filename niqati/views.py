@@ -124,11 +124,11 @@ def coordinator_view(request, activity_id):
 
     # If it has been two weeks since the end of the activity, don't
     # alow niqati requests.
-    last_episode = activity.episode_set.order_by('-end_date', '-end_time').first()
-    if timezone.now().date() > last_episode.end_date + datetime.timedelta(14):
-        return render(request, 'niqati/activity_orders.html',
-                      {'activity': activity, 'active_tab': 'niqati',
-                       'error': 'closed'})
+    #last_episode = activity.episode_set.order_by('-end_date', '-end_time').first()
+    #if timezone.now().date() > last_episode.end_date + datetime.timedelta(14):
+    #    return render(request, 'niqati/activity_orders.html',
+    #                  {'activity': activity, 'active_tab': 'niqati',
+    #                   'error': 'closed'})
     if request.method == 'POST':
         form = OrderForm(request.POST, activity=activity, user=request.user)
         if form.is_valid():

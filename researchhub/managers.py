@@ -17,12 +17,12 @@ class ResearchHubQuerySet(models.QuerySet):
         now = timezone.now()
         return (self.filter(available_from__isnull=True,
                             available_until__isnull=True) | \
-                self.filter(available_from__gte=now,
+                self.filter(available_from__lte=now,
                             available_until__isnull=True) | \
                 self.filter(available_from__isnull=True,
-                            available_until__lte=now) | \
-                self.filter(available_from__gte=now,
-                            available_until__lte=now))\
+                            available_until__gte=now) | \
+                self.filter(available_from__lte=now,
+                            available_until__gte=now))\
                             .undeleted().filter(is_hidden=False)
 
     def unavailable(self):

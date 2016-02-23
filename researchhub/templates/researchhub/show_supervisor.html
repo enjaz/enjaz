@@ -11,6 +11,10 @@
                 <i class="entypo-pencil"></i>
                 Edit
             </button>
+            <button data-url="{% url 'researchhub:delete_supervisor' supervisor.pk %}" class="confirm-delete-supervisor btn btn-icon btn-danger">
+                <i class="entypo-block"></i>
+                Delete
+            </button>
         </div>
     </div>
     {% endif %}
@@ -100,6 +104,8 @@ p{
 {% with modal_id='edit-supervisor-modal' %}
     {% include "researchhub/partials/common_edit_modal.html" %}
 {% endwith %}
-
+{% with model='supervisor' %}
+    {% include "researchhub/partials/delete_asset.html" %}
+{% endwith %}
 {% endblock %}
 

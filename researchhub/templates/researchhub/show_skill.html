@@ -12,6 +12,10 @@
                 <i class="entypo-pencil"></i>
                 Edit
             </button>
+            <button data-url="{% url 'researchhub:delete_skill' skill.pk %}" class="confirm-delete-skill btn btn-icon btn-danger">
+                <i class="entypo-block"></i>
+                Delete
+            </button>
         </div>
     </div>
     {% endif %}
@@ -99,6 +103,8 @@ p{
 {% with modal_id='edit-skill-modal' %}
     {% include "researchhub/partials/common_edit_modal.html" %}
 {% endwith %}
-
+{% with model='skill' %}
+    {% include "researchhub/partials/delete_asset.html" %}
+{% endwith %}
 {% endblock %}
 

@@ -34,13 +34,11 @@
                 <div class="panel-title">Latest supervisors</div>
                 <div class="panel-options">
                     <a href="{% url 'researchhub:list_supervisors' %}" type="button" class="btn btn-default">
-                         All supervisors
+                         <i class="fa fa-bars"></i> All supervisors
                     </a>
-                    {% if user|is_researchhub_coordinator_or_member or user.is_superuser %}
-                    <a id="add-supervisor" type="button" class="btn btn-default">
-                         <i class="entypo-plus"></i> Add supervisor
+                    <a href="{% url 'supervisor_signup' %}" type="button" class="btn btn-default">
+                         <i class="fa fa-user-plus"></i> Signup as a supervisor
                     </a>
-                    {% endif %}
                 </div>
             </div>
 
@@ -100,7 +98,7 @@
                 <div class="panel-title">Latest projects</div>
                 <div class="panel-options">
                     <a href="{% url 'researchhub:list_projects' %}" type="button" class="btn btn-default">
-                         All projects
+                         <i class="fa fa-bars"></i> All projects
                     </a>
                     <a id="add-project" type="button" class="btn btn-default">
                          <i class="entypo-graduation-cap"></i> Add your project!
@@ -163,7 +161,7 @@
                 <div class="panel-title">Latest skilled students</div>
                 <div class="panel-options">
                     <a href="{% url 'researchhub:list_skills' %}" type="button" class="btn btn-default">
-                         All skilled students
+                         <i class="fa fa-bars"></i> All skilled students
                     </a>
                     {% if not user|has_current_skill_profile %}
                     <a id="add-skill" type="button" class="btn btn-default">
@@ -209,7 +207,6 @@
 {% block customscript %}
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
 {% include "researchhub/partials/add_project_asset.html" %}
-{% include "researchhub/partials/add_supervisor_asset.html" %}
 {% include "researchhub/partials/add_skill_asset.html" %}
 {% endblock %}
 {% block customstyles %}

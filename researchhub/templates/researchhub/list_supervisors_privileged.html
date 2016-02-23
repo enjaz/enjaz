@@ -8,8 +8,8 @@
     <div class="row" style="margin-left: 0; margin-bottom: 5px;">
         <div style="float: right;">
             <a id="add-supervisor" class="btn btn-icon btn-success">
-                <i class="entypo-plus"></i>
-               Add supervisor
+                <i class="fa fa-plus"></i>
+               Add supervisor (existing account)
             </a>
         </div>
     </div>
@@ -64,6 +64,9 @@
     </div>
     <div id="collapse-unavailable" class="panel-collapse collapse in">
         <div class="panel-body"><div class="row">
+            <div class="col-offset-md-1 col-md-10">
+                The following list contains the supervisors that are explicitly hidden, and that are not currently available.  By clicking 'Hide', you override the specified availability dates. 
+            </div>
             <table class="display datatable dt-responsive">
                 <thead>
                     <tr>
@@ -82,9 +85,9 @@
                         <td>{{ supervisor.interests|linebreaksbr }}</td>
                         <td data-order="{{ supervisor.submission_date|date:"U" }}">{{ supervisor.submission_date|date:"Y-n-j" }}</td>
                         <td>
-                            {% if supervisor.is_hidden %}
+                            {% if supervisor.is_hidden and supervisor.is_within_availability_dates %}
                                 <button class="btn btn-success btn-xs btn-supervisor" data-pk="{{ supervisor.pk }}" data-action="show">Show</button>
-                            {% else %}
+                            {% elif supervisor.is_within_availability_dates %}
                                 <button class="btn btn-danger btn-xs btn-supervisor" data-pk="{{ supervisor.pk }}" data-action="hide">Hide</button>
                             {% endif %}
                         </td>

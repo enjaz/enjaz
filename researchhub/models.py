@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 
 from researchhub.managers import ResearchHubQuerySet, ProjectQuerySet
 
@@ -60,7 +61,10 @@ class Supervisor(models.Model):
             return True
 
     def __unicode__(self):
-        return self.user.common_profile.get_en_full_name()
+        try:
+            return self.user.common_profile.get_en_full_name()
+        except ObjectDoesNotExist:
+            return self.user.username
 
 class SkilledStudent(models.Model):
     year = models.ForeignKey('core.StudentClubYear', null=True,
@@ -83,7 +87,7 @@ class SkilledStudent(models.Model):
 
     objects = ResearchHubQuerySet.as_manager()
 
-    def is_currently_available(self):
+    def is_within_availability_dates(self):
         if not self.is_hidden or \
            self.available_from and self.available_from > timezone.now() or \
            self.available_until and self.available_until < timezone.now():
@@ -92,4 +96,7 @@ class SkilledStudent(models.Model):
             return True
 
     def __unicode__(self):
-        return self.user.common_profile.get_en_full_name()
+        try:
+            return self.user.common_profile.get_en_full_name()
+        except ObjectDoesNotExist:
+            return self.user.username

@@ -48,6 +48,10 @@
                     <th>Communication</th>
                     <td>{{ supervisor.communication|linebreaksbr }}</td>
                 </tr>
+                <tr>
+                    <th>Email</th>
+                    <td><a href="mailto:{{ supervisor.user.email }}">{{ supervisor.user.email }}</a></td>
+                </tr>
                 {% if supervisor.available_from %}
                 <tr>
                     <th>Available from</th>

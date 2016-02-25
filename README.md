@@ -8,7 +8,7 @@ borrow books.
 
 # Licensing
 
-Copyright (C) 2014 Muhammad Saeed Arabi and Osama Khalid.
+Copyright (C) 2014-2016 Muhammad Saeed Arabi and Osama Khalid.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
@@ -49,6 +49,7 @@ Current dependencies:
 * django-taggit
 * django-templated-email
 * django-userena _(check out the official installation documentation)_
+* djagno-wkhtmltopdf
 * easy-thumbnails
 * djangorestframework
 * future

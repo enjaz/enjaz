@@ -1,0 +1,67 @@
+<!DOCTYPE html>{% load staticfiles %}
+<html lang="en" dir="ltr">
+<head>
+	<title>Invitation to ResearchHub</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+<style type="text/css">
+
+p, h1{
+	font-family: 'Roboto', "GE Dinar One", sans-serif;
+}
+
+p{
+ 	text-align: justify;
+	line-height: 1.3em;
+}
+
+.sign p{
+	text-align: right;
+}
+
+p.link{
+	font-size: 17px;
+	margin-left: 3em;
+	font-weight: 700;
+	text-decoration: underline;
+}
+
+#logo{
+	width: 200px;
+	float: right;
+	margin: 0 10px 10px 10px;
+}
+</style>
+</head>
+<body>
+
+<h1>Invitation to ResearchHub</h1>
+
+<img id="logo" src="https://enjazportal.com{% static 'img/researchhub.png' %}">
+
+<p>Dear {{ name }},</p>
+
+<p>We are very happy to invite you to be part of <strong>the research opportunity program, ResearchHub</strong>!  <strong>ResearchHub</strong> is a platform to facilitate the process of doing research between KSAU-HS students and doctors.</p>
+
+<p>This program aims to organize the process of finding a primary investigator for a student project, recruiting a team, asking for help in specific areas of
+research such as data collection and analysis, and it also allows doctors to reach a large number of students in case said doctor wants students to join in on a research project, or even in cases where students can help with gathering data, or to do any other task that is needed.</p>
+
+<p>By signing-up, a profile will be created for you on <strong>ResearchHub</strong>, and it will be managed by our team.  No changes will be done to your profile without your knowledge, and we will ask for updates regularly via email.</p>
+
+<p>We are eager to have you on the ResearhHub!  To sign-up, please enter the following link:</p>
+
+<p class="link">http://bit.ly/join_rh</p>
+
+<p>We will be happy to answer any questions and receive suggestions at our email address:</p>
+
+<p class="link">researchhub@enjazportal.com</p>
+
+<div class="sign">
+<p>
+Sincerely,<br>
+ResearchHub Team
+</p>
+</div>
+
+</body>
+</html>

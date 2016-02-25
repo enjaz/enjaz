@@ -1,0 +1,29 @@
+{% extends 'researchhub_base.html' %}
+{% block title %}Join Us{% endblock %}
+{% block content %}
+<div class="english-field">
+    <h1 style="    font-size: 4em;
+    margin-bottom: 50px;
+    text-align: center;" class="english-field"><span style="border-bottom: 4px solid black;">Join Us</span></h1>
+    <div class="row">
+        <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
+                <p class="section-intro"></p>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
+            <h2 class="english-field researchhub-section-header"><i class="fa fa-envelope"></i><br>Invite the best of researchers!</h2>
+            <p class="section-intro">ResearchHub is a cooperative project! There will always be one doctor that we have yet to invite to join, and here exactly where we need your help the most!</p>
+            <p class="section-intro"><strong>First of all,</strong> identify the doctors that we need to get in!</p>
+            <p class="section-intro"><strong>Second,</strong> enter the name of the doctor so we can prepare you a special invitation:</p>
+            <form style="text-align: center;" class="form" method="get" action="{% url 'researchhub:invitation' %}">
+                <input style="color: black; font-size: 1.2em; width: 70%; margin-right: auto; margin-left: auto;" name="name" placeholder="Dr. Foo Bar" class="form-control">
+                <input style="margin: 5px;" type="submit" class="btn btn-success" value="Get invitation!" style="margin-right: auto; margin-left: auto;">
+            </form>
+            <p class="section-intro"><strong>Third,</strong> print the invitiation and hand it to them!  Try to fill the sign-up with them (so they don't forget all about it!)</p>
+            <p class="section-intro"><strong>Finally,</strong> let us know!  Drop us a line at <a href="mailto:researchhub@enjazportal.com">researchhub@enjazportal.com</a> and tell us how your meeting went!</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

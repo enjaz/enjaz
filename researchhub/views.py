@@ -11,6 +11,7 @@ from post_office import mail
 from researchhub.models import Supervisor, Project, SkilledStudent
 from researchhub.forms import ProjectForm, MemberProjectForm, SupervisorForm, SkilledStudentForm
 from researchhub import utils
+from wkhtmltopdf.views import PDFTemplateView
 
 def index(request):
     latest_supervisors = Supervisor.objects.available().order_by("-submission_date")[:10]
@@ -44,6 +45,12 @@ def list_projects(request):
         projects = Project.objects.shown().order_by("-submission_date")
         return render(request, "researchhub/list_projects.html",
                       {'projects': projects})
+
+class InvitationView(PDFTemplateView):
+    def get_context_data(self, **kwargs):
+        context = super(InvitationView, self).get_context_data(**kwargs)
+        context['name'] = self.request.GET.get('name')
+        return context
 
 @login_required
 @csrf.csrf_exempt
@@ -257,9 +264,9 @@ def delete_supervisor(request, pk):
     return {"message": "success", "list_url": full_url}
 
 def list_skills(request):
-    available_skills = SkilledStudent.objects.available().order_by("-submission_date")
+    skills = SkilledStudent.objects.available().order_by("-submission_date")
     return render(request, "researchhub/list_skills.html",
-                  {'available_skills': available_skills})
+                  {'skills': skills})
 
 @login_required
 @decorators.ajax_only

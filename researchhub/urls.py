@@ -7,6 +7,7 @@ urlpatterns = patterns('',
     url(r'^indicators/$', views.indicators, name="indicators"),
     url(r'^faq/$', TemplateView.as_view(template_name='researchhub/faq.html'), name="faq"),
     url(r'^how_it_works/$', TemplateView.as_view(template_name='researchhub/how_it_works.html'), name="how_it_works"),
+    url(r'^join_us/$', TemplateView.as_view(template_name='researchhub/join_us.html'), name="join_us"),
     url(r'^consultation/$', TemplateView.as_view(template_name='researchhub/consultation.html'), name="consultation"),
 
     # Projects
@@ -21,6 +22,12 @@ urlpatterns = patterns('',
     # Supervisors
     url(r'^supervisors/$', views.list_supervisors, name="list_supervisors"),
     url(r'^supervisors/control/$', views.control_supervisors, name="control_supervisors"),
+    #url(r'^supervisors/invitation$', TemplateView.as_view(template_name='researchhub/invitation.html'), name="invitation"),
+    url(r'^supervisors/invitation$', views.InvitationView.as_view(cmd_options = {
+                'margin-top': 20,
+                'margin-right': 20,
+                'margin-left': 20,
+            }, template_name='researchhub/invitation.html', filename='invitation.pdf'), name="invitation"),
     url(r'^supervisors/add/$', views.add_supervisor, name="add_supervisor"),
     url(r'^supervisors/(?P<pk>\d+)/$', views.show_supervisor, name="show_supervisor"),
     url(r'^supervisors/(?P<pk>\d+)/rate/$', views.rate_supervisor, name="rate_supervisor"),

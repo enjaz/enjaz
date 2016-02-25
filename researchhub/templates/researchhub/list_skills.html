@@ -28,7 +28,7 @@
             <tr>
                 <td><a href="{% url 'researchhub:show_skill' skill.pk %}">{{ skill.user.common_profile.get_en_full_name }}</a></td>
                 <td>{{ skill.description|truncatechars:100 }}</td>
-                <td data-order="{{ project.submission_date|date:"U" }}"><a href="{% url 'researchhub:show_project' project.pk %}">{{ project.submission_date|date:"Y-n-j" }}</a></td>
+                <td data-order="{{ project.submission_date|date:"U" }}">{{ project.submission_date|date:"Y-n-j" }}</td>
             </tr>
             {% endfor %}
         </tbody>

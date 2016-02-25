@@ -25,10 +25,10 @@
          <tbody>
             {% for project in projects %}
             <tr>
-                <td>{{ projec.title }}</td>
+                <td><a href="{% url 'researchhub:show_project' project.pk %}">{{ projec.title }}</a></td>
                 <td>{{ projec.field }}</td>
                 <td>{{ projec.supervisor }}</td>
-                <td data-order="{{ project.submission_date|date:"U" }}"><a href="{% url 'researchhub:show_project' project.pk %}">{{ project.submission_date|date:"Y-n-j" }}</a></td>
+                <td data-order="{{ project.submission_date|date:"U" }}">{{ project.submission_date|date:"Y-n-j" }}</td>
             </tr>
             {% endfor %}
         </tbody>

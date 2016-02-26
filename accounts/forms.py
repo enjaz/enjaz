@@ -125,7 +125,13 @@ class StudentSignupForm(EnjazSignupForm):
         Point.objects.create(year=current_year,
                              user=new_user,
                              note=u"رصيد مبدئي.",
-                             value=1)
+                             value=1,
+                             category='L')
+        Point.objects.create(year=current_year,
+                             user=new_user,
+                             note=u"رصيد مبدئي.",
+                             value=1,
+                             category='G')
 
         CommonProfile.objects.create(user=new_user,
                                      is_student=True,

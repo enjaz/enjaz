@@ -24,7 +24,7 @@ class GuideProfile(models.Model):
     avatar = models.ImageField(u"صورة رمزية", upload_to='studentguide/avatar/')
     activities = models.TextField(u"المشاريع والنشاطات السابقة", help_text=u"ما أبرز الأنشطة والمشاريع التي سبق أن عملت عليها؟ هذا يتضمن أي أبحاث، أو أعمال كان لك دورٌ أساسيٌ فيها.")
     academic_interests = models.TextField(u"الاهتمامات الأكاديمية", help_text=u"في السياق الأكاديمي، ما الذي يستهويك؟")
-    nonacademic_interests = models.TextField(u"الاهتمامات غير  الأكاديمية", help_text=u"بعيدا عن التحصيل الأكاديمي، ما الذي يشغلك؟")
+    nonacademic_interests = models.TextField(u"الاهتمامات غير  الأكاديمية", help_text=u"بعيدا عن التحصيل الأكاديمي، ما الذي يشغلك؟", blank=True)
     batch = models.PositiveSmallIntegerField(verbose_name=u"الدفعة")
     year = models.ForeignKey(StudentClubYear, null=True,
                              on_delete=models.SET_NULL, default=None,

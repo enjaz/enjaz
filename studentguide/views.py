@@ -120,6 +120,14 @@ def list_guides(request):
 
 @login_required
 @riyadh_only
+def list_guides_by_tag(request, tag_code_name):
+    tag = get_object_or_404(Tag, code_name=tag_code_name)
+    guides = GuideProfile.objects.current_year().undeleted().for_user_gender(request.user).for_user_city(request.user).filter(tags=tag)
+    return render(request, "studentguide/list_guides_by_tag.html",
+                  {'guides': guides, 'tag': tag})
+
+@login_required
+@riyadh_only
 def my_profile(request):
     guide = get_object_or_404(GuideProfile, user=request.user)
     return HttpResponseRedirect(reverse('studentguide:show_guide',

@@ -17,6 +17,7 @@ urlpatterns = patterns('',
 
     # Guide URLs
     url(r'^guides/$', views.list_guides, name="list_guides"),
+    url(r'^guides/(?P<tag_code_name>[\d\w_]+)$', views.list_guides_by_tag, name="list_guides_by_tag"),
     url(r'^guides/add/$', views.add_guide, name="add_guide"),
     url(r'^guides/add/introduction/$', TemplateView.as_view(template_name='studentguide/add_guide_introduction.html'), name="add_guide_introduction"),
     url(r'^guides/add/thanks/$', TemplateView.as_view(template_name='studentguide/add_guide_thanks.html'), name="add_guide_thanks"),

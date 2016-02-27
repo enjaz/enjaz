@@ -47,8 +47,8 @@
             {% for tag in tags %}
             {% autoescape off %}{% cycle '<div class="row">' '' '' '' %}{% endautoescape %}
             <div class="col-md-3 col-xs-6">
-                <a {% if tag.image %}style="background-image:url('{{ tag.image.url }}')"{% endif %} href="{% url 'studentguide:choose_random_guide' tag.code_name %}" class="tag-image"></a>
-                <h3><a href="{% url 'studentguide:choose_random_guide' tag.code_name %}">{{ tag.name }}</a></h3>
+                <a {% if tag.image %}style="background-image:url('{{ tag.image.url }}')"{% endif %} href="{% url 'studentguide:list_guides_by_tag' tag.code_name %}" class="tag-image"></a>
+                <h3><a href="{% url 'studentguide:list_guides_by_tag' tag.code_name %}">{{ tag.name }}</a></h3>
             </div>
             {% autoescape off %}
             {% cycle '' '' '' '</div>' %}

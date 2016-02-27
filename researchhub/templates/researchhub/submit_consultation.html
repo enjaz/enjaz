@@ -1,0 +1,62 @@
+{% extends 'researchhub_base.html' %}
+{% block title %}Consultation Team{% endblock %}
+{% block content %}
+<div class="english-field">
+    <h1 style="    font-size: 4em;
+    margin-bottom: 50px;
+    text-align: center;" class="english-field"><span style="border-bottom: 4px solid black;">Consultation Team</span></h1>
+    <div class="row">
+        <div class="col-sm-8 col-sm-offset-2 mentor-section-intro">
+            <p class="section-intro">The consultation team of ResearchHub consists of a group of students who have research experience and are passionate in this field, assessing them a group of expert supervisors.</p>
+            <p class="section-intro">If you are accessing this page then you need our help, we will be more than happy to provide you with whatever guidance you need once you book an appointment with us!</p>
+            <p class="section-intro">According to the team evaluation you might not need to attend a consultation session, in this case your concern will be assessed through email. Or you will receive a confirmation email to your booking with the selected timing.</p>
+            <p class="section-intro"><strong>First,</strong> Please describe your project, and your concern:</p>
+            <form style="text-align: center;" class="form" method="post" action="{% url 'researchhub:submit_consultation' %}">
+                {% csrf_token %}
+                <textarea class="english-field  autogrow form-control" required name="description"></textarea>
+            <p class="section-intro"><strong>Second,</strong> select the most suitable date.  We are available from 4:00PM-5:00PM on Tuesdays and Wednesdays of the first and third weeks of the month:</p>
+                <input required id="first_date" name="first_date" placeholder="The most suitable date" class="english-field  form-control">
+            <p class="section-intro"><strong>Third,</strong> select an alternative date:</p>
+                <input required id="second_date" name="second_date" placeholder="Alternative date" class="english-field form-control">
+            <p class="section-intro">Thank you very much and please proceed to book the appointment below!</p>
+                <input style="margin: 5px;" type="submit" class="btn btn-success" value="Get a consult!">
+            </form>
+        </div>
+    </div>
+</div>select the most suitable dates for our meeting and
+{% endblock %}
+{% block customscript %}
+<script type="text/javascript">
+$(function(){
+    function getWeekNo(date){
+        day = date.getDate()
+        day += (date.getDay() == 0 ? 0 : 7 - date.getDay());
+        return Math.ceil(parseFloat(day) / 7);
+    }
+    console.log("fuck");
+    $("#first_date, #second_date")
+        .attr('data-start-view', '1')
+        .datepicker({minDate: 1,
+                     beforeShowDay: function(date) {
+                         var day = date.getDay();
+                         targetted_week = getWeekNo(date) == 1 || getWeekNo(date) == 3 || getWeekNo(date) == 5;
+                         targetted_day = (day == 2 || day == 3);
+                         return [(targetted_week && targetted_day)];   
+                     }
+                    });
+});
+</script>
+<style type="text/css">
+input.form-control, textarea.form-control{
+    color: black;
+    font-size: 1.1em;
+    width: 85%;
+    margin-bottom: 10px;
+    margin-right: auto;
+    margin-left: auto;
+}
+    .mentor-section-intro{
+        color: #484747
+    }
+</style>
+{% endblock %}

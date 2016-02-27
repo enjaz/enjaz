@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
 from django.utils import timezone
@@ -9,7 +10,7 @@ from core import decorators
 from core.models import StudentClubYear
 from post_office import mail
 from researchhub.models import Supervisor, Project, SkilledStudent
-from researchhub.forms import ProjectForm, MemberProjectForm, SupervisorForm, SkilledStudentForm
+from researchhub.forms import ProjectForm, MemberProjectForm, SupervisorForm, SkilledStudentForm, ConsultationForm
 from researchhub import utils
 from wkhtmltopdf.views import PDFTemplateView
 
@@ -51,6 +52,26 @@ class InvitationView(PDFTemplateView):
         context = super(InvitationView, self).get_context_data(**kwargs)
         context['name'] = self.request.GET.get('name')
         return context
+
+@login_required
+def submit_consultation(request):
+    if request.method == 'POST':    
+        form = ConsultationForm(request.POST)
+        if form.is_valid():
+            email_context = {'user': request.user,
+                             'data': form.cleaned_data}
+            mail.send([request.user.email],
+                       template="researchhub_consultation_submitted_to_user",
+                       context=email_context)
+            mail.send(["researchhub@enjazportal.com"],
+                       template="researchhub_consultation_submitted_to_team",
+                       context=email_context,
+                       headers={'Reply-to': request.user.email})
+            return HttpResponseRedirect(reverse('researchhub:consultation_received'))
+    else:
+        form = ConsultationForm()
+    return render(request, 'researchhub/submit_consultation.html',
+                  {'form': form})
 
 @login_required
 @csrf.csrf_exempt

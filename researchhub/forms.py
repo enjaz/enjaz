@@ -7,6 +7,10 @@ from researchhub import utils
 from researchhub.models import Supervisor, Project, SkilledStudent
 from userena.forms import SignupForm
 
+class ConsultationForm(forms.Form):
+    description = forms.CharField(widget=forms.Textarea)
+    first_date = forms.DateField()
+    second_date = forms.DateField()
 
 class ProjectForm(forms.ModelForm):
     class Meta:

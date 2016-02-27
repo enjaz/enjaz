@@ -8,13 +8,9 @@
 {% block pageheader %}<span class="english-field">ResearchHub</span>{% endblock %}
 
 {% block navbar %}
-    <li class="english-field"><a href="{% url 'researchhub:join_us' %}"><i class="fa fa-envelope"></i> Join the team!</a></li>
-    <li class="english-field"><a href="{% url 'researchhub:consultation' %}"><i class="fa fa-gavel"></i> Consultation team</a></li>
+    <li class="english-field"><a href="{% url 'researchhub:join_us' %}"><i class="fa fa-envelope"></i> Join the team</a></li>
+    <li class="english-field"><a href="{% url 'researchhub:submit_consultation' %}"><i class="fa fa-gavel"></i> Get consultation</a></li>
     <li class="english-field"><a href="{% url 'researchhub:faq' %}"><i class="fa fa-question-circle"></i> FAQ</a></li>
-    <li class="english-field"><a href="{% url 'researchhub:list_supervisors' %}"><i class="fa fa-hand-o-right"></i> Supervisors</a></li>
-    <li class="english-field"><a href="{% url 'researchhub:list_projects' %}"><i class="fa fa-lightbulb-o"></i> Projects</a></li>
-    <li class="english-field"><a href="{% url 'researchhub:list_skills' %}"><i class="fa fa-magic"></i> Skilled students</a></li>
-
 {% endblock %}
 
 {% block content %}{% endblock %}

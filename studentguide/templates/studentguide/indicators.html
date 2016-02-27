@@ -17,11 +17,12 @@
 </div>
 <div class="row">
     <div class="col-xs-12">
-            <h3>طلبات الإرشاد</h3>
-            <table id="requests" class="table datatable">
+            <h3>طلبات إرشاد معتمدة</h3>
+            <table id="accepted-requests" class="table datatable">
                 <thead>
                     <tr>
                         <th>مقدم الطلب</th>
+                        <th>بريد مقدم الطلب</th>
                         <th>المرشد</th>
                         <th>حالة مقدم الطلب</th>
                         <th>حالة المرشد</th>
@@ -29,9 +30,64 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for guide_request in requests %}
+                    {% for guide_request in requests.accepted %}
                     <tr>
                         <td>{{ guide_request.user.common_profile.get_ar_full_name }}</td>
+                        <td class="english-field"><a href="mailto:{{ guide_request.user.email }}">{{ guide_request.user.email }}</a></td>
+                        <td><a href="{% url 'studentguide:show_guide' guide_request.guide.pk %}">{{ guide_request.guide.user.common_profile.get_ar_full_name }}</a></td>
+                        <td>{{ guide_request.get_requester_status_display }}</td>
+                        <td>{{ guide_request.get_guide_status_display }}</td>
+                        <td data-order="{{ guide_request.submission_date|date:"U" }}">{{ guide_request.submission_date|date:"j F Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <h3>طلبات إرشاد معلقة</h3>
+            <table id="pending-requests" class="table datatable">
+                <thead>
+                    <tr>
+                        <th>مقدم الطلب</th>
+                        <th>بريد مقدم الطلب</th>
+                        <th>المرشد</th>
+                        <th>تاريخ الإضافة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for guide_request in requests.pending %}
+                    <tr>
+                        <td>{{ guide_request.user.common_profile.get_ar_full_name }}</td>
+                        <td class="english-field"><a href="mailto:{{ guide_request.user.email }}">{{ guide_request.user.email }}</a></td>
+                        <td><a href="{% url 'studentguide:show_guide' guide_request.guide.pk %}">{{ guide_request.guide.user.common_profile.get_ar_full_name }}</a></td>
+                        <td data-order="{{ guide_request.submission_date|date:"U" }}">{{ guide_request.submission_date|date:"j F Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <h3>طلبات إرشاد ملغية أو مرفوضة</h3>
+            <table id="canceled-requests" class="table datatable">
+                <thead>
+                    <tr>
+                        <th>مقدم الطلب</th>
+                        <th>بريد مقدم الطلب</th>
+                        <th>المرشد</th>
+                        <th>حالة مقدم الطلب</th>
+                        <th>حالة المرشد</th>
+                        <th>تاريخ الإضافة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for guide_request in requests.canceled %}
+                    <tr>
+                        <td>{{ guide_request.user.common_profile.get_ar_full_name }}</td>
+                        <td class="english-field"><a href="mailto:{{ guide_request.user.email }}">{{ guide_request.user.email }}</a></td>
                         <td><a href="{% url 'studentguide:show_guide' guide_request.guide.pk %}">{{ guide_request.guide.user.common_profile.get_ar_full_name }}</a></td>
                         <td>{{ guide_request.get_requester_status_display }}</td>
                         <td>{{ guide_request.get_guide_status_display }}</td>
@@ -69,13 +125,24 @@
 {% block customscript %}
 <link rel="stylesheet" href="{% static 'css/chartist.min.css' %}">
 <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/buttons/buttons.dataTables.min.css' %}">
 <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/buttons.html5.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/jszip.min.js' %}"></script>
+
 <script src="{% static 'js/chartist.min.js' %}"></script>
 <script type="text/javascript">
     $(function () {
         language = {% include 'js/dataTables-arabic.json' %};
         $("#guides").DataTable({
-            "order": [[ 7, "desc" ]],
+            dom: 'Bfrtip',
+            buttons: [
+                'copyHtml5',
+                'excelHtml5',
+                'csvHtml5',
+            ],
+            "order": [[ 8, "desc" ]],
             "language": language,
         });
         $("#feedback").DataTable({
@@ -86,8 +153,24 @@
             "order": [[ 1, "desc" ]],
             "language": language,
         });
-        $("#requests").DataTable({
-            "order": [[ 4, "desc" ]],
+        $("#accepted-requests, #canceled-requests").DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copyHtml5',
+                'excelHtml5',
+                'csvHtml5',
+            ],
+            "order": [[ 5, "desc" ]],
+            "language": language,
+        });
+        $("#pending-requests").DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copyHtml5',
+                'excelHtml5',
+                'csvHtml5',
+            ],
+            "order": [[ 3, "desc" ]],
             "language": language,
         });
     });

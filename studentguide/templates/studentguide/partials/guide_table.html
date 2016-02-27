@@ -2,6 +2,7 @@
     <thead>
         <tr>
             <th>الاسم</th>
+            <th>البريد</th>
             <th>الكلية</th>
             <th># طلبات الإرشاد المعتمدة</th>
             <th># طلبات الإرشاد المعلقة</th>
@@ -15,6 +16,7 @@
         {% for guide in guides %}
         <tr>
             <td><a href="{% url 'studentguide:show_guide' guide.pk %}">{{ guide.user.common_profile.get_ar_full_name }}</a></td>
+            <td class="english-field"><a href="mailto:{{ guide.user.email }}">{{ guide.user.email }}</a></td>
             <td>{{ guide.user.common_profile.college.get_name_display }}</td>
             <td><a href="{% url 'studentguide:list_guide_requests' guide.pk %}">{{ guide.guide_requests.accepted.count }}</a></td>
             <td><a href="{% url 'studentguide:list_guide_requests' guide.pk %}">{{ guide.guide_requests.pending.count }}</a></td>

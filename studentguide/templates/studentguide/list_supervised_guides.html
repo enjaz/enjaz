@@ -48,15 +48,24 @@
 {% endblock %}
 
 {% block customscript %}
-<link rel="stylesheet" href="{% static 'css/chartist.min.css' %}">
 <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/buttons/buttons.dataTables.min.css' %}">
 <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'js/chartist.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/buttons.html5.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/jszip.min.js' %}"></script>
+
 <script type="text/javascript">
     $(function () {
         language = {% include 'js/dataTables-arabic.json' %};
         $("#guides").DataTable({
-            "order": [[ 7, "desc" ]],
+            dom: 'Bfrtip',
+            buttons: [
+                'copyHtml5',
+                'excelHtml5',
+                'csvHtml5',
+            ],
+            "order": [[ 8, "desc" ]],
             "language": language,
         });
         $("#reports").DataTable({

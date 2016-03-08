@@ -25,9 +25,9 @@
          <tbody>
             {% for project in projects %}
             <tr>
-                <td><a href="{% url 'researchhub:show_project' project.pk %}">{{ projec.title }}</a></td>
-                <td>{{ projec.field }}</td>
-                <td>{{ projec.supervisor }}</td>
+                <td><a href="{% url 'researchhub:show_project' project.pk %}">{{ project.title }}</a></td>
+                <td>{{ project.field }}</td>
+                <td>{{ project.supervisor }}</td>
                 <td data-order="{{ project.submission_date|date:"U" }}">{{ project.submission_date|date:"Y-n-j" }}</td>
             </tr>
             {% endfor %}

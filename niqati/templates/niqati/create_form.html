@@ -24,7 +24,7 @@ $(function(){
 		var category = $(input).data('category');
 		// By default, hide the autocomplete input field and label.
 		$('#id_students_' + category + '-wrapper').hide();
-		$('label[for=id_students_' + category).hide();
+		$('label[for=id_students_' + category + ']').hide();
 		// Show a link that would display it.
 		$('label[for=id_count_' + category + ']').append(" (<a data-action='autocomplete' data-category=" + category + ">ادخال مباشر!</a>)");
 		$('label[for=id_students_' + category + ']').append(" (<a data-action='number' data-category=" + category + ">ألغِ الإدخال المباشر!</a>)");

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import autocomplete_light
 from django.contrib.auth.models import User
-
+from core.models import StudentClubYear
 
 class NiqatiUserAutocomplete(autocomplete_light.AutocompleteModelTemplate):
     search_fields=['^email', '^common_profile__ar_first_name',
@@ -16,6 +16,7 @@ class NiqatiUserAutocomplete(autocomplete_light.AutocompleteModelTemplate):
          'placeholder': 'أَضف طالبا',
          'data-autocomplete-minimum-characters': 1}
     widget_attrs = {'class': 'modern-style'}
-    choices = User.objects.filter(common_profile__is_student=True, coordination__isnull=True, is_active=True)
+    current_year = StudentClubYear.objects.get_current()
+    choices = User.objects.filter(common_profile__is_student=True, is_active=True).exclude(coordination__year=current_year)
 
 autocomplete_light.register(NiqatiUserAutocomplete)

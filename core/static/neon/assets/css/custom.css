@@ -462,7 +462,7 @@ body.login-page .login-content .alert-warning a {
 }
 
 .autocomplete-light-widget{
-	display: block !important;
+	display: block;
 }
 
 .group-overlay{

@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event.name }}{% endblock %}
+{% block pageheaderurl %}{{ event.url }}{% endblock %}
+{% block pageheader %}<span class="english-field">{{ event.get_html_name|safe  }}</span>{% endblock %}
+
+{% block content %}{% endblock %}
+{% block customscript %}{% endblock %}

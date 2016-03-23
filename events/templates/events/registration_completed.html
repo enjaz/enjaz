@@ -1,0 +1,19 @@
+{% extends 'events_submission_base.html' %}{% load staticfiles %}
+{% block csssheet %}
+<link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.css' %}">
+{% endblock %}
+{% block meta_description %}التسجيل في {{ event.name }}{% endblock %}
+{% block title %}اكتمل التسجيل{% endblock %}
+{% block description %}<h2 class="dinar-light">التسجيل في {{ event.get_html_name|safe }}</h2>{% endblock %}
+
+{% block content %}
+<div class="form-register-success visible dinar-light">
+	<i class="entypo-check"></i>
+	<h3  class="dinar-light">اكتمل تسجيلك في {{ event.get_html_name|safe }}!</h3>
+    <p style="text-align: justify;">يمكنك الاطلاع على مستجدات الحدث عبر <a href="https://twitter.com/KSAU_Events">حسابنا على تويتر</a> و<a href="https://telegram.me/KSAUEVENTS">قناتنا على تلغرام</a>{% if event.url %} و<a href="{{ event.url }}">موقع الحدث</a>{% endif %}!</p>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+{% endblock %}

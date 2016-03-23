@@ -1,0 +1,222 @@
+{% extends 'events_submission_base.html' %}{% load staticfiles %}
+{% block csssheet %}
+<link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.css' %}">
+{% endblock %}
+{% block meta_description %}التسجيل في {{ event.name }}{% endblock %}
+{% block title %}التسجيل في {{ event.name }}{% endblock %}
+{% block description %}<h2 class="dinar-light">التسجيل في {{ event.get_html_name|safe }}</h2>{% endblock %}
+
+{% block content %}
+
+<p class="dinar-light enjaz-warning"><i class="entypo-info"></i> إذا كنت من طلاب وطالبات جامعة الملك سعود بن عبد العزيز للعلوم الصحيّة، فينبغي التسجيل في {{ event.get_html_name|safe }} عبر <a href="{% url 'userena_signin' %}?next={% url 'events:user_registration' event.code_name %}">الدخول إلى بوّابة إنجاز</a>. هذا النموذج مخصص لطلاب وطالبات الجامعات والكليّات الصحيّة الأخرى فقط.</p>
+
+<form id="form_register" method="post">
+    {% csrf_token %}
+    <div class="dinar-light registration-form">
+            <h3 class="dinar-light">سجّل معلوماتك</h3>
+			<div class="form-group">
+                <label class="control-label">الاسم بالعربية</label>
+				<div class="input-group{% if nonuser_form.ar_first_name.errors or nonuser_form.ar_middle_name.errors or nonuser_form.ar_last_name.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-user"></i>
+					</div>
+					
+					<input {% if nonuser_form.ar_first_name.value and not nonuser_form.ar_first_name.errors %}value="{{ nonuser_form.ar_first_name.value }}" {% endif %}type="text" class="form-control" name="ar_first_name" id="ar_first_name" placeholder="{{ nonuser_form.ar_first_name.label }}" required="required"/>
+					{% if nonuser_form.ar_first_name.errors %}
+					    {% for error in nonuser_form.ar_first_name.errors %}
+					        <label class='error' for='ar_first_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if nonuser_form.ar_middle_name.value and not nonuser_form.ar_middle_name.errors %}value="{{ nonuser_form.ar_middle_name.value }}" {% endif %}type="text" class="form-control" name="ar_middle_name" id="ar_middle_name" placeholder="{{ nonuser_form.ar_middle_name.label }}" required="required"/>
+					{% if nonuser_form.ar_middle_name.errors %}
+					    {% for error in nonuser_form.ar_middle_name.errors %}
+					        <label class='error' for='ar_middle_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if nonuser_form.ar_last_name.value and not nonuser_form.ar_last_name.errors %}value="{{ nonuser_form.ar_last_name.value }}" {% endif %}type="text" class="form-control" name="ar_last_name" id="ar_last_name" placeholder="{{ nonuser_form.ar_last_name.label }}" required="required"/>
+					{% if nonuser_form.ar_last_name.errors %}
+					    {% for error in nonuser_form.ar_last_name.errors %}
+					        <label class='error' for='ar_last_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+
+			<div class="form-group">
+                                <label class="control-label">الاسم بالإنجليزية</label>
+				<div class="english-field input-group{% if nonuser_form.en_first_name.errors or nonuser_form.en_middle_name.errors or nonuser_form.en_last_name.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-user"></i>
+					</div>
+					
+					<input {% if nonuser_form.en_first_name.value and not nonuser_form.en_first_name.errors %}value="{{ nonuser_form.en_first_name.value }}" {% endif %}type="text" class="form-control" name="en_first_name" id="en_first_name" placeholder="{{ nonuser_form.en_first_name.label }}" required="required"/>
+					{% if nonuser_form.en_first_name.errors %}
+					    {% for error in nonuser_form.en_first_name.errors %}
+					        <label class='dinar-light error' for='en_first_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if nonuser_form.en_middle_name.value and not nonuser_form.en_middle_name.errors %}value="{{ nonuser_form.en_middle_name.value }}" {% endif %}type="text" class="form-control" name="en_middle_name" id="en_middle_name" placeholder="{{ nonuser_form.en_middle_name.label }}" required="required"/>
+					{% if nonuser_form.en_middle_name.errors %}
+					    {% for error in nonuser_form.en_middle_name.errors %}
+					        <label class='dinar-light error' for='en_middle_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if nonuser_form.en_last_name.value and not nonuser_form.en_last_name.errors %}value="{{ nonuser_form.en_last_name.value }}" {% endif %}type="text" class="form-control" name="en_last_name" id="en_last_name" placeholder="{{ nonuser_form.en_last_name.label }}" required="required"/>
+					{% if nonuser_form.en_last_name.errors %}
+					    {% for error in nonuser_form.en_last_name.errors %}
+					        <label class='dinar-light error' for='en_last_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="input-group{% if nonuser_form.gender.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-docs"></i>
+					</div>
+					<select {% if nonuser_form.gender.value and not nonuser_form.gender.errors %}value="{{ nonuser_form.gender.value }}" {% endif %}class="form-control" id="gender" name="gender"  title="{{ nonuser_form.gender.label }}" required="required">
+                                                <option value="">{{ nonuser_form.gender.label }}</option>
+                                                {% for value, label in nonuser_form.fields.gender.widget.choices %}
+                                                <option {% if nonuser_form.gender.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
+					</select>
+					{% if nonuser_form.gender.errors %}
+					    {% for error in nonuser_form.gender.errors %}
+					        <label class='error' for='gender' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="english-field input-group{% if form.email.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-mail"></i>
+					</div>
+					
+					<input {% if nonuser_form.email.value and not nonuser_form.email.errors %}value="{{ nonuser_form.email.value }}" {% endif %}type="text" class="form-control" name="email" id="email" {% if not nonuser_form.email.errors %}placeholder="{{ nonuser_form.email.label }}"{% endif %} required="required"/>
+					{% if nonuser_form.email.errors %}
+					    {% for error in nonuser_form.email.errors %}
+					        <label class='dinar-light error' for='email' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="input-group{% if form.mobile_number.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-mobile"></i>
+					</div>
+					
+					<input {% if nonuser_form.mobile_number.value and not nonuser_form.mobile_number.errors %}value="{{ nonuser_form.mobile_number.value }}" {% endif %}type="text" class="form-control" name="mobile_number" id="mobile_number" placeholder="{{ nonuser_form.mobile_number.label }}" required="required"/>
+					{% if nonuser_form.mobile_number.errors %}
+					    {% for error in nonuser_form.mobile_number.errors %}
+					        <label class='error' for='mobile_number' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="input-group{% if nonuser_form.university.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-graduation-cap"></i>
+					</div>
+                    
+					<select {% if nonuser_form.university.value and not nonuser_form.university.errors %}value="{{ nonuser_form.university.value }}" {% endif %}class="form-control" id="university-list" title="{{ nonuser_form.university.label }}" required="required">
+                        <option value="">{{ nonuser_form.university.label }}</option>
+                        <option value="KSU">جامعة الملك سعود</option>
+                        <option value="ImamU">جامعة الإمام محمد بن سعود الإسلامية</option>
+                        <option value="Alfaisal">جامعة الفيصل</option>
+                        <option value="KAU">جامعة الملك عبدالعزيز</option>
+                        <option value="KFU">جامعة الملك فيصل</option>
+                        <option value="KKU">جامعة الملك خالد</option>
+                        <option value="PSAU">جامعة الأمير سطام بن عبد العزيز</option>
+                        <option value="QU">جامعة القصيم</option>
+                        <option value="MA">جامعة المجمعة</option>
+                        <option value="Other">جامعة أخرى</option>
+					</select>
+                    <input {% if nonuser_form.university.value and not nonuser_form.university.errors %}value="{{ nonuser_form.university.value }}" {% endif %}type="text" class="form-control" id="university-text-field" placeholder="اكتب جامعتك هنا" style="display: none"/>
+					{% if nonuser_form.university.errors %}
+					    {% for error in nonuser_form.university.errors %}
+					        <label class='error' for='university' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="input-group{% if nonuser_form.college.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-graduation-cap"></i>
+					</div>
+                    
+					<select {% if nonuser_form.college.value and not nonuser_form.college.errors %}value="{{ nonuser_form.college.value }}" {% endif %}class="form-control" id="college-list" title="{{ nonuser_form.college.label }}" required="required">
+                        <option value="">{{ nonuser_form.college.label }}</option>
+                        {% for value, label in college_choices %}
+                        <option value="{{ label }}">{{ label }}</option>{% endfor %}
+                        <option value="Other">كليّة أخرى</option>
+					</select>
+                    <input {% if nonuser_form.college.value and not nonuser_form.college.errors %}value="{{ nonuser_form.college.value }}" {% endif %}type="text" class="form-control" id="college-text-field" placeholder="اكتب كليّتك هنا" style="display: none"/>
+					{% if nonuser_form.college.errors %}
+					    {% for error in nonuser_form.college.errors %}
+					        <label class='error' for='college' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+            <input type="hidden" name="college">
+            <input type="hidden" name="university">
+            {% with 'events/partials/registration_form_'|add:event.code_name|add:"html" as template %}
+                {% include template %}
+            {% endwith %}
+			<div class="form-group">
+				<button type="submit" class="btn btn-success btn-block btn-login">
+					<i class="entypo-right-open-mini"></i>
+					سجّل!
+				</button>
+			</div>
+    </div>
+</form>
+{% endblock %}
+
+{% block customscript %}
+<script type="text/javascript">
+    $(function(){
+//        $('#agree').change(function(){
+//            if (this.checked){
+//                $('button').removeAttr('disabled')
+//            } else {
+//                $('button').attr('disabled', 'disabled')
+//            }
+//        });
+        $('#college-list').change(function(){
+            value = $(this).val();
+            if ($('#college-list option[value=Other]:checked').length){
+                $('#college-text-field').show();
+                $('#college-text-field').attr('required', 'required');
+            } else {
+                $('#college-text-field').hide();
+                $('#college-text-field').removeAttr('required');
+                $('input[name=college]').val(value);
+            }
+        });
+        $('#college-text-field').change(function(){
+            value = $(this).val();
+            $('input[name=college]').val(value);
+        });
+        $('#university-list').change(function(){
+            value = $(this).val();
+            if ($('#university-list option[value=Other]:checked').length){
+                $('#university-text-field').show();
+                $('#university-text-field').attr('required', 'required');
+            } else {
+                $('#university-text-field').hide();
+                $('#university-text-field').removeAttr('required');
+                $('input[name=university]').val(value);
+            }
+        });
+        $('#university-text-field').change(function(){
+            value = $(this).val();
+            $('input[name=university]').val(value);
+        });
+    });
+</script>
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+{% endblock %}

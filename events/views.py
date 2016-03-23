@@ -60,7 +60,7 @@ def nonuser_registration(request, event_code_name):
             email_context = {'name': nonuser.ar_first_name,
                              'event': event}
             mail.send([nonuser.email],
-                      template="events_registration_submitted",
+                      template="event_registration_submitted",
                       context=email_context)
             return HttpResponseRedirect(reverse('events:registration_completed',
                                                 args=(event.code_name,)))
@@ -101,7 +101,7 @@ def user_registration(request, event_code_name):
             context_email = {'name': request.user.common_profile.ar_first_name,
                              'event': event}
             mail.send([request.user.email],
-                      template="hpc_registration_submitted",
+                      template="event_registration_submitted",
                       context=context_email)
             return HttpResponseRedirect(reverse('events:registration_completed',
                                                 args=(event.code_name,)))

@@ -15,7 +15,6 @@ class NonUserForm(forms.ModelForm):
 class RegistrationForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
-        self.nonuser = kwargs.pop("nonuser", None)
         event = kwargs.pop("event")
         super(RegistrationForm, self).__init__(*args, **kwargs)
         time_slots = Session.objects.filter(event=event, time_slot__isnull=False).values_list('time_slot', flat=True).distinct()
@@ -37,7 +36,7 @@ class RegistrationForm(forms.Form):
             self.fields['session_%s' % untimed_session.code_name] = forms.BooleanField(label=untimed_session.name,
                                                                                        required=False)
 
-    def save(self):
+    def save(self, nonuser):
         timed_session_fields = [field_name for field_name in self.cleaned_data
                                 if field_name.startswith('time_slot_') and self.cleaned_data[field_name]]
         untimed_session_code_names = [field_name.split('_')[-1] for field_name in self.cleaned_data
@@ -50,8 +49,8 @@ class RegistrationForm(forms.Form):
 
         if self.user:
             registration = Registration.objects.create(user=self.user)
-        elif self.nonuser:
-            registration = Registration.objects.create(nonuser=self.nonuser)
+        elif nonuser:
+            registration = Registration.objects.create(nonuser=nonuser)
 
         for timed_session_field in timed_session_fields:
             session = self.cleaned_data[timed_session_field]

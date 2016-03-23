@@ -52,11 +52,11 @@ def nonuser_registration(request, event_code_name):
         return HttpResponseRedirect(reverse('events:user_registration',
                                             args=(event.code_name,)))
     if request.method == 'POST':
-        registration_form = RegistrationForm(request.POST, nonuser=nonuser, event=event)
+        registration_form = RegistrationForm(request.POST, event=event)
         nonuser_form = NonUserForm(request.POST)
         if registration_form.is_valid() and nonuser_form.is_valid():
             nonuser = nonuser_form.save()
-            registration = registration_form.save()
+            registration = registration_form.save(nonuser=nonuser)
             email_context = {'name': nonuser.ar_first_name,
                              'event': event}
             mail.send([nonuser.email],
@@ -65,7 +65,7 @@ def nonuser_registration(request, event_code_name):
             return HttpResponseRedirect(reverse('events:registration_completed',
                                                 args=(event.code_name,)))
     elif request.method == 'GET':
-        registration_form = RegistrationForm(nonuser=nonuser, event=event)
+        registration_form = RegistrationForm(event=event)
         nonuser_form = NonUserForm()
 
     session_choices = Session.objects.filter(event=event,

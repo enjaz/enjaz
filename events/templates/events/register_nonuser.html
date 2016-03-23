@@ -163,7 +163,7 @@
 			</div>
             <input type="hidden" name="college">
             <input type="hidden" name="university">
-            {% with 'events/partials/registration_form_'|add:event.code_name|add:"html" as template %}
+            {% with 'events/partials/registration_form_'|add:event.code_name|add:".html" as template %}
                 {% include template %}
             {% endwith %}
 			<div class="form-group">

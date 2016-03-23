@@ -1,0 +1,16 @@
+{% extends 'front/front_base.html' %}{% load staticfiles %}{% load events_tags %}
+{% block title %}المقبولون في {{ event.name }}{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-offset-2">
+        <h1>المقبولون في {{ event.get_html_name|safe }}</h1>
+        <p style="text-align: justify; color: #373E4A; font-size: 1.2em;">أهلا بكم في {{ event.get_html_name|safe }}!  أدناه قائمة بالمقبولين والمقبولات في الفعاليات التي يتضمّنها الحدث.  في حال لم تعثر على اسمك، فهذا يعني أن المقاعد اكتملت قبل أن نتمكّن من ضمّ اسمك، مع تطلّعنا لأن تمضي وقتا ماتعًا ومفيدا في الحدث!</p>
+        <ul>
+        {% for session in event.sessions %}
+            <li><a href="{% url 'events:show_session' event.code_name session.pk %}">{{ session }}</a></li>
+        {% endfor %}
+        </ul>
+
+    </div>
+</div>
+{% endblock %}

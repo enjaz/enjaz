@@ -1,0 +1,28 @@
+{% extends 'events_submission_base.html' %}{% load staticfiles %}
+{% block csssheet %}
+<link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.css' %}">
+{% endblock %}
+{% block meta_description %}التسجيل في {{ event.name }}{% endblock %}
+{% block title %}التسجيل في {{ event.name }}{% endblock %}
+{% block description %}<h2 class="dinar-light">التسجيل في {{ event.get_html_name|safe }}</h2>{% endblock %}
+{% block content %}
+<div class="form-register-success visible dinar-light">
+	<i class="entypo-flag"></i>
+    <p style="margin-top: 15px;">أهلا {{ user.common_profile.ar_first_name|default:user.username }} {{ user.common_profile.ar_last_name }}!  من هنا يمكنك التسجيل في {{ event.get_html_name|safe }}.</p>
+</div>
+<form id="form_register" method="post">
+    {% csrf_token %}
+        <div class="dinar-light registration-form">
+            {% include 'events/partials/registration_form_onsite.html' %}
+			<div class="form-group">
+				<button disabled type="submit" class="btn btn-success btn-block btn-login">
+					<i class="entypo-left-open-mini"></i>
+					سجّل!
+				</button>
+			</div>
+        </div>
+</form>
+{% endblock %}
+{% block customscript %}
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'events_submission_base.html' %}{% load staticfiles %}
+{% block meta_description %}التسجيل في {{ event.name }}{% endblock %}
+{% block title %}التسجيل في {{ event.name }}{% endblock %}
+{% block csssheet %}
+<link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.css' %}">
+{% endblock %}
+{% block description %}<h2 class="dinar-light">التسجيل في {{ event.get_html_name|safe }}</h2>{% endblock %}
+
+{% block content %}
+<div class="form-register-success visible dinar-light">
+	<i class="entypo-flag"></i>
+    <p class="enjaz-intro" style="margin-top: 15px;">هل أنت من طلاب جامعة الملك سعود بن عبد العزيز للعلوم الصحيّة؟ يمكنك التسجيل في {{ event.get_html_name|safe }} بعد <a href="{% url 'userena_signin' %}?next={% url 'events:user_registration' event.code_name %}">الدخول إلى بوّابة إنجاز</a>.</p>
+    <hr>
+    <p class="enjaz-intro">أما زملاؤنا من طلاب الجامعات والكليّات الصحيّة الأخرى فيمكنكم التسجيل <a href="{% url 'events:nonuser_registration'  event.code_name %}">عبر النموذج المخصص</a>.</p>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+{% endblock %}
+
+
+

@@ -29,6 +29,11 @@ class Event(models.Model):
     start_date = models.DateField(u"تاريخ البدء", null=True)
     end_date = models.DateField(u"تاريخ الانتهاء", null=True)
     url = models.CharField(max_length=255, blank=True)
+    twitter = models.CharField(max_length=255,
+                               blank=True,
+                               default="KSAU_Events")
+    is_on_telegram = models.BooleanField(default=True,
+                                         verbose_name=u"متاح التسجيل في يوم الحدث؟")
     organizing_club = models.ForeignKey(Club)
     priorities = models.PositiveSmallIntegerField(default=1)
 

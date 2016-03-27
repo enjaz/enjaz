@@ -41,11 +41,6 @@ def add_focr(apps, schema_editor):
                            time_slot=1,
                            date=workshop_date,
                            gender='')
-    Session.objects.create(name="Data collection, management, and handling: Be a smart data manager",
-                           event=focr2016_event,
-                           time_slot=1,
-                           date=workshop_date,
-                           gender='')
     Session.objects.create(name="Literature review and research question",
                            event=focr2016_event,
                            time_slot=1,
@@ -71,7 +66,6 @@ def add_focr(apps, schema_editor):
 def remove_focr(apps, schema_editor):
     Club = apps.get_model('clubs', 'Club')
     Event = apps.get_model('events', 'Event')
-    Session = apps.get_model('events', 'Session')
     Club.objects.filter(english_name="Foundtions of Clinical Research 2016").delete()
     Event.objects.filter(name="Foundations of Clinical Research 2016").delete()
 

@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+0# -*- coding: utf-8  -*-
 from django import forms
 
 from accounts.utils import get_user_gender
@@ -36,7 +36,7 @@ class RegistrationForm(forms.Form):
             self.fields['session_%s' % untimed_session.code_name] = forms.BooleanField(label=untimed_session.name,
                                                                                        required=False)
 
-    def save(self, nonuser):
+    def save(self, nonuser=None):
         timed_session_fields = [field_name for field_name in self.cleaned_data
                                 if field_name.startswith('time_slot_') and self.cleaned_data[field_name]]
         untimed_session_code_names = [field_name.split('_')[-1] for field_name in self.cleaned_data

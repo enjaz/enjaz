@@ -28,7 +28,7 @@ def list_sessions(request, event_code_name):
 
 def show_session(request, event_code_name, pk):
     event = get_object_or_404(Event, code_name=event_code_name)
-    session = get_object_or_404(Session, pk=pk)
+    session = get_object_or_404(Session, pk=pk, event=event)
     return render(request, 'events/session_show.html',
                   {'session': session})
 
@@ -36,7 +36,7 @@ def introduce_registration(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
     utils.check_if_closed(event)
     if request.user.is_authenticated() and \
-       not utils.is_organizing_committee_member(event, request.user) and \
+       not utils.is_organizing_committee_member(request.user, event) and \
        not request.user.is_superuser:
         return HttpResponseRedirect(reverse('events:user_registration',
                                             args=(event.code_name,)))
@@ -114,13 +114,24 @@ def user_registration(request, event_code_name):
 @login_required
 def list_registrations(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
-    if not utils.is_organizing_committee_member(event, request.user) and \
+    if not utils.is_organizing_committee_member(request.user, event) and \
        not request.user.is_superuser:
         raise PermissionDenied
 
     sessions = Session.objects.filter(event=event)
     return render(request, "events/registration_list.html",
-                  {'sessions': sessions})
+                  {'event': event, 'sessions': sessions})
+
+@login_required
+def show_session_privileged(request, event_code_name, pk):
+    event = get_object_or_404(Event, code_name=event_code_name)
+    session = get_object_or_404(Session, pk=pk, event=event)
+    if not utils.is_organizing_committee_member(request.user, event) and \
+       not request.user.is_superuser:
+        raise PermissionDenied
+
+    return render(request, 'events/session_show_privileged.html',
+                  {'session': session, 'event': event})
 
 def registration_completed(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)

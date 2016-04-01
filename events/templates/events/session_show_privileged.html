@@ -1,0 +1,60 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}{% load events_tags %}
+{% block title %}قائمة المسجلين في {{ session }}{% endblock %}
+{% block pageheaderurl %}{% url 'events:list_registrations' event.code_name %}{% endblock %}
+{% block content %}
+<h1>المسجلون في {{ session }}</h1>
+    <table class="display datatable">
+        <thead>
+            <tr>
+                <th>الاسم العربي</th>
+                <th class="not-mobile">الاسم الإنجليزي</th>
+                <th class="not-mobile">الجامعة</th>
+                <th class="not-mobile">الكلية</th>
+                <td class="not-mobile">البريد</td>
+                <th>تاريخ التسجيل</th>
+                <th class="not-mobile">الأولولية</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for registration in session.get_all_registrations.undeleted %}
+            <tr>
+                <td>{{ registration.get_ar_full_name }}</td>
+                <td class="english-field" s>{{ registration.get_en_full_name }}</td>
+                <td>{{ registration.get_university }}</td>
+                <td>{{ registration.get_college }}</td>
+                <td><a class="english-field" href="mailto:{{ registration.get_email }}">{{ registration.get_email }}</a></td>
+                <td data-order='{{ registration.date_submitted|date:"U" }}'>{{ registration.date_submitted }}</td>
+                <td>{{ registration|get_session_priority:session }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block customscript %}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/datatables/buttons/buttons.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/jszip.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/vfs_fonts.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/buttons.html5.min.js' %}"></script>
+	<script>
+    $(function(){
+        $('.datatable').dataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copyHtml5',
+                'excelHtml5',
+                'csvHtml5',
+            ],
+            order: [[ 5, "desc" ]],
+            language: {% include 'js/dataTables-arabic.json' %},
+        });
+        // Allow the dropdown menus to cross the border of the panel without being cropped
+        $(".panel").css("overflow-x", "visible").css("overflow-y", "visible");
+    });
+    </script>
+{% endblock %}

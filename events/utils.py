@@ -20,9 +20,12 @@ def check_if_closed(event):
         return HttpResponseRedirect(reverse('events:registration_closed'))
 
 def get_user_organizing_events(user):
-    user_events = (Event.objects.filter(organizing_club__members=user) | \
-                   Event.objects.filter(organizing_club__coordinator=user) | \
-                   Event.objects.filter(organizing_club__deputies=user)).distinct()
+    if user.is_superuser:
+        user_events = Event.objects.all()
+    else:
+        user_events = (Event.objects.filter(organizing_club__members=user) | \
+                       Event.objects.filter(organizing_club__coordinator=user) | \
+                       Event.objects.filter(organizing_club__deputies=user)).distinct()
     return user_events
 
 def register_in_vma(session, registration):

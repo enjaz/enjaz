@@ -1,13 +1,24 @@
 {% extends 'events_evaluation_base.html' %}{% load staticfiles %}{% load events_tags %}
 
-{% block title %}قائمة المسجلين{% endblock %}
+{% block title %}قائمة المسجلين والمسجلات{% endblock %}
 {% block pageheaderurl %}{% url 'events:list_registrations' event.code_name %}{% endblock %}
 
 {% block content %}
-<h1>المسجلون في {{ event.get_html_name|safe }}</h1>
-<ul>
+<h1>المسجلون والمسجلات في {{ event.get_html_name|safe }}</h1>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>الجلسة</th>
+            <th>عدد المسجلين والمسجلات</th>
+        </tr>
+    </thead>
 {% for session in event.session_set.all %}
-    <li><a href="{% url 'events:show_session_privileged' event.code_name session.pk %}">{{ session }}</a></li>
+    <tbody>
+        <tr>
+            <td><a href="{% url 'events:show_session_privileged' event.code_name session.pk %}">{{ session }}</a></td>
+            <td>{{ session.get_all_registrations.count }}</td>
+        </tr>
+    </tbody>
 {% endfor %}
-</ul>
+</table>
 {% endblock %}

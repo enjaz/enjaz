@@ -7,8 +7,10 @@ from django.http import HttpResponseRedirect
 from django.utils import timezone
 
 from core.utils import hindi_to_arabic
+from events.models import Event
 
-def is_organizing_committee_member(event, user):
+
+def is_organizing_committee_member(user, event):
     organizing_club = event.organizing_club
     return user.memberships.current_year().filter(pk=organizing_club.pk).exists()
 
@@ -16,6 +18,12 @@ def check_if_closed(event):
     if event.registration_closing_date and \
        timezone.now() > event.registration_closing_date:
         return HttpResponseRedirect(reverse('events:registration_closed'))
+
+def get_user_organizing_events(user):
+    user_events = (Event.objects.filter(organizing_club__members=user) | \
+                   Event.objects.filter(organizing_club__coordinator=user) | \
+                   Event.objects.filter(organizing_club__deputies=user)).distinct()
+    return user_events
 
 def register_in_vma(session, registration):
     en_full_name = urllib2.quote(registration.get_en_full_name().replace(u'\u202a', '')

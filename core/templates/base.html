@@ -1,4 +1,4 @@
-{% load staticfiles %}{% load studentguide_tags %}{% load hpc_tags %}
+{% load staticfiles %}{% load studentguide_tags %}{% load events_tags %}
 <!DOCTYPE html>
 <html lang="en" dir="rtl">
 <!--
@@ -164,29 +164,31 @@ you?
                 </a>
             </li>
             {% endif %}
-            {% if user.is_superuser or user|is_organizing_committee_member or user|is_research_committee_member %}
+            {% if user|has_user_organizing_events %}
             <li>
-				<a>
-					<i class="entypo-calendar"></i>
-					<span class="english-field">HPC 2016</span>
-				</a>
+                <a>
+                    <i class="entypo-calendar"></i>
+                    <span>أنشطة كبرى</span>
+                </a>
                 <ul>
-                    {% if user.is_superuser or user|is_organizing_committee_member %}
-                    <li>
-                        <a href="{% url 'hpc:list_registrations' %}">
-                            <i class="entypo-chart-pie"></i>
-                            <span>المسجلون</span>
-                        </a>
-                    </li>
-                    {% endif %}
-                    {% if user.is_superuser or user|is_research_committee_member %}
-                    <li>
-                        <a href="{% url 'hpc:list_abstracts' %}">
-                            <i class="entypo-docs"></i>
-                            <span class="english-field">Abstracts</span>
-                        </a>
-                    </li>
-                    {% endif %}
+                {% for event in user|get_user_organizing_events %}
+                <li>
+                    <a>
+                        <i class="entypo-calendar"></i>
+                        <span class="english-field">{{ event.name }}</span>
+                    </a>
+                    <ul>
+                        {% if user.is_superuser or user|is_organizing_committee_member:event %}
+                        <li>
+                            <a href="{% url 'events:list_registrations' event.code_name %}">
+                                <i class="entypo-chart-pie"></i>
+                                <span>المسجلون</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </li>
+                {% endfor %}
                 </ul>
             </li>
             {% endif %}

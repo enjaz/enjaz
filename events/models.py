@@ -74,6 +74,10 @@ class Session(models.Model):
                                                   verbose_name=u"متاح التسجيل في يوم الحدث؟")
     objects = SessionQuerySet.as_manager()
 
+    def get_all_registrations(self):
+        return (self.first_priory_registrations.all() | \
+                self.second_priory_registrations.all()).distinct()
+
     def __unicode__(self):
         if self.gender:
             return u"%s (%s)" % (self.name, self.get_gender_display())

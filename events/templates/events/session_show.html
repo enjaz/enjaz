@@ -6,7 +6,7 @@
         <h1><a href="{% url 'events:list_sessions' event.code_name session.event.code_name %}">المقبولون في {{ session.event.get_html_name|safe }}</a>: {{ session.name }}</h1>
         {% if user.is_superuser or user|is_organizing_committee_member %}
         <h2>طالبات</h2>
-        <table class="display datatable  dt-responsive">
+        <table class="display datatable dt-responsive">
             <thead>
                 <tr>
                     <th>الاسم العربي</th>
@@ -33,7 +33,7 @@
             </tbody>
         </table>
         <h2>طلاب</h2>
-        <table class="display datatable  dt-responsive">
+        <table class="display datatable dt-responsive">
             <thead>
                 <tr>
                     <th>الاسم العربي</th>
@@ -81,6 +81,8 @@
        {% endif %}
     </div>
 </div>
+{% endblock %}
+{% block customscript %}
 <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
 <link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
 <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
@@ -89,7 +91,6 @@
 <link rel="stylesheet" href="{% static 'js/datatables/buttons/buttons.dataTables.min.css' %}">
 <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/dataTables.buttons.min.js' %}"></script>
 <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/jszip.min.js' %}"></script>
-<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/vfs_fonts.js' %}"></script>
 <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/buttons.html5.min.js' %}"></script>
 {% endif %}
 <script type="text/javascript">

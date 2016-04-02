@@ -178,14 +178,12 @@ you?
                         <span class="english-field">{{ event.name }}</span>
                     </a>
                     <ul>
-                        {% if user.is_superuser or user|is_organizing_committee_member:event %}
                         <li>
                             <a href="{% url 'events:list_registrations' event.code_name %}">
                                 <i class="entypo-chart-pie"></i>
                                 <span>المسجلون والمسجلات</span>
                             </a>
                         </li>
-                        {% endif %}
                     </ul>
                 </li>
                 {% endfor %}

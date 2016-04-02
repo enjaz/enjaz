@@ -24,7 +24,7 @@ from activities.models import Activity, Evaluation
 from activities.forms import EvaluationForm
 from activities.utils import get_club_notification_to, get_club_notification_cc
 from clubs.models import Club, city_choices
-from clubs.utils import has_coordination_to_activity, get_user_coordination_and_deputyships, can_review_any_niqati, is_coordinator_of_any_club
+from clubs.utils import is_presidency_coordinator_or_deputy, has_coordination_to_activity, get_user_coordination_and_deputyships, can_review_any_niqati, is_coordinator_of_any_club
 from niqati.models import Category, Code, Code_Order, Code_Collection, Review, COUPON, SHORT_LINK
 from niqati.forms import OrderForm, RedeemCodeForm
 
@@ -33,7 +33,7 @@ current_year = StudentClubYear.objects.get_current()
 
 @login_required
 def index(request):
-    if request.user.has_perms('niqati.view_general_report'): # Superuser
+    if request.user.is_superuser or is_presidency_coordinator_or_deputy(request.user):
         return HttpResponseRedirect(reverse('niqati:general_report'))
     elif can_review_any_niqati(request.user):
         return HttpResponseRedirect(reverse('niqati:list_pending_orders'))
@@ -293,8 +293,11 @@ def list_pending_orders(request):
     return render(request, 'niqati/approve.html', context)
 
 @login_required
-@permission_required('niqati.view_general_report', raise_exception=True)
 def general_report(request, city=""):
+    if not request.user.is_superuser and \
+       not is_presidency_coordinator_or_deputy(request.user):
+        raise PermissionDenied
+
     if city:
         city_codes = [city_pair[0] for city_pair in city_choices]
         if not city in city_codes:

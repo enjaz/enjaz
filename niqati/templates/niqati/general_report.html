@@ -39,11 +39,11 @@
     {% for niqati_user in users %}
         <tr>
             <td><a href="{% url 'niqati:student_report_with_username' niqati_user.username %}">{{ niqati_user.common_profile.get_ar_full_name|default:niqati_user }}</a></td>
-            <td>{{ niqati_user.common_profile.get_en_full_name|default:niqati_user }}</td>
+            <td class="english-field">{{ niqati_user.common_profile.get_en_full_name|default:niqati_user }}</td>
             <td>{{ niqati_user.common_profile.college }}</td>
             <td>{{ niqati_user.common_profile.student_id }}</td>
             <td>{{ niqati_user.common_profile.badge_number }}</td>
-            <td>{{ niqati_user.email }}</td>
+            <td class="english-field"><a href="mailto:{{ niqati_user.email }}">{{ niqati_user.email }}</a></td>
             <td>{{ niqati_user.common_profile.mobile_number }}</td>
             <td class="points">{{ niqati_user.point_sum }}</td>
         </tr>

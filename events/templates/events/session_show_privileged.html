@@ -3,7 +3,7 @@
 {% block pageheaderurl %}{% url 'events:list_registrations' event.code_name %}{% endblock %}
 {% block content %}
 <h1>المسجلون والمسجلات في {{ session }}</h1>
-    <table class="display datatable">
+    <table class="display datatable dt-responsive">
         <thead>
             <tr>
                 <th>الاسم العربي</th>
@@ -39,7 +39,6 @@
     <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
     <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/dataTables.buttons.min.js' %}"></script>
     <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/jszip.min.js' %}"></script>
-    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/vfs_fonts.js' %}"></script>
     <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/buttons.html5.min.js' %}"></script>
 	<script>
     $(function(){

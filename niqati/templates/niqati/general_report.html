@@ -22,16 +22,16 @@
   <h2>التقرير العام</h2>
 </div>
 
-<table class="table datatable">
+<table class="table datatable dt-responsive">
     <thead>
       <tr>
         <th>الاسم بالعربية</th>
-        <th>الاسم بالإنجليزية</th>
-        <th>الكلية</th>
-        <th>الرقم الجامعي</th>
-        <th>رقم البطاقة</th>
-        <th>البريد الإلكتروني</th>
-        <th>الجوال</th>
+        <th class="not-mobile">الاسم بالإنجليزية</th>
+        <th class="not-mobile">الكلية</th>
+        <th class="not-mobile">الرقم الجامعي</th>
+        <th class="not-mobile">رقم البطاقة</th>
+        <th class="not-mobile">البريد الإلكتروني</th>
+        <th class="not-mobile">الجوال</th>
         <th>عدد النقاط</th>
       </tr>
     </thead>
@@ -55,10 +55,22 @@
 
 {% block customscript %}
     <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/datatables/buttons/buttons.dataTables.min.css' %}">
     <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/jszip.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/buttons.html5.min.js' %}"></script>
     <script type="text/javascript">
     $(document).ready(function () {
         $(".datatable").DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copyHtml5',
+                'excelHtml5',
+                'csvHtml5',
+            ],
             "order": [[ 6, "desc" ]],
             "language": {% include 'js/dataTables-arabic.json' %}
         });

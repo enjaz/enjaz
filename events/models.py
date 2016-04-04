@@ -43,6 +43,13 @@ class Event(models.Model):
         else:
             return self.name
 
+    def get_has_multiple_sessions(self):
+        """Used to generate proper emails."""
+        if self.session_set.count() > 1:
+            return True
+        else:
+            return False
+
     def __unicode__(self):
         return self.name
 

@@ -10,6 +10,8 @@
                 <th class="not-mobile">الاسم الإنجليزي</th>
                 <th class="not-mobile">الجامعة</th>
                 <th class="not-mobile">الكلية</th>
+                <th class="not-mobile">الرقم الجامعي</th>
+                <th class="not-mobile">الجندر</th>
                 <td class="not-mobile">البريد</td>
                 <th>تاريخ التسجيل</th>
                 <th class="not-mobile">الأولولية</th>
@@ -22,6 +24,8 @@
                 <td class="english-field" s>{{ registration.get_en_full_name }}</td>
                 <td>{{ registration.get_university }}</td>
                 <td>{{ registration.get_college }}</td>
+                <td>{{ registration.user.common_profile.student_id }}</td>
+                <td>{% if registration.get_gender == 'F' %}طالبة{% elif registration.get_gender == 'M' %}طالب{% endif %}</td>
                 <td><a class="english-field" href="mailto:{{ registration.get_email }}">{{ registration.get_email }}</a></td>
                 <td data-order='{{ registration.date_submitted|date:"U" }}'>{{ registration.date_submitted }}</td>
                 <td>{{ registration|get_session_priority:session }}</td>
@@ -49,7 +53,7 @@
                 'excelHtml5',
                 'csvHtml5',
             ],
-            order: [[ 5, "desc" ]],
+            order: [[ 7, "desc" ]],
             language: {% include 'js/dataTables-arabic.json' %},
         });
         // Allow the dropdown menus to cross the border of the panel without being cropped

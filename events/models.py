@@ -202,6 +202,7 @@ class Registration(models.Model):
             return self.nonuser.mobile_number
         except AttributeError:
             return ''
+
     def get_ar_first_name(self):
         if self.user:
             try:
@@ -230,5 +231,16 @@ class Registration(models.Model):
         elif self.nonuser:
             return self.nonuser.get_en_full_name()
 
+    def get_gender(self):
+        try:
+            if self.user:
+                return self.user.common_profile.college.gender
+        except ObjectDoesNotExist:
+            pass
+        try:
+            return self.nonuser.gender
+        except AttributeError:
+            return ''
+        
     def __unicode__(self):
         return self.get_en_full_name()

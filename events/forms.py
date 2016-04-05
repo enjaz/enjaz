@@ -19,7 +19,7 @@ class RegistrationForm(forms.Form):
         super(RegistrationForm, self).__init__(*args, **kwargs)
         time_slots = Session.objects.filter(event=self.event, time_slot__isnull=False).values_list('time_slot', flat=True).distinct()
         for time_slot in time_slots:
-            time_slot_sessions = Session.objects.filter(event=event, time_slot=time_slot)
+            time_slot_sessions = Session.objects.filter(event=self.event, time_slot=time_slot)
             if self.user:
                 user_gender = get_user_gender(self.user)
                 time_slot_sessions = Session.objects.filter(event=self.event,

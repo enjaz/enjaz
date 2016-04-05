@@ -19,20 +19,20 @@ class RegistrationUniversityFilter(admin.SimpleListFilter):
         elif self.value() == 'other':
             return queryset.filter(nonuser__isnull=False)
 
-class SessionFilter(admin.SimpleListFilter):
-    title = "Session"
-    parameter_name = 'session'
+class EventFilter(admin.SimpleListFilter):
+    title = "Event"
+    parameter_name = 'event'
     def lookups(self, request, model_admin):
-        return Session.objects.values_list('pk', 'name') 
+        return Event.objects.values_list('pk', 'name') 
 
     def queryset(self, request, queryset):
         if self.value():
-            return queryset.filter(sessions__pk=self.value())
+            return queryset.filter(first_priority_sessions__event__pk=self.value()).distinct()
 
 class RegistrationAdmin(admin.ModelAdmin):
     list_display = ['pk', '__unicode__', 'get_university', 'get_college',
                     'date_submitted']
-    list_filter = [RegistrationUniversityFilter, SessionFilter]
+    list_filter = [RegistrationUniversityFilter, EventFilter]
     search_fields= ('user__username', 'user__email',
                     'user__common_profile__en_first_name',
                     'user__common_profile__en_middle_name',

@@ -15,22 +15,22 @@ class NonUserForm(forms.ModelForm):
 class RegistrationForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
-        event = kwargs.pop("event")
+        self.event = kwargs.pop("event")
         super(RegistrationForm, self).__init__(*args, **kwargs)
-        time_slots = Session.objects.filter(event=event, time_slot__isnull=False).values_list('time_slot', flat=True).distinct()
+        time_slots = Session.objects.filter(event=self.event, time_slot__isnull=False).values_list('time_slot', flat=True).distinct()
         for time_slot in time_slots:
             time_slot_sessions = Session.objects.filter(event=event, time_slot=time_slot)
             if self.user:
                 user_gender = get_user_gender(self.user)
-                time_slot_sessions = Session.objects.filter(event=event,
+                time_slot_sessions = Session.objects.filter(event=self.event,
                                                             time_slot=time_slot,
                                                             gender__in=['', user_gender])
             # Add as many time slot fields as many priorities we have.
-            for priority in range(1, event.priorities + 1):
+            for priority in range(1, self.event.priorities + 1):
                 self.fields['time_slot_%s_%s' % (time_slot, priority)] = forms.ModelChoiceField(time_slot_sessions, required=False)
                 self.fields['time_slot_%s_%s' % (time_slot, priority)].widget.attrs['class'] = 'form-control'
 
-        untimed_sessions = Session.objects.filter(event=event, time_slot__isnull=True)
+        untimed_sessions = Session.objects.filter(event=self.event, time_slot__isnull=True)
 
         for untimed_session in untimed_sessions:
             self.fields['session_%s' % untimed_session.code_name] = forms.BooleanField(label=untimed_session.name,
@@ -61,7 +61,7 @@ class RegistrationForm(forms.Form):
                     registration.second_priority_sessions.add(session)
 
         for session_code_name in untimed_session_code_names:
-            session = Session.objects.get(code_name=session_code_name)
+            session = Session.objects.get(event=self.event, code_name=session_code_name)
             registration.first_priority_sessions.add(session)
 
         return registration

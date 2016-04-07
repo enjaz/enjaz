@@ -20,10 +20,10 @@ class Command(BaseCommand):
             count = repetitions.count()
             if count:
                 for repetition in repetitions:
-                    for session in repetition.sessions.all():
-                        if session.time_slot and registration.sessions.filter(time_slot=session.time_slot).exists():
+                    for session in repetition.first_priority_sessions.all():
+                        if session.time_slot and registration.first_priority_sessions.filter(time_slot=session.time_slot).exists():
                             print "Conflict between {} and {}!".format(repetition.pk, registration.pk)
-                        elif registration.sessions.filter(pk=session.pk).exists():
+                        elif registration.first_priority_sessions.filter(pk=session.pk).exists():
                             print "I found {} repeated in both {} and {}.".format(session.pk, repetition.pk, registration.pk)
                         else:
                             continue
@@ -32,6 +32,19 @@ class Command(BaseCommand):
                         deleted.append(repetition.pk)
                         print "Marked {} as deleted.".format(repetition.pk)
                         break
+                    for session in repetition.second_priority_sessions.all():
+                        if session.time_slot and registration.second_priority_sessions.filter(time_slot=session.time_slot).exists():
+                            print "Conflict between {} and {}!".format(repetition.pk, registration.pk)
+                        elif registration.second_priority_sessions.filter(pk=session.pk).exists():
+                            print "I found {} repeated in both {} and {}.".format(session.pk, repetition.pk, registration.pk)
+                        else:
+                            continue
+                        repetition.is_deleted = True
+                        repetition.save()
+                        deleted.append(repetition.pk)
+                        print "Marked {} as deleted.".format(repetition.pk)
+                        break
+
                 total_count += count
             else:
                 continue

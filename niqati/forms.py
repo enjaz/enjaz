@@ -7,7 +7,7 @@ import autocomplete_light
 from django.contrib import messages
 from django.utils import timezone
 from django import forms
-from niqati.models import Code_Order, Code_Collection, Category, Code
+from niqati.models import Order, Collection, Category, Code
 
 class OrderForm(forms.Form):
 
@@ -54,7 +54,7 @@ class OrderForm(forms.Form):
         # Use this to check if we have created any collections.  If we
         # haven't (i.e. all of them are zero), don't create the order.
         collections_created = False 
-        order = Code_Order.objects.create(episode=self.cleaned_data['episode'],
+        order = Order.objects.create(episode=self.cleaned_data['episode'],
                                           assignee=reviewing_parent,
                                           submitter=self.user)
 
@@ -72,9 +72,9 @@ class OrderForm(forms.Form):
                 continue
             students = self.cleaned_data.get('students_' + category_pk)
             collections_created = True # If count is 
-            collection = Code_Collection.objects.create(code_count=count,
-                                                        code_category=category,
-                                                        parent_order=order)
+            collection = Collection.objects.create(code_count=count,
+                                                        category=category,
+                                                        order=order)
             if students:
                 collection.students.add(*students)
                 collection.save()
@@ -119,8 +119,8 @@ class RedeemCodeForm(forms.Form):
             # happen.  If they do have another code, but the new one
             # has higher point, replace it.
             self.other_code = None
-            if not self.code.collection.parent_order.episode.allow_multiple_niqati:
-                other_codes = Code.objects.filter(collection__parent_order__episode=self.code.collection.parent_order.episode,
+            if not self.code.collection.order.episode.allow_multiple_niqati:
+                other_codes = Code.objects.filter(collection__order__episode=self.code.collection.order.episode,
                                                   user=self.user)
                 if other_codes.exists():
                     self.other_code = other_codes.first()
@@ -140,7 +140,7 @@ class RedeemCodeForm(forms.Form):
     #     # is part of collection
     #     if 'string' in cleaned_data and \
     #        self.code.collection and \
-    #        timezone.now().date() > self.code.collection.parent_order.episode.end_date + datetime.timedelta(14):
+    #        timezone.now().date() > self.code.collection.order.episode.end_date + datetime.timedelta(14):
     #         raise forms.ValidationError(u"مضى أكثر من أسبوعين على انتهاء النشاط ولم يعد ممكنا إدخال نقاطي!", code="TwoWeeks")
 
     #     return cleaned_data

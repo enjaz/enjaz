@@ -31,7 +31,6 @@ class Category(models.Model):
 
     def __unicode__(self):
         return self.label
-    
 
 class Code(models.Model):
     # Basic Properties
@@ -44,11 +43,8 @@ class Code(models.Model):
     # To document the reason for manually-added codes.
     note = models.CharField(max_length=200, blank=True)
 
-    # Obsolete
-    category = models.ForeignKey(Category, null=True, blank=True)
-
     # Generation-related
-    collection = models.ForeignKey('Code_Collection', null=True,
+    collection = models.ForeignKey('Collection', null=True,
                                    blank=True,
                                    on_delete=models.SET_NULL)
     generation_date = models.DateTimeField(auto_now_add=True)
@@ -86,23 +82,23 @@ class Code(models.Model):
     
 
 
-# When a club requests codes for a certain activity, a Code_Order is created. This Code_Order contains several
-# Code_Collections, each corresponding to a code category (idea, organizer, etc.). Each Code_Collection contains all information
-# and methods for creation of codes of its specific category. The Code_Order just houses the different Code_Collections
+# When a club requests codes for a certain activity, an Order is created. This Order contains several
+# Collections, each corresponding to a code category (idea, organizer, etc.). Each Collection contains all information
+# and methods for creation of codes of its specific category. The Order just houses the different Collections
 # together.
 # ---
-# Code_Collection is the "functional unit" of the code generation process
-# Code_Order is a container that contains all Code_Collections of a single order
+# Collection is the "functional unit" of the code generation process
+# Order is a container that contains all Collections of a single order
 # ---
-# Management approves idea Code_Collections, not Code_Orders
-# For each activity, Clubs see a list of Code_Orders, with each containing files (e.g. PDFs) representing the Code_Collections
+# Management approves idea Collections, not Orders
+# For each activity, Clubs see a list of Orders, with each containing files (e.g. PDFs) representing the Collections
 
 
-class Code_Collection(models.Model): # group of codes that are (1) of the same type & (2) of the same Code_Order
+class Collection(models.Model): # group of codes that are (1) of the same type & (2) of the same Order
     # Generation-related
-    code_category = models.ForeignKey(Category)
+    category = models.ForeignKey(Category)
     code_count = models.PositiveSmallIntegerField()
-    parent_order = models.ForeignKey('Code_Order') # --- relation to activity is through the Code_Order
+    order = models.ForeignKey('Order') # --- relation to activity is through the Order
     students = models.ManyToManyField(User, blank=True,
                                       limit_choices_to={'common_profile__is_student': True,
                                                         'coordination__isnull': True})
@@ -120,7 +116,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
     asset = models.FileField(upload_to='niqati/codes/') # either the PDF file for coupons or the list of short links (as txt/html?)
 
     def __unicode__(self):
-        return self.parent_order.episode.__unicode__() + " - " + self.code_category.ar_label
+        return self.order.episode.__unicode__() + " - " + self.category.ar_label
     
     def admin_coupon_link(self):
         if self.pk:
@@ -132,7 +128,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
         verbose_name = u"مجموعة نقاط"
         verbose_name_plural = u"مجموعات النقاط"
 
-class Code_Order(models.Model): # consists of one Code_Collection or more
+class Order(models.Model): # consists of one Collection or more
     episode = models.ForeignKey(Episode, verbose_name=u"الموعد")
     date_ordered = models.DateTimeField(auto_now_add=True)
     assignee = models.ForeignKey('clubs.Club', null=True, blank=True,
@@ -151,7 +147,7 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
 
     # Obsolete
     def is_reviewed(self):
-        if len(self.code_collection_set.filter(approved=None)) == 0:
+        if self.collection_set.filter(approved=None).count() == 0:
             return True
         else:
             return False
@@ -182,9 +178,9 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
                          if not char in look_alike])
         year = StudentClubYear.objects.get_current()
 
-        for collection in self.code_collection_set.all():
+        for collection in self.collection_set.all():
             random_strings = []
-            points = collection.code_category.points
+            points = collection.category.points
             codes = []
 
             if collection.students.exists():
@@ -209,7 +205,7 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
             
             # If we are deadling with direct entry of students
             if collection.students.exists():
-                activity = collection.parent_order.episode.activity
+                activity = collection.order.episode.activity
                 string_count = 0
                 for student in collection.students.all():
                     random_string = random_strings[string_count]
@@ -256,7 +252,7 @@ class Review(models.Model):
     reviewer = models.ForeignKey(User, null=True,
                                  on_delete=models.SET_NULL,
                                  related_name="reviewed_niqati_orders")
-    order = models.ForeignKey('Code_Order', null=True,
+    order = models.ForeignKey('Order', null=True,
                                    blank=True,
                                    on_delete=models.SET_NULL)
     # Approval choices:

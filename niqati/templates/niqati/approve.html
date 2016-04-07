@@ -45,10 +45,10 @@
 			<td>{{ order.date_ordered }}</td>
 			<td>
 				<ul class="list-group">
-				 	{% for collection in order.code_collection_set.all %}
+				 	{% for collection in order.collection_set.all %}
 				 	<li class="list-group-item">
 					    {% if not collection.students.exists %}<span class="badge">{{ collection.code_count }} أكواد</span>{% endif %}
-					    {{ collection.code_category.ar_label }}
+					    {{ collection.category.ar_label }}
 						{% if collection.students %}
 						<ul>
 							{% for student in collection.students.all %} 

@@ -26,9 +26,9 @@ body {
 <body>
 <div class="container">
 	<div class="row">
-		<div class="col-sm-4 col-sm-offset-4"">
+		<div class="col-sm-4 col-sm-offset-4">
 <p id="generating" class="alert alert-warning">النقاط تُولّد...</p>
-    <h2>{{ collection.code_category.name }}</h2>
+    <h2>{{ collection.category.name }}</h2>
 
     <ol id="link-list">
     {% for code in collection.code_set.all %}

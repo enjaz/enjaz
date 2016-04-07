@@ -93,16 +93,16 @@
           <div id="left">
             <div id="qr"><img src="{{ endpoint }}{% url 'niqati:submit' %}?code={{ code.code_string }}" alt=""/></div>
             <div dir="rtl" id="activity">
-              <div dir="auto" id="title">{{ collection.parent_order.episode }}</div>
+              <div dir="auto" id="title">{{ collection.order.episode }}</div>
               <div id="role">{{ collection.category.ar_label }}<!-- change to ar_label --></div>
             </div>
           </div>
           <div id="right">
-            <div id="instructions">{% if collection.code_category.label == 'Idea'  %}
+            <div id="instructions">{% if collection.category.label == 'Idea'  %}
 <img src="{% static 'images/niqati/cardinstructions3pt.png' %}"alt=""/>
-{% elif collection.code_category.label == 'Organizer'  %}
+{% elif collection.category.label == 'Organizer'  %}
 <img src="{% static 'images/niqati/cardinstructions2pt.png' %}"alt=""/>
-{% elif collection.code_category.label == 'Participation'  %}
+{% elif collection.category.label == 'Participation'  %}
 <img src="{% static 'images/niqati/cardinstructions1pt.png' %}"alt=""/>
 {% endif %}</div>
               

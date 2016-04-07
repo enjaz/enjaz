@@ -23,8 +23,8 @@
     <tbody>
     {% for code in niqati_user.code_set.current_year %}
         <tr>
-            <td>{% if code.collection %}<a href="{% url 'activities:show' code.collection.parent_order.episode.activity.pk %}">{{ code.collection.parent_order.episode }}</a>{% else %}مخصّصة{% endif %}</td>
-            <td>{% if code.collection %}{{ code.collection.code_category.ar_label }}{% else %}{{ code.note }}{% endif %}</td>
+            <td>{% if code.collection %}<a href="{% url 'activities:show' code.collection.order.episode.activity.pk %}">{{ code.collection.order.episode }}</a>{% else %}مخصّصة{% endif %}</td>
+            <td>{% if code.collection %}{{ code.collection.category.ar_label }}{% else %}{{ code.note }}{% endif %}</td>
             <td>{{ code.points }}</td>
             <td data-order="{{ code.redeem_date|date:"U" }}">{{ code.redeem_date }}</td>
         </tr>

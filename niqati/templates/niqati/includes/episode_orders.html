@@ -29,9 +29,9 @@
 			    <td>
 			        <ul class="list-group">
 			        {# collections #}
-			        {% for collection in order.code_collection_set.all %}
+			        {% for collection in order.collection_set.all %}
 			            <li class="list-group-item">
-				        {{ collection.code_category.ar_label }}
+				        {{ collection.category.ar_label }}
 			 		{% if not collection.students.exists %}
 						<span class="badge">{{ collection.code_count }} أكواد</span>
 						{% if order.is_approved == True %}<ul class="list-inline"><li class="entypo-docs"><a href="{% url 'niqati:download_coupons' collection.pk %}">كوبونات</a></li><li class="entypo-link"><a href="{% url 'niqati:download_links' collection.pk %}">روابط</a></li></ul>{% endif %}

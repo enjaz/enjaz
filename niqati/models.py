@@ -19,7 +19,7 @@ from clubs.models import Club
 from core.models import StudentClubYear
 from niqati.managers import CodeQuerySet
 
-CODE_STRING_LENGTH = 6
+STRING_LENGTH = 6
 COUPON = '0'
 SHORT_LINK = '1'
 
@@ -37,7 +37,7 @@ class Code(models.Model):
     year = models.ForeignKey(StudentClubYear,
                              null=True,
                              on_delete=models.SET_NULL)
-    code_string = models.CharField(max_length=16, unique=True) # a 16-digit string, unique throughout all the db
+    string = models.CharField(max_length=16, unique=True) # a 16-digit string, unique throughout all the db
     points = models.PositiveSmallIntegerField(default=0)
 
     # To document the reason for manually-added codes.
@@ -64,7 +64,7 @@ class Code(models.Model):
     asset = models.CharField(max_length=300, blank=True) # either (1) short link or (2) link to QR (depending on delivery_type of parent collection)
         
     def __unicode__(self):
-        return self.code_string
+        return self.string
 
     def is_redeemed(self):
         return self.user is not None
@@ -98,6 +98,7 @@ class Collection(models.Model): # group of codes that are (1) of the same type &
     # Generation-related
     category = models.ForeignKey(Category)
     code_count = models.PositiveSmallIntegerField()
+    codes = models.ManyToManyField(Code, blank=True, related_name="containing_collections")
     order = models.ForeignKey('Order') # --- relation to activity is through the Order
     students = models.ManyToManyField(User, blank=True,
                                       limit_choices_to={'common_profile__is_student': True,
@@ -190,12 +191,12 @@ class Order(models.Model): # consists of one Collection or more
 
             while True:
                 for i in range(required_codes):
-                    random_string = ''.join(random.choice(chars) for i in range(CODE_STRING_LENGTH))
+                    random_string = ''.join(random.choice(chars) for i in range(STRING_LENGTH))
                     random_strings.append(random_string)
 
-                identical_codes = Code.objects.filter(code_string__in=random_strings)
+                identical_codes = Code.objects.filter(string__in=random_strings)
                 if identical_codes.exists():
-                    identical_strings = [identical_code.code_string \
+                    identical_strings = [identical_code.string \
                                          for identical_code in identical_codes]
                     for identical_string in identical_strings:
                         random_strings.pop(identical_string)
@@ -209,7 +210,7 @@ class Order(models.Model): # consists of one Collection or more
                 string_count = 0
                 for student in collection.students.all():
                     random_string = random_strings[string_count]
-                    codes.append(Code(code_string=random_string,
+                    codes.append(Code(string=random_string,
                                       points=points,
                                       collection=collection,
                                       year=year,
@@ -223,7 +224,7 @@ class Order(models.Model): # consists of one Collection or more
 
             else: # If we are deadling with counts
                     for random_string in random_strings:
-                        codes.append(Code(code_string=random_string,
+                        codes.append(Code(string=random_string,
                                           points=points,
                                           collection=collection,
                                           year=year))

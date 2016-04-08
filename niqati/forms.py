@@ -86,7 +86,6 @@ class OrderForm(forms.Form):
 
 class RedeemCodeForm(forms.Form):
     string = forms.CharField(label="")
-
     def __init__(self, user, *args, **kwargs):
         super(RedeemCodeForm, self).__init__(*args, **kwargs)
         self.user = user  # Save the user as this is important for validation
@@ -100,11 +99,11 @@ class RedeemCodeForm(forms.Form):
         (3) user doesn't have another code in the same event.
         """
         # Make sure the code is uppercase, without any spaces or hyphens
-        code_string = self.cleaned_data['string'].upper().replace(" ", "").replace("-", "")
+        string = self.cleaned_data['string'].upper().replace(" ", "").replace("-", "")
 
         # first, check that code exists
         try:
-            self.code = Code.objects.get(code_string=code_string)
+            self.code = Code.objects.get(string=string)
         except Code.DoesNotExist:
             raise forms.ValidationError(u"هذا الرمز غير صحيح.", code="DoesNotExist")
 
@@ -129,7 +128,7 @@ class RedeemCodeForm(forms.Form):
                     elif self.other_code.points == self.code.points:
                         raise forms.ValidationError(u"لديك رمز آخر في نفس النشاط، وبنفس مقدار النقاط.", code="HasOtherCode")
 
-        return code_string
+        return string
 
     # def clean(self):
     #     """
@@ -162,7 +161,7 @@ class RedeemCodeForm(forms.Form):
                 message = u"تم إدخال الرمز بنجاح."
             message_level = 'success'
 
-            new_code = Code.objects.get(code_string=self.cleaned_data['string'])
+            new_code = Code.objects.get(string=self.cleaned_data['string'])
             new_code.user = self.user
             new_code.redeem_date = timezone.now()
             new_code.save()

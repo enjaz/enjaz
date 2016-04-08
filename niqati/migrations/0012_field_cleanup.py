@@ -21,6 +21,11 @@ class Migration(migrations.Migration):
             old_name='parent_order',
             new_name='order',
         ),
+        migrations.RenameField(
+            model_name='code',
+            old_name='code_string',
+            new_name='string',
+        ),
         migrations.RemoveField(
             model_name='code',
             name='category',

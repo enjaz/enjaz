@@ -88,10 +88,10 @@
 </head>
 
 <body>
-    {% for code in collection.code_set.all %}
+    {% for code in collection.codes.all %}
         <div id="card">
           <div id="left">
-            <div id="qr"><img src="{{ endpoint }}{% url 'niqati:submit' %}?code={{ code.code_string }}" alt=""/></div>
+            <div id="qr"><img src="{{ endpoint }}{% url 'niqati:submit' %}?code={{ code.string }}" alt=""/></div>
             <div dir="rtl" id="activity">
               <div dir="auto" id="title">{{ collection.order.episode }}</div>
               <div id="role">{{ collection.category.ar_label }}<!-- change to ar_label --></div>
@@ -106,7 +106,7 @@
 <img src="{% static 'images/niqati/cardinstructions1pt.png' %}"alt=""/>
 {% endif %}</div>
               
-            <div id="code">{{ code.code_string }}</div>
+            <div id="code">{{ code.string }}</div>
         <div id="logos"><img src="{% static 'images/niqati/niqatiformheader.png' %}"/></div>
           </div>
         </div>

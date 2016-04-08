@@ -204,7 +204,7 @@ def review_order(request):
                  niqati_reviewers.filter(deputies=request.user)
 
     # Permission check
-    if request.user.has_perm('niqati.change_code_order'):
+    if request.user.has_perm('niqati.change_order'):
         reviewer_club = None
     elif user_clubs.exists():
         reviewer_club = user_clubs.first()
@@ -283,12 +283,12 @@ def list_pending_orders(request):
         raise PermissionDenied
 
     # For the superuser, show all pending requests.
-    if request.user.has_perm('niqati.change_code_order'):
-        activities_with_pending_orders = Activity.objects.current_year().filter(episode__code_order__isnull=False,
-                                                                              episode__code_order__is_approved__isnull=True).distinct()
+    if request.user.has_perm('niqati.change_order'):
+        activities_with_pending_orders = Activity.objects.current_year().filter(episode__order__isnull=False,
+                                                                              episode__order__is_approved__isnull=True).distinct()
     else:
-        activities_with_pending_orders = Activity.objects.current_year().filter(episode__code_order__assignee__in=user_niqati_reviewing_clubs,
-                                                                 episode__code_order__is_approved__isnull=True).distinct()
+        activities_with_pending_orders = Activity.objects.current_year().filter(episode__order__assignee__in=user_niqati_reviewing_clubs,
+                                                                 episode__order__is_approved__isnull=True).distinct()
     context = {'activities_with_pending_orders': activities_with_pending_orders}
     return render(request, 'niqati/approve.html', context)
 
@@ -334,7 +334,7 @@ def get_short_url(request):
         endpoint = "https://api-ssl.bitly.com/v3/shorten?format=txt&access_token=%(api_key)s&longUrl=" % {"api_key": settings.BITLY_KEY}
         domain = Site.objects.get_current().domain
         domain =  'enjazportal.com' # REMOVE
-        full_url = urlquote("http://%s%s?code=%s" % (domain, reverse("niqati:submit"), code.code_string))
+        full_url = urlquote("http://%s%s?code=%s" % (domain, reverse("niqati:submit"), code.string))
         response = requests.get(endpoint + full_url)
         short_link = response.text
         short_link = short_link.strip() # remove tailing new lines

@@ -554,7 +554,7 @@ class Episode(models.Model):
                not self.report_is_submitted()
 
     def get_reviewed_niqati_orders(self):
-        return self.code_order_set.filter(is_approved__isnull=False)
+        return self.order_set.filter(is_approved__isnull=False)
 
 class Category(models.Model):
     ar_name = models.CharField(max_length=50,

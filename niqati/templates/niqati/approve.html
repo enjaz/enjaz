@@ -39,7 +39,7 @@
 		<th><!-- التصرف: قبول أو رفض الطلب كاملاً --></th>
 	</tr>
 	{% for episode in activity.episode_set.all %}
-    {% for order in episode.code_order_set.all %}
+    {% for order in episode.order_set.all %}
 	{% if order.is_approved == None %}
 		<tr id="order-{{ order.pk }}">
 			<td>{{ order.date_ordered }}</td>

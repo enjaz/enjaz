@@ -12,7 +12,7 @@ def get_short_link(domain, endpoint, code):
     Otherwise, generate it and return the result.
     """
     if not code.short_link:
-        full_url = urlquote("http://%s%s?code=%s" % (domain, reverse("niqati:submit"), code.code_string))
+        full_url = urlquote("http://%s%s?code=%s" % (domain, reverse("niqati:submit"), code.string))
         response = requests.get(endpoint + full_url)
         short_link = response.text
         code.short_link = short_link

@@ -25,7 +25,7 @@ from activities.forms import EvaluationForm
 from activities.utils import get_club_notification_to, get_club_notification_cc
 from clubs.models import Club, city_choices
 from clubs.utils import is_presidency_coordinator_or_deputy, has_coordination_to_activity, get_user_coordination_and_deputyships, can_review_any_niqati, is_coordinator_of_any_club
-from niqati.models import Category, Code, Code_Order, Code_Collection, Review, COUPON, SHORT_LINK
+from niqati.models import Category, Code, Order, Collection, Review, COUPON, SHORT_LINK
 from niqati.forms import OrderForm, RedeemCodeForm
 
 
@@ -75,7 +75,7 @@ def claim_code(request):
     eval_form = EvaluationForm(request.POST)
     if form.is_valid() and eval_form.is_valid():
         result = form.process()
-        eval_form.save(form.code.collection.parent_order.episode, request.user)
+        eval_form.save(form.code.collection.order.episode, request.user)
         return result
     else:
         errors = form.errors
@@ -167,8 +167,8 @@ def coordinator_view(request, activity_id):
 
 @login_required
 def download_collection(request, pk, download_type):
-    collection = get_object_or_404(Code_Collection, pk=pk)
-    activity = collection.parent_order.episode.activity
+    collection = get_object_or_404(Collection, pk=pk)
+    activity = collection.order.episode.activity
     domain = Site.objects.get_current().domain
     domain =  'enjazportal.com' # REMOVE
 
@@ -198,13 +198,13 @@ def download_collection(request, pk, download_type):
 def review_order(request):
     order_pk = request.POST.get('pk')
     action = request.POST.get('action')
-    order = get_object_or_404(Code_Order, pk=order_pk)
+    order = get_object_or_404(Order, pk=order_pk)
     niqati_reviewers = Club.objects.niqati_reviewing_parents(order)
     user_clubs = niqati_reviewers.filter(coordinator=request.user) | \
                  niqati_reviewers.filter(deputies=request.user)
 
     # Permission check
-    if request.user.has_perm('niqati.change_code_order'):
+    if request.user.has_perm('niqati.change_order'):
         reviewer_club = None
     elif user_clubs.exists():
         reviewer_club = user_clubs.first()
@@ -283,12 +283,12 @@ def list_pending_orders(request):
         raise PermissionDenied
 
     # For the superuser, show all pending requests.
-    if request.user.has_perm('niqati.change_code_order'):
-        activities_with_pending_orders = Activity.objects.current_year().filter(episode__code_order__isnull=False,
-                                                                              episode__code_order__is_approved__isnull=True).distinct()
+    if request.user.has_perm('niqati.change_order'):
+        activities_with_pending_orders = Activity.objects.current_year().filter(episode__order__isnull=False,
+                                                                              episode__order__is_approved__isnull=True).distinct()
     else:
-        activities_with_pending_orders = Activity.objects.current_year().filter(episode__code_order__assignee__in=user_niqati_reviewing_clubs,
-                                                                 episode__code_order__is_approved__isnull=True).distinct()
+        activities_with_pending_orders = Activity.objects.current_year().filter(episode__order__assignee__in=user_niqati_reviewing_clubs,
+                                                                 episode__order__is_approved__isnull=True).distinct()
     context = {'activities_with_pending_orders': activities_with_pending_orders}
     return render(request, 'niqati/approve.html', context)
 
@@ -317,7 +317,7 @@ def general_report(request, city=""):
 def get_short_url(request):
     pk = request.POST.get('pk')
     code = get_object_or_404(Code, pk=pk)
-    order = code.collection.parent_order
+    order = code.collection.order
     activity = order.episode.activity
     niqati_reviewers = Club.objects.niqati_reviewing_parents(order)
     user_clubs_niqati_reviewers = niqati_reviewers.filter(coordinator=request.user) | \
@@ -334,7 +334,7 @@ def get_short_url(request):
         endpoint = "https://api-ssl.bitly.com/v3/shorten?format=txt&access_token=%(api_key)s&longUrl=" % {"api_key": settings.BITLY_KEY}
         domain = Site.objects.get_current().domain
         domain =  'enjazportal.com' # REMOVE
-        full_url = urlquote("http://%s%s?code=%s" % (domain, reverse("niqati:submit"), code.code_string))
+        full_url = urlquote("http://%s%s?code=%s" % (domain, reverse("niqati:submit"), code.string))
         response = requests.get(endpoint + full_url)
         short_link = response.text
         short_link = short_link.strip() # remove tailing new lines

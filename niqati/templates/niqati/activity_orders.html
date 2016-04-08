@@ -9,7 +9,7 @@
 <div class="panel panel-primary panel-shadow" data-collapsed="0">		
 	<!-- panel body -->
 	<div class="panel-body with-table">
-        {% with orders=episode.code_order_set.all %}
+        {% with orders=episode.order_set.all %}
             {% include 'niqati/includes/episode_orders.html' %}
         {% endwith %}
 	</div>

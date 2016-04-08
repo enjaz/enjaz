@@ -5,6 +5,7 @@ import datetime
 import autocomplete_light
 
 from django.contrib import messages
+from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 from django import forms
 from niqati.models import Order, Collection, Category, Code
@@ -118,8 +119,10 @@ class RedeemCodeForm(forms.Form):
             # happen.  If they do have another code, but the new one
             # has higher point, replace it.
             self.other_code = None
-            if not self.code.collection.order.episode.allow_multiple_niqati:
-                other_codes = Code.objects.filter(collection__order__episode=self.code.collection.order.episode,
+            if not self.code.content_object.allow_multiple_niqati:
+                episode_content_type = ContentType.objects.get(model="episode")
+                other_codes = Code.objects.filter(content_type=episode_content_type,
+                                                  object_id=self.code.object_id,
                                                   user=self.user)
                 if other_codes.exists():
                     self.other_code = other_codes.first()

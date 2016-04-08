@@ -1,4 +1,4 @@
-{% extends "base.html" %}{% load staticfiles %}{% load clubs_utils %}
+{% extends "base.html" %}{% load staticfiles %}{% load clubs_utils %}{% load niqati_tags %}
 {% block navbutton %}
     {% if user.is_superuser %}
         {% include 'includes/nav-button.html' %}
@@ -161,7 +161,7 @@
 					<tbody>
 						{% for code in latest_entries %}
 						<tr>
-							<td dir="auto">{{ code.get_description|safe }}</td>
+							<td dir="auto">{{ code|get_description|safe }}</td>
 							<td>{{ code.points }}</td>
 							<td>{{ code.redeem_date }}</td>
 						</tr>

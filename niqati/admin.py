@@ -3,7 +3,7 @@ from django.contrib import admin
 from niqati.models import Code, Collection, Order
 
 class CodeAdmin(admin.ModelAdmin):
-    #list_display = ('code_string', 'collection__parent_order__episode', 'ordering_club', 'collection__code_category', 'user', 'redeem_date',)
+    list_display = ('string', 'user', 'redeem_date', 'generation_date')
     readonly_fields = ('object_id', 'content_type')
     search_fields = ["string", ]
 

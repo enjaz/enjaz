@@ -19,5 +19,5 @@ class Migration(migrations.Migration):
 
     operations = [
        migrations.RunPython(
-            add_codes_to_collections
+            add_codes_to_collections)
     ]

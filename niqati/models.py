@@ -212,7 +212,6 @@ class Order(models.Model): # consists of one Collection or more
                     random_string = random_strings[string_count]
                     codes.append(Code(string=random_string,
                                       points=points,
-                                      collection=collection,
                                       year=year,
                                       user=student,
                                       redeem_date=timezone.now()))
@@ -221,13 +220,14 @@ class Order(models.Model): # consists of one Collection or more
                               template="niqati_approved_to_direct_recipient",
                               context={'activity': activity,
                                        'student': student})
+                collection.codes.add(*codes)
 
             else: # If we are deadling with counts
                     for random_string in random_strings:
                         codes.append(Code(string=random_string,
                                           points=points,
-                                          collection=collection,
                                           year=year))
+                    collection.codes.add(*codes)
             Code.objects.bulk_create(codes)
 
     def __unicode__(self):

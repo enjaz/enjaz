@@ -1,14 +1,16 @@
 # -*- coding: utf-8  -*-
 from datetime import timedelta
-from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
 from django.utils import timezone
 
 from core.models import StudentClubYear
 from bulb.managers import BookQuerySet, RequestQuerySet, PointQuerySet, GroupQuerySet, SessionQuerySet, MembershipQuerySet
+from niqati.models import Code
+import niqati.utils
 
-#MAXIMUM_GROUP_MEMBERS = 20
 
 class Category(models.Model):
     name = models.CharField(max_length=50,
@@ -139,6 +141,25 @@ class Request(models.Model):
                                      is_counted=True)\
                              .update(is_counted=False)
 
+    def create_related_niqati_codes(self, random_string=None):
+        if not niqati.utils.can_claim_niqati(self.book.submitter):
+            return
+        current_year = StudentClubYear.objects.get_current()
+        if not random_string:
+            random_strings = niqati.utils.get_free_random_strings(1)
+            random_string = random_strings[0]
+        request_content_type = ContentType.objects.get(app_label="bulb", model="request")
+        owner_codes = Code.objects.filter(user=self.book.submitter,
+                                          content_type=request_content_type,
+                                          object_id=self.pk)
+        if not owner_codes.exists():
+            Code.objects.create(user=self.book.submitter,
+                                content_object=self,
+                                string=random_string,
+                                year=current_year,
+                                points=1,
+                                redeem_date=timezone.now())
+
     def create_related_points(self):
         current_year = StudentClubYear.objects.get_current()
         owner_points = Point.objects.filter(request=self,
@@ -246,13 +267,13 @@ class Group(models.Model):
 
     def get_last_session(self):
         try:
-            return self.session_set.order_by('-date').first()
+            return self.session_set.filter(is_deleted=False).order_by('date').last()
         except Session.DoesNotExist:
             return
 
     def get_has_recent_sessions(self):
         three_weeks_ago = timezone.now().date() - timedelta(21)
-        return self.session_set.filter(date__gte=three_weeks_ago).exists()
+        return self.session_set.filter(is_deleted=False).filter(date__gte=three_weeks_ago).exists()
 
     def get_report_count(self):
         return Report.objects.filter(session__group=self).count()
@@ -314,6 +335,43 @@ class Report(models.Model):
     description = models.TextField(verbose_name=u"مجريات الجلسة")
     submission_date = models.DateTimeField(u"تاريخ الإرسال",
                                            auto_now_add=True)
+
+    def create_related_niqati_codes(self):
+        current_year = StudentClubYear.objects.get_current()
+        session_content_type = ContentType.objects.get(app_label="bulb", model="session")
+        coordinator = self.session.group.coordinator
+        attendees = self.attendees.all() | \
+                    User.objects.filter(pk=coordinator.pk)
+        code_count = attendees.count()
+        random_strings = niqati.utils.get_free_random_strings(code_count)
+        string_count = 0
+
+        # Attendees can have three statuses:
+        # 1) A coordinator who is hosting their first session (=3 points)
+        # 2) A coordinator who is hosting their further session (=2 points)
+        # 3) An attednees
+
+        for attendee in attendees:
+            if not niqati.utils.can_claim_niqati(attendee):
+                continue
+            if attendee == coordinator:
+                if self.session.group.session_set.filter(is_deleted=False).order_by("date").first() == self.session:
+                    points = 3
+                else:
+                    points = 2
+            else:
+                points = 1
+            attendee_codes = Code.objects.filter(user=attendee,
+                                                 content_type=session_content_type,
+                                                 object_id=self.session.pk)
+            if not attendee_codes.exists():
+                Code.objects.create(user=attendee,
+                                    content_object=self.session,
+                                    string=random_strings[string_count],
+                                    year=current_year,
+                                    points=points,
+                                    redeem_date=self.submission_date)
+            string_count += 1
 
     def __unicode__(self):
         return "%s %d" % (self.session.group.name, self.pk)

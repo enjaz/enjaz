@@ -1,4 +1,4 @@
-{% extends "niqati_base.html" %}{% load staticfiles %}
+{% extends "niqati_base.html" %}{% load staticfiles %}{% load niqati_tags %}
 {% block title %}{% if user == niqati_user %}تقريري{% else %}تقرير {{ niqati_user.common_profile.get_ar_full_name }}{% endif %}{% endblock %}
 
 {% block content %}
@@ -23,7 +23,7 @@
     <tbody>
     {% for code in niqati_user.code_set.current_year %}
         <tr>
-            <td>{{ code.get_description|safe }}</td>
+            <td>{{ code|get_description|safe }}</td>
             <th class="english-field">{{ code.string }}</th>
             <td>{{ code.points }}</td>
             <td data-order="{{ code.redeem_date|date:"U" }}">{{ code.redeem_date }}</td>

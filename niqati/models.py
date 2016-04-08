@@ -1,9 +1,4 @@
 # -*- coding: utf-8  -*-
-import string
-import random
-import requests
-import os
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -15,15 +10,14 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.http import urlquote
 
-from activities.models import Activity, Episode
+from activities.models import Episode
 from activities.utils import get_club_notification_to, get_club_notification_cc
-from bulb.models import Request, Session
 from clubs.models import Club
 from core.models import StudentClubYear
 from post_office import mail
 from niqati.managers import CodeQuerySet
 
-STRING_LENGTH = 6
+
 COUPON = '0'
 SHORT_LINK = '1'
 
@@ -71,33 +65,6 @@ class Code(models.Model):
     
     # Obsolete
     asset = models.CharField(max_length=300, blank=True) # either (1) short link or (2) link to QR (depending on delivery_type of parent collection)
-
-    def get_description(self):
-        if not self.content_object:
-            return u"مُخصّصة ({})".format(self.note)
-        elif type(self.content_object) is Episode and self.containing_collections.exists():
-            activity_link = u"<a href=\"{}\">{}</a>".format(reverse('activities:show',
-                                                                   args=(self.content_object.activity.pk,)),
-                                                            self.content_object)
-            category = self.containing_collections.first().category
-            if category.label == "Idea":
-                return u"صغت فكرة {}".format(activity_link)
-            elif category.label == "Organizer":
-                return u"نظّمت {}".format(activity_link)
-            elif category.label == "Participation":
-                return u"شاركت في {}".format(activity_link)
-        elif type(self.content_object) is Request:
-            book_link = u"<a href=\"{}\">{}</a>".format(reverse('bulb:show_book',
-                                                               args=(self.content_object.book.pk,)),
-                                                        self.content_object.book)
-            return u"ساهمت بكتاب " + book_link
-        elif type(self.content_object) is Session:
-            group_link = u"<a href=\"{}\">{}</a>".format(reverse('bulb:show_group',
-                                                                args=(self.content_object.group.pk,)),
-                                                         self.content_object.group)
-            return u"عقدت جلسة {} لمجموعة {}".format(self.content_object, group_link)
-        else:
-            return "<span class=\"english-field\">{}</span>".format(self.string)
 
     def __unicode__(self):
         return self.string
@@ -200,6 +167,9 @@ class Order(models.Model): # consists of one Collection or more
                 yield self.codes.filter(category=category)
         
     def create_codes(self):
+        # To avoid import erros:
+        from . import utils
+
         # To reduce database queries and to improve performance, we
         # are going to generate all random strings once and check them
         # all in one query to see if any of them is already taken.  If
@@ -209,14 +179,9 @@ class Order(models.Model): # consists of one Collection or more
         # Now, it can be as low as 2 queries for the whole collection.
         # Previously, it took 30 seconds to generate 200 codes, now it
         # takes 1 second.
-        look_alike = "O0I1"
-        all_chars = string.ascii_uppercase + string.digits
-        chars = "".join([char for char in all_chars
-                         if not char in look_alike])
         year = StudentClubYear.objects.get_current()
 
         for collection in self.collection_set.all():
-            random_strings = []
             points = collection.category.points
             codes = []
 
@@ -225,21 +190,8 @@ class Order(models.Model): # consists of one Collection or more
             else:
                 required_codes = collection.code_count
 
-            while True:
-                for i in range(required_codes):
-                    random_string = ''.join(random.choice(chars) for i in range(STRING_LENGTH))
-                    random_strings.append(random_string)
+            random_strings = utils.get_free_random_strings(required_codes)
 
-                identical_codes = Code.objects.filter(string__in=random_strings)
-                if identical_codes.exists():
-                    identical_strings = [identical_code.string \
-                                         for identical_code in identical_codes]
-                    for identical_string in identical_strings:
-                        random_strings.pop(identical_string)
-                    required_codes = len(identical_strings)    
-                else:
-                    break
-            
             # If we are deadling with direct entry of students
             if collection.students.exists():
                 activity = collection.order.episode.activity

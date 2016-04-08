@@ -1,17 +1,20 @@
 # -*- coding: utf-8  -*-
 import string
 import random
-from django.core.urlresolvers import reverse
 import requests
 import os
 
-from django.db import models, IntegrityError
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.core.files import File
+from django.core.urlresolvers import reverse
+from django.db import models, IntegrityError
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.http import urlquote
-from django.template.loader import render_to_string
-from django.core.files import File
-from django.conf import settings
+
 from activities.utils import get_club_notification_to, get_club_notification_cc
 from post_office import mail
 from activities.models import Activity, Episode
@@ -42,6 +45,11 @@ class Code(models.Model):
 
     # To document the reason for manually-added codes.
     note = models.CharField(max_length=200, blank=True)
+
+    # A Code can bind to any model on Enjaz
+    content_type = models.ForeignKey(ContentType, null=True, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
+    content_object = GenericForeignKey('content_type', 'object_id')
 
     # Generation-related
     collection = models.ForeignKey('Collection', null=True,

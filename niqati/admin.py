@@ -1,10 +1,10 @@
 # -*- coding: utf-8  -*-
 from django.contrib import admin
-
 from niqati.models import Code, Collection, Order
 
 class CodeAdmin(admin.ModelAdmin):
     #list_display = ('code_string', 'collection__parent_order__episode', 'ordering_club', 'collection__code_category', 'user', 'redeem_date',)
+    readonly_fields = ('object_id', 'content_type')
 
     def ordering_club(self, obj):
         return obj.episode.activity.primary_club.name

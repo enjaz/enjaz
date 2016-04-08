@@ -3,18 +3,19 @@ import requests
 import datetime
 
 from django.conf import settings
-from django.shortcuts import render, get_object_or_404
+from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
+from django.db.models import Sum
+from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.views.decorators import csrf
+from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.utils.http import urlquote
-from django.db.models import Sum
-from django.core.exceptions import PermissionDenied
-from django.views.decorators import csrf
 
 from post_office import mail
 from accounts.models import get_gender

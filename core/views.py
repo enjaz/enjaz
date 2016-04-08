@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect
 from django.db.models import Sum, Count
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 
@@ -43,7 +44,7 @@ def portal_home(request):
         niqati_sum = request.user.code_set.current_year().aggregate(niqati_sum=Sum('points'))['niqati_sum']
         context['niqati_sum'] = niqati_sum
         context['niqati_count'] = request.user.code_set.current_year().count()
-        context['latest_entries'] = request.user.code_set.current_year().order_by('-redeem_date')[::-1][:5]
+        context['latest_entries'] = request.user.code_set.current_year().order_by('-redeem_date')[:5]
 
         # --- books --------
         context['books_count'] = Book.objects.count()
@@ -139,15 +140,16 @@ def indicators(request, city=""):
             else:
                 club.niqati_order_interval = '-'
 
-            club.month_generated_codes = Code.objects.distinct().filter(collection__order__episode__activity__is_approved=True,
-                                                                        collection__order__episode__activity__primary_club=club,
-                                                                        collection__order__episode__start_date__gte=last_month,
-                                                                        collection__order__episode__start_date__lt=timezone.now().date())\
+            episode_content_type = ContentType.objects.get(model="episode")
+            month_episode_pks = Episode.objects.filter(activity__is_approved=True,
+                                                       activity__primary_club=club,
+                                                       start_date__gte=last_month,
+                                                       start_date__lt=timezone.now().date()).values_list("pk", flat=True)
+            club.month_generated_codes = Code.objects.distinct().filter(content_type=episode_content_type,
+                                                                        object_id__in=month_episode_pks)\
                                                                 .count()
-            club.month_entered_codes = Code.objects.distinct().filter(collection__order__episode__activity__is_approved=True,
-                                                                      collection__order__episode__activity__primary_club=club,
-                                                                      collection__order__episode__start_date__gte=last_month,
-                                                                      collection__order__episode__start_date__lt=timezone.now().date(),
+            club.month_entered_codes = Code.objects.distinct().filter(content_type=episode_content_type,
+                                                                      object_id__in=month_episode_pks,
                                                                       user__isnull=False).count()
             club.used_direct_entry = Order.objects.distinct().filter(episode__activity__is_approved=True,
                                                                      episode__activity__primary_club=club,

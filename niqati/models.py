@@ -15,11 +15,12 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.http import urlquote
 
-from activities.utils import get_club_notification_to, get_club_notification_cc
-from post_office import mail
 from activities.models import Activity, Episode
+from activities.utils import get_club_notification_to, get_club_notification_cc
+from bulb.models import Request, Session
 from clubs.models import Club
 from core.models import StudentClubYear
+from post_office import mail
 from niqati.managers import CodeQuerySet
 
 STRING_LENGTH = 6
@@ -70,7 +71,34 @@ class Code(models.Model):
     
     # Obsolete
     asset = models.CharField(max_length=300, blank=True) # either (1) short link or (2) link to QR (depending on delivery_type of parent collection)
-        
+
+    def get_description(self):
+        if not self.content_object:
+            return u"مُخصّصة ({})".format(self.note)
+        elif type(self.content_object) is Episode and self.containing_collections.exists():
+            activity_link = u"<a href=\"{}\">{}</a>".format(reverse('activities:show',
+                                                                   args=(self.content_object.activity.pk,)),
+                                                            self.content_object)
+            category = self.containing_collections.first().category
+            if category.label == "Idea":
+                return u"صغت فكرة {}".format(activity_link)
+            elif category.label == "Organizer":
+                return u"نظّمت {}".format(activity_link)
+            elif category.label == "Participation":
+                return u"شاركت في {}".format(activity_link)
+        elif type(self.content_object) is Request:
+            book_link = u"<a href=\"{}\">{}</a>".format(reverse('bulb:show_book',
+                                                               args=(self.content_object.book.pk,)),
+                                                        self.content_object.book)
+            return u"ساهمت بكتاب " + book_link
+        elif type(self.content_object) is Session:
+            group_link = u"<a href=\"{}\">{}</a>".format(reverse('bulb:show_group',
+                                                                args=(self.content_object.group.pk,)),
+                                                         self.content_object.group)
+            return u"عقدت جلسة {} لمجموعة {}".format(self.content_object, group_link)
+        else:
+            return "<span class=\"english-field\">{}</span>".format(self.string)
+
     def __unicode__(self):
         return self.string
 
@@ -219,6 +247,7 @@ class Order(models.Model): # consists of one Collection or more
                 for student in collection.students.all():
                     random_string = random_strings[string_count]
                     codes.append(Code(string=random_string,
+                                      content_object=collection.order.episode,
                                       points=points,
                                       year=year,
                                       user=student,
@@ -228,15 +257,16 @@ class Order(models.Model): # consists of one Collection or more
                               template="niqati_approved_to_direct_recipient",
                               context={'activity': activity,
                                        'student': student})
-                collection.codes.add(*codes)
 
             else: # If we are deadling with counts
                     for random_string in random_strings:
                         codes.append(Code(string=random_string,
+                                          content_object=collection.order.episode,
                                           points=points,
                                           year=year))
-                    collection.codes.add(*codes)
             Code.objects.bulk_create(codes)
+            created_codes = Code.objects.filter(string__in=random_strings)
+            collection.codes.add(*created_codes)
 
     def __unicode__(self):
         return self.episode.__unicode__()

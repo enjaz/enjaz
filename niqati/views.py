@@ -75,7 +75,7 @@ def claim_code(request):
     eval_form = EvaluationForm(request.POST)
     if form.is_valid() and eval_form.is_valid():
         result = form.process()
-        eval_form.save(form.code.collection.order.episode, request.user)
+        eval_form.save(form.code.content_object, request.user)
         return result
     else:
         errors = form.errors

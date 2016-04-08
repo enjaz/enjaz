@@ -46,9 +46,15 @@ def get_description(code):
                                                     code.content_object.book)
         return u"ساهمت بكتاب " + book_link
     elif type(code.content_object) is Session:
+        if code.points == 1:
+            action = u"حضرت"
+        elif code.points == 2:
+            action = u"نظمت"
+        elif code.points == 3:
+            action = u"انطلاقة المجموعة:"
         group_link = u"<a href=\"{}\">{}</a>".format(reverse('bulb:show_group',
                                                             args=(code.content_object.group.pk,)),
                                                      code.content_object.group)
-        return u"عقدت جلسة {} لمجموعة {}".format(code.content_object.title, group_link)
+        return action + u" جلسة {} لمجموعة {}".format(code.content_object.title, group_link)
     else:
         return "<span class=\"english-field\">{}</span>".format(code.string)

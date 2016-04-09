@@ -14,14 +14,14 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('directory')
-        parser.add_argument('--session', name='session',
+        parser.add_argument('--session', dest='session',
                             default=None, type=int)
 
     def handle(self, *args, **options):
         csv_files = os.listdir(options['directory'])
         self.stdout.write("Included files are: {}".format(", ".join(csv_files)))
         if options['session']:
-            sessions = Session.objects.filter(pk=session)
+            sessions = Session.objects.filter(pk=options['session'])
         else:
             sessions = Session.objects.filter(vma_id__isnull=False)
         for session in sessions:
@@ -55,7 +55,8 @@ class Command(BaseCommand):
                     answer = raw_input(u"Do you want to accept everybody for {}? (Y) ".format(session.pk))
                     if answer.lower() == 'y':
                         break
-                for registration in session.registration_set.filter(is_deleted=False).exclude(moved_sessions=session):
+                registrations = session.get_all_registrations()
+                for registration in registrations.filter(is_deleted=False).exclude(moved_sessions=session):
                     try:
                         register_in_vma(session, registration)
                     except (UnicodeEncodeError, KeyError), e:

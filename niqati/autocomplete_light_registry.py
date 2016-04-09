@@ -17,6 +17,7 @@ class NiqatiUserAutocomplete(autocomplete_light.AutocompleteModelTemplate):
          'data-autocomplete-minimum-characters': 1}
     widget_attrs = {'class': 'modern-style'}
     current_year = StudentClubYear.objects.get_current()
-    choices = User.objects.filter(common_profile__is_student=True, is_active=True).exclude(coordination__year=current_year)
+    choices = User.objects.filter(common_profile__is_student=True, is_active=True).exclude(coordination__can_submit_activities=True,
+                                                                                           coordination__year=current_year)
 
 autocomplete_light.register(NiqatiUserAutocomplete)

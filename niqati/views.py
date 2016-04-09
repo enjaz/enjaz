@@ -178,7 +178,7 @@ def download_collection(request, pk, download_type):
         raise PermissionDenied
 
     if download_type == COUPON:
-        endpoint = "http://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" + domain
+        endpoint = "https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" + domain
 
         response = render(request, 'niqati/includes/coupons.html', {"collection": collection,
                                                                    "domain": domain,
@@ -335,7 +335,7 @@ def get_short_url(request):
         endpoint = "https://api-ssl.bitly.com/v3/shorten?format=txt&access_token=%(api_key)s&longUrl=" % {"api_key": settings.BITLY_KEY}
         domain = Site.objects.get_current().domain
         domain =  'enjazportal.com' # REMOVE
-        full_url = urlquote("http://%s%s?code=%s" % (domain, reverse("niqati:submit"), code.string))
+        full_url = urlquote("https://%s%s?code=%s" % (domain, reverse("niqati:submit"), code.string))
         response = requests.get(endpoint + full_url)
         short_link = response.text
         short_link = short_link.strip() # remove tailing new lines

@@ -11,13 +11,13 @@
 <div class="page-header">
   <h3>مجموع نقاطي: <small>{{ total_points }} نقطة</small></h3>
 </div>
-<table id="niqati" class="datatable display">
+<table id="niqati" class="datatable display dt-responsive">
     <thead>
       <tr>
         <th>الوصف</th>
-        <th>الرمز</th>
+        <th class="not-mobile">الرمز</th>
         <th>عدد النقاط</th>
-        <th>تاريخ الإدخال</th>
+        <th class="not-mobile">تاريخ الإدخال</th>
       </tr>
     </thead>
     <tbody>
@@ -34,12 +34,14 @@
 {% endblock %}
 {% block customscript %}
 <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
 <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
 <script>
 $(function () {
 	$('#niqati').DataTable({
-        "order": [[ 3, "desc" ]],
-        "language": {% include 'js/dataTables-arabic.json' %}
+        order: [[ 3, "desc" ]],
+        language: {% include 'js/dataTables-arabic.json' %}
     });
 });
 </script>

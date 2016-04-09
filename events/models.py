@@ -74,7 +74,7 @@ class Session(models.Model):
     location = models.CharField(blank=True, default="",
                                 max_length=200,
                                 verbose_name=u"المكان")
-    date = models.DateField(u"التاريخ", null=True)
+    date = models.DateField(u"التاريخ", null=True, blank=True)
     start_time = models.TimeField(u"وقت البداية", null=True, blank=True, default=None)
     end_time = models.TimeField(u"وقت النهاية", null=True, blank=True, default=None)
     date_submitted = models.DateTimeField(auto_now_add=True)
@@ -83,8 +83,8 @@ class Session(models.Model):
     objects = SessionQuerySet.as_manager()
 
     def get_all_registrations(self):
-        return (self.first_priory_registrations.all() | \
-                self.second_priory_registrations.all()).distinct()
+        return (self.first_priority_registrations.all() | \
+                self.second_priority_registrations.all()).distinct()
 
     def __unicode__(self):
         if self.gender:
@@ -154,9 +154,9 @@ class Registration(models.Model):
     nonuser = models.ForeignKey(NonUser, null=True, blank=True,
                                 related_name='event_registrations')
     first_priority_sessions  = models.ManyToManyField(Session, blank=True,
-                                                      related_name="first_priory_registrations")
+                                                      related_name="first_priority_registrations")
     second_priority_sessions  = models.ManyToManyField(Session, blank=True,
-                                                      related_name="second_priory_registrations")
+                                                      related_name="second_priority_registrations")
     moved_sessions = models.ManyToManyField(Session, blank=True,
                                             related_name="moved_registrations")
     date_submitted = models.DateTimeField(auto_now_add=True)

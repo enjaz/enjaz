@@ -4,7 +4,7 @@
     <div class="panel-heading" role="tab" id="headingOne">
       <div class="panel-title">
         <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-          اليوم الأول
+          اليوم الأول (11 أبريل)
         </a>
       </div>
     </div>
@@ -49,7 +49,7 @@
     <div class="panel-heading" role="tab" id="headingTwo">
       <div class="panel-title">
         <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-          اليوم الثاني
+          اليوم الثاني (12 أبريل)
         </a>
       </div>
     </div>
@@ -90,7 +90,7 @@
     <div class="panel-heading" role="tab" id="headingThree">
       <div class="panel-title">
         <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-          اليوم الثالث
+          اليوم الثالث (13 أبريل)
         </a>
       </div>
     </div>
@@ -109,6 +109,7 @@
                   <tr>
                       <th>3:00- 3:50</th>
                       <td>
+                          Workshops (for accepted attednees only):
                           <ul>
                               <li>Data collection, management, and handling ( Be a smart data manager )</li>
                               <li>Scientific writing</li>
@@ -137,20 +138,13 @@
     </div>
   </div>
 </div>
-
-            <h3 class="dinar-light">اختر جدولك</h3>
-            <p>يتكون {{ event.get_html_name|safe }} من فعاليات حافلة تمتد لثلاثة أيام!  يمكنك أدناه التسجيل في الحدث ثم اختيار ورش العمل التي ترغب بحضورها.</p>
             <div class="day-section">
                 <h4 class="dinar-light">البرنامج العام<br>(من 11 إلى 13 أبريل)</h4>
-                <p>في اليوم الأول والثاني والثالث للحدث يقام البرنامج العام وفيه نستضيف نخبة من روّاد البحث العلمي كما يقام برنامج الأبحاث  وفيه يُقدّم طلاب وطالبات التخصّصات الصحيّة أهم أبحاثهم. إذا كنت ترغب في حضورهما، فاختر الخيار التالي:</p>
-                <div class="form-group">
-                    <div class="checkbox">
-                        <label class="remember_me_label">
-                            <input type="checkbox" id="id_session_main" name="session_main"> {{ registration_form.session_main.label }}
-                        </label>
-                    </div>
-                </div>
+                <p>التسجيل الآن متاح في البرنامج العام، وفيه نستضيف نخبة من روّاد البحث العلمي كما يقام برنامج الأبحاث  وفيه يُقدّم طلاب وطالبات التخصّصات الصحيّة أهم أبحاثهم.</p>
+                <p>التسجيل في ورش العمل اكتمل، ولم يعد مُتاحًا.</p>
+                            <input type="hidden" id="id_session_main" name="session_main">
             </div>
+<!--
             <div class="day-section">
                 <h4 class="dinar-light">الورش في اليوم الثالث<br>(13 أبريل)</h4>
                 <p>بعد انتهاء البرنامج العام، تنطلق ورش عمل البحث العلمي. يمكنك اختيار ورشة العمل التي تودّ حضورها في اليوم الثالث.</p>
@@ -171,3 +165,4 @@
                     </div>
                 </div>
             </div>
+-->

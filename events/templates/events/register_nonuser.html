@@ -123,6 +123,7 @@
 					<select {% if nonuser_form.university.value and not nonuser_form.university.errors %}value="{{ nonuser_form.university.value }}" {% endif %}class="form-control" id="university-list" title="{{ nonuser_form.university.label }}" required="required">
                         <option value="">{{ nonuser_form.university.label }}</option>
                         <option value="KSU">جامعة الملك سعود</option>
+                        <option value="PNU">جامعة الأميرة نورة بنت عبد الرحمن</option>
                         <option value="ImamU">جامعة الإمام محمد بن سعود الإسلامية</option>
                         <option value="Alfaisal">جامعة الفيصل</option>
                         <option value="KAU">جامعة الملك عبدالعزيز</option>
@@ -131,6 +132,14 @@
                         <option value="PSAU">جامعة الأمير سطام بن عبد العزيز</option>
                         <option value="QU">جامعة القصيم</option>
                         <option value="MA">جامعة المجمعة</option>
+                        <option value="MCST">كليات المعرفة</option>
+                        <option value="RiyadhColleges">كليات الرياض لطب الأسنان والصيدلة</option>
+                        <option value="Alfarabi">كليات الفارابي</option>
+                        <option value="Inaya">كلية العناية الطبية</option>
+                        <option value="TU">جامعة الطائف</option>
+                        <option value="UOH">جامعة حائل</option>
+                        <option value="DAU">جامعة دار العلوم</option>
+                        <option value="ISNC">كلية ابن سينا الأهلية للعلوم الطبية</option>
                         <option value="Other">جامعة أخرى</option>
 					</select>
                     <input {% if nonuser_form.university.value and not nonuser_form.university.errors %}value="{{ nonuser_form.university.value }}" {% endif %}type="text" class="form-control" id="university-text-field" placeholder="اكتب جامعتك هنا" style="display: none"/>
@@ -168,7 +177,7 @@
             {% endwith %}
 			<div class="form-group">
 				<button type="submit" class="btn btn-success btn-block btn-login">
-					<i class="entypo-right-open-mini"></i>
+					<i class="entypo-left-open-mini"></i>
 					سجّل!
 				</button>
 			</div>

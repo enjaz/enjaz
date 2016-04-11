@@ -28,6 +28,7 @@ class Event(models.Model):
     registration_closing_date = models.DateField(u"تاريخ انتهاء التسجيل", null=True, blank=True)
     start_date = models.DateField(u"تاريخ البدء", null=True)
     end_date = models.DateField(u"تاريخ الانتهاء", null=True)
+    onsite_after = models.DateField(u"التسجيل في الموقع يبدأ من", null=True)
     url = models.URLField(max_length=255, blank=True, default="")
     location_url = models.URLField(max_length=255, blank=True, default="")
     twitter = models.CharField(max_length=255,

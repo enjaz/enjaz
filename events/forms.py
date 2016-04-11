@@ -33,6 +33,7 @@ class RegistrationForm(forms.Form):
         untimed_sessions = Session.objects.filter(event=self.event, time_slot__isnull=True)
 
         for untimed_session in untimed_sessions:
+            print 'session_%s' % untimed_session.code_name
             self.fields['session_%s' % untimed_session.code_name] = forms.BooleanField(label=untimed_session.name,
                                                                                        required=False)
 
@@ -45,6 +46,7 @@ class RegistrationForm(forms.Form):
         # If no sessions were selected, do not register.
         if not untimed_session_code_names and \
            not timed_session_fields:
+            print "fuck!"
             return
 
         if self.user:

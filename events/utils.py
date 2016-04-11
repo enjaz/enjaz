@@ -46,9 +46,9 @@ def register_in_vma(session, registration):
     email = urllib2.quote(registration.get_email())
 
     if session.vma_time_code:
-        url = u"http://www.medicalacademy.org/portal/register/member/workshop/organizer?workshop_id={}&workshop_time_code={}&organizer=1&full_name={}&email={}&mobile={}".format(session.vma_id, session.vma_time_code, en_full_name, email, phone).encode("utf-8")
+        url = u"http://www.medicalacademy.org/portal/register/member/workshop/organizer?workshop_id={}&workshop_time_code={}&organizer=1&full_name={}&email={}&mobile={}".format(session.vma_id, session.vma_time_code, en_full_name, email, phone_number).encode("utf-8")
     else:
-        url = u"http://www.medicalacademy.org/portal/register/member/event/organizer?event_id={}&organizer=1&full_name={}&email={}&mobile={}".format(session.vma_id, en_full_name, email, phone).encode("utf-8")
+        url = u"http://www.medicalacademy.org/portal/register/member/event/organizer?event_id={}&organizer=1&full_name={}&email={}&mobile={}".format(session.vma_id, en_full_name, email, phone_number).encode("utf-8")
 
     response = urllib2.urlopen(url).read()
 
@@ -58,9 +58,9 @@ def register_in_vma(session, registration):
         print "response was", response
 
 
-def send_onsite_confirmation(registration):
+def send_onsite_confirmation(registration, event):
     programs = []
-    for session in registration.moved_sessions.all():
+    for session in registration.moved_sessions.filter(vma_id__isnull=False):
         url = "http://medicalacademy.org/portal/list/registration/get/data?event_id=" + str(session.vma_id)
         data = urllib2.urlopen(url)
         processed_data = json.load(data)
@@ -70,11 +70,14 @@ def send_onsite_confirmation(registration):
                 programs.append((session, user['confirmation_link']))
                 break
 
+    session_count = registration.moved_sessions.count()
     email_context = {'registration': registration,
-                     'programs': programs}
+                     'session_count': session_count,
+                     'programs': programs,
+                     'event': event}
 
     mail.send([registration.get_email()],
-               template="hpc_registration_confirmed",
+               template="event_registration_reminder",
                context=email_context)
     registration.confirmation_sent = True
     registration.save()

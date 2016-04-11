@@ -57,11 +57,16 @@ def nonuser_registration(request, event_code_name):
         if registration_form.is_valid() and nonuser_form.is_valid():
             nonuser = nonuser_form.save()
             registration = registration_form.save(nonuser=nonuser)
-            email_context = {'name': nonuser.ar_first_name,
-                             'event': event}
-            mail.send([nonuser.email],
-                      template="event_registration_submitted",
-                      context=email_context)
+            if event.onsite_after and timezone.now().date() >= event.onsite_after:
+                for session in registrations.first_priority_sessions.all():
+                    utils.register_in_vma(session, registration)
+                utils.send_onsite_confirmation(registration, event)
+            else:
+                email_context = {'name': nonuser.ar_first_name,
+                                 'event': event}
+                mail.send([nonuser.email],
+                          template="event_registration_submitted",
+                          context=email_context)
             return HttpResponseRedirect(reverse('events:registration_completed',
                                                 args=(event.code_name,)))
     elif request.method == 'GET':
@@ -98,11 +103,17 @@ def user_registration(request, event_code_name):
         registration_form = RegistrationForm(request.POST, user=request.user, event=event)
         if registration_form.is_valid():
             registration = registration_form.save()
-            context_email = {'name': request.user.common_profile.ar_first_name,
-                             'event': event}
-            mail.send([request.user.email],
-                      template="event_registration_submitted",
-                      context=context_email)
+            print registration
+            if event.onsite_after and timezone.now().date() >= event.onsite_after:
+                for session in registration.first_priority_sessions.all():
+                    utils.register_in_vma(session, registration)
+                utils.send_onsite_confirmation(registration, event)
+            else:
+                context_email = {'name': request.user.common_profile.ar_first_name,
+                                 'event': event}
+                mail.send([request.user.email],
+                          template="event_registration_submitted",
+                          context=context_email)
             return HttpResponseRedirect(reverse('events:registration_completed',
                                                 args=(event.code_name,)))
     elif request.method == 'GET':

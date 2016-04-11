@@ -1,25 +1,23 @@
 # -*- coding: utf-8  -*-
-import string
-import random
-from django.core.urlresolvers import reverse
-import requests
-import os
-
-from django.db import models, IntegrityError
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.core.files import File
+from django.core.urlresolvers import reverse
+from django.db import models, IntegrityError
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.http import urlquote
-from django.template.loader import render_to_string
-from django.core.files import File
-from django.conf import settings
+
+from activities.models import Episode
 from activities.utils import get_club_notification_to, get_club_notification_cc
-from post_office import mail
-from activities.models import Activity, Episode
 from clubs.models import Club
 from core.models import StudentClubYear
+from post_office import mail
 from niqati.managers import CodeQuerySet
 
-CODE_STRING_LENGTH = 6
+
 COUPON = '0'
 SHORT_LINK = '1'
 
@@ -31,24 +29,25 @@ class Category(models.Model):
 
     def __unicode__(self):
         return self.label
-    
 
 class Code(models.Model):
     # Basic Properties
     year = models.ForeignKey(StudentClubYear,
                              null=True,
                              on_delete=models.SET_NULL)
-    code_string = models.CharField(max_length=16, unique=True) # a 16-digit string, unique throughout all the db
+    string = models.CharField(max_length=16, unique=True) # a 16-digit string, unique throughout all the db
     points = models.PositiveSmallIntegerField(default=0)
 
     # To document the reason for manually-added codes.
     note = models.CharField(max_length=200, blank=True)
 
-    # Obsolete
-    category = models.ForeignKey(Category, null=True, blank=True)
+    # A Code can bind to any model on Enjaz
+    content_type = models.ForeignKey(ContentType, null=True, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
+    content_object = GenericForeignKey('content_type', 'object_id')
 
     # Generation-related
-    collection = models.ForeignKey('Code_Collection', null=True,
+    collection = models.ForeignKey('Collection', null=True,
                                    blank=True,
                                    on_delete=models.SET_NULL)
     generation_date = models.DateTimeField(auto_now_add=True)
@@ -66,9 +65,9 @@ class Code(models.Model):
     
     # Obsolete
     asset = models.CharField(max_length=300, blank=True) # either (1) short link or (2) link to QR (depending on delivery_type of parent collection)
-        
+
     def __unicode__(self):
-        return self.code_string
+        return self.string
 
     def is_redeemed(self):
         return self.user is not None
@@ -86,23 +85,24 @@ class Code(models.Model):
     
 
 
-# When a club requests codes for a certain activity, a Code_Order is created. This Code_Order contains several
-# Code_Collections, each corresponding to a code category (idea, organizer, etc.). Each Code_Collection contains all information
-# and methods for creation of codes of its specific category. The Code_Order just houses the different Code_Collections
+# When a club requests codes for a certain activity, an Order is created. This Order contains several
+# Collections, each corresponding to a code category (idea, organizer, etc.). Each Collection contains all information
+# and methods for creation of codes of its specific category. The Order just houses the different Collections
 # together.
 # ---
-# Code_Collection is the "functional unit" of the code generation process
-# Code_Order is a container that contains all Code_Collections of a single order
+# Collection is the "functional unit" of the code generation process
+# Order is a container that contains all Collections of a single order
 # ---
-# Management approves idea Code_Collections, not Code_Orders
-# For each activity, Clubs see a list of Code_Orders, with each containing files (e.g. PDFs) representing the Code_Collections
+# Management approves idea Collections, not Orders
+# For each activity, Clubs see a list of Orders, with each containing files (e.g. PDFs) representing the Collections
 
 
-class Code_Collection(models.Model): # group of codes that are (1) of the same type & (2) of the same Code_Order
+class Collection(models.Model): # group of codes that are (1) of the same type & (2) of the same Order
     # Generation-related
-    code_category = models.ForeignKey(Category)
+    category = models.ForeignKey(Category)
     code_count = models.PositiveSmallIntegerField()
-    parent_order = models.ForeignKey('Code_Order') # --- relation to activity is through the Code_Order
+    codes = models.ManyToManyField(Code, blank=True, related_name="containing_collections")
+    order = models.ForeignKey('Order') # --- relation to activity is through the Order
     students = models.ManyToManyField(User, blank=True,
                                       limit_choices_to={'common_profile__is_student': True,
                                                         'coordination__isnull': True})
@@ -120,7 +120,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
     asset = models.FileField(upload_to='niqati/codes/') # either the PDF file for coupons or the list of short links (as txt/html?)
 
     def __unicode__(self):
-        return self.parent_order.episode.__unicode__() + " - " + self.code_category.ar_label
+        return self.order.episode.__unicode__() + " - " + self.category.ar_label
     
     def admin_coupon_link(self):
         if self.pk:
@@ -132,7 +132,7 @@ class Code_Collection(models.Model): # group of codes that are (1) of the same t
         verbose_name = u"مجموعة نقاط"
         verbose_name_plural = u"مجموعات النقاط"
 
-class Code_Order(models.Model): # consists of one Code_Collection or more
+class Order(models.Model): # consists of one Collection or more
     episode = models.ForeignKey(Episode, verbose_name=u"الموعد")
     date_ordered = models.DateTimeField(auto_now_add=True)
     assignee = models.ForeignKey('clubs.Club', null=True, blank=True,
@@ -151,7 +151,7 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
 
     # Obsolete
     def is_reviewed(self):
-        if len(self.code_collection_set.filter(approved=None)) == 0:
+        if self.collection_set.filter(approved=None).count() == 0:
             return True
         else:
             return False
@@ -167,6 +167,9 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
                 yield self.codes.filter(category=category)
         
     def create_codes(self):
+        # To avoid import erros:
+        from . import utils
+
         # To reduce database queries and to improve performance, we
         # are going to generate all random strings once and check them
         # all in one query to see if any of them is already taken.  If
@@ -176,15 +179,10 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
         # Now, it can be as low as 2 queries for the whole collection.
         # Previously, it took 30 seconds to generate 200 codes, now it
         # takes 1 second.
-        look_alike = "O0I1"
-        all_chars = string.ascii_uppercase + string.digits
-        chars = "".join([char for char in all_chars
-                         if not char in look_alike])
         year = StudentClubYear.objects.get_current()
 
-        for collection in self.code_collection_set.all():
-            random_strings = []
-            points = collection.code_category.points
+        for collection in self.collection_set.all():
+            points = collection.category.points
             codes = []
 
             if collection.students.exists():
@@ -192,30 +190,17 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
             else:
                 required_codes = collection.code_count
 
-            while True:
-                for i in range(required_codes):
-                    random_string = ''.join(random.choice(chars) for i in range(CODE_STRING_LENGTH))
-                    random_strings.append(random_string)
+            random_strings = utils.get_free_random_strings(required_codes)
 
-                identical_codes = Code.objects.filter(code_string__in=random_strings)
-                if identical_codes.exists():
-                    identical_strings = [identical_code.code_string \
-                                         for identical_code in identical_codes]
-                    for identical_string in identical_strings:
-                        random_strings.pop(identical_string)
-                    required_codes = len(identical_strings)    
-                else:
-                    break
-            
             # If we are deadling with direct entry of students
             if collection.students.exists():
-                activity = collection.parent_order.episode.activity
+                activity = collection.order.episode.activity
                 string_count = 0
                 for student in collection.students.all():
                     random_string = random_strings[string_count]
-                    codes.append(Code(code_string=random_string,
+                    codes.append(Code(string=random_string,
+                                      content_object=collection.order.episode,
                                       points=points,
-                                      collection=collection,
                                       year=year,
                                       user=student,
                                       redeem_date=timezone.now()))
@@ -227,11 +212,13 @@ class Code_Order(models.Model): # consists of one Code_Collection or more
 
             else: # If we are deadling with counts
                     for random_string in random_strings:
-                        codes.append(Code(code_string=random_string,
+                        codes.append(Code(string=random_string,
+                                          content_object=collection.order.episode,
                                           points=points,
-                                          collection=collection,
                                           year=year))
             Code.objects.bulk_create(codes)
+            created_codes = Code.objects.filter(string__in=random_strings)
+            collection.codes.add(*created_codes)
 
     def __unicode__(self):
         return self.episode.__unicode__()
@@ -256,7 +243,7 @@ class Review(models.Model):
     reviewer = models.ForeignKey(User, null=True,
                                  on_delete=models.SET_NULL,
                                  related_name="reviewed_niqati_orders")
-    order = models.ForeignKey('Code_Order', null=True,
+    order = models.ForeignKey('Order', null=True,
                                    blank=True,
                                    on_delete=models.SET_NULL)
     # Approval choices:

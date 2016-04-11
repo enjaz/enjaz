@@ -100,6 +100,9 @@ class Activity(models.Model):
     # Override the default manager with the activity custom manager
     objects = ActivityQuerySet.as_manager()
 
+    def get_absolute_url(self):
+        return reverse("activities:show", args=(self.id, ))
+ 
     def registration_is_open(self):
         """
         Return ``True`` if there is 1 published form marked as primary. Return ``False`` if there isn't or,
@@ -554,7 +557,7 @@ class Episode(models.Model):
                not self.report_is_submitted()
 
     def get_reviewed_niqati_orders(self):
-        return self.code_order_set.filter(is_approved__isnull=False)
+        return self.order_set.filter(is_approved__isnull=False)
 
 class Category(models.Model):
     ar_name = models.CharField(max_length=50,

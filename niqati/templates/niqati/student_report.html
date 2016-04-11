@@ -1,4 +1,4 @@
-{% extends "niqati_base.html" %}{% load staticfiles %}
+{% extends "niqati_base.html" %}{% load staticfiles %}{% load niqati_tags %}
 {% block title %}{% if user == niqati_user %}تقريري{% else %}تقرير {{ niqati_user.common_profile.get_ar_full_name }}{% endif %}{% endblock %}
 
 {% block content %}
@@ -11,20 +11,20 @@
 <div class="page-header">
   <h3>مجموع نقاطي: <small>{{ total_points }} نقطة</small></h3>
 </div>
-<table id="niqati" class="datatable display">
+<table id="niqati" class="datatable display dt-responsive">
     <thead>
       <tr>
-        <th>النشاط</th>
-        <th>دورك في النشاط</th>
+        <th>الوصف</th>
+        <th class="not-mobile">الرمز</th>
         <th>عدد النقاط</th>
-        <th>تاريخ الإدخال</th>
+        <th class="not-mobile">تاريخ الإدخال</th>
       </tr>
     </thead>
     <tbody>
     {% for code in niqati_user.code_set.current_year %}
         <tr>
-            <td>{% if code.collection %}<a href="{% url 'activities:show' code.collection.parent_order.episode.activity.pk %}">{{ code.collection.parent_order.episode }}</a>{% else %}مخصّصة{% endif %}</td>
-            <td>{% if code.collection %}{{ code.collection.code_category.ar_label }}{% else %}{{ code.note }}{% endif %}</td>
+            <td>{{ code|get_description|safe }}</td>
+            <th class="english-field">{{ code.string }}</th>
             <td>{{ code.points }}</td>
             <td data-order="{{ code.redeem_date|date:"U" }}">{{ code.redeem_date }}</td>
         </tr>
@@ -34,12 +34,14 @@
 {% endblock %}
 {% block customscript %}
 <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
 <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
 <script>
 $(function () {
 	$('#niqati').DataTable({
-        "order": [[ 3, "desc" ]],
-        "language": {% include 'js/dataTables-arabic.json' %}
+        order: [[ 3, "desc" ]],
+        language: {% include 'js/dataTables-arabic.json' %}
     });
 });
 </script>

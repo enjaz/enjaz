@@ -8,7 +8,7 @@ from activities.models import Activity, Episode
 from activities.models import Category as ActivityCategory
 from clubs.models import Club
 from media.models import Buzz, BuzzView
-from niqati.models import Code, Category, Code_Collection, Code_Order
+from niqati.models import Code, Category, Collection, Order
 
 class ModifiedAuthTokenSerializer(AuthTokenSerializer):
     def validate(self, attrs):
@@ -93,7 +93,7 @@ class NiqatiEpisodeSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     episode = NiqatiEpisodeSerializer(read_only=True)
     class Meta:
-        model = Code_Order
+        model = Order
         fields = ('episode',)
 
 class NiqatiCategorySerializer(serializers.ModelSerializer):
@@ -102,11 +102,11 @@ class NiqatiCategorySerializer(serializers.ModelSerializer):
         fields = ('ar_label',)
 
 class CollectionSerializer(serializers.ModelSerializer):
-    parent_order = OrderSerializer(read_only=True)
-    code_category = NiqatiCategorySerializer(read_only=True)
+    order = OrderSerializer(read_only=True)
+    category = NiqatiCategorySerializer(read_only=True)
     class Meta:
-        model = Code_Collection
-        fields = ('code_category', 'parent_order')
+        model = Collection
+        fields = ('category', 'order')
 
 class CodeSerializer(serializers.ModelSerializer):
     collection = CollectionSerializer(read_only=True)

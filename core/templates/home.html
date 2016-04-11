@@ -1,4 +1,4 @@
-{% extends "base.html" %}{% load staticfiles %}{% load clubs_utils %}
+{% extends "base.html" %}{% load staticfiles %}{% load clubs_utils %}{% load niqati_tags %}
 {% block navbutton %}
     {% if user.is_superuser %}
         {% include 'includes/nav-button.html' %}
@@ -159,11 +159,11 @@
 					</thead>
 					
 					<tbody>
-						{% for c in latest_entries %}
+						{% for code in latest_entries %}
 						<tr>
-							<td dir="auto">{% if c.collection %}<a href="{% url 'activities:show' c.collection.parent_order.episode.activity.pk %}">{{ c.collection.parent_order.episode }}</a>{% else %}مخصّصة{% endif %}</td>
-							<td>{{ c.points }}</td>
-							<td>{{ c.redeem_date }}</td>
+							<td dir="auto">{{ code|get_description|safe }}</td>
+							<td>{{ code.points }}</td>
+							<td>{{ code.redeem_date }}</td>
 						</tr>
 						{% endfor %}
 					</tbody>

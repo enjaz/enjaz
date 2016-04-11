@@ -26,12 +26,12 @@ body {
 <body>
 <div class="container">
 	<div class="row">
-		<div class="col-sm-4 col-sm-offset-4"">
+		<div class="col-sm-4 col-sm-offset-4">
 <p id="generating" class="alert alert-warning">النقاط تُولّد...</p>
-    <h2>{{ collection.code_category.name }}</h2>
+    <h2>{{ collection.category.name }}</h2>
 
     <ol id="link-list">
-    {% for code in collection.code_set.all %}
+    {% for code in collection.codes.all %}
         {% if code.short_link %}
 	    <li><a href="{{ code.short_link }}">{{ code.short_link }}</a></li>
         {% endif %}
@@ -42,7 +42,7 @@ body {
 </div>
 <script>
 $(function() {
-    var code_pks = [{% for code in collection.code_set.all %}{% if not code.short_link %}{{ code.pk }},{% endif %}{% endfor %}];
+    var code_pks = [{% for code in collection.codes.all %}{% if not code.short_link %}{{ code.pk }},{% endif %}{% endfor %}];
     var remaining_pks = code_pks;
     if (code_pks.length){
         $('#generating').show('slow');

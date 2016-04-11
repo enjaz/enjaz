@@ -46,6 +46,7 @@
                         <th>اسم النشاط</th>
                         <th>تاريخ البداية</th>
                         <th>تاريخ النهاية</th>
+                        <th>عدد المستفيدين</th>
                         <th>التقرير</th>
                         <th>التغطية</th>
                     </tr>
@@ -57,6 +58,7 @@
                         <td><a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a></td>
                         <td data-order='{{ episode.start_date|date:"U" }}'>{{ episode.start_date|date:"j F" }}</td>
                         <td data-order='{{ episode.end_date|date:"U" }}'>{{ episode.end_date|date:"j F" }}</td>
+                        <td>{{ episode.followupreport.participant_count }}</td>
                         <td id="episode-{{ episode.pk }}-report-container">
                             {% include 'media/components/report_options.html' %}
                         </td>
@@ -79,15 +81,27 @@
 
 {% block customscript %}
 	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/datatables/buttons/buttons.dataTables.min.css' %}">
+
 	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
-	<script src="{% static 'js/dataTables.tableTools.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/jszip.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/buttons.html5.min.js' %}"></script>
 <script>
 $(function () {
     attach_report_option_handler();
 	attach_assign_task_to_click_event();
 	$('.activity_list').dataTable({
-		"order": [[ 3, "desc" ]],
-		"language": {% include 'js/dataTables-arabic.json' %}
+        dom: 'Bfrtip',
+        buttons: [
+            'copyHtml5',
+            'excelHtml5',
+            'csvHtml5',
+        ],
+		order: [[ 2, "desc" ]],
+		language: {% include 'js/dataTables-arabic.json' %}
 	});
 	// Allow the dropdown menus to cross the border of the panel without being cropped
 	$(".panel").css("overflow-x", "visible").css("overflow-y", "visible");

@@ -5,9 +5,10 @@ import datetime
 import autocomplete_light
 
 from django.contrib import messages
+from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 from django import forms
-from niqati.models import Code_Order, Code_Collection, Category, Code
+from niqati.models import Order, Collection, Category, Code
 
 class OrderForm(forms.Form):
 
@@ -54,7 +55,7 @@ class OrderForm(forms.Form):
         # Use this to check if we have created any collections.  If we
         # haven't (i.e. all of them are zero), don't create the order.
         collections_created = False 
-        order = Code_Order.objects.create(episode=self.cleaned_data['episode'],
+        order = Order.objects.create(episode=self.cleaned_data['episode'],
                                           assignee=reviewing_parent,
                                           submitter=self.user)
 
@@ -72,9 +73,9 @@ class OrderForm(forms.Form):
                 continue
             students = self.cleaned_data.get('students_' + category_pk)
             collections_created = True # If count is 
-            collection = Code_Collection.objects.create(code_count=count,
-                                                        code_category=category,
-                                                        parent_order=order)
+            collection = Collection.objects.create(code_count=count,
+                                                        category=category,
+                                                        order=order)
             if students:
                 collection.students.add(*students)
                 collection.save()
@@ -86,7 +87,6 @@ class OrderForm(forms.Form):
 
 class RedeemCodeForm(forms.Form):
     string = forms.CharField(label="")
-
     def __init__(self, user, *args, **kwargs):
         super(RedeemCodeForm, self).__init__(*args, **kwargs)
         self.user = user  # Save the user as this is important for validation
@@ -100,11 +100,11 @@ class RedeemCodeForm(forms.Form):
         (3) user doesn't have another code in the same event.
         """
         # Make sure the code is uppercase, without any spaces or hyphens
-        code_string = self.cleaned_data['string'].upper().replace(" ", "").replace("-", "")
+        string = self.cleaned_data['string'].upper().replace(" ", "").replace("-", "")
 
         # first, check that code exists
         try:
-            self.code = Code.objects.get(code_string=code_string)
+            self.code = Code.objects.get(string=string)
         except Code.DoesNotExist:
             raise forms.ValidationError(u"هذا الرمز غير صحيح.", code="DoesNotExist")
 
@@ -119,8 +119,10 @@ class RedeemCodeForm(forms.Form):
             # happen.  If they do have another code, but the new one
             # has higher point, replace it.
             self.other_code = None
-            if not self.code.collection.parent_order.episode.allow_multiple_niqati:
-                other_codes = Code.objects.filter(collection__parent_order__episode=self.code.collection.parent_order.episode,
+            if not self.code.content_object.allow_multiple_niqati:
+                episode_content_type = ContentType.objects.get(model="episode")
+                other_codes = Code.objects.filter(content_type=episode_content_type,
+                                                  object_id=self.code.object_id,
                                                   user=self.user)
                 if other_codes.exists():
                     self.other_code = other_codes.first()
@@ -129,7 +131,7 @@ class RedeemCodeForm(forms.Form):
                     elif self.other_code.points == self.code.points:
                         raise forms.ValidationError(u"لديك رمز آخر في نفس النشاط، وبنفس مقدار النقاط.", code="HasOtherCode")
 
-        return code_string
+        return string
 
     # def clean(self):
     #     """
@@ -140,7 +142,7 @@ class RedeemCodeForm(forms.Form):
     #     # is part of collection
     #     if 'string' in cleaned_data and \
     #        self.code.collection and \
-    #        timezone.now().date() > self.code.collection.parent_order.episode.end_date + datetime.timedelta(14):
+    #        timezone.now().date() > self.code.collection.order.episode.end_date + datetime.timedelta(14):
     #         raise forms.ValidationError(u"مضى أكثر من أسبوعين على انتهاء النشاط ولم يعد ممكنا إدخال نقاطي!", code="TwoWeeks")
 
     #     return cleaned_data
@@ -162,7 +164,7 @@ class RedeemCodeForm(forms.Form):
                 message = u"تم إدخال الرمز بنجاح."
             message_level = 'success'
 
-            new_code = Code.objects.get(code_string=self.cleaned_data['string'])
+            new_code = Code.objects.get(string=self.cleaned_data['string'])
             new_code.user = self.user
             new_code.redeem_date = timezone.now()
             new_code.save()

@@ -575,9 +575,10 @@ def control_request(request):
             if book_request.requester_status == 'D':
                 book_request.status = 'D'
 
-            # If no previous points have been created (i.e. by
-            # requester's confirmation), create one.
+            # If no previous points or codes have been created
+            # (i.e. by requester's confirmation), create one.
             book_request.create_related_points()
+            book_request.create_related_niqati_codes()
 
         elif action == 'owner_returned' and previous_owner_status != 'R':
             book.is_available = True
@@ -672,9 +673,10 @@ def control_request(request):
             if book_request.owner_status == 'D':
                 book_request.status = 'D'
 
-            # If no previous points have been created (i.e. by
-            # requester's confirmation), create one.
+            # If no previous points or codes have been created
+            # (i.e. by requester's confirmation), create one.
             book_request.create_related_points()
+            book_request.create_related_niqati_codes()
 
         elif action == 'requester_returned' and previous_requester_status != 'R':
             book.is_available = True
@@ -998,6 +1000,7 @@ def add_report(request, group_pk, session_pk):
         form = ReportForm(request.POST, request.FILES, instance=instance)
         if form.is_valid():
             report = form.save()
+            report.create_related_niqati_codes()
             show_report_url = reverse('bulb:show_report', args=(session.group.pk, session.pk))
             full_url = request.build_absolute_uri(show_report_url)
             response['show_url'] = full_url

@@ -63,7 +63,7 @@
                         <td>{{ episode.followupreport.participant_count }}</td>
                         <td>{{ episode.followupreport.organizer_count }}</td>
                         <td>
-                        {% for image in report.images.all %}
+                        {% for image in episode.followupreport.images.all %}
                             {% if forloop.first %}<ul>{% endif %}
                                 <li>
                                 <a href="{{ image.image.url }}" class="english-field">

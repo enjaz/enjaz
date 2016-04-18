@@ -13,21 +13,26 @@ class Command(BaseCommand):
     help = "Delete repeated non-user repetitions."
 
     def add_arguments(self, parser):
-        parser.add_argument('directory')
+        parser.add_argument('--directory', dest='directory',
+                            default=None, type=str)
         parser.add_argument('--session', dest='session',
                             default=None, type=int)
 
     def handle(self, *args, **options):
-        csv_files = os.listdir(options['directory'])
-        self.stdout.write("Included files are: {}".format(", ".join(csv_files)))
-        if options['session']:
-            sessions = Session.objects.filter(pk=options['session'])
+        directory = options['directory']
+        session = options['session']
+        if directory:
+            csv_files = os.listdir(directory)
+            self.stdout.write("Included files are: {}".format(", ".join(csv_files)))
+        if session:
+            sessions = Session.objects.filter(pk=session)
         else:
             sessions = Session.objects.filter(vma_id__isnull=False)
         for session in sessions:
-            csv_filename = str(session.pk) + '.csv'
-            full_path = os.path.join(options['directory'], csv_filename)
-            if os.path.isfile(full_path):
+            if directory:
+                csv_filename = str(session.pk) + '.csv'
+                full_path = os.path.join(directory, csv_filename)
+            if directory and os.path.isfile(full_path):
                 self.stdout.write("{} exists".format(full_path))
                 csv_file = open(full_path)
                 csv_reader = unicodecsv.reader(csv_file, encoding="utf-8")
@@ -50,7 +55,6 @@ class Command(BaseCommand):
                         print e
                         self.stdout.write("Error with registration {}.".format(registration.pk))
             else:
-                self.stdout.write("{} is missing".format(full_path))
                 while True:
                     answer = raw_input(u"Do you want to accept everybody for {}? (Y) ".format(session.pk))
                     if answer.lower() == 'y':

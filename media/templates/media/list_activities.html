@@ -40,13 +40,15 @@
     </div>
     <div id="collapse{{ club.pk }}" class="panel-collapse collapse {% if clubs.count > 1 %}out{% else %}in{% endif %}">
         <div class="panel-body"><div class="row">
-            <table class="display activity_list">
+            <table class="display activity_list dt-responsive">
                 <thead>
                     <tr>
                         <th>اسم النشاط</th>
-                        <th>تاريخ البداية</th>
-                        <th>تاريخ النهاية</th>
-                        <th>عدد المستفيدين</th>
+                        <th class="not-mobile">تاريخ البداية</th>
+                        <th class="not-mobile">تاريخ النهاية</th>
+                        <th class="not-mobile">عدد المستفيدين</th>
+                        <th class="not-mobile">عدد المنظّمين</th>
+                        <th class="none">المرفقات</th>
                         <th>التقرير</th>
                         <th>التغطية</th>
                     </tr>
@@ -59,6 +61,21 @@
                         <td data-order='{{ episode.start_date|date:"U" }}'>{{ episode.start_date|date:"j F" }}</td>
                         <td data-order='{{ episode.end_date|date:"U" }}'>{{ episode.end_date|date:"j F" }}</td>
                         <td>{{ episode.followupreport.participant_count }}</td>
+                        <td>{{ episode.followupreport.organizer_count }}</td>
+                        <td>
+                        {% for image in episode.followupreport.images.all %}
+                            {% if forloop.first %}<ul>{% endif %}
+                                <li>
+                                <a href="{{ image.image.url }}" class="english-field">
+                                    <i class="entypo-picture"></i>
+                                    {{ image.image.name }}
+                                </a>
+                                </li>
+                            {% if forloop.last %}</ul>{% endif %}
+                            {% empty %}
+                                <p>لا يوجد.</p>
+                        {% endfor %}
+                        </td>
                         <td id="episode-{{ episode.pk }}-report-container">
                             {% include 'media/components/report_options.html' %}
                         </td>

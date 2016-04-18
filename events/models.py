@@ -28,14 +28,14 @@ class Event(models.Model):
     registration_closing_date = models.DateField(u"تاريخ انتهاء التسجيل", null=True, blank=True)
     start_date = models.DateField(u"تاريخ البدء", null=True)
     end_date = models.DateField(u"تاريخ الانتهاء", null=True)
-    onsite_after = models.DateField(u"التسجيل في الموقع يبدأ من", null=True)
+    onsite_after = models.DateField(u"التسجيل في الموقع يبدأ من", null=True, blank=True)
     url = models.URLField(max_length=255, blank=True, default="")
     location_url = models.URLField(max_length=255, blank=True, default="")
     twitter = models.CharField(max_length=255,
                                blank=True,
                                default="KSAU_Events")
     is_on_telegram = models.BooleanField(default=True,
-                                         verbose_name=u"متاح التسجيل في يوم الحدث؟")
+                                         verbose_name=u"على تلغرام؟")
     organizing_club = models.ForeignKey(Club)
     priorities = models.PositiveSmallIntegerField(default=1)
 

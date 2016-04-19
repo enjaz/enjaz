@@ -15,7 +15,9 @@ def check_if_closed(event):
         return HttpResponseRedirect(reverse('events:registration_closed'))
 
 def get_user_organizing_events(user):
-    if user.is_superuser:
+    if not user.is_authenticated():
+        return Event.objects.none()
+    elif user.is_superuser:
         user_events = Event.objects.all()
     else:
         user_events = (Event.objects.filter(organizing_club__members=user) | \

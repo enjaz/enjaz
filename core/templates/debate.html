@@ -1,0 +1,36 @@
+{% extends 'base.html' %}{% load staticfiles %}{% load bootstrap3 %}
+{% block pageheaderurl %}{% url 'home' %}{% endblock %}
+{% block pageheader %}الصفحة الرئيسية{% endblock %}
+
+{% block title %}المناظرات الرئاسية لانتخابات 2016-2017{% endblock %}
+{% block content %}
+<h1 style="font-size: 36px; text-align: center;">المناظرات الرئاسية لانتخابات 2016-2017</h1>
+<p class="section-intro">أهلا بك في المناظرات الرئاسية لانتخابات 2016-2017!  نسعى في هذه الانتخابات لتفعيل مشاركة الجمهور الطلابي، وسنعرض على الجمهور أثناء المناظرة أسئلة لحظية نعرض نتائجها بشكل مباشر. كن مستعدًا للمشاركة.</p>
+<div class="text-center">
+{% if url %}
+<a id="debate-link" target="_blank" href="{{ url }}" class="btn btn-primary btn-lg">عبّء الاستطلاع</a>
+{% else %}
+<button disabled id="debate-link" target="_blank" href="{{ url }}" style="margin-left: auto; margin-right: auto;" class="btn btn-danger btn-lg">لم ينشر الاستطلاع بعد.<br>كن على أهبة الاستعداد!</a>
+{% endif %}
+</div>
+
+{% if form %}
+    <h2>عدّل</h2>
+    <form method="post" class="form">
+        {% csrf_token %}
+        {% bootstrap_field form.url show_label=False field_class='english-field' %}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">
+                {% bootstrap_icon "ok-sign" %} عدّل
+            </button>
+        {% endbuttons %}
+    </form>
+{% endif %}
+<style type="text/css">
+    #debate-link{
+        margin-bottom: 10px;
+        font-size: 20px;
+    }
+    
+</style>
+{% endblock %}

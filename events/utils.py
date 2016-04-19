@@ -81,5 +81,5 @@ def send_onsite_confirmation(registration, event):
     mail.send([registration.get_email()],
                template="event_registration_reminder",
                context=email_context)
-    registration.confirmation_sent = True
+    registration.reminder_sent = True
     registration.save()

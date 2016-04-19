@@ -9,5 +9,6 @@ urlpatterns = patterns('',
     url(r'^debate/$', 'core.views.debate', name='debate'),
     url(r'^indicators/$', 'core.views.indicators', name='indicators'),
     url(r'^indicators/(?P<city>\w)/$', 'core.views.indicators', name='indicators_for_city'),
+    url(r'^aboutsc/deanship_cp4/$', TemplateView.as_view(template_name='cp4_bader.html'), name='cp4_bader'),
     url(r'^visit/(?P<pk>\d+)/$', "core.views.visit_announcement", name='visit_announcement'),
 )

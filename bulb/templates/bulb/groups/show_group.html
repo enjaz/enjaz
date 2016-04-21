@@ -85,7 +85,7 @@
     </div>
 </div>
 <h2>الجلسات</h2>
-    {% for session in group.session_set.undeleted %}
+    {% for session in sessions.undeleted %}
 <div class="row">
     <h3 id="session-{{ session.pk }}">{{ session.date|date:"j F" }}: {% if session.report %}<a href="{% url 'bulb:show_report' group.pk session.pk %}">{% endif %}{{ session.title }}{% if session.report %}</a>{% endif %}</h3>
     {% if session.report or user|can_edit_group:group %}

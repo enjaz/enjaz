@@ -27,7 +27,7 @@
                         <td>{{ group.coordinator.common_profile.get_ar_full_name }}</td>
                         <td data-order="{{ group.submission_date|date:"U" }}">{{ group.submission_date|date:"j F Y" }}</td>
                         <td>{{ group.membership_set.count }}</td>
-                        <td>{{ group.session_set.count }}</td>
+                        <td>{{ group.session_set.undeleted.count }}</td>
                         <td>{{ group.get_report_count }}</td>
                         {% if group.get_last_session %}
                         <td data-order="{{ group.get_last_session.date|date:"U" }}">{{ group.get_last_session.date }}

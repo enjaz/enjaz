@@ -17,8 +17,8 @@ from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.utils.http import urlquote
 
+from niqati import utils
 from post_office import mail
-from accounts.models import get_gender
 from core import decorators
 from core.models import StudentClubYear
 from activities.models import Activity, Evaluation
@@ -29,8 +29,6 @@ from clubs.utils import is_presidency_coordinator_or_deputy, has_coordination_to
 from niqati.models import Category, Code, Order, Collection, Review, COUPON, SHORT_LINK
 from niqati.forms import OrderForm, RedeemCodeForm
 
-
-current_year = StudentClubYear.objects.get_current()
 
 @login_required
 def index(request):
@@ -52,9 +50,13 @@ def redeem(request, code=""):
     """
     GET: show the code submission form.
     POST: submit a code.
-    """    
-    if current_year.niqati_closure_date and timezone.now() > current_year.niqati_closure_date:
-        return render(request, "niqati/submit_closed.html")
+    """
+    if utils.is_niqati_closed(user=request.user):
+        current_year = StudentClubYear.objects.get_current()
+        closing_ceremony_date = current_year.get_closing_ceremony_date(request.user)
+        print closing_ceremony_date
+        context = {'closing_ceremony_date': closing_ceremony_date}
+        return render(request, "niqati/submit_closed.html", context)
     elif is_coordinator_of_any_club(request.user):
         user_club = request.user.coordination.current_year().first()
         context = {'user_club': user_club}
@@ -74,7 +76,8 @@ def redeem(request, code=""):
 def claim_code(request):
     form = RedeemCodeForm(request.user, request.POST)
     eval_form = EvaluationForm(request.POST)
-    if form.is_valid() and eval_form.is_valid():
+    if utils.is_niqati_closed(user=request.user) and \
+       form.is_valid() and eval_form.is_valid():
         result = form.process()
         eval_form.save(form.code.content_object, request.user)
         return result
@@ -123,13 +126,18 @@ def coordinator_view(request, activity_id):
        and not request.user.is_superuser:
         raise PermissionDenied
 
+    if utils.is_niqati_closed(activity=activity):
+        return render(request, 'niqati/activity_orders.html',
+                      {'activity': activity, 'active_tab': 'niqati',
+                       'error': 'closed'})
+
     # If it has been two weeks since the end of the activity, don't
     # alow niqati requests.
     #last_episode = activity.episode_set.order_by('-end_date', '-end_time').first()
     #if timezone.now().date() > last_episode.end_date + datetime.timedelta(14):
     #    return render(request, 'niqati/activity_orders.html',
     #                  {'activity': activity, 'active_tab': 'niqati',
-    #                   'error': 'closed'})
+    #                   'error': 'expired'})
     if request.method == 'POST':
         form = OrderForm(request.POST, activity=activity, user=request.user)
         if form.is_valid():
@@ -303,6 +311,7 @@ def general_report(request, city=""):
         city_codes = [city_pair[0] for city_pair in city_choices]
         if not city in city_codes:
             raise Http404
+        current_year = StudentClubYear.objects.get_current()
         users = User.objects.filter(common_profile__city=city,
                                     code__year=current_year).annotate(point_sum=Sum('code__points')).filter(point_sum__gt=0).order_by('-point_sum')
         context = {'users': users}

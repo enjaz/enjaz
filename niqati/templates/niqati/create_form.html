@@ -1,8 +1,10 @@
 {% load bootstrap3 %}
 {% include 'autocomplete_light/static.html' %}
 
-{% if error == 'closed' %}
+{% if error == 'expired' %}
 <p class="alert alert-danger">مضى أكثر من 14 يومًا على انقضاء النشاط، ولم يعد ممكنًا رفع طلب نقاطي.</p>
+{% elif error == 'closed' %}
+<p class="alert alert-danger">انتهت سنة النشاط الطلابي!  لم يعد ممكنا طلب النقاط لهذا النشاط.</p>
 {% else %}
 <div class="row">
 	<div class="col-sm-4 col-sm-offset-4">

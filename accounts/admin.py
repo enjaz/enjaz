@@ -131,8 +131,9 @@ class ModifiedUserAdmin(UserenaAdmin):
 ones) deal with the User model."""
     actions = [remove_add_code_perm, remove_add_bookrequest_perm,
                remove_add_book_perm]
-    list_display = ('username', 'full_en_name', 'email', 'is_active',
-                    'is_coordinator', 'is_employee', 'date_joined')
+    list_display = ('username', 'full_en_name', 'full_ar_name',
+                    'email', 'is_active', 'is_coordinator',
+                    'date_joined')
     list_filter = (EmployeeFilter, CoordinatorFilter, CollegeFilter,
                    SectionFilter)
     search_fields= ('username', 'email',
@@ -161,17 +162,15 @@ ones) deal with the User model."""
     is_coordinator.boolean = True
     is_coordinator.short_description = u"منسق؟"
 
-    def is_employee(self, obj):
-        if obj.user_permissions.filter(codename='deanship_employee'):
-            return True
-        else:
-            return False
-    is_employee.boolean = True
-    is_employee.short_description = u"موظف؟"
-
     def full_en_name(self, obj):
         try:
             return obj.common_profile.get_en_full_name()
+        except ObjectDoesNotExist:
+            return
+
+    def full_ar_name(self, obj):
+        try:
+            return obj.common_profile.get_ar_full_name()
         except ObjectDoesNotExist:
             return
 

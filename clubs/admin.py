@@ -1,7 +1,6 @@
 # -*- coding: utf-8  -*-
 from django.contrib import admin
 from clubs.models import Club, College, city_choices, gender_choices
-from accounts.admin import deanship_admin
 from core.models import StudentClubYear
 
 class YearFilter(admin.SimpleListFilter):
@@ -74,4 +73,3 @@ class CollegeAdmin(admin.ModelAdmin):
 
 admin.site.register(College, CollegeAdmin)
 admin.site.register(Club, ClubAdmin)
-deanship_admin.register(Club, ClubAdmin)

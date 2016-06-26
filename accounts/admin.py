@@ -2,72 +2,39 @@
 from django import forms
 
 from django.contrib import admin
+from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User, Permission, Group
 from django.contrib.auth import authenticate
-from django.contrib.admin.sites import AdminSite
-from django.contrib.admin.forms import AdminAuthenticationForm
 from django.core.exceptions import ObjectDoesNotExist
 from userena.admin import UserenaAdmin
 
 from clubs.models import Club, college_choices, section_choices
 from accounts.models import CommonProfile
 from core.models import StudentClubYear
+import media.utils
+import clubs.utils
 
 current_year = StudentClubYear.objects.get_current()
 
-class DeanshipAuthenticationForm(AdminAuthenticationForm):
-    """A custom authentication form used in the admin app.  Based on the
-original Django code."""
-    def clean(self):
-        username = self.cleaned_data.get('username')
-        password = self.cleaned_data.get('password')
-        message = admin.forms.ERROR_MESSAGE
-        params = {'username': self.username_field.verbose_name}
-        deanship_group = Group.objects.get(name='deanship')
+class UserListAuthenticationForm(AdminAuthenticationForm):
+    def confirm_login_allowed(self, user):
+        if not user.is_active and \
+           not (media.utils.is_media_coordinator_or_deputy(user) or \
+                clubs.utils.is_presidency_coordinator_or_deputy(request.user)):
+            raise forms.ValidationError(
+                self.error_messages['invalid_login'],
+                code='invalid_login',
+                params={'username': self.username_field.verbose_name}
+                )
 
-        if username and password:
-            self.user_cache = authenticate(username=username, password=password)
-            if self.user_cache is None:
-                raise forms.ValidationError(message, code='invalid', params=params)
-            # If the user isn't a deanship employee and isn't a system
-            # administrator, they must not be able to use the deanship
-            # admin interface.
-            elif not deanship_group in self.user_cache.groups.all() and\
-                 not self.user_cache.is_superuser:
-                raise forms.ValidationError(message, code='invalid', params=params)
-        return self.cleaned_data
-
-class DeanshipAdmin(AdminSite):
-    """This admin website is for the Student Affairs Deanship employees
-to modify user permissions (e.g. who is the coordinator of which
-club)."""
-
-    login_form = DeanshipAuthenticationForm
+class UserListAdmin(admin.sites.AdminSite):
+    login_form = UserListAuthenticationForm
 
     def has_permission(self, request):
-        return request.user.has_perm('deanship_employee')
-
-def remove_add_code_perm(modeladmin, request, queryset):
-    add_code = Permission.objects.get(codename='add_code')
-    for user in queryset:
-        user.user_permissions.remove(add_code)
-        user.save()
-remove_add_code_perm.short_description = u"امنع من تسجيل نقاط"
-
-def remove_add_book_perm(modeladmin, request, queryset):
-    add_book = Permission.objects.get(codename='add_book')
-    for user in queryset:
-        user.user_permissions.remove(add_book)
-        user.save()
-remove_add_book_perm.short_description = u"امنع من إضافة الكتب"
-
-def remove_add_bookrequest_perm(modeladmin, request, queryset):
-    add_bookrequest = Permission.objects.get(codename='add_bookrequest')
-    for user in queryset:
-        user.user_permissions.remove(add_bookrequest)
-        user.save()
-remove_add_bookrequest_perm.short_description = u"امنع من طلب استعارة الكتب"
+        return media.utils.is_media_coordinator_or_deputy(request.user) or \
+               clubs.utils.is_presidency_coordinator_or_deputy(request.user) or \
+               request.user.is_superuser
 
 class CommonProfileInline(admin.StackedInline):
     model = CommonProfile
@@ -129,11 +96,11 @@ class SectionFilter(admin.SimpleListFilter):
 class ModifiedUserAdmin(UserenaAdmin):
     """This changes the way the admin websites (both the main and deanship
 ones) deal with the User model."""
-    actions = [remove_add_code_perm, remove_add_bookrequest_perm,
-               remove_add_book_perm]
-    list_display = ('username', 'full_en_name', 'full_ar_name',
-                    'email', 'is_active', 'is_coordinator',
+    list_display = ('username', 'full_ar_name', 'full_en_name', 'college',
+                    'student_id', 'badge_number', 'email',
+                    'mobile_number', 'is_active', 'is_coordinator',
                     'date_joined')
+
     list_filter = (EmployeeFilter, CoordinatorFilter, CollegeFilter,
                    SectionFilter)
     search_fields= ('username', 'email',
@@ -156,6 +123,16 @@ ones) deal with the User model."""
                     'common_profile__job_description')
     inlines = [CommonProfileInline,]
 
+    def has_module_permission(self, request, obj=None):
+        return media.utils.is_media_coordinator_or_deputy(request.user) or \
+               clubs.utils.is_presidency_coordinator_or_deputy(request.user) or \
+               request.user.is_superuser
+
+    def has_change_permission(self, request, obj=None):
+        return media.utils.is_media_coordinator_or_deputy(request.user) or \
+               clubs.utils.is_presidency_coordinator_or_deputy(request.user) or \
+               request.user.is_superuser
+
     def is_coordinator(self, obj):
         return obj.coordination.current_year().exists()
 
@@ -173,10 +150,35 @@ ones) deal with the User model."""
             return obj.common_profile.get_ar_full_name()
         except ObjectDoesNotExist:
             return
+    
+    def student_id(self, obj):
+        try:
+            return obj.common_profile.student_id
+        except ObjectDoesNotExist:
+            return
+
+    def badge_number(self, obj):
+        try:
+            return obj.common_profile.badge_number
+        except ObjectDoesNotExist:
+            return
+
+    def mobile_number(self, obj):
+        try:
+            return obj.common_profile.mobile_number
+        except ObjectDoesNotExist:
+            return
+
+    def college(self, obj):
+        try:
+            return obj.common_profile.college
+        except ObjectDoesNotExist:
+            return
 
     full_en_name.short_description = u"الاسم الإنجليزي الكامل"
+    full_ar_name.short_description = u"الاسم العربي الكامل"
 
-deanship_admin = DeanshipAdmin("Deanship Admin")
+user_list_admin = UserListAdmin("User List Admin")
 admin.site.unregister(User)
 admin.site.register(User, ModifiedUserAdmin)
-deanship_admin.register(User, ModifiedUserAdmin)
+user_list_admin.register(User, ModifiedUserAdmin)

@@ -122,7 +122,7 @@ def can_view_followupreport(user, activity):
         clubs.utils.is_member(activity.primary_club, user) or \
         clubs.utils.is_employee_of_any_club(user) or \
         clubs.utils.is_deanship_of_students_affairs_coordinator_or_member(user) or \
-        user.is_superuser
+        user.has_perms('media.view_all_followupreports')
 
 def get_clubs_for_assessment_by_user(user):
     user_assessing_clubs = clubs.utils.get_user_clubs(user).filter(can_assess=True)

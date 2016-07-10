@@ -857,8 +857,9 @@ def edit_group(request, group_pk):
 @login_required
 def show_group(request, group_pk):
     group = get_object_or_404(Group, pk=group_pk, is_deleted=False)
-    return render(request, "bulb/groups/show_group.html",
-                  {'group': group})
+    context = {'group': group,
+               'sessions': group.session_set.order_by("date")}
+    return render(request, "bulb/groups/show_group.html", context)
 
 @decorators.ajax_only
 @decorators.post_only

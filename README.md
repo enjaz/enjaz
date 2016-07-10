@@ -67,13 +67,16 @@ In the project `urls.py`, add the following:
 ```
 # [...]
 from django.views.generic import TemplateView
-from accounts.admin import deanship_admin
-from arshidni.admin import arshidni_admin
 from accounts.forms import StudentSignupForm, NonStudentSignupForm, ModifiedAuthenticationForm
-from core.views import visit_announcement
+from accounts.admin import user_list_admin
+from arshidni.admin import arshidni_admin
 from activities.urls import activity_forms_urls
+from researchhub.forms import ResearchHubSignupForm
 from clubs.urls import club_forms_urls
 # [...]
+import autocomplete_light
+autocomplete_light.autodiscover()
+
     url(r'^$', 'core.views.portal_home', name='home'),
     url(r'^visit/(?P<pk>\d+)/$', visit_announcement, name='visit_announcement'),
     url(r'^about/$', TemplateView.as_view(template_name='about.html'), name='about'),
@@ -87,13 +90,14 @@ from clubs.urls import club_forms_urls
     url(r'^voice/', include('studentvoice.urls', namespace="studentvoice")),
     url(r'^arshidni/admin/', include(arshidni_admin.urls, namespace="arshidni_admin")),
     url(r'^arshidni/', include('arshidni.urls', namespace="arshidni")),
+    url(r'^user_list/', include(user_list_admin.urls)),
     url(r'^media/', include('media.urls', namespace="media")),
     url(r'^accounts/resend/$', 'accounts.views.resend_confirmation_key', name='resend_confirmation_key'),
     url(r'^accounts/signup/$', 'userena.views.signup', {'signup_form': StudentSignupForm, 'template_name': 'userena/student_signup_form.html'}),
     url(r'^accounts/signup/nonstudents/$', 'userena.views.signup', {'signup_form': NonStudentSignupForm, 'template_name': 'userena/nonstudent_signup_form.html'}, name="nonstudent_signup"),
     url(r'^accounts/signin/$', 'userena.views.signin', {'auth_form': ModifiedAuthenticationForm}),
     url(r'^accounts/', include('userena.urls')),
-    url(r'^da/', include(deanship_admin.urls)),
+    url(r'^autocomplete/', include('autocomplete_light.urls')),
 # [...]
 ```
 
@@ -116,9 +120,6 @@ Current required settings:
 * For django-constance dynamic settings:
 ```
 CONSTANCE_CONFIG = {
-    'FVP_USERNAME': ('', 'What is the username of the female vice president?'),
-    'MVP_USERNAME': ('', 'What is the username of the male vice president?'),
-    'DHA_USERNAME': ('', 'What is the username of the Deanship Head of Activities?'),
     'STUDENTVOICE_THRESHOLD': (30, 'What is the point threshold on which voices should be sent to their recipients?'),
     }
 ```

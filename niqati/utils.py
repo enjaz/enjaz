@@ -1,7 +1,12 @@
 import string
 import random
 
+from django.utils import timezone
+
+from core.models import StudentClubYear
+import accounts.utils
 import clubs.utils
+
 
 STRING_LENGTH = 6
 
@@ -35,3 +40,18 @@ def get_free_random_strings(number):
 def can_claim_niqati(user):
     return not clubs.utils.is_coordinator_of_any_club(user) and \
            not user.is_superuser
+
+def is_niqati_closed(user=None, activity=None):
+    if user:
+        year = StudentClubYear.objects.get_current()
+        city = accounts.utils.get_user_city(user)
+    elif activity:
+        year = activity.primary_club.year
+        city = activity.primary_club.city
+
+    return city == 'A' and year.alahsa_niqati_closure_date and \
+        timezone.now() >= year.alahsa_niqati_closure_date or \
+        city == 'J' and year.jeddah_niqati_closure_date and \
+        timezone.now() >= year.jeddah_niqati_closure_date or \
+        city == 'R' and year.riyadh_niqati_closure_date and \
+        timezone.now() >= year.riyadh_niqati_closure_date

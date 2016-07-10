@@ -8,15 +8,18 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
+from django.core.urlresolvers import reverse
 from django.utils import timezone
 
-from clubs.models import Club, College, city_choices
+from .models import Announcement, Publication, StudentClubYear
+from .forms import DebateForm
+from accounts.utils import get_user_gender
 from activities.models import Activity, Episode
 from books.models import Book
-from .models import Announcement, Publication, StudentClubYear
+from clubs.models import Club, College, city_choices
+from constance import config
 from niqati.models import Order, Code
 from media.models import FollowUpReport, Story
-from accounts.utils import get_user_gender
 import clubs.utils
 
 
@@ -230,3 +233,18 @@ def indicators(request, city=""):
                    city_choices}
 
     return render(request, 'indicators.html', context)
+
+def debate(request):
+    url = config.DEBATE_URL
+    context ={'url': url}
+    if request.user.is_superuser or \
+       request.user.username in ['alsaaid031', 'alkaabba039', 'aljuhani518']:
+        if request.method == 'POST':
+            form = DebateForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect(reverse("debate"))
+        elif request.method == 'GET':
+            form = DebateForm(initial={'url': url})
+        context['form'] = form
+    return render(request, 'debate.html', context)

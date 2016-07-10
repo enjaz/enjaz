@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import translation
 
-from events.models import Event, Session, Registration
+from events.models import Event, Registration
 from post_office import mail
 
 class Command(BaseCommand):
@@ -25,7 +25,7 @@ class Command(BaseCommand):
         users = {}
         event = Event.objects.get(pk=options['event_pk'])
         list_url = "http://medicalacademy.org/portal/list/registration/get/data?event_id="
-        for session in Session.objects.filter(event=event, vma_id__isnull=False):
+        for session in event.session_set.filter(vma_id__isnull=False):
             self.stdout.write(u"Getting {}...".format(session))
             url = list_url + str(session.vma_id)
             data = urllib2.urlopen(url)
@@ -33,7 +33,8 @@ class Command(BaseCommand):
             count = len(users[session.vma_id])
             self.stdout.write(u"We got {}.".format(count))
 
-        for registration in Registration.objects.filter(is_deleted=False,
+        for registration in Registration.objects.filter(first_priority_sessions__event=event,
+                                                        is_deleted=False,
                                                         reminder_sent=False,
                                                         moved_sessions__isnull=False).distinct():
             enjaz_sessions = registration.first_priority_sessions.all() | \

@@ -5,8 +5,10 @@ from django.db import models, migrations
 
 def get_presidency_and_deanship(apps):
     Club = apps.get_model('clubs', 'Club')
-    presidency = Club.objects.get(english_name="Presidency")
-    deanship = Club.objects.get(english_name="Deanship of Student Affairs")
+    StudentClubYear = apps.get_model('core', 'StudentClubYear')
+    year2014_2015 = StudentClubYear.objects.get(start_date__year=2014, end_date__year=2015)
+    presidency = Club.objects.get(english_name="Presidency", city="R", gender="", year=year2014_2015)
+    deanship = Club.objects.get(english_name="Deanship of Student Affairs", year=year2014_2015)
     return presidency, deanship
 
 def upgrade_reviews(apps, schema_editor):
@@ -26,7 +28,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('activities', '0002_review_reviewer_club'),
-        ('clubs', '0004_add_dsa'),
+        ('clubs', '0016_separate_presidency'),
     ]
 
     operations = [

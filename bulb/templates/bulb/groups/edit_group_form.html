@@ -1,5 +1,4 @@
 {% load bootstrap3 %}{% load staticfiles %}
-{% include 'autocomplete_light/static.html' %}
 
 <form enctype="multipart/form-data" id="edit-group-form" action="post">
 {% csrf_token %}
@@ -48,4 +47,6 @@ $(function () {
         });
     });
 });
+            
 </script>
+{{ form.media }}

@@ -2,7 +2,7 @@
 import os
 from datetime import datetime, timedelta
 
-from django.contrib.contenttypes.generic import GenericRelation
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import Avg, F, Sum
 from django.contrib.auth.models import User

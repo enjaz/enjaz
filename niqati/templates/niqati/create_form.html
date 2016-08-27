@@ -1,5 +1,4 @@
 {% load bootstrap3 %}
-{% include 'autocomplete_light/static.html' %}
 
 {% if error == 'expired' %}
 <p class="alert alert-danger">مضى أكثر من 14 يومًا على انقضاء النشاط، ولم يعد ممكنًا رفع طلب نقاطي.</p>
@@ -58,4 +57,6 @@ $(function(){
 	});
 });
 </script>
+
+{{ form.media }}
 {% endif %}

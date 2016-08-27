@@ -7,8 +7,6 @@ from core.models import StudentClubYear
 from clubs.models import Club
 import clubs.utils
 
-current_year = StudentClubYear.objects.get_current()
-
 WHAT_IF_URL = "whatif"
 HUNDRED_SAYS_URL = "100says"
 WHAT_IF = 0

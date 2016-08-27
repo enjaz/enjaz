@@ -1,14 +1,14 @@
 student-portal
 ==============
 
-The Student Portal is a [Django-based](https://www.djangoproject.com) platform for university student activity.
-Through the platform, students can submit activities for approval,
-join clubs, enter their 'Activity Points' (Niqati) and contribute and
-borrow books.
+The Student Portal is a [Django-based](https://www.djangoproject.com)
+platform for university student activity.  Through the platform,
+students can submit activities for approval, join clubs, enter their
+'Activity Points' (Niqati) and contribute and borrow books.
 
 # Licensing
 
-Copyright (C) 2014-2016 Muhammad Saeed Arabi and Osama Khalid.
+Copyright (C) 2014-2016 Muhammad Saeed Arabi and [Osama Khalid](https://osamakhalid.com).
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
@@ -36,96 +36,133 @@ Licensed under the General Public License version 3 of the License, or
 
 # Installation 
 
-Current dependencies:
-* Django
-* django-bootstrap3
-* django-constance-updated
-* django-cors-headers
-* django-email_extras
-* django-picklefield
-* django-post-office _(check out the official installation documentation)_
-* django-tagging
-* django-tagging-autocomplete
-* django-taggit
-* django-templated-email
-* django-userena _(check out the official installation documentation)_
-* djagno-wkhtmltopdf
-* easy-thumbnails
-* djangorestframework
-* future
-* pdfcrowd
-* requests
-* unicodecsv
-* unidecode
+Enjaz Portal works with Python 2.7 and Django 1.8.
 
-A cronjob is required to process niqati code orders as follows:
-```
-* * * * * cd ~/path/to/portal/ && /path/to/python manage.py generateniqati >> ~/path/to/log/generate_niqati.log 2>&1
-```
+You can instlal all the dependencies  using:
 
+```pip install -r requirements.txt```
+
+
+### Step one: URLS
 In the project `urls.py`, add the following:
 ```
-# [...]
+# After default imports:
+
 from django.views.generic import TemplateView
 from accounts.forms import StudentSignupForm, NonStudentSignupForm, ModifiedAuthenticationForm
 from accounts.admin import user_list_admin
-from arshidni.admin import arshidni_admin
 from activities.urls import activity_forms_urls
 from researchhub.forms import ResearchHubSignupForm
 from clubs.urls import club_forms_urls
-# [...]
-import autocomplete_light
-autocomplete_light.autodiscover()
+from core.views import visit_announcement
 
-    url(r'^$', 'core.views.portal_home', name='home'),
-    url(r'^visit/(?P<pk>\d+)/$', visit_announcement, name='visit_announcement'),
-    url(r'^about/$', TemplateView.as_view(template_name='about.html'), name='about'),
-    url(r'^aboutsc/$', TemplateView.as_view(template_name='about_sc.html'), name='about_sc'),
+urlpatterns = [
+    url(r'^', include('core.urls')),
+    url(r'^api/', include('api.urls')),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^admin/', include(admin.site.urls)),
     activity_forms_urls,
     url(r'^activities/', include('activities.urls', namespace="activities")),
     club_forms_urls,
     url(r'^clubs/', include('clubs.urls', namespace="clubs")),
-    url(r'^books/', include('books.urls', namespace="books")),
+    url(r'^bulb/', include('bulb.urls', namespace="bulb")),
+    url(r'^events/', include('events.urls', namespace="events")),
+    url(r'^hpc/', include('hpc.urls', namespace="hpc")),
+    url(r'^researchhub/supervisors/signup/$', 'userena.views.signup', {'signup_form': ResearchHubSignupForm, 'template_name': 'researchhub/supervisor_signup_form.html'}, name="supervisor_signup"),
+    url(r'^researchhub/', include('researchhub.urls', namespace="researchhub")),
+    url(r'^mentors/', include('studentguide.urls', namespace="studentguide")),
     url(r'^niqati/', include('niqati.urls', namespace="niqati")),
     url(r'^voice/', include('studentvoice.urls', namespace="studentvoice")),
-    url(r'^arshidni/admin/', include(arshidni_admin.urls, namespace="arshidni_admin")),
-    url(r'^arshidni/', include('arshidni.urls', namespace="arshidni")),
     url(r'^user_list/', include(user_list_admin.urls)),
-    url(r'^media/', include('media.urls', namespace="media")),
-    url(r'^accounts/resend/$', 'accounts.views.resend_confirmation_key', name='resend_confirmation_key'),
+    url(r'^mediacenter/', include('media.urls', namespace="media")),
     url(r'^accounts/signup/$', 'userena.views.signup', {'signup_form': StudentSignupForm, 'template_name': 'userena/student_signup_form.html'}),
+    url(r'^accounts/resend/$', 'accounts.views.resend_confirmation_key', name='resend_confirmation_key'),
     url(r'^accounts/signup/nonstudents/$', 'userena.views.signup', {'signup_form': NonStudentSignupForm, 'template_name': 'userena/nonstudent_signup_form.html'}, name="nonstudent_signup"),
     url(r'^accounts/signin/$', 'userena.views.signin', {'auth_form': ModifiedAuthenticationForm}),
+    url(r'^accounts/edit/$', 'accounts.views.edit_common_profile', name='edit_common_profile'),
     url(r'^accounts/', include('userena.urls')),
-    url(r'^autocomplete/', include('autocomplete_light.urls')),
-# [...]
+    url(r'^books/', RedirectView.as_view(pattern_name='bulb:index')),
+    url(r'^arshidni/', RedirectView.as_view(pattern_name='studentguide:index')),
+]
 ```
 
-Current required settings:
-* DEFAULT_FROM_EMAIL: The default _noreply_ email.
-* MEDIA_ROOT: Where do you want to save the covers on the server?
-* MEDIA_URL: Where do you want users to access the covers?
-* `GOOGLE_BOOKS_KEY`: to be generated from https://code.google.com/apis/console/
-* `PDFCROWD_USERNAME`: a pdfcrowd username
-* `PDFCROWD_KEY`: a pdfcrowd api key
+
+Furthermore, if you are running Enjaz on development server, make sure
+you confiture the static and media URLs as per the [Django documentation](https://docs.djangoproject.com/en/1.8/howto/static-files/#serving-static-files-during-development).
+
+### Step two: Settings
+
+Replace `INSTALLED_APPS` in `settings.py` with the following:
+```
+INSTALLED_APPS = (
+    'dal',
+    'dal_select2',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.sites',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'accounts',
+    'core',
+    'userena',
+    'taggit',
+    'guardian',
+    'easy_thumbnails',
+    'bootstrap3',
+    'post_office',
+    'constance',
+    'constance.backends.database',
+    'activities',
+    'books',
+    'clubs',
+    'niqati',
+    'media',
+    'studentvoice',
+    'forms_builder.forms',
+    'forms_builder.wrapper',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'api',
+    'bulb',
+    'arshidni',
+    'studentguide',
+    'hpc',
+    'researchhub',
+    'wkhtmltopdf',
+    'events',
+)
+```
+
+Current required settings in `settings.py`:
+* `DEFAULT_FROM_EMAIL`: The default _noreply_ email.
+* `MEDIA_ROOT`: Where you want to save user uploads
+* `MEDIA_URL`: Where you want users to access user uploads.
 * `BITLY_KEY`: a bit.ly api key
-* `AUTH_PROFILE_MODULE = 'accounts.EnjazProfile'`
-* `USERENA_WITHOUT_USERNAMES = True`
-* `USERENA_ACTIVATION_RETRY = True`
-* `USERENA_ACTIVATION_DAYS = 30`
-* `FORMS_BUILDER_USE_SLUGS = False`, (or `True` if you like)
-* `FORMS_BUILDER_USE_SITES = False`
-* `FORMS_BUILDER_CHOICES_SEPARATOR = '/'` or any character of your choice
-* Add `"django.core.context_processors.request"` to the [default TEMPLATE_CONTEXT_PROCESSORS](https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATE_CONTEXT_PROCESSORS)
-* For django-constance dynamic settings:
+Also add the following:
 ```
-CONSTANCE_CONFIG = {
-    'STUDENTVOICE_THRESHOLD': (30, 'What is the point threshold on which voices should be sent to their recipients?'),
-    }
+AUTHENTICATION_BACKENDS = (
+    'userena.backends.UserenaAuthenticationBackend',
+    'guardian.backends.ObjectPermissionBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+SITE_ID = 1
+ANONYMOUS_USER_ID = -1
+AUTH_PROFILE_MODULE = 'accounts.EnjazProfile'
+USERENA_WITHOUT_USERNAMES = True
+USERENA_ACTIVATION_RETRY = True
+USERENA_ACTIVATION_DAYS = 30`
+FORMS_BUILDER_USE_SLUGS = False # or True if you like
+FORMS_BUILDER_USE_SITES = False
+FORMS_BUILDER_CHOICES_SEPARATOR = '/' # or any character of your choice
 ```
 
-# First run
-* Usernea requires certain permissions to function.  Those are
-  provided with the `manage.py check_permissions` command.  Make sure
-  that you run it because otherwise, the sign-up page may just stop
-  raise exceptions.
+### Step three: Migrate!
+
+After everything is set, migrate!
+
+```python manage.py migrate```

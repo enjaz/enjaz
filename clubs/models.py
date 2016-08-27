@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-from django.contrib.contenttypes.generic import GenericRelation
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum

@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.conf import settings as django_settings
-from django.contrib.contenttypes.generic import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError

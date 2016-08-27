@@ -3,7 +3,6 @@
 {% csrf_token %}
 {% bootstrap_form form %}
 </form>
-{% include 'autocomplete_light/static.html' %}
 <script type="text/javascript">
 $(function () {
 
@@ -51,4 +50,6 @@ $(function () {
 
     });
 });
+            
 </script>
+{{ form.media }}

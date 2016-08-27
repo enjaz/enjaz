@@ -2,9 +2,10 @@
 """Forms for Niqati app."""
 
 import datetime
-import autocomplete_light
+from dal import autocomplete
 
 from django.contrib import messages
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 from django import forms
@@ -29,7 +30,15 @@ class OrderForm(forms.Form):
             self.fields["count_%s" % category.pk] = forms.IntegerField(label=category.ar_label, required=False, initial=0,
                               min_value=0)
             if category.direct_entry:
-                self.fields['students_%s' % category.pk] =  autocomplete_light.ModelMultipleChoiceField('NiqatiUserAutocomplete', label=u"طلاب ال" + category.ar_label, required=False)
+                self.fields['students_%s' % category.pk] = forms.ModelMultipleChoiceField(
+                    widget=autocomplete.ModelSelect2Multiple(url='niqati:niqati-user-autocomplete',
+                                                             attrs={
+                                                                 'data-placeholder': 'أَضف طالبا',
+                                                                 'data-minimum-input-length': 3
+                                                             }),
+                    label=u"طلاب ال" + category.ar_label,
+                    queryset=User.objects.all(),
+                    required=False)
                 self.fields["count_%s" % category.pk].widget.attrs = {'data-direct-entry': 'true', 'data-category': category.pk}
             # `clean()` (below) will make sure that at least one field has a non-zero value.
 

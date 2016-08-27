@@ -7,16 +7,17 @@ from django.db.models import Count
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
 from django.utils import timezone
+from dal import autocomplete
 from post_office import mail
 
 
 from accounts.utils import get_user_gender
+from core.utils import get_search_queryset
 from core.models import StudentClubYear
 from core import decorators
 from bulb.models import Category, Book, Request, Point, Group, Membership, Session, Report, ReaderProfile
 from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, RequestForm, GroupForm, SessionForm, ReportForm, ReaderProfileForm
 from bulb import utils
-
 
 @login_required
 def index(request):
@@ -1155,3 +1156,24 @@ def edit_reader_profile(request, reader_pk):
 
     context['form'] = form
     return render(request, 'bulb/readers/edit_reader_profile_form.html', context)
+
+class BulbUserAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated():
+            return User.objects.none()
+
+        qs = User.objects.filter(common_profile__is_student=True, is_active=True)
+
+        if self.q:
+            search_fields=['email', 'common_profile__ar_first_name',
+                           'common_profile__ar_last_name',
+                           'common_profile__en_first_name',
+                           'common_profile__en_last_name',
+                           'common_profile__student_id',
+                           'common_profile__mobile_number']
+            qs = get_search_queryset(qs, search_fields, self.q)
+
+        return qs
+
+    def get_result_label(self, item):
+        return"{{ %s }} (<span class=\"english-field\">{{ %s }}</span>)" % (item.common_profile.get_ar_full_name, item.username)

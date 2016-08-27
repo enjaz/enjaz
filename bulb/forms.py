@@ -1,8 +1,9 @@
 # -*- coding: utf-8  -*-
 import re
 
+from django.contrib.auth.models import User
 from django import forms
-import autocomplete_light
+from dal import autocomplete
 
 from accounts.utils import get_user_gender
 from bulb.models import Book, Request, Group, Session, Report, Membership, ReaderProfile
@@ -100,7 +101,16 @@ class GroupForm(forms.ModelForm):
             self.fields['gender'].choices = gender_choices
             self.fields['gender'].initial = initial_choice
 
-    members = autocomplete_light.ModelMultipleChoiceField('BulbUserAutocomplete', label=u"الأعضاء", required=False)
+    members = forms.ModelMultipleChoiceField(
+                    widget=autocomplete.ModelSelect2Multiple(url='bulb:bulb-user-autocomplete',
+                                                             attrs={
+                                                                 'class': 'modern-style',
+                                                                 'data-placeholder': 'أَضف طالبا',
+                                                                 'data-minimum-input-length': 3
+                                                             }),
+                    label=u"الأعضاء",
+                    queryset=User.objects.all(),
+                    required=False)
 
     class Meta:
         model = Group
@@ -114,7 +124,17 @@ class SessionForm(forms.ModelForm):
                   'end_time']
 
 class ReportForm(forms.ModelForm):
-    attendees = autocomplete_light.ModelMultipleChoiceField('BulbUserAutocomplete', label=u"الحضور", required=False)
+    attendees = forms.ModelMultipleChoiceField(
+        widget=autocomplete.ModelSelect2Multiple(url='bulb:bulb-user-autocomplete',
+                                                 attrs={
+                                                     'class': 'modern-style',
+                                                     'data-placeholder': 'أَضف طالبا',
+                                                     'data-minimum-input-length': 3
+                                                 }),
+        label=u"الحضور",
+        queryset=User.objects.all(),
+        required=False)
+
     class Meta:
         model = Report
         fields = ['attendees', 'description']

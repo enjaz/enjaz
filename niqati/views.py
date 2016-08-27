@@ -17,18 +17,19 @@ from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.utils.http import urlquote
 
-from niqati import utils
-from post_office import mail
-from core import decorators
-from core.models import StudentClubYear
 from activities.models import Activity, Evaluation
 from activities.forms import EvaluationForm
 from activities.utils import get_club_notification_to, get_club_notification_cc
+from post_office import mail
+from core import decorators
+from core.models import StudentClubYear
+from core.utils import get_search_queryset
+from dal import autocomplete
 from clubs.models import Club, city_choices
 from clubs.utils import is_presidency_coordinator_or_deputy, has_coordination_to_activity, get_user_coordination_and_deputyships, can_review_any_niqati, is_coordinator_of_any_club
+from niqati import utils
 from niqati.models import Category, Code, Order, Collection, Review, COUPON, SHORT_LINK
 from niqati.forms import OrderForm, RedeemCodeForm
-
 
 @login_required
 def index(request):
@@ -356,3 +357,25 @@ def get_short_url(request):
 
     return {'url': code.short_link }
 
+class NiqatiUserAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated():
+            return User.objects.none()
+
+        current_year = StudentClubYear.objects.get_current()
+        qs = User.objects.filter(common_profile__is_student=True, is_active=True).exclude(coordination__can_submit_activities=True,
+                                                                                          coordination__year=current_year)
+
+        if self.q:
+            search_fields=['email', 'common_profile__ar_first_name',
+                           'common_profile__ar_last_name',
+                           'common_profile__en_first_name',
+                           'common_profile__en_last_name',
+                           'common_profile__student_id',
+                           'common_profile__mobile_number']
+            qs = get_search_queryset(qs, search_fields, self.q)
+
+        return qs
+
+    def get_result_label(self, item):
+        return"{{ %s }} (<span class=\"english-field\">{{ %s }}</span>)" % (item.common_profile.get_ar_full_name, item.username)

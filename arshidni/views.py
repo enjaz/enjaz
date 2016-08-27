@@ -35,9 +35,6 @@ COLLEAGUE_SUPERVISION_LIMIT = 8
 #    rule to the start date because some groups may be register after
 #    they have already started. [Osama, Aug 2, 2014]
 
-current_year = StudentClubYear.objects.get_current()
-
-
 # Home
 
 @login_required
@@ -577,9 +574,8 @@ def list_colleagues(request):
 @login_required
 @permission_required('arshidni.add_supervisionrequest', raise_exception=True)
 def submit_supervision_request(request, colleague_profile_id):
-    colleague_profile = get_object_or_404(ColleagueProfile,
+    colleague_profile = get_object_or_404(ColleagueProfile.objects.current_year(),
                                           pk=colleague_profile_id,
-                                          year=current_year,
                                           is_published=True)
     context = {'colleague_profile': colleague_profile}
     if request.method == 'POST':
@@ -631,13 +627,14 @@ def register_colleague_profile(request):
     # Check if the user already has a profile. If so, redirect them to
     # the edit page.
     try:
-        current_profile = ColleagueProfile.objects.get(user=request.user, year=current_year)
+        current_profile = ColleagueProfile.objects.current_year().get(user=request.user)
         return HttpResponseRedirect(reverse('arshidni:edit_colleague_profile',
                                                 args=(current_profile.pk,)))
     except ObjectDoesNotExist:
         pass
 
     if request.method == 'POST':
+        current_year = StudentClubYear.objects.get_current()
         colleague_object = ColleagueProfile(user=request.user, year=current_year)
         form = ColleagueProfileForm(request.POST, instance=colleague_object)
         if form.is_valid():
@@ -664,8 +661,7 @@ def register_colleague_profile(request):
 
 @login_required
 def show_colleague_profile(request, colleague_profile_id):
-    colleague_profile = get_object_or_404(ColleagueProfile,
-                                          year=current_year,
+    colleague_profile = get_object_or_404(ColleagueProfile.objects.current_year(),
                                           pk=colleague_profile_id,
                                           is_published__in=[True,
                                                             None])
@@ -683,8 +679,7 @@ def show_colleague_profile(request, colleague_profile_id):
 @login_required
 def edit_colleague_profile(request, colleague_profile_id):
     # Don't allow editing deleted profiles
-    colleague_profile = get_object_or_404(ColleagueProfile,
-                                          year=current_year,
+    colleague_profile = get_object_or_404(ColleagueProfile.objects.current_year(),
                                           pk=colleague_profile_id,
                                           is_published__in=[True, None])
 
@@ -713,8 +708,7 @@ def edit_colleague_profile(request, colleague_profile_id):
 @login_required
 def supervision_requests_to_me(request):
     try:
-        colleague_profile = ColleagueProfile.objects.get(user=request.user,
-                                                         year=current_year)
+        colleague_profile = ColleagueProfile.objects.current_year().get(user=request.user)
     except ObjectDoesNotExist:
         colleague_profile = None
 
@@ -734,8 +728,7 @@ def supervision_requests_to_me(request):
 def my_supervision_requests(request):
     # TODO: [Arshidni-wide] if you the user is colleague himself, they
     # shouldn't be able to submit any requests.
-    supervision_requests = SupervisionRequest.objects.filter(user=request.user,
-                                                             colleague__year=current_year)
+    supervision_requests = SupervisionRequest.objects.current_year().filter(user=request.user)
 
     context = {'page_requests': supervision_requests}
     return render(request, 'arshidni/my_supervision_requests.html', context)
@@ -748,9 +741,8 @@ def my_supervision_requests(request):
 def student_action(request):
     supervision_request_id = request.POST.get('supervision_request_id')
     action = request.POST.get('action')
-    supervision_request = get_object_or_404(SupervisionRequest,
-                                            pk=supervision_request_id,
-                                            colleague__year=current_year)
+    supervision_request = get_object_or_404(SupervisionRequest.objects.current_year(),
+                                            pk=supervision_request_id)
 
     if supervision_request.user != request.user:
         raise Exception(u'لست أنت مقدم الطلب!')
@@ -788,9 +780,8 @@ def student_action(request):
 def colleague_action(request):
     supervision_request_id = request.POST.get('supervision_request_id')
     action = request.POST.get('action')
-    supervision_request = get_object_or_404(SupervisionRequest,
-                                            pk=supervision_request_id,
-                                            colleague__year=current_year)
+    supervision_request = get_object_or_404(SupervisionRequest.objects.current_year(),
+                                            pk=supervision_request_id)
     colleague_profile = supervision_request.colleague
 
     if colleague_profile.user != request.user:

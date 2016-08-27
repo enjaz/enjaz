@@ -19,4 +19,5 @@ urlpatterns = patterns('',
     url(r'^approve/$', views.list_pending_orders, name='list_pending_orders'),
     url(r'^generalreport/$', views.general_report, name='general_report'),
     url(r'^generalreport/(?P<city>\w+)/$', views.general_report, name='general_report_for_city'),
+    url(r'^niqati-user-autocomplete/$', views.NiqatiUserAutocomplete.as_view(), name='niqati-user-autocomplete',),
 )

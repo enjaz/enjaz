@@ -15,8 +15,6 @@ from core.models import StudentClubYear
 import media.utils
 import clubs.utils
 
-current_year = StudentClubYear.objects.get_current()
-
 class UserListAuthenticationForm(AdminAuthenticationForm):
     def confirm_login_allowed(self, user):
         if not user.is_active and \
@@ -66,6 +64,7 @@ class CoordinatorFilter(admin.SimpleListFilter):
         )
 
     def queryset(self, request, queryset):
+        current_year = StudentClubYear.objects.get_current()
         if self.value() == '1':
             return queryset.filter(coordination__year=current_year)
         if self.value() == '0':

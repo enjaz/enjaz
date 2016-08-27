@@ -5,6 +5,7 @@ from bulb import views
 urlpatterns = patterns('',
     url(r'^$', views.index, name="index"),
     url(r'^indicators/$', views.indicators, name="indicators"),
+    url(r'^bulb-user-autocomplete/$', views.BulbUserAutocomplete.as_view(), name='bulb-user-autocomplete',),
 
     # Books exchange
     url(r'^exchange/$', views.list_book_categories, name="list_book_categories"),

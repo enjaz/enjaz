@@ -3,7 +3,6 @@ from core.models import StudentClubYear
 from clubs.models import Club
 from clubs.utils import get_user_coordination_and_deputyships
 
-current_year = StudentClubYear.objects.get_current()
 
 def get_arshidni_club_for_user(user):    
     if user.common_profile:
@@ -16,12 +15,8 @@ def get_arshidni_club_for_user(user):
             gender = user.common_profile.college.gender
     else:
         # Fall back to the Male Arshidni in Riyadh
-        arshidni = Club.objects.get(english_name='Arshidni',
-                                    year=current_year, city='R',
-                                    gender='M')
-    arshidni = Club.objects.get(english_name='Arshidni',
-                                year=current_year, city=city,
-                                gender=gender)
+        arshidni = Club.objects.current_year().get(english_name='Arshidni', city='R', gender='M')
+    arshidni = Club.objects.current_year().get(english_name='Arshidni', city=city, gender=gender)
 
     return arshidni
 

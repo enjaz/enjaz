@@ -2,8 +2,6 @@
 from .models import Club
 from core.models import StudentClubYear
 
-current_year = StudentClubYear.objects.get_current()
-
 def is_coordinator_of_any_club(user):
     """Return whether the user is a coordinator of any club."""
     return user.coordination.current_year().filter(can_submit_activities=True).exists()

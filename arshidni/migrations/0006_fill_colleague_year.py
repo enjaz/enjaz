@@ -20,6 +20,7 @@ def remove_year(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
+        ('core', '0006_add_2016_year'),
         ('arshidni', '0005_better_related_names'),
     ]
 

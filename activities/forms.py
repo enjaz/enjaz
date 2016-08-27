@@ -13,8 +13,6 @@ from media.utils import can_assess_club_as_media_coordinator
 from clubs.models import Club
 from core.models import StudentClubYear
 
-current_year = StudentClubYear.objects.get_current()
-
 class ActivityForm(ModelForm):
     """A general form, which doesn't include 'Presidency'."""
     queryset = Club.objects.current_year().visible()
@@ -291,6 +289,7 @@ class AssessmentForm(ModelForm):
         if self.category == 'M':
             del self.fields['cooperator_points']
 
+        current_year = StudentClubYear.objects.get_current()
         for criterion in Criterion.objects.filter(year=current_year,
                                                   category=self.category,
                                                   city__contains=self.activity.primary_club.city):

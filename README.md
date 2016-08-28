@@ -136,12 +136,7 @@ INSTALLED_APPS = (
 )
 ```
 
-Current required settings in `settings.py`:
-* `DEFAULT_FROM_EMAIL`: The default _noreply_ email.
-* `MEDIA_ROOT`: Where you want to save user uploads
-* `MEDIA_URL`: Where you want users to access user uploads.
-* `BITLY_KEY`: a bit.ly api key
-Also add the following:
+Also add the following settings:
 ```
 AUTHENTICATION_BACKENDS = (
     'userena.backends.UserenaAuthenticationBackend',
@@ -160,6 +155,11 @@ FORMS_BUILDER_USE_SLUGS = False # or True if you like
 FORMS_BUILDER_USE_SITES = False
 FORMS_BUILDER_CHOICES_SEPARATOR = '/' # or any character of your choice
 ```
+
+Finally, there are two more required settings:
+* `DEFAULT_FROM_EMAIL`: The default _noreply_ email.
+* `BITLY_KEY`: a bit.ly API key
+
 
 ### Step three: Migrate!
 

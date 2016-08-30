@@ -55,6 +55,7 @@ from activities.urls import activity_forms_urls
 from researchhub.forms import ResearchHubSignupForm
 from clubs.urls import club_forms_urls
 from core.views import visit_announcement
+from django.views.generic.base import RedirectView
 
 urlpatterns = [
     url(r'^', include('core.urls')),
@@ -150,7 +151,7 @@ ANONYMOUS_USER_ID = -1
 AUTH_PROFILE_MODULE = 'accounts.EnjazProfile'
 USERENA_WITHOUT_USERNAMES = True
 USERENA_ACTIVATION_RETRY = True
-USERENA_ACTIVATION_DAYS = 30`
+USERENA_ACTIVATION_DAYS = 30
 FORMS_BUILDER_USE_SLUGS = False # or True if you like
 FORMS_BUILDER_USE_SITES = False
 FORMS_BUILDER_CHOICES_SEPARATOR = '/' # or any character of your choice

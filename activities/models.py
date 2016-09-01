@@ -54,6 +54,7 @@ class Activity(models.Model):
     description = models.TextField(verbose_name=u"وصف النشاط")
     public_description = models.TextField(verbose_name=u"الوصف الإعلامي",
                                           help_text=u"هذا هو الوصف الذي سيعرض للطلاب")
+    goals = models.TextField(verbose_name=u"ما أهداف هذا النشاط، وكيف يخدم الصالح العام؟")
     requirements = models.TextField(blank=True,
                                     verbose_name=u"متطلبات النشاط")
     submitter = models.ForeignKey(User, null=True,
@@ -372,6 +373,8 @@ class Review(models.Model):
                                   verbose_name=u"ملاحظات على التاريخ والوقت")
     description_notes = models.TextField(blank=True,
                                         verbose_name=u"ملاحظات على الوصف")
+    goal_notes = models.TextField(blank=True,
+                                        verbose_name=u"ملاحظات على الأهداف")
     requirement_notes = models.TextField(blank=True,
                                         verbose_name=u"ملاحظات على المتطلبات")
     inside_notes = models.TextField(blank=True,

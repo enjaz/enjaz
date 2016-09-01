@@ -25,7 +25,7 @@ class ActivityForm(ModelForm):
     class Meta:
         model = Activity
         fields = ['name', 'category', 'description',
-                  'public_description', 'gender', 'organizers',
+                  'public_description', 'goals', 'gender', 'organizers',
                   'participants', 'secondary_clubs',
                   'inside_collaborators', 'outside_collaborators',
                   'requirements']
@@ -174,7 +174,7 @@ class ReviewerActivityForm(ActivityForm):
     class Meta:
         model = Activity
         fields = ['chosen_reviewer_club', 'name', 'category',
-                  'description', 'public_description', 'gender',
+                  'description', 'public_description',  'goals','gender',
                   'organizers', 'participants', 'secondary_clubs',
                   'inside_collaborators', 'outside_collaborators',
                   'requirements']
@@ -193,7 +193,7 @@ class DirectActivityForm(ActivityForm):
     class Meta:
         model = Activity
         fields = ['name', 'primary_club', 'category', 'description',
-                  'public_description', 'gender', 'organizers',
+                  'public_description', 'goals', 'gender', 'organizers',
                   'participants', 'secondary_clubs',
                   'inside_collaborators', 'outside_collaborators',
                   'requirements',]
@@ -242,7 +242,7 @@ class ReviewForm(ModelForm):
     class Meta:
         model = Review
         fields = ['clubs_notes', 'name_notes', 'description_notes',
-                  'datetime_notes', 'requirement_notes',
+                  'datetime_notes', 'requirement_notes', 'goal_notes',
                   'inside_notes', 'outside_notes',
                   'organizers_notes', 'participants_notes',
                   'is_approved', 'attachment_notes',

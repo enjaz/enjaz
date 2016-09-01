@@ -55,6 +55,18 @@
 			</tr>
 			
 			<tr>
+				<th>أهداف النشاط</th>
+				<td>{{ activity.goals|linebreaksbr }}</td>
+				<td>
+					{% if review.goal_notes %}
+						{{ review.goal_notes|linebreaksbr }}
+					{% else %}
+						لا يوجد.
+					{% endif %}
+				</td>
+			</tr>
+
+			<tr>
 				<th>النادي المنظم</th>
 				<td>
 					<a href="{% url 'clubs:show' activity.primary_club.pk %}">

@@ -295,7 +295,10 @@ class AssessmentForm(ModelForm):
                                                   city__contains=self.activity.primary_club.city):
             field_name = 'criterion_' + str(criterion.code_name)
             if self.instance.id:
-                initial_value = CriterionValue.objects.get(assessment=self.instance, criterion=criterion).value
+                try:
+                    initial_value = CriterionValue.objects.get(assessment=self.instance, criterion=criterion).value
+                except CriterionValue.DoesNotExist:
+                    initial_value = 0
             else:
                 initial_value = 0
             self.fields[field_name] = forms.IntegerField(label=criterion.ar_name, initial=initial_value,

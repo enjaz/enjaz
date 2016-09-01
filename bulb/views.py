@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db.models import Count
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
 from django.utils import timezone
@@ -15,8 +16,8 @@ from accounts.utils import get_user_gender
 from core.utils import get_search_queryset
 from core.models import StudentClubYear
 from core import decorators
-from bulb.models import Category, Book, Request, Point, Group, Membership, Session, Report, ReaderProfile
-from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, RequestForm, GroupForm, SessionForm, ReportForm, ReaderProfileForm
+from bulb.models import Category, Book, Request, Point, Group, Membership, Session, Report, ReaderProfile, Recruitment
+from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, RequestForm, GroupForm, SessionForm, ReportForm, ReaderProfileForm, RecruitmentForm
 from bulb import utils
 
 @login_required
@@ -1156,6 +1157,21 @@ def edit_reader_profile(request, reader_pk):
 
     context['form'] = form
     return render(request, 'bulb/readers/edit_reader_profile_form.html', context)
+
+@login_required
+def handle_recruitment(request):
+    if request.method == 'POST':
+        recruitment = Recruitment(user=request.user)
+        form = RecruitmentForm(request.POST, request.FILES, instance=recruitment)
+        if form.is_valid():
+            recruitment = form.save()
+            return HttpResponseRedirect(reverse('bulb:recruitment_thanks'))
+        else:
+            print form.errors
+    else:
+        form = RecruitmentForm()
+    context = {'form': form}
+    return render(request, 'bulb/recruitment.html', context)
 
 class BulbUserAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):

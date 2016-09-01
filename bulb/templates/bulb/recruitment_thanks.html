@@ -1,0 +1,157 @@
+<!DOCTYPE html>{% load staticfiles %}
+<html class="detail" lang="ar">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="سراج">
+    <title>سراج | كن معنا!</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap-3.3.6.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-rtl-3.3.4.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
+    <!--<link href="css/stylish-portfolio.css" rel="stylesheet">-->
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+	    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+
+
+<style>
+@font-face {
+    font-family: 'GE Dinar One';
+    font-weight: lighter;
+    src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
+}
+		
+@font-face {
+    font-family: 'GE Dinar One';
+    font-weight: normal;
+    src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
+}
+
+body {
+  font-family: 'GE Dinar One', serif;
+}
+
+html.detail{
+    background: linear-gradient( rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8) ), url("{% static 'img/bulb/recruitment-background.jpg' %}") no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+html.detail body{
+    background-color: transparent;
+    color: white;
+}
+
+.detail a{
+    color: #85C7FF;
+}
+footer{
+    padding: 60px 0;
+}
+
+.step-section {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 10px;
+    width: 90%;
+    margin-right: auto;
+    margin-left: auto;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.checkbox label{
+    margin-right: 10px;
+}
+
+#third-phase, #promotion-step{
+    display: none;
+}
+
+#sad-child{
+    border-radius: 10px;
+    max-width: 100%;
+}
+
+#delete-button input[type='submit']:disabled{
+    background-color: #497d49;
+}
+
+p.instructions{
+    text-align: justify;
+}
+
+p.intro{
+background: rgba(0, 0, 0, 0.7);
+border-radius: 10px;
+padding: 18px;
+width: 90%;
+margin-right: auto;
+margin-left: auto;
+margin-bottom: 20px;
+color: white;
+font-size: 15px;
+}
+
+p.explaination{
+border-radius: 10px;
+padding: 10px;
+margin-right: auto;
+margin-left: auto;
+margin-bottom: 0px;
+font-size: 14px;
+color: #e8ff74;
+}
+
+hr{
+margin-bottom: 5px;
+    max-width: 100px;
+}
+
+.form-group .checkbox{
+    margin-right: 15px;
+}
+</style>
+
+
+    <div class="row">
+        <div class="col-md-12">
+	<form class="form-horizontal" action="/" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+<div class="text-center">
+<img class="bounceInDown" src="{% static 'img/bulb/logo.png' %}">
+</div>
+
+            <p class="intro instructions">
+شكرا جزيلا لك!  استلمنا منك، ومتشوّقون لأن تكون/تكوني من أسرة سِراج!<br>لأي مقترحات أو أفكار لا تتردّد/ي في التواصل عبر عنوان المبادرة: <a href="mailto:bulb@enjazportal.com">bulb@enjazportal.com</a>.
+</p>
+{% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
+	<!-- Piwik -->
+	<script type="text/javascript">
+	  var _paq = _paq || [];
+      {% if user.is_authenticated %}
+      _paq.push(['setUserId', '{{ user.username }}']);
+      {% endif %}
+	  _paq.push(['trackPageView']);
+	  _paq.push(['enableLinkTracking']);
+	  (function() {
+	    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://enjazportal.com/stats/";
+	    _paq.push(['setTrackerUrl', u+'piwik.php']);
+	    _paq.push(['setSiteId', 1]);
+	    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+	    g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+	  })();
+	</script>
+	<noscript><p><img src="//enjazportal.com/stats/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+        <!-- End Piwik Code -->
+{% endif %}
+
+</body>
+</html>
+

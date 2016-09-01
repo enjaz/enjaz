@@ -6,7 +6,7 @@ from django import forms
 from dal import autocomplete
 
 from accounts.utils import get_user_gender
-from bulb.models import Book, Request, Group, Session, Report, Membership, ReaderProfile
+from bulb.models import Book, Request, Group, Session, Report, Membership, ReaderProfile, Recruitment
 from bulb import utils
 
 class BookEditForm(forms.ModelForm):
@@ -173,3 +173,8 @@ class ReaderProfileForm(forms.ModelForm):
         fields = ['areas_of_interests', 'favorite_books',
                   'favorite_writers', 'average_reading',
                   'goodreads', 'twitter']
+
+class RecruitmentForm(forms.ModelForm):
+    class Meta:
+        model = Recruitment
+        exclude = ['user']

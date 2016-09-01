@@ -77,7 +77,7 @@ def redeem(request, code=""):
 def claim_code(request):
     form = RedeemCodeForm(request.user, request.POST)
     eval_form = EvaluationForm(request.POST)
-    if utils.is_niqati_closed(user=request.user) and \
+    if not utils.is_niqati_closed(user=request.user) and \
        form.is_valid() and eval_form.is_valid():
         result = form.process()
         eval_form.save(form.code.content_object, request.user)
@@ -127,7 +127,8 @@ def coordinator_view(request, activity_id):
        and not request.user.is_superuser:
         raise PermissionDenied
 
-    if utils.is_niqati_closed(activity=activity):
+    if not request.user.is_superuser and \
+       utils.is_niqati_closed(activity=activity):
         return render(request, 'niqati/activity_orders.html',
                       {'activity': activity, 'active_tab': 'niqati',
                        'error': 'closed'})
@@ -148,7 +149,9 @@ def coordinator_view(request, activity_id):
                 # Make sure that a coordinator was assigned to the
                 # reviewing club before trying to send an email
                 # notification.
-                if reviewing_parent and reviewing_parent.coordinator:
+                if not request.user.is_superuser and\
+                   reviewing_parent and \
+                   reviewing_parent.coordinator:
                     list_pending_orders_url = reverse('niqati:list_pending_orders')
                     full_url = request.build_absolute_uri(list_pending_orders_url)
                     email_context = {'order': order, 'full_url': full_url}
@@ -158,7 +161,7 @@ def coordinator_view(request, activity_id):
 
                     msg = u"تم إرسال الطلب؛ و سيتم إنشاء النقاط فور الموافقة عليه"
                     messages.add_message(request, messages.SUCCESS, msg)
-                elif not reviewing_parent:
+                elif request.user.is_superuser or not reviewing_parent:
                     order.is_approved = True
                     order.save()
                     order.create_codes()

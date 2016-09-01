@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from bulb.models import Category, Book, Request, Point, Membership, Group
+from bulb.models import Category, Book, Request, Point, Membership, Group, Recruitment
 
 class MembershipAdmin(admin.TabularInline):
     model = Membership
@@ -22,5 +22,6 @@ admin.site.register(Category)
 admin.site.register(Book)
 admin.site.register(Request)
 admin.site.register(Point)
+admin.site.register(Recruitment)
 admin.site.register(Group, GroupAdmin)
 

@@ -8,6 +8,8 @@ def is_bulb_coordinator_or_deputy(user):
     return coordination_and_deputyships.filter(english_name='Bulb').exists()
 
 def is_bulb_member(user):
+    if not user.is_authenticated():
+        return False
     user_clubs = user.memberships.current_year()
     return user_clubs.filter(english_name='Bulb').exists()
 

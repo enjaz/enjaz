@@ -52,10 +52,12 @@ from django.views.generic import TemplateView
 from accounts.forms import StudentSignupForm, NonStudentSignupForm, ModifiedAuthenticationForm
 from accounts.admin import user_list_admin
 from activities.urls import activity_forms_urls
-from researchhub.forms import ResearchHubSignupForm
+from bulb.admin import bulb_admin
 from clubs.urls import club_forms_urls
 from core.views import visit_announcement
 from django.views.generic.base import RedirectView
+from researchhub.forms import ResearchHubSignupForm
+
 
 urlpatterns = [
     url(r'^', include('core.urls')),
@@ -66,6 +68,7 @@ urlpatterns = [
     url(r'^activities/', include('activities.urls', namespace="activities")),
     club_forms_urls,
     url(r'^clubs/', include('clubs.urls', namespace="clubs")),
+    url(r'^bulb/admin/', include(bulb_admin.urls)),
     url(r'^bulb/', include('bulb.urls', namespace="bulb")),
     url(r'^events/', include('events.urls', namespace="events")),
     url(r'^hpc/', include('hpc.urls', namespace="hpc")),

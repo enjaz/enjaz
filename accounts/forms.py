@@ -10,7 +10,6 @@ from core.models import StudentClubYear
 import core.utils
 from userena.forms import SignupForm
 
-
 class EnjazSignupForm(SignupForm):
     # FIXME: Dirty 'verbose_name' hack?
     ar_first_name = forms.CharField(label=CommonProfile._meta.get_field('ar_first_name').verbose_name,
@@ -25,6 +24,10 @@ class EnjazSignupForm(SignupForm):
                                 max_length=30)
     en_last_name = forms.CharField(label=CommonProfile._meta.get_field('en_last_name').verbose_name,
                                 max_length=30)
+    en_last_name = forms.CharField(label=CommonProfile._meta.get_field('en_last_name').verbose_name,
+                                max_length=30)
+    alternative_email = forms.EmailField(label=CommonProfile._meta.get_field('alternative_email').verbose_name)
+
     badge_number = forms.IntegerField(label=CommonProfile._meta.get_field('badge_number').verbose_name, required=False)
     city = forms.CharField(label=u"المدينة", max_length=1, widget=forms.Select(choices=city_choices))
 
@@ -141,6 +144,7 @@ class StudentSignupForm(EnjazSignupForm):
                                      en_first_name=self.cleaned_data['en_first_name'],
                                      en_middle_name=self.cleaned_data['en_middle_name'],
                                      en_last_name=self.cleaned_data['en_last_name'],
+                                     alternative_email=self.cleaned_data['alternative_email'],
                                      badge_number=self.cleaned_data.get('badge_number'),
                                      city=self.cleaned_data['city'],
                                      student_id=self.cleaned_data.get('student_id'),
@@ -173,6 +177,7 @@ class NonStudentSignupForm(EnjazSignupForm):
                                      en_first_name=self.cleaned_data['en_first_name'],
                                      en_middle_name=self.cleaned_data['en_middle_name'],
                                      en_last_name=self.cleaned_data['en_last_name'],
+                                     alternative_email=self.cleaned_data['alternative_email'],
                                      badge_number=self.cleaned_data['badge_number'],
                                      city=self.cleaned_data['city'],
                                      mobile_number=mobile_number,
@@ -231,8 +236,8 @@ class EditStudentCommonProfile(forms.ModelForm):
         model = CommonProfile
         fields = ['ar_first_name', 'ar_middle_name', 'ar_last_name',
                   'en_first_name', 'en_middle_name', 'en_last_name',
-                  'student_id', 'badge_number', 'mobile_number',
-                  'city']
+                  'alternative_email', 'student_id', 'badge_number',
+                  'mobile_number', 'city']
 
     def clean(self):
         cleaned_data = super(EditStudentCommonProfile, self).clean()

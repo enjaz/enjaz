@@ -83,10 +83,22 @@
 						<i class="entypo-mail"></i>
 					</div>
 					
-					<input {% if form.email.value and not form.email.errors %}value="{{ form.email.value }}" {% endif %}type="text" class="form-control" name="email" id="email" {% if not form.email.errors %}placeholder="البريد الإلكتروني الجامعي"{% endif %} required="required"/>
+					<input {% if form.email.value and not form.email.errors %}value="{{ form.email.value }}" {% endif %}type="text" class="tooltip-jquery  form-control" name="email" id="email" {% if not form.email.errors %}placeholder="البريد الإلكتروني الجامعي"{% endif %} title="البريد الجامعي الذي ينتهي بـ @ksau-hs.edu.sa" required="required"/>
 					{% if form.email.errors %}
 					    {% for error in form.email.errors %}
 					        <label class='dinar-light error' for='email' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+				<div class="english-field input-group{% if form.alternative_email.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-mail"></i>
+					</div>
+					
+					<input {% if form.alternative_email.value and not form.alternative_email.errors %}value="{{ form.alternative_email.value }}" {% endif %}type="text" class="tooltip-jquery form-control" name="alternative_email" id="alternative_email" {% if not form.alternative_email.errors %}placeholder="{{ form.alternative_email.label }}"{% endif %} title="البريد الشخصي، مثلا بريدك على Gmail أو Hotmail" required="required"/>
+					{% if form.alternative_email.errors %}
+					    {% for error in form.alternative_email.errors %}
+					        <label class='dinar-light error' for='alternative_email' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 				</div>
@@ -224,8 +236,15 @@
 {% endblock %}
 {% block customscript %}
 <link rel="stylesheet" href="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.css' %}" id="style-resource-3">
+<link rel="stylesheet" href="{% static 'css/tooltipster.min.css' %}">
 <script src="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.min.js' %}" id="script-resource-11"></script>
 <script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
 <script src="{% static 'neon/assets/js/jquery.inputmask.bundle.min.js' %}"></script>
+<script src="{% static 'js/jquery.tooltipster.min.js' %}"></script>
+<script type="application/javascript">
+        $(function() {
+            $('.tooltip-jquery').tooltipster();
+        });
+</script>
 {% include 'userena/partials/college_selection.html' %}
 {% endblock %}

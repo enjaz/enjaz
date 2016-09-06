@@ -7,7 +7,6 @@
 
 <p class="dinar-light enjaz-warning"><i class="entypo-info"></i> أدناه معلوماتكم المسجّلة على بوابة إنجاز.  تستخدم هذه المعلومات عند التسجيل في أنشطة نادي الطلاب، ولاستصدار الشهادات، وتعرض في مختلف أجزاء البوابة مثل برنامج نقاطي ومبادرة سِراج.</p>
 
-
 <form method="post" role="form" id="form_register">	
         {% csrf_token %}
 	<div class="dinar-light">
@@ -68,6 +67,22 @@
 			</div>
 
 			<div class="form-group">
+                <label class="control-label">{{ form.alternative_email.label }}</label>
+				<div class="input-group{% if form.alternative_email.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-mail"></i>
+					</div>
+					
+					<input {% if form.alternative_email.value and not form.alternative_email.errors %}value="{{ form.alternative_email.value }}" {% endif %}type="text" class="tooltip-jquery form-control" name="alternative_email" id="alternative_email" placeholder="{{ form.alternative_email.label }}" title="البريد الشخصي، مثلا بريدك على Gmail أو Hotmail" required="required"/>
+					{% if form.alternative_email.errors %}
+					    {% for error in form.alternative_email.errors %}
+					        <label class='error' for='alternative_email' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+
+			<div class="form-group">
                 <label class="control-label">{{ form.mobile_number.label }}</label>
 				<div class="input-group{% if form.mobile_number.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
@@ -103,7 +118,7 @@
 					<div class="input-group-addon">
 						<i class="entypo-graduation-cap"></i>
 					</div>
-					
+
 					<input {% if form.student_id.value and not form.student_id.errors %}value="{{ form.student_id.value }}" {% endif %}type="text" class="form-control" name="student_id" id="student_id" placeholder="{{ form.student_id.label }}" required="required" />
 					{% if form.student_id.errors %}
 					    {% for error in form.student_id.errors %}
@@ -193,8 +208,15 @@
 {% endblock %}
 {% block customscript %}
 <link rel="stylesheet" href="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.css' %}" id="style-resource-3">
+<link rel="stylesheet" href="{% static 'css/tooltipster.min.css' %}">
 <script src="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.min.js' %}" id="script-resource-11"></script>
 <script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
 <script src="{% static 'neon/assets/js/jquery.inputmask.bundle.min.js' %}"></script>
+<script src="{% static 'js/jquery.tooltipster.min.js' %}"></script>
+<script type="application/javascript">
+        $(function() {
+            $('.tooltip-jquery').tooltipster();
+        });
+</script>>
 {% include 'userena/partials/college_selection.html' %}
 {% endblock %}

@@ -5,7 +5,6 @@ from django.contrib import admin
 from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User, Permission, Group
-from django.contrib.auth import authenticate
 from django.core.exceptions import ObjectDoesNotExist
 from userena.admin import UserenaAdmin
 
@@ -19,7 +18,7 @@ class UserListAuthenticationForm(AdminAuthenticationForm):
     def confirm_login_allowed(self, user):
         if not user.is_active and \
            not (media.utils.is_media_coordinator_or_deputy(user) or \
-                clubs.utils.is_presidency_coordinator_or_deputy(request.user)):
+                clubs.utils.is_presidency_coordinator_or_deputy(user)):
             raise forms.ValidationError(
                 self.error_messages['invalid_login'],
                 code='invalid_login',

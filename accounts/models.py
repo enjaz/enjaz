@@ -32,6 +32,8 @@ class CommonProfile(models.Model):
                                       verbose_name=u'الاسم الأوسط')
     en_last_name = models.CharField(max_length=30,
                                     verbose_name=u'الاسم الأخير')
+    alternative_email = models.EmailField(u"البريد الإلكتروني  الشخصي البديل",
+                                          blank=True)
     badge_number = models.IntegerField(null=True,
                                        verbose_name=u'رقم البطاقة الجامعية')
     mobile_number = models.CharField(max_length=20,

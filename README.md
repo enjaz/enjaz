@@ -50,6 +50,7 @@ Then within the `enjaz` directory, turn it on the git repository:
 ```
 git init
 git remote add origin https://github.com/osamak/student-portal.git
+git pull origin master
 ```
 
 ### Step one: URLS

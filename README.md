@@ -42,6 +42,12 @@ You can instlal all the dependencies  using:
 
 ```pip install -r requirements.txt```
 
+Create a new project, for example:
+```django-admin startproject enjaz```
+
+Then within the `enjaz` directory, turn it on the git repository:
+```git init```
+```git remote add origin https://github.com/osamak/student-portal.git```
 
 ### Step one: URLS
 In the project `urls.py`, add the following:
@@ -152,12 +158,35 @@ MEDIA_URL = '/media/'
 SITE_ID = 1
 ANONYMOUS_USER_ID = -1
 AUTH_PROFILE_MODULE = 'accounts.EnjazProfile'
+LOGIN_URL = '/accounts/signin/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_URL = '/accounts/signout/'
+LOGOUT_REDIRECT_URL = '/'
 USERENA_WITHOUT_USERNAMES = True
 USERENA_ACTIVATION_RETRY = True
 USERENA_ACTIVATION_DAYS = 30
 FORMS_BUILDER_USE_SLUGS = False # or True if you like
 FORMS_BUILDER_USE_SITES = False
 FORMS_BUILDER_CHOICES_SEPARATOR = '/' # or any character of your choice
+
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+    }
+
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+CONSTANCE_CONFIG = {
+    'STUDENTVOICE_THRESHOLD': (30, ''),
+    'DEBATE_URL': ('',''),
+    }
+
+REST_FRAMEWORK = {
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+            )
+    }
+
 ```
 
 Finally, there are two more required settings:
@@ -165,8 +194,16 @@ Finally, there are two more required settings:
 * `BITLY_KEY`: a bit.ly API key
 
 
-### Step three: Migrate!
+### Step three: Get the database sorted out
 
 After everything is set, migrate!
 
 ```python manage.py migrate```
+
+Then import sites, categories and email templates:
+
+```python manage.py loaddata core/fixtures/default_emailtemplates.json core/fixtures/default_sites.json activities/fixtures/default_categories.json```
+
+Finally, create userena permissions using:
+
+```python manage.py check_permissions```

@@ -38,10 +38,6 @@ Licensed under the General Public License version 3 of the License, or
 
 Enjaz Portal works with Python 2.7 and Django 1.8.
 
-You can instlal all the dependencies  using:
-
-```pip install -r requirements.txt```
-
 Create a new project, for example:
 ```django-admin startproject enjaz```
 
@@ -52,6 +48,10 @@ git init
 git remote add origin https://github.com/osamak/student-portal.git
 git pull origin master
 ```
+
+You can then install all the dependencies using:
+
+```pip install -r requirements.txt```
 
 ### Step one: URLS
 In the project `urls.py`, add the following:

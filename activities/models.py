@@ -54,7 +54,7 @@ class Activity(models.Model):
     description = models.TextField(verbose_name=u"وصف النشاط")
     public_description = models.TextField(verbose_name=u"الوصف الإعلامي",
                                           help_text=u"هذا هو الوصف الذي سيعرض للطلاب")
-    goals = models.TextField(verbose_name=u"ما أهداف هذا النشاط، وكيف يخدم الصالح العام؟")
+    goals = models.TextField(verbose_name=u"ما أهداف هذا النشاط، وكيف يخدم المجتمع والصالح العام؟")
     requirements = models.TextField(blank=True,
                                     verbose_name=u"متطلبات النشاط")
     submitter = models.ForeignKey(User, null=True,

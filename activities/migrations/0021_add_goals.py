@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='activity',
             name='goals',
-            field=models.TextField(verbose_name='\u0645\u0627 \u0623\u0647\u062f\u0627\u0641 \u0647\u0630\u0627 \u0627\u0644\u0646\u0634\u0627\u0637\u060c \u0648\u0643\u064a\u0641 \u064a\u062e\u062f\u0645 \u0627\u0644\u0635\u0627\u0644\u062d \u0627\u0644\u0639\u0627\u0645\u061f'),
+            field=models.TextField(verbose_name='\u0645\u0627 \u0623\u0647\u062f\u0627\u0641 \u0647\u0630\u0627 \u0627\u0644\u0646\u0634\u0627\u0637\u060c \u0648\u0643\u064a\u0641 \u064a\u062e\u062f\u0645 \u0627\u0644\u0645\u062c\u062a\u0645\u0639 \u0648\u0627\u0644\u0635\u0627\u0644\u062d \u0627\u0644\u0639\u0627\u0645\u061f'),
         ),
         migrations.AddField(
             model_name='review',

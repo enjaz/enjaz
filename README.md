@@ -46,8 +46,9 @@ Create a new project, for example:
 ```django-admin startproject enjaz```
 
 Then within the `enjaz` directory, turn it on the git repository:
-```git init```
-```git remote add origin https://github.com/osamak/student-portal.git```
+
+```git init
+git remote add origin https://github.com/osamak/student-portal.git```
 
 ### Step one: URLS
 In the project `urls.py`, add the following:

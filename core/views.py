@@ -52,8 +52,8 @@ def portal_home(request):
 
         # --- books --------
         context['book_sample'] = Book.objects.current_year().for_user_city(request.user).available().order_by("?")[:6]
-        context['books_count'] = Book.objects.current_year().undeleted().count()
-        context['my_books_count'] = request.user.book_giveaways.current_year().undeleted().count()
+        context['book_count'] = Book.objects.current_year().undeleted().count()
+        context['my_book_count'] = request.user.book_giveaways.current_year().undeleted().count()
         
         # --- announcements 
         context['student_researches'] = Announcement.objects.filter(type='R')[::-1] # show last first

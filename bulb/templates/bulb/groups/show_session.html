@@ -83,6 +83,8 @@
 {% endblock %}
 {% block customscript %}
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+{% include "bulb/components/connect_twitter.html" %}
+
 <style>
 p{
     font-size: 17px;

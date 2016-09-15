@@ -33,6 +33,10 @@
 </table>
 {% endblock %}
 {% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+{% include "bulb/components/connect_twitter.html" %}
+{% include "bulb/exchange/components/edit_book_asset.html" %}
+{% include "bulb/exchange/components/edit_needed_book_asset.html" %}
 <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
 <link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
 <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>

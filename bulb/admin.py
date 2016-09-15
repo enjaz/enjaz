@@ -66,8 +66,9 @@ class GroupAdmin(admin.ModelAdmin):
 class RecruitmentAdmin(admin.ModelAdmin):
     list_display = ['get_full_ar_name', 'get_email',
                     'get_mobile_number', 'get_college',
+                    'prefers_coordination', 'prefers_team_membership',
                     'wants_book_exchange_organization',
-                    'wants_dewanya_organization']
+                    'wants_dewanya_organization', 'submission_date']
 
     def get_readonly_fields(self, request, obj=None):
         return [field.name for field in self.model._meta.fields]
@@ -91,7 +92,7 @@ class RecruitmentAdmin(admin.ModelAdmin):
 
     def get_college(self, obj):
         try:
-            return obj.user.common_profile.get_college_display()
+            return obj.user.common_profile.college.get_name_display()
         except ObjectDoesNotExist:
             return
     get_college.short_description = "College"

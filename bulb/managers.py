@@ -5,6 +5,7 @@ from accounts.utils import get_user_city, get_user_gender
 
 class BulbQuerySet(models.QuerySet):
     def current_year(self):
+        return self.filter()
         year = StudentClubYear.objects.get_current()
         return self.filter(year=year)
 
@@ -53,6 +54,7 @@ class BookQuerySet(BulbQuerySet):
 
 class RequestQuerySet(models.QuerySet):
     def current_year(self):
+        return self.filter()
         year = StudentClubYear.objects.get_current()
         return self.filter(book__year=year)
 
@@ -82,6 +84,7 @@ class RequestQuerySet(models.QuerySet):
 
 class PointQuerySet(models.QuerySet):
     def current_year(self):
+        return self.filter()
         year = StudentClubYear.objects.get_current()
         return self.filter(year=year)
 
@@ -137,6 +140,7 @@ class GroupQuerySet(BulbQuerySet):
 
 class SessionQuerySet(BulbQuerySet):
     def current_year(self):
+        return self.filter()
         year = StudentClubYear.objects.get_current()
         return self.filter(year=year) | self.filter(group__year=year)
 
@@ -156,6 +160,7 @@ class SessionQuerySet(BulbQuerySet):
 
 class MembershipQuerySet(models.QuerySet):
     def current_year(self):
+        return self.filter()
         year = StudentClubYear.objects.get_current()
         return self.filter(group__year=year)
  

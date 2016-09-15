@@ -217,9 +217,11 @@ def add_guide(request):
             email_context = {'assessor': random_assessor,
                              'guide': guide,
                              'full_url': full_url}
-            mail.send([random_assessor.email],
-                      template="guide_assigned_randomly_to_assessor",
-                      context=email_context)
+            # If there are members to pick from, send an email.
+            if random_assessor:
+                mail.send([random_assessor.email],
+                          template="guide_assigned_randomly_to_assessor",
+                          context=email_context)
             show_guide_url = reverse('studentguide:show_guide', args=(guide.pk,))
             full_url = request.build_absolute_uri(show_guide_url)
             return {"message": "success", "show_url": full_url}

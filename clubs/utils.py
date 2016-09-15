@@ -1,6 +1,7 @@
 """Utility functions related to the clubs app."""
 from .models import Club
 from core.models import StudentClubYear
+import accounts.utils
 
 def is_coordinator_of_any_club(user):
     """Return whether the user is a coordinator of any club."""
@@ -200,3 +201,18 @@ def can_submit_activities(user):
     else:
         coordination_and_deputyships = get_user_coordination_and_deputyships(user)
         return coordination_and_deputyships.filter(can_submit_activities=True).exists()
+
+def get_club_for_user(english_name, user):
+    targeted_clubs = Club.objects.current_year().filter(english_name=english_name)
+    user_city = accounts.utils.get_user_city(user)
+    if user_city == 'R':
+        user_gender = accounts.utils.get_user_gender(user)
+        if user_gender == 'F':
+            return targeted_clubs.get(city="R", gender="F")
+        else:
+            return targeted_clubs.get(city="R", gender="M")
+    elif user_city:
+        return targeted_clubs.get(city=user_city)
+    else:
+        # If the no city was found, default to Riyadh female club.
+        return targeted_clubs.get(city="R", gender="F")

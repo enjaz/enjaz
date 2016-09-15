@@ -41,7 +41,7 @@ def can_add_request(user, guide):
     # superusers can always add requests.  Otherwise, if the user has
     # a GuideProfile, they are not expected to submit a supervision
     # request.
-    if get_user_gender(user) != get_user_gender(guide.user) or \
+    if accounts.utils.get_user_gender(user) != accounts.utils.get_user_gender(guide.user) or \
        guide.guide_requests.filter(user=user).exclude(requester_status='C',
                                                       guide_status='P').exists() or \
        not guide.is_available:

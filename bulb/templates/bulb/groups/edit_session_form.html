@@ -22,10 +22,14 @@ $(function () {
 
         /* get some values from elements on the page: */
         var formData = new FormData($(this)[0]); 
-        {% if session %}{# if a session is passed, then post to edit_session url, otherwise to add_session #}
+        {% if session and group %}{# if a session is passed, then post to edit_session url, otherwise to add_session #}
         var url = "{% url 'bulb:edit_session' group.pk session.pk %}";
-        {% else %}
-        var url = "{% url 'bulb:add_session' group.pk %}";
+        {% elif session and not group %}
+        var url = "{% url 'bulb:edit_session' session.pk %}";
+        {% elif not session and not group  %}
+        var url = "{% url 'bulb:add_free_session' %}";
+        {% elif not session and group  %}
+        var url = "{% url 'bulb:add_group_session' group.pk %}";
         {% endif %}
 
         /* Send the data */

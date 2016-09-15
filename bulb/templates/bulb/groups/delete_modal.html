@@ -1,4 +1,4 @@
-
+{% if group %}
 <div class="modal fade" id="confirm-delete-group-modal">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
@@ -18,7 +18,7 @@
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-
+{% endif %}
 <div class="modal fade" id="confirm-delete-session-modal">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
@@ -28,7 +28,7 @@
       </div>
       <div class="modal-body">
           <form id="confirm-delete-session-form">
-              <label>هل أنت متأكد؟ سيتم إبلاغ أعضاء المجموعة بإلغاء هذا الموعد.</label>
+              <label>هل أنت متأكد من حذف هذه الجلسة؟ {% if group %}سيتم إبلاغ أعضاء المجموعة بإلغاء هذا الموعد.{% endif %}</label>
           </form>
       </div>
       <div class="modal-footer">
@@ -42,13 +42,10 @@
 
 <script type="text/javascript">
 $(function() {
+    {% if group %}
+
     $("button#confirm-delete-group").click(function(){
         $("#confirm-delete-group-modal").modal('show');
-    });
-    $("button.confirm-delete-session").click(function(){
-        var url = $(this).data('url');
-        $("#delete-session").data('url', url);
-        $("#confirm-delete-session-modal").modal('show');
     });
     $("#delete-group").click(function () {
         /* get some values from elements on the page: */
@@ -65,6 +62,12 @@ $(function() {
                 window.location.href = data.list_url;
             }
         });
+    });
+    {% endif %}
+    $("button.confirm-delete-session").click(function(){
+        var url = $(this).data('url');
+        $("#delete-session").data('url', url);
+        $("#confirm-delete-session-modal").modal('show');
     });
     $("#delete-session").click(function () {
         /* get some values from elements on the page: */

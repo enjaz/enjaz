@@ -2,6 +2,7 @@
 from django.db import models
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.contrib.auth.models import User
 
 import accounts.utils
 
@@ -97,3 +98,17 @@ class StudentClubYear(models.Model):
     class Meta:
         verbose_name = u"سنة نادي"
         verbose_name_plural = u"سنوات النادي"
+
+class Tweet(models.Model):
+    text = models.CharField(u"النص", max_length=155)
+    tweet_id = models.BigIntegerField(null=True)
+    user = models.ForeignKey(User, null=True,
+                             on_delete=models.SET_NULL)
+    was_sent = models.BooleanField(u"أرسلت؟", default=False)
+    modification_date = models.DateTimeField(u"تاريخ التعديل",
+                                           auto_now=True)
+    submission_date = models.DateTimeField(u"تاريخ الإضافة",
+                                           auto_now_add=True)
+
+    def __unicode__(self):
+        return self.text

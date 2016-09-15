@@ -3,7 +3,7 @@ from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import ObjectDoesNotExist
 
-from bulb.models import Category, Book, Request, Point, Membership, Group, Recruitment
+from bulb.models import Category, Book, NeededBook, Request, Point, Membership, Group, Recruitment
 from bulb import utils
 
 class BulbAuthenticationForm(AdminAuthenticationForm):
@@ -36,6 +36,28 @@ class MembershipAdmin(admin.TabularInline):
         except AttributeError:
             return obj.user.username
     get_name.short_description = "Name"
+
+class BookAdmin(admin.ModelAdmin):
+    search_fields = ['title', 'submitter__common_profile__en_first_name',
+                    'submitter__common_profile__en_middle_name',
+                    'submitter__common_profile__en_last_name',
+                    'submitter__common_profile__ar_first_name',
+                    'submitter__common_profile__ar_middle_name',
+                    'submitter__common_profile__ar_last_name']
+
+    list_display = ['title', 'submitter', 'category', 'is_available',
+                    'submission_date']
+
+class NeededBookAdmin(admin.ModelAdmin):
+    search_fields = ['title', 'requester__common_profile__en_first_name',
+                    'requester__common_profile__en_middle_name',
+                    'requester__common_profile__en_last_name',
+                    'requester__common_profile__ar_first_name',
+                    'requester__common_profile__ar_middle_name',
+                    'requester__common_profile__ar_last_name']
+
+    list_display = ['title', 'requester', 'category',
+                    'submission_date']
 
 class GroupAdmin(admin.ModelAdmin):
     list_filter = ["is_deleted", ]
@@ -86,7 +108,8 @@ class RecruitmentAdmin(admin.ModelAdmin):
 
 bulb_admin = BulbAdmin("Bulb Admin")
 admin.site.register(Category)
-admin.site.register(Book)
+admin.site.register(Book, BookAdmin)
+admin.site.register(NeededBook, NeededBookAdmin)
 admin.site.register(Request)
 admin.site.register(Point)
 admin.site.register(Recruitment, RecruitmentAdmin)

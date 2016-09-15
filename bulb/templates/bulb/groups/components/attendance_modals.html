@@ -1,40 +1,40 @@
 
-<div class="modal fade" id="confirm-join-modal">
+<div class="modal fade" id="confirm-attend-session-modal">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">الانضمام للمجموعة</h4>
+        <h4 class="modal-title">تأكيد الحضور</h4>
       </div>
       <div class="modal-body">
-          <form id="confirm-delete-form">
-              <label>هل أنت متأكد أنك ترغب في الانضمام لهذه المجموعة؟ ستصلك تنبيهات جلساتها.</label>
+          <form id="confirm-attend-form">
+              <label>هل أنت متأكد أنك ترغب في حضور هذه الجلسة؟ سيظهر اسمك ضمن الحضور.</label>
           </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">ألغِ</button>
-        <button data-action="join" id="join-group" type="button" class="btn btn-primary confirm">أكّد</button>
+        <button data-action="attend" id="attend-session" type="button" class="btn btn-primary confirm">أكّد</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
 
-<div class="modal fade" id="confirm-leave-modal">
+<div class="modal fade" id="confirm-cancel-session-modal">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">مغادرة المجموعة</h4>
+        <h4 class="modal-title">إلغاء تأكيد الحضور</h4>
       </div>
       <div class="modal-body">
-          <form id="confirm-delete-form">
-              <label>هل أنت متأكد أنك ترغب في مغادرة هذه المجموعة؟ لن تصلك أي تنبيهات عن جلساتها.</label>
+          <form id="confirm-leave-form">
+              <label>هل أنت متأكد أنك ترغب في إلغاء حضور الجلسة؟.</label>
           </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">ألغِ</button>
-        <button data-action="leave" id="leave-group" type="button" class="btn btn-danger confirm">أكّد</button>
+        <button data-action="cancel" id="cancel-session" type="button" class="btn btn-danger confirm">أكّد</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

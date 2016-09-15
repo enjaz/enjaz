@@ -10,5 +10,5 @@
 {% endif %}
     {% endautoescape %}
 {% empty %}
-    <p>لا توجد مجموعات قراءة.</p>
+    <p>لا توجد مجموعات قراءة{% if archived %} مؤرشفة{% endif %}.</p>
 {% endfor %}

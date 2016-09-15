@@ -106,6 +106,11 @@ you confiture the static and media URLs as per the [Django documentation](https:
 
 ### Step two: Settings
 
+Import the following:
+```
+from django.contrib.messages import constants as messages
+```
+
 Replace `INSTALLED_APPS` in `settings.py` with the following:
 ```
 INSTALLED_APPS = (

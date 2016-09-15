@@ -7,15 +7,16 @@ from django.db.models import Sum, Count
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 
+from core import decorators
 from .models import Announcement, Publication, StudentClubYear
 from .forms import DebateForm
 from accounts.utils import get_user_gender
 from activities.models import Activity, Episode
-from books.models import Book
+from bulb.models import Book
 from clubs.models import Club, College, city_choices
 from constance import config
 from niqati.models import Order, Code
@@ -50,9 +51,9 @@ def portal_home(request):
         context['latest_entries'] = request.user.code_set.current_year().order_by('-redeem_date')[:5]
 
         # --- books --------
-        context['books_count'] = Book.objects.count()
-        context['my_books_count'] = request.user.book_contributions.count()
-        context['latest_books'] = Book.objects.all()[::-1][:5] # TODO: update to be gender-segregated
+        context['book_sample'] = Book.objects.current_year().for_user_city(request.user).available().order_by("?")[:6]
+        context['books_count'] = Book.objects.current_year().undeleted().count()
+        context['my_books_count'] = request.user.book_giveaways.current_year().undeleted().count()
         
         # --- announcements 
         context['student_researches'] = Announcement.objects.filter(type='R')[::-1] # show last first
@@ -233,6 +234,18 @@ def indicators(request, city=""):
                    city_choices}
 
     return render(request, 'indicators.html', context)
+
+@decorators.ajax_only
+@login_required
+def cancel_twitter_connection(request):
+    try:
+        common_profile = request.user.common_profile
+    except ObjectDoesNotExist:
+        return {}
+
+    common_profile.canceled_twitter_connection = True
+    common_profile.save()
+    return {}
 
 def debate(request):
     url = config.DEBATE_URL

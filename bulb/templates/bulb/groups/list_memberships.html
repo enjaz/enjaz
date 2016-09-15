@@ -54,7 +54,7 @@
         $(".btn-membership").click(function () {
         /* get some values from elements on the page: */
         button = this;
-        var url = "{% url 'bulb:control_membership' %}";
+        var url = "{% url 'bulb:control_group' %}";
         var action = $(this).data('action');
         var data = {
             group_pk: $(this).data('group-pk'),

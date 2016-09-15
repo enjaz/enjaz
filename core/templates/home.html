@@ -1,4 +1,4 @@
-{% extends "base.html" %}{% load staticfiles %}{% load clubs_utils %}{% load niqati_tags %}
+{% extends "base.html" %}{% load staticfiles %}{% load clubs_utils %}{% load niqati_tags %}{% load bulb_tags %}
 {% block navbutton %}
     {% if user.is_superuser %}
         {% include 'includes/nav-button.html' %}
@@ -176,75 +176,61 @@
 	</div>
 </div><!-- end panel -->
 {% endif %}
-{% comment %}
-<div class="panel minimal minimal-gray">
-	<div class="panel-heading">
-		<div class="panel-title">
-			<h2>الكتب</h2>
-		</div>
-	</div>
-	<div class="panel-body">
-		<div class="col-md-9">
-		<div class="panel panel-warning panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
-			
-			<!-- panel head -->
-			<div class="panel-heading">
-				<div class="panel-title">آخر الكتب المضافة</div>
-				
-				<div class="panel-options">
-					<a href="{% url 'books:list' %}" type="button" class="btn btn-default">
-						 المزيد
-					</a>
-				</div>
-				
-			</div>
-			
-			<!-- panel body -->
-			<div class="panel-body">
-				
-				<table class="table table-hover">
-					<thead>
-						<tr>
-							<th>الكتاب</th>
-							<th>المساهم</th>
-							<th>تاريخ الإضافة</th>
-						</tr>
-					</thead>
-					
-					<tbody>
-						{% for b in latest_books %}
-						<tr>
-							<td><a href="{% url 'books:show' b.pk %}">{{ b.title }}</a></td>
-							<td>{{ b.submitter.common_profile.get_ar_full_name|default:b.submitter.username }}</td>
-							<td>{{ b.submission_date }}</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-				
-			</div>
-			
-		</div>
-	</div>
-	<div class="col-md-3">
-		<div class="tile-stats tile-orange">
-			<div class="icon"><i class="entypo-book"></i></div>
-			<div class="num" data-start="0" data-end="{{ books_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
-			
-			<h3>عدد الكتب</h3>
-			<p>مجموع الكتب المعروضة في بوابة إنجاز</p>
-		</div>
-		<div class="tile-stats tile-white-orange">
-			<div class="icon"><i class="entypo-book"></i></div>
-			<div class="num" data-start="0" data-end="{{ my_books_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
-			
-			<h3>عدد كتبي</h3>
-			<p>عدد كتبي المعروضة في بوابة إنجاز</p>
-		</div>
-	</div>
-	</div>
+
+<div class="row">
+    <div class="panel minimal minimal-gray">
+        <div class="panel-heading">
+            <div class="panel-title">
+                <h2>مكتبة سِراج</h2>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="col-md-9">
+            <p style="color: #574802; background-color: #ffefa4; border-color: #ffd78a; width: 85%; font-size: 16px; text-align: justify; margin-right: auto; margin-left: auto;" class="alert section-intro">تخيّل لو عرض كل طلاب الجامعة وطالباتها ما عندهم من كتبٍ ثقافية ومعرفية قيّمة، وبنينا معا مكتبة عامرة! هذا ما نريده في <strong>قسم تبادل الكتب التابع لسِراج</strong>. تستطيع استبدال كتبك بالكتب المعروضة من خلال رصيد يزيد وينقص بناء على عدد الكتب التي تقوم بعرضها واستبدالها.</p>
+            <div class="panel panel-warning panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+
+                <!-- panel head -->
+                <div class="panel-heading">
+                    <div class="panel-title">من الكتب</div>
+
+                    <div class="panel-options">
+                        <a id="add-book" type="button" class="btn btn-default">
+                             <i class="entypo-plus"></i> أضف كتابًا
+                        </a>
+                        <a href="{% url 'bulb:list_book_categories' %}" type="button" class="btn btn-default">
+                             المزيد
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- panel body -->
+                <div class="panel-body">
+                    {% with from_home=True books=book_sample %}
+                    {% include "bulb/exchange/components/list_books.html" %}
+                    {% endwith %}
+                </div>
+
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="tile-stats tile-orange">
+                <div class="icon"><i class="entypo-book"></i></div>
+                <div class="num" data-start="0" data-end="{{ book_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+                <h3>عدد الكتب</h3>
+                <p>مجموع الكتب المنشورة على بوابة إنجاز</p>
+            </div>
+            <div class="tile-stats tile-orange">
+                <div class="icon"><i class="entypo-star"></i></div>
+                <div class="num" data-start="0" data-end="{{ book_request_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+                <h3>عدد كتبي</h3>
+                <p>مجموع الكتب التي لك على بوابة إنجاز</p>
+            </div>
+        </div>
+        </div>
+    </div>
 </div>
-{% endcomment %}
+{% comment %}
 <div class="row">
 <div class="col-md-6">
 <div class="panel minimal minimal-gray">
@@ -321,5 +307,10 @@
 </div>
 </div>
 </div>
+{% endcomment %}
 {% endblock %}
 
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+{% include "bulb/exchange/components/edit_book_asset.html" %}
+{% endblock %}

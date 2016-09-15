@@ -1,0 +1,50 @@
+{% load staticfiles %}
+<script type="text/javascript">
+{% include "bulb/exchange/components/initialize_needed_book_buttons.js" %}
+
+    $(function () {
+        initialize_needed_book_buttons();
+        // initialize book edit modal
+        $('#edit-needed-book-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        });
+        $("#add-needed-book").click(function () {
+
+            $("#edit-needed-book-modal").modal('show');
+            $("#edit-needed-book-modal .modal-title").html("أضف طلب كتاب");
+            
+            $("#edit-needed-book-modal .modal-body").load("{% url 'bulb:add_needed_book_introduction' %}", function(){
+                $('.end-needed-book-introduction').click(function() {
+                    $("#edit-needed-book-modal .modal-body").load("{% url 'bulb:add_needed_book' %}");
+                });
+            });
+
+            var $submitButton = $("#edit-needed-book-modal button.submit-button");
+            // Unbind any handlers previously attached to the submit button
+            // This is necessary to avoid multiple submissions of the form
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-needed-book-form").submit();
+            });
+
+        });
+
+        {% if from_category  %}
+        // load books
+        loadBooks();
+        {% endif %}
+    });
+    {% if from_category %}
+    function loadBooks() {
+        $("#category").load("{% url 'bulb:list_needed_book_previews' 'category' category.code_name %}", initialize_needed_book_buttons);
+    }
+    {% endif %}
+    {% include 'bulb/adjust_modal_size.js' %}
+</script>
+
+
+{% with modal_id='edit-needed-book-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}

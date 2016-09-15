@@ -1,6 +1,16 @@
 {% extends 'bulb_base.html' %}{% load staticfiles %}{% load bulb_tags %}
 {% block content %}
+<style>
+div.section-intro, p.section-intro{
+    width: 85%;
+    font-size: 16px;
+    text-align: justify;
+    margin-right: auto;
+    margin-left: auto;
+}
+</style>
 <h1>مبادرة سِراج</h1>
+
 <div class="row">
     <div class="col-sm-9">
         <p style="
@@ -8,7 +18,10 @@
     text-align: justify;
     font-size: 18px;
     margin-right: auto;
-    margin-left: auto;" class="section-intro">مبادرة تدعو إلى إحياء روح "اقرأ" في المجتمع الطلابي، وخلق بيئة للتبادل المعرفي والثقافي والفكري! كن جزءًا من مبادرة سِراج و انضم إلى نخبة من قراء وقارئات الجامعة، وتذكر دومًا أننا آذانُ صاغية لأفكارك ومقترحاتك فراسلنا على البريد <a href="mailto:bulb@enjazportal.com">bulb@enjazportal.com</a>، <span style="background: yellow;">وانضمّ إلى <a href="https://telegram.me/seraj_initiative">قناتنا على تلغرام</a> لنخصّك بآخر المستجدات!</span></p>
+    margin-left: auto;" class="section-intro">مبادرة لخلق بيئة للتبادل المعرفي والثقافي والفكري! كن جزءًا من مبادرة سِراج و انضم إلى نخبة من قراء وقارئات الجامعة، وتذكر دومًا أننا آذانُ صاغية لأفكارك ومقترحاتك فراسلنا على البريد <a href="mailto:bulb@enjazportal.com">bulb@enjazportal.com</a>، <span style="background: yellow;">وانضمّ إلى <a target="_blank" href="https://telegram.me/seraj_initiative">قناتنا على تلغرام</a> لنخصّك بآخر المستجدات!</span></p>
+        {% if user.is_authenticated and not user.social_auth.exists %}
+        <p class="text-center"><a style="background-color: #1da1f3; color: white;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn"><i class="fa fa-twitter"></i> اربط حسابي بتويتر</a></p>
+        {% endif %}
     </div>
 {% if not user.reader_profile or not user.reading_group_coordination.exists and not user.reading_group_memberships.exists or not user.book_giveaways.exists %}
 <div class="col-sm-3">
@@ -40,12 +53,12 @@
     <div class="panel minimal minimal-gray">
         <div class="panel-heading">
             <div class="panel-title">
-                <h2>مجموعات القراءة</h2>
+                <h2 class="bulb-header"><a href="{% url 'bulb:list_groups' %}">جلسات النقاش والقراءة</a></h2>
             </div>
         </div>
         <div class="panel-body">
             <div class="col-md-9">
-            <p style="color: #574802; background-color: #ffefa4; border-color: #ffd78a; width: 85%; font-size: 16px; text-align: justify; margin-right: auto; margin-left: auto;" class="alert section-intro">لا تزال الفرصة مهيئة لإشباع شغفك المعرفي بعيدًا عن المجال الأكاديمي. هنا تجد من يشاركك اهتماماتك من مختلف الكليات والسنوات الدراسية. انضم كعضو في <strong>مجموعات القراءة</strong>، وساهم في إثراء جلسات النقاش، أو أسس مجموعتك في المجال والموضوع الذي تختاره. </p>
+            <p style="color: #574802; background-color: #ffefa4; border-color: #ffd78a;" class="alert section-intro">لا تزال الفرصة مهيئة لإشباع شغفك المعرفي بعيدًا عن المجال الأكاديمي. هنا تجد من يشاركك اهتماماتك من مختلف الكليات والسنوات الدراسية. انضم كعضو في <strong>مجموعات القراءة</strong>، وساهم في إثراء جلسات النقاش، أو أسس مجموعتك في المجال والموضوع الذي تختاره. </p>
             <div class="panel panel-warning panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
 
                 <!-- panel head -->
@@ -71,8 +84,14 @@
             <div class="tile-stats tile-orange">
                 <div class="icon"><i class="fa fa-comments"></i></div>
                 <div class="num" data-start="0" data-end="{{ group_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
-                <h3>عدد مجموعات القراءة</h3>
-                <p>مجموع المجموعات المعروضة في بوابة إنجاز</p>
+                <h3>عدد مجموعات النقاش والقراءة</h3>
+                <p>مجموع المجموعات المعروضة في بوابة إنجاز على امتداد المدن الثلاث</p>
+            </div>
+            <div class="tile-stats tile-orange">
+                <div class="icon"><i class="fa fa-comments"></i></div>
+                <div class="num" data-start="0" data-end="{{ session_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+                <h3>عدد الجلسات</h3>
+                <p>مجموع جلسات النقاش والقراءة التي أعلن عنها على بوّابة إنجاز على امتداد المدن الثلاث</p>
             </div>
             <div class="tile-stats tile-orange">
                 <div class="icon"><i class="entypo-user"></i></div>
@@ -88,17 +107,22 @@
 
                 <!-- panel head -->
                 <div class="panel-heading">
-                    <div class="panel-title">جلسات القراءة والنقاش القادمة</div>
+                    <div class="panel-title">جلسات النقاش والقراءة القادمة</div>
+                    <div class="panel-options">
+                        <a href="{% url 'bulb:list_sessions' %}" type="button" class="btn btn-default">
+                             المزيد
+                        </a>
+                    </div>
                 </div>
 
                 <!-- panel body -->
                 <div class="panel-body">
-                    {% if sessions %}
+                    {% if sessions.exists %}
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th class="hidden-xs">عنوان الجلسة</th>
-                                <th>المجموعة</th>
+                                <th>عنوان الجلسة</th>
+                                <th class="hidden-xs">المجموعة</th>
                                 <th>التاريخ</th>
                             </tr>
                         </thead>
@@ -106,8 +130,8 @@
                         <tbody>
                             {% for session in sessions %}
                             <tr>
-                                <td class="hidden-xs">{{ session.title }}</td>
-                                <td><a href="{% url 'bulb:show_group' session.group.pk %}">{{ session.group.name }}</a> ({{ session.group.get_gender_display }})</td>
+                                <td class="hidden-xs">{% if session.group %}{{ session.title }}{% else %}<a href="{% url 'bulb:show_session' session.pk %}">{{ session.title }}</a>{% endif %}</td>
+                                <td>{% if session.group %}<a href="{% url 'bulb:show_group' session.group.pk %}">{{ session.group.name }}</a>{% if group.is_limited_by_gender %} ({{ session.group.get_gender_display }}){% endif %}{% else %}جلسة حرّة{% endif %}</td>
                                 <td>{{ session.date|date:"l j F Y" }}</td>
                             </tr>
                             {% endfor %}
@@ -129,12 +153,19 @@
     <div class="panel minimal minimal-gray">
         <div class="panel-heading">
             <div class="panel-title">
-                <h2>تبادل الكتب</h2>
+                <h2 class="bulb-header"><a href="{% url 'bulb:list_book_categories' %}">تبادل الكتب</a></h2>
             </div>
         </div>
         <div class="panel-body">
             <div class="col-md-9">
-            <p style="color: #045702; background-color: #bdedbc; border-color: #b4e8a8; width: 85%; font-size: 16px; text-align: justify; margin-right: auto; margin-left: auto;" class="alert section-intro">تخيّل لو عرض كل طلاب الجامعة وطالباتها ما عندهم من كتبٍ ثقافية ومعرفية قيّمة، وبنينا معا مكتبة عامرة! هذا ما نريده في <strong>قسم تبادل الكتب</strong>. تستطيع استبدال كتبك بالكتب المعروضة من خلال رصيد يزيد وينقص بناء على عدد الكتب التي تقوم بعرضها واستبدالها.</p>
+            <div style="color: #045702; background-color: #bdedbc; border-color: #b4e8a8;" class="alert section-intro"><p>تخيّل لو عرض كل طلاب الجامعة وطالباتها ما عندهم من كتبٍ ثقافية ومعرفية قيّمة، وبنينا معا مكتبة عامرة! هذا ما نريده في <strong>قسم تبادل الكتب</strong>. تستطيع استبدال كتبك بالكتب المعروضة من خلال رصيد يزيد وينقص بناء على عدد الكتب التي تقوم بعرضها واستبدالها.</p>
+                <div class="text-center">
+                    <form action="{% url 'bulb:search_books' %}" class="form-inline">
+                        <input name="q" id="term" class="form-control" type="text">
+                        <input class="form-control btn btn-xs btn-primary" type="submit" value="ابحث">
+                    </form>
+                </div>
+                </div>
             <div class="panel panel-success panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
 
                 <!-- panel head -->
@@ -142,9 +173,11 @@
                     <div class="panel-title">من الكتب</div>
 
                     <div class="panel-options">
+                        {% if user.is_authenticated %}
                         <a id="add-book" type="button" class="btn btn-default">
                              <i class="entypo-plus"></i> أضف كتابًا
                         </a>
+                        {% endif %}
                         <a href="{% url 'bulb:list_book_categories' %}" type="button" class="btn btn-default">
                              المزيد
                         </a>
@@ -155,7 +188,7 @@
                 <!-- panel body -->
                 <div class="panel-body">
                     {% with from_home=True books=book_sample %}
-                    {% include "bulb/exchange/list_books.html" %}
+                    {% include "bulb/exchange/components/list_books.html" %}
                     {% endwith %}
                 </div>
 
@@ -178,7 +211,7 @@
         </div>
         <div class="panel-body">
             <div class="col-md-9">
-            <div class="panel panel-warning panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+            <div class="panel panel-success panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
 
                 <!-- panel head -->
                 <div class="panel-heading">
@@ -192,7 +225,7 @@
 
                 <!-- panel body -->
                 <div class="panel-body">
-                    {% if latest_books %}
+                    {% if latest_books.exists %}
                     <table class="table table-hover">
                         <thead>
                             <tr>
@@ -213,12 +246,62 @@
                         </tbody>
                     </table>
                     {% else %}
-                    <p>لا توجد جلسات نقاش وقراءة مستقبلية.</p>
+                    <p>لا توجد كتب أضيفت في سِراج حتى الآن.</p>
                     {% endif %}
                 </div>
             </div>
         </div>
         </div>
+        
+        <div class="panel-body">
+            <div class="col-md-9">
+            <div class="panel panel-success panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+
+                <!-- panel head -->
+                <div class="panel-heading">
+                    <div class="panel-title">الكتب المطلوبة</div>
+                    <div class="panel-options">
+                        {% if user.is_authenticated %}
+                        <a id="add-needed-book" type="button" class="btn btn-default">
+                             <i class="entypo-plus"></i> أضف طلب كتاب
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'bulb:list_needed_book_categories' %}" type="button" class="btn btn-default">
+                             جميع الكتب المطلوبة
+                        </a>
+                    </div>
+                </div>
+
+                <!-- panel body -->
+                <div class="panel-body">
+                    {% if latest_needed_books.exists %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>اسم الكتاب</th>
+                                <th class="hidden-xs">المُساهم</th>
+                                <th>تاريخ الإضافة</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for needed_book in latest_needed_books %}
+                            <tr>
+                                <td>{% if needed_book.existing_book  %}<span class="badge badge-success">وُفّر!</span>{% else %}<span class="badge badge-warning">مطلوب</span>{% endif %}<a href="{% url 'bulb:show_needed_book' needed_book.pk %}">{{ needed_book.title }}</td>
+                                <td class="hidden-xs">{% reader_profile_link needed_book.requester %}</td>
+                                <td>{{ needed_book.submission_date|date:"l j F Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p>لا توجد كتب طُلبت من سِراج حتى الآن.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        </div>
+
     </div>
 </div>
 
@@ -228,12 +311,19 @@
     <div class="panel minimal minimal-gray">
         <div class="panel-heading">
             <div class="panel-title">
-                <h2>قارئات وقراء الجامعة</h2>
+                <h2 class="bulb-header"><a href="{% url 'bulb:list_reader_profiles' %}">قارئات وقراء الجامعة</a></h2>
             </div>
         </div>
         <div class="panel-body">
             <div class="col-md-9">
-            <p style="color: #2c7ea1;background-color: #c5e8f7;border-color: #a6e8f3; width: 85%; font-size: 16px; text-align: justify; margin-right: auto; margin-left: auto;" class="alert section-intro">هُنا يُعرّف قرّاء وقارئات الجامعة باهتماماتهم الثقافية، كتبهم المفضلة، كُتابهم وكاتباتهم المفضلين، ونعرض مجموعات القراءة التي انضموا لها والكتب التي ساهموا بها لسِراج. انضم إلى <strong>سجل قارئات وقراء الجامعة</strong> لتكونَ جزءًا من هذا المجتمع القارئ.</p>
+            <div style="color: #2c7ea1;background-color: #c5e8f7;border-color: #a6e8f3; " class="alert section-intro"><p>هُنا يُعرّف قرّاء وقارئات الجامعة باهتماماتهم الثقافية، كتبهم المفضلة، كُتابهم وكاتباتهم المفضلين، ونعرض مجموعات القراءة التي انضموا لها والكتب التي ساهموا بها لسِراج. انضم إلى <strong>سجل قارئات وقراء الجامعة</strong> لتكونَ جزءًا من هذا المجتمع القارئ.</p>
+                <div class="text-center">
+                    <form action="{% url 'bulb:search_readers' %}" class="form-inline">
+                        <input name="q" id="term" class="form-control" type="text">
+                        <input class="form-control btn btn-xs btn-primary" type="submit" value="ابحث">
+                    </form>
+                </div>
+                </div>
             <div class="panel panel-info panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
 
                 <!-- panel head -->
@@ -285,7 +375,64 @@
         </div>
     </div>
 </div>
+
+
 {% endblock %}
 {% block customscript %}
+<!---Twitter Modal -->>
+<div class="modal fade" id="connect-twitter">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">أغلق</span></button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body ativa-scroll text-center">
+          <h2>بات الآن ممكنا إخبار أصدقائك عن سِراج!</h2>
+          <p>اربط تفاعلك مع سِراج بحسابك على تويتر، وساعد الطلاب والطالبات في اكتشاف سِراج، واكتشاف كتبك ومجموعاتك وصفحتك التعريفية. معًا نبني مجتمعًا معرفيًا ثقافيًا!</p>
+          <p>بعد الربط، سوف تُكتب تغريدة آلية في حسابك عندما تضيف كتابا إو تنضمّ إلى مجموعة، ويمكنك إلغاء الربط في أي وقت.</p>
+          <div class="row">
+              <a style="color: #1da1f3;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-lg"><i class="fa fa-twitter fa-4x"></i><br>اربط حسابي بتويتر</a>
+          </div>
+          <div class="row">
+                  <a id="cancel-twitter-connection" style="color: rgb(243, 29, 89)"><i class="fa fa-times fa-4x"></i><br> لا تسألني مُجدًدا</a>
+          </div>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script type="text/javascript">
+{%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
+$(function(){
+    $('#connect-twitter').modal({
+      keyboard: true,
+      backdrop: 'static',
+    });
+    $("#cancel-twitter-connection").click(function(){
+        $.ajax({
+            url: "{% url 'cancel_twitter_connection' %}",
+            type: 'GET',
+            cache: false,
+            success: function(data){
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                toastr.success("لن يظهر السؤال مُجددًا.");
+                // hide modal
+                $("#connect-twitter").modal('hide');
+            }
+        });
+
+    });
+});
+ 
+
+{% endif %}
+</script>
+
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+
 {% include "bulb/exchange/components/edit_book_asset.html" %}
+{% include "bulb/exchange/components/edit_needed_book_asset.html" %}
+
 {% endblock %}

@@ -1,0 +1,34 @@
+{% load staticfiles %}
+<script type="text/javascript">
+    $(function () {
+        // initialize session edit modal
+        $('#edit-session-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        });
+        $("button#add-session").click(function () {
+            $("#edit-session-modal").modal('show');
+
+            $("#edit-session-modal .modal-title").html("أضف جلسة حرّة");
+            $("#edit-session-modal .modal-body").load("{% url 'bulb:add_free_session_introduction' %}", function(){
+                $('.end-session-introduction').click(function() {
+                    $("#edit-session-modal .modal-body").load("{% url 'bulb:add_free_session' %}");
+            });
+            });
+
+            var $submitButton = $("#edit-session-modal button.submit-button");
+            // Unbind any handlers previously attached to the submit button
+            // This is necessary to avoid multiple submissions of the form
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-session-form").submit();
+            });
+        });
+    });
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+
+{% with modal_id='edit-session-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}

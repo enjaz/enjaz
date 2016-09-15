@@ -1,7 +1,12 @@
 {% load staticfiles %}
 <script type="text/javascript">
     function loadGroups() {
-        $("#groups").load("{% url 'bulb:list_group_previews' %}");
+        {% if archived %}
+        var url = "{% url 'bulb:list_archived_group_previews' %}";
+        {% else %}
+        var url = "{% url 'bulb:list_group_previews' %}";
+        {% endif %}
+        $("#groups").load(url);
     }
     $(function () {
         // initialize group edit modal

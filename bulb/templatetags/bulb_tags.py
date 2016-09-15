@@ -21,12 +21,24 @@ def can_edit_book(user, book):
     return utils.can_edit_book(user, book)
 
 @register.filter
+def can_edit_needed_book(user, needed_book):
+    return utils.can_edit_needed_book(user, needed_book)
+
+@register.filter
 def can_order_book(user, book):
     return utils.can_order_book(user, book)
 
 @register.filter
 def can_edit_group(user, group):
     return utils.can_edit_group(user, group)
+
+@register.filter
+def can_edit_session(user, session):
+    return utils.can_edit_session(user, session)
+
+@register.filter
+def can_attend_session(user, session):
+    return utils.can_attend_session(user, session)
 
 @register.filter
 def can_join_group(user, group):

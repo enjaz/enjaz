@@ -3,7 +3,6 @@
     <div class="row row-flex">
     {% if book.cover %}
         <div class="col-sm-4">
-            <div class=""></div>
             <div style="text-align: center; border-left: solid 1px #eee;">
                 <div class="book-contribution">{% if book.contribution == 'L' %}للاستعارة{% elif book.contribution == 'G' %}للاقتناء{% endif %}</div>
                 <a class="book-image" style="background-image:url('{{ book.cover.url }}');" href="{% url 'bulb:show_book' book.pk %}"></a>

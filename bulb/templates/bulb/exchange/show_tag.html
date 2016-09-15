@@ -1,0 +1,30 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}
+{% block title %}كتب {{ tag.name }}{% endblock %}
+{% block navbar %}
+    {% include "bulb/exchange/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+        <div class="row">
+            <div class="col-sm-9">
+                <h1><a href="{% url 'bulb:list_book_tags' %}">وسوم كتب سِراج</a>: {{ tag.name }}</h1>
+            </div>
+            <div class="col-sm-3">
+                {% include "bulb/exchange/components/critical_buttons.html" %}
+            </div>
+        </div>
+        <div class="panel panel-success panel-shadow" data-collapsed="0">
+            <div class="panel-body">
+                <div id="tag-books">
+                    {% include "bulb/exchange/components/list_books.html" %}
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+
+{% include "bulb/exchange/components/edit_book_asset.html" %}
+{% include "bulb/exchange/components/order_modal.html" %}
+{% include "bulb/exchange/delete_modal.html" %}
+{% endblock %}

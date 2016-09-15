@@ -1,9 +1,11 @@
-{% extends "bulb_base.html" %}{% load staticfiles %}{% load bulb_tags %}
+{% extends "bulb_base.html" %}{% load staticfiles %}{% load bulb_tags %}{% load tagging_tags %}
 {% block title %}{{ book.title }}{% endblock %}
 {% block navbar %}
     {% include "bulb/exchange/components/navbar.html" %}
 {% endblock %}
 {% block content %}
+{% tags_for_object book as book_tags %}
+
 <div class="row">
     <div class="col-sm-4">
         <div style="text-align: center; border-left: solid 1px #eee;">
@@ -27,10 +29,11 @@
 
             <li><span style="color: black;">نوع المساهمة</span>: لل{{ book.get_contribution_display }}</li>
             {% if book.available_until%}<li><span style="color: black;">الكتاب متاح حتى</span>: {{ book.available_until|date:"j F Y" }}</li>{% endif %}
-            <li><span style="color: black;">التصنيف</span>: <a href="{% url 'bulb:show_category' book.category.code_name %}">{{ book.category.name }}</a></li>
+            <li><span style="color: black;">الوسوم</span>:  {% for tag in book_tags %}<a href="{% url 'bulb:show_tag' tag.name %}">{{ tag.name }}</a> {% endfor %}</li>
             {% if book.pages %}<li><span style="color: black;">عدد الصفحات</span>: {{ book.pages }}</li>{% endif %}
             <li><span style="color: black;">حالة الكتاب</span>: {{ book.get_condition_display }}</li>
         </ul>
+    
         <span style="margin-bottom: 10px; float: left">
             {% if user|can_edit_book:book %}
             <button data-url="{% url 'bulb:edit_book' book.pk %}" class="edit-book btn btn-xs btn-icon btn-gold">
@@ -51,6 +54,40 @@
         </span>
     </div>
 </div>
+<div style="border-top: solid 1px #eee; margin-top: 5px;" class="row">
+{% if sample_user_books.exists %}
+    <div class="col-sm-6" style="border-left: solid 1px #eee;">
+    <h2>كتب أخرى من {{ book.submitter.common_profile.ar_first_name }}</h2>
+        <div class="row">
+        {% for user_book in sample_user_books %}
+        <div class="col-md-4 col-sm-6">
+            <div class="text-center">
+                <div class="book-contribution">{% if user_book.contribution == 'L' %}للاستعارة{% elif user_book.contribution == 'G' %}للاقتناء{% endif %}</div>
+                <a class="book-image" style="background-image:url('{{ user_book.cover.url }}');" href="{% url 'bulb:show_book' user_book.pk %}"></a>
+                {{ user_book.title }}
+            </div>
+        </div>
+        {% endfor %}
+        </div><!--/row-->
+    </div><!--/col-sm-6-->
+{% endif %}
+{% if sample_category_books.exists %}
+    <div class="col-sm-6">
+        <h2>كتب أخرى عن {{ book.category.name }}</h2>
+        <div class="row">
+        {% for category_book in sample_category_books %}
+        <div class="col-md-4 col-sm-6">
+            <div class="text-center">
+                <div class="book-contribution">{% if category_book.contribution == 'L' %}للاستعارة{% elif category_book.contribution == 'G' %}للاقتناء{% endif %}</div>
+                <a class="book-image" style="background-image:url('{{ category_book.cover.url }}');" href="{% url 'bulb:show_book' category_book.pk %}"></a>
+                {{ category_book.title }}
+            </div>
+        </div>
+        {% endfor %}
+        </div><!--/row-->
+    </div><!--/col-sm-6-->
+{% endif %}
+</div>
 {% endblock %}
 
 
@@ -66,12 +103,13 @@ dt{
 </style>
 <script type="text/javascript">
     $(function(){
-        {% include "bulb/exchange/initialize_book_buttons.js" %}
+        {% include "bulb/exchange/components/initialize_book_buttons.js" %}
         initialize_book_buttons();
     });
 </script>
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
 {% include "bulb/exchange/components/edit_book_asset.html" %}
+{% include "bulb/exchange/components/edit_needed_book_asset.html" %}
 {% include "bulb/exchange/components/order_modal.html" %}
 {% include "bulb/exchange/delete_modal.html" %}
 {% endblock %}

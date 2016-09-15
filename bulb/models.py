@@ -6,8 +6,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils import timezone
 
+from tagging.registry import register
+from tagging_autocomplete.models import TagAutocompleteField
 from core.models import StudentClubYear
-from bulb.managers import BookQuerySet, RequestQuerySet, PointQuerySet, GroupQuerySet, SessionQuerySet, MembershipQuerySet
+from bulb import managers
 from niqati.models import Code
 import niqati.utils
 
@@ -21,17 +23,44 @@ class Category(models.Model):
     is_meta = models.BooleanField(default=False,
                                   verbose_name=u"تصنيف علوي؟")
     description = models.TextField(blank=True, verbose_name=u"وصف التصنيف")
-    image = models.FileField(upload_to='bulb/categories/', blank=True, null=True)
+    image = models.ImageField(upload_to='bulb/categories/', blank=True, null=True)
     def __unicode__(self):
         return self.name
 
+class NeededBook(models.Model):
+    tags = TagAutocompleteField(u"الوسوم")
+    year = models.ForeignKey('core.StudentClubYear', null=True,
+                             on_delete=models.SET_NULL)
+    title = models.CharField(u"العنوان", max_length=200)
+    cover = models.ImageField(u"الغلاف", upload_to='bulb/covers/')
+    authors = models.CharField(u"تأليف", max_length=200)
+    description = models.TextField(u"وصف الكتاب")
+    requester = models.ForeignKey(User)
+    category = models.ForeignKey(Category,
+                                 verbose_name=u"القسم",
+                                 null=True,
+                                 on_delete=models.SET_NULL,
+                                 limit_choices_to={'is_meta': False})
+    existing_book = models.ForeignKey('Book', null=True,
+                                      on_delete=models.SET_NULL)
+    is_deleted = models.BooleanField(default=False,
+                                     verbose_name=u"محذوف؟")
+    submission_date = models.DateTimeField(u"تاريخ الإرسال",
+                                           auto_now_add=True)
+    modification_date = models.DateTimeField(u"تاريخ التعديل",
+                                           auto_now=True)
+    objects = managers.NeededBookQuerySet.as_manager()
+
+#register(NeededBook)
+    
 class Book(models.Model):
+    tags = TagAutocompleteField(u"الوسوم")
     year = models.ForeignKey('core.StudentClubYear', null=True,
                              on_delete=models.SET_NULL)
     pages = models.PositiveSmallIntegerField(u"عدد الصفحات",
                                              blank=True, null=True, help_text=u"اختياري")
     title = models.CharField(max_length=200, verbose_name=u"العنوان")
-    authors = models.CharField(max_length=200, verbose_name=u"المؤلف")
+    authors = models.CharField(max_length=200, verbose_name=u"تأليف")
     edition = models.CharField(max_length=200, verbose_name=u"الطبعة",
                                blank=True, help_text=u"اختياري")
     condition_choices = (
@@ -56,21 +85,23 @@ class Book(models.Model):
     description = models.TextField(verbose_name=u"وصف الكتاب")
     submitter = models.ForeignKey(User,
                                   related_name='book_giveaways')
-    cover = models.FileField(u"الغلاف", upload_to='bulb/covers/')
+    cover = models.ImageField(u"الغلاف", upload_to='bulb/covers/')
     submission_date = models.DateTimeField(u"تاريخ الإرسال",
                                            auto_now_add=True)
     modification_date = models.DateTimeField(u"تاريخ التعديل",
                                            auto_now=True)
     category = models.ForeignKey(Category,
-                                 verbose_name=u"التصنيفات",
+                                 verbose_name=u"القسم",
                                  null=True,
                                  on_delete=models.SET_NULL,
                                  limit_choices_to={'is_meta': False})
+    is_publicly_owned = models.BooleanField(default=False,
+                                            verbose_name=u"كتاب عمومي لا يُنسب لحساب بعينه.")
     is_available = models.BooleanField(default=True,
                                        verbose_name=u"متاح؟")
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
-    objects = BookQuerySet.as_manager()
+    objects = managers.BookQuerySet.as_manager()
 
 
     def last_pending_request(self):
@@ -89,6 +120,8 @@ class Book(models.Model):
 
     def __unicode__(self):
         return self.title
+
+#register(Book)
 
 class Request(models.Model):
     book = models.ForeignKey(Book, null=True,
@@ -127,7 +160,7 @@ class Request(models.Model):
     borrowing_end_date = models.DateField(u"تاريخ انتهاء مدة الإعارة",
                                           blank=True, default=None,
                                           null=True)
-    objects = RequestQuerySet.as_manager()
+    objects = managers.RequestQuerySet.as_manager()
 
     def get_expected_delivery_date(self):
         return self.submission_date + timedelta(7)
@@ -142,7 +175,9 @@ class Request(models.Model):
                              .update(is_counted=False)
 
     def create_related_niqati_codes(self, random_string=None):
-        if not niqati.utils.can_claim_niqati(self.book.submitter):
+        # Skip owner niqati if the book is publicly owned
+        if not niqati.utils.can_claim_niqati(self.book.submitter) or \
+           self.book.is_publicly_owned:
             return
         current_year = StudentClubYear.objects.get_current()
         if not random_string:
@@ -162,6 +197,21 @@ class Request(models.Model):
 
     def create_related_points(self):
         current_year = StudentClubYear.objects.get_current()
+        requester_points = Point.objects.filter(request=self,
+                                                user=self.requester,
+                                                is_counted=True)
+
+        if not requester_points.exists():
+            Point.objects.create(year=current_year,
+                                 category=self.book.contribution,
+                                 request=self,
+                                 user=self.requester,
+                                 value=-1)
+
+        # Skip owner points if the book is publicly owned
+        if self.book.is_publicly_owned:
+            return
+
         owner_points = Point.objects.filter(request=self,
                                             user=self.book.submitter,
                                             is_counted=True)
@@ -171,16 +221,6 @@ class Request(models.Model):
                                  request=self,
                                  user=self.book.submitter,
                                  value=1)
-        requester_points = Point.objects.filter(request=self,
-                                                user=self.requester,
-                                                is_counted=True)
-        if not requester_points.exists():
-            print self.book.contribution
-            Point.objects.create(year=current_year,
-                                 category=self.book.contribution,
-                                 request=self,
-                                 user=self.requester,
-                                 value=-1)
 
     def is_due_returning(self):
         return timezone.now().date() >= self.borrowing_end_date
@@ -210,7 +250,7 @@ class Point(models.Model):
                             blank=True, default="")
     value = models.IntegerField(u"القيمة")
 
-    objects = PointQuerySet.as_manager()
+    objects = managers.PointQuerySet.as_manager()
 
     def get_details(self):
         if self.request and self.user == self.request.requester:
@@ -229,7 +269,7 @@ class Point(models.Model):
 class Group(models.Model):
     year = models.ForeignKey('core.StudentClubYear', null=True,
                              on_delete=models.SET_NULL)
-    image = models.FileField(u"الصورة", upload_to='bulb/groups/')
+    image = models.ImageField(u"الصورة", upload_to='bulb/groups/')
     name = models.CharField(max_length=200, verbose_name=u"الاسم")
     description = models.TextField(verbose_name=u"وصف")
     coordinator = models.ForeignKey(User, null=True,
@@ -238,26 +278,25 @@ class Group(models.Model):
                                     on_delete=models.SET_NULL,
                                     limit_choices_to={'common_profile__is_student':
                                                         True})
-    gender_choices = (
-        #('', u'الطلاب والطالبات'),
-        ('F', u'الطالبات'),
-        ('M', u'الطلاب'),
-        )
-    gender = models.CharField(max_length=1,verbose_name=u"المجموعة موجّهة إلى",
-                              choices=gender_choices, default="",
-                              blank=True)
+    is_limited_by_gender = models.BooleanField(u"محدودة بالجندر", default=True)
+    is_limited_by_city = models.BooleanField(u"محدودة بالمدينة", default=True)
     category = models.ForeignKey(Category,
                                  verbose_name=u"التصنيفات",
                                  null=True,
-                                 on_delete=models.SET_NULL)
+                                 on_delete=models.SET_NULL,
+                                 limit_choices_to={'is_meta': False})
     submission_date = models.DateTimeField(u"تاريخ الإرسال",
                                            auto_now_add=True)
     modification_date = models.DateTimeField(u"تاريخ التعديل",
                                            auto_now=True)
+    is_private = models.BooleanField(default=False,
+                                     verbose_name=u"هل المجموعة خاصة وتطلب موافقة قبل النضمام والاطلاع؟")
+    is_archived = models.BooleanField(default=False,
+                                     verbose_name=u"مؤرشفة؟")
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوفة؟")
 
-    objects = GroupQuerySet.as_manager()
+    objects = managers.GroupQuerySet.as_manager()
 
     def is_mixed_gender(self):
         """Check if the group has active memberships of different genders."""
@@ -297,12 +336,14 @@ class Membership(models.Model):
     modification_date = models.DateTimeField(u"تاريخ التعديل",
                                            auto_now=True)
 
-    objects = MembershipQuerySet.as_manager()
+    objects = managers.MembershipQuerySet.as_manager()
 
     def __unicode__(self):
         return "%s - %s" % (self.group.name, self.user.username)
 
 class Session(models.Model):
+    year = models.ForeignKey('core.StudentClubYear', null=True,
+                             on_delete=models.SET_NULL, blank=True)
     group = models.ForeignKey(Group, null=True,
                               on_delete=models.SET_NULL,
                               verbose_name=u"المجموعة")
@@ -314,13 +355,19 @@ class Session(models.Model):
     date = models.DateField(u"التاريخ")
     start_time = models.TimeField(u"وقت البداية")
     end_time = models.TimeField(u"وقت النهاية")
+    is_limited_by_gender = models.BooleanField(u"محدودة بالجندر", default=True)
+    is_limited_by_city = models.BooleanField(u"محدودة بالمدينة", default=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوفة؟")
+    submitter = models.ForeignKey(User, null=True, blank=True,
+                                  related_name="sessions_submitted")
+    confirmed_attendees = models.ManyToManyField(User, blank=True,
+                                            related_name="sessions_confirmed")
     submission_date = models.DateTimeField(u"تاريخ الإرسال",
                                            auto_now_add=True)
     is_online = models.BooleanField(default=False,
                                     verbose_name=u"جلسة الإنترنت؟")
-    objects = SessionQuerySet.as_manager()
+    objects = managers.SessionQuerySet.as_manager()
 
     def __unicode__(self):
         return "%s (%s)" % (self.group.name, self.title)
@@ -384,7 +431,7 @@ class ReaderProfile(models.Model):
                                           help_text=u"فيم تفضل القراءة؟")
     favorite_books = models.TextField(verbose_name=u"كتبك المفضّلة.",
                                       help_text=u"من أفضل الكتب التي قرأت، اختر ثلاثة!")
-    favorite_writers = models.TextField(verbose_name=u"كُتابك وكاتباتك المفضلين",
+    favorite_writers  = models.TextField(verbose_name=u"كُتابك وكاتباتك المفضلين",
                                         help_text=u"من أفضل الذين قرأت لهم، اختر ثلاثة!")
     average_reading = models.CharField(max_length=200, verbose_name=u"معدل القراءة",
                                        help_text=u"كم كتابا تقرأ في السنة؟")

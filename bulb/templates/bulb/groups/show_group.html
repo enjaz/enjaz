@@ -19,7 +19,7 @@
     </div>
     <div class="col-sm-8">
         {% if user|can_edit_group:group and not group|group_can_have_sessions %}
-        <p class="alert alert-warning">لا يمكنك عقد جلسات قبل أن يبلغ عدد أعضاء المجموعة أربعة أعضاء (شاملا رئيس المجموعة). هيا، أعلن! بإمكانك إحضار أربعة!</p>
+        <p class="alert alert-warning">  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> لا يمكنك عقد جلسات قبل أن يبلغ عدد أعضاء المجموعة أربعة أعضاء (شاملا رئيس المجموعة). هيا، أعلن! بإمكانك دعوة أربعة!</p>
         {% endif %}
        <h2 dir="auto" >{{ group.name }}</h2>
         <p dir="auto" class="group-description">
@@ -27,7 +27,7 @@
         </p>
         <table class="table table-hover">
             <tr>
-                <th>المُنسّق</th>
+                <th>تنسيق</th>
                 <td>{% reader_profile_link group.coordinator %}</td>
             </tr>
             <tr>
@@ -35,7 +35,7 @@
                 <td>{{ group.submission_date|date:"j F Y" }}</td>
             </tr>
             <tr>
-                <th>الأعضاء</th>
+                <th>الأعضاء والعضوات</th>
                 <td>
                     {% if group.membership_set.active.exists %}
                         <ul>
@@ -44,7 +44,7 @@
                         {% endfor %}
                         </ul>
                     {% else %}
-                    لا يوجد أعضاء في المجموعة حتى الآن. كن عضوًا!
+                    لا يوجد أعضاء في المجموعة حتى الآن. اطلب عضوية!
                     {% endif %}
                 </td>
             </tr>
@@ -57,8 +57,19 @@
             </a>
             {% if group|group_can_have_sessions %}
             <button id="add-session" class="btn btn-xs btn-icon btn-success">
-            <i class="entypo-flag"></i>
-            اعقد جلسة جديدة
+                <i class="entypo-flag"></i>
+                اعقد جلسة جديدة
+            </button>
+            {% endif %}
+            {% if group.is_archived %}
+            <button  data-action="unarchive" data-pk="{{ group.pk }}" class="confirm-unarchive-group btn btn-xs btn-icon btn-gold">
+                <i class="entypo-upload"></i>
+                ألغِ أرشيف المجموعة
+            </button>
+            {% else %}
+            <button  data-action="archive" data-pk="{{ group.pk }}" class="confirm-archive-group btn btn-xs btn-icon btn-gold">
+                <i class="entypo-inbox"></i>
+                أرشف المجموعة
             </button>
             {% endif %}
             <button id="edit-group" class="btn btn-xs btn-icon btn-gold">
@@ -71,12 +82,12 @@
             </button>
             {% endif %}
             {% if user|can_join_group:group %}
-            <button data-action="join" data-pk="{{ group.pk }}" class="confirm-join btn btn-xs btn-icon btn-success">
+            <button data-action="join" data-pk="{{ group.pk }}" class="confirm-join-group btn btn-xs btn-icon btn-success">
                 <i class="entypo-flag"></i>
-                كن عضوًا
+                اطلب عضوية
             </button>
             {% elif user|is_active_group_member:group %}
-            <button data-action="leave" data-pk="{{ group.pk }}" class="confirm-leave btn btn-xs btn-icon btn-danger">
+            <button data-action="leave" data-pk="{{ group.pk }}" class="confirm-leave-group btn btn-xs btn-icon btn-danger">
                 <i class="entypo-mute"></i>
                 غادر
             </button>
@@ -85,6 +96,7 @@
     </div>
 </div>
 <h2>الجلسات</h2>
+{% if user|can_edit_group:group or not group.is_private or group.is_private and user|is_active_group_member:group %}
     {% for session in sessions.undeleted %}
 <div class="row">
     <h3 id="session-{{ session.pk }}">{{ session.date|date:"j F" }}: {% if session.report %}<a href="{% url 'bulb:show_report' group.pk session.pk %}">{% endif %}{{ session.title }}{% if session.report %}</a>{% endif %}</h3>
@@ -149,6 +161,9 @@
     {% empty %}
     <p>لم تعقد أي جلسات حتى الآن.</p>
     {% endfor %}
+{% elif group.is_private and not user|is_active_group_member:group %}
+        <p class="alert alert-danger">  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> هذه مجموعة خاصة، ولا يمكنك الاطلاع على جلساتها دون تقديم طلب العضوية والموافقة عليه.</p>        
+{% endif %}
 {% endblock %}
 {% block customscript %}
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
@@ -159,8 +174,11 @@ p{
 </style>
 <script type="text/javascript">   
 $(function () {
-    {% include "bulb/groups/membership_buttons_initialization.js" %} 
-    initialize_membership_buttons();
+    {% include "bulb/groups/components/initialize_group_buttons.js" %} 
+    initialize_group_buttons();
+     {% include "bulb/groups/components/initialize_session_buttons.js" %} 
+    initialize_session_buttons();
+
     $('#edit-group-modal, #edit-session-modal, #edit-report-modal').modal({
       keyboard: false,
       backdrop: 'static',
@@ -184,13 +202,13 @@ $(function () {
         $("#edit-session-modal").modal('show');
 
         $("#edit-session-modal .modal-title").html("أضف جلسة");
-        $("#edit-session-modal .modal-body").load("{% url 'bulb:add_session' group.pk %}");
+        $("#edit-session-modal .modal-body").load("{% url 'bulb:add_group_session' group.pk %}");
 
         var $submitButton = $("#edit-session-modal button.submit-button");
         // Unbind any handlers previously attached to the submit button
         // This is necessary to avoid multiple submissions of the form
         $submitButton.off('click');
-        $submitButton.click(function () {
+        $submitButton.click(function () {show_group
             $("form#edit-session-form").submit();
         });
     });
@@ -229,7 +247,9 @@ $(function () {
 });
 {% include 'bulb/adjust_modal_size.js' %}
 </script>
-{% include "bulb/groups/membership_modals.html" %}
+{% include "bulb/groups/components/membership_modals.html" %}
+{% include "bulb/groups/components/attendance_modals.html" %}
+
 {% with modal_id='edit-group-modal' %}
     {% include "bulb/groups/common_edit_modal.html" %}
 {% endwith %}

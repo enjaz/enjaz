@@ -2,17 +2,21 @@
 {% block title %}قارئات وقراء الجامعة{% endblock %}
 {% block content %}
 
-<h1>قارئات وقراء الجامعة</h1>
-{% if not user.reader_profile %}
-<div class="row" style="margin-left: 0">
-    <div style="float: left;">
-        <button id="add-reader-profile" class="btn btn-icon btn-success">
+<div class="row">
+    <div class="col-sm-9">
+        <h1>قارئات وقراء الجامعة</h1>
+        {% include 'bulb/readers/components/search_form.html' %}
+    </div>
+    <div class="col-sm-3">
+        {% if not user.reader_profile %}
+        <button id="add-reader-profile" class="btn btn-block btn-icon btn-success">
             <i class="entypo-plus"></i>
-            سجل نفسك قارئًا
+            سجلني مع القارئات والقراء
         </button>
+        {% endif %}
     </div>
 </div>
-{% endif %}
+
 <table class="datatable display dt-responsive">
     <thead>
         <th>الاسم</th>
@@ -54,8 +58,9 @@
 
 <script type="text/javascript">
     $('.datatable').DataTable({
-        "order": [[ 2, "desc" ]],
-        "language": {% include 'js/dataTables-arabic.json' %}
+        bFilter: false,
+        order: [[ 2, "desc" ]],
+        language: {% include 'js/dataTables-arabic.json' %}
     });
     $(function () {
         // initialize reader profile edit modal

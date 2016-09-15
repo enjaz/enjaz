@@ -1,21 +1,19 @@
-{% extends "bulb_base.html" %}{% load staticfiles %}
-{% block title %}مجموعات القراءة{% endblock %}
+{% extends "bulb_base.html" %}{% load staticfiles %}{% load bulb_tags %}
+{% block title %}جلسات النقاش والقراءة{% if archived %} المؤرشفة{% endif %}{% endblock %}
 {% block content %}
-    <div class="row" style="margin-left: 0">
-        <div style="float: left;">
-            <button id="add-group" class="btn btn-icon btn-success">
-                <i class="entypo-plus"></i>
-                أنشئ مجموعة
-            </button>
+    <div class="row" >
+        <div class="col-md-9">
+            <h1>مجموعات النقاش والقراءة{% if archived %} المؤرشفة{% endif %}</h1>
+            <p>أدناه قائمة بمجموعات النقاش والقراءة النشطة.  يمكنك أيضا الاطلاع على <a href="{% url 'bulb:list_archived_groups' %}">مجموعات النقاش والقراءة المؤرشفة</a>.</p>
+        </div>
+        <div class="col-md-offset-1 col-md-2">
+            {% include "bulb/groups/components/critical_buttons.html" %}
         </div>
     </div>
-    <div class="row">
-        <h1>مجموعات القراءة</h1>
-        <div class="panel panel-success panel-shadow" data-collapsed="0">
-            <div class="panel-body">
-                <div id="groups">
-                    {% include "media/polls/ajax-loader.html" %}
-                </div>
+    <div class="panel panel-success panel-shadow" data-collapsed="0">
+        <div class="panel-body">
+            <div id="groups">
+                {% include "media/polls/ajax-loader.html" %}
             </div>
         </div>
     </div>
@@ -24,5 +22,6 @@
 {% block customscript %}
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
 {% include "bulb/groups/add_group_asset.html" %}
-{% include "bulb/groups/membership_modals.html" %}
+{% include "bulb/groups/add_session_asset.html" %}
+{% include "bulb/groups/components/membership_modals.html" %}
 {% endblock %}

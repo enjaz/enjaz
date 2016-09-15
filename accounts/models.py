@@ -40,7 +40,8 @@ class CommonProfile(models.Model):
                                      verbose_name=u'رقم الجوال')
     city = models.CharField(max_length=1, choices=city_choices,
                             verbose_name=u"المدينة", default="R")
-
+    canceled_twitter_connection = models.BooleanField(default=False,
+                                                      verbose_name=u"ألغى طلب الربط بتويتر؟")
     # Fields specific for students
     student_id = models.IntegerField(null=True, blank=True,
                                      verbose_name=u'الرقم الجامعي')

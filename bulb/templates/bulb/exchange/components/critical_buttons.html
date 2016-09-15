@@ -1,16 +1,16 @@
-<div class="row" style="margin-left: 0">
-    <div style="float: left;">
-        <button id="add-book" class="btn btn-icon btn-success">
-            <i class="entypo-plus"></i>
-            أضف كتابًا
-        </button>
-        <a href="{% url 'bulb:student_report' %}#giving" class="btn btn-icon give btn-warning">
-            <i class="fa fa-star"></i>
-            رصيد الاقتناء: {{ user.book_points.count_total_giving }}
-        </a>
-        <a href="{% url 'bulb:student_report' %}#lending" class="btn btn-icon lend btn-warning ">
-            <i class="fa fa-retweet"></i>
-            رصيد الاستعارة: {{ user.book_points.count_total_lending }}
-        </a>
-    </div>
-</div>
+<button style="margin-bottom: 5px;" id="add-book" class="btn btn-block btn-icon btn-success">
+    <i class="entypo-plus"></i>
+    أضف كتابًا
+</button>
+<button style="margin-bottom: 5px;" id="add-needed-book" class="btn btn-block btn-icon btn-success needed">
+    <i class="entypo-help"></i>
+    اطلب كتابًا
+</button>
+<a style="margin-bottom: 5px;" href="{% url 'bulb:student_report' %}#giving" class="btn btn-block btn-icon give btn-warning">
+    <i class="entypo-suitcase"></i>
+    رصيد الاقتناء: {{ user.book_points.count_total_giving }}
+</a>
+<a style="margin-bottom: 5px;" href="{% url 'bulb:student_report' %}#lending" class="btn btn-block btn-icon lend btn-warning ">
+    <i class="entypo-hourglass"></i>
+    رصيد الاستعارة: {{ user.book_points.count_total_lending }}
+</a>

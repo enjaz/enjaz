@@ -1,7 +1,7 @@
 {% load bulb_tags %}
 <div class="col-sm-4">
     {% if group.gender == 'M' or group.gender == 'F' %}<div class="group-gender">{% if group.gender == 'M' %}للطلاب{% elif group.gender == 'F' %}للطالبات{% endif %}</div>{% endif %}
-    <div class="group-image" style="background-image: url('{{ group.image.url }}');"></div>
-    <div class="group-overlay"></div>
-    <a class="group-link" href="{% url 'bulb:show_group' group.pk %}"><div class="group-name"><span>{{ group.name }}</span></div></a>
+    <div class="group-image" style="background-image: linear-gradient( rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0.3) ), url('{{ group.image.url }}');">
+    </div>
+<a class="group-link" href="{% url 'bulb:show_group' group.pk %}"><div class="group-name"><span>{% if group.is_private %}<i class="fa fa-lock" aria-hidden="true"></i>{% endif %} {{ group.name }}</span></div></a>
 </div>

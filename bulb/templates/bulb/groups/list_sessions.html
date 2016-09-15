@@ -1,0 +1,62 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}{% load bulb_tags %}
+{% block title %}جلسات النقاش والقراءة{% endblock %}
+{% block content %}
+    <div class="row" >
+        <div class="col-md-9">
+            <h1>جلسات النقاش والقراءة</h1>
+        </div>
+        <div class="col-md-offset-1 col-md-2">
+            {% include "bulb/groups/components/critical_buttons.html" %}
+        </div>
+    </div>
+    <div class="panel panel-success panel-shadow" data-collapsed="0">
+        <div class="panel-body">
+            <div id="free-sessions">
+                {% if sessions.exists %}
+                <table class="datatable display dt-responsive">
+                    <thead>
+                        <th>عنوان الجلسة</th>
+                        <th>مجموعة القراءة</th>
+                        <th class="not-mobile">مقدّمـ/ـة الدعوة</th>
+                        <th>التاريخ</th>
+                        <th class="not-mobile">عدد التأكيدات</th>
+                    </thead>
+                    <tbody>
+                        {% for session in sessions %}
+                        <tr>
+                            <td>{% if session.group %}<a href="{% url 'bulb:show_group' session.group.pk %}#{{ session.pk }}">{% else %}<a href="{% url 'bulb:show_session' session.pk %}">{% endif %}{{ session.title }}</a></td>
+                            <td>{% if session.group %}<a href="{% url 'bulb:show_group' session.group.pk %}">{{ session.group.title }}{% else %}جلسة حرّة{% endif %}</a></td>
+                            <td>{% reader_profile_link session.submitter %}</td>
+                            <td data-order="{{ session.date|date:'U' }}">{{ session.date|date:"l j F Y" }}</td>
+                            <td>{{ session.confirmed_attendees.count }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>لا توجد جلسات.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<script type="text/javascript">
+    $(function(){
+        $('.datatable').DataTable({
+            bFilter: false,
+            order: [[ 3, "desc" ]],
+            language: {% include 'js/dataTables-arabic.json' %}
+        });
+    });
+</script>
+{% include "bulb/groups/add_group_asset.html" %}
+{% include "bulb/groups/add_session_asset.html" %}
+{% include "bulb/groups/components/membership_modals.html" %}
+{% endblock %}

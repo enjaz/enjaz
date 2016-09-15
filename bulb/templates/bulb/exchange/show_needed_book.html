@@ -1,0 +1,108 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}{% load bulb_tags %}{% load tagging_tags %}
+{% block title %}كتاب مطلوب: {{ needed_book.title }}{% endblock %}
+{% block navbar %}
+    {% include "bulb/exchange/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+{% tags_for_object needed_book as needed_book_tags %}
+
+<div class="row">
+    <div class="col-sm-4">
+        <div style="text-align: center; border-left: solid 1px #eee;">
+            <div class="book-image" style="background-image:url('{{ needed_book.cover.url }}');"></div>
+            تأليف: {{ needed_book.authors }}
+        </div>
+    </div>
+    <div class="col-sm-8">
+        {% if needed_book.existing_book %}
+        <p class="alert alert-success"><i class="fa fa-exclamation-triangle"></i> تمّت تلبية هذا الطلب ب<a href="{% url 'bulb:show_book' needed_book.exisiting_book.pk %}">كتاب من {{ needed_book.exisiting_book.submitter.common_profile.get_ar_full_name }}</a></p>
+        {% endif %}
+       <h2 dir="auto">كتاب مطلوب: {{ needed_book.title }}</h2>
+        <p dir="auto" class="book-description">
+            {{ needed_book.description|linebreaksbr }}
+        </p>
+        <ul class="list-unstyled" style="padding-right: 0;">
+            <li><span style="color: black;">طلب من</span>: {% reader_profile_link needed_book.requester %}</li>
+            <li><span style="color: black;">تاريخ الطلب</span>: {{ needed_book.submission_date|date:"j F Y" }}</li>
+            <li><span style="color: black;">الوسوم</span>:  {% for tag in needed_book_tags %}<a href="{% url 'bulb:show_needed_tag' tag.name %}">{{ tag.name }}</a> {% endfor %}</li>
+        </ul>
+    
+        <span style="margin-bottom: 10px; float: left">
+            {% if user|can_edit_needed_book:needed_book %}
+            <button data-url="{% url 'bulb:edit_needed_book' needed_book.pk %}" class="edit-needed-book btn btn-xs btn-icon btn-gold">
+                <i class="entypo-pencil"></i>
+                عدل
+            </button>
+            <button data-confirm-url="{% url 'bulb:confirm_needed_book_deletion' needed_book.pk %}" data-deletion-url="{% url 'bulb:delete_needed_book' needed_book.pk %}" data-pk="{{ needed_book.pk }}" class="confirm-delete-needed-book btn btn-xs btn-icon btn-danger">
+                <i class="entypo-block"></i>
+                احذف
+            </button>
+            {% endif %}
+        </span>
+    </div>
+</div>
+<div style="border-top: solid 1px #eee; margin-top: 5px;" class="row">
+{% if sample_category_books.exists %}
+    <div class="col-sm-6">
+        <h2>كتب أخرى {{ needed_book.category.name }}</h2>
+        <div class="row">
+        {% for category_book in sample_category_books %}
+        <div class="col-md-4 col-sm-6">
+            <div class="text-center">
+                <div class="book-contribution">{% if category_book.contribution == 'L' %}للاستعارة{% elif category_book.contribution == 'G' %}للاقتناء{% endif %}</div>
+                <a class="book-image" style="background-image:url('{{ category_book.cover.url }}');" href="{% url 'bulb:show_book' category_book.pk %}"></a>
+                {{ category_book.title }}
+            </div>
+        </div>
+        {% endfor %}
+        </div><!--/row-->
+    </div><!--/col-sm-6-->
+{% endif %}
+</div>
+{% endblock %}
+
+
+{% block customscript %}
+<style>
+p{
+    font-size: 17px;
+}
+dt{
+    color: black;
+    font-weight: 400;
+}
+</style>
+<script type="text/javascript">
+    $(function(){
+        {% include "bulb/exchange/components/initialize_needed_book_buttons.js" %}
+        initialize_needed_book_buttons();
+         
+    $(".edit-needed-book").click(function () {
+        // show the edit book modal {# you can find it in bulb/exchange/home.html #}
+        $("#edit-book-modal").modal('show');
+        var url = $(this).data('url'); 
+
+        $("#edit-book-modal .modal-title").html("عدّل كتاب");
+        $("#edit-book-modal .modal-body").load(url);
+
+        var $submitButton = $("#edit-book-modal button.submit-button");
+        // Unbind any handlers previously attached to the submit button
+        // This is necessary to avoid multiple submissions of the form
+        $submitButton.off('click');
+        $submitButton.click(function () {
+            $("form#edit-book-form").submit();
+        });
+    });
+    $("button.confirm-delete-needed-book").click(function(){
+        var confirm_url = $(this).data('confirm-url');
+        var deletion_url = $(this).data('deletion-url');
+        $('#confirm-delete-book-modal .modal-body').load(confirm_url);
+        $("#delete-book").data('deletion-url', deletion_url); 
+        $("#confirm-delete-book-modal").modal('show');
+    });
+    });
+</script>
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+{% include "bulb/exchange/components/edit_needed_book_asset.html" %}
+{% include "bulb/exchange/delete_modal.html" %}
+{% endblock %}

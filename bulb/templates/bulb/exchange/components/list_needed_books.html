@@ -1,11 +1,11 @@
-{% for book in books %}
+{% for needed_book in needed_books %}
     {% autoescape off %}{% cycle '<div class="row">' '' %}{% endautoescape %}
-    {% include "bulb/exchange/components/book_preview.html" %}
+    {% include "bulb/exchange/components/preview_needed_book.html" %}
     {% autoescape off %}
     {% cycle '' '</div>' %}
 {% if not forloop.last %}
     <hr {% cycle 'class="visible-xs"' '' %}>
-{% elif not forloop.counter|divisibleby:2 %}
+{% elif not forloop.counter|divisibleby:3 %}
     </div>
 {% endif %}
     {% endautoescape %}

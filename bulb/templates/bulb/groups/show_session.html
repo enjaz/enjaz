@@ -1,0 +1,147 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}{% load bulb_tags %}
+{% block title %}{{ session.title }}{% endblock %}
+{% block content %}
+        {% if user|can_edit_session:session %}
+        <p class="alert alert-warning">لا يمكنك عقد جلسات قبل أن يبلغ عدد المؤكدين والمؤكدات أربعة.  هيا، أعلن! بإمكانك حثّ أربعة على الحضور!</p>
+        {% endif %}
+       <h1 dir="auto" >{{ session.title }}</h1>
+        <p dir="auto" class="group-description">
+            {{ session.agenda|linebreaksbr }}
+        </p>
+        <table class="table table-hover">
+            <tr>
+                <th>دعوة</th>
+                <td>{% reader_profile_link session.submitter %}</td>
+            </tr>
+            <tr>
+                <th>تاريخ الدعوة</th>
+                <td>{{ session.submission_date|date:"j F Y" }}</td>
+            </tr>
+            <tr>
+                <th>الوقت والمكان</th>
+                <td>
+                    <div>
+                        <i class="entypo-calendar"></i>
+                        {{ session.date }}
+                    </div>
+                    <div>
+                        <i class="entypo-clock"></i>
+                        {{ session.start_time }}
+                        -
+                        {{ session.end_time }}
+                    </div>
+                    <div>
+                        <i class="entypo-location"></i>
+                        {{ session.location }}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>المؤكدون والمؤكدات</th>
+                <td>
+                    {% if session.confirmed_attendees.exists %}
+                        <ul>
+                        {% for attendee in session.confirmed_attendees.all %}
+                            <li>{% reader_profile_link attendee %}</li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                    لا يوجد حضور مؤكد حتى الآن.
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+        {% if user|can_edit_session:session %}
+        <div style="float: left">
+            <button data-url="{% url 'bulb:edit_session' session.pk %}" class="edit-session btn btn-block btn-xs btn-icon btn-gold">
+                <i class="entypo-pencil"></i>
+                عدل الجلسة
+            </button>
+            <button data-url="{% url 'bulb:delete_session' session.pk %}" class="confirm-delete-session btn btn-block  btn-xs btn-icon btn-danger">
+                <i class="entypo-block"></i>
+                احذف الجلسة
+            </button>
+            <button data-url="{% url 'bulb:add_report' group.pk session.pk %}" class="add-report btn btn-block  btn-xs btn-icon btn-success">
+                <i class="entypo-flag"></i>
+                    ارفع محضرًا
+            </button>
+        </div>
+        {% endif %}
+        {% if user|can_attend_session:session %}
+        <button data-action="attend" data-pk="{{ session.pk }}" class="confirm-attend-session btn btn-xs btn-icon btn-success">
+            <i class="entypo-flag"></i>
+            أكّد الحضور
+        </button>
+        {% elif user in session.confirmed_session.all %}
+        <button data-action="cancel" data-pk="{{ session.pk }}" class="confirm-cancel-session btn btn-xs btn-icon btn-success">
+            <i class="entypo-flag"></i>
+            ألغِ تأكيد الحضور
+        </button>
+
+        {% endif %}
+
+{% endblock %}
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<style>
+p{
+    font-size: 17px;
+}
+</style>
+<script type="text/javascript">   
+$(function () {
+    {% include "bulb/groups/components/initialize_session_buttons.js" %} 
+    initialize_session_buttons();
+
+    $('#edit-session-modal, #edit-report-modal').modal({
+      keyboard: false,
+      backdrop: 'static',
+      show    : false,
+    });
+    $(".add-report").click(function () {
+        var url = $(this).data('url');
+
+        $("#edit-report-modal").modal('show');
+
+        $("#edit-report-modal .modal-title").html("أضف تقريرا");
+        $("#edit-report-modal .modal-body").load(url);
+
+        var $submitButton = $("#edit-report-modal button.submit-button");
+        // Unbind any handlers previously attached to the submit button
+        // This is necessary to avoid multiple submissions of the form
+        $submitButton.off('click');
+        $submitButton.click(function () {
+            $("form#edit-report-form").submit();
+        });
+    });
+    $(".edit-session").click(function () {
+        var url = $(this).data('url');
+
+        $("#edit-session-modal").modal('show');
+
+        $("#edit-session-modal .modal-title").html("عدل الجلسة");
+        $("#edit-session-modal .modal-body").load(url);
+
+        var $submitButton = $("#edit-session-modal button.submit-button");
+        // Unbind any handlers previously attached to the submit button
+        // This is necessary to avoid multiple submissions of the form
+        $submitButton.off('click');
+        $submitButton.click(function () {
+            $("form#edit-session-form").submit();
+        });
+    });
+});
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+{% include "bulb/groups/components/attendance_modals.html" %}
+{% with modal_id='edit-group-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}
+{% with modal_id='edit-session-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}
+{% with modal_id='edit-report-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}
+{% include "bulb/groups/delete_modal.html" %}
+{% endblock %}

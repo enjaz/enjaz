@@ -12,38 +12,72 @@ from dal import autocomplete
 from post_office import mail
 
 
-from accounts.utils import get_user_gender
 from core.utils import get_search_queryset
-from core.models import StudentClubYear
+from core.models import StudentClubYear, Tweet
 from core import decorators
-from bulb.models import Category, Book, Request, Point, Group, Membership, Session, Report, ReaderProfile, Recruitment
-from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, RequestForm, GroupForm, SessionForm, ReportForm, ReaderProfileForm, RecruitmentForm
+from bulb.models import Category, Book, NeededBook, Request, Point, Group, Membership, Session, Report, ReaderProfile, Recruitment
+from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, NeededBookForm, RequestForm, GroupForm, FreeSessionForm, SessionForm, ReportForm, ReaderProfileForm, RecruitmentForm
 from bulb import utils
 
-@login_required
 def index(request):
-    groups = Group.objects.current_year().undeleted().order_by("?")[:6]
-    sessions = Session.objects.current_year().undeleted()\
+    groups = Group.objects.current_year().for_user_city(request.user).unarchived().undeleted().order_by("?")[:6]
+    sessions = Session.objects.current_year().for_user_city(request.user).undeleted()\
                               .filter(date__gte=timezone.now().date())\
+                              .public()\
                               .order_by("date")[:5]
     group_count = Group.objects.current_year().undeleted().count()
+    session_count = Session.objects.current_year().undeleted().count()
     group_user_count = (User.objects.filter(reading_group_memberships__isnull=False) | \
                         User.objects.filter(reading_group_coordination__isnull=False)).distinct().count()
-    book_sample = Book.objects.current_year().available().order_by("?")[:6]
-    latest_books = Book.objects.current_year().undeleted().order_by("-submission_date")[:6]
+    book_sample = Book.objects.current_year().for_user_city(request.user).available().order_by("?")[:6]
+    latest_books = Book.objects.current_year().for_user_city(request.user).undeleted().order_by("-submission_date")[:6]
+    latest_needed_books = NeededBook.objects.current_year().for_user_city(request.user).undeleted().order_by("-submission_date")[:6]
     book_count = Book.objects.current_year().undeleted().count()
     book_request_count = Request.objects.current_year().count()
     reader_profiles = ReaderProfile.objects.order_by("?")[:10]
     reader_profile_count = ReaderProfile.objects.count()
     context = {'groups': groups, 'group_count': group_count,
-               'group_user_count': group_user_count,
-               'sessions': sessions,
-               'book_sample': book_sample, 'latest_books': latest_books,
-               'book_count': book_count,
-               'book_request_count': book_request_count,
-               'reader_profiles': reader_profiles,
+               'session_count': session_count, 'group_user_count':
+               group_user_count, 'sessions': sessions, 'book_sample':
+               book_sample, 'latest_books': latest_books,
+               'latest_needed_books': latest_needed_books,
+               'book_count': book_count, 'book_request_count':
+               book_request_count, 'reader_profiles': reader_profiles,
                'reader_profile_count': reader_profile_count}
     return render(request, "bulb/index.html", context)
+
+@login_required
+def search_books(request):
+    context = {}
+    if request.GET.get('q'):        
+        existing_books = Book.objects.current_year().undeleted().available()
+        fields = ['title', 'authors', 'description',
+                  'submitter__common_profile__ar_first_name',
+                  'submitter__common_profile__ar_middle_name',
+                  'submitter__common_profile__ar_last_name',
+                  'submitter__common_profile__en_first_name',
+                  'submitter__common_profile__en_middle_name',
+                  'submitter__common_profile__en_last_name']
+        results = get_search_queryset(existing_books, fields, request.GET['q'])
+        context['results'] = results
+    return render(request, "bulb/exchange/search.html", context)
+
+@login_required
+def search_readers(request):
+    context = {}
+    if request.GET.get('q'):        
+        existing_readers = ReaderProfile.objects.all()
+        fields = ['areas_of_interests', 'favorite_books',
+                  'favorite_writers', 'twitter',
+                  'user__common_profile__ar_first_name',
+                  'user__common_profile__ar_middle_name',
+                  'user__common_profile__ar_last_name',
+                  'user__common_profile__en_first_name',
+                  'user__common_profile__en_middle_name',
+                  'user__common_profile__en_last_name']
+        results = get_search_queryset(existing_readers, fields, request.GET['q'])
+        context['results'] = results
+    return render(request, "bulb/readers/search.html", context)
 
 @login_required
 def list_book_categories(request):
@@ -51,9 +85,20 @@ def list_book_categories(request):
                                                     book__is_available=True,
                                                     book__is_deleted=False)
     # If we have books, show the All category.
-    if Book.objects.current_year().available().exists():
+    if Book.objects.current_year().undeleted().available().exists():
         categories |= Category.objects.filter(code_name="all").distinct()
     context = {'categories': categories}
+    return render(request, "bulb/exchange/list_categories.html",
+                  context)
+
+@login_required
+def list_needed_book_categories(request):
+    categories = Category.objects.distinct().filter(neededbook__isnull=False,
+                                                    neededbook__is_deleted=False)
+    # If we have books, show the All category.
+    if NeededBook.objects.current_year().undeleted().still_needed().exists():
+        categories |= Category.objects.filter(code_name="all").distinct()
+    context = {'categories': categories, 'needed': True}
     return render(request, "bulb/exchange/list_categories.html",
                   context)
 
@@ -64,9 +109,9 @@ def books_by_date(request):
                   {'books': books})
 
 @login_required
-def show_category(request, code_name):
+def show_category(request, code_name, needed=False):
     category = get_object_or_404(Category, code_name=code_name)
-    context = {'category': category}
+    context = {'category': category, 'needed': needed}
     return render(request, "bulb/exchange/show_category.html", context)
 
 @decorators.ajax_only
@@ -75,28 +120,51 @@ def show_category(request, code_name):
 def list_book_previews(request, source, name):
     if source == "category":
         category = get_object_or_404(Category, code_name=name)
-        books = Book.objects.current_year().available()
+        books = Book.objects.current_year().undeleted().available()
         if category.code_name != 'all':
             books = books.filter(category=category)
     elif source == "user":
         condition = request.POST.get('condition')
         user = get_object_or_404(User, username=name)
         if condition == 'available':
-            books = Book.objects.current_year().available().of_user(user)
+            books = Book.objects.current_year().undeleted().available().of_user(user)
         elif condition == 'borrowed':
             book_pks = Request.objects.filter(book__contribution='L', owner_status='D')\
                                       .values_list('book__pk', flat=True)
-            books = Book.objects.current_year().filter(pk__in=book_pks, is_deleted=False).of_user(user).distinct()
+            books = Book.objects.current_year().undeleted().filter(pk__in=book_pks, is_deleted=False).of_user(user).distinct()
         elif condition == 'done':
             book_pks = (Request.objects.filter(book__contribution="G",
                                           owner_status="D") | \
                         Request.objects.filter(book__contribution="L",
                                           owner_status="R"))\
                                        .values_list('book__pk', flat=True)
-            books = Book.objects.current_year().filter(pk__in=book_pks, is_deleted=False).of_user(user).distinct()
+            books = Book.objects.current_year().undeleted().filter(pk__in=book_pks, is_deleted=False).of_user(user).distinct()
 
-    return render(request, "bulb/exchange/list_books.html",
+    return render(request, "bulb/exchange/components/list_books.html",
                   {'books': books})
+
+@decorators.ajax_only
+@csrf.csrf_exempt
+@login_required
+def list_needed_book_previews(request, source, name):
+    if source == "category":
+        category = get_object_or_404(Category, code_name=name)
+        needed_books = NeededBook.objects.current_year().undeleted().still_needed()
+        if category.code_name != 'all':
+            needed_books = needed_books.filter(category=category)
+    elif source == "user":
+        condition = request.POST.get('condition')
+        user = get_object_or_404(User, username=name)
+        if condition == 'still_needed':
+            needed_books = NeededBook.objects.current_year().undeleted().still_needed().of_user(user)
+        elif condition == 'fulfilled':
+            needed_books = NeededBook.objects.current_year()\
+                                             .undeleted()\
+                                             .filter(existing_book__isnull=False)\
+                                             .of_user(user)
+
+    return render(request, "bulb/exchange/components/list_needed_books.html",
+                  {'needed_books': needed_books})
 
 @decorators.ajax_only
 @decorators.get_only
@@ -161,10 +229,13 @@ def confirm_book_order(request, pk):
             elif book_request.delivery == 'D':
                 owner_template = "book_requested_directly_to_owner"
 
-            email_context['full_url'] = my_books_full_url
-            mail.send([book.submitter.email],
-                      template=owner_template,
-                      context=email_context)
+            # If the book is publicly owned, don't send an emial
+            # notification
+            if not book.is_publicly_owned:
+                email_context['full_url'] = my_books_full_url
+                mail.send([book.submitter.email],
+                          template=owner_template,
+                          context=email_context)
             requests_by_me_url = reverse('bulb:requests_by_me')
             full_url = request.build_absolute_uri(requests_by_me_url)
             return {"message": "success", "list_url": full_url}            
@@ -172,14 +243,30 @@ def confirm_book_order(request, pk):
     elif request.method == 'GET':
         form = RequestForm(instance=instance)
 
-    return render(request, "bulb/exchange/confirm_book_order.html",
+    return render(request, "bulb/exchange/components/confirm_book_order.html",
                   {'book': book, 'form': form})
 
 @login_required
 def show_book(request, pk):
     book = get_object_or_404(Book, pk=pk, is_deleted=False)
+    book_pool = Book.objects.exclude(pk=book.pk).current_year().available().order_by("?")
+    sample_user_books = book_pool.filter(submitter=book.submitter)[:3]
+    sample_category_books = book_pool.exclude(pk__in=[b.pk for b in sample_user_books])\
+                                     .filter(category=book.category)[:3]
     return render(request, "bulb/exchange/show_book.html",
-                  {'book': book})
+                  {'book': book, 'sample_user_books': sample_user_books,
+                   'sample_category_books': sample_category_books})
+
+@login_required
+def show_needed_book(request, pk):
+    needed_book = get_object_or_404(NeededBook, pk=pk, is_deleted=False)
+    sample_category_books = Book.objects.current_year().available()\
+                                        .order_by("?")\
+                                        .filter(category=needed_book.category)[:3]
+    return render(request, "bulb/exchange/show_needed_book.html",
+                  {'needed_book': needed_book,
+                   'sample_category_books': sample_category_books})
+
 
 @decorators.ajax_only
 @login_required
@@ -189,8 +276,19 @@ def confirm_book_deletion(request, pk):
     if not utils.can_edit_book(request.user, book):
         raise PermissionDenied
 
-    return render(request, "bulb/exchange/confirm_book_deletion.html",
+    return render(request, "bulb/exchange/components/confirm_book_deletion.html",
                   {'book': book})
+
+@decorators.ajax_only
+@login_required
+@decorators.get_only
+def confirm_needed_book_deletion(request, pk):
+    needed_book = get_object_or_404(NeededBook, pk=pk, is_deleted=False)
+    if not utils.can_edit_needed_book(request.user, needed_book):
+        raise PermissionDenied
+
+    return render(request, "bulb/exchange/components/confirm_needed_book_deletion.html",
+                  {'needed_book': needed_book})
 
 @decorators.ajax_only
 @decorators.post_only
@@ -215,10 +313,11 @@ def delete_book(request, pk):
         email_context = {'book': book,
                          'book_request': pending_request,
                          'bulb_coordinator': bulb_coordinator}
-        mail.send([book.submitter.email],
-                  cc=cc_coordinator,
-                  template="book_deleted_to_owner",
-                  context=email_context)
+        if not book.is_publicly_owned:
+            mail.send([book.submitter.email],
+                      cc=cc_coordinator,
+                      template="book_deleted_to_owner",
+                      context=email_context)
         if pending_request:
             pending_request.cancel_related_user_point(pending_request.requester)
             mail.send([pending_request.requester.email],
@@ -231,6 +330,22 @@ def delete_book(request, pk):
     show_category_url = reverse('bulb:show_category',
                                 args=(book.category.code_name,))
     full_url = request.build_absolute_uri(show_category_url)
+    return {"message": "success", "list_url": full_url}
+
+@decorators.ajax_only
+@decorators.post_only
+@login_required
+@csrf.csrf_exempt
+def delete_needed_book(request, pk):
+    needed_book = get_object_or_404(NeededBook, pk=pk,
+                                    is_deleted=False)
+    if not utils.can_edit_needed_book(request.user, needed_book):
+        raise Exception(u"لا تستطيع حذف المجموعة")    
+
+    needed_book.is_deleted = True
+    needed_book.save()
+    list_url = reverse('bulb:show_needed_category', args=(needed_book.category.code_name,))
+    full_url = request.build_absolute_uri(list_url)
     return {"message": "success", "list_url": full_url}
 
 @decorators.ajax_only
@@ -249,17 +364,39 @@ def add_book(request, contribution):
         instance = Book(submitter=request.user,
                         year=current_year,
                         contribution=contribution)
-        form = BookForm(request.POST, request.FILES, instance=instance)
+        form = BookForm(request.POST, request.FILES, instance=instance, user=request.user)
         if form.is_valid():
             book = form.save()
             show_book_url = reverse('bulb:show_book', args=(book.pk,))
             full_url = request.build_absolute_uri(show_book_url)
+            if not book.is_publicly_owned:
+                utils.create_tweet(request.user, 'add_book', (book.title, full_url))
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
-        form = BookForm()
+        form = BookForm(user=request.user)
 
     context = {'form': form}
     return render(request, 'bulb/exchange/edit_book_form.html', context)
+@decorators.ajax_only
+@login_required
+def add_needed_book(request):
+    if request.method == 'POST':
+        current_year = StudentClubYear.objects.get_current()
+        instance = NeededBook(requester=request.user,
+                              year=current_year)
+        form = NeededBookForm(request.POST, request.FILES, instance=instance)
+        if form.is_valid():
+            needed_book = form.save()
+            show_url = reverse('bulb:show_needed_book', args=(needed_book.pk,))
+            full_url = request.build_absolute_uri(show_url)
+            utils.create_tweet(request.user, 'add_needed_book', (needed_book.title, full_url))
+            return {"message": "success", "show_url": full_url}
+    elif request.method == 'GET':
+        form = NeededBookForm()
+
+    context = {'form': form}
+    return render(request, 'bulb/exchange/edit_needed_book_form.html', context)
+
 
 @decorators.ajax_only
 @login_required
@@ -282,6 +419,29 @@ def edit_book(request, pk):
 
     context['form'] = form
     return render(request, 'bulb/exchange/edit_book_form.html', context)
+
+@decorators.ajax_only
+@login_required
+def edit_needed_book(request, pk):
+    needed_book = get_object_or_404(NeededBook, pk=pk)
+
+    if not utils.can_edit_needed_book(request.user, needed_book):
+        raise Exception(u"لا تستطيع تعديل الكتاب")
+
+    context = {'needed_book': needed_book}
+    if request.method == 'POST':
+        form = NeededBookForm(request.POST, request.FILES, instance=needed_book)
+        if form.is_valid():
+            needed_book = form.save()
+            show_book_url = reverse('bulb:show_needed_book', args=(needed_book.pk,))
+            full_url = request.build_absolute_uri(show_book_url)
+            return {"message": "success", "show_url": full_url}
+    elif request.method == 'GET':
+        form = NeededBookForm(instance=needed_book)
+
+    context['form'] = form
+    return render(request, 'bulb/exchange/edit_needed_book_form.html', context)
+
 
 @login_required
 def requests_by_me(request):
@@ -617,10 +777,11 @@ def control_request(request):
                           cc=cc_coordinator,
                           template="indirect_book_request_failed_to_requester",
                           context=email_context)
-                mail.send([book.submitter.email],
-                          cc=cc_coordinator,
-                          template="indirect_book_request_failed_to_owner",
-                          context=email_context)
+                if not book.is_publicly_owned:
+                    mail.send([book.submitter.email],
+                              cc=cc_coordinator,
+                              template="indirect_book_request_failed_to_owner",
+                              context=email_context)
             elif book_request.delivery == 'D':
                 # Just to make sure
                 book.is_available = False
@@ -715,10 +876,11 @@ def control_request(request):
                           cc=cc_coordinator,
                           template="indirect_book_request_failed_to_requester",
                           context=email_context)
-                mail.send([book.submitter.email],
-                          cc=cc_coordinator,
-                          template="indirect_book_request_failed_to_owner",
-                          context=email_context)
+                if not book.is_publicly_owned:
+                    mail.send([book.submitter.email],
+                              cc=cc_coordinator,
+                              template="indirect_book_request_failed_to_owner",
+                              context=email_context)
             elif book_request.delivery == 'D':
                 # Just to make sure
                 book.is_available = False
@@ -747,9 +909,10 @@ def control_request(request):
             # Return the point to the book requester
             book_request.cancel_related_user_point(request.user)
 
-            mail.send([book.submitter.email],
-                      template="book_request_canceled_to_owner",
-                      context=email_context)
+            if not book.is_publicly_owned:
+                mail.send([book.submitter.email],
+                          template="book_request_canceled_to_owner",
+                          context=email_context)
 
             # Also, email Bulb coordinator.
             if book_request.delivery == 'I' and bulb_coordinator:
@@ -804,16 +967,28 @@ def convert_balance(request):
 # Reading Groups
 
 @login_required
-def list_groups(request):
-    return render(request, 'bulb/groups/list_groups.html')
+def list_groups(request, archived=False):
+    context = {'archived': archived}
+    return render(request, 'bulb/groups/list_groups.html', context)
+
+@login_required
+def list_sessions(request):
+    sessions = Session.objects.current_year().undeleted().public()
+    context = {'sessions': sessions}
+    return render(request, 'bulb/groups/list_sessions.html', context)
 
 @decorators.ajax_only
 @csrf.csrf_exempt
 @login_required
-def list_group_previews(request):
-    groups = Group.objects.current_year().undeleted().for_user_city(request.user).order_by('?')
+def list_group_previews(request, archived=False):
+    if archived:
+        groups = Group.objects.current_year().undeleted().archived().for_user_city(request.user).order_by('?')
+    else:
+        groups = Group.objects.current_year().undeleted().unarchived().for_user_city(request.user).order_by('?')
+
+    context = {'groups': groups, 'archived': archived}
     return render(request, "bulb/groups/list_group_previews.html",
-                  {'groups': groups})
+                  context)
 
 @decorators.ajax_only
 @login_required
@@ -827,6 +1002,7 @@ def add_group(request):
             group = form.save()
             show_group_url = reverse('bulb:show_group', args=(group.pk,))
             full_url = request.build_absolute_uri(show_group_url)
+            utils.create_tweet(request.user, 'add_group', (group.name, full_url))
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
         form = GroupForm(user=request.user)
@@ -874,8 +1050,8 @@ def delete_group(request, group_pk):
 
     group.is_deleted = True
     group.save()
-    list_groups_url = reverse('bulb:list_groups')
-    full_url = request.build_absolute_uri(list_groups_url)
+    list_url = reverse('bulb:list_groups')
+    full_url = request.build_absolute_uri(list_url)
     return {"message": "success", "list_url": full_url}
 
 @login_required
@@ -890,18 +1066,19 @@ def list_memberships(request, group_pk):
 
 @decorators.ajax_only
 @login_required
-def add_session(request, group_pk):
+def add_group_session(request, group_pk):
     group = get_object_or_404(Group, pk=group_pk, is_deleted=False)
     if not utils.can_edit_group(request.user, group):
         raise Exception(u"لا تستطيع تعديل المجموعة")    
 
     if request.method == 'POST':
-        instance = Session(group=group)
+        instance = Session(group=group, submitter=request.user)
         form = SessionForm(request.POST, instance=instance)
         if form.is_valid():
             session = form.save()
             show_group_url = reverse('bulb:show_group', args=(group.pk,))
             full_url = request.build_absolute_uri(show_group_url)
+            utils.create_tweet(request.user, 'add_session', (session.title, full_url))
             email_context = {'session': session, 'full_url': full_url}
             if session.date >= timezone.now().date():
                 # If the coordinator is not already a group member, email
@@ -923,7 +1100,7 @@ def add_session(request, group_pk):
 
                 # Notify Bulb coordinator and their deputies.
                 email_context['member'] = bulb_coordinator
-                cc = utils.get_session_submitted_cc(group)
+                cc = utils.get_session_submitted_cc(session)
                 mail.send([bulb_coordinator.email],
                           cc=cc,
                           template="reading_group_session_just_submitted",
@@ -937,26 +1114,64 @@ def add_session(request, group_pk):
 
 @decorators.ajax_only
 @login_required
-def edit_session(request, group_pk, session_pk):
-    group = get_object_or_404(Group, pk=group_pk, is_deleted=False)
+def add_free_session(request):
+    if request.method == 'POST':
+        current_year = StudentClubYear.objects.get_current()
+        instance = Session(submitter=request.user, year=current_year)
+        form = FreeSessionForm(request.POST, instance=instance, user=request.user)
+        if form.is_valid():
+            session = form.save()
+            show_session_url = reverse('bulb:show_session', args=(session.pk,))
+            full_url = request.build_absolute_uri(show_session_url)
+            utils.create_tweet(request.user, 'add_session', (session.title, full_url))
+            email_context = {'session': session, 'full_url': full_url}
+            if session.date >= timezone.now().date():
+                bulb_coordinator = utils.get_bulb_club_for_user(session.submitter).coordinator
+                email_context['member'] = bulb_coordinator
+                cc = utils.get_session_submitted_cc(session)
+                mail.send([bulb_coordinator.email],
+                          cc=cc,
+                          template="free_session_just_submitted",
+                          context=email_context)
+            return {"message": "success", "show_url": full_url}
+    elif request.method == 'GET':
+        form = FreeSessionForm(user=request.user)
+
+    context = {'form': form}
+    return render(request, 'bulb/groups/edit_session_form.html', context)
+
+@decorators.ajax_only
+@login_required
+def edit_session(request, session_pk, group_pk=None):
     session = get_object_or_404(Session, pk=session_pk,
-                                is_deleted=False, group__pk=group_pk)
-    if not utils.can_edit_group(request.user, session.group):
+                                is_deleted=False)
+    context = {'session': session}
+    if group_pk:
+        group = get_object_or_404(Group, pk=group_pk, is_deleted=False)
+        context['group'] = group
+
+    if not utils.can_edit_session(request.user, session):
         raise Exception(u"لا تستطيع تعديل المجموعة")
 
     response = {"message": "success"}
-    context = {'session': session, 'group': group}
 
     if request.method == 'POST':
-        form = SessionForm(request.POST, instance=session)
+        if group_pk:
+            form = SessionForm(request.POST, instance=session)
+            show_url = reverse('bulb:show_group', args=(group.pk,))
+        else:
+            form = FreeSessionForm(request.POST, instance=session, user=request.user)
+            show_url = reverse('bulb:show_session', args=(session.pk,))
         if form.is_valid():
-            session = form.save()
-            show_group_url = reverse('bulb:show_group', args=(group.pk,))
-            full_url = request.build_absolute_uri(show_group_url)
+            session = form.save()                
+            full_url = request.build_absolute_uri(show_url)
             response['show_url'] = full_url
             return response
     elif request.method == 'GET':
-        form = SessionForm(instance=session)
+        if group_pk:
+            form = SessionForm(instance=session)
+        else:
+            form = FreeSessionForm(instance=session, user=request.user)
 
     context['form'] = form
     return render(request, 'bulb/groups/edit_session_form.html', context)
@@ -965,20 +1180,27 @@ def edit_session(request, group_pk, session_pk):
 @decorators.post_only
 @login_required
 @csrf.csrf_exempt
-def delete_session(request, group_pk, session_pk):
+def delete_session(request, session_pk, group_pk=None):
     session = get_object_or_404(Session, pk=session_pk,
-                                is_deleted=False, group__pk=group_pk,
-                                group__is_deleted=False)
-    if not utils.can_edit_group(request.user, session.group):
+                                is_deleted=False)
+    if not utils.can_edit_session(request.user, session):
         raise Exception(u"لا تستطيع حذف المجموعة")    
 
     session.is_deleted = True
     session.save()
-
-    show_group_url = reverse('bulb:show_group', args=(session.group.pk,))
-    full_url = request.build_absolute_uri(show_group_url)
+    if session.group:
+        after_url = reverse('bulb:show_group', args=(session.group.pk,))
+    else:
+        after_url = reverse('bulb:list_sessions')
+    full_url = request.build_absolute_uri(after_url)
 
     return {"message": "success", "show_url": full_url}
+
+def show_session(request, session_pk):
+    session = get_object_or_404(Session, pk=session_pk,
+                                is_deleted=False, group=None)
+    return render(request, "bulb/groups/show_session.html",
+                  {'session': session})
 
 def show_report(request, group_pk, session_pk):
     report = get_object_or_404(Report, session__group__pk=group_pk,
@@ -988,12 +1210,10 @@ def show_report(request, group_pk, session_pk):
 
 @decorators.ajax_only
 @login_required
-def add_report(request, group_pk, session_pk):
-    session = get_object_or_404(Session, pk=session_pk,
-                                group__pk=group_pk,
-                                group__is_deleted=False)
+def add_report(request, session_pk, group_pk=None):
+    session = get_object_or_404(Session, pk=session_pk)
 
-    if not utils.can_edit_group(request.user, session.group):
+    if not utils.can_edit_session(request.user, session):
         raise Exception(u"لا تستطيع تعديل المجموعة")
 
     response = {"message": "success"}
@@ -1004,7 +1224,10 @@ def add_report(request, group_pk, session_pk):
         if form.is_valid():
             report = form.save()
             report.create_related_niqati_codes()
-            show_report_url = reverse('bulb:show_report', args=(session.group.pk, session.pk))
+            if group_pk:
+                show_report_url = reverse('bulb:show_report', args=(session.group.pk, session.pk))
+            else:
+                show_report_url = reverse('bulb:show_report', args=(session.pk,))
             full_url = request.build_absolute_uri(show_report_url)
             response['show_url'] = full_url
             return response
@@ -1016,21 +1239,21 @@ def add_report(request, group_pk, session_pk):
 
 @decorators.ajax_only
 @login_required
-def edit_report(request, group_pk, session_pk):
-    report = get_object_or_404(Report, session__pk=session_pk,
-                               session__group__pk=group_pk,
-                               session__group__is_deleted=False)
-    if not utils.can_edit_group(request.user, report.session.group):
+def edit_report(request, session_pk, group_pk=None):
+    report = get_object_or_404(Report, session__pk=session_pk)
+    if not utils.can_edit_session(request.user, report.session):
         raise Exception(u"لا تستطيع تعديل المجموعة")
 
     response = {"message": "success"}
     context = {'report': report}
     if request.method == 'POST':
-        form = ReportForm(request.POST, request.FILES, instance=report)
+        form = ReportForm(request.POST, instance=report)
         if form.is_valid():
             report = form.save()
-            show_report_url = reverse('bulb:show_report', args=(report.session.group.pk,
-                                                               report.session.pk))
+            if group_pk:
+                show_report_url = reverse('bulb:show_report', args=(report.session.group.pk, report.session.pk))
+            else:
+                show_report_url = reverse('bulb:show_report', args=(report.session.pk,))
             full_url = request.build_absolute_uri(show_report_url)
             response['show_url'] = full_url
             return response
@@ -1044,29 +1267,79 @@ def edit_report(request, group_pk, session_pk):
 @decorators.post_only
 @login_required
 @csrf.csrf_exempt
-def control_membership(request):
+def toggle_session_confirmation(request):
+    action = request.POST.get('action')
+    session_pk = request.POST.get('session_pk')
+    session = get_object_or_404(Session, pk=session_pk)
+    show_url = reverse('bulb:show_session', args=(session.pk,))
+    full_url = request.build_absolute_uri(show_url)
+
+    response = {"message": "success", 'show_url': full_url}
+    if action == 'attend':
+        # Make sure that the user can indeed be added to the group
+        if not utils.can_attend_session(request.user, session):
+            raise Exception(u"لا تستطيع حضور هذه الجلسة.")
+        session.confirmed_attendees.add(request.user)
+        # Notify session submitter
+        email_context = {'attendee': request.user,
+                         'session': session,
+                         'full_url': full_url}
+        mail.send([session.submitter.email],
+                   template="new_attendee_to_session_submitter",
+                   context=email_context)
+
+    elif action == 'cancel':
+        # Make sure that the user can indeed be added to the group
+        if not session.confirmed_attendees.filter(pk=request.user.pk).exists():
+            raise Exception("لا تستطيع مغادرة هذه المجموعة.")
+        session.confirmed_attendees.remove(request.user)
+    return response
+
+@decorators.ajax_only
+@decorators.post_only
+@login_required
+@csrf.csrf_exempt
+def control_group(request):
     action = request.POST.get('action')
     group_pk = request.POST.get('group_pk')
     group = get_object_or_404(Group, pk=group_pk)
     user_pk = request.POST.get('user_pk')
+    show_group_url = reverse('bulb:show_group', args=(group.pk,))
+    full_show_url = request.build_absolute_uri(show_group_url)
     if user_pk:
         user = get_object_or_404(User, pk=user_pk)
 
     response = {"message": "success"}
 
-    if action == 'deactivate':
+    if action in ['deactivate', 'activate', 'archive', 'unarchive']:
         if not utils.can_edit_group(request.user, group):
-            raise Exception("You cannot deactivate users.")
-        Membership.objects.filter(group=group, user=user).update(is_active=False)
-    elif action == 'activate':
-        if not utils.can_edit_group(request.user, group):
-            raise Exception("You cannot activate users.")
-        Membership.objects.filter(group=group, user=user).update(is_active=True)
+            raise Exception("You are not allowed to perform this action.")
+
+        if action == 'deactivate':
+            Membership.objects.filter(group=group, user=user).update(is_active=False)
+        elif action == 'activate':
+            Membership.objects.filter(group=group, user=user).update(is_active=True)
+        elif action == 'archive':
+            group.is_archived = True
+            group.save()
+            # Notify group coordinator if they were not the one who
+            # archived it.
+            if request.user != group.coordinator:
+                email_context = {'group': group,
+                                 'full_url': full_url}
+                mail.send([group.coordinator.email],
+                           template="group_archived_to_group_coordinator",
+                           context=email_context)
+        elif action == 'unarchive':
+            group.is_archived = False
+            group.save()
+
     elif action == 'join':
         # Make sure that the user can indeed be added to the group
         if not utils.can_join_group(request.user, group):
             raise Exception(u"لا تستطيع الانضمام لهذه المجموعة.")
-        Membership.objects.create(group=group, user=request.user)
+        Membership.objects.create(group=group, user=request.user,
+                                  is_active=not group.is_private)
 
         # Notify group coordinator
         list_memberships_url = reverse('bulb:list_memberships', args=(group.pk,))
@@ -1077,18 +1350,16 @@ def control_membership(request):
         mail.send([group.coordinator.email],
                    template="new_reading_group_member_to_group_coordinator",
                    context=email_context)
+        utils.create_tweet(request.user, 'join_group', (group.name, full_show_url))
 
-        show_group_url = reverse('bulb:show_group', args=(group.pk,))
-        full_show_url = request.build_absolute_uri(show_group_url)
-        response['show_url'] = full_show_url
     elif action == 'leave':
         # Make sure that the user can indeed be added to the group
         if not Membership.objects.filter(group=group, user=request.user).exists():
             raise Exception("لا تستطيع مغادرة هذه المجموعة.")
         Membership.objects.get(group=group, user=request.user).delete()
-        show_group_url = reverse('bulb:show_group', args=(group.pk,))
-        full_url = request.build_absolute_uri(show_group_url)
-        response['show_url'] = full_url
+
+
+    response['show_url'] = full_show_url
 
     return response
 
@@ -1129,6 +1400,7 @@ def add_reader_profile(request):
             reader_profile = form.save()
             show_reader_profile_url = reverse('bulb:show_reader_profile', args=(reader_profile.pk,))
             full_url = request.build_absolute_uri(show_reader_profile_url)
+            utils.create_tweet(request.user, 'add_reader', (full_url,))
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
         form = ReaderProfileForm()
@@ -1166,8 +1438,6 @@ def handle_recruitment(request):
         if form.is_valid():
             recruitment = form.save()
             return HttpResponseRedirect(reverse('bulb:recruitment_thanks'))
-        else:
-            print form.errors
     else:
         form = RecruitmentForm()
     context = {'form': form}

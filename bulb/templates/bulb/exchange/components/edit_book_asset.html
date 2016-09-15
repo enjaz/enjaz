@@ -1,6 +1,6 @@
 {% load staticfiles %}
 <script type="text/javascript">
-{% include "bulb/exchange/initialize_book_buttons.js" %}
+{% include "bulb/exchange/components/initialize_book_buttons.js" %}
     $(function () {
         initialize_book_buttons();
         // initialize book edit modal
@@ -9,7 +9,7 @@
           backdrop: 'static',
           show    : false,
         });
-        $("button#add-book, a#add-book").click(function () {
+        $("#add-book").click(function () {
 
             $("#edit-book-modal").modal('show');
             $("#edit-book-modal .modal-title").html("أضف كتابًا");
@@ -46,7 +46,7 @@
     });
     {% if from_category %}
     function loadBooks() {
-        $("#category-books").load("{% url 'bulb:list_book_previews' 'category' category.code_name %}", initialize_book_buttons);
+        $("#category").load("{% url 'bulb:list_book_previews' 'category' category.code_name %}", initialize_book_buttons);
     }
     {% elif from_my_books %}
     function loadBooks() {
@@ -58,21 +58,7 @@
     {% include 'bulb/adjust_modal_size.js' %}
 </script>
 
-<!-- book adding/editing modal -->
-<div class="modal fade" id="edit-book-modal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">أغلق</span></button>
-        <h4 class="modal-title"></h4>
-      </div>
-      <div class="modal-body ativa-scroll">
-        {% include "media/polls/ajax-loader.html" %}
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">أغلق</button>
-        <button type="button" class="submit-button btn btn-primary">احفظ</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+
+{% with modal_id='edit-book-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}

@@ -1,0 +1,4 @@
+<form action="{% url 'bulb:search_readers' %}" class="form-inline">
+    <input name="q" id="term" class="form-control" {% if request.GET.q %}value="{{ request.GET.q }}"{% endif %} type="text">
+    <input class="form-control btn btn-xs btn-primary" type="submit" value="ابحث">
+</form>

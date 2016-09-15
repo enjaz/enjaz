@@ -3,23 +3,41 @@ from django.utils import timezone
 from core.models import StudentClubYear
 from accounts.utils import get_user_city, get_user_gender
 
-class BookQuerySet(models.QuerySet):
+class BulbQuerySet(models.QuerySet):
     def current_year(self):
         year = StudentClubYear.objects.get_current()
         return self.filter(year=year)
-
-    def available(self):
-        """
-        Return a queryset of approved books.
-        """
-        return self.undeleted().filter(is_available=True)\
-                               .exclude(available_until__lte=timezone.now().date())
 
     def deleted(self):
         return self.filter(is_deleted=True)
 
     def undeleted(self):
         return self.filter(is_deleted=False)
+    
+
+class NeededBookQuerySet(BulbQuerySet):
+    def still_needed(self):
+        return self.filter(existing_book__isnull=True)
+
+    def of_user(self, user):
+        return self.filter(requester=user)
+
+    def for_user_city(self, user=None):
+        city_condition = models.Q()
+
+        if user and user.is_authenticated():
+            city = get_user_city(user)
+            if city:
+                city_condition = models.Q(requester__common_profile__city=city)
+        return self.filter(city_condition)
+
+class BookQuerySet(BulbQuerySet):
+    def available(self):
+        """
+        Return a queryset of approved books.
+        """
+        return self.undeleted().filter(is_available=True)\
+                               .exclude(available_until__lte=timezone.now().date())
 
     def of_user(self, user):
         return self.filter(submitter=user)
@@ -90,22 +108,12 @@ class PointQuerySet(models.QuerySet):
         else:
             return total
 
-class GroupQuerySet(models.QuerySet):
-    def current_year(self):
-        year = StudentClubYear.objects.get_current()
-        return self.filter(year=year)
+class GroupQuerySet(BulbQuerySet):
+    def unarchived(self):
+        return self.filter(is_archived=False)
 
-    def undeleted(self):
-        """
-        Return a queryset of undeleted groups.
-        """
-        return self.filter(is_deleted=False)
-
-    def deleted(self):
-        """
-        Return a queryset of deleted groups.
-        """
-        return self.filter(is_deleted=True)
+    def archived(self):
+        return self.filter(is_archived=True)
 
     def for_user_gender(self, user=None):
         gender_condition = models.Q()
@@ -113,7 +121,8 @@ class GroupQuerySet(models.QuerySet):
         if user and user.is_authenticated():
             gender = get_user_gender(user)
             if gender:
-                gender_condition = models.Q(coordinator__common_profile__college__gender=gender)
+                gender_condition = models.Q(coordinator__common_profile__college__gender=gender, is_limited_by_gender=True) |\
+                                   models.Q(is_limited_by_gender=False)
         return self.filter(gender_condition)
 
     def for_user_city(self, user=None):
@@ -122,16 +131,28 @@ class GroupQuerySet(models.QuerySet):
         if user and user.is_authenticated():
             city = get_user_city(user)
             if city:
-                city_condition = models.Q(coordinator__common_profile__city=city)
+                city_condition = models.Q(coordinator__common_profile__city=city, is_limited_by_city=True) |\
+                                 models.Q(is_limited_by_city=False)
         return self.filter(city_condition)
 
-class SessionQuerySet(models.QuerySet):
+class SessionQuerySet(BulbQuerySet):
     def current_year(self):
         year = StudentClubYear.objects.get_current()
-        return self.filter(group__year=year)
+        return self.filter(year=year) | self.filter(group__year=year)
 
-    def undeleted(self):
-        return self.filter(is_deleted=False)
+    def public(self):
+        return self.filter(group__is_private=False)
+
+    def for_user_city(self, user=None):
+        city_condition = models.Q()
+
+        if user and user.is_authenticated():
+            city = get_user_city(user)
+            if city:
+                city_condition = models.Q(group__coordinator__common_profile__city=city, group__is_limited_by_city=True) |\
+                                 models.Q(group__is_limited_by_city=False) |\
+                                 models.Q(group__isnull=True, submitter__common_profile__city=city)
+        return self.filter(city_condition)
 
 class MembershipQuerySet(models.QuerySet):
     def current_year(self):

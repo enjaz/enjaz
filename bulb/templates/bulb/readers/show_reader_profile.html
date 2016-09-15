@@ -81,6 +81,8 @@
 
 {% block customscript %}
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+{% include "bulb/components/connect_twitter.html" %}
+
 <script type="text/javascript">
 $(function(){
     $('#edit-reader-profile-modal').modal({

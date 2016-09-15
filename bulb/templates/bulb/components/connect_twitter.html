@@ -1,0 +1,48 @@
+<!---Twitter Modal -->>
+<div class="modal fade" id="connect-twitter">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">أغلق</span></button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body ativa-scroll text-center">
+          <h2>بات الآن ممكنا إخبار أصدقائك عن سِراج!</h2>
+          <p>اربط تفاعلك مع سِراج بحسابك على تويتر، وساعد الطلاب والطالبات في اكتشاف سِراج، واكتشاف كتبك ومجموعاتك وصفحتك التعريفية. معًا نبني مجتمعًا معرفيًا ثقافيًا!</p>
+          <p>بعد الربط، سوف تُكتب تغريدة آلية في حسابك عندما تضيف كتابا إو تنضمّ إلى مجموعة، ويمكنك إلغاء الربط في أي وقت.</p>
+          <div class="row">
+              <a style="color: #1da1f3;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-lg"><i class="fa fa-twitter fa-4x"></i><br>اربط حسابي بتويتر</a>
+          </div>
+          <div class="row">
+                  <a id="cancel-twitter-connection" style="color: rgb(243, 29, 89)"><i class="fa fa-times fa-4x"></i><br> لا تسألني مُجدًدا</a>
+          </div>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script type="text/javascript">
+{%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
+$(function(){
+    $('#connect-twitter').modal({
+      keyboard: true,
+      backdrop: 'static',
+    });
+    $("#cancel-twitter-connection").click(function(){
+        $.ajax({
+            url: "{% url 'cancel_twitter_connection' %}",
+            type: 'GET',
+            cache: false,
+            success: function(data){
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                toastr.success("لن يظهر السؤال مُجددًا.");
+                // hide modal
+                $("#connect-twitter").modal('hide');
+            }
+        });
+
+    });
+});
+{% endif %}
+</script>

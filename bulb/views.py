@@ -408,14 +408,14 @@ def edit_book(request, pk):
 
     context = {'book': book}
     if request.method == 'POST':
-        form = BookEditForm(request.POST, request.FILES, instance=book)
+        form = BookEditForm(request.POST, request.FILES, instance=book, user=request.user)
         if form.is_valid():
             book = form.save()
             show_book_url = reverse('bulb:show_book', args=(book.pk,))
             full_url = request.build_absolute_uri(show_book_url)
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
-        form = BookEditForm(instance=book)
+        form = BookEditForm(instance=book, user=request.user)
 
     context['form'] = form
     return render(request, 'bulb/exchange/edit_book_form.html', context)

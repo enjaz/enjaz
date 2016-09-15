@@ -167,6 +167,8 @@
 {% endblock %}
 {% block customscript %}
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+{% include "bulb/components/connect_twitter.html" %}
+
 <style>
 p{
     font-size: 17px;
@@ -208,7 +210,7 @@ $(function () {
         // Unbind any handlers previously attached to the submit button
         // This is necessary to avoid multiple submissions of the form
         $submitButton.off('click');
-        $submitButton.click(function () {show_group
+        $submitButton.click(function () {
             $("form#edit-session-form").submit();
         });
     });

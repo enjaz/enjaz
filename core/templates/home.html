@@ -181,7 +181,7 @@
     <div class="panel minimal minimal-gray">
         <div class="panel-heading">
             <div class="panel-title">
-                <h2>مكتبة سِراج</h2>
+                <h2 class="bulb-header"><a href="{% url 'bulb:index' %}">مكتبة سِراج</a></h2>
             </div>
         </div>
         <div class="panel-body">
@@ -222,7 +222,7 @@
             </div>
             <div class="tile-stats tile-orange">
                 <div class="icon"><i class="entypo-star"></i></div>
-                <div class="num" data-start="0" data-end="{{ book_request_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+                <div class="num" data-start="0" data-end="{{ my_book_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
                 <h3>عدد كتبي</h3>
                 <p>مجموع الكتب التي لك على بوابة إنجاز</p>
             </div>

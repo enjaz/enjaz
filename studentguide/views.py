@@ -17,6 +17,7 @@ from studentguide import utils
 from studentguide.decorators import riyadh_only
 from studentguide.models import GuideProfile, Request, Report, Feedback, Tag, MentorOfTheMonth
 from studentguide.forms import GuideForm, RequestForm, ReportForm, FeedbackForm
+import clubs.utils
 
 @login_required
 @riyadh_only
@@ -205,7 +206,7 @@ def list_request_summaries(request, guide_pk=None):
 def add_guide(request):
     if request.method == 'POST':
         current_year = StudentClubYear.objects.get_current()
-        studentguide_club = utils.get_studentguide_club_for_user(request.user)
+        studentguide_club = clubs.utils.get_club_for_user("Student Guide", request.user)
         random_assessor = studentguide_club.members.order_by('?').first()
         instance = GuideProfile(user=request.user, year=current_year, assessor=random_assessor)
         form = GuideForm(request.POST, request.FILES, instance=instance)

@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, url, include
 from django.views.generic import TemplateView
 
 urlpatterns = patterns('',
@@ -12,4 +12,5 @@ urlpatterns = patterns('',
     url(r'^aboutsc/deanship_cp4/$', TemplateView.as_view(template_name='cp4_bader.html'), name='cp4_bader'),
     url(r'^visit/(?P<pk>\d+)/$', "core.views.visit_announcement", name='visit_announcement'),
     url(r'^cancel_twitter_connection$', "core.views.cancel_twitter_connection", name='cancel_twitter_connection'),
+    url('', include('social.apps.django_app.urls', namespace='social')),
 )

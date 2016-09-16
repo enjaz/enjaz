@@ -152,6 +152,7 @@ INSTALLED_APPS = (
     'researchhub',
     'wkhtmltopdf',
     'events',
+    'social.apps.django_app.default',
 )
 ```
 
@@ -160,6 +161,7 @@ Also add the following settings:
 AUTHENTICATION_BACKENDS = (
     'userena.backends.UserenaAuthenticationBackend',
     'guardian.backends.ObjectPermissionBackend',
+    'social.backends.twitter.TwitterOAuth',
     'django.contrib.auth.backends.ModelBackend',
 )
 STATIC_URL = '/static/'
@@ -195,12 +197,22 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
             )
     }
-
+SOCIAL_AUTH_PIPELINE = (
+    'social.pipeline.social_auth.social_details',
+    'social.pipeline.social_auth.social_uid',
+    'social.pipeline.social_auth.auth_allowed',
+    'social.pipeline.social_auth.social_user',
+    'social.pipeline.social_auth.associate_user',
+    'social.pipeline.social_auth.load_extra_data',
+    'social.pipeline.user.user_details',
+)
 ```
 
 Finally, there are two more required settings:
 * `DEFAULT_FROM_EMAIL`: The default _noreply_ email.
 * `BITLY_KEY`: a bit.ly API key
+* `SOCIAL_AUTH_TWITTER_KEY`: Twitter consumer key
+* `SOCIAL_AUTH_TWITTER_SECRET`: Twitter secret key
 
 
 ### Step three: Get the database sorted out

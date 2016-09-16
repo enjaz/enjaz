@@ -9,13 +9,13 @@ import accounts.utils
 import clubs.utils
 
 
-def create_tweet(user, action, arguments):
+def create_tweet(user, action, arguments, media_path=None):
     if not user.social_auth.exists():
         return
     if action == "add_book":
-	text = u"أضفت كتاب {} إلى المكتبة الطلابية التعاونية!\nيمكن طلبه الآن: {}\n#مبادرة_سِراج"
+	text = u"أضفت كتاب {} إلى المكتبة الطلابية التعاونية.\n{}\n#مبادرة_سِراج"
     if action == "add_needed_book":
-	text = u"أريد كتاب {}.\nهل يتوفّر لديك؟: {}\n#مبادرة_سِراج"
+	text = u"أريد كتاب \"{}\".\nهل يتوفّر لديك؟: {}\n#مبادرة_سِراج"
     elif action == "join_group":
 	text = u"انضممت إلى مجموعة {} للنقاش والقراءة!\nيمكن الانضمام الآن: {}\n#مبادرة_سِراج"
     elif action == "add_group":
@@ -23,10 +23,11 @@ def create_tweet(user, action, arguments):
     elif action == "add_reader":
 	text = u"سجّلت نفسي مع قارئات وقراء الجامعة.  يمكن أن تقرأ صفحتي من هنا:  {}\n#مبادرة_سِراج"
     elif action == "add_session":
-	text = u"أعلنت عن جلسة نقاش عن {} يمكنك تسجيل نفسك ضمن الحضور هنا: {}\n#مبادرة_سِراج"
+	text = u"أعلنت عن جلسة نقاش عن {} يمكن تسجيل حضورك من هنا: {}\n#مبادرة_سِراج"
 
     try:
-        Tweet.objects.create(text=text.format(*arguments), user=user)
+        Tweet.objects.create(text=text.format(*arguments), user=user,
+                             media_path=media_path)
     except IntegrityError:
         # If the tweet turned to be longer than 140 charecters, just don't do anything.
         pass

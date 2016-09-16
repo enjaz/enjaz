@@ -43,6 +43,10 @@
 {% endblock %}
 
 {% block customscript %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
 {% include "bulb/components/connect_twitter.html" %}
 <script type="text/javascript">

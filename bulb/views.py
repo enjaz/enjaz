@@ -370,7 +370,9 @@ def add_book(request, contribution):
             show_book_url = reverse('bulb:show_book', args=(book.pk,))
             full_url = request.build_absolute_uri(show_book_url)
             if not book.is_publicly_owned:
-                utils.create_tweet(request.user, 'add_book', (book.title, full_url))
+                utils.create_tweet(request.user, 'add_book',
+                                   (book.title, full_url),
+                                   media_path=book.cover.path)
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
         form = BookForm(user=request.user)
@@ -389,7 +391,9 @@ def add_needed_book(request):
             needed_book = form.save()
             show_url = reverse('bulb:show_needed_book', args=(needed_book.pk,))
             full_url = request.build_absolute_uri(show_url)
-            utils.create_tweet(request.user, 'add_needed_book', (needed_book.title, full_url))
+            utils.create_tweet(request.user, 'add_needed_book',
+                               (needed_book.title, full_url),
+                               media_path=needed_book.cover.path)
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
         form = NeededBookForm()

@@ -102,6 +102,9 @@ class StudentClubYear(models.Model):
 class Tweet(models.Model):
     text = models.CharField(u"النص", max_length=155)
     tweet_id = models.BigIntegerField(null=True)
+    media_path = models.CharField(u"مسار الصورة المرفقة",
+                                  max_length=254,
+                                  blank=True, default="")
     user = models.ForeignKey(User, null=True,
                              on_delete=models.SET_NULL)
     was_sent = models.BooleanField(u"أرسلت؟", default=False)

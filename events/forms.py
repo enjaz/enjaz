@@ -2,7 +2,7 @@
 from django import forms
 
 from accounts.utils import get_user_gender
-from events.models import NonUser, Session, Registration
+from events.models import NonUser, Session, Registration, Abstract
 
 class NonUserForm(forms.ModelForm):
     class Meta:
@@ -67,3 +67,61 @@ class RegistrationForm(forms.Form):
             registration.first_priority_sessions.add(session)
 
         return registration
+
+class AbstractForm(forms.ModelForm):
+    class Meta:
+        model = Abstract
+        fields = ['title', 'authors', 'university', 'college',
+                  'presenting_author', 'email', 'phone', 'level',
+                  'presentation_preference', 'attachment']
+
+class EvaluationForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop("event")
+        self.abstract = kwargs.pop("abstract")
+        self.user = kwargs.pop("user", None)
+        super(EvaluationForm, self).__init__(*args, **kwargs)
+
+        default_choices = [(i, i) for i in range(1, 6)]
+        for criterion in Criterion.objects.filter(event=self.event):
+            field_name = 'criterion_' + str(criterion.code_name)
+            initial_value = None
+            if self.instance.id:
+                try:
+                    criterion_value = CriterionValue.objects.get(evaluation=self.instance,
+                                                                 criterion=criterion)
+                    initial_value = criterion_value.value
+                except CriterionValue.DoesNotExist:
+                    pass
+            
+            self.fields[field_name] = forms.IntegerField(label=criterion.human_name, initial=initial_value,
+                                                         widget=forms.RadioSelect, choices=default_choices,
+                                                         required=True,
+                                                         help_text=criterion.instructions)
+
+    def save(self):
+        # Create only if the instance has not been saved (i.e. we are
+        # not editing)
+        if not self.instance.id:
+            evaluation = Evaluation.objects.create(abstract=self.abstract,
+                                                   evaluator=self.user)
+        else:
+            evaluation = self.instance
+            evaluation.evaluator = self.user
+            evaluation.save()
+
+        for field_name in self.cleaned_data:
+            value = self.cleaned_data[field_name]
+            criterion_name = field_name.replace('criterion_', '')
+            criterion = Criterion.objects.get(code_name=criterion_name)
+            if not self.instance.id:
+                CriterionValue.objects.create(criterion=criterion,
+                                              evaluation=evaluation,
+                                              value=value)
+            else:
+                criterion_value = CriterionValue.objects.get(criterion=criterion,
+                                                             evaluation=evaluation)
+                criterion_value.value = value
+                criterion_value.save()
+
+        return evaluation

@@ -2,8 +2,8 @@
 {% block csssheet %}
 <link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.css' %}">
 {% endblock %}
-{% block meta_description %}التسجيل في {{ event.name }}{% endblock %}
-{% block title %}التسجيل في {{ event.name }}{% endblock %}
+{% block meta_description %}التسجيل في {{ event.official_name }}{% endblock %}
+{% block title %}التسجيل في {{ event.official_name }}{% endblock %}
 {% block description %}<h2 class="dinar-light">التسجيل في {{ event.get_html_name|safe }}</h2>{% endblock %}
 {% block content %}
 <div class="form-register-success visible dinar-light">

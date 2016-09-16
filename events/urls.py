@@ -15,4 +15,9 @@ urlpatterns = patterns('',
     url(r'^(?P<event_code_name>[\d\w_]+)/registration/thanks/$', views.registration_completed, name="registration_completed"),
     url(r'^(?P<event_code_name>[\d\w_]+)/registration/closed/$', views.registration_closed, name="registration_closed"),
     url(r'^(?P<event_code_name>[\d\w_]+)/registration/already/$', views.registration_already, name="registration_already"),
+    url(r'^(?P<event_code_name>[\d\w_]+)/abstracts/$', views.submit_abstract, name="submit_abstract"),
+    url(r'^(?P<event_code_name>[\d\w_]+)/abstracts/list/$', views.list_abstracts, name="list_abstracts"),
+    url(r'^(?P<event_code_name>[\d\w_]+)/abstracts/show/(?P<pk>\d+)/$', views.show_abstract, name="show_abstract"),
+    url(r'^(?P<event_code_name>[\d\w_]+)/abstracts/thanks/$', TemplateView.as_view(template_name='events/abstracts/abstract_submission_completed.html'), name="abstract_submision_completed"),
+
 )

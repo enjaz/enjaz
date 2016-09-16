@@ -8,8 +8,8 @@ from django.utils import timezone
 from post_office import mail
 
 from clubs.models import college_choices
-from events.forms import NonUserForm, RegistrationForm
-from events.models import Event, Registration, Session
+from events.forms import NonUserForm, RegistrationForm, AbstractForm
+from events.models import Event, Registration, Session, Abstract
 from events import utils
 
 def redirect_home(request, event_code_name):
@@ -19,6 +19,71 @@ def redirect_home(request, event_code_name):
     else:
         return HttpResponseRedirect(reverse('events:registration_introduction',
                                             args=(event.code_name,)))
+
+def submit_abstract(request, event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name,
+                              receives_abstract_submission=True)
+    context = {'event': event}
+
+    if event.abstract_submission_opening_date and timezone.now() < event.abstract_submission_opening_date:
+        return render(request, 'events/abstracts/abstract_not_started.html', context)
+    elif event.abstract_submission_closing_date and timezone.now() > event.abstract_submission_closing_date:
+        return render(request, 'events/abstracts/abstract_closed.html', context)
+
+    if request.method == 'POST':
+        instance = Abstract(event=event)
+        form = AbstractForm(request.POST, request.FILES,
+                            instance=instance)
+        if form.is_valid():
+            abstract = form.save()
+            return HttpResponseRedirect(reverse('events:abstract_submision_completed'))
+
+    elif request.method == 'GET':
+        form = AbstractForm()
+
+    context['form'] = form
+    return render(request, 'events/abstracts/abstract_submission.html', context)
+
+@login_required
+def list_abstracts(request, event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name,
+                              receives_abstract_submission=True)
+    if not utils.can_evaluate_abstracts(request.user, event):
+        raise PermissionDenied
+
+    pending_abstracts = Abstract.objects.filter(event=event, is_deleted=False, evaluation__isnull=True)
+    evaluated_abstracts = Abstract.objects.filter(event=event, is_deleted=False, evaluation__isnull=False)
+
+    context = {'event': event,
+               'pending_abstracts': pending_abstracts,
+               'evaluated_abstracts': evaluated_abstracts}
+
+    return render(request, 'events/abstracts/list_abstracts.html', context)
+
+@login_required
+def show_abstract(request, event_code_name, pk):
+    abstract = get_object_or_404(Abstract, pk=pk, is_deleted=False)
+    event = abstract.event
+
+    if not utils.can_evaluate_abstracts(request.user, event):
+        raise PermissionDenied
+
+    try:
+        evaluation = abstract.evaluation
+    except Evaluation.DoesNotExist:
+        evaluation = Evaluation(evaluator=request.user,
+                                abstract=abstract)
+
+    if request.method == 'POST':
+        form = EvaluationForm(request.POST, instance=evaluation)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('events:list_abstracts'))
+    elif request.method == 'GET':
+        form = EvaluationForm(instance=evaluation)
+    context = {'event': event, 'abstract': abstract, 'form': form}
+
+    return render(request, "events/abstracts/show_abstract.html", context)
 
 def list_sessions(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
@@ -57,7 +122,7 @@ def nonuser_registration(request, event_code_name):
         if registration_form.is_valid() and nonuser_form.is_valid():
             nonuser = nonuser_form.save()
             registration = registration_form.save(nonuser=nonuser)
-            if event.onsite_after and timezone.now().date() >= event.onsite_after:
+            if event.onsite_after and timezone.now() >= event.onsite_after:
                 for session in registrations.first_priority_sessions.all():
                     utils.register_in_vma(session, registration)
                 utils.send_onsite_confirmation(registration, event)
@@ -104,7 +169,7 @@ def user_registration(request, event_code_name):
         if registration_form.is_valid():
             registration = registration_form.save()
             print registration
-            if event.onsite_after and timezone.now().date() >= event.onsite_after:
+            if event.onsite_after and timezone.now() >= event.onsite_after:
                 for session in registration.first_priority_sessions.all():
                     utils.register_in_vma(session, registration)
                 utils.send_onsite_confirmation(registration, event)

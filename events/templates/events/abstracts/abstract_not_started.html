@@ -1,0 +1,15 @@
+{% extends 'events_submission_base.html' %}{% load staticfiles %}
+{% block meta_description %}{{ event.english_name }} Abstract Submission{% endblock %}
+{% block title %}Abstract submission not started!{% endblock %}
+
+{% block content %}
+<div class="form-register-success visible english-field">
+	<i class="entypo-info"></i>
+	<h3 class="english-field">Abstract submission nnot started!</h3>
+    <p style="text-align: justify;">We haven't yet started accepting abstract submissions for {{ event.english_name }}. Stay tuned!</p>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+{% endblock %}

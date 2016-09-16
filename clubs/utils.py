@@ -37,7 +37,7 @@ def is_member(club, user):
 
 def is_coordinator_or_member(club, user):
     """Return whether the user is the coordinator, a deputy or a member of a given club."""
-    return is_coordinator(club, user) or is_member(club, user)
+    return is_coordinator(club, user) or is_deputy(club, user) or is_member(club, user)
 
 def is_coordinator_or_deputy(club, user):
     """Return whether the user is the coordinator or a deputy of a given club."""

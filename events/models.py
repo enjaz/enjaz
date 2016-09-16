@@ -1,7 +1,8 @@
 # -*- coding: utf-8  -*-
-from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
+from django.db.models import Sum
 
 from clubs.models import Club
 from events.managers import RegistrationQuerySet, SessionQuerySet
@@ -18,32 +19,41 @@ session_gender_choices = (
 )
 
 class Event(models.Model):
-    name = models.CharField(max_length=255)
-    is_english_name = models.BooleanField(u"هل اسم الحدث إنجليزي", default=False)
+    official_name = models.CharField(u"الاسم الرسمي", max_length=255)
+    english_name = models.CharField(u"الاسم الإنجليزي", max_length=255, default="", blank=True)
+
+    is_official_name_english = models.BooleanField(u"هل اسم الحدث الرسمي إنجليزي", default=False)
     code_name = models.CharField(max_length=50, default="",
                                  blank=True,
                                  verbose_name=u"الاسم البرمجي",
                                  help_text=u"حروف لاتينية صغيرة وأرقام")
-    registration_opening_date = models.DateField(u"تاريخ فتح التسجيل", null=True, blank=True)
-    registration_closing_date = models.DateField(u"تاريخ انتهاء التسجيل", null=True, blank=True)
+    registration_opening_date = models.DateTimeField(u"تاريخ فتح التسجيل", null=True, blank=True)
+    registration_closing_date = models.DateTimeField(u"تاريخ انتهاء التسجيل", null=True, blank=True)
     start_date = models.DateField(u"تاريخ البدء", null=True)
     end_date = models.DateField(u"تاريخ الانتهاء", null=True)
-    onsite_after = models.DateField(u"التسجيل في الموقع يبدأ من", null=True, blank=True)
+    onsite_after = models.DateTimeField(u"التسجيل في الموقع يبدأ من", null=True, blank=True)
     url = models.URLField(max_length=255, blank=True, default="")
     location_url = models.URLField(max_length=255, blank=True, default="")
     twitter = models.CharField(max_length=255,
                                blank=True,
                                default="KSAU_Events")
+    receives_abstract_submission = models.BooleanField(default=False,
+                                                       verbose_name=u"يستقبل ملخصات بحثية؟")
+    abstract_submission_opening_date = models.DateTimeField(u"تاريخ فتح استقبال الملخصات البحثية", null=True, blank=True)
+    abstract_submission_closing_date = models.DateTimeField(u"تاريخ انتهاء إغلاق استقبال الملخصات البحثية", null=True, blank=True)
+    abstract_submission_instruction_url = models.URLField(u"رابط تعليمات إرسال الأبحاث", max_length=255, blank=True, default="")
+    abstract_revision_club = models.ForeignKey(Club, null=True, blank=True,
+                                               related_name="abstract_revision_events")
     is_on_telegram = models.BooleanField(default=True,
                                          verbose_name=u"على تلغرام؟")
     organizing_club = models.ForeignKey(Club)
     priorities = models.PositiveSmallIntegerField(default=1)
 
     def get_html_name(self):
-        if self.is_english_name:
-            return "<span class='english-field'>" + self.name + "</span>"
+        if self.is_official_name_english:
+            return "<span class='english-field'>" + self.official_name + "</span>"
         else:
-            return self.name
+            return self.official_name
 
     def get_has_multiple_sessions(self):
         """Used to generate proper emails."""
@@ -53,7 +63,7 @@ class Event(models.Model):
             return False
 
     def __unicode__(self):
-        return self.name
+        return self.official_name
 
 class Session(models.Model):
     event = models.ForeignKey(Event)
@@ -253,3 +263,70 @@ class Registration(models.Model):
         
     def __unicode__(self):
         return self.get_en_full_name()
+
+class Abstract(models.Model):
+    event = models.ForeignKey(Event, verbose_name=u"الحدث")    
+    title = models.CharField(verbose_name="Title", max_length=255)
+    authors = models.TextField(verbose_name=u"Name of authors")
+    university = models.CharField(verbose_name="University", max_length=255)
+    college = models.CharField(verbose_name="College", max_length=255)
+    presenting_author = models.CharField(verbose_name="Presenting author", max_length=255)
+    email = models.EmailField(verbose_name="Email")
+    phone = models.CharField(verbose_name="Phone number", max_length=20)
+    level_choices = (
+        ('U', 'Undergraduate'),
+        ('G', 'Graduate')
+        )
+    level = models.CharField(verbose_name="Level", max_length=1,
+                             default='', choices=level_choices)
+    presentation_preference_choices = (
+        ('O', 'Oral'),
+        ('P', 'Poster')
+        )
+    presentation_preference = models.CharField(verbose_name="Presentation preference", max_length=1, choices=presentation_preference_choices)
+    attachment = models.FileField(verbose_name=u"Attach the abstract", upload_to="hpc/abstract/")
+    date_submitted = models.DateTimeField(auto_now_add=True)
+    is_deleted = models.BooleanField(default=False,
+                                     verbose_name=u"محذوف؟")
+
+    def get_average_score(self):
+        evaluation_number = self.evaluation_set.count()
+        if not evaluation_number:
+            return 0
+        total_score = CriterionValue.objects.filter(evaluation__in=self.evaluation_set).aggregate(Sum('value'))['value__sum']
+        return total_score / evaluation_number
+
+    def __unicode__(self):
+        return self.title
+
+class Evaluation(models.Model):
+    abstract = models.ForeignKey(Abstract)
+    evaluator = models.ForeignKey(User, related_name="event_abstract_evaluations")
+    date_submitted = models.DateTimeField(auto_now_add=True)
+    date_edited = models.DateTimeField(auto_now=True)
+
+    def get_total_score(self):
+        return self.criterion_values.aggregate(Sum('value'))['value__sum'] or 0
+
+
+class Criterion(models.Model):
+    event = models.ForeignKey(Event, verbose_name=u"الحدث")
+    human_name = models.CharField(max_length=200,
+                               verbose_name=u"اسم المعيار الذي سيظهر")
+    code_name = models.CharField(max_length=200,
+                                 verbose_name=u"اسم المعيار البرمجي")
+    instructions = models.TextField(verbose_name=u"تعليمات")
+
+    def __unicode__(self):
+        return self.code_name
+
+class CriterionValue(models.Model):
+    evaluation = models.ForeignKey(Evaluation, verbose_name=u"التقييم",
+                                   related_name="criterion_values")
+    criterion = models.ForeignKey(Criterion, null=True,
+                                  blank=True, on_delete=models.SET_NULL,
+                                  default=None, verbose_name=u"المعيار")
+    value = models.IntegerField(verbose_name=u"القيمة")
+
+    def __unicode__(self):
+        return "{}: {}".format(self.criterion.code_name, self.value)

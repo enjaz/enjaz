@@ -1,0 +1,15 @@
+{% extends 'events_submission_base.html' %}{% load staticfiles %}
+{% block meta_description %}{{ event.english_name }} Abstract Submission{% endblock %}
+{% block title %}Abstract received!{% endblock %}
+
+{% block content %}
+<div class="form-register-success visible english-field">
+	<i class="entypo-check"></i>
+	<h3>Your abstract submission has been received!</h3>
+    <p style="text-align: justify;">Your abstract will be reviewed by our Scientific Committee and a notification of acceptance will be sent out at least 3 weeks in advance of the conference. Stay tuned!</p>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+{% endblock %}

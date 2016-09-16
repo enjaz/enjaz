@@ -15,7 +15,10 @@ class Command(BaseCommand):
                               access_token_key=user_tokens['oauth_token'],
                               access_token_secret=user_tokens['oauth_token_secret'],)
             try:
-                status = api.PostUpdate(tweet.text)
+                if tweet.media_path:
+                    status = api.PostMedia(tweet.text, tweet.media_path)
+                else:
+                    status = api.PostUpdate(tweet.text)
             except twitter.TwitterError, e:
                 print "Something went wrong with #{}: ".format(tweet.pk), e
                 continue

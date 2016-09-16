@@ -556,10 +556,11 @@ def indicators(request, city=""):
         raise PermissionDenied
 
     if city:
-        books = Book.objects.current_year().for_user_city(request.user)
-        book_requests = Request.objects.current_year().for_user_city(request.user)
-        groups = Group.objects.current_year().for_user_city(request.user)
-        sessions = Session.objects.current_year().for_user_city(request.user)
+        books = Book.objects.current_year().filter(submitter__common_profile__city=city)
+        book_requests = Request.objects.current_year().filter(requester__common_profile__city=city)
+        groups = Group.objects.current_year().filter(coordinator__common_profile__city=city)
+        sessions = Session.objects.current_year().filter(group__coordinator__common_profile__city=city) | \
+                   Session.objects.current_year().filter(group__isnull=True, submitter__common_profile__city=city)
         users = (User.objects.filter(book_giveaways__isnull=False) |
                  User.objects.filter(request__isnull=False) |
                  User.objects.filter(reading_group_coordination__isnull=False) |

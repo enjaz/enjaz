@@ -1,6 +1,6 @@
-from accounts.utils import get_user_gender
 from studentguide.models import GuideProfile
 from clubs.models import Club
+import accounts.utils
 import clubs.utils
 
 def is_studentguide_member(user):
@@ -18,16 +18,6 @@ def get_studentguide_club_of_user(user):
         return studentguide.first()
     else:
         return None
-
-def get_studentguide_club_for_user(user):
-    user_gender = get_user_gender(user)
-    if user_gender == 'F':
-        return Club.objects.current_year().get(english_name="Student Guide",
-                                               gender="F")
-    else:
-        return Club.objects.current_year().get(english_name="Student Guide",
-                                               gender="M")
-
     
 def has_guide_profile(user):
     return GuideProfile.objects.current_year().filter(user=user).exists()
@@ -51,7 +41,7 @@ def can_add_request(user, guide):
     # superusers can always add requests.  Otherwise, if the user has
     # a GuideProfile, they are not expected to submit a supervision
     # request.
-    if get_user_gender(user) != get_user_gender(guide.user) or \
+    if accounts.utils.get_user_gender(user) != accounts.utils.get_user_gender(guide.user) or \
        guide.guide_requests.filter(user=user).exclude(requester_status='C',
                                                       guide_status='P').exists() or \
        not guide.is_available:

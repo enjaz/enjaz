@@ -9,7 +9,7 @@ import accounts.utils
 import clubs.utils
 
 
-def create_tweet(user, action, arguments, media_path=None):
+def create_tweet(user, action, arguments, media_path=""):
     if not user.social_auth.exists():
         return
     if action == "add_book":

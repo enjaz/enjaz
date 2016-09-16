@@ -6,7 +6,7 @@
 {% if city_choices %}
     <ul>
     {% for city in city_choices %}
-        <li><a href="{% url 'indicators_for_city' city.0 %}">{{ city.1 }}</a></li>
+        <li><a href="{% url 'bulb:indicators' city.0 %}">{{ city.1 }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
@@ -65,10 +65,10 @@
                     {% for session in sessions.undeleted %}
                     <tr>
                         <td>{{ session.title }}</td>
-                        <td><a href="{% url 'bulb:show_group' session.group.pk %}">{{ session.group.name }}</a></td>
+                        <td>{% if session.group %}<a href="{% url 'bulb:show_group' session.group.pk %}">{{ session.group.name }}</a>{% else %}جلسة حرّة{% endif %}</td>
                         <td data-order="{{ session.submission_date|date:"U" }}">{{ session.submission_date|date:"g:i a؛ j F Y" }}</td>
                         <td data-order="{{ session.date|date:"U" }}">{{ session.date }}</td>
-                        <td>{% if session.report %}<a href="{% url 'bulb:show_report' session.group.pk session.pk %}">نعم</a>{% else %}لا{% endif %}</td>
+                        <td>{% if session.report %}{% if session.group %}<a href="{% url 'bulb:show_report' session.group.pk session.pk %}">{% else %}<a href="{% url 'bulb:show_report' session.pk %}">{% endif %}نعم</a>{% else %}لا{% endif %}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

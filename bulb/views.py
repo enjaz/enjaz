@@ -564,32 +564,32 @@ def indicators(request, city=""):
                  User.objects.filter(request__isnull=False) |
                  User.objects.filter(reading_group_coordination__isnull=False) |
                  User.objects.filter(reading_group_memberships__isnull=False) |
-                 User.objects.filter(reader_profile__isnull=False)).filter(common_profile__city=user_city).distinct()
+                 User.objects.filter(reader_profile__isnull=False)).filter(common_profile__city=city).distinct()
 
         book_users = User.objects.filter(common_profile__is_student=True,
                                          book_points__is_counted=True)\
                                  .annotate(point_count=Count('book_points'))\
                                  .filter(point_count__gte=3)\
-                                 .filter(common_profile__city=user_city)
+                                 .filter(common_profile__city=city)
         book_contributing_male_users = User.objects.filter(common_profile__college__gender='M',
                                                            book_giveaways__isnull=False)\
-                                                    .filter(common_profile__city=user_city)\
+                                                    .filter(common_profile__city=city)\
                                                    .distinct().count()
         book_contributing_female_users = User.objects.filter(common_profile__college__gender='F',
                                                              book_giveaways__isnull=False)\
-                                                     .filter(common_profile__city=user_city)\
+                                                     .filter(common_profile__city=city)\
                                                      .distinct().count()
         group_male_users = (User.objects.filter(reading_group_memberships__isnull=False,
                                                 common_profile__college__gender='M') | \
                             User.objects.filter(reading_group_coordination__isnull=False,
                                                 common_profile__college__gender='M'))\
-                                        .filter(common_profile__city=user_city)\
+                                        .filter(common_profile__city=city)\
                                         .distinct().count()
         group_female_users = (User.objects.filter(reading_group_memberships__isnull=False,
                                                   common_profile__college__gender='F') | \
                               User.objects.filter(reading_group_coordination__isnull=False,
                                                   common_profile__college__gender='F'))\
-                                          .filter(common_profile__city=user_city).distinct().count()
+                                          .filter(common_profile__city=city).distinct().count()
 
         context = {'groups': groups,
                    'sessions': sessions,
@@ -606,7 +606,7 @@ def indicators(request, city=""):
         context = {'city_choices':
                    city_choices}
 
-        return render(request, 'bulb/indicators.html', context)
+    return render(request, 'bulb/indicators.html', context)
 
 @decorators.ajax_only
 @csrf.csrf_exempt

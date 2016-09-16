@@ -14,7 +14,9 @@
         </div>
     </div>
     <div class="col-sm-8">
-        {% if not book.is_available %}
+        {% if not user|book.is_in_user_city %}
+        <p class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i> هذا الكتاب ليس في {{ user.common_profile.get_city_display }} ولذا لن يمكنك طلبه!</p>
+        {% elif not book.is_available %}
         <p class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i> طُلب هذا الكتاب، ولم يعد متوفرًا!</p>
         {% elif not book.is_within_availability_period %}
         <p class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i> انتهت المدّة التي كان فيها هذا الكتاب مُتاحة للاستعارة.</p>

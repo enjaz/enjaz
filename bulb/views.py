@@ -11,13 +11,15 @@ from django.utils import timezone
 from dal import autocomplete
 from post_office import mail
 
-
 from core.utils import get_search_queryset
 from core.models import StudentClubYear, Tweet
 from core import decorators
 from bulb.models import Category, Book, NeededBook, Request, Point, Group, Membership, Session, Report, ReaderProfile, Recruitment
 from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, NeededBookForm, RequestForm, GroupForm, FreeSessionForm, SessionForm, ReportForm, ReaderProfileForm, RecruitmentForm
 from bulb import utils
+from clubs.models import city_choices
+import accounts.utils
+
 
 def index(request):
     groups = Group.objects.current_year().for_user_city(request.user).unarchived().undeleted().order_by("?")[:6]
@@ -50,7 +52,7 @@ def index(request):
 def search_books(request):
     context = {}
     if request.GET.get('q'):        
-        existing_books = Book.objects.current_year().undeleted().available()
+        existing_books = Book.objects.current_year().undeleted().available().for_user_city(request.user)
         fields = ['title', 'authors', 'description',
                   'submitter__common_profile__ar_first_name',
                   'submitter__common_profile__ar_middle_name',
@@ -548,49 +550,63 @@ def list_my_requests(request):
     return render(request, 'bulb/exchange/list_direct_requests.html', context)    
 
 @login_required
-def indicators(request):
+def indicators(request, city=""):
     if not utils.is_bulb_coordinator_or_deputy(request.user) and \
        not request.user.is_superuser:
         raise PermissionDenied
 
-    books = Book.objects.current_year()
-    book_requests = Request.objects.current_year()
-    groups = Group.objects.current_year()
-    sessions = Session.objects.current_year()
-    users = (User.objects.filter(book_giveaways__isnull=False) |
-             User.objects.filter(request__isnull=False) |
-             User.objects.filter(reading_group_coordination__isnull=False) |
-             User.objects.filter(reading_group_memberships__isnull=False) |
-             User.objects.filter(reader_profile__isnull=False)
-    ).filter(common_profile__is_student=True).distinct()
-    book_users = User.objects.filter(common_profile__is_student=True,
-                                     book_points__is_counted=True)\
-                             .annotate(point_count=Count('book_points'))\
-                             .filter(point_count__gte=3)
-    book_contributing_male_users = User.objects.filter(common_profile__college__gender='M',
-                                                       book_giveaways__isnull=False).distinct().count()
-    book_contributing_female_users = User.objects.filter(common_profile__college__gender='F',
-                                                         book_giveaways__isnull=False).distinct().count()
-    group_male_users = (User.objects.filter(reading_group_memberships__isnull=False,
-                                            common_profile__college__gender='M') | \
-                        User.objects.filter(reading_group_coordination__isnull=False,
-                                            common_profile__college__gender='M')).distinct().count()
-    group_female_users = (User.objects.filter(reading_group_memberships__isnull=False,
-                                              common_profile__college__gender='F') | \
-                          User.objects.filter(reading_group_coordination__isnull=False,
-                                              common_profile__college__gender='F')).distinct().count()
+    if city:
+        books = Book.objects.current_year().for_user_city(request.user)
+        book_requests = Request.objects.current_year().for_user_city(request.user)
+        groups = Group.objects.current_year().for_user_city(request.user)
+        sessions = Session.objects.current_year().for_user_city(request.user)
+        users = (User.objects.filter(book_giveaways__isnull=False) |
+                 User.objects.filter(request__isnull=False) |
+                 User.objects.filter(reading_group_coordination__isnull=False) |
+                 User.objects.filter(reading_group_memberships__isnull=False) |
+                 User.objects.filter(reader_profile__isnull=False)).filter(common_profile__city=user_city).distinct()
 
-    context = {'groups': groups,
-               'sessions': sessions,
-               'books': books,
-               'book_requests': book_requests,
-               'book_users': book_users,
-               'users': users,
-               'book_contributing_male_users': book_contributing_male_users,
-               'book_contributing_female_users': book_contributing_female_users,
-               'group_male_users': group_male_users,
-               'group_female_users': group_female_users}
-    return render(request, 'bulb/indicators.html', context)
+        book_users = User.objects.filter(common_profile__is_student=True,
+                                         book_points__is_counted=True)\
+                                 .annotate(point_count=Count('book_points'))\
+                                 .filter(point_count__gte=3)\
+                                 .filter(common_profile__city=user_city)
+        book_contributing_male_users = User.objects.filter(common_profile__college__gender='M',
+                                                           book_giveaways__isnull=False)\
+                                                    .filter(common_profile__city=user_city)\
+                                                   .distinct().count()
+        book_contributing_female_users = User.objects.filter(common_profile__college__gender='F',
+                                                             book_giveaways__isnull=False)\
+                                                     .filter(common_profile__city=user_city)\
+                                                     .distinct().count()
+        group_male_users = (User.objects.filter(reading_group_memberships__isnull=False,
+                                                common_profile__college__gender='M') | \
+                            User.objects.filter(reading_group_coordination__isnull=False,
+                                                common_profile__college__gender='M'))\
+                                        .filter(common_profile__city=user_city)\
+                                        .distinct().count()
+        group_female_users = (User.objects.filter(reading_group_memberships__isnull=False,
+                                                  common_profile__college__gender='F') | \
+                              User.objects.filter(reading_group_coordination__isnull=False,
+                                                  common_profile__college__gender='F'))\
+                                          .filter(common_profile__city=user_city).distinct().count()
+
+        context = {'groups': groups,
+                   'sessions': sessions,
+                   'books': books,
+                   'book_requests': book_requests,
+                   'book_users': book_users,
+                   'users': users,
+                   'book_contributing_male_users': book_contributing_male_users,
+                   'book_contributing_female_users': book_contributing_female_users,
+                   'group_male_users': group_male_users,
+                   'group_female_users': group_female_users}
+
+    else:
+        context = {'city_choices':
+                   city_choices}
+
+        return render(request, 'bulb/indicators.html', context)
 
 @decorators.ajax_only
 @csrf.csrf_exempt

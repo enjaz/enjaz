@@ -3,6 +3,13 @@
 
 {% block content %}
 <h1>مؤشرات سِراج</h1>
+{% if city_choices %}
+    <ul>
+    {% for city in city_choices %}
+        <li><a href="{% url 'indicators_for_city' city.0 %}">{{ city.1 }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
 <h2>مجموعات القراءة</h2>
 <div class="row">
     <div class="col-md-12">
@@ -218,7 +225,7 @@
         <textarea style="margin-bottom: 10px;" readonly class="english-field form-control">{% for user in users %} {{ user.email }}; {% endfor %}</textarea>
     </div>
 </div>
-
+{% endif %}
 {% endblock %}
 {% block customscript %}
 <link rel="stylesheet" href="{% static 'css/chartist.min.css' %}">

@@ -103,7 +103,7 @@ def can_edit_requester_status(user, book_request):
 def can_order_book(user, book):
     if book.is_deleted or \
        accounts.utils.get_user_city(user) != accounts.utils.get_user_city(book.submitter) or \
-       book.available_until > timezone.now().date() or \
+       book.available_until and book.available_until > timezone.now().date() or \
        user == book.submitter or \
        not book.is_available:
         return False

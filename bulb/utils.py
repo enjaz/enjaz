@@ -9,7 +9,7 @@ import accounts.utils
 import clubs.utils
 
 
-def create_tweet(user, action, arguments, media_path=None):
+def create_tweet(user, action, arguments, media_path=""):
     if not user.social_auth.exists():
         return
     if action == "add_book":
@@ -102,6 +102,8 @@ def can_edit_requester_status(user, book_request):
     
 def can_order_book(user, book):
     if book.is_deleted or \
+       accounts.utils.get_user_city(user) != accounts.utils.get_user_city(book.submitter) or \
+       book.available_until > timezone.now().date() or \
        user == book.submitter or \
        not book.is_available:
         return False
@@ -147,6 +149,7 @@ def can_attend_session(user, session):
 
 def can_join_group(user, group):
     if group.is_deleted or \
+       group.is_archived or \
        group.membership_set.filter(user=user).exists() or \
        group.coordinator == user or \
        (group.is_limited_by_gender and accounts.utils.get_user_gender(user) != accounts.utils.get_user_gender(group.coordinator)) or \

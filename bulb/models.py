@@ -11,6 +11,7 @@ from tagging_autocomplete.models import TagAutocompleteField
 from core.models import StudentClubYear
 from bulb import managers
 from niqati.models import Code
+import accounts.utils
 import niqati.utils
 
 
@@ -103,6 +104,12 @@ class Book(models.Model):
                                      verbose_name=u"محذوف؟")
     objects = managers.BookQuerySet.as_manager()
 
+
+    def is_in_user_city(self, user):
+        if user.is_superuser:
+            return True
+        else:
+            return accounts.utils.get_user_city(user) == accounts.utils.get_user_city(self.submitter)
 
     def last_pending_request(self):
         if self.contribution == 'L':

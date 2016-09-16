@@ -58,6 +58,16 @@ class RequestQuerySet(models.QuerySet):
         year = StudentClubYear.objects.get_current()
         return self.filter(book__year=year)
 
+    def for_user_city(self, user):
+        # Used in indicators
+        city_condition = models.Q()
+    
+        if user and user.is_authenticated():
+            city = get_user_city(user)
+            if city:
+                city_condition = models.Q(requester__common_profile__city=city)
+        return self.filter(city_condition)
+
     def to_user(self, user):
         return self.filter(book__submitter=user)
 

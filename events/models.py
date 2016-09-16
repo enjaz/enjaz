@@ -284,7 +284,11 @@ class Abstract(models.Model):
         ('P', 'Poster')
         )
     presentation_preference = models.CharField(verbose_name="Presentation preference", max_length=1, choices=presentation_preference_choices)
-    attachment = models.FileField(verbose_name=u"Attach the abstract", upload_to="hpc/abstract/")
+    introduction = models.TextField(verbose_name=u"Introduction")
+    methodology = models.TextField(verbose_name=u"Methodology")
+    results = models.TextField(verbose_name=u"Results")
+    discussion = models.TextField(verbose_name=u"Discussion")
+    conclusion = models.TextField(verbose_name=u"Conclusion")
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
@@ -298,6 +302,10 @@ class Abstract(models.Model):
 
     def __unicode__(self):
         return self.title
+
+class AbstractFigure(models.Model):
+    abstract = models.ForeignKey(Abstract, related_name='figures')
+    figure = models.FileField(verbose_name=u"Attach the figure", upload_to="hpc/figures/")
 
 class Evaluation(models.Model):
     abstract = models.ForeignKey(Abstract)

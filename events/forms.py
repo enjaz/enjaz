@@ -2,7 +2,8 @@
 from django import forms
 
 from accounts.utils import get_user_gender
-from events.models import NonUser, Session, Registration, Abstract
+from events.models import NonUser, Session, Registration, Abstract, AbstractFigure
+from django.forms.models import inlineformset_factory
 
 class NonUserForm(forms.ModelForm):
     class Meta:
@@ -73,7 +74,10 @@ class AbstractForm(forms.ModelForm):
         model = Abstract
         fields = ['title', 'authors', 'university', 'college',
                   'presenting_author', 'email', 'phone', 'level',
-                  'presentation_preference', 'attachment']
+                  'presentation_preference', 'introduction', 'methodology',
+                  'results', 'discussion', 'conclusion']
+
+AbstractFigureFormset = inlineformset_factory(Abstract, AbstractFigure, fields=['figure'])
 
 class EvaluationForm(forms.Form):
     def __init__(self, *args, **kwargs):

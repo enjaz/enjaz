@@ -8,8 +8,8 @@ from django.utils import timezone
 from post_office import mail
 
 from clubs.models import college_choices
-from events.forms import NonUserForm, RegistrationForm, AbstractForm
-from events.models import Event, Registration, Session, Abstract
+from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset
+from events.models import Event, Registration, Session, Abstract, AbstractFigure
 from events import utils
 
 def redirect_home(request, event_code_name):
@@ -34,14 +34,19 @@ def submit_abstract(request, event_code_name):
         instance = Abstract(event=event)
         form = AbstractForm(request.POST, request.FILES,
                             instance=instance)
-        if form.is_valid():
+        figure_formset = AbstractFigureFormset(request.POST, request.FILES)
+        if form.is_valid() and figure_formset.is_valid():
             abstract = form.save()
+            figure_formset.instance = abstract
+            figure_formset.save()
             return HttpResponseRedirect(reverse('events:abstract_submision_completed'))
 
     elif request.method == 'GET':
         form = AbstractForm()
+        figure_formset = AbstractFigureFormset()
 
-    context['form'] = form
+    context = {'form': form,
+               'figure_formset': figure_formset}
     return render(request, 'events/abstracts/abstract_submission.html', context)
 
 @login_required

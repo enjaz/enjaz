@@ -32,7 +32,7 @@ def add_clubs(apps, schema_editor):
                         year=year_2016_2017,
                         parent=alahsa_presidency,
                         email="bulb@enjazportal.com",
-                        city="R",
+                        city="A",
                         visible=False,
                         can_view_assessments=False,
                         is_assessed=False,

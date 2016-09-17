@@ -16,9 +16,14 @@ def redirect_home(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
     if event.url:
         return HttpResponseRedirect(event.url)
-    else:
+    elif event.is_registration_open():
         return HttpResponseRedirect(reverse('events:registration_introduction',
                                             args=(event.code_name,)))
+    elif event.is_abstract_submission_open():        
+        return HttpResponseRedirect(reverse('events:submit_abstract',
+                                            args=(event.code_name,)))
+    else:
+        raise Http404
 
 def submit_abstract(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name,
@@ -39,14 +44,16 @@ def submit_abstract(request, event_code_name):
             abstract = form.save()
             figure_formset.instance = abstract
             figure_formset.save()
-            return HttpResponseRedirect(reverse('events:abstract_submision_completed'))
+            return HttpResponseRedirect(reverse('events:abstract_submision_completed',
+                                                args=(event.code_name,)))
 
     elif request.method == 'GET':
         form = AbstractForm()
         figure_formset = AbstractFigureFormset()
 
-    context = {'form': form,
-               'figure_formset': figure_formset}
+    context['form'] = form
+    context['figure_formset'] = figure_formset
+
     return render(request, 'events/abstracts/abstract_submission.html', context)
 
 @login_required
@@ -83,7 +90,8 @@ def show_abstract(request, event_code_name, pk):
         form = EvaluationForm(request.POST, instance=evaluation)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse('events:list_abstracts'))
+            return HttpResponseRedirect(reverse('events:list_abstracts',
+                                                args=(event.code_name,)))
     elif request.method == 'GET':
         form = EvaluationForm(instance=evaluation)
     context = {'event': event, 'abstract': abstract, 'form': form}

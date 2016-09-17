@@ -1,12 +1,13 @@
 {% extends 'events_submission_base.html' %}{% load staticfiles %}
 {% block meta_description %}{{ event.english_name }} Abstract Submission{% endblock %}
 {% block title %}Abstract submission{% endblock %}
-{% block description %}{% if event.abstract_submission_instruction_url %}<span class="english-field">Please fill in the following form.  Make sure that you have read <a target="_blank" href="{{ event.abstract_submission_instruction_url }}">the regulations carefully</a>.</span>{% endif %}{% endblock %}
+{% block description %}{% if event.abstract_submission_instruction_url %}<div class="english-field"><p class="text-center">Please fill in the following form.  Make sure that you have read <a target="_blank" href="{{ event.abstract_submission_instruction_url }}">the regulations carefully</a>.</div>{% endif %}{% endblock %}
 
 {% block content %}
 <form method="post" role="form" id="form_register" enctype="multipart/form-data">	
         {% csrf_token %}
-	<div class="english-field">
+	<div class="english-field registration-form">
+            <h3 class="english-field">Your details</h3>
 			<div class="form-group">
 				<div class="english-field input-group{% if form.title.errors or form.ar_middle_name.errors or form.ar_last_name.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
@@ -125,7 +126,7 @@
 			<div class="form-group" id="presentation_preference-group">
 				<div class="input-group{% if form.presentation_preference.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
-						<i class="entypo-docs"></i>
+						<i class="entypo-doc"></i>
 					</div>
 					<select {% if form.presentation_preference.value and not form.presentation_preference.errors %}value="{{ form.presentation_preference.value }}" {% endif %}class="form-control english-field" id="presentation_preference" name="presentation_preference" required title="Presentation preference">
                                                 <option value="">Presentation preference</option>
@@ -139,11 +140,12 @@
 					{% endif %}
 				</div>
 			</div>
-        
+            <h3 class="english-field">Post your abstract</h3>
+        <p>In the {{ event.english_name }}, abstracts are divided into five sections: introduction, methodology, results, discussion and conclusion.  Make sure that you have read <a target="_blank" href="{{ event.abstract_submission_instruction_url }}">the regulations carefully</a> and post your abstract below.</p>
             <div class="form-group">
 				<div class="input-group{% if form.introduction.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
-						<i class="entypo-users"></i>
+						<i class="entypo-docs"></i>
 					</div>
 					
 					<textarea {% if form.introduction.value and not form.introduction.errors %}value="{{ form.introduction.value }}" {% endif %}type="text" class="form-control english-field" name="introduction" id="introduction" placeholder="Abstract's introduction" required="required"></textarea>
@@ -158,7 +160,7 @@
             <div class="form-group">
 				<div class="input-group{% if form.methodology.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
-						<i class="entypo-users"></i>
+						<i class="entypo-docs"></i>
 					</div>
 					
 					<textarea {% if form.methodology.value and not form.methodology.errors %}value="{{ form.methodology.value }}" {% endif %}type="text" class="form-control english-field" name="methodology" id="methodology" placeholder="Abstract's methodology" required="required"></textarea>
@@ -173,7 +175,7 @@
             <div class="form-group">
 				<div class="input-group{% if form.results.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
-						<i class="entypo-users"></i>
+						<i class="entypo-docs"></i>
 					</div>
 					
 					<textarea {% if form.results.value and not form.results.errors %}value="{{ form.results.value }}" {% endif %}type="text" class="form-control english-field" name="results" id="results" placeholder="Abstract's results" required="required"></textarea>
@@ -188,7 +190,7 @@
             <div class="form-group">
 				<div class="input-group{% if form.discussion.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
-						<i class="entypo-users"></i>
+						<i class="entypo-docs"></i>
 					</div>
 					
 					<textarea {% if form.discussion.value and not form.discussion.errors %}value="{{ form.discussion.value }}" {% endif %}type="text" class="form-control english-field" name="discussion" id="discussion" placeholder="Abstract's discussion" required="required"></textarea>
@@ -203,7 +205,7 @@
             <div class="form-group">
 				<div class="input-group{% if form.conclusion.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
-						<i class="entypo-users"></i>
+						<i class="entypo-docs"></i>
 					</div>
 					
 					<textarea {% if form.conclusion.value and not form.conclusion.errors %}value="{{ form.conclusion.value }}" {% endif %}type="text" class="form-control english-field" name="conclusion" id="conclusion" placeholder="Abstract's conclusion" required="required"></textarea>
@@ -215,7 +217,8 @@
 				</div>  
 			</div>
         
-            <h4>Figures</h4>
+            <h3>Attach your figures</h3>
+        <p>If your abstract cites any figures, upload them in order of reference (the first figure is figure 1, the second is figure 2, etc.)</p>
                         {# -------- #}
                         {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
                         {{ figure_formset.management_form }}
@@ -227,11 +230,6 @@
                                 <col class="col-xs-8">
                                 <col class="col-xs-4">
                             </colgroup>
-                          <thead><tr>
-                            {% for field in form.visible_fields %}
-                            <th>{{ field.label|capfirst }}</th>
-                            {% endfor %}
-                          </tr></thead>
                           {% endif %}
                           <tr class="form-container">
                           {% for field in form.visible_fields %}
@@ -278,8 +276,21 @@ will result in a refusal of my application.
 <script src="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.min.js' %}" id="script-resource-11"></script>
 <script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
 <script src="{% static 'neon/assets/js/jquery.inputmask.bundle.min.js' %}"></script>
+<script src="{% static 'js/jquery.formset.js' %}"></script>
+<script src="{% static 'js/jquery.autogrowtextarea.min.js' %}"></script>
 <script type="text/javascript">
     $(function(){
+        $("textarea").autoGrow();
+        // add formset controls
+        $("#figure-formset .form-container").formset({
+            prefix: '{{ figure_formset.prefix }}',
+            addText: 'Add a figure',
+            deleteText: 'Delete',
+            addCssClass: 'add-row btn btn-xs btn-primary',
+            deleteCssClass: 'delete-row btn btn-xs btn-danger',
+        });
+        
+        
         $('#agree').change(function(){
             if (this.checked){
                 $('button').removeAttr('disabled')

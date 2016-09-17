@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import Sum
+from django.utils import timezone
 
 from clubs.models import Club
 from events.managers import RegistrationQuerySet, SessionQuerySet
@@ -48,6 +49,29 @@ class Event(models.Model):
                                          verbose_name=u"على تلغرام؟")
     organizing_club = models.ForeignKey(Club)
     priorities = models.PositiveSmallIntegerField(default=1)
+
+    def is_abstract_submission_open(self):
+        #If we have abstract_submission_opening_date and/or
+        # abstract_submission_closing_date, let's respect them
+        if self.receives_abstract_submission and \
+           (not self.abstract_submission_opening_date or \
+            self.abstract_submission_opening_date and \
+            timezone.now() > self.abstract_submission_opening_date) and \
+           (not self.abstract_submission_closing_date or \
+            self.abstract_submission_closing_date and \
+            timezone.now() < self.abstract_submission_opening_date):
+                return True
+
+    def is_registration_open(self):
+        #If we have registration_opening_date and/or
+        # registration_closing_date, let's respect them
+        if (not self.registration_opening_date or \
+            self.abstract_submission_opening_date and \
+            timezone.now() > self.registration_opening_date) and \
+           (not self.registration_closing_date or \
+            self.registration_closing_date and \
+            timezone.now() < self.registration_closing_date):
+            return True
 
     def get_html_name(self):
         if self.is_official_name_english:
@@ -284,11 +308,11 @@ class Abstract(models.Model):
         ('P', 'Poster')
         )
     presentation_preference = models.CharField(verbose_name="Presentation preference", max_length=1, choices=presentation_preference_choices)
-    introduction = models.TextField(verbose_name=u"Introduction")
-    methodology = models.TextField(verbose_name=u"Methodology")
-    results = models.TextField(verbose_name=u"Results")
-    discussion = models.TextField(verbose_name=u"Discussion")
-    conclusion = models.TextField(verbose_name=u"Conclusion")
+    introduction = models.TextField(u"Introduction", default="")
+    methodology = models.TextField(u"Methodology", default="")
+    results = models.TextField(u"Results", default="")
+    discussion = models.TextField(u"Discussion", default="")
+    conclusion = models.TextField(u"Conclusion", default="")
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")

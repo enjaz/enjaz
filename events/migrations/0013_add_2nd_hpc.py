@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from datetime import date
+from datetime import datetime, date
 from django.db import models, migrations
 
 def add_hpc(apps, schema_editor):
@@ -12,7 +12,8 @@ def add_hpc(apps, schema_editor):
     end_date = date(2016, 12, 22)
     year_2016_2017 = StudentClubYear.objects.get(start_date__year=2016,
                                                  end_date__year=2017)
-    presidency = Club.objects.get(english_name="Presidency", year=year_2016_2017)
+    presidency = Club.objects.get(english_name="Presidency",
+                                  year=year_2016_2017, gender="", city="R")
     hpc_2nd_club = Club.objects.create(english_name="Organizing Committee of the 2nd HPC",
                         name="لجنة تنظيم مؤتمر التخصصات الصحية الثاني",
                         gender="",
@@ -23,9 +24,9 @@ def add_hpc(apps, schema_editor):
                         can_view_assessments=False,
                         is_assessed=False,
                         can_submit_activities=False)
-    hpc_2nd_event = Event.objects.create(official_name= "مؤتمر التخصصات السحية الثاني",
+    hpc_2nd_event = Event.objects.create(official_name= "مؤتمر التخصصات ال صحية الثاني",
                                          english_name="2nd Health Profession Conference",
-                                         is_english_name=True,
+                                         is_official_name_english=True,
                                          code_name="hpc-2nd",
                                          start_date=start_date,
                                          end_date=end_date,

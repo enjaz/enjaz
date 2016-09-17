@@ -33,8 +33,8 @@ class OrderForm(forms.Form):
                 self.fields['students_%s' % category.pk] = forms.ModelMultipleChoiceField(
                     widget=autocomplete.ModelSelect2Multiple(url='niqati:niqati-user-autocomplete',
                                                              attrs={
-                                                                 'data-placeholder': 'أَضف طالبا',
-                                                                 'data-minimum-input-length': 3
+                                                                 'data-placeholder': 'أَضف اسمًا',
+                                                                 'data-html': 'true',
                                                              }),
                     label=u"طلاب ال" + category.ar_label,
                     queryset=User.objects.all(),

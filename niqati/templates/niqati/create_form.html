@@ -24,7 +24,6 @@ $(function(){
 	$.each($('input[data-direct-entry=true]'), function(index, input){
 		var category = $(input).data('category');
 		// By default, hide the autocomplete input field and label.
-		$('#id_students_' + category + '-wrapper').hide();
 		$('label[for=id_students_' + category + ']').hide();
 		// Show a link that would display it.
 		$('label[for=id_count_' + category + ']').append(" (<a data-action='autocomplete' data-category=" + category + ">ادخال مباشر!</a>)");
@@ -39,8 +38,9 @@ $(function(){
 			// Hide number selection
 			$('#id_count_' + category).hide(300);
 			$('label[for=id_count_' + category + ']').hide(300, function(){
-				$('#id_students_' + category + '-wrapper').show(300).css('display', 'block');
+				$('#id_students_' + category ).show(300).css('display', 'block');
 				$('label[for=id_students_' + category + ']').show(300);
+                $('#id_students_' + category).closest("div").children("span.select2").removeClass("select2-hidden-accessible");
 			});
 
 		}else{
@@ -48,15 +48,16 @@ $(function(){
 			$('#id_students_' + category).html("");
 			$('#id_students_' + category + '-deck').html("");
 			// Hide autocomplete selection
-			$('#id_students_' + category + '-wrapper').hide(300);
 			$('label[for=id_students_' + category + ']').hide(300, function(){
 				$('#id_count_' + category).show(300);
 				$('label[for=id_count_' + category + ']').show(300);
+                $('#id_students_' + category).closest("div").children("span.select2").addClass("select2-hidden-accessible");
 			});
 		}
 	});
 });
 </script>
+
 
 {{ form.media }}
 {% endif %}

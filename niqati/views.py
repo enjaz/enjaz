@@ -381,4 +381,5 @@ class NiqatiUserAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
     def get_result_label(self, item):
-        return"{{ %s }} (<span class=\"english-field\">{{ %s }}</span>)" % (item.common_profile.get_ar_full_name, item.username)
+        return "%s (<span class=\"english-field\">%s</span>)" % (item.common_profile.get_ar_full_name(), item.username)
+        return u"%s (%s)" % (item.common_profile.get_ar_full_name(), item.username)

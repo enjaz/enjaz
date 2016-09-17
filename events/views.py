@@ -136,7 +136,7 @@ def nonuser_registration(request, event_code_name):
             nonuser = nonuser_form.save()
             registration = registration_form.save(nonuser=nonuser)
             if event.onsite_after and timezone.now() >= event.onsite_after:
-                for session in registrations.first_priority_sessions.all():
+                for session in registration.first_priority_sessions.all():
                     utils.register_in_vma(session, registration)
                 utils.send_onsite_confirmation(registration, event)
             else:

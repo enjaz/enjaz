@@ -16,7 +16,7 @@ class Command(BaseCommand):
                               access_token_secret=user_tokens['oauth_token_secret'],)
             try:
                 if tweet.media_path:
-                    status = api.PostMedia(tweet.text, tweet.media_path)
+                    status = api.PostUpdate(tweet.text, media=tweet.media_path)
                 else:
                     status = api.PostUpdate(tweet.text)
             except twitter.TwitterError, e:

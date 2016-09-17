@@ -2,7 +2,7 @@
 {% block csssheet %}
 <link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.css' %}">
 {% endblock %}
-{% block meta_description %}التسجيل في {{ event.name }}{% endblock %}
+{% block meta_description %}التسجيل في {{ event.official_name }}{% endblock %}
 {% block title %}سبق التسجيل{% endblock %}
 {% block description %}<h2 class="dinar-light">التسجيل في {{ event.get_html_name|safe }}</h2>{% endblock %}
 
@@ -10,7 +10,7 @@
 <div class="form-register-success visible dinar-light">
 	<i class="entypo-check"></i>
 	<h3  class="dinar-light">سبق أن سجّلت بنجاح في {{ event.get_html_name|safe }}!</h3>
-    <p style="text-align: justify;">يمكنك الاطلاع على مستجدات الحدث عبر <a href="https://twitter.com/{{ event.twitter }}">حسابنا على تويتر</a>{% if event.is_on_telegram %} و<a href="https://telegram.me/KSAUEVENTS">قناتنا على تلغرام</a>{% endif %}{% if event.url %} و<a href="{{ event.url }}">موقع الحدث</a>{% endif %}!</p>
+    <p style="text-align: justify;">يمكنك الاطلاع على مستجدات الحدث عبر <a target="_blank" href="https://twitter.com/{{ event.twitter }}">حسابنا على تويتر</a>{% if event.is_on_telegram %} و<a target="_blank" href="https://telegram.me/KSAUEVENTS">قناتنا على تلغرام</a>{% endif %}{% if event.url %} و<a href="{{ event.url }}">موقع الحدث</a>{% endif %}!</p>
 </div>
 {% endblock %}
 

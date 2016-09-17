@@ -2,7 +2,12 @@
 from django.contrib import admin
 from django.core.exceptions import ObjectDoesNotExist
 
-from events.models import Event, Session, Registration, NonUser
+from events.models import Event, Session, Registration, NonUser, Abstract, AbstractFigure
+
+class AbstractFigureInline(admin.TabularInline):
+    model = AbstractFigure
+    extra = 0
+
 
 class RegistrationUniversityFilter(admin.SimpleListFilter):
     title = "University"
@@ -81,7 +86,11 @@ class NonUserAdmin(admin.ModelAdmin):
 
     inlines = [RegistrationInline]
 
+class AbstractAdmin(admin.ModelAdmin):
+    inlines = [AbstractFigureInline]
+
 admin.site.register(Event)
 admin.site.register(Session)
 admin.site.register(Registration, RegistrationAdmin)
 admin.site.register(NonUser, NonUserAdmin)
+admin.site.register(Abstract, AbstractAdmin)

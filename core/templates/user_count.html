@@ -1,0 +1,47 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="description" content="بوابة إنجاز للنشاطات الطلابية" />
+    
+    <title>إنجاز | عدد المسجلين والمسجلات</title>
+	<link rel="icon" href="{% static 'logo/favicon.png' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
+    <script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/countupjs/1.7.1/countUp.min.js"></script>    
+</head>
+    
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-4 col-sm-offset-4">
+                    <h1 class="english-field " style="font-size: 80px; text-align: center;" id="counter">0</h1>
+                    <p class="text-center" style="font-size: 25px; ">المسجّلين والمسجّلات منذ السابعة صباحًا يوم الأحد 18 سبتمبر.</p>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+    var previousCount = 0;
+    updatecounter = function(){
+        $.ajax({url: "{% url 'update_user_count' %}",
+                method: 'GET',
+                success: function(data){
+                    var counter = new CountUp("counter", previousCount, data['user_count'], 0, 1);
+                    counter.start();
+                    previousCount = data['user_count'];
+               }
+        });
+    }
+    setInterval(updatecounter, 1000);
+        
+    $(function(){
+
+    });
+    </script>
+</body>
+    

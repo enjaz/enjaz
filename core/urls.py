@@ -12,4 +12,7 @@ urlpatterns = patterns('',
     url(r'^aboutsc/deanship_cp4/$', TemplateView.as_view(template_name='cp4_bader.html'), name='cp4_bader'),
     url(r'^visit/(?P<pk>\d+)/$', "core.views.visit_announcement", name='visit_announcement'),
     url(r'^cancel_twitter_connection$', "core.views.cancel_twitter_connection", name='cancel_twitter_connection'),
+    url(r'^user_count/$', TemplateView.as_view(template_name='user_count.html'), name='user_count'),
+    url(r'^user_count/update$', "core.views.update_user_count", name='update_user_count'),
+                       
 )

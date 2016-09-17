@@ -105,6 +105,8 @@ class Tweet(models.Model):
     media_path = models.CharField(u"مسار الصورة المرفقة",
                                   max_length=254,
                                   blank=True, default="")
+    failed_trials = models.PositiveSmallIntegerField(u"عدد المحاولات الفاشلة",
+                                                     default=0)
     user = models.ForeignKey(User, null=True,
                              on_delete=models.SET_NULL)
     was_sent = models.BooleanField(u"أرسلت؟", default=False)

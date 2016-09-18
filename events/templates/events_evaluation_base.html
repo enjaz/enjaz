@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ event.name }}{% endblock %}
+{% block title %}{{ event.official_name }}{% endblock %}
 {% block pageheaderurl %}{{ event.url }}{% endblock %}
 {% block pageheader %}<span class="english-field">{{ event.get_html_name|safe  }}</span>{% endblock %}
 

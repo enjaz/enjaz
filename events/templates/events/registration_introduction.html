@@ -1,6 +1,6 @@
 {% extends 'events_submission_base.html' %}{% load staticfiles %}
-{% block meta_description %}التسجيل في {{ event.name }}{% endblock %}
-{% block title %}التسجيل في {{ event.name }}{% endblock %}
+{% block meta_description %}التسجيل في {{ event.official_name }}{% endblock %}
+{% block title %}التسجيل في {{ event.official_name }}{% endblock %}
 {% block csssheet %}
 <link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.css' %}">
 {% endblock %}

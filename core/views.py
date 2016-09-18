@@ -247,6 +247,12 @@ def cancel_twitter_connection(request):
     common_profile.save()
     return {}
 
+@decorators.ajax_only
+def update_user_count(request):
+    start_date = timezone.make_aware(datetime(2016, 9, 18, 7), timezone.get_default_timezone())
+    user_count = User.objects.filter(date_joined__gte=start_date).count()
+    return {'user_count': user_count}
+
 def debate(request):
     url = config.DEBATE_URL
     context ={'url': url}

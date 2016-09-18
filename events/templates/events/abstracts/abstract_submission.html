@@ -1,0 +1,317 @@
+{% extends 'events_submission_base.html' %}{% load staticfiles %}
+{% block meta_description %}{{ event.english_name }} Abstract Submission{% endblock %}
+{% block title %}Abstract submission{% endblock %}
+{% block description %}{% if event.abstract_submission_instruction_url %}<div class="english-field"><p class="text-center">Please fill in the following form.  Make sure that you have read <a target="_blank" href="{{ event.abstract_submission_instruction_url }}">the regulations carefully</a>.</div>{% endif %}{% endblock %}
+
+{% block content %}
+<form method="post" role="form" id="form_register" enctype="multipart/form-data">	
+        {% csrf_token %}
+	<div class="english-field registration-form">
+            <h3 class="english-field">Your details</h3>
+			<div class="form-group">
+				<div class="english-field input-group{% if form.title.errors or form.ar_middle_name.errors or form.ar_last_name.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-flag"></i>
+					</div>
+					
+					<input {% if form.title.value and not form.title.errors %}value="{{ form.title.value }}" {% endif %}type="text" class="form-control english-field" name="title" id="title" placeholder="Abstract title" required="required"/>
+					{% if form.title.errors %}
+					    {% for error in form.title.errors %}
+					        <label class='error' for='title' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>  
+			</div>
+			<div class="form-group">
+				<div class="input-group{% if form.authors.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-users"></i>
+					</div>
+					
+					<textarea {% if form.authors.value and not form.authors.errors %}value="{{ form.authors.value }}" {% endif %}type="text" class="form-control english-field" name="authors" id="authors" placeholder="Authors' names" required="required"></textarea>
+					{% if form.authors.errors %}
+					    {% for error in form.authors.errors %}
+					        <label class='error' for='authors' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>  
+			</div>
+
+			<div class="form-group" id="university-group">
+				<div class="input-group{% if form.university.errors %} validate-has-error{% endif %}" style="text-align: left; color: #ffffff;">
+					<div class="input-group-addon">
+						<i class="entypo-graduation-cap"></i>
+					</div>
+                    <input class="english-field" type="radio" id="ksauhs-university" name="university-radio" value="KSAU-HS" style="margin-left: 10px;margin-right: 5px;" checked required>King Saud bin Abdulaziz University for Health Sciences<br>
+                    <input class="english-field" type="radio" id="other-university" name="university-radio" value="Other" style="margin-left: 10px; margin-right: 5px;" required>Other
+					<input {% if form.university.value and not form.university.errors %}value="{{ form.university.value }}" {% endif %}type="text" class="form-control english-field" id="university-text-field" placeholder="Type university name" style="display: none"/>
+					{% if form.university.errors %}
+					    {% for error in form.university.errors %}
+					        <label class='error' for='university' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+        
+			<div class="form-group">
+				<div class="english-field input-group{% if form.college.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-graduation-cap"></i>
+					</div>
+					
+					<input {% if form.college.value and not form.college.errors %}value="{{ form.college.value }}" {% endif %}type="text" class="form-control english-field" name="college" id="college" placeholder="College" required="required"/>
+					{% if form.college.errors %}
+					    {% for error in form.college.errors %}
+					        <label class='error' for='college' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group" id="level-group">
+				<div class="input-group{% if form.level.errors %} validate-has-error{% endif %}" style="text-align: left; color: #ffffff;">
+					<div class="input-group-addon">
+						<i class="entypo-address"></i>
+					</div>
+                    <input class="english-field" type="radio" name="level" value="U" style="margin-left: 10px;margin-right: 5px;" checked required>Undergraduate<br>
+                    <input class="english-field" type="radio" name="level" value="G" style="margin-left: 10px; margin-right: 5px;" required>Graduate
+					{% if form.level.errors %}
+					    {% for error in form.level.errors %}
+					        <label class='error' for='level' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="english-field input-group{% if form.presenting_author.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-user"></i>
+					</div>
+					
+					<input {% if form.presenting_author.value and not form.presenting_author.errors %}value="{{ form.presenting_author.value }}" {% endif %}type="text" class="form-control english-field" name="presenting_author" id="presenting_author" placeholder="Presenting author" required="required"/>
+					{% if form.presenting_author.errors %}
+					    {% for error in form.presenting_author.errors %}
+					        <label class='error' for='presenting_author' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="english-field input-group{% if form.email.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-mail"></i>
+					</div>
+					
+					<input {% if form.email.value and not form.email.errors %}value="{{ form.email.value }}" {% endif %}type="text" class="form-control english-field" name="email" id="email" {% if not form.email.errors %}placeholder="Email address"{% endif %} required="required"/>
+					{% if form.email.errors %}
+					    {% for error in form.email.errors %}
+					        <label class='error' for='email' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="english-field input-group{% if form.phone.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-mobile"></i>
+					</div>
+					
+					<input {% if form.phone.value and not form.phone.errors %}value="{{ form.phone.value }}" {% endif %}type="text" class="form-control english-field" name="phone" id="phone" placeholder="Contact number" required="required"/>
+					{% if form.phone.errors %}
+					    {% for error in form.phone.errors %}
+					        <label class='error' for='phone' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group" id="presentation_preference-group">
+				<div class="input-group{% if form.presentation_preference.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-doc"></i>
+					</div>
+					<select {% if form.presentation_preference.value and not form.presentation_preference.errors %}value="{{ form.presentation_preference.value }}" {% endif %}class="form-control english-field" id="presentation_preference" name="presentation_preference" required title="Presentation preference">
+                                                <option value="">Presentation preference</option>
+                                                <option value="O">Oral presentation</option>
+                                                <option value="P">Poster</option>
+					</select>
+					{% if form.presentation_preference.errors %}
+					    {% for error in form.presentation_preference.errors %}
+					        <label class='error' for='presentation_preference' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+            <h3 class="english-field">Post your abstract</h3>
+        <p>In the {{ event.english_name }}, abstracts are divided into five sections: introduction, methodology, results, discussion and conclusion.  Make sure that you have read <a target="_blank" href="{{ event.abstract_submission_instruction_url }}">the regulations carefully</a> and post your abstract below.</p>
+            <div class="form-group">
+				<div class="input-group{% if form.introduction.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-docs"></i>
+					</div>
+					
+					<textarea {% if form.introduction.value and not form.introduction.errors %}value="{{ form.introduction.value }}" {% endif %}type="text" class="form-control english-field" name="introduction" id="introduction" placeholder="Abstract's introduction" required="required"></textarea>
+					{% if form.introduction.errors %}
+					    {% for error in form.introduction.errors %}
+					        <label class='error' for='introduction' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>  
+			</div>
+        
+            <div class="form-group">
+				<div class="input-group{% if form.methodology.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-docs"></i>
+					</div>
+					
+					<textarea {% if form.methodology.value and not form.methodology.errors %}value="{{ form.methodology.value }}" {% endif %}type="text" class="form-control english-field" name="methodology" id="methodology" placeholder="Abstract's methodology" required="required"></textarea>
+					{% if form.methodology.errors %}
+					    {% for error in form.methodology.errors %}
+					        <label class='error' for='methodology' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>  
+			</div>
+        
+            <div class="form-group">
+				<div class="input-group{% if form.results.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-docs"></i>
+					</div>
+					
+					<textarea {% if form.results.value and not form.results.errors %}value="{{ form.results.value }}" {% endif %}type="text" class="form-control english-field" name="results" id="results" placeholder="Abstract's results" required="required"></textarea>
+					{% if form.results.errors %}
+					    {% for error in form.results.errors %}
+					        <label class='error' for='results' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>  
+			</div>
+        
+            <div class="form-group">
+				<div class="input-group{% if form.discussion.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-docs"></i>
+					</div>
+					
+					<textarea {% if form.discussion.value and not form.discussion.errors %}value="{{ form.discussion.value }}" {% endif %}type="text" class="form-control english-field" name="discussion" id="discussion" placeholder="Abstract's discussion" required="required"></textarea>
+					{% if form.discussion.errors %}
+					    {% for error in form.discussion.errors %}
+					        <label class='error' for='discussion' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>  
+			</div>
+        
+            <div class="form-group">
+				<div class="input-group{% if form.conclusion.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-docs"></i>
+					</div>
+					
+					<textarea {% if form.conclusion.value and not form.conclusion.errors %}value="{{ form.conclusion.value }}" {% endif %}type="text" class="form-control english-field" name="conclusion" id="conclusion" placeholder="Abstract's conclusion" required="required"></textarea>
+					{% if form.conclusion.errors %}
+					    {% for error in form.conclusion.errors %}
+					        <label class='error' for='conclusion' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>  
+			</div>
+        
+            <h3>Attach your figures</h3>
+        <p>If your abstract cites any figures, upload them in order of reference (the first figure is figure 1, the second is figure 2, etc.)</p>
+                        {# -------- #}
+                        {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
+                        {{ figure_formset.management_form }}
+                        {{ figure_formset.non_form_errors.as_ul }}
+                        <table id="figure-formset" class="form" style="width: 100%;">
+                        {% for form in figure_formset.forms %}
+                          {% if forloop.first %}
+                            <colgroup>
+                                <col class="col-xs-8">
+                                <col class="col-xs-4">
+                            </colgroup>
+                          {% endif %}
+                          <tr class="form-container">
+                          {% for field in form.visible_fields %}
+                            <td>
+                            {# Include the hidden fields in the form #}
+                            {% if forloop.first %}
+                              {% for hidden in form.hidden_fields %}
+                              {{ hidden }}
+                              {% endfor %}
+                            {% endif %}
+                                <div class="form-group">
+                              {{ field.errors.as_ul }}
+                              {{ field }}
+                                </div>
+                            </td>
+                          {% endfor %}
+                          </tr>
+                        {% endfor %}
+                        </table>
+                        {# ------- #}
+
+        
+            <div class="form-group" style="text-align: justify;">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="agree">I read the guidelines and I certify that all provided information on this application is vild and correct. I understand that withholding of information or giving false information
+will result in a refusal of my application.
+                    </label>
+                </div>
+            </div>
+            <input type="hidden" name="university" value="KSAU-HS">
+			<div class="form-group">
+				<button disabled type="submit" class="btn btn-success btn-block btn-login">
+					<i class="entypo-right-open-mini"></i>
+					Submit
+				</button>
+			</div>
+	</div>
+</form>
+
+{% endblock %}
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.css' %}" id="style-resource-3">
+<script src="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.min.js' %}" id="script-resource-11"></script>
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+<script src="{% static 'neon/assets/js/jquery.inputmask.bundle.min.js' %}"></script>
+<script src="{% static 'js/jquery.formset.js' %}"></script>
+<script src="{% static 'js/jquery.autogrowtextarea.min.js' %}"></script>
+<script type="text/javascript">
+    $(function(){
+        $("textarea").autoGrow();
+        // add formset controls
+        $("#figure-formset .form-container").formset({
+            prefix: '{{ figure_formset.prefix }}',
+            addText: 'Add a figure',
+            deleteText: 'Delete',
+            addCssClass: 'add-row btn btn-xs btn-primary',
+            deleteCssClass: 'delete-row btn btn-xs btn-danger',
+        });
+        
+        
+        $('#agree').change(function(){
+            if (this.checked){
+                $('button').removeAttr('disabled')
+            } else {
+                $('button').attr('disabled', 'disabled')
+            }
+        });
+        $('input[name=university-radio]').change(function(){
+            if ($('input[name=university-radio][value=Other]').prop('checked')){
+                $('#university-text-field').show();
+                $('#university-text-field').attr('required', 'required');
+            } else {
+                $('#university-text-field').hide();
+                $('#university-text-field').removeAttr('required');
+                $('input[name=university]').val('KSAU-HS');
+            }
+        });
+        $('#university-text-field').change(function(){
+            value = $(this).val();
+            $('input[name=university]').val(value);
+        });
+    });
+</script>
+{% endblock %}

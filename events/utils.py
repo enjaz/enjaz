@@ -3,11 +3,21 @@ import urllib2
 import json
 from post_office import mail
 
+
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 
 from core.utils import hindi_to_arabic
 from events.models import Event
+import clubs.utils
+
+def can_evaluate_abstracts(user, event):
+    if user.is_superuser:
+        return True
+    elif event.abstract_revision_club:
+        return clubs.utils.is_coordinator_or_member(event.abstract_revision_club, request.user)
+    else:
+        return False
 
 def check_if_closed(event):
     if event.registration_closing_date and \

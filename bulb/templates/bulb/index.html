@@ -416,7 +416,10 @@ div.section-intro, p.section-intro{
             success: function (data) {
                 if (data.success == 1) {
                     toastr.success("أضفت للنشرة البريدية. شكرا لك!");
+                    {# We will only hide the button after signup for authenticated users #}
+                    {% if not user.is_authenticated %}
                     $("form#newspaper-signup").hide();
+                    {% endif %}
                 } else {
                     if (data.message == 'previous'){
                         toastr.error("سبق أن سجلت في نشرتنا البريدية,");

@@ -1477,7 +1477,12 @@ def handle_newspaper_signup(request):
     else:
         form = NewspaperSignupForm(request.POST)
         if form.is_valid():
-            form.save()
+            email = form.cleaned_data['email']
+            previous_signup = NewspaperSignup.objects.filter(email=email).exists()
+            if previous_signup:
+                raise Exception("previous")
+            else:
+                form.save()
         else:
             raise Exception("invalid")
     return {}

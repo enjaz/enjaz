@@ -23,6 +23,20 @@ div.section-intro, p.section-intro{
         <p class="text-center"><a style="background-color: #1da1f3; color: white;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn"><i class="fa fa-twitter"></i> اربط حسابي بتويتر</a></p>
         {% endif %}
     </div>
+{% if not user.bulb_newspaper_signup and not user.is_signup %}
+<div class="col-sm-3">
+    <form class="form" id="newspaper-signup">
+        {% if not user.is_authenticated  %}
+        <input required class="english-field form-control" placeholder="البريد الإلكتروني" id="email" name="email" type="email">
+        {% endif %}
+        <button  class="btn btn-block btn-success" type="submit">
+            <i class="fa fa-envolpe"></i>
+            سجلني في القائمة البريدية!
+        </button>
+    </form>
+</div>
+{% endif %}
+{% comment %}
 {% if not user.reader_profile or not user.reading_group_coordination.exists and not user.reading_group_memberships.exists or not user.book_giveaways.exists %}
 <div class="col-sm-3">
 {% if not user.reader_profile %}
@@ -47,6 +61,7 @@ div.section-intro, p.section-intro{
 {% endif %}
 </div>
 {% endif %}
+{% endcomment %}
 </div>
 
 <div class="row">
@@ -383,5 +398,36 @@ div.section-intro, p.section-intro{
 {% include "bulb/components/connect_twitter.html" %}
 {% include "bulb/exchange/components/edit_book_asset.html" %}
 {% include "bulb/exchange/components/edit_needed_book_asset.html" %}
+<script type="application/javascript">
+    $("form#newspaper-signup").submit(function (event) {
+        event.preventDefault();
+        var formData = {
+            {% if not user.is_authenticated %}
+            email: $("#email").val(),
+                
+            {% endif %}
+                       };
+        toastr.options.positionClass = "toast-top-left";
+        $.ajax({
+            url: "{% url 'bulb:handle_newspaper_signup' %}",
+            type: 'POST',
+            data: formData,
+            cache: false,
+            success: function (data) {
+                if (data.success == 1) {
+                    toastr.success("أضفت للنشرة البريدية. شكرا لك!");
+                    $("form#newspaper-signup").hide();
+                } else {
+                    if (data.message == 'previous'){
+                        toastr.error("سبق أن سجلت في نشرتنا البريدية,");
+                    } else if(data.message == 'invalid'){
+                        toastr.error("البريد الذي أدخل غير صحيح.");
+                    }
+                }}
+        });
 
+                    
+    })
+
+</script>
 {% endblock %}

@@ -7,7 +7,7 @@ from dal import autocomplete
 from tagging.fields import TagField
 
 import accounts.utils
-from bulb.models import Book, NeededBook, Request, Group, Session, Report, Membership, ReaderProfile, Recruitment
+from bulb.models import Book, NeededBook, Request, Group, Session, Report, Membership, ReaderProfile, Recruitment, NewspaperSignup
 from bulb import utils
 
 city_choices = (
@@ -152,9 +152,8 @@ class GroupForm(forms.ModelForm, CommonControl):
     members = forms.ModelMultipleChoiceField(
                     widget=autocomplete.ModelSelect2Multiple(url='bulb:bulb-user-autocomplete',
                                                              attrs={
-                                                                 'class': 'modern-style',
-                                                                 'data-placeholder': 'أَضف طالبا',
-                                                                 'data-minimum-input-length': 3
+                                                                 'data-html': 'true',
+                                                                 'data-placeholder': 'أَضف اسما',
                                                              }),
                     label=u"الأعضاء",
                     queryset=User.objects.all(),
@@ -217,9 +216,8 @@ class ReportForm(forms.ModelForm):
     attendees = forms.ModelMultipleChoiceField(
         widget=autocomplete.ModelSelect2Multiple(url='bulb:bulb-user-autocomplete',
                                                  attrs={
-                                                     'class': 'modern-style',
-                                                     'data-placeholder': 'أَضف طالبا',
-                                                     'data-minimum-input-length': 3
+                                                     'data-placeholder': 'أَضف اسما',
+                                                     'data-html': 'true',
                                                  }),
         label=u"الحضور",
         queryset=User.objects.all(),
@@ -268,3 +266,9 @@ class RecruitmentForm(forms.ModelForm):
     class Meta:
         model = Recruitment
         exclude = ['user']
+
+class NewspaperSignupForm(forms.ModelForm):
+    email = forms.EmailField(required=True)
+    class Meta:
+        model = NewspaperSignup
+        fields = ['email']

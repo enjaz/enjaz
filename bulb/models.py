@@ -499,3 +499,14 @@ class Recruitment(models.Model):
                                            auto_now_add=True)
     def __unicode__(self):
         return self.user.username
+
+class NewspaperSignup(models.Model):
+    user = models.OneToOneField(User, verbose_name=u"المستخدم",
+                                related_name="bulb_newspaper_signup",
+                                null=True, blank=True)
+    email = models.EmailField(default="", blank=True)
+    submission_date = models.DateTimeField(u"تاريخ الإرسال",
+                                       auto_now_add=True)
+
+    def __unicode__(self):
+        return self.email or self.user.username

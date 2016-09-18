@@ -9,7 +9,9 @@ urlpatterns = patterns('',
     url(r'^indicators/(?:(?P<city>\w)/)?$', views.indicators, name="indicators"),
     url(r'^join_us/$', views.handle_recruitment, name="handle_recruitment"),
     url(r'^join_us/thanks/$', TemplateView.as_view(template_name='bulb/recruitment_thanks.html'), name="recruitment_thanks"),
-    url(r'^bulb-user-autocomplete/$', views.BulbUserAutocomplete.as_view(), name='bulb-user-autocomplete',),
+    url(r'^bulb-user-autocomplete/$', views.BulbUserAutocomplete.as_view(), name='bulb-user-autocomplete'),
+    url(r'^newspaper/$', views.handle_newspaper_signup, name='handle_newspaper_signup'),
+    url(r'^newspaper/update$', views.update_newspaper_count, name='update_newspaper_count'),
 
     # Books exchange
     url(r'^exchange/$', views.list_book_categories, name="list_book_categories"),

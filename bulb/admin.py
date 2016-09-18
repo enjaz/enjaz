@@ -3,7 +3,7 @@ from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import ObjectDoesNotExist
 
-from bulb.models import Category, Book, NeededBook, Request, Point, Membership, Group, Recruitment
+from bulb.models import Category, Book, NeededBook, Request, Point, Membership, Group, Recruitment, NewspaperSignup
 from bulb import utils
 
 class BulbAuthenticationForm(AdminAuthenticationForm):
@@ -115,4 +115,6 @@ admin.site.register(Request)
 admin.site.register(Point)
 admin.site.register(Recruitment, RecruitmentAdmin)
 bulb_admin.register(Recruitment, RecruitmentAdmin)
+admin.site.register(NewspaperSignup)
+bulb_admin.register(NewspaperSignup)
 admin.site.register(Group, GroupAdmin)

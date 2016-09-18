@@ -14,8 +14,8 @@ from post_office import mail
 from core.utils import get_search_queryset
 from core.models import StudentClubYear, Tweet
 from core import decorators
-from bulb.models import Category, Book, NeededBook, Request, Point, Group, Membership, Session, Report, ReaderProfile, Recruitment
-from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, NeededBookForm, RequestForm, GroupForm, FreeSessionForm, SessionForm, ReportForm, ReaderProfileForm, RecruitmentForm
+from bulb.models import Category, Book, NeededBook, Request, Point, Group, Membership, Session, Report, ReaderProfile, Recruitment, NewspaperSignup
+from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, NeededBookForm, RequestForm, GroupForm, FreeSessionForm, SessionForm, ReportForm, ReaderProfileForm, RecruitmentForm, NewspaperSignupForm
 from bulb import utils
 from clubs.models import city_choices
 import accounts.utils
@@ -1463,6 +1463,31 @@ def handle_recruitment(request):
         form = RecruitmentForm()
     context = {'form': form}
     return render(request, 'bulb/recruitment.html', context)
+
+@decorators.post_only
+@decorators.ajax_only
+@csrf.csrf_exempt
+def handle_newspaper_signup(request):
+    if request.user.is_authenticated():
+        previous_signup = NewspaperSignup.objects.filter(user=request.user).exists()
+        if previous_signup:
+            raise Exception("previous")
+        else:
+            NewspaperSignup.objects.create(user=request.user)
+    else:
+        form = NewspaperSignupForm(request.POST)
+        if form.is_valid():
+            form.save()
+        else:
+            raise Exception("invalid")
+    return {}
+
+@decorators.get_only
+@decorators.ajax_only
+def update_newspaper_count(request):
+    newspaper_count = NewspaperSignup.objects.count()
+    return {'newspaper_count': newspaper_count}
+
 
 class BulbUserAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):

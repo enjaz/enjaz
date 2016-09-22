@@ -2,7 +2,7 @@
 import datetime
 
 from django.contrib import admin
-from activities.models import Activity, Episode, Category, Evaluation, Review, Assessment, Criterion
+from activities.models import Activity, Episode, Category, Evaluation, Review, Assessment, Criterion, DepositoryItem
 from clubs.models import section_choices
 from clubs.utils import get_presidency, get_deanship
 from core.models import StudentClubYear
@@ -95,8 +95,12 @@ class EvaluationAdmin(admin.ModelAdmin):
     readonly_fields = ('relevance', 'quality')
     list_display = ('episode', 'evaluator', 'relevance', 'quality')
 
+class DepositoryItemAdmin(admin.ModelAdmin):
+    list_display = ('name', 'quantity', 'unit')
+
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(Category)
 admin.site.register(Assessment)
 admin.site.register(Criterion)
 admin.site.register(Evaluation, EvaluationAdmin)
+admin.site.register(DepositoryItem, DepositoryItemAdmin)

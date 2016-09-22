@@ -56,7 +56,7 @@ class Activity(models.Model):
                                           help_text=u"هذا هو الوصف الذي سيعرض للطلاب")
     goals = models.TextField(verbose_name=u"ما أهداف هذا النشاط، وكيف يخدم المجتمع والصالح العام؟")
     requirements = models.TextField(blank=True,
-                                    verbose_name=u"متطلبات النشاط")
+                                    verbose_name=u"متطلبات النشاط الأخرى")
     submitter = models.ForeignKey(User, null=True,
                                   on_delete=models.SET_NULL)
     submission_date = models.DateTimeField(u'تاريخ الإرسال',
@@ -642,3 +642,27 @@ class CriterionValue(models.Model):
 
     def __unicode__(self):
         return "{}: {}".format(self.criterion.code_name, self.value)
+
+class DepositoryItem(models.Model):
+    name = models.CharField(u"الاسم", default="", max_length=100)
+    quantity = models.PositiveIntegerField(u"الكمية", null=True, blank=True)
+    unit = models.CharField(u"الوحدة", default="", max_length=20)
+    category = models.CharField(u"التصنيف", default="", max_length=40)
+    submission_date = models.DateTimeField(u'تاريخ الإرسال',
+                                           auto_now_add=True)
+    edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
+    def __unicode__(self):
+        return self.name
+
+class ItemRequest(models.Model):
+    activity = models.ForeignKey(Activity)
+    name = models.CharField(u"الاسم", default="", max_length=100)
+    quantity = models.PositiveIntegerField(u"الكمية")
+    unit = models.CharField(u"الوحدة", default="", max_length=20)
+    category = models.CharField(u"التصنيف", default="", max_length=40)
+    submission_date = models.DateTimeField(u'تاريخ الإرسال',
+                                           auto_now_add=True)
+    edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
+
+    def __unicode__(self):
+        return self.name

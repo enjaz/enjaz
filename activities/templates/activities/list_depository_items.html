@@ -1,0 +1,59 @@
+{% extends 'activities_base.html' %}{% load staticfiles %}
+{% block title %}قائمة موجودات المخازن{% endblock %}
+
+{% block content %}
+<div class="panel-group" id="item-accordion">
+    
+{% for categorized_items in categorized_items_list %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#item-accordion" href="#collapse-{{ forloop.counter }}" class="collapsed">
+                    {{ categorized_items.category }}
+                </a>
+            </h4>
+        </div>
+        <div id="collapse-{{ forloop.counter }}" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <div class="row">
+                    <table class="display datatable compact">
+                        <thead>
+                            <tr>
+                                <th class="all">العنصر</th>
+                                {% if user.is_superuser %}<th class="all">الكمية</th>{% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in categorized_items.items %}
+                            <tr>
+                                <td dir="auto">{{ item.name }}</td>
+                                {% if user.is_superuser %}<td>{{ item.quantity }}</td>{% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+</div>
+
+{% if user.is_superuser %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input name="excel_file" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+    <input type="submit" class="btn btn-success" value="أرسل">
+</form>
+{% endif %}
+{% endblock %}
+{% block customscript %}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+	<script>
+    $('.datatable').dataTable({
+        "language": {% include 'js/dataTables-arabic.json' %}
+    });
+	</script>
+{% endblock %}
+

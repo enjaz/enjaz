@@ -10,6 +10,7 @@ from niqati import views as niqati_views
 urlpatterns = patterns('',
     url(r'^$', views.list_activities, name='list'),
     url(r'^create/$', views.create, name='create'),
+    url(r'^depository/$', views.list_depository_items, name='list_depository_items'),
     url(r'^(?P<activity_id>\d+)/$', views.show, name='show'),
     url(r'^(?P<activity_id>\d+)/edit/$', views.edit, name='edit'),
     url(r'^(?P<activity_id>\d+)/delete/$', views.delete, name='delete'),
@@ -19,6 +20,7 @@ urlpatterns = patterns('',
     url(r'^(?P<activity_id>\d+)/assess/(?P<category>[mp])/$', views.assess, name='assess'),
     url(r'^assessments/$', views.assessment_list, name='assessment_list'),
     url(r'^(?P<activity_id>\d+)/niqati/$', niqati_views.coordinator_view, name='niqati_orders'),
+    url(r'^autocomplete_items/$', views.autocomplete_items, name='autocomplete_items'),
     # url(r'^(?P<activity_id>\d+)/niqati/create/$', niqati_views.coordinator_view, name='niqati_create'),
 )
 

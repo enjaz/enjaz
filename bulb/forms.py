@@ -153,7 +153,7 @@ class GroupForm(forms.ModelForm, CommonControl):
                     widget=autocomplete.ModelSelect2Multiple(url='bulb:bulb-user-autocomplete',
                                                              attrs={
                                                                  'data-html': 'true',
-                                                                 'data-placeholder': 'أَضف اسما',
+                                                                 'data-placeholder': 'أَضف عنصرا',
                                                              }),
                     label=u"الأعضاء",
                     queryset=User.objects.all(),

@@ -18,6 +18,13 @@ class CustomUserChoiceField(forms.ModelChoiceField):
         except ObjectDoesNotExist:
             return obj
 
+class EmployeeReport(ModelForm):
+    class Meta:
+        model = EmployeeReport
+        fields = ['speaker', 'quotation', 'sponsor_speech', 'prize', 'prize_college',
+                  'booth', 'sponsor', 'participant_count', 'organizer_count', 'speaker_count',
+                  'lecture_count', 'session_count', 'booth_count', 'end', 'notes']
+
 class FollowUpReportForm(ModelForm):
     class Meta:
         model = FollowUpReport

@@ -148,7 +148,7 @@
 					طباعة التقرير
 					<i class="entypo-doc-text"></i>
 				</a>
-                {% if user|can_submit_followupreport:report.episode.activity %}
+                {% if user|can_submit_studentreport:report.episode.activity %}
                 <a class="btn btn-gold btn-icon icon-left" href="{% url 'media:edit_report' report.pk %}">
                     <i class="entypo-pencil"></i>
                     عدّل التقرير

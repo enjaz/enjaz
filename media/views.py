@@ -24,7 +24,7 @@ from media.models import FollowUpReport, Story, Article, StoryReview, ArticleRev
 from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
     TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm, \
     FollowUpReportImageFormset, ReportCommentForm, BuzzForm
-from media.utils import is_media_coordinator_or_member, is_club_coordinator_or_member, is_media_or_club_coordinator_or_member, proper_poll_type, get_poll_type_url, media_coordinator_or_member_test, get_user_media_center, get_clubs_for_assessment_by_user, can_submit_followupreport, get_club_media_center, media_user_test, is_media_coordinator_or_deputy, can_view_followupreport
+from media.utils import is_media_coordinator_or_member, is_club_coordinator_or_member, is_media_or_club_coordinator_or_member, proper_poll_type, get_poll_type_url, media_coordinator_or_member_test, get_user_media_center, get_clubs_for_assessment_by_user, can_submit_studentreport, get_club_media_center, media_user_test, is_media_coordinator_or_deputy, can_view_followupreport
 from accounts.utils import get_user_gender, get_user_city
 
 # Keywords
@@ -96,7 +96,7 @@ def submit_report(request, episode_pk):
     episode = get_object_or_404(Episode, pk=episode_pk)
     
     # Permission checks
-    if not can_submit_followupreport(request.user, episode.activity):
+    if not can_submit_studentreport(request.user, episode.activity):
         raise PermissionDenied
     # (2) The passed episode shouldn't already have a report.
     #     Overriding a previous submission shouldn't be allowed
@@ -241,7 +241,7 @@ def edit_report(request, episode_pk):
     report = get_object_or_404(FollowUpReport, episode=episode)
 
     # Permission checks
-    if not can_submit_followupreport(request.user, episode.activity):
+    if not can_submit_studentreport(request.user, episode.activity):
         raise PermissionDenied
 
     if request.method == 'POST':
@@ -277,7 +277,7 @@ def report_comment(request, episode_pk):
     # Permission checks
     # The passed episode should be owned by the user's club or the user should be a member of the media center
     # This is more specific than the test of ``user_passes_test`` above.
-    if not can_submit_followupreport(request.user, episode.activity):
+    if not can_submit_studentreport(request.user, episode.activity):
         raise PermissionDenied
 
     comment_form = ReportCommentForm(request.POST, instance=ReportComment(report=report, author=request.user))
@@ -315,7 +315,7 @@ def create_story(request, episode_pk):
     # --- Permission Checks ---
     # (1) The user should be part of the Media Center (either head or member)
 
-    if not can_submit_followupreport(request.user, episode.activity):
+    if not can_submit_studentreport(request.user, episode.activity):
         raise PermissionDenied
 
     # (2) The passed episode shouldn't already have a story.
@@ -397,7 +397,7 @@ def edit_story(request, episode_pk):
                              reviewer=request.user)
     
     # --- Permission Checks ---
-    if not can_submit_followupreport(request.user, episode.activity):
+    if not can_submit_studentreport(request.user, episode.activity):
         raise PermissionDenied
     
     if request.method == 'POST':

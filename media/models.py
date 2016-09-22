@@ -56,6 +56,34 @@ class BaseComment(models.Model):
     class Meta:
         abstract = True
 
+class EmployeeReport(models.Model):
+    """
+    A follow-up report, submitted after REPORT_DUE_AFTER days of an activity episode.
+    """
+    episode = models.OneToOneField(Episode, verbose_name=u"الموعد")
+
+    submitter = models.ForeignKey(User)
+    date_submitted = models.DateTimeField(auto_now_add=True,
+                                      verbose_name=u"تاريخ رفع التقرير")
+
+    # Content
+    speaker = models.TextField(verbose_name=u"أسماء المتحدثين")
+    quotation = models.TextField(verbose_name=u"اقتباسات من المتحدثين")
+    sponsor_speech = models.TextField(verbose_name=u"كلمة الرعاة")
+    prize_winner = models.TextField(verbose_name=u"أسماء المكرمين")
+    winner_college_or_club = models.TextField(verbose_name=u"الكلية أو النادي الذي يتبع له المكرم")
+    booth = models.TextField(verbose_name=u"أسماء الأركان المشاركة")
+    sponsor = models.TextField(verbose_name=u"أسماء الجهات الراعية أو المشاركة")
+
+    participant_count = models.IntegerField(verbose_name=u"عدد المشاركين")
+    organizer_count = models.IntegerField(verbose_name=u"عدد المنظمين")
+    speaker_count = models.IntegerField(verbose_name=u"عدد المتحدثين")
+    lecture_count = models.IntegerField(verbose_name=u"عدد المحاضرات")
+    session_count = models.IntegerField(verbose_name=u"عدد ورش العمل")
+    booth_count = models.IntegerField(verbose_name=u"عدد الأركان")
+    end = models.TextField(verbose_name=u"كيف إنتهى النشاط؟")
+
+    notes = models.TextField(verbose_name=u"ملاحظات")
 
 class FollowUpReport(models.Model):
     """

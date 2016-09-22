@@ -38,8 +38,8 @@ def can_review_media_assessment(user):
     return utils.is_media_coordinator_or_deputy(user) or user.is_superuser
 
 @register.filter
-def can_submit_followupreport(user, activity):
-    return utils.can_submit_followupreport(user, activity)
+def can_submit_studentreport(user, activity):
+    return utils.can_submit_studentreport(user, activity)
 
 @register.filter
 def can_view_followupreport(user, activity):

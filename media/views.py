@@ -102,14 +102,14 @@ def submit_employee_report(request, episode_pk):
     #     Overriding a previous submission shouldn't be allowed
     try:
         report = episode.employeereport
-        return HttpResponseRedirect(reverse('media:edit_report',
+        return HttpResponseRedirect(reverse('media:edit_employee_report',
                                             args=(episode.pk, )))
     except ObjectDoesNotExist:
         pass
 
     if request.method == 'POST':
         form = EmployeeReportForm(request.POST,
-                                  instance=FollowUpReport(pk=episode.pk, # make pk equal to episode pk
+                                  instance=EmployeeReport(pk=episode.pk, # make pk equal to episode pk
                                                                          # to keep things synchronized
                                                           episode=episode,
                                                           submitter=request.user)
@@ -121,7 +121,46 @@ def submit_employee_report(request, episode_pk):
                                                 ))
     else:
         form = EmployeeReportForm()
-    return render(request, 'media/report_write.html', {'form': form})
+    return render(request, 'media/report_write.html', {'form': form,
+                                                        'employee_submit': True})
+
+@login_required
+def show_employee_report(request, episode_pk):
+    """
+    Show a EmployeeReport.
+    """
+    episode = get_object_or_404(Episode, pk=episode_pk)
+    report = get_object_or_404(EmployeeReport, episode=episode)
+
+    # Permission checks
+    if not can_view_followupreport(request.user, episode.activity):
+        raise PermissionDenied
+
+    return render(request, 'media/report_read.html', {'report': report, 'comment_form': ReportCommentForm(),
+                                                      'employee_show':True})
+
+@login_required
+def edit_employee_report(request, episode_pk):
+    episode = get_object_or_404(Episode, pk=episode_pk)
+    report = get_object_or_404(EmployeeReport, episode=episode)
+
+    # Permission checks
+    if not can_submit_employeereport(request.user, episode.activity):
+        raise PermissionDenied
+
+    if request.method == 'POST':
+        form = EmployeeReportForm(request.POST, instance=report)
+        if form.is_valid():
+            form.save()
+
+            return HttpResponseRedirect(reverse('media:show_employee_report',
+                                                args=(episode.pk, )
+                                                ))
+    else:
+        form = EmployeeReportForm(instance=report)
+    return render(request, "media/report_write.html", {'form': form,
+                                                       'episode': episode,
+                                                       'employee_edit': True})
 
 @login_required
 def submit_report(request, episode_pk):

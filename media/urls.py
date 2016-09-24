@@ -8,9 +8,11 @@ urlpatterns = patterns('',
                        
     # Reports
     url(r'^activities/reports/$', views.list_reports, name="list_reports"),
-    url(r'^activities/reports/(?P<episode_pk>\d+)/submit/$', views.submit_employee_report, name="submit_employee_report"),
+    url(r'^activities/reports/(?P<episode_pk>\d+)/submit_employee_report/$', views.submit_employee_report, name="submit_employee_report"),
     url(r'^activities/reports/(?P<episode_pk>\d+)/submit/$', views.submit_report, name="submit_report"),
+    url(r'^activities/reports/(?P<episode_pk>\d+)/employee_report/$', views.show_employee_report, name="show_employee_report"),
     url(r'^activities/reports/(?P<episode_pk>\d+)/$', views.show_report, name="show_report"),
+    url(r'^activities/reports/(?P<episode_pk>\d+)/edite_mployee_report/$', views.edit_employee_report, name="edit_employee_report"),
     url(r'^activities/reports/(?P<episode_pk>\d+)/edit/$', views.edit_report, name="edit_report"),
     url(r'^activities/reports/(?P<episode_pk>\d+)/comment/$', views.report_comment, name="report_comment"),
     url(r'^activities/reports/options/$', views.update_report_options, name="update_report_options"),

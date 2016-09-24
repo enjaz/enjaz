@@ -108,8 +108,11 @@ def can_assess_club_as_media(user, club):
     return user_media_centers.exists()
 
 def can_submit_employeereport(user):
-    return clubs.utils.is_employee(user) or \
-           user.is_superuser
+    return clubs.utils.is_employee_of_any_club(user) or \
+        is_media_coordinator_or_member(user) or \
+        clubs.utils.is_presidency_coordinator_or_deputy(user) or \
+        user.has_perms('media.add_followupreport') or \
+        user.is_superuser
 
 def can_submit_studentreport(user, activity):
     return clubs.utils.has_coordination_to_activity(user, activity) or \

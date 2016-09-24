@@ -6,13 +6,14 @@
 <p>التقرير التالي يحتوي معلومات النشاط الافتراضية كما تم رفعها في طلب النشاط؛ نرجو تحديث البيانات أو تعديلها حسب المعلومات و الإحصائيات الحقيقية.</p>
 {% endif %}
 <hr>
-<form action="{% if edit %}{% url 'media:edit_report' episode.pk %}{% else %}{% url 'media:submit_report' episode.pk %}{% endif %}" enctype="multipart/form-data" method="post">
+<form action="{% if edit %}{% url 'media:edit_report' episode.pk %}{% elif employee_edit %}{% url 'media:edit_employee_report' episode.pk %}{% elif employee_submit %}{% url 'media:submit_employee_report' episode.pk %}{% else %}{% url 'media:submit_report' episode.pk %}{% endif %}" enctype="multipart/form-data" method="post">
     {# The enctype="multipart/form-data" attribute is required for uploading files via html forms in django. #}
     {# Also make sure you pass request.FILES to the django form. #}
     {# See: https://docs.djangoproject.com/en/dev/topics/http/file-uploads/#basic-file-uploads #}
 {% csrf_token %}
 {% bootstrap_form form %}
 
+    {% if not employee %}
     <h4>الصور المرفقة</h4>
     {# -------- #}
     {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
@@ -52,11 +53,12 @@
     {# ------- #}
 
 <hr>
-
+    {% endif %}
 <button class="btn btn-block btn-green" type="submit">
 	<i class="glyphicon glyphicon-ok-sign"></i> 
 	أرسل
 </button>
+
 </form>
 {% endblock %}
 

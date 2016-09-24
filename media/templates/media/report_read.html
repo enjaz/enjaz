@@ -74,7 +74,9 @@
 				<th colspan="4" class="text-center">محتوى التقرير</th>
 			</tr>
 		</thead>
-		
+	{% if employee_show %}
+            <!-- employee report content -->
+    {% else %}
 		<tbody>
 			<tr>
 				<th class="text-center">الوصف</th>
@@ -112,12 +114,14 @@
                 <td colspan="3">{{ report.notes|linebreaksbr }}</td>
             </tr>
 		</tbody>
+     {% end if %}
 	</table>
-	
+
 	<div class="margin"></div>
 
 	<div class="row">
-		
+			{% if not employee_show %}
+
 		<div class="col-sm-6">
 
             <div class="invoice-left">
@@ -138,7 +142,7 @@
             </div>
 
         </div>
-
+                {% end if %}
         <div class="col-sm-6">
 
 
@@ -148,8 +152,8 @@
 					طباعة التقرير
 					<i class="entypo-doc-text"></i>
 				</a>
-                {% if user|can_submit_studentreport:report.episode.activity %}
-                <a class="btn btn-gold btn-icon icon-left" href="{% url 'media:edit_report' report.pk %}">
+                {% if user|can_submit_studentreport:report.episode.activity and user|can_submit_employeereport:report.episode.activity %}
+                <a class="btn btn-gold btn-icon icon-left" href="{% if employee_edit %}{% url 'media:edit_employee_report' episode.pk %}{% else %}{% url 'media:edit_report' report.pk %}{% end if %}">
                     <i class="entypo-pencil"></i>
                     عدّل التقرير
                 </a>

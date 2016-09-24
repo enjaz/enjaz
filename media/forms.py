@@ -6,7 +6,7 @@ from django.forms import ModelForm
 from django.forms.models import inlineformset_factory
 from clubs.utils import get_media_center
 
-from media.models import FollowUpReport, Story, StoryReview, Article, ArticleReview, CustomTask, TaskComment, Poll, \
+from media.models import EmployeeReport, FollowUpReport, Story, StoryReview, Article, ArticleReview, CustomTask, TaskComment, Poll, \
     PollResponse, WHAT_IF, HUNDRED_SAYS, PollComment, PollChoice, FollowUpReportImage, ReportComment, Buzz
 
 # A nice trick to display full names instead of usernames
@@ -18,7 +18,7 @@ class CustomUserChoiceField(forms.ModelChoiceField):
         except ObjectDoesNotExist:
             return obj
 
-class EmployeeReport(ModelForm):
+class EmployeeReportForm(ModelForm):
     class Meta:
         model = EmployeeReport
         fields = ['speaker', 'quotation', 'sponsor_speech', 'prize', 'prize_college',

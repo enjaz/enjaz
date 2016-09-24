@@ -245,7 +245,7 @@ def create(request):
                 form_object.is_approved = True
                 form_object.assignee = None
             else:
-                if 'chosen_reviewer_club' in form.cleaned_data:
+                if form.cleaned_data.get('chosen_reviewer_club'):
                     reviewing_parent = form.cleaned_data['chosen_reviewer_club']
                 else:
                     reviewing_parent = form_object.primary_club.get_next_activity_reviewing_parent()

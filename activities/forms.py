@@ -171,6 +171,7 @@ class ActivityForm(ModelForm):
 class ReviewerActivityForm(ActivityForm):
     """A form which allows the submitter to choose the reviewer."""
     chosen_reviewer_club = ModelChoiceField(queryset=Club.objects.none(),
+                                            required=False,
                                             label=u"المُراجع",
                                             help_text=u"الكلية المراجعة")
     class Meta:

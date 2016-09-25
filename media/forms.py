@@ -21,7 +21,7 @@ class CustomUserChoiceField(forms.ModelChoiceField):
 class EmployeeReportForm(ModelForm):
     class Meta:
         model = EmployeeReport
-        fields = ['speaker', 'quotation', 'sponsor_speech', 'prize', 'prize_college',
+        fields = ['speaker', 'quotation', 'sponsor_speech', 'prize_winner', 'winner_college_or_club',
                   'booth', 'sponsor', 'participant_count', 'organizer_count', 'speaker_count',
                   'lecture_count', 'session_count', 'booth_count', 'end', 'notes']
 

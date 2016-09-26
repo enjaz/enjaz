@@ -34,8 +34,8 @@ def index(request):
     book_sample = Book.objects.current_year().for_user_city(request.user).available().order_by("?")[:6]
     latest_books = Book.objects.current_year().for_user_city(request.user).undeleted().order_by("-submission_date")[:6]
     latest_needed_books = NeededBook.objects.current_year().for_user_city(request.user).undeleted().order_by("-submission_date")[:6]
-    book_count = Book.objects.current_year().undeleted().count()
-    book_request_count = Request.objects.current_year().count()
+    book_count = Book.objects.current_year().for_user_city(request.user).undeleted().count()
+    book_request_count = Request.objects.current_year().for_user_city(request.user).count()
     reader_profiles = ReaderProfile.objects.order_by("?")[:10]
     reader_profile_count = ReaderProfile.objects.count()
     context = {'groups': groups, 'group_count': group_count,

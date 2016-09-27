@@ -76,7 +76,8 @@ def list_activities(request):
     if request.user.is_authenticated():
         template = 'activities/list_privileged.html'
 
-        if request.user.is_superuser:
+        if request.user.is_superuser or \
+           is_deanship_of_students_affairs_coordinator_or_member(request.user):
             # If the user is a super user or part of the presidency,
             # then show all activities
             context['pending'] = Activity.objects.pending().current_year()

@@ -13,7 +13,7 @@
 {% csrf_token %}
 {% bootstrap_form form %}
 
-    {% if not employee %}
+    {% if not employee_submit and not employee_edit %}
     <h4>الصور المرفقة</h4>
     {# -------- #}
     {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}

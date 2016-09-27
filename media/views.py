@@ -96,7 +96,7 @@ def submit_employee_report(request, episode_pk):
     episode = get_object_or_404(Episode, pk=episode_pk)
 
     # Permission checks
-    if not can_submit_employeereport(request.user, episode.activity):
+    if not can_submit_employeereport(request.user):
         raise PermissionDenied
     # (2) The passed episode shouldn't already have a report.
     #     Overriding a previous submission shouldn't be allowed
@@ -122,7 +122,8 @@ def submit_employee_report(request, episode_pk):
     else:
         form = EmployeeReportForm()
     return render(request, 'media/report_write.html', {'form': form,
-                                                        'employee_submit': True})
+                                                        'employee_submit': True,
+                                                       'episode':episode})
 
 @login_required
 def show_employee_report(request, episode_pk):
@@ -145,7 +146,7 @@ def edit_employee_report(request, episode_pk):
     report = get_object_or_404(EmployeeReport, episode=episode)
 
     # Permission checks
-    if not can_submit_employeereport(request.user, episode.activity):
+    if not can_submit_employeereport(request.user):
         raise PermissionDenied
 
     if request.method == 'POST':

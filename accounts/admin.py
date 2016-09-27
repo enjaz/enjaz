@@ -37,7 +37,12 @@ class CommonProfileInline(admin.StackedInline):
     model = CommonProfile
     max_num = 1
     extra = 0
-    
+
+def make_active(modeladmin, request, queryset):
+    queryset.update(is_active=True)
+make_active.short_description = u"نشّط حسابات المستخدمين والمستخدمات"
+
+
 class EmployeeFilter(admin.SimpleListFilter):
     title = u"عمادة شؤون الطلاب"
     parameter_name = 'is_employee'
@@ -101,6 +106,7 @@ ones) deal with the User model."""
 
     list_filter = (EmployeeFilter, CoordinatorFilter, CollegeFilter,
                    SectionFilter)
+    actions = [make_active]
     search_fields= ('username', 'email',
                     'common_profile__en_first_name',
                     'common_profile__en_middle_name',

@@ -196,8 +196,28 @@
             <tr>
                 <th>متطلبات النشاط</th>
                     <td>
-                        {% if activity.requirements %}
-                            {{ activity.requirements|linebreaksbr }}
+                        {{ activity.itemrequest_set.exists }}
+                        {{  activity.itemrequest_set }}
+                        {% if activity.requirements or activity.itemrequest_set.exists %}
+                            {% if activity.itemrequest_set.exists %}
+                                <table>
+                                    <thead>
+                                        <th>الصنف</th>
+                                        <th>الكمية</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for item_request in activity.itemrequest_set.all %}
+                                            <tr>
+                                                <td>{{ item_request.name }}</td>
+                                                <td>{{ item_request.quantity }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% endif %}
+                            {% if activity.requirements %}
+                                <strong>متطلبات أخرى: </strong>{{ activity.requirements|linebreaksbr }}
+                            {% endif %}
                         {% else %}
                             لا يوجد.
                         {% endif %}

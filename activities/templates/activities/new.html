@@ -22,9 +22,50 @@
 			
 			<!-- panel body -->
     </div>
+    {{ item_request_formset.management_form }}
+    {% if user_club.city == 'R' or user.is_superuser %}
+    <div id="item-request-section">
+        <h3>طلبات مخازن العمادة</h3>
+        <p>يمكن من هنا طلب موجودات عمادة شؤون الطلاب من المخازن. يمكن الاطلاع على <a href="{% url 'activities:list_depository_items' %}">القائمة الكاملة بموجودات مخازن العمادة</a>.</p>
+        {# -------- #}
+        {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
+        {{ item_request_formset.non_form_errors.as_ul }}
+        <table id="depository-formset" class="form" style="width: 100%;">
+        {% for form in item_request_formset.forms %}
+          {% if forloop.first %}
+            <colgroup>
+                <col class="col-xs-8">
+                <col class="col-xs-4">
+            </colgroup>
+          <thead><tr>
+            {% for field in form.visible_fields %}
+            <th>{{ field.label|capfirst }}</th>
+            {% endfor %}
+          </tr></thead>
+          {% endif %}
+          <tr class="form-container">
+          {% for field in form.visible_fields %}
+            <td>
+            {# Include the hidden fields in the form #}
+            {% if forloop.first %}
+              {% for hidden in form.hidden_fields %}
+              {{ hidden }}
+              {% endfor %}
+            {% endif %}
+                <div class="form-group">
+              {{ field.errors.as_ul }}
+              {% bootstrap_field field %}
+                </div>
+            </td>
+          {% endfor %}
+          </tr>
+        {% endfor %}
+        </table>
+        <hr>
+    </div>
+    {% endif %}
     <h4>المستندات المرفقة</h4>
     {# -------- #}
-    {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
     {{ attachment_formset.management_form }}
     {{ attachment_formset.non_form_errors.as_ul }}
     <table id="attachment-formset" class="form" style="width: 100%;">
@@ -51,7 +92,7 @@
         {% endif %}
             <div class="form-group">
           {{ field.errors.as_ul }}
-          {{ field }}
+          {% bootstrap_field field %}
             </div>
         </td>
       {% endfor %}
@@ -76,6 +117,8 @@ $('input[type=text], textarea').attr('dir', 'auto');
 // Move the episode panel to the 6th position in the form
 // (after the description field)
 $('#episode_panel').insertAfter('form .form-group:nth-child(8)');
+    
+$('#item-request-section').insertAfter('form .form-group:nth-child(14)');
 	
 // Wrap all the fields related to episodes in a single div.
 // This makes it much easier for styling.
@@ -320,20 +363,46 @@ function updateEpisodes() {
  */
 </script>
 
-<link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/font-awesome/css/font-awesome.min.css' %}">
 {% endblock %}
 
 {% block customscript %}
+<link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/font-awesome/css/font-awesome.min.css' %}">
 <script src="{% static 'js/jquery.formset.js' %}"></script>
 <script src="{% static 'neon/assets/js/bootstrap-timepicker.min.js' %}"></script>
 <script>
-    // add formset controls
-    $("#attachment-formset .form-container").formset({
-        prefix: '{{ attachment_formset.prefix }}',
-        addText: 'أضف مستندًا',
-        deleteText: 'احذف',
-        addCssClass: 'add-row btn btn-xs btn-primary',
-        deleteCssClass: 'delete-row btn btn-xs btn-default',
+    function initializeAutocomplete(context){
+        console.log("hi");
+        console.log($(".item-request-autocomplete"));
+        $(".item-request-autocomplete", context || null).autocomplete({
+            source: "{% url 'activities:autocomplete_items' %}",
+            position: { my : "right top", at: "right bottom" },
+            minLength: 2
+        });
+    }
+
+    $(function(){
+        // add formset controls
+        $("#attachment-formset .form-container").formset({
+            prefix: '{{ attachment_formset.prefix }}',
+            addText: 'أضف مستندًا',
+            deleteText: 'احذف',
+            addCssClass: 'add-row btn btn-xs btn-primary',
+            deleteCssClass: 'delete-row btn btn-xs btn-default',
+            formCssClass: 'attachment-formset'
+        });
+        $("#depository-formset .form-container").formset({
+            prefix: '{{ item_request_formset.prefix }}',
+            addText: 'أضف عنصرًا',
+            deleteText: 'احذف',
+            addCssClass: 'add-row btn btn-xs btn-primary',
+            deleteCssClass: 'delete-row btn btn-xs btn-default',
+            formCssClass: 'depository-formset',
+            added: function(row){
+                initializeAutocomplete(row);
+            }
+        });
+        initializeAutocomplete();
+
     });
 </script>
 {% endblock %}

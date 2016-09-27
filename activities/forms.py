@@ -4,14 +4,16 @@ This module contains the forms used in the activities app.
 """
 from django import forms
 from django.forms import ModelForm, ModelChoiceField, ModelMultipleChoiceField
-from django.forms.widgets import TextInput
+from django.forms.widgets import TextInput, Select
 from django.forms.models import inlineformset_factory
 from django.utils import timezone
+from openpyxl import load_workbook
 
-from activities.models import Activity, Episode, Review, Evaluation, Attachment, Assessment, Criterion, CriterionValue
-from media.utils import can_assess_club_as_media_coordinator
+from activities.models import Activity, Episode, Review, Evaluation, Attachment, Assessment, Criterion, CriterionValue, DepositoryItem, ItemRequest 
 from clubs.models import Club
 from core.models import StudentClubYear
+from dal import autocomplete
+from media.utils import can_assess_club_as_media_coordinator
 
 class ActivityForm(ModelForm):
     """A general form, which doesn't include 'Presidency'."""
@@ -169,6 +171,7 @@ class ActivityForm(ModelForm):
 class ReviewerActivityForm(ActivityForm):
     """A form which allows the submitter to choose the reviewer."""
     chosen_reviewer_club = ModelChoiceField(queryset=Club.objects.none(),
+                                            required=False,
                                             label=u"المُراجع",
                                             help_text=u"الكلية المراجعة")
     class Meta:
@@ -265,6 +268,14 @@ class EvaluationForm(ModelForm):
         fields = ['quality', 'relevance']
 
 AttachmentFormSet = inlineformset_factory(Activity, Attachment, fields=['document', 'description'], extra=1)
+
+class ItemRequestForm(ModelForm):
+    class Meta:
+        model = ItemRequest
+        fields = ['name', 'quantity']
+        widgets = {'name': TextInput(attrs={'class': 'item-request-autocomplete text-right'})}
+
+ItemRequestFormSet = inlineformset_factory(Activity, ItemRequest, ItemRequestForm, extra=1)
 
 class AssessmentForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -366,3 +377,50 @@ class AssessmentForm(ModelForm):
     class Meta:
         model = Assessment
         fields = ['notes', 'cooperator_points', 'is_reviewed']
+
+class UpdateDepositoryItemForm(forms.Form):
+    excel_file = forms.FileField()
+
+    def save(self):
+        excel_file = self.cleaned_data['excel_file']
+        wb = load_workbook(excel_file)
+        categories = wb.get_sheet_names()
+
+        DepositoryItem.objects.all().delete()
+        items = []
+        for category in categories:
+            ws = wb[category]
+            for row in ws:
+                # To exclude headers and empty rows, skip all items
+                # that don't have a quantity, unless the quantity is
+                # explicitly not applicable (i.e. written as '-').
+                if row[1].value == '-':
+                    quantity = None
+                else:
+                    try:
+                        quantity = int(row[1].value)
+                    except (TypeError, ValueError, UnicodeEncodeError):
+                        continue
+
+                name = row[0].value
+
+                # If no name, skip
+                if not name:
+                    continue
+                else:
+                    name = name.strip()
+                try:
+                    unit = row[2].value or ""
+                except IndexError:
+                    unit = ""
+
+                if unit:
+                    unit = unit.strip()
+
+                cleaned_category = category.strip()
+
+                item = DepositoryItem(name=name, unit=unit,
+                                      quantity=quantity, category=cleaned_category)
+                items.append(item)
+        DepositoryItem.objects.bulk_create(items)
+

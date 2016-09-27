@@ -4,13 +4,13 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
-from django.db.models import Q
+from django.core.exceptions import PermissionDenied
+import json
 
 from post_office import mail
 
-from activities.models import Activity, Review, Episode,  Assessment
-from activities.forms import ActivityForm, ReviewerActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm, AttachmentFormSet, AssessmentForm
+from activities.models import Activity, Review, Episode,  Assessment, DepositoryItem
+from activities.forms import ActivityForm, ReviewerActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm, AttachmentFormSet, AssessmentForm, ItemRequestFormSet, UpdateDepositoryItemForm
 from accounts.utils import get_user_gender
 from activities.utils import get_club_notification_to, get_club_notification_cc, can_assess_club, \
     get_club_assessing_club_by_user, can_assess_any_club
@@ -20,6 +20,7 @@ from clubs.utils import is_coordinator_or_member, is_coordinator_or_deputy_of_an
     is_member_of_any_club, is_employee_of_any_club, is_coordinator, is_coordinator_or_deputy, get_user_clubs, \
     get_user_coordination_and_deputyships, has_coordination_to_activity, get_deanship, is_employee, \
     can_review_activity, can_delete_activity, can_edit_activity, can_submit_activities, is_deanship_of_students_affairs_coordinator_or_member
+from core.utils import get_search_queryset
 from media.utils import MAX_OVERDUE_REPORTS, can_assess_club_as_media_coordinator, can_assess_club_as_media_member, can_assess_club_as_media, is_media_coordinator_or_deputy, get_user_media_center, get_clubs_for_assessment_by_user
 from media.models import FollowUpReport, FollowUpReportImage, Story
 
@@ -75,7 +76,8 @@ def list_activities(request):
     if request.user.is_authenticated():
         template = 'activities/list_privileged.html'
 
-        if request.user.is_superuser:
+        if request.user.is_superuser or \
+           is_deanship_of_students_affairs_coordinator_or_member(request.user):
             # If the user is a super user or part of the presidency,
             # then show all activities
             context['pending'] = Activity.objects.pending().current_year()
@@ -215,6 +217,7 @@ def create(request):
         # activity under.  Normal users shouldn't.
         can_directly_add = request.user.has_perm('activities.directly_add_activity')
         attachment_formset = AttachmentFormSet(request.POST, request.FILES)
+        item_request_formset = ItemRequestFormSet(request.POST)
         if can_directly_add:
             activity = Activity(submitter=request.user)
             form = DirectActivityForm(request.POST, instance=activity)
@@ -226,13 +229,15 @@ def create(request):
                 form.fields['chosen_reviewer_club'].queryset = user_club.possible_parents.all()
             else:
                 form = ActivityForm(request.POST, instance=activity)
-        if form.is_valid() and attachment_formset.is_valid():
+        if form.is_valid() and attachment_formset.is_valid() and item_request_formset.is_valid():
             form_object = form.save()
             attachment_formset.instance = form_object
+            item_request_formset.instance = form_object
             attachments = attachment_formset.save(commit=False)
             for attachment in attachments:
                 attachment.submitter = request.user
                 attachment.save()
+            item_request_formset.save()
 
             # If the user can directly add activities, make the
             # activity automatically approved.  Otherwise, email the
@@ -241,7 +246,7 @@ def create(request):
                 form_object.is_approved = True
                 form_object.assignee = None
             else:
-                if 'chosen_reviewer_club' in form.cleaned_data:
+                if form.cleaned_data.get('chosen_reviewer_club'):
                     reviewing_parent = form.cleaned_data['chosen_reviewer_club']
                 else:
                     reviewing_parent = form_object.primary_club.get_next_activity_reviewing_parent()
@@ -265,10 +270,11 @@ def create(request):
             return HttpResponseRedirect(reverse('activities:list'))
         else:
             context = {'form': form,
-                       'attachment_formset': attachment_formset}
+                       'attachment_formset': attachment_formset,
+                       'item_request_formset': item_request_formset}
             return render(request, 'activities/new.html', context)
     elif request.method == 'GET':
-        context = {'attachment_formset': AttachmentFormSet()}
+        context = {'attachment_formset': AttachmentFormSet(), 'item_request_formset': ItemRequestFormSet()}
         if request.user.has_perm("activities.directly_add_activity"):
             form = DirectActivityForm()
         else:
@@ -293,6 +299,7 @@ def edit(request, activity_id):
         attachment_formset = AttachmentFormSet(request.POST,
                                                request.FILES,
                                                instance=activity)
+        item_request_formset = ItemRequestFormSet(request.POST, instance=activity)
         if request.user.has_perm('activities.directly_add_activity'):
             modified_activity = DirectActivityForm(request.POST,
                                                    instance=activity)
@@ -307,8 +314,11 @@ def edit(request, activity_id):
             modified_activity = ActivityForm(request.POST,
                                              instance=activity)
         # Should check that edits are valid before saving
-        if modified_activity.is_valid() and attachment_formset.is_valid():
+        if modified_activity.is_valid() and \
+           attachment_formset.is_valid() and \
+           item_request_formset.is_valid():
             modified_activity.save()
+            item_request_formset.save()
 
             # Handle attachments
             attachments = attachment_formset.save(commit=False)
@@ -361,10 +371,12 @@ def edit(request, activity_id):
             context = {'form': modified_activity,
                        'activity_id': activity_id,
                        'attachment_formset': attachment_formset,
+                       'item_request_formset': item_request_formset,
                        'edit': True}
             return render(request, 'activities/new.html', context)
     else:
         attachment_formset = AttachmentFormSet(instance=activity)
+        item_request_formset = ItemRequestFormSet(instance=activity)
         # There are different activity forms depending on what
         # permission the user has.  Presidency group members
         # (i.e. with directly_add_activity) can add activities
@@ -383,7 +395,8 @@ def edit(request, activity_id):
             form = ActivityForm(instance=activity)
         context = {'form': form, 'activity_id': activity_id,
                    'activity': activity, 'edit': True,
-                   'attachment_formset': attachment_formset}
+                   'attachment_formset': attachment_formset,
+                   'item_request_formset': item_request_formset}
         return render(request, 'activities/new.html', context)
 
 @login_required
@@ -458,7 +471,7 @@ def review(request, activity_id, reviewer_id):
         try:  # If the review is already there, edit it.
             review_object = Review.objects.get(activity=activity,
                                                reviewer_club=reviewer_club)
-        except ObjectDoesNotExist:
+        except Review.DoesNotExist:
             review_object = Review(activity=activity,
                                    reviewer=request.user,
                                    reviewer_club=reviewer_club)
@@ -557,7 +570,7 @@ def review(request, activity_id, reviewer_id):
                 review_object = Review.objects.get(activity=activity,
                                                    reviewer_club=reviewer_club)
                 review = ReviewForm(instance=review_object)
-            except ObjectDoesNotExist:
+            except Review.DoesNotExist:
                 review = ReviewForm()
                 # Note 1: Here, review is a ReviewForm object, because
                 # we want to write
@@ -569,7 +582,7 @@ def review(request, activity_id, reviewer_id):
                                             reviewer_club=reviewer_club)
                 # Note 2: Here, review is a Review object, because we
                 # just want to read
-            except ObjectDoesNotExist:
+            except Review.DoesNotExist:
                 review = None
 
     context = {'activity': activity, 'review': review, 'active_tab':
@@ -684,7 +697,7 @@ def assess(request, activity_id, category):
     try:  
         assessment = Assessment.objects.distinct().get(activity=activity,
                                                        criterionvalue__criterion__category=category)
-    except ObjectDoesNotExist:
+    except Assessment.DoesNotExist:
         assessment = Assessment(activity=activity,
                                 assessor=request.user,
                                 assessor_club=assessor_club)
@@ -730,3 +743,33 @@ def assess(request, activity_id, category):
         template_name = 'activities/assessment_media_center.html'
 
     return render(request, template_name, context)
+
+def list_depository_items(request):
+    context = {}
+    if request.method == 'POST':
+        form = UpdateDepositoryItemForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse("activities:list_depository_items"))
+    elif request.method == 'GET':            
+        categories = DepositoryItem.objects.values_list('category', flat=True).distinct()
+        categorized_items_list = []
+        for category in categories:
+            items = DepositoryItem.objects.filter(category=category)
+            categorized_items_list.append({'category': category, 'items': items})
+        context['categorized_items_list'] = categorized_items_list
+    return render(request, 'activities/list_depository_items.html', context)
+
+
+def autocomplete_items(request):
+    print request.GET
+    term = request.GET.get('term')
+    if not term:
+        raise Http404
+
+    qs = DepositoryItem.objects.filter(quantity__gte=0) | \
+         DepositoryItem.objects.filter(quantity__isnull=True)
+
+    result_query = get_search_queryset(qs, ['name', 'category'], term)
+    result_list = [u"{} ({})".format(r.name, r.category) for r in result_query]
+    return HttpResponse(json.dumps(result_list))

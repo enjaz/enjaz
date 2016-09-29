@@ -175,6 +175,7 @@ def show(request, activity_id):
        can_review_activity(request.user, activity) or \
        request.user.has_perm('activities.view_activity') or \
        is_employee(activity.primary_club, request.user) or\
+       is_deanship_of_students_affairs_coordinator_or_member(request.user) or\
        any([club in activity_clubs for club in user_clubs]):
         # Don't raise any errors
         pass

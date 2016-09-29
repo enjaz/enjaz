@@ -507,7 +507,7 @@ def review(request, activity_id, reviewer_id):
                         # Email notifications
                         email_context['full_url'] = activity_full_url
                         mail.send(get_club_notification_to(activity),
-                            cc=get_club_notification_cc(activity),
+                            cc=get_club_notification_cc(activity, reviewer_club),
                             template="activity_approved_to_coordinator",
                             context=email_context)
                         if activity.primary_club.employee:
@@ -533,7 +533,7 @@ def review(request, activity_id, reviewer_id):
                     email_context['last_reviewer'] = reviewer_club
                     email_context['full_url'] = last_review_full_url
                     mail.send(get_club_notification_to(activity),
-                              cc=get_club_notification_cc(activity),
+                              cc=get_club_notification_cc(activity, reviewer_club),
                               template="activity_rejected_to_coordinator",
                               context=email_context)
 
@@ -553,7 +553,7 @@ def review(request, activity_id, reviewer_id):
                     email_context['last_reviewer'] = reviewer_club
                     email_context['full_url'] = last_review_full_url
                     mail.send(get_club_notification_to(activity),
-                              cc=get_club_notification_cc(activity),
+                              cc=get_club_notification_cc(activity, reviewer_club),
                               template="activity_held_to_coordinator",
                               context=email_context)
             activity.save()

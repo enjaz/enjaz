@@ -1,6 +1,6 @@
 {% extends 'media_base.html' %}{% load staticfiles %}{% load clubs_utils %}{% load media_tags %}
 {% block title %}
-تقرير {{ report.episode.activity.name }}
+ تقرير 	{% if employee_show %}عمادة شؤون الطلاب{% else %}المركز الإعلامي{% endif %} عن {{ report.episode.activity.name }}
 {% endblock %}
 
 {% block content %}
@@ -18,7 +18,7 @@
 		
 		<div class="col-sm-6 invoice-right">
 		
-				<h3>تقرير #{{ report.episode.pk }}</h3>
+				<h3>تقرير {% if employee_show %}عمادة شؤون الطلاب{% else %}المركز الإعلامي{% endif %} #{{ report.episode.pk }}</h3>
 				<span>{{ report.date_submitted }}</span>
 		</div>
 		
@@ -74,37 +74,67 @@
 				<th colspan="4" class="text-center">محتوى التقرير</th>
 			</tr>
 		</thead>
-		
-		<tbody>
+	{% if employee_show %}
+            <tbody>
 			<tr>
-				<th class="text-center">الوصف</th>
-				<td colspan="3" class="activity-description">{{ report.description|linebreaksbr }}</td>
-			</tr>
-			
-			<tr>
-				<th class="text-center">تاريخ البداية</th>
-				<td>{{ report.start_date }}</td>
-				<th class="text-center">تاريخ النهاية</th>
-				<td>{{ report.end_date }}</td>
-			</tr>
-			
-			<tr>
-				<th class="text-center">وقت البداية</th>
-				<td>{{ report.start_time }}</td>
-				<th class="text-center">وقت النهاية</th>
-				<td>{{ report.end_time }}</td>
-			</tr>
-			
-			<tr>
-				<th class="text-center">عدد المنظمين</th>
-				<td>{{ report.organizer_count }}</td>
-				<th class="text-center">عدد المشاركين</th>
-				<td>{{ report.participant_count }}</td>
+				<th class="text-center">أسماء المتحدثين</th>
+				<td colspan="3" class="activity-description">{{ report.speaker|linebreaksbr }}</td>
 			</tr>
 
             <tr>
-                <th class="text-center">أماكن النشر و الإعلان</th>
-                <td colspan="3">{{ report.announcement_sites|linebreaksbr }}</td>
+				<th class="text-center">إقتباسات من الحديث</th>
+				<td colspan="3" class="activity-description">{{ report.quotation|linebreaksbr }}</td>
+			</tr>
+
+            <tr>
+				<th class="text-center">كلمة الرعاة</th>
+				<td colspan="3" class="activity-description">{{ report.sponsor_speech|linebreaksbr }}</td>
+			</tr>
+
+            <tr>
+				<th class="text-center">أسماء المكرمين</th>
+				<td colspan="3" class="activity-description">{{ report.prize_winner|linebreaksbr }}</td>
+			</tr>
+
+            <tr>
+				<th class="text-center">الكلية أو النادي الذي يتبع له المكرم</th>
+				<td colspan="3" class="activity-description">{{ report.winner_college_or_club|linebreaksbr }}</td>
+			</tr>
+
+            <tr>
+				<th class="text-center">أسماء الأركان المشاركة</th>
+				<td colspan="3" class="activity-description">{{ report.booth|linebreaksbr }}</td>
+			</tr>
+
+            <tr>
+				<th class="text-center">أسماؤ الجهات الراعية أو المشاركة</th>
+				<td colspan="3" class="activity-description">{{ report.sponsor|linebreaksbr }}</td>
+			</tr>
+
+			<tr>
+				<th class="text-center">عدد المشاركين</th>
+				<td>{{ report.participant_count }}</td>
+				<th class="text-center">عدد المنظمين</th>
+				<td>{{ report.organizer_count }}</td>
+			</tr>
+
+			<tr>
+				<th class="text-center">عدد المتحدثين</th>
+				<td>{{ report.speaker_count }}</td>
+				<th class="text-center">عدد المحاضرات</th>
+				<td>{{ report.lecture_count }}</td>
+			</tr>
+
+			<tr>
+				<th class="text-center">عدد ورش العمل</th>
+				<td>{{ report.session_count }}</td>
+				<th class="text-center">عدد الأركان</th>
+				<td>{{ report.booth_count }}</td>
+			</tr>
+
+            <tr>
+                <th class="text-center">كيف إنتهى النشاط؟</th>
+                <td colspan="3">{{ report.end|linebreaksbr }}</td>
             </tr>
 
             <tr>
@@ -112,16 +142,40 @@
                 <td colspan="3">{{ report.notes|linebreaksbr }}</td>
             </tr>
 		</tbody>
+    {% else %}
+		<tbody>
+			<tr>
+				<th class="text-center">روابط الإعلان عبر تويتر</th>
+				<td colspan="3" class="activity-description">{{ report.twitter_announcement|linebreaksbr }}</td>
+			</tr>
+		</tbody>
+     {% endif %}
 	</table>
-	
+
 	<div class="margin"></div>
 
 	<div class="row">
-		
-		<div class="col-sm-6">
+			{% if not employee_show %}
 
+		<div class="col-sm-6">
             <div class="invoice-left">
-                <h4>مرفقات التقرير</h4>
+                <h4>صور إعلانات النشاط</h4>
+
+                {% for image in report.ad_images.all %}
+                    {% if forloop.first %}<ul>{% endif %}
+                        <li>
+                        <a href="{{ image.image.url }}" class="english-field">
+                            <i class="entypo-picture"></i>
+                            {{ image.image.name }}
+                        </a>
+                        </li>
+                    {% if forloop.last %}</ul>{% endif %}
+                {% empty %}
+                    <p>لا يوجد.</p>
+                {% endfor %}
+            </div>
+            <div class="invoice-left">
+                <h4>صور النشاط</h4>
 
                 {% for image in report.images.all %}
                     {% if forloop.first %}<ul>{% endif %}
@@ -136,9 +190,8 @@
                     <p>لا يوجد.</p>
                 {% endfor %}
             </div>
-
         </div>
-
+                {% endif %}
         <div class="col-sm-6">
 
 
@@ -148,7 +201,7 @@
 					طباعة التقرير
 					<i class="entypo-doc-text"></i>
 				</a>
-                {% if user|can_submit_followupreport:report.episode.activity %}
+                {% if user|can_submit_studentreport:report.episode.activity %}
                 <a class="btn btn-gold btn-icon icon-left" href="{% url 'media:edit_report' report.pk %}">
                     <i class="entypo-pencil"></i>
                     عدّل التقرير
@@ -167,7 +220,7 @@
 <br>
 <hr>
 <br>
-
+{% if not employee_show %}
 <!-- Comments --><div class="panel panel-primary panel-shadow">
 <div class="panel-heading">
     <h4 class="panel-title">
@@ -232,6 +285,6 @@
         {% endif %}
 
 
-
+{% endif %}
  </div></div>
 {% endblock %}

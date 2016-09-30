@@ -60,8 +60,8 @@
                         <td><a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a></td>
                         <td data-order='{{ episode.start_date|date:"U" }}'>{{ episode.start_date|date:"j F" }}</td>
                         <td data-order='{{ episode.end_date|date:"U" }}'>{{ episode.end_date|date:"j F" }}</td>
-                        <td>{{ episode.followupreport.participant_count }}</td>
-                        <td>{{ episode.followupreport.organizer_count }}</td>
+                        <td>{{ episode.employeereport.participant_count }}</td>
+                        <td>{{ episode.employeereport.organizer_count }}</td>
                         <td>
                         {% for image in episode.followupreport.images.all %}
                             {% if forloop.first %}<ul>{% endif %}

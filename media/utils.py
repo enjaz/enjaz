@@ -107,7 +107,14 @@ def can_assess_club_as_media(user, club):
 
     return user_media_centers.exists()
 
-def can_submit_followupreport(user, activity):
+def can_submit_employeereport(user):
+    return clubs.utils.is_employee_of_any_club(user) or \
+        is_media_coordinator_or_member(user) or \
+        clubs.utils.is_presidency_coordinator_or_deputy(user) or \
+        user.has_perms('media.add_followupreport') or \
+        user.is_superuser
+
+def can_submit_studentreport(user, activity):
     return clubs.utils.has_coordination_to_activity(user, activity) or \
            is_media_coordinator_or_member(user) or \
            is_media_representative_of_club(user, activity.primary_club) or\
@@ -116,7 +123,7 @@ def can_submit_followupreport(user, activity):
            user.is_superuser
 
 def can_view_followupreport(user, activity):
-    return can_submit_followupreport(user, activity) or \
+    return can_submit_studentreport(user, activity) or \
         clubs.utils.is_member(activity.primary_club, user) or \
         clubs.utils.is_employee_of_any_club(user) or \
         clubs.utils.is_deanship_of_students_affairs_coordinator_or_member(user) or \

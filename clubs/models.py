@@ -153,7 +153,7 @@ class Club(models.Model):
         for activity in self.primary_activity.approved():
             episodes.extend(activity.episode_set.all())
         # Get all club's episodes whose report is due
-        due_episodes = filter(lambda x: x.report_is_due(),
+        due_episodes = filter(lambda x: x.report_is_due() and not x.report_is_submitted(),
                               episodes)
         return len(due_episodes)
     

@@ -42,5 +42,9 @@ def can_submit_studentreport(user, activity):
     return utils.can_submit_studentreport(user, activity)
 
 @register.filter
+def can_submit_employeereport(user):
+    return utils.can_submit_employeereport(user)
+
+@register.filter
 def can_view_followupreport(user, activity):
     return utils.can_view_followupreport(user, activity)

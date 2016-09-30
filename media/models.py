@@ -67,23 +67,23 @@ class EmployeeReport(models.Model):
                                       verbose_name=u"تاريخ رفع التقرير")
 
     # Content
-    speaker = models.TextField(verbose_name=u"أسماء المتحدثين")
-    quotation = models.TextField(verbose_name=u"اقتباسات من المتحدثين")
-    sponsor_speech = models.TextField(verbose_name=u"كلمة الرعاة")
-    prize_winner = models.TextField(verbose_name=u"أسماء المكرمين")
-    winner_college_or_club = models.TextField(verbose_name=u"الكلية أو النادي الذي يتبع له المكرم")
-    booth = models.TextField(verbose_name=u"أسماء الأركان المشاركة")
-    sponsor = models.TextField(verbose_name=u"أسماء الجهات الراعية أو المشاركة")
+    speaker = models.TextField(verbose_name=u"أسماء المتحدثين والمتحدثات")
+    quotation = models.TextField(verbose_name=u"اقتباسات من المتحدثين والمتحدثات")
+    sponsor_speech = models.TextField(verbose_name=u"كلمة الرعاة", blank=True, help_text=u"اختياري")
+    prize_winner = models.TextField(verbose_name=u"أسماء المكرمين والمكرمات", blank=True, help_text=u"اختياري")
+    winner_college_or_club = models.TextField(verbose_name=u"الكلية أو النادي الذي يتبع له المكرم", blank=True, help_text=u"اختياري")
+    booth = models.TextField(verbose_name=u"أسماء الأركان المشاركة", blank=True)
+    sponsor = models.TextField(verbose_name=u"أسماء الجهات الراعية أو المشاركة", blank=True, help_text=u"اختياري")
 
-    participant_count = models.IntegerField(verbose_name=u"عدد المشاركين")
-    organizer_count = models.IntegerField(verbose_name=u"عدد المنظمين")
-    speaker_count = models.IntegerField(verbose_name=u"عدد المتحدثين")
-    lecture_count = models.IntegerField(verbose_name=u"عدد المحاضرات")
-    session_count = models.IntegerField(verbose_name=u"عدد ورش العمل")
-    booth_count = models.IntegerField(verbose_name=u"عدد الأركان")
-    end = models.TextField(verbose_name=u"كيف إنتهى النشاط؟")
+    attendant_count = models.PositiveIntegerField(verbose_name=u"عدد الحاضرين والحاضرات", null=True)
+    organizer_count = models.PositiveIntegerField(verbose_name=u"عدد المنظمين والمنظمات")
+    speaker_count = models.PositiveIntegerField(verbose_name=u"عدد المتحدثين والمتحدثات", blank=True, help_text=u"اختياري", null=True)
+    lecture_count = models.PositiveIntegerField(verbose_name=u"عدد المحاضرات", blank=True, help_text=u"اختياري", null=True)
+    session_count = models.PositiveIntegerField(verbose_name=u"عدد ورش العمل", blank=True, help_text=u"اختياري", null=True)
+    booth_count = models.PositiveIntegerField(verbose_name=u"عدد الأركان", blank=True, help_text=u"اختياري", null=True)
+    end = models.TextField(verbose_name=u"كيف انتهى النشاط؟")
 
-    notes = models.TextField(verbose_name=u"ملاحظات")
+    notes = models.TextField(verbose_name=u"ملاحظات", blank=True, help_text=u"اختياري")
 
 class FollowUpReport(models.Model):
     """
@@ -94,22 +94,26 @@ class FollowUpReport(models.Model):
     submitter = models.ForeignKey(User)
     date_submitted = models.DateTimeField(auto_now_add=True,
                                       verbose_name=u"تاريخ رفع التقرير")
-    
+
     # Content
+    twitter_announcement = models.TextField(verbose_name=u"روابط الإعلان عبر تويتر", default="")
+
+    objects = FollowUpQuerySet.as_manager()
+
+    # Obsolete fields (kept for preserving previous data only)
     description = models.TextField(verbose_name=u"الوصف",
                                    help_text=u"")
-    start_date = models.DateField(verbose_name=u"تاريخ البداية")
-    end_date = models.DateField(verbose_name=u"تاريخ النهاية")
-    start_time = models.TimeField(verbose_name=u"وقت البداية")
-    end_time = models.TimeField(verbose_name=u"وقت النهاية")
+    start_date = models.DateField(verbose_name=u"تاريخ البداية", blank=True, null=True)
+    end_date = models.DateField(verbose_name=u"تاريخ النهاية", blank=True, null=True)
+    start_time = models.TimeField(verbose_name=u"وقت البداية", blank=True, null=True)
+    end_time = models.TimeField(verbose_name=u"وقت النهاية", blank=True, null=True)
     location = models.CharField(max_length=128,
-                                verbose_name=u"المكان")
-    organizer_count = models.IntegerField(verbose_name=u"عدد المنظمين")
-    participant_count = models.IntegerField(verbose_name=u"عدد المشاركين")
-
+                                verbose_name=u"المكان", blank=True, default="")
+    organizer_count = models.IntegerField(verbose_name=u"عدد المنظمين", blank=True, null=True)
+    participant_count = models.IntegerField(verbose_name=u"عدد المشاركين", blank=True, null=True)
     announcement_sites = models.TextField(verbose_name=u"أماكن النشر و الإعلان")
-    notes = models.TextField(verbose_name=u"ملاحظات", null=True, blank=True)
-    objects = FollowUpQuerySet.as_manager()
+    notes = models.TextField(verbose_name=u"ملاحظات", blank=True, default="")
+
     def __unicode__(self):
         "Return the name of the parent activity followed by the number of the episode"
         return self.episode.activity.name + " #" + str(self.episode.get_index())
@@ -123,6 +127,9 @@ class FollowUpReport(models.Model):
         verbose_name_plural = u"التقارير"
 #         app_label = u"المركز الإعلامي"
 
+class FollowUpReportAdImage(models.Model):
+    report = models.ForeignKey(FollowUpReport, related_name='ad_images')
+    image = models.FileField(verbose_name=u"الإعلان", upload_to="media/ad_images/")
 
 class FollowUpReportImage(models.Model):
     report = models.ForeignKey(FollowUpReport, related_name='images')

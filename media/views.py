@@ -23,7 +23,7 @@ from media.models import EmployeeReport, FollowUpReport, Story, Article, StoryRe
     WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment, POLL_TYPE_CHOICES, ReportComment, Buzz
 from media.forms import EmployeeReportForm, FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
     TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm, \
-    FollowUpReportImageFormset, ReportCommentForm, BuzzForm
+    FollowUpReportImageFormset, FollowUpReportAdImageFormset, ReportCommentForm, BuzzForm
 from media.utils import is_media_coordinator_or_member, is_club_coordinator_or_member, is_media_or_club_coordinator_or_member, proper_poll_type, get_poll_type_url, media_coordinator_or_member_test, get_user_media_center, get_clubs_for_assessment_by_user, can_submit_employeereport, can_submit_studentreport, get_club_media_center, media_user_test, is_media_coordinator_or_deputy, can_view_followupreport
 from accounts.utils import get_user_gender, get_user_city
 
@@ -190,10 +190,15 @@ def submit_report(request, episode_pk):
                                                           submitter=request.user)
                                   )
         image_formset = FollowUpReportImageFormset(request.POST, request.FILES)
-        if form.is_valid() and image_formset.is_valid():
+        ad_formet = FollowUpReportAdImageFormset(request.POST, request.FILES)
+        if form.is_valid() and \
+           image_formset.is_valid() and \
+           ad_formet.is_valid():
             instance = form.save()
             image_formset.instance = instance
             image_formset.save()
+            ad_formet.instance = instance
+            ad_formet.save()
 
             # Only send a mail notification if the activity is done,
             # but not more than five days ago (in that case, we should
@@ -231,8 +236,10 @@ def submit_report(request, episode_pk):
                                            'participant_count': episode.activity.participants,
                                            })
         image_formset = FollowUpReportImageFormset()
+        ad_formset = FollowUpReportAdImageFormset()
     return render(request, 'media/report_write.html', {'form': form,
                                                        'image_formset': image_formset,
+                                                       'ad_formset': ad_formset,
                                                        'episode': episode})
 
 @csrf.csrf_exempt
@@ -322,9 +329,13 @@ def edit_report(request, episode_pk):
     if request.method == 'POST':
         form = FollowUpReportForm(request.POST, instance=report)
         image_formset = FollowUpReportImageFormset(request.POST, request.FILES, instance=report)
-        if form.is_valid() and image_formset.is_valid():
+        ad_formset = FollowUpReportAdImageFormset(request.POST, request.FILES, instance=report)
+        if form.is_valid() and\
+           image_formset.is_valid() and\
+           ad_formset.is_valid():
             form.save()
             image_formset.save()
+            ad_formset.save()
 
             # Send notification to media center
             media_center = get_club_media_center(episode.activity.primary_club)
@@ -338,8 +349,11 @@ def edit_report(request, episode_pk):
     else:
         form = FollowUpReportForm(instance=report)
         image_formset = FollowUpReportImageFormset(instance=report)
+        ad_formset = FollowUpReportAdImageFormset(instance=report)
+        
     return render(request, "media/report_write.html", {'form': form,
                                                        'image_formset': image_formset,
+                                                       'ad_formset': ad_formset,
                                                        'episode': episode,
                                                        'edit': True})
 

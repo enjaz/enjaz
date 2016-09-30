@@ -7,7 +7,7 @@ from django.forms.models import inlineformset_factory
 from clubs.utils import get_media_center
 
 from media.models import EmployeeReport, FollowUpReport, Story, StoryReview, Article, ArticleReview, CustomTask, TaskComment, Poll, \
-    PollResponse, WHAT_IF, HUNDRED_SAYS, PollComment, PollChoice, FollowUpReportImage, ReportComment, Buzz
+    PollResponse, WHAT_IF, HUNDRED_SAYS, PollComment, PollChoice, FollowUpReportImage, FollowUpReportAdImage, ReportComment, Buzz
 
 # A nice trick to display full names instead of usernames
 # Check: http://stackoverflow.com/questions/16369403/foreign-key-and-select-field-value-in-admin-interface
@@ -21,19 +21,19 @@ class CustomUserChoiceField(forms.ModelChoiceField):
 class EmployeeReportForm(ModelForm):
     class Meta:
         model = EmployeeReport
-        fields = ['speaker', 'quotation', 'sponsor_speech', 'prize_winner', 'winner_college_or_club',
-                  'booth', 'sponsor', 'participant_count', 'organizer_count', 'speaker_count',
-                  'lecture_count', 'session_count', 'booth_count', 'end', 'notes']
+        fields = ['speaker', 'quotation', 'sponsor_speech',
+                  'prize_winner', 'winner_college_or_club', 'booth',
+                  'sponsor', 'attendant_count', 'organizer_count',
+                  'speaker_count', 'lecture_count', 'session_count',
+                  'booth_count', 'end', 'notes']
 
 class FollowUpReportForm(ModelForm):
     class Meta:
         model = FollowUpReport
-        fields = ['description', 'start_date', 'end_date',
-                  'start_time', 'end_time', 'location',
-                  'organizer_count', 'participant_count',
-                  'announcement_sites', 'notes']
+        fields = ['twitter_announcement']
 
 FollowUpReportImageFormset = inlineformset_factory(FollowUpReport, FollowUpReportImage, fields=['image'])
+FollowUpReportAdImageFormset = inlineformset_factory(FollowUpReport, FollowUpReportAdImage, fields=['image'])
 
 class ReportCommentForm(ModelForm):
     def __init__(self, *args, **kwargs):

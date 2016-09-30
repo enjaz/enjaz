@@ -241,7 +241,7 @@ you?
 				</a>
                 <ul>
                     {% load media_tags %}
-                    {% if user|is_media_coordinator_or_member or user.is_superuser or user.media_representations.current_year.exists %}
+                    {% if user|is_media_coordinator_or_member or user.is_superuser or user.media_representations.current_year.exists or or user.employee.current_year.exists %}
                     <li>
                         <a href="{% url 'media:list_activities' %}">
                             <i class="entypo-flag"></i>

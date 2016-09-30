@@ -53,8 +53,11 @@ def list_activities(request):
     addition to the media representatives of clubs.
     """
     media_representations = request.user.media_representations.current_year()
+    employee_clubs = request.user.employee.current_year()
     if media_representations.exists():
         clubs_for_user = media_representations
+    elif employee_clubs.exists():
+        clubs_for_user = employee_clubs
     else:
         clubs_for_user = get_clubs_for_assessment_by_user(request.user)
     return render(request, 'media/list_activities.html', {'clubs': clubs_for_user})
@@ -81,8 +84,11 @@ def list_reports(request):
     """
     # Get all reports
     media_representations = request.user.media_representations.current_year()
+    employee_clubs = request.user.employee.current_year()
     if media_representations.exists():
         clubs_for_user = media_representations
+    elif employee_clubs.exists():
+        clubs_for_user = employee_clubs
     else:
         clubs_for_user = get_clubs_for_assessment_by_user(request.user)
     reports = FollowUpReport.objects.current_year().filter(episode__activity__primary_club__in=clubs_for_user)

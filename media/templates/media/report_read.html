@@ -77,7 +77,7 @@
 	{% if employee_show %}
             <tbody>
 			<tr>
-				<th class="text-center">أسماء المتحدثين</th>
+				<th class="text-center">أسماء المتحدثين والمتحدثات</th>
 				<td colspan="3" class="activity-description">{{ report.speaker|linebreaksbr }}</td>
 			</tr>
 
@@ -92,7 +92,7 @@
 			</tr>
 
             <tr>
-				<th class="text-center">أسماء المكرمين</th>
+				<th class="text-center">أسماء المكرمين والمكرمات</th>
 				<td colspan="3" class="activity-description">{{ report.prize_winner|linebreaksbr }}</td>
 			</tr>
 
@@ -112,14 +112,14 @@
 			</tr>
 
 			<tr>
-				<th class="text-center">عدد المشاركين</th>
-				<td>{{ report.participant_count }}</td>
-				<th class="text-center">عدد المنظمين</th>
+				<th class="text-center">عدد الحضور والحاضرات</th>
+				<td>{{ report.attendant_count }}</td>
+				<th class="text-center">عدد المنظمين والمنظمات</th>
 				<td>{{ report.organizer_count }}</td>
 			</tr>
 
 			<tr>
-				<th class="text-center">عدد المتحدثين</th>
+				<th class="text-center">عدد المتحدثين والمتحدثات</th>
 				<td>{{ report.speaker_count }}</td>
 				<th class="text-center">عدد المحاضرات</th>
 				<td>{{ report.lecture_count }}</td>
@@ -133,7 +133,7 @@
 			</tr>
 
             <tr>
-                <th class="text-center">كيف إنتهى النشاط؟</th>
+                <th class="text-center">كيف انتهى النشاط؟</th>
                 <td colspan="3">{{ report.end|linebreaksbr }}</td>
             </tr>
 
@@ -202,7 +202,7 @@
 					<i class="entypo-doc-text"></i>
 				</a>
                 {% if user|can_submit_studentreport:report.episode.activity %}
-                <a class="btn btn-gold btn-icon icon-left" href="{% url 'media:edit_report' report.pk %}">
+                <a class="btn btn-gold btn-icon icon-left" href="{% if employee_show %}{% url 'media:edit_employee_report' report.pk %}{% else %}{% url 'media:edit_report' report.pk %}{% endif %}">
                     <i class="entypo-pencil"></i>
                     عدّل التقرير
                 </a>

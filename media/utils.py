@@ -65,11 +65,12 @@ def media_coordinator_or_member_test(user):
 def media_user_test(user):
     if not is_media_coordinator_or_member(user) and \
        not user.is_superuser and \
+       not user.employee.current_year().exists() and \
        not user.media_representations.current_year().exists():
         raise PermissionDenied
     else:
         return True    
-    
+
 def is_club_coordinator_or_member(user):
     if not ((clubs.utils.is_coordinator_of_any_club(user) or clubs.utils.is_member_of_any_club(user)
              and not is_media_coordinator_or_member(user)) or user.is_superuser):

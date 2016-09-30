@@ -76,7 +76,8 @@ def list_activities(request):
     if request.user.is_authenticated():
         template = 'activities/list_privileged.html'
 
-        if request.user.is_superuser:
+        if request.user.is_superuser or \
+           is_deanship_of_students_affairs_coordinator_or_member(request.user):
             # If the user is a super user or part of the presidency,
             # then show all activities
             context['pending'] = Activity.objects.pending().current_year()
@@ -174,6 +175,7 @@ def show(request, activity_id):
        can_review_activity(request.user, activity) or \
        request.user.has_perm('activities.view_activity') or \
        is_employee(activity.primary_club, request.user) or\
+       is_deanship_of_students_affairs_coordinator_or_member(request.user) or\
        any([club in activity_clubs for club in user_clubs]):
         # Don't raise any errors
         pass
@@ -245,7 +247,7 @@ def create(request):
                 form_object.is_approved = True
                 form_object.assignee = None
             else:
-                if 'chosen_reviewer_club' in form.cleaned_data:
+                if form.cleaned_data.get('chosen_reviewer_club'):
                     reviewing_parent = form.cleaned_data['chosen_reviewer_club']
                 else:
                     reviewing_parent = form_object.primary_club.get_next_activity_reviewing_parent()
@@ -505,7 +507,7 @@ def review(request, activity_id, reviewer_id):
                         # Email notifications
                         email_context['full_url'] = activity_full_url
                         mail.send(get_club_notification_to(activity),
-                            cc=get_club_notification_cc(activity),
+                            cc=get_club_notification_cc(activity, reviewer_club),
                             template="activity_approved_to_coordinator",
                             context=email_context)
                         if activity.primary_club.employee:
@@ -531,7 +533,7 @@ def review(request, activity_id, reviewer_id):
                     email_context['last_reviewer'] = reviewer_club
                     email_context['full_url'] = last_review_full_url
                     mail.send(get_club_notification_to(activity),
-                              cc=get_club_notification_cc(activity),
+                              cc=get_club_notification_cc(activity, reviewer_club),
                               template="activity_rejected_to_coordinator",
                               context=email_context)
 
@@ -551,7 +553,7 @@ def review(request, activity_id, reviewer_id):
                     email_context['last_reviewer'] = reviewer_club
                     email_context['full_url'] = last_review_full_url
                     mail.send(get_club_notification_to(activity),
-                              cc=get_club_notification_cc(activity),
+                              cc=get_club_notification_cc(activity, reviewer_club),
                               template="activity_held_to_coordinator",
                               context=email_context)
             activity.save()

@@ -9,7 +9,7 @@
 
 {% block navbar %}
     <li><a href="{% url 'bulb:list_groups' %}"><i class="fa fa-comments"></i> جلسات النقاش والقراءة</a></li>
-    <li><a href="{% url 'bulb:list_book_categories' %}"><i class="fa fa-book"></i> تبادل الكتب</a></li>
+    <li><a href="{% url 'bulb:list_book_categories' %}"><i class="fa fa-book"></i> المكتبة الطلابية التعاونية</a></li>
     <li><a href="{% url 'bulb:list_reader_profiles' %}"><i class="entypo-users"></i> قارئات وقراء الجامعة</a></li>
     {% if user|is_bulb_coordinator_or_deputy or user.is_superuser %}
     <li><a href="{% url 'bulb:indicators' %}"><span class="glyphicon glyphicon-stats"></span> مؤشرات سِراج</a></li>

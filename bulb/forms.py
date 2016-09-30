@@ -120,28 +120,32 @@ class GroupForm(forms.ModelForm, CommonControl):
         if self.instance.pk:
             del self.fields['members']
 
-        self.user_city = accounts.utils.get_user_city(self.user)
-        self.user_gender = accounts.utils.get_user_gender(self.user)
-    
+        if self.instance.id:
+            self.user_city = accounts.utils.get_user_city(self.instance.coordinator)
+            self.user_gender = accounts.utils.get_user_gender(self.instance.coordinator)
+            if self.instance.is_limited_by_city:
+                self.fields['city'].initial = self.user_city
+        else:
+            self.user_city = accounts.utils.get_user_city(self.user)
+            self.user_gender = accounts.utils.get_user_gender(self.user)
+            self.fields['city'].initial = '-'
+
         if not self.user.is_superuser and \
            not utils.is_bulb_coordinator_or_deputy(self.user):
             self.control_gender()
 
             
             if self.user_city == 'R':
-                self.fields['city'].initial = 'R'
                 self.fields['city'].choices = (
                     ('-', u'الرياض وجدة والأحساء'),
                     ('R', u'الرياض فقط'),
                 )
             elif self.user_city == 'J':
-                self.fields['city'].initial = 'A'
                 self.fields['city'].choices = (
                     ('-', u'الرياض وجدة والأحساء'),
                     ('A', u'الأحساء فقط'),
                 )
             elif self.user_city == 'J':
-                self.fields['city'].initial = 'J'
                 self.fields['city'].choices = (
                     ('-', u'الرياض وجدة والأحساء'),
                     ('J', u'جدة فقط'),
@@ -153,7 +157,7 @@ class GroupForm(forms.ModelForm, CommonControl):
                     widget=autocomplete.ModelSelect2Multiple(url='bulb:bulb-user-autocomplete',
                                                              attrs={
                                                                  'data-html': 'true',
-                                                                 'data-placeholder': 'أَضف اسما',
+                                                                 'data-placeholder': 'أَضف عنصرا',
                                                              }),
                     label=u"الأعضاء",
                     queryset=User.objects.all(),
@@ -164,9 +168,13 @@ class GroupForm(forms.ModelForm, CommonControl):
 
         if self.user_gender == self.cleaned_data['gender']:
             group.is_limited_by_gender = True
+        else:
+            group.is_limited_by_gender = False
 
         if self.user_city == self.cleaned_data['city']:
             group.is_limited_by_city = True
+        else:
+            group.is_limited_by_city = False
 
         group.save()
         return group

@@ -34,8 +34,8 @@ def index(request):
     book_sample = Book.objects.current_year().for_user_city(request.user).available().order_by("?")[:6]
     latest_books = Book.objects.current_year().for_user_city(request.user).undeleted().order_by("-submission_date")[:6]
     latest_needed_books = NeededBook.objects.current_year().for_user_city(request.user).undeleted().order_by("-submission_date")[:6]
-    book_count = Book.objects.current_year().undeleted().count()
-    book_request_count = Request.objects.current_year().count()
+    book_count = Book.objects.current_year().for_user_city(request.user).undeleted().count()
+    book_request_count = Request.objects.current_year().for_user_city(request.user).count()
     reader_profiles = ReaderProfile.objects.order_by("?")[:10]
     reader_profile_count = ReaderProfile.objects.count()
     context = {'groups': groups, 'group_count': group_count,
@@ -87,7 +87,7 @@ def list_book_categories(request):
                                                     book__is_available=True,
                                                     book__is_deleted=False)
     # If we have books, show the All category.
-    if Book.objects.current_year().undeleted().available().exists():
+    if Book.objects.current_year().undeleted().for_user_city(request.user).available().exists():
         categories |= Category.objects.filter(code_name="all").distinct()
     context = {'categories': categories}
     return render(request, "bulb/exchange/list_categories.html",
@@ -98,7 +98,7 @@ def list_needed_book_categories(request):
     categories = Category.objects.distinct().filter(neededbook__isnull=False,
                                                     neededbook__is_deleted=False)
     # If we have books, show the All category.
-    if NeededBook.objects.current_year().undeleted().still_needed().exists():
+    if NeededBook.objects.current_year().undeleted().for_user_city(request.user).still_needed().exists():
         categories |= Category.objects.filter(code_name="all").distinct()
     context = {'categories': categories, 'needed': True}
     return render(request, "bulb/exchange/list_categories.html",
@@ -106,7 +106,7 @@ def list_needed_book_categories(request):
 
 @login_required
 def books_by_date(request):
-    books =  Book.objects.current_year().undeleted().order_by("-submission_date")
+    books =  Book.objects.current_year().for_user_city(request.user).undeleted().order_by("-submission_date")
     return render(request, "bulb/exchange/books_by_date.html",
                   {'books': books})
 
@@ -122,7 +122,7 @@ def show_category(request, code_name, needed=False):
 def list_book_previews(request, source, name):
     if source == "category":
         category = get_object_or_404(Category, code_name=name)
-        books = Book.objects.current_year().undeleted().available()
+        books = Book.objects.current_year().for_user_city(request.user).undeleted().available()
         if category.code_name != 'all':
             books = books.filter(category=category)
     elif source == "user":
@@ -151,7 +151,7 @@ def list_book_previews(request, source, name):
 def list_needed_book_previews(request, source, name):
     if source == "category":
         category = get_object_or_404(Category, code_name=name)
-        needed_books = NeededBook.objects.current_year().undeleted().still_needed()
+        needed_books = NeededBook.objects.current_year().for_user_city(request.user).undeleted().still_needed()
         if category.code_name != 'all':
             needed_books = needed_books.filter(category=category)
     elif source == "user":
@@ -251,7 +251,7 @@ def confirm_book_order(request, pk):
 @login_required
 def show_book(request, pk):
     book = get_object_or_404(Book, pk=pk, is_deleted=False)
-    book_pool = Book.objects.exclude(pk=book.pk).current_year().available().order_by("?")
+    book_pool = Book.objects.exclude(pk=book.pk).current_year().for_user_city(request.user).available().order_by("?")
     sample_user_books = book_pool.filter(submitter=book.submitter)[:3]
     sample_category_books = book_pool.exclude(pk__in=[b.pk for b in sample_user_books])\
                                      .filter(category=book.category)[:3]
@@ -262,7 +262,7 @@ def show_book(request, pk):
 @login_required
 def show_needed_book(request, pk):
     needed_book = get_object_or_404(NeededBook, pk=pk, is_deleted=False)
-    sample_category_books = Book.objects.current_year().available()\
+    sample_category_books = Book.objects.current_year().for_user_city(request.user).available()\
                                         .order_by("?")\
                                         .filter(category=needed_book.category)[:3]
     return render(request, "bulb/exchange/show_needed_book.html",
@@ -1513,4 +1513,4 @@ class BulbUserAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
     def get_result_label(self, item):
-        return"{{ %s }} (<span class=\"english-field\">{{ %s }}</span>)" % (item.common_profile.get_ar_full_name, item.username)
+        return"%s (<span class=\"english-field\">%s</span>)" % (item.common_profile.get_ar_full_name(), item.username)

@@ -30,7 +30,7 @@ class EmployeeReportForm(ModelForm):
 class FollowUpReportForm(ModelForm):
     class Meta:
         model = FollowUpReport
-        fields = ['twitter_announcement']
+        fields = ['description', 'twitter_announcement']
 
 FollowUpReportImageFormset = inlineformset_factory(FollowUpReport, FollowUpReportImage, fields=['image'])
 FollowUpReportAdImageFormset = inlineformset_factory(FollowUpReport, FollowUpReportAdImage, fields=['image'])
@@ -53,7 +53,7 @@ class StoryForm(ModelForm):
 
 class StoryReviewForm(ModelForm):
     notes = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'rows': '5', 'placeholder': u'الملاحظات'}))
-    approve = forms.BooleanField(label=u"اعتمد التغطية.", required=False)
+    approve = forms.BooleanField(label=u"اعتمد الخبر.", required=False)
     class Meta:
         model = StoryReview
         fields = ['notes', 'approve']

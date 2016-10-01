@@ -552,6 +552,7 @@ def list_my_requests(request):
 @login_required
 def indicators(request, city=""):
     if not utils.is_bulb_coordinator_or_deputy(request.user) and \
+       not utils.is_bulb_member(request.user) and \
        not request.user.is_superuser:
         raise PermissionDenied
 

@@ -29,13 +29,15 @@ class CommonControl:
         # default option, but it's just to make sure that people know
         # what are chosing.
         if self.user_gender == 'F':
-            self.fields['gender'].initial = 'F'
+            if not self.instance.id: 
+                self.fields['gender'].initial = 'F'
             self.fields['gender'].choices = (
                 ('-', u'الطلاب والطالبات'),
                 ('F', u'الطالبات'),
                 )
         elif self.user_gender == 'M':
-            self.fields['gender'].initial = 'M'
+            if not self.instance.id:
+                self.fields['gender'].initial = 'M'
             self.fields['gender'].choices = (
                 ('-', u'الطلاب والطالبات'),
                 ('M', u'الطلاب')
@@ -125,6 +127,8 @@ class GroupForm(forms.ModelForm, CommonControl):
             self.user_gender = accounts.utils.get_user_gender(self.instance.coordinator)
             if self.instance.is_limited_by_city:
                 self.fields['city'].initial = self.user_city
+            if self.instance.is_limited_by_gender:
+                self.fields['gender'].initial = self.user_gender
         else:
             self.user_city = accounts.utils.get_user_city(self.user)
             self.user_gender = accounts.utils.get_user_gender(self.user)
@@ -134,7 +138,6 @@ class GroupForm(forms.ModelForm, CommonControl):
            not utils.is_bulb_coordinator_or_deputy(self.user):
             self.control_gender()
 
-            
             if self.user_city == 'R':
                 self.fields['city'].choices = (
                     ('-', u'الرياض وجدة والأحساء'),

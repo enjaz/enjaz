@@ -5,7 +5,7 @@
         {% if not episode.storytask %}
             {% if request.user|is_coordinator_or_deputy:media_center or user.is_superuser %}
                 <div class="btn-group left-dropdown">
-                    <a href="{% url 'media:create_story' episode.pk %}" class="btn btn-xs btn-default btn-create-story">اكتب تغطية</a>
+                    <a href="{% url 'media:create_story' episode.pk %}" class="btn btn-xs btn-default btn-create-story">اكتب خبر</a>
                     <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown">
                         <span class="caret"></span>
                     </button>
@@ -31,13 +31,13 @@
                 </div>
             {% else %}
                 <a href="{% url 'media:create_story' episode.pk %}"
-                class="btn btn-default btn-xs">اكتب تغطية</a>
+                class="btn btn-default btn-xs">اكتب خبر</a>
             {% endif %}
         {% else %}
             {# when there is no story, the only task that could be there will be at index 0 #}
             {% if episode.storytask.assignee == user %}
                 <a href="{% url 'media:create_story' episode.pk %}"
-                class="btn btn-orange btn-xs">اكتب تغطية</a>
+                class="btn btn-orange btn-xs">اكتب خبر</a>
             {% else %}
                 <a href="{% url 'media:create_story' episode.pk %}" class="btn btn-gold btn-xs">
                     معيَّن ل{{ episode.storytask.assignee.common_profile.ar_first_name }}
@@ -51,14 +51,14 @@
             {# if assigned to user, show in different color #}
             {% if episode.storytask.assignee == user %}
                 <a href="{% url 'media:show_story' episode.pk %}"
-                class="btn btn-orange btn-xs">استعرض التغطية (توجد ملاحظات)</a>
+                class="btn btn-orange btn-xs">استعرض الخبر (توجد ملاحظات)</a>
             {% else %}
                 <a href="{% url 'media:show_story' episode.pk %}"
-                class="btn btn-gold btn-xs">استعرض التغطية</a>
+                class="btn btn-gold btn-xs">استعرض الخبر</a>
             {% endif %}
         {% else %}
             <a href="{% url 'media:show_story' episode.pk %}"
-            class="btn btn-blue btn-xs">استعرض التغطية</a>
+            class="btn btn-blue btn-xs">استعرض الخبر</a>
         {% endif %}
     {% endif %}
 </div>

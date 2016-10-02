@@ -52,10 +52,11 @@ def list_activities(request):
     Stories.  This page is to be used by both Media Center members, in
     addition to the media representatives of clubs.
     """
-    media_representations = request.user.media_representations.current_year()
+    user_coordination_and_representations = request.user.media_representations.current_year() | \
+                                            request.user.coordination.current_year()
     employee_clubs = request.user.employee.current_year()
-    if media_representations.exists():
-        clubs_for_user = media_representations
+    if user_coordination_and_representations.exists():
+        clubs_for_user = user_coordination_and_representations
     elif employee_clubs.exists():
         clubs_for_user = employee_clubs
     else:
@@ -83,10 +84,11 @@ def list_reports(request):
     Show a list of all reports in a single table.
     """
     # Get all reports
-    media_representations = request.user.media_representations.current_year()
+    user_coordination_and_representations = request.user.media_representations.current_year() | \
+                                            request.user.coordination.current_year()
     employee_clubs = request.user.employee.current_year()
-    if media_representations.exists():
-        clubs_for_user = media_representations
+    if user_coordination_and_representations.exists():
+        clubs_for_user = user_coordination_and_representations
     elif employee_clubs.exists():
         clubs_for_user = employee_clubs
     else:

@@ -1,4 +1,4 @@
-{% load clubs_utils %}
+{% load clubs_utils %}{% load media_tags %}
 <div class="row">
 {% if episode.employee_report_is_submitted %}
     <a href="{% url 'media:show_employee_report' episode.pk %}"
@@ -13,7 +13,9 @@
     {% endif %}
     {# ---- #}
     {% if episode.requires_report %}
-        {% if episode.report_is_due and not episode.employee_report_is_submitted %}
+        {% if not episode.employee_report_is_submitted and not user|can_submit_employeereport %}
+		    <a class="btn btn-primary btn-xs disabled">لم يرفع تقرير العمادة بعد</a>
+        {% elif episode.report_is_due and not episode.employee_report_is_submitted %}
             <a href="{% url 'media:submit_employee_report' episode.pk %}" class="btn btn-gold btn-xs">بانتظار رفع تقرير العمادة</a>
         {% elif episode.report_is_overdue and not episode.employee_report_is_submitted %}
             <a href="{% url 'media:submit_employee_report' episode.pk %}" class="btn btn-red btn-xs">بانتظار رفع تقرير العمادة</a>
@@ -44,8 +46,9 @@
     {# ---- #}
 
     {% if episode.requires_report %}
-
-        {% if episode.report_is_due and not episode.report_is_submitted %}
+        {% if not episode.report_is_submitted and not user|can_submit_studentreport:activity %}
+            <a class="btn btn-primary btn-xs disabled">لم يرفع تقرير المركز الإعلامي بعد</a>
+        {% elif episode.report_is_due and not episode.report_is_submitted %}
             <a href="{% url 'media:submit_report' episode.pk %}" class="btn btn-gold btn-xs">بانتظار رفع تقرير المركز الإعلامي</a>
         {% elif episode.report_is_overdue and not episode.report_is_submitted %}
             <a href="{% url 'media:submit_report' episode.pk %}" class="btn btn-red btn-xs">بانتظار رفع تقرير المركز الإعلامي</a>

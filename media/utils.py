@@ -66,6 +66,7 @@ def media_user_test(user):
     if not is_media_coordinator_or_member(user) and \
        not user.is_superuser and \
        not user.employee.current_year().exists() and \
+       not clubs.utils.is_coordinator_of_any_club(user) and \
        not user.media_representations.current_year().exists():
         raise PermissionDenied
     else:

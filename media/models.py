@@ -96,6 +96,8 @@ class FollowUpReport(models.Model):
                                       verbose_name=u"تاريخ رفع التقرير")
 
     # Content
+    description = models.TextField(verbose_name=u"الوصف",
+                                   help_text=u"")
     twitter_announcement = models.TextField(verbose_name=u"روابط الإعلان عبر تويتر", default="")
 
     objects = FollowUpQuerySet.as_manager()
@@ -154,7 +156,7 @@ class Story(models.Model):
     writer = models.ForeignKey(User,
                                verbose_name=u"الكاتب")
     date_submitted = models.DateTimeField(auto_now_add=True,
-                                      verbose_name=u"تاريخ رفع التغطية")
+                                      verbose_name=u"تاريخ رفع الخبر")
     
     title = models.CharField(max_length=128,
                              verbose_name=u"العنوان")
@@ -170,8 +172,8 @@ class Story(models.Model):
             ("review_story", "Can review any available story."),
             ("assign_review_story", "Can assign members to review stories.")
         )
-        verbose_name = u"تغطية"
-        verbose_name_plural = u"التغطيات"
+        verbose_name = u"خبر"
+        verbose_name_plural = u"الأخبار"
 #         app_label = u"المركز الإعلامي"
 
 
@@ -250,10 +252,10 @@ class StoryReview(Review):
     A review for a story.
     """
     story = models.OneToOneField(Story,
-                                 verbose_name=u"التغطية")
+                                 verbose_name=u"الخبر")
     class Meta:
-        verbose_name = u"مراجعة تغطية"
-        verbose_name_plural = u"مراجعات التغطيات"
+        verbose_name = u"مراجعة خبر"
+        verbose_name_plural = u"مراجعات الأخبار"
 #         app_label = u"المركز الإعلامي"
 
 
@@ -297,8 +299,8 @@ class StoryTask(Task):
         return self.episode.__unicode__()
     
     class Meta:
-        verbose_name = u"مهمة تغطية"
-        verbose_name_plural = u"مهمات التغطيات"
+        verbose_name = u"مهمة خبر"
+        verbose_name_plural = u"مهمات الأخبار"
 #         app_label = u"المركز الإعلامي"
 
 

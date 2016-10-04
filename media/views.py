@@ -55,12 +55,13 @@ def list_activities(request):
     user_coordination_and_representations = request.user.media_representations.current_year() | \
                                             request.user.coordination.current_year()
     employee_clubs = request.user.employee.current_year()
-    if user_coordination_and_representations.exists():
+    if is_media_coordinator_or_member(request.user) or \
+       request.user.is_superuser:
+        clubs_for_user = get_clubs_for_assessment_by_user(request.user)
+    elif user_coordination_and_representations.exists():
         clubs_for_user = user_coordination_and_representations
     elif employee_clubs.exists():
         clubs_for_user = employee_clubs
-    else:
-        clubs_for_user = get_clubs_for_assessment_by_user(request.user)
     return render(request, 'media/list_activities.html', {'clubs': clubs_for_user})
 
 @login_required

@@ -54,7 +54,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for activity in club.primary_activity.approved %}
+                    {% for activity in club.get_primary_and_secondary_activities.approved %}
                     {% for episode in activity.episode_set.all %}
                     <tr>
                         <td><a href="{% url 'activities:show' activity.pk %}">{{ activity.name }}</a></td>

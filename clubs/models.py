@@ -204,6 +204,9 @@ class Club(models.Model):
         return points
     get_total_points.short_description = u'إجمالي النقاط'
 
+    def get_primary_and_secondary_activities(self):
+        return self.primary_activity.all() | self.secondary_activity.all()
+
     class Meta:
         # For the admin interface.
         verbose_name = u"نادي"

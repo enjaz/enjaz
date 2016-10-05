@@ -56,6 +56,12 @@ def is_media_coordinator_or_member(user):
 def is_media_representative_of_club(user, club):
     return user in club.media_representatives.all()
 
+def is_media_representative_of_activity(user, activity):
+    primary_club_queryset = Club.objects.filter(pk=activity.primary_club.pk)
+    secondary_club_queryset = activity.secondary_clubs.all()
+    club_pks = (primary_club_queryset | secondary_club_queryset).values_list('pk', flat=True)
+    return user.media_representations.filter(pk__in=club_pks).exists()
+
 def media_coordinator_or_member_test(user):
     if not is_media_coordinator_or_member(user) and not user.is_superuser:
         raise PermissionDenied
@@ -119,7 +125,7 @@ def can_submit_employeereport(user):
 def can_submit_studentreport(user, activity):
     return clubs.utils.has_coordination_to_activity(user, activity) or \
            is_media_coordinator_or_member(user) or \
-           is_media_representative_of_club(user, activity.primary_club) or\
+           is_media_representative_of_activity(user, activity) or\
            clubs.utils.is_presidency_coordinator_or_deputy(user) or \
            user.has_perms('media.add_followupreport') or \
            user.is_superuser

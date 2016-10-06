@@ -60,7 +60,7 @@
         <ul class="modal-intro">
             <li>سنتواصل مع {{ book.submitter.common_profile.ar_first_name }} لاستلام الكتاب، ثم سنتواصل معك لتستلم الكتاب. (تتطلب هذه العملية قرابة الأسبوع).</li>
             <li> في حال وجود أي استفسار، يمكنك التواصل مع مُنسّق سِراج:
-                {% include 'bulb/exchange/components/bulb_coordinator_contacts.html' %}
+                {% include 'bulb/exchange/components/book_exchange_coordinator_contacts.html' %}
             </li>
             <li>يمكنك الرجوع لتفاصيل الطلب وتعديله في صفحة "<a href="{% url 'bulb:requests_by_me' %}">طلباتي</a>".</li>
         </ul>

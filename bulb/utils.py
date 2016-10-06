@@ -3,7 +3,7 @@ import datetime
 from django.utils import timezone
 from django.db import IntegrityError
 
-from clubs.models import Club
+from clubs.models import Club, Team
 from core.models import Tweet
 import accounts.utils
 import clubs.utils
@@ -40,19 +40,29 @@ def is_bulb_member(user):
     if not user.is_authenticated():
         return False
     user_clubs = user.memberships.current_year()
-    return user_clubs.filter(english_name='Bulb').exists()
+    user_teams = user.team_memberships.current_year() | \
+                 user.team_coordination.current_year()
+    return user_clubs.filter(english_name='Bulb').exists() or \
+        user_teams.filter(club__english_name='Bulb').exists()
+
+def is_in_book_exchange_team(user):
+    user_teams = user.team_memberships.current_year() | \
+                 user.team_coordination.current_year()
+    return user_teams.filter(code_name="book_exchange").exists()
 
 def get_bulb_club_for_user(user):
     return clubs.utils.get_club_for_user("Bulb", user)
 
 def get_indirect_request_cc(book):
     """Bulb members are those who are assigned indirect requests."""
-    bulb_club = get_bulb_club_for_user(book.submitter)
-    return [member.email for member in bulb_club.members.all()]
+    book_exchange_team = clubs.utils.get_team_for_user("book_exchange", book.submitter)
+    emails = list(book_exchange_team.members.values_list('email', flat=True))
+    return emails
 
 def get_session_submitted_cc(session):
     bulb_club = get_bulb_club_for_user(session.submitter)
-    return [deputy.email for deputy in bulb_club.deputies.all()]
+    emails = list(bulb_club.deputies.values_list('email', flat=True))
+    return email
 
 def get_bulb_club_of_user(user):
     user_clubs = clubs.utils.get_user_clubs(user)
@@ -85,6 +95,7 @@ def can_edit_needed_book(user, needed_book):
 def can_edit_owner_status(user, book):
     if is_bulb_coordinator_or_deputy(user) or \
        is_bulb_member(user) or \
+       is_in_book_exchange_team(user) or \
        user.is_superuser or \
        book.submitter == user:
         return True
@@ -94,6 +105,7 @@ def can_edit_owner_status(user, book):
 def can_edit_requester_status(user, book_request):
     if is_bulb_coordinator_or_deputy(user) or \
        is_bulb_member(user) or \
+       is_in_book_exchange_team(user) or \
        user.is_superuser or \
        user == book_request.requester:
         return True

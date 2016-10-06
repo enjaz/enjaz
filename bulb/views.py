@@ -19,7 +19,7 @@ from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, NeededBookForm,
 from bulb import utils
 from clubs.models import city_choices
 import accounts.utils
-
+import clubs.utils
 
 def index(request):
     groups = Group.objects.current_year().for_user_city(request.user).unarchived().undeleted().order_by("?")[:6]
@@ -173,14 +173,14 @@ def list_needed_book_previews(request, source, name):
 @login_required
 def order_instructions(request, pk):
     book = get_object_or_404(Book, pk=pk, is_deleted=False)
-    bulb_coordinator = utils.get_bulb_club_for_user(book.submitter).coordinator
+    book_exchange_coordinator = clubs.utils.get_team_for_user("book_exchange", book.submitter).coordinator
     last_request = book.last_pending_request()
     
     if not (last_request and last_request.requester == request.user) and \
        not utils.can_order_book(request.user, book):
         raise PermissionDenied
 
-    context = {'book': book, 'bulb_coordinator': bulb_coordinator}
+    context = {'book': book, 'book_exchange_coordinator': book_exchange_coordinator}
 
     return render(request, "bulb/exchange/components/order_body.html",
                   context)
@@ -190,7 +190,7 @@ def order_instructions(request, pk):
 @csrf.csrf_exempt
 def confirm_book_order(request, pk):
     book = get_object_or_404(Book, pk=pk, is_deleted=False)
-    bulb_coordinator = utils.get_bulb_club_for_user(book.submitter).coordinator
+    book_exchange_coordinator = clubs.utils.get_team_for_user("book_exchange", book.submitter).coordinator
     current_year = StudentClubYear.objects.get_current()
     instance = Request(requester=request.user, book=book)
     if request.method == 'POST':
@@ -218,13 +218,13 @@ def confirm_book_order(request, pk):
             my_books_full_url = request.build_absolute_uri(my_books_url)
             if book_request.delivery == 'I':
                 owner_template = "book_requested_indirectly_to_owner"
-                if bulb_coordinator:
+                if book_exchange_coordinator:
                     indirect_requests_url = reverse('bulb:indirect_requests')
                     indirect_requests_full_url = request.build_absolute_uri(indirect_requests_url)
                     email_context['full_url'] = indirect_requests_full_url
-                    email_context['bulb_coordinator'] = bulb_coordinator
+                    email_context['book_exchange_coordinator'] = book_exchange_coordinator
                     cc = utils.get_indirect_request_cc(book)
-                    mail.send([bulb_coordinator.email],
+                    mail.send([book_exchange_coordinator.email],
                               cc=cc,
                               template="book_requested_indirectly_to_coordinator",
                               context=email_context)
@@ -307,14 +307,14 @@ def delete_book(request, pk):
     # the requester accordingly.
     if request.user != book.submitter:
         pending_request = book.last_pending_request()
-        bulb_coordinator = utils.get_bulb_club_for_user(book.submitter).coordinator
-        if bulb_coordinator:
-            cc_coordinator = [bulb_coordinator.email]
+        book_exchange_coordinator = clubs.utils.get_team_for_user("book_exchange", book.submitter).coordinator
+        if book_exchange_coordinator:
+            cc_coordinator = [book_exchange_coordinator.email]
         else:
             cc_coordinator = []
         email_context = {'book': book,
                          'book_request': pending_request,
-                         'bulb_coordinator': bulb_coordinator}
+                         'book_exchange_coordinator': book_exchange_coordinator}
         if not book.is_publicly_owned:
             mail.send([book.submitter.email],
                       cc=cc_coordinator,
@@ -497,7 +497,7 @@ def pending_request(request):
 @login_required
 @csrf.csrf_exempt
 def list_my_books(request):
-    bulb_coordinator = utils.get_bulb_club_for_user(request.user).coordinator
+    book_exchange_coordinator = clubs.utils.get_team_for_user("book_exchange", request.user).coordinator
     condition = request.POST.get('condition')
     if condition == 'pending':
         pks = Request.objects.filter(status="",
@@ -518,7 +518,7 @@ def list_my_books(request):
     books = Book.objects.filter(pk__in=pks, is_deleted=False).of_user(request.user).distinct()
 
     context =  {'books': books,
-                'bulb_coordinator': bulb_coordinator}
+                'book_exchange_coordinator': book_exchange_coordinator}
     return render(request, 'bulb/exchange/list_my_books.html', context)    
 
 
@@ -526,7 +526,7 @@ def list_my_books(request):
 @login_required
 @csrf.csrf_exempt
 def list_my_requests(request):
-    bulb_coordinator = utils.get_bulb_club_for_user(request.user).coordinator
+    book_exchange_coordinator = clubs.utils.get_team_for_user("book_exchange", request.user).coordinator
     condition = request.POST.get('condition')
     if condition == 'pending':
         requests = Request.objects.filter(requester=request.user,
@@ -546,13 +546,14 @@ def list_my_requests(request):
                                           requester_status="R")
 
     context =  {'requests': requests,
-                'bulb_coordinator': bulb_coordinator}
+                'book_exchange_coordinator': book_exchange_coordinator}
     return render(request, 'bulb/exchange/list_direct_requests.html', context)    
 
 @login_required
 def indicators(request, city=""):
     if not utils.is_bulb_coordinator_or_deputy(request.user) and \
        not utils.is_bulb_member(request.user) and \
+       not utils.is_in_book_exchange_team(request.user) and \
        not request.user.is_superuser:
         raise PermissionDenied
 
@@ -616,11 +617,12 @@ def indicators(request, city=""):
 def list_indirect_requests(request):
     if not utils.is_bulb_coordinator_or_deputy(request.user) and \
        not utils.is_bulb_member(request.user) and \
+       not utils.is_in_book_exchange_team(request.user) and \
        not request.user.is_superuser:
         raise PermissionDenied
 
     condition = request.POST.get('condition')
-    bulb_club = utils.get_bulb_club_of_user(request.user)
+    book_exchange_team = clubs.utils.get_team_for_user("book_exchange", request.user)
     if condition == 'to_receive':
         # Get all requests that are:
         # * for indirect delivery,
@@ -629,7 +631,8 @@ def list_indirect_requests(request):
         requests = Request.objects.filter(delivery='I',
                                           owner_status='',
                                           requester_status='',
-                                          book__submitter__common_profile__college__gender=bulb_club.gender)
+                                          book__submitter__common_profile__city=book_exchange_team.city,
+                                          book__submitter__common_profile__college__gender=book_exchange_team.gender)
         side = 'owner'
     elif condition == 'to_give':
         # Get all requests that are:
@@ -639,7 +642,8 @@ def list_indirect_requests(request):
         requests = Request.objects.filter(delivery='I',
                                           owner_status='D',
                                           requester_status='',
-                                          requester__common_profile__college__gender=bulb_club.gender)
+                                          requester__common_profile__city=book_exchange_team.city,
+                                          requester__common_profile__college__gender=book_exchange_team.gender)
         side = 'requester'
     elif condition == 'to_return_to_owner':
         # Get all requesters that are:
@@ -651,7 +655,8 @@ def list_indirect_requests(request):
                                           requester_status='R',
                                           owner_status='D',
                                           borrowing_end_date__lte=timezone.now(),
-                                          book__submitter__common_profile__college__gender=bulb_club.gender)
+                                          book__submitter__common_profile__city=book_exchange_team.city,
+                                          book__submitter__common_profile__college__gender=book_exchange_team.gender)
         side = 'owner'
     elif condition == 'to_claim_from_requester':
         # Get all requesters that are:
@@ -662,7 +667,8 @@ def list_indirect_requests(request):
                                           book__contribution='L',
                                           requester_status='D',
                                           borrowing_end_date__lte=timezone.now(),
-                                          requester__common_profile__college__gender=bulb_club.gender)
+                                          requester__common_profile__city=book_exchange_team.city,
+                                          requester__common_profile__college__gender=book_exchange_team.gender)
         side = 'requester'
     elif condition == 'failed_requester':
         # Get all requesters that are:
@@ -671,12 +677,14 @@ def list_indirect_requests(request):
         # * haven't been returned by the requesters,
         requests = Request.objects.filter(delivery='I',
                                           requester_status='F',
-                                          requester__common_profile__college__gender=bulb_club.gender)
+                                          requester__common_profile__city=book_exchange_team.city,
+                                          requester__common_profile__college__gender=book_exchange_team.gender)
         side = 'requester'
     elif condition == 'failed_owner':
         requests = Request.objects.filter(delivery='I',
                                           owner_status='F',
-                                          book__submitter__common_profile__college__gender=bulb_club.gender)
+                                          book__submitter__common_profile__city=book_exchange_team.city,
+                                          book__submitter__common_profile__college__gender=book_exchange_team.gender)
         side = 'owner'
     elif condition == 'done':
         # Get all requesters that are:
@@ -686,23 +694,25 @@ def list_indirect_requests(request):
         # * exclude requests that are supposed to be in the claim/return lists. 
         requests = Request.objects.filter(delivery='I',
                                           owner_status='D',
-                                           book__submitter__common_profile__college__gender=bulb_club.gender)\
+                                          book__submitter__common_profile__city=book_exchange_team.city,
+                                          book__submitter__common_profile__college__gender=book_exchange_team.gender)\
                                   .exclude(book__contribution='L',
                                            borrowing_end_date__lte=timezone.now()) | \
                    Request.objects.filter(delivery='I',
                                           requester_status='D',
-                                          requester__common_profile__college__gender=bulb_club.gender)\
+                                          requester__common_profile__city=book_exchange_team.city,
+                                          requester__common_profile__college__gender=book_exchange_team.gender)\
                                   .exclude(book__contribution='L',
                                            borrowing_end_date__lte=timezone.now()) | \
                    Request.objects.filter(delivery='I',
                                           book__contribution='L',
                                           status='R',
-                                          requester__common_profile__college__gender=bulb_club.gender)
+                                          requester__common_profile__city=book_exchange_team.city,
+                                          requester__common_profile__college__gender=book_exchange_team.gender)
 
         side = None
 
     context = {'requests': requests,
-               'bulb_club': bulb_club,
                'side': side}
 
     return render(request, 'bulb/exchange/list_indirect_requests.html', context)
@@ -711,6 +721,7 @@ def list_indirect_requests(request):
 def indirect_requests(request):
     if not utils.is_bulb_coordinator_or_deputy(request.user) and \
        not utils.is_bulb_member(request.user) and \
+       not utils.is_in_book_exchange_team(request.user) and \
        not request.user.is_superuser:
         raise PermissionDenied
 
@@ -731,14 +742,14 @@ def control_request(request):
     request_pk = request.POST.get('pk')
     book_request = get_object_or_404(Request, pk=request_pk)
     book = book_request.book
-    bulb_coordinator = utils.get_bulb_club_for_user(request.user).coordinator
-    if bulb_coordinator:
-        cc_coordinator = [bulb_coordinator.email]
+    book_exchange_coordinator = clubs.utils.get_team_for_user("book_exchange", book.submitter).coordinator
+    if book_exchange_coordinator:
+        cc_coordinator = [book_exchange_coordinator.email]
     else:
         cc_coordinator = []
     email_context = {'book': book,
                      'book_request': book_request,
-                     'bulb_coordinator': bulb_coordinator}
+                     'book_exchange_coordinator': book_exchange_coordinator}
 
     if action.startswith('owner_'):
         if not utils.can_edit_owner_status(request.user, book):
@@ -833,9 +844,9 @@ def control_request(request):
                       template="book_request_canceled_to_requester",
                       context=email_context)
             # Also, email Bulb coordinator.
-            if book_request.delivery == 'I' and bulb_coordinator:
+            if book_request.delivery == 'I' and book_exchange_coordinator:
                 cc = utils.get_indirect_request_cc(book)
-                mail.send([bulb_coordinator.email],
+                mail.send([book_exchange_coordinator.email],
                           cc=cc,
                           template="indirect_book_request_canceled_to_coordinator",
                           context=email_context)
@@ -937,9 +948,9 @@ def control_request(request):
                           context=email_context)
 
             # Also, email Bulb coordinator.
-            if book_request.delivery == 'I' and bulb_coordinator:
+            if book_request.delivery == 'I' and book_exchange_coordinator:
                 cc = utils.get_indirect_request_cc(book)
-                mail.send([bulb_coordinator.email],
+                mail.send([book_exchange_coordinator.email],
                           cc=cc,
                           template="indirect_book_request_canceled_to_coordinator",
                           context=email_context)

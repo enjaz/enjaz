@@ -12,7 +12,7 @@
     <table class="table table-hover">
         <tr>
             <th>الاسم</th>
-            <td>{{ book_request.book.submitter.common_profile.get_ar_full_name }}</td>
+            <td>{{ book_request.book.submitter.common_profile.get_ar_full_name }}{% if book.is_publicly_owned %} (كتاب عمومي){% endif %}</td>
         </tr>
         <tr>
             <th>الكلية</th>
@@ -93,22 +93,22 @@
         {% if book_request.requester_status == 'D' and book_request.book.contribution == 'L' %}
             {% if book_request.is_due_returing %}
             <p class="alert alert-danger">
-                حان موعد تسليم الكتاب! تواصل مع مُنسّق سراج {{ bulb_coordinator.common_profile.get_ar_full_name }} لإعادة الكتاب.
+                حان موعد تسليم الكتاب! تواصل مع مُنسّق المكتبة الطلابية التعاونية {{ book_exchange_coordinator.common_profile.get_ar_full_name }} لإعادة الكتاب.
             </p>
             {% else %}
             <p class="alert alert-warning">
-                تواصل مع مُنسّق سراج {{ bulb_coordinator.common_profile.get_ar_full_name }} لإعادة الكتاب قبل {{ book_request.borrowing_end_date|date:"l j F" }}.
+                تواصل مع مُنسّق سراج {{ book_exchange_coordinator.common_profile.get_ar_full_name }} لإعادة الكتاب قبل {{ book_request.borrowing_end_date|date:"l j F" }}.
             </p>
             {% endif %}
         {% elif book_request.requester_status == '' or book_request.requester_status == 'F' %}
         <p class="alert alert-warning">
-        طلبتَ <strong>الإيصال عبر فريق سِراج</strong>. سيتواصل معكَ مُنسّق سِراج {{ bulb_coordinator.common_profile.get_ar_full_name }} فور حصوله على الكتاب.
+        طلبتَ <strong>الإيصال عبر فريق سِراج</strong>. سيتواصل معكَ مُنسّق المكتبة الطلابية التعاونية {{ book_exchange_coordinator.common_profile.get_ar_full_name }} فور حصوله على الكتاب.
         </p>
         <button data-pk="{{ book_request.pk }}" class="canceled btn-block btn-icon btn btn-danger">
             <i class="fa fa-times"></i>
             ألغِ الطلب
         </button>
         {% endif %}
-        {% include 'bulb/exchange/components/bulb_coordinator_contacts.html' %}
+        {% include 'bulb/exchange/components/book_exchange_coordinator_contacts.html' %}
     {% endif %}
 </div>

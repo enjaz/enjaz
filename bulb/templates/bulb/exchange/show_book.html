@@ -26,7 +26,7 @@
             {{ book.description|linebreaksbr }}
         </p>
         <ul class="list-unstyled" style="padding-right: 0;">
-            <li><span style="color: black;">أضافه</span>: {% reader_profile_link book.submitter %}</li>
+            {% if not book.is_publicly_owned %}<li><span style="color: black;">أضافه</span>: {% reader_profile_link book.submitter %}</li>{% endif %}
             <li><span style="color: black;">تاريخ الإضافة</span>: {{ book.submission_date|date:"j F Y" }}</li>
 
             <li><span style="color: black;">نوع المساهمة</span>: لل{{ book.get_contribution_display }}</li>
@@ -59,7 +59,7 @@
 <div style="border-top: solid 1px #eee; margin-top: 5px;" class="row">
 {% if sample_user_books.exists %}
     <div class="col-sm-6" style="border-left: solid 1px #eee;">
-    <h2>كتب أخرى من {{ book.submitter.common_profile.ar_first_name }}</h2>
+    <h2>كتب أخرى من {% if book.is_publicly_owned %}سِراج{% else %}{{ book.submitter.common_profile.ar_first_name }}{% endif %}</h2>
         <div class="row">
         {% for user_book in sample_user_books %}
         <div class="col-md-4 col-sm-6">

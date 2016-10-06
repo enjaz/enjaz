@@ -3,9 +3,6 @@ import datetime
 
 from django.contrib import admin
 from activities.models import Activity, Episode, Category, Evaluation, Review, Assessment, Criterion, DepositoryItem
-from clubs.models import section_choices
-from clubs.utils import get_presidency, get_deanship
-from core.models import StudentClubYear
 
 class EpisodeInline(admin.TabularInline):
     model = Episode
@@ -14,33 +11,6 @@ class EpisodeInline(admin.TabularInline):
 class ReviewInline(admin.StackedInline):
     model = Review
     extra = 0
-
-class YearFilter(admin.SimpleListFilter):
-    title = u"السنة"
-    parameter_name = 'year'
-    def lookups(self, request, model_admin):
-        years = StudentClubYear.objects.all()
-        year_lookups = [(year.start_date.year, unicode(year))
-                        for year in years]
-        return year_lookups
-
-    def queryset(self, request, queryset):
-        if self.value():
-            start_year = int(self.value())
-            end_year = start_year + 1
-            chosen_year = StudentClubYear.objects.get_by_year(start_year, end_year)
-            return queryset.filter(primary_club__year=chosen_year)
-
-class CategoryFilter(admin.SimpleListFilter):
-    title = u"التصنيف"
-    parameter_name = 'published'
-    def lookups(self, request, model_admin):
-        return [(category.en_name, category.ar_name) for category in
-                Category.objects.filter(category__isnull=True)]
-
-    def queryset(self, request, queryset):
-        if self.value():
-            return queryset.filter(category__en_name=self.value())
 
 class SubmissionFilter(admin.SimpleListFilter):
     title = u"تاريخ الإرسال"
@@ -86,7 +56,7 @@ class ActivityAdmin(admin.ModelAdmin):
                     'submission_date', 'is_approved',
                     'get_approval_status_message', 'get_relevance_score_average',
                     'get_quality_score_average', 'get_evaluation_count')
-    list_filter = [CategoryFilter, SubmissionFilter, StatusFilter, YearFilter]
+    list_filter = ['category', 'primary_club__city', 'gender', 'primary_club__year', SubmissionFilter, StatusFilter]
     readonly_fields = ('get_relevance_score_average', 'get_quality_score_average', )
     search_fields = ["name", "primary_club__name", ]
     inlines = [EpisodeInline, ReviewInline]

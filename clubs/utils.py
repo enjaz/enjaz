@@ -1,5 +1,5 @@
 """Utility functions related to the clubs app."""
-from .models import Club
+from .models import Club, Team
 from core.models import StudentClubYear
 import accounts.utils
 
@@ -216,3 +216,18 @@ def get_club_for_user(english_name, user):
     else:
         # If the no city was found, default to Riyadh female club.
         return targeted_clubs.get(city="R", gender="F")
+
+def get_team_for_user(code_name, user, gender_specific=True, city_specific=True):
+    targeted_teams = Team.objects.current_year().filter(code_name=code_name)
+    if city_specific:
+        team_city = accounts.utils.get_user_city(user)
+        if not team_city:
+            team_city = "R"
+        targeted_teams = targeted_teams.filter(city=team_city)
+    if gender_specific:
+        team_gender = accounts.utils.get_user_gender(user)
+        if not team_gender:
+            team_gender = "R"
+        targeted_teams = targeted_teams.filter(gender=team_gender)
+
+    return targeted_teams.first()

@@ -15,20 +15,31 @@ def get_club_notification_to(activity):
     return [activity.submitter.email]
 
 
-def get_club_notification_cc(activity):
+def get_club_notification_cc(activity, reviewer_club=None):
     """Return the address that should be sent an email notifcation in the
     'cc' field.
     """
     addresses = []
     # If the person who submitted the activity is not the coordinator,
     # add the coordinator to the CC list.
-    if activity.submitter != activity.primary_club.coordinator:
-        if activity.primary_club.coordinator and \
-           activity.primary_club.coordinator.email:
-            addresses.append(activity.primary_club.coordinator.email)
-    for secondary_club in activity.secondary_clubs.filter(coordinator__isnull=False):
-        if secondary_club.coordinator.email:
-            addresses.append(secondary_club.coordinator.email)
+    if activity.submitter != activity.primary_club.coordinator and \
+       activity.primary_club.coordinator and \
+       activity.primary_club.coordinator.email:
+        addresses.append(activity.primary_club.coordinator.email)
+
+    # Send notifications to parents who have submitted reviews
+    review_club_pks = activity.review_set.values_list('reviewer_club__pk', flat=True)
+    reviewing_clubs = Club.objects.activity_reviewing_parents(activity).filter(pk__in=review_club_pks)
+    # Don't CC the club that's doing the current review
+    if reviewer_club:
+        reviewing_clubs = reviewing_clubs.exclude(pk=reviewer_club.pk)
+    clubs = (activity.secondary_clubs.all() | \
+             reviewing_clubs)\
+             .filter(coordinator__isnull=False)
+    for club in clubs:
+        if club.coordinator.email:
+            addresses.append(club.coordinator.email)
+
     return addresses
 
 

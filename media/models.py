@@ -56,6 +56,34 @@ class BaseComment(models.Model):
     class Meta:
         abstract = True
 
+class EmployeeReport(models.Model):
+    """
+    A follow-up report, submitted after REPORT_DUE_AFTER days of an activity episode.
+    """
+    episode = models.OneToOneField(Episode, verbose_name=u"الموعد")
+
+    submitter = models.ForeignKey(User)
+    date_submitted = models.DateTimeField(auto_now_add=True,
+                                      verbose_name=u"تاريخ رفع التقرير")
+
+    # Content
+    speaker = models.TextField(verbose_name=u"أسماء المتحدثين والمتحدثات")
+    quotation = models.TextField(verbose_name=u"اقتباسات من المتحدثين والمتحدثات")
+    sponsor_speech = models.TextField(verbose_name=u"كلمة الرعاة", blank=True, help_text=u"اختياري")
+    prize_winner = models.TextField(verbose_name=u"أسماء المكرمين والمكرمات", blank=True, help_text=u"اختياري")
+    winner_college_or_club = models.TextField(verbose_name=u"الكلية أو النادي الذي يتبع له المكرم", blank=True, help_text=u"اختياري")
+    booth = models.TextField(verbose_name=u"أسماء الأركان المشاركة", blank=True)
+    sponsor = models.TextField(verbose_name=u"أسماء الجهات الراعية أو المشاركة", blank=True, help_text=u"اختياري")
+
+    attendant_count = models.PositiveIntegerField(verbose_name=u"عدد الحاضرين والحاضرات", null=True)
+    organizer_count = models.PositiveIntegerField(verbose_name=u"عدد المنظمين والمنظمات")
+    speaker_count = models.PositiveIntegerField(verbose_name=u"عدد المتحدثين والمتحدثات", blank=True, help_text=u"اختياري", null=True)
+    lecture_count = models.PositiveIntegerField(verbose_name=u"عدد المحاضرات", blank=True, help_text=u"اختياري", null=True)
+    session_count = models.PositiveIntegerField(verbose_name=u"عدد ورش العمل", blank=True, help_text=u"اختياري", null=True)
+    booth_count = models.PositiveIntegerField(verbose_name=u"عدد الأركان", blank=True, help_text=u"اختياري", null=True)
+    end = models.TextField(verbose_name=u"كيف انتهى النشاط؟")
+
+    notes = models.TextField(verbose_name=u"ملاحظات", blank=True, help_text=u"اختياري")
 
 class FollowUpReport(models.Model):
     """
@@ -66,22 +94,28 @@ class FollowUpReport(models.Model):
     submitter = models.ForeignKey(User)
     date_submitted = models.DateTimeField(auto_now_add=True,
                                       verbose_name=u"تاريخ رفع التقرير")
-    
+
     # Content
     description = models.TextField(verbose_name=u"الوصف",
                                    help_text=u"")
-    start_date = models.DateField(verbose_name=u"تاريخ البداية")
-    end_date = models.DateField(verbose_name=u"تاريخ النهاية")
-    start_time = models.TimeField(verbose_name=u"وقت البداية")
-    end_time = models.TimeField(verbose_name=u"وقت النهاية")
-    location = models.CharField(max_length=128,
-                                verbose_name=u"المكان")
-    organizer_count = models.IntegerField(verbose_name=u"عدد المنظمين")
-    participant_count = models.IntegerField(verbose_name=u"عدد المشاركين")
+    twitter_announcement = models.TextField(verbose_name=u"روابط الإعلان عبر تويتر", default="")
 
-    announcement_sites = models.TextField(verbose_name=u"أماكن النشر و الإعلان")
-    notes = models.TextField(verbose_name=u"ملاحظات", null=True, blank=True)
     objects = FollowUpQuerySet.as_manager()
+
+    # Obsolete fields (kept for preserving previous data only)
+    description = models.TextField(verbose_name=u"الوصف",
+                                   help_text=u"")
+    start_date = models.DateField(verbose_name=u"تاريخ البداية", blank=True, null=True)
+    end_date = models.DateField(verbose_name=u"تاريخ النهاية", blank=True, null=True)
+    start_time = models.TimeField(verbose_name=u"وقت البداية", blank=True, null=True)
+    end_time = models.TimeField(verbose_name=u"وقت النهاية", blank=True, null=True)
+    location = models.CharField(max_length=128,
+                                verbose_name=u"المكان", blank=True, default="")
+    organizer_count = models.IntegerField(verbose_name=u"عدد المنظمين", blank=True, null=True)
+    participant_count = models.IntegerField(verbose_name=u"عدد المشاركين", blank=True, null=True)
+    announcement_sites = models.TextField(verbose_name=u"أماكن النشر و الإعلان")
+    notes = models.TextField(verbose_name=u"ملاحظات", blank=True, default="")
+
     def __unicode__(self):
         "Return the name of the parent activity followed by the number of the episode"
         return self.episode.activity.name + " #" + str(self.episode.get_index())
@@ -95,6 +129,9 @@ class FollowUpReport(models.Model):
         verbose_name_plural = u"التقارير"
 #         app_label = u"المركز الإعلامي"
 
+class FollowUpReportAdImage(models.Model):
+    report = models.ForeignKey(FollowUpReport, related_name='ad_images')
+    image = models.FileField(verbose_name=u"الإعلان", upload_to="media/ad_images/")
 
 class FollowUpReportImage(models.Model):
     report = models.ForeignKey(FollowUpReport, related_name='images')
@@ -119,7 +156,7 @@ class Story(models.Model):
     writer = models.ForeignKey(User,
                                verbose_name=u"الكاتب")
     date_submitted = models.DateTimeField(auto_now_add=True,
-                                      verbose_name=u"تاريخ رفع التغطية")
+                                      verbose_name=u"تاريخ رفع الخبر")
     
     title = models.CharField(max_length=128,
                              verbose_name=u"العنوان")
@@ -135,8 +172,8 @@ class Story(models.Model):
             ("review_story", "Can review any available story."),
             ("assign_review_story", "Can assign members to review stories.")
         )
-        verbose_name = u"تغطية"
-        verbose_name_plural = u"التغطيات"
+        verbose_name = u"خبر"
+        verbose_name_plural = u"الأخبار"
 #         app_label = u"المركز الإعلامي"
 
 
@@ -215,10 +252,10 @@ class StoryReview(Review):
     A review for a story.
     """
     story = models.OneToOneField(Story,
-                                 verbose_name=u"التغطية")
+                                 verbose_name=u"الخبر")
     class Meta:
-        verbose_name = u"مراجعة تغطية"
-        verbose_name_plural = u"مراجعات التغطيات"
+        verbose_name = u"مراجعة خبر"
+        verbose_name_plural = u"مراجعات الأخبار"
 #         app_label = u"المركز الإعلامي"
 
 
@@ -262,8 +299,8 @@ class StoryTask(Task):
         return self.episode.__unicode__()
     
     class Meta:
-        verbose_name = u"مهمة تغطية"
-        verbose_name_plural = u"مهمات التغطيات"
+        verbose_name = u"مهمة خبر"
+        verbose_name_plural = u"مهمات الأخبار"
 #         app_label = u"المركز الإعلامي"
 
 

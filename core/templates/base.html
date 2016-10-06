@@ -1,4 +1,4 @@
-{% load staticfiles %}{% load studentguide_tags %}{% load events_tags %}
+{% load staticfiles %}{% load studentguide_tags %}{% load events_tags %}{% load clubs_utils %}
 <!DOCTYPE html>
 <html lang="en" dir="rtl">
 <!--
@@ -241,7 +241,7 @@ you?
 				</a>
                 <ul>
                     {% load media_tags %}
-                    {% if user|is_media_coordinator_or_member or user.is_superuser or user.media_representations.current_year.exists %}
+                    {% if user|is_media_coordinator_or_member or user|is_coordinator_of_any_club or user.is_superuser or user.media_representations.current_year.exists or user.employee.current_year.exists %}
                     <li>
                         <a href="{% url 'media:list_activities' %}">
                             <i class="entypo-flag"></i>

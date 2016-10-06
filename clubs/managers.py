@@ -2,6 +2,11 @@ from django.db import models
 from accounts.utils import get_user_city, get_user_gender
 from core.models import StudentClubYear
 
+class TeamQuerySet(models.QuerySet):
+    def current_year(self):
+        current_year = StudentClubYear.objects.get_current()
+        return self.filter(models.Q(year=current_year) | models.Q(year__isnull=True))
+
 
 class ClubQuerySet(models.QuerySet):
     """

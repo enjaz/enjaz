@@ -254,7 +254,7 @@ div.section-intro, p.section-intro{
                             {% for book in latest_books %}
                             <tr>
                                 <td>{% if not book.is_available  %}<span class="badge badge-warning">طُلب!</span>{% else %}<span class="badge badge-success">متاح</span>{% endif %}<a href="{% url 'bulb:show_book' book.pk %}">{{ book.title }}</td>
-                                <td class="hidden-xs">{% reader_profile_link book.submitter %}</td>
+                                <td class="hidden-xs">{% if book.is_publicly_owned %}سِراج{% else %}{% reader_profile_link book.submitter %}{% endif %}</td>
                                 <td>{{ book.submission_date|date:"l j F Y" }}</td>
                             </tr>
                             {% endfor %}

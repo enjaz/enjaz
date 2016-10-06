@@ -6,7 +6,7 @@ from django.db.models import Sum
 
 from forms_builder.forms.models import Form
 from core.models import StudentClubYear
-from clubs.managers import ClubQuerySet
+from clubs.managers import ClubQuerySet, TeamQuerySet
 
 section_choices = (
     ('NG', u'الحرس الوطني'),
@@ -153,7 +153,7 @@ class Club(models.Model):
         for activity in self.primary_activity.approved():
             episodes.extend(activity.episode_set.all())
         # Get all club's episodes whose report is due
-        due_episodes = filter(lambda x: x.report_is_due(),
+        due_episodes = filter(lambda x: x.report_is_due() and not x.report_is_submitted(),
                               episodes)
         return len(due_episodes)
     
@@ -204,6 +204,9 @@ class Club(models.Model):
         return points
     get_total_points.short_description = u'إجمالي النقاط'
 
+    def get_primary_and_secondary_activities(self):
+        return self.primary_activity.all() | self.secondary_activity.all()
+
     class Meta:
         # For the admin interface.
         verbose_name = u"نادي"
@@ -238,3 +241,43 @@ class College(models.Model):
         # For the admin interface.
         verbose_name = u"كلية"
         verbose_name_plural = u"الكليات"
+
+class Team(models.Model):
+    name = models.CharField(max_length=200, verbose_name=u"الاسم")
+    code_name = models.CharField(max_length=200, verbose_name=u"الاسم البرمجي")
+    email = models.EmailField(max_length=254, verbose_name=u"البريد الإلكتروني",
+                              blank=True)
+    year = models.ForeignKey(StudentClubYear, null=True, blank=True,
+                             on_delete=models.SET_NULL, default=None,
+                             verbose_name=u"السنة")
+    city = models.CharField(max_length=1, choices=city_choices,
+                            blank=True, default="",
+                            verbose_name=u"المدينة")
+    gender = models.CharField(max_length=1, choices=gender_choices,
+                              verbose_name=u"الجندر", blank=True,
+                              default="")
+    club = models.ForeignKey(Club, null=True, blank=True,
+                             verbose_name=u"النادي المتصل")
+    coordinator = models.ForeignKey(User, null=True,
+                                    blank=True,
+                                    related_name="team_coordination",
+                                    verbose_name=u"المنسق")
+    members = models.ManyToManyField(User, verbose_name=u"الأعضاء",
+                                     blank=True,
+                                     related_name="team_memberships")
+    objects = TeamQuerySet.as_manager()
+    class Meta:
+        # For the admin interface.
+        verbose_name = u"فريق"
+        verbose_name_plural = u"الفرق"
+
+    def __unicode__(self):
+        if self.gender and not self.city:
+            return u"%s (%s)" % (self.name, self.get_gender_display())
+        elif self.city and not self.gender:
+            return u"%s (%s)" % (self.name, self.get_city_display())
+        elif self.city and self.gender:
+            return u"%s (%s/%s)" % (self.name, self.get_city_display(),
+                                    self.get_gender_display())
+        else:
+            return self.name

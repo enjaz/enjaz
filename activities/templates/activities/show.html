@@ -107,7 +107,7 @@
                         {% for episode in activity.episode_set.all %}
                         <li>
                         {# if the user has privileges to add a follow-up report... #}
-						{% if user|is_employee_of_any_club or user|has_coordination_to_activity:activity or user|can_submit_followupreport:activity or perms.media.add_followupreport or user|is_deanship_of_students_affairs_coordinator_or_member %}
+						{% if user|is_employee_of_any_club or user|has_coordination_to_activity:activity or user|can_submit_studentreport:activity or perms.media.add_followupreport or user|is_deanship_of_students_affairs_coordinator_or_member %}
 						{# group the activity info in a div to make #}
 						{# space for the report button #}
 						<div class="col-md-10">
@@ -136,36 +136,67 @@
 						{% if user|can_view_followupreport:activity %}
 						</div>
 						<div class="followupreport_zone col-md-2">
+                            <div class="row">
                             {# The particular logic for the following is described here: https://github.com/osamak/student-portal/issues/81 #}
-			    {% if episode.report_is_submitted %}
-			            		<a href="{% url 'media:show_report' episode.pk %}"
-			            		class="btn btn-green btn-xs">استعرض التقرير</a>
+                            {% if episode.employee_report_is_submitted %}
+			            		<a href="{% url 'media:show_employee_report' episode.pk %}"
+			            		class="btn btn-green btn-xs">استعرض تقرير العمادة</a>
                             {# show a special note for employees, that the report hasn't been submitted yet. #}
-                            {% elif not episode.report_is_submitted and not user|can_submit_followupreport:activity %}
-			            		<a class="btn btn-primary btn-xs disabled">لم يرفع التقرير بعد</a>
+                            {% elif not episode.employee_report_is_submitted and not user|can_submit_employeereport %}
+			            		<a class="btn btn-primary btn-xs disabled">لم يرفع تقرير العمادة بعد</a>
                             {# only show the link if the user is not an employee #}
-                            {% elif episode.requires_report and user|can_submit_followupreport:activity %}
-
-                                {% if episode.report_is_due %}
-                                    <a href="{% url 'media:submit_report' episode.pk %}"
-                                    class="btn btn-gold btn-xs">ارفع التقرير</a>
+                            {% elif episode.requires_report and user|can_submit_employeereport %}
+                                {% if episode.report_is_due and not episode.report_is_submitted %}
+                                    <a href="{% url 'media:submit_employee_report' episode.pk %}"
+                                    class="btn btn-gold btn-xs">ارفع تقرير العمادة</a>
 
                                 {% elif episode.report_is_overdue %}
-                                    <a href="{% url 'media:submit_report' episode.pk %}"
-                                    class="btn btn-red btn-xs">ارفع التقرير</a>
+                                    <a href="{% url 'media:submit_employee_report' episode.pk %}"
+                                    class="btn btn-red btn-xs">ارفع تقرير العمادة</a>
 
                                 {% else %}
                                     {% if episode.can_report_early %}
-                                        <a href="{% url 'media:submit_report' episode.pk %}"
-                                        class="btn btn-info btn-xs">ارفع التقرير</a>
+                                        <a href="{% url 'media:submit_employee_report' episode.pk %}"
+                                        class="btn btn-info btn-xs">ارفع تقرير العمادة</a>
                                     {% elif activity.is_approved %}
                                         <a class="btn btn-primary btn-xs disabled">بانتظار انتهاء النشاط</a>
                                     {% endif %}
                                 {% endif %}
-                            {% elif user|can_submit_followupreport:activity %}
-                                <a href="{% url 'media:submit_report' episode.pk %}"
-                                class="btn btn-info btn-xs">ارفع التقرير (اختياري)</a>
+                            {% elif user|can_submit_employeereport %}
+                                <a href="{% url 'media:submit_employee_report' episode.pk %}"
+                                class="btn btn-info btn-xs">ارفع تقرير العمادة (اختياري)</a>
 			            	{% endif %}
+                            </div>
+                            <div class="row">
+                            {% if episode.report_is_submitted %}
+			            		<a href="{% url 'media:show_report' episode.pk %}"
+			            		class="btn btn-green btn-xs">استعرض تقرير المركز الإعلامي</a>
+                            {# show a special note for employees, that the report hasn't been submitted yet. #}
+                            {% elif not episode.report_is_submitted and not user|can_submit_studentreport:activity %}
+			            		<a class="btn btn-primary btn-xs disabled">لم يرفع تقرير المركز الإعلامي بعد</a>
+                            {# only show the link if the user is not an employee #}
+                            {% elif episode.requires_report and user|can_submit_studentreport:activity %}
+                                {% if episode.report_is_due and not episode.report_is_submitted %}
+                                    <a href="{% url 'media:submit_report' episode.pk %}"
+                                    class="btn btn-gold btn-xs">ارفع تقرير المركز الإعلامي</a>
+
+                                {% elif episode.report_is_overdue %}
+                                    <a href="{% url 'media:submit_report' episode.pk %}"
+                                    class="btn btn-red btn-xs">ارفع تقرير المركز الإعلامي</a>
+
+                                {% else %}
+                                    {% if episode.can_report_early %}
+                                        <a href="{% url 'media:submit_report' episode.pk %}"
+                                        class="btn btn-info btn-xs">ارفع تقرير المركز الإعلامي</a>
+                                    {% elif activity.is_approved %}
+                                        <a class="btn btn-primary btn-xs disabled">بانتظار انتهاء النشاط</a>
+                                    {% endif %}
+                                {% endif %}
+                            {% elif user|can_submit_studentreport:activity %}
+                                <a href="{% url 'media:submit_report' episode.pk %}"
+                                class="btn btn-info btn-xs">ارفع تقرير المركز الإعلامي (اختياري)</a>
+			            	{% endif %}
+                            </div>
 						</div>
 						{% endif %}
 					</li>

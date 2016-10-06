@@ -19,12 +19,12 @@ from clubs.utils import get_media_center
 from core import decorators
 from clubs.models import Club
 from activities.models import Activity, Episode
-from media.models import FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment, \
+from media.models import EmployeeReport, FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment, \
     WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment, POLL_TYPE_CHOICES, ReportComment, Buzz
-from media.forms import FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
+from media.forms import EmployeeReportForm, FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
     TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm, \
-    FollowUpReportImageFormset, ReportCommentForm, BuzzForm
-from media.utils import is_media_coordinator_or_member, is_club_coordinator_or_member, is_media_or_club_coordinator_or_member, proper_poll_type, get_poll_type_url, media_coordinator_or_member_test, get_user_media_center, get_clubs_for_assessment_by_user, can_submit_followupreport, get_club_media_center, media_user_test, is_media_coordinator_or_deputy, can_view_followupreport
+    FollowUpReportImageFormset, FollowUpReportAdImageFormset, ReportCommentForm, BuzzForm
+from media.utils import is_media_coordinator_or_member, is_club_coordinator_or_member, is_media_or_club_coordinator_or_member, proper_poll_type, get_poll_type_url, media_coordinator_or_member_test, get_user_media_center, get_clubs_for_assessment_by_user, can_submit_employeereport, can_submit_studentreport, get_club_media_center, media_user_test, is_media_coordinator_or_deputy, can_view_followupreport
 from accounts.utils import get_user_gender, get_user_city
 
 # Keywords
@@ -52,11 +52,16 @@ def list_activities(request):
     Stories.  This page is to be used by both Media Center members, in
     addition to the media representatives of clubs.
     """
-    media_representations = request.user.media_representations.current_year()
-    if media_representations.exists():
-        clubs_for_user = media_representations
-    else:
+    user_coordination_and_representations = request.user.media_representations.current_year() | \
+                                            request.user.coordination.current_year()
+    employee_clubs = request.user.employee.current_year()
+    if is_media_coordinator_or_member(request.user) or \
+       request.user.is_superuser:
         clubs_for_user = get_clubs_for_assessment_by_user(request.user)
+    elif user_coordination_and_representations.exists():
+        clubs_for_user = user_coordination_and_representations
+    elif employee_clubs.exists():
+        clubs_for_user = employee_clubs
     return render(request, 'media/list_activities.html', {'clubs': clubs_for_user})
 
 @login_required
@@ -80,13 +85,92 @@ def list_reports(request):
     Show a list of all reports in a single table.
     """
     # Get all reports
-    media_representations = request.user.media_representations.current_year()
-    if media_representations.exists():
-        clubs_for_user = media_representations
+    user_coordination_and_representations = request.user.media_representations.current_year() | \
+                                            request.user.coordination.current_year()
+    employee_clubs = request.user.employee.current_year()
+    if user_coordination_and_representations.exists():
+        clubs_for_user = user_coordination_and_representations
+    elif employee_clubs.exists():
+        clubs_for_user = employee_clubs
     else:
         clubs_for_user = get_clubs_for_assessment_by_user(request.user)
     reports = FollowUpReport.objects.current_year().filter(episode__activity__primary_club__in=clubs_for_user)
     return render(request, 'media/list_reports.html', {'reports': reports})
+
+@login_required
+def submit_employee_report(request, episode_pk):
+    """
+    Submit a EmployeeReport.
+    """
+    episode = get_object_or_404(Episode, pk=episode_pk)
+
+    # Permission checks
+    if not can_submit_employeereport(request.user):
+        raise PermissionDenied
+    # (2) The passed episode shouldn't already have a report.
+    #     Overriding a previous submission shouldn't be allowed
+    try:
+        report = episode.employeereport
+        return HttpResponseRedirect(reverse('media:edit_employee_report',
+                                            args=(episode.pk, )))
+    except ObjectDoesNotExist:
+        pass
+
+    if request.method == 'POST':
+        form = EmployeeReportForm(request.POST,
+                                  instance=EmployeeReport(pk=episode.pk, # make pk equal to episode pk
+                                                                         # to keep things synchronized
+                                                          episode=episode,
+                                                          submitter=request.user)
+                                  )
+        if form.is_valid():
+            instance = form.save()
+            return HttpResponseRedirect(reverse('activities:show',
+                                                args=(episode.activity.pk, )
+                                                ))
+    else:
+        form = EmployeeReportForm()
+    return render(request, 'media/report_write.html', {'form': form,
+                                                        'employee_submit': True,
+                                                       'episode':episode})
+
+@login_required
+def show_employee_report(request, episode_pk):
+    """
+    Show a EmployeeReport.
+    """
+    episode = get_object_or_404(Episode, pk=episode_pk)
+    report = get_object_or_404(EmployeeReport, episode=episode)
+
+    # Permission checks
+    if not can_view_followupreport(request.user, episode.activity):
+        raise PermissionDenied
+
+    return render(request, 'media/report_read.html', {'report': report, 'comment_form': ReportCommentForm(),
+                                                      'employee_show':True})
+
+@login_required
+def edit_employee_report(request, episode_pk):
+    episode = get_object_or_404(Episode, pk=episode_pk)
+    report = get_object_or_404(EmployeeReport, episode=episode)
+
+    # Permission checks
+    if not can_submit_employeereport(request.user):
+        raise PermissionDenied
+
+    if request.method == 'POST':
+        form = EmployeeReportForm(request.POST, instance=report)
+        if form.is_valid():
+            form.save()
+
+            return HttpResponseRedirect(reverse('media:show_employee_report',
+                                                args=(episode.pk, )
+                                                ))
+    else:
+        form = EmployeeReportForm(instance=report)
+    return render(request, "media/report_write.html", {'form': form,
+                                                       'episode': episode,
+                                                       'employee_edit': True})
 
 @login_required
 def submit_report(request, episode_pk):
@@ -96,7 +180,7 @@ def submit_report(request, episode_pk):
     episode = get_object_or_404(Episode, pk=episode_pk)
     
     # Permission checks
-    if not can_submit_followupreport(request.user, episode.activity):
+    if not can_submit_studentreport(request.user, episode.activity):
         raise PermissionDenied
     # (2) The passed episode shouldn't already have a report.
     #     Overriding a previous submission shouldn't be allowed
@@ -115,10 +199,15 @@ def submit_report(request, episode_pk):
                                                           submitter=request.user)
                                   )
         image_formset = FollowUpReportImageFormset(request.POST, request.FILES)
-        if form.is_valid() and image_formset.is_valid():
+        ad_formet = FollowUpReportAdImageFormset(request.POST, request.FILES)
+        if form.is_valid() and \
+           image_formset.is_valid() and \
+           ad_formet.is_valid():
             instance = form.save()
             image_formset.instance = instance
             image_formset.save()
+            ad_formet.instance = instance
+            ad_formet.save()
 
             # Only send a mail notification if the activity is done,
             # but not more than five days ago (in that case, we should
@@ -156,8 +245,10 @@ def submit_report(request, episode_pk):
                                            'participant_count': episode.activity.participants,
                                            })
         image_formset = FollowUpReportImageFormset()
+        ad_formset = FollowUpReportAdImageFormset()
     return render(request, 'media/report_write.html', {'form': form,
                                                        'image_formset': image_formset,
+                                                       'ad_formset': ad_formset,
                                                        'episode': episode})
 
 @csrf.csrf_exempt
@@ -241,15 +332,19 @@ def edit_report(request, episode_pk):
     report = get_object_or_404(FollowUpReport, episode=episode)
 
     # Permission checks
-    if not can_submit_followupreport(request.user, episode.activity):
+    if not can_submit_studentreport(request.user, episode.activity):
         raise PermissionDenied
 
     if request.method == 'POST':
         form = FollowUpReportForm(request.POST, instance=report)
         image_formset = FollowUpReportImageFormset(request.POST, request.FILES, instance=report)
-        if form.is_valid() and image_formset.is_valid():
+        ad_formset = FollowUpReportAdImageFormset(request.POST, request.FILES, instance=report)
+        if form.is_valid() and\
+           image_formset.is_valid() and\
+           ad_formset.is_valid():
             form.save()
             image_formset.save()
+            ad_formset.save()
 
             # Send notification to media center
             media_center = get_club_media_center(episode.activity.primary_club)
@@ -263,8 +358,11 @@ def edit_report(request, episode_pk):
     else:
         form = FollowUpReportForm(instance=report)
         image_formset = FollowUpReportImageFormset(instance=report)
+        ad_formset = FollowUpReportAdImageFormset(instance=report)
+        
     return render(request, "media/report_write.html", {'form': form,
                                                        'image_formset': image_formset,
+                                                       'ad_formset': ad_formset,
                                                        'episode': episode,
                                                        'edit': True})
 
@@ -277,7 +375,7 @@ def report_comment(request, episode_pk):
     # Permission checks
     # The passed episode should be owned by the user's club or the user should be a member of the media center
     # This is more specific than the test of ``user_passes_test`` above.
-    if not can_submit_followupreport(request.user, episode.activity):
+    if not can_submit_studentreport(request.user, episode.activity):
         raise PermissionDenied
 
     comment_form = ReportCommentForm(request.POST, instance=ReportComment(report=report, author=request.user))
@@ -315,7 +413,7 @@ def create_story(request, episode_pk):
     # --- Permission Checks ---
     # (1) The user should be part of the Media Center (either head or member)
 
-    if not can_submit_followupreport(request.user, episode.activity):
+    if not can_submit_studentreport(request.user, episode.activity):
         raise PermissionDenied
 
     # (2) The passed episode shouldn't already have a story.
@@ -397,7 +495,7 @@ def edit_story(request, episode_pk):
                              reviewer=request.user)
     
     # --- Permission Checks ---
-    if not can_submit_followupreport(request.user, episode.activity):
+    if not can_submit_studentreport(request.user, episode.activity):
         raise PermissionDenied
     
     if request.method == 'POST':

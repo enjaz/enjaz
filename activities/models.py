@@ -522,10 +522,12 @@ class Episode(models.Model):
 
     def report_due_date(self):
         """
-        Return the due date of the report, which is within 7
-        days of the end of the corresponding episode.
+        Return the due date of the report, which is every Monday.
         """
-        return self.end_datetime() + timedelta(days=REPORT_DUE_AFTER)
+        date = self.end_datetime() + timedelta(1)
+        while date.weekday() != 0:
+            date += timedelta(1)
+        return date
 
     def report_is_submitted(self):
         """
@@ -533,6 +535,16 @@ class Episode(models.Model):
         """
         try:
             report = self.followupreport
+            return True
+        except ObjectDoesNotExist:
+            return False
+
+    def employee_report_is_submitted(self):
+        """
+        Return whether or not an employee report has been submitted for this episode.
+        """
+        try:
+            report = self.employeereport
             return True
         except ObjectDoesNotExist:
             return False
@@ -545,8 +557,7 @@ class Episode(models.Model):
         """
         return self.activity.is_approved and \
                self.requires_report and \
-               self.end_datetime() < datetime.now() < self.report_due_date() and \
-               not self.report_is_submitted()
+               self.end_datetime() < datetime.now() < self.report_due_date()
 
     def report_is_overdue(self):
         """
@@ -556,8 +567,7 @@ class Episode(models.Model):
         """
         return self.activity.is_approved and \
                self.requires_report and \
-               datetime.now() > self.report_due_date() and \
-               not self.report_is_submitted()
+               datetime.now() > self.report_due_date()
 
     def get_reviewed_niqati_orders(self):
         return self.order_set.filter(is_approved__isnull=False)

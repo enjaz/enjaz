@@ -54,9 +54,9 @@ class GenericBookForm(forms.ModelForm):
         # Remove is_publicly_owned field from ordinary users.
         user = kwargs.pop('user')
         super(GenericBookForm, self).__init__(*args, **kwargs)
-        if user.is_superuser or \
-           utils.is_bulb_coordinator_or_deputy(user) or \
-           utils.is_bulb_member(user):
+        if not user.is_superuser and \
+           not utils.is_bulb_coordinator_or_deputy(user) and \
+           not utils.is_bulb_member(user):
             del self.fields['is_publicly_owned']
 
 class BookEditForm(GenericBookForm):

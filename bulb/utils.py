@@ -56,7 +56,10 @@ def get_bulb_club_for_user(user):
 def get_indirect_request_cc(book):
     """Bulb members are those who are assigned indirect requests."""
     book_exchange_team = clubs.utils.get_team_for_user("book_exchange", book.submitter)
+    bulb_club = get_bulb_club_for_user(book.submitter)
     emails = list(book_exchange_team.members.values_list('email', flat=True))
+    if bulb_club.coordinator:
+        emails += [bulb_club.coordinator.email]
     return emails
 
 def get_session_submitted_cc(session):

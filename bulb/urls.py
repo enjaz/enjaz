@@ -12,6 +12,8 @@ urlpatterns = patterns('',
     url(r'^bulb-user-autocomplete/$', views.BulbUserAutocomplete.as_view(), name='bulb-user-autocomplete'),
     url(r'^newspaper/$', views.handle_newspaper_signup, name='handle_newspaper_signup'),
     url(r'^newspaper/update$', views.update_newspaper_count, name='update_newspaper_count'),
+    url(r'^suggest_friend/$', views.handle_dewanya_suggestions, name="handle_dewanya_suggestions"),
+    url(r'^suggest_friend/autocomplete$', views.autocomplete_users, name="autocomplete_users"),
 
     # Books exchange
     url(r'^exchange/$', views.list_book_categories, name="list_book_categories"),

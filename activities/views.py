@@ -76,8 +76,7 @@ def list_activities(request):
     if request.user.is_authenticated():
         template = 'activities/list_privileged.html'
 
-        if request.user.is_superuser or \
-           is_deanship_of_students_affairs_coordinator_or_member(request.user):
+        if request.user.is_superuser:
             # If the user is a super user or part of the presidency,
             # then show all activities
             context['pending'] = Activity.objects.pending().current_year()
@@ -89,9 +88,6 @@ def list_activities(request):
             # and rejected activities.
             context['pending'] = Activity.objects.pending().undeleted().for_user_clubs(request.user).distinct()
             context['rejected'] = Activity.objects.rejected().undeleted().for_user_clubs(request.user).distinct()
-            # In addition to the gender-specific approved activities,
-            # show all activities of the user club.
-            context['approved'] = (context['approved'] |  Activity.objects.approved().for_user_clubs(request.user)).distinct()
 
             # Only display to coordinators and deputies
             if is_coordinator_or_deputy_of_any_club(request.user):
@@ -498,7 +494,25 @@ def review(request, activity_id, reviewer_id):
             activity_full_url = request.build_absolute_uri(activity_url)
             email_context = {'activity': activity}
             if review.cleaned_data['is_approved']:
+                # This loop is to handle a situation in which the
+                # chosen_parent_reviewer has been changed after the
+                # activity has been reviewed by other grandparents.
+                # In that case, we just need to skip all parents who
+                # have alraedy approved that activity.
                 reviewing_parent = reviewer_club.get_next_activity_reviewing_parent()
+                while True:
+                    parent_review = Review.objects.filter(activity=activity,
+                                                          reviewer_club=reviewing_parent,
+                                                          is_approved=True).exists()
+                    if parent_review:
+                        # If the activity has already been approved by
+                        # a parent, move to the next and test it again
+                        # (if it exists)
+                        reviewing_parent = reviewing_parent.get_next_activity_reviewing_parent()
+                        if reviewing_parent:
+                            continue
+                    break
+
                 # Reached the top of the review hierarchy => activity
                 # approved.
                 if not reviewing_parent:
@@ -763,7 +777,6 @@ def list_depository_items(request):
 
 
 def autocomplete_items(request):
-    print request.GET
     term = request.GET.get('term')
     if not term:
         raise Http404

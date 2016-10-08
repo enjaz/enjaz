@@ -8,11 +8,14 @@
     </div>
 </div>
 <div class="col-sm-4 vcenter">
+    {% if book_request.book.is_publicly_owned %}
+    هذا كتابٌ عمومي في مكتبة سِراج وليس لأحدٍ بعينه.
+    {% endif %}
     <p>صاحب الكتاب:</p>
     <table class="table table-hover">
         <tr>
             <th>الاسم</th>
-            <td>{{ book_request.book.submitter.common_profile.get_ar_full_name }}</td>
+            <td>{{ book_request.book.submitter.common_profile.get_ar_full_name }}{% if book.is_publicly_owned %} (كتاب عمومي){% endif %}</td>
         </tr>
         <tr>
             <th>الكلية</th>

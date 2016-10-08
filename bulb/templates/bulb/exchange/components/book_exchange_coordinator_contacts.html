@@ -1,0 +1,22 @@
+<table class="table table-hover">
+    <tr>
+        <th>الاسم</th>
+        <td>{{ book_exchange_coordinator.common_profile.get_ar_full_name }}</td>
+    </tr>
+    <tr>
+        <th>الكلية</th>
+        <td>{{ book_exchange_coordinator.common_profile.college.get_name_display }}</td>
+    </tr>
+    <tr>
+        <th>البريد</th>
+        <td class="english-field">
+            <a href="mailto:{{ book_exchange_coordinator.email }}">{{ book_exchange_coordinator.email }}</a>
+        </td>
+    </tr>
+    {% if not book_exchange_coordinator.common_profile.college.gender == 'F' %}
+    <tr>
+        <th>رقم الجوال</th>
+        <td>{{ book_exchange_coordinator.common_profile.mobile_number }}</td>
+    </tr>
+    {% endif %}
+</table>

@@ -58,9 +58,9 @@
     </ul>
     {% elif book.last_pending_request.requester.delivery == 'I' %}
         <ul class="modal-intro">
-            <li>سنتواصل مع {{ book.submitter.common_profile.ar_first_name }} لاستلام الكتاب، ثم سنتواصل معك لتستلم الكتاب. (تتطلب هذه العملية قرابة الأسبوع).</li>
+            <li>{% if not book.is_publicly_owned %}سنتواصل مع {{ book.submitter.common_profile.ar_first_name }} لاستلام الكتاب، ثم {% endif %}سنتواصل معك لتستلم الكتاب. (تتطلب هذه العملية قرابة الأسبوع).</li>
             <li> في حال وجود أي استفسار، يمكنك التواصل مع مُنسّق سِراج:
-                {% include 'bulb/exchange/components/bulb_coordinator_contacts.html' %}
+                {% include 'bulb/exchange/components/book_exchange_coordinator_contacts.html' %}
             </li>
             <li>يمكنك الرجوع لتفاصيل الطلب وتعديله في صفحة "<a href="{% url 'bulb:requests_by_me' %}">طلباتي</a>".</li>
         </ul>
@@ -71,7 +71,7 @@
                 <a id="order-{{ book.pk }}-img" href="{% url 'bulb:show_book' book.pk %}"></a>
             </div>
             <div class="col-sm-7 col-xs-6 vcenter">
-                <p class="modal-intro">يمكنك الآن طلب كتاب <strong>{{ book.title }}</strong> من {{ book.submitter.common_profile.get_ar_full_name }}، من {{ book.submitter.common_profile.college.get_name_display }}. {% if book.contribution == 'G' %}هذا الكتاب للاقتناء{% else %}هذا الكتاب للإعارة {% if book.available_until%}وهو متوفر حتى {{ book.available_until|date:"l j F Y" }}{% endif %}.{% endif %}.</p>
+                <p class="modal-intro">يمكنك الآن طلب كتاب <strong>{{ book.title }}</strong>{% if not book.is_publicly_owned %} من {{ book.submitter.common_profile.get_ar_full_name }}، من {{ book.submitter.common_profile.college.get_name_display }}{% endif %}. {% if book.contribution == 'G' %}هذا الكتاب للاقتناء{% else %}هذا الكتاب للإعارة {% if book.available_until%}وهو متوفر حتى {{ book.available_until|date:"l j F Y" }}{% endif %}.{% endif %}.</p>
     {% if user.common_profile.college.gender == book.submitter.common_profile.college.gender and not book.is_publicly_owned %}
                 <p class="modal-intro">لديك خياران للطلب:</p>
             </div>
@@ -88,7 +88,7 @@
                 <button data-instruction-url="{% url 'bulb:order_instructions' book.pk %}"  data-confirm-url="{% url 'bulb:confirm_book_order' book.pk %}" class="bulb-option order-option indirect">
                     <div class="icon"><i class="fa fa-truck"></i></div>			
                     <h3>توصيل فريق سِراج</h3>
-                    <p>سنتواصل مع {{ book.submitter.common_profile.ar_first_name }} لنأخذ منه الكتاب، ثم سنتصل بك ليصلك الكتاب، يتم ذلك عادة خلال أسبوع.</p>
+                    <p>{% if not book.is_publicly_owned %}سنتواصل مع {{ book.submitter.common_profile.ar_first_name }} لنأخذ الكتاب، ثم {% endif %}سنتصل بك ليصلك الكتاب، يتم ذلك عادة خلال أسبوع.</p>
                 </button>
             </div>
         </div>
@@ -96,7 +96,7 @@
                 <button data-instruction-url="{% url 'bulb:order_instructions' book.pk %}"  data-confirm-url="{% url 'bulb:confirm_book_order' book.pk %}" class="bulb-option order-option indirect">
                     <div class="icon"><i class="fa fa-truck"></i></div>			
                     <h3>إيصال بواسطة فريق سِراج</h3>
-                    <p>سنتواصل مع {{ book.submitter.common_profile.ar_first_name }} لنأخذ منه الكتاب، ثم سنتصل بك ليصلك الكتاب، يتم ذلك عادة خلال أسبوع.</p>
+                    <p>{% if not book.is_publicly_owned %}سنتواصل مع {{ book.submitter.common_profile.ar_first_name }} لنأخذ الكتاب، ثم {% endif %}سنتصل بك ليصلك الكتاب، يتم ذلك عادة خلال أسبوع.</p>
                 </button>
             </div>
         </div>

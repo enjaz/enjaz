@@ -199,15 +199,15 @@ def submit_report(request, episode_pk):
                                                           submitter=request.user)
                                   )
         image_formset = FollowUpReportImageFormset(request.POST, request.FILES)
-        ad_formet = FollowUpReportAdImageFormset(request.POST, request.FILES)
+        ad_formset = FollowUpReportAdImageFormset(request.POST, request.FILES)
         if form.is_valid() and \
            image_formset.is_valid() and \
-           ad_formet.is_valid():
+           ad_formset.is_valid():
             instance = form.save()
             image_formset.instance = instance
             image_formset.save()
-            ad_formet.instance = instance
-            ad_formet.save()
+            ad_formset.instance = instance
+            ad_formset.save()
 
             # Only send a mail notification if the activity is done,
             # but not more than five days ago (in that case, we should

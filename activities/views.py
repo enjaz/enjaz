@@ -259,7 +259,8 @@ def create(request):
                     email_context = {'activity': form_object,
                                      'full_url': full_url,
                                      'reviewer_club': reviewing_parent}
-                    if reviewing_parent.coordinator:
+                    if reviewing_parent.coordinator and \
+                       reviewing_parent.coordinator.email:
                         mail.send([reviewing_parent.coordinator.email],
                                    template="activity_submitted",
                                    context=email_context)
@@ -344,7 +345,8 @@ def edit(request, activity_id):
                 email_context = {'activity': activity,
                                  'full_url': full_url,
                                  'reviewer_club': chosen_reviewer_club}
-                if chosen_reviewer_club.coordinator:
+                if chosen_reviewer_club.coordinator and \
+                   chosen_reviewer_club.coordinator.email:
                     mail.send([chosen_reviewer_club.coordinator.email],
                                template="activity_submitted",
                                context=email_context)
@@ -537,7 +539,9 @@ def review(request, activity_id, reviewer_id):
                     upcoming_review_full_url = request.build_absolute_uri(upcoming_review_url)
                     email_context['full_url'] = upcoming_review_full_url
                     email_context['upcoming_reviewer'] = reviewing_parent
-                    if reviewing_parent.coordinator and 'is_approved' in review.changed_data:
+                    if reviewing_parent.coordinator and \
+                       reviewing_parent.coordinator.email and \
+                       'is_approved' in review.changed_data:
                         mail.send(reviewing_parent.coordinator.email,
                                   template="activity_approved_to_next_reviewer",
                                   context=email_context)                    

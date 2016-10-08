@@ -11,7 +11,7 @@
     {% if user|is_media_coordinator_or_member or user.is_superuser %}
     <li><a href="{% url 'activities:assessment_list' %}"><span class="glyphicon glyphicon-pencil"></span> قيّم الأنشطة</a></li>
     <li><a href="{% url 'media:list_campus_activities' %}"><i class="entypo-hourglass"></i> أنشطة الأسبوع</a></li>
-    <li><a href="{% url 'media:list_articles' %}"><i class="entypo-newspaper"></i> المقالات</a></li>
+    <li><a href="{% url 'media:list_articles' %}"><i class="entypo-newspaper"></i> مدونة النادي</a></li>
     {% else %}
     <li><a href="{% url 'media:submit_article' %}"><i class="entypo-feather"></i> أرسل مقالًا</a></li>
     <li><a href="{% url 'media:list_articles' %}"><i class="entypo-newspaper"></i> مقالاتي</a></li>

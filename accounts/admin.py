@@ -114,6 +114,7 @@ ones) deal with the User model."""
                     'common_profile__ar_first_name',
                     'common_profile__ar_middle_name',
                     'common_profile__ar_last_name',
+                    'common_profile__alternative_email',
                     'common_profile__student_id',
                     'common_profile__badge_number',
                     'common_profile__mobile_number',

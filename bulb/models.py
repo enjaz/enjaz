@@ -508,5 +508,14 @@ class NewspaperSignup(models.Model):
     submission_date = models.DateTimeField(u"تاريخ الإرسال",
                                        auto_now_add=True)
 
+    def get_email(self):
+        return self.email or self.user.email
+
     def __unicode__(self):
         return self.email or self.user.username
+
+class DewanyaSuggestion(models.Model):
+    name = models.CharField(max_length=100, verbose_name=u"الاسم")
+    subject = models.CharField(max_length=100, verbose_name=u"الموضوع")
+    submission_date = models.DateTimeField(u"تاريخ الإرسال",
+                                       auto_now_add=True)    

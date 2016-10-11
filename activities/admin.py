@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.utils import timezone
 from django.forms import ModelForm
 from django.contrib import admin
-from activities.models import Activity, Episode, Category, Evaluation, Review, Assessment, Criterion, DepositoryItem
+from activities.models import Activity, Episode, Category, Evaluation, Review, Assessment, Criterion, DepositoryItem, Invitation
 from clubs.models import Club
 from core.models import StudentClubYear
 
@@ -95,3 +95,4 @@ admin.site.register(Assessment)
 admin.site.register(Criterion)
 admin.site.register(Evaluation, EvaluationAdmin)
 admin.site.register(DepositoryItem, DepositoryItemAdmin)
+admin.site.register(Invitation)

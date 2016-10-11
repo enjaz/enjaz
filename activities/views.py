@@ -10,7 +10,7 @@ import json
 from post_office import mail
 
 from activities.models import Activity, Review, Episode,  Assessment, DepositoryItem
-from activities.forms import ActivityForm, ReviewerActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm, AttachmentFormSet, AssessmentForm, ItemRequestFormSet, UpdateDepositoryItemForm
+from activities.forms import ActivityForm, ReviewerActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm, AttachmentFormSet, AssessmentForm, ItemRequestFormSet, DisabledItemRequestFormSet, UpdateDepositoryItemForm
 from accounts.utils import get_user_gender
 from activities.utils import get_club_notification_to, get_club_notification_cc, can_assess_club, \
     get_club_assessing_club_by_user, can_assess_any_club
@@ -293,11 +293,16 @@ def edit(request, activity_id):
     if not can_edit_activity(request.user, activity):
         raise PermissionDenied
 
+    user_coordination = get_user_coordination_and_deputyships(request.user)
+    user_club = user_coordination.first()
+
     if request.method == 'POST':
         attachment_formset = AttachmentFormSet(request.POST,
                                                request.FILES,
                                                instance=activity)
-        item_request_formset = ItemRequestFormSet(request.POST, instance=activity)
+        item_request_formset = ItemRequestFormSet(request.POST,
+                                                  instance=activity)
+
         if request.user.has_perm('activities.directly_add_activity'):
             modified_activity = DirectActivityForm(request.POST,
                                                    instance=activity)
@@ -305,18 +310,21 @@ def edit(request, activity_id):
              has_coordination_to_activity(request.user, activity):
             modified_activity = DisabledActivityForm(request.POST,
                                                      instance=activity)
+            item_request_formset = None
         elif activity.primary_club.possible_parents.exists():
             modified_activity = ReviewerActivityForm(request.POST, instance=activity)
             modified_activity.fields['chosen_reviewer_club'].queryset = activity.primary_club.possible_parents.all()
         else:
             modified_activity = ActivityForm(request.POST,
                                              instance=activity)
+
         # Should check that edits are valid before saving
         if modified_activity.is_valid() and \
            attachment_formset.is_valid() and \
-           item_request_formset.is_valid():
+           (not item_request_formset or item_request_formset and item_request_formset.is_valid()):
             modified_activity.save()
-            item_request_formset.save()
+            if activity.is_editable:
+                item_request_formset.save()
 
             # Handle attachments
             attachments = attachment_formset.save(commit=False)
@@ -368,6 +376,7 @@ def edit(request, activity_id):
                                                 args=(activity.pk, )))
         else:
             context = {'form': modified_activity,
+                       'user_club': user_club,
                        'activity_id': activity_id,
                        'attachment_formset': attachment_formset,
                        'item_request_formset': item_request_formset,
@@ -376,6 +385,7 @@ def edit(request, activity_id):
     else:
         attachment_formset = AttachmentFormSet(instance=activity)
         item_request_formset = ItemRequestFormSet(instance=activity)
+
         # There are different activity forms depending on what
         # permission the user has.  Presidency group members
         # (i.e. with directly_add_activity) can add activities
@@ -387,12 +397,14 @@ def edit(request, activity_id):
         elif not activity.is_editable and \
              has_coordination_to_activity(request.user, activity):
             form = DisabledActivityForm(instance=activity)
+            item_request_formset = DisabledItemRequestFormSet(instance=activity)
         elif activity.primary_club.possible_parents.exists():
             form = ReviewerActivityForm(instance=activity)
             form.fields['chosen_reviewer_club'].queryset = activity.primary_club.possible_parents.all()
         else:
             form = ActivityForm(instance=activity)
         context = {'form': form, 'activity_id': activity_id,
+                   'user_club': user_club, 
                    'activity': activity, 'edit': True,
                    'attachment_formset': attachment_formset,
                    'item_request_formset': item_request_formset}

@@ -566,13 +566,15 @@ def indicators(request, city=""):
 
         detailed_users = (User.objects.filter(book_giveaways__isnull=False) |
                           User.objects.filter(reading_group_coordination__isnull=False) |
-                          User.objects.filter(request__isnull=False)).distinct()
+                          User.objects.filter(request__isnull=False))\
+                         .filter(common_profile__city=city).distinct()
 
         users = (User.objects.filter(book_giveaways__isnull=False) |
                  User.objects.filter(request__isnull=False) |
                  User.objects.filter(reading_group_coordination__isnull=False) |
                  User.objects.filter(reading_group_memberships__isnull=False) |
-                 User.objects.filter(reader_profile__isnull=False)).filter(common_profile__city=city).distinct()
+                 User.objects.filter(reader_profile__isnull=False))\
+                 .filter(common_profile__city=city).distinct()
 
         user_count = users.count()
 

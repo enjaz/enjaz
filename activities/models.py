@@ -676,3 +676,39 @@ class ItemRequest(models.Model):
 
     def __unicode__(self):
         return self.name
+
+class Invitation(models.Model):
+    title = models.CharField(u"الاسم", default="", max_length=100)
+    activity = models.ForeignKey(Activity, null=True, blank=True)
+    background = models.ImageField(upload_to='invitations/backgrounds/',
+                              blank=True, null=True)
+    logo = models.ImageField(upload_to='invitations/backgrounds/',
+                              blank=True, null=True)
+    short_description = models.TextField(verbose_name=u"وصف قصير")
+    full_description = models.TextField(verbose_name=u"وصف قصير")
+    hashtag = models.CharField(u"هاشتاغ", default="", max_length=20,
+                               blank=True, help_text="بدون #")
+    publication_date = models.DateTimeField(u"تاريخ النشر", blank=True)
+    students = models.ManyToManyField(User, blank=True)
+    location = models.CharField(default="",
+                                max_length=200,
+                                verbose_name=u"المكان")
+    date = models.DateField(u"التاريخ")
+    start_time = models.TimeField(u"وقت البداية")
+    end_time = models.TimeField(u"وقت النهاية")
+    submission_date = models.DateTimeField(u'تاريخ الإرسال',
+                                           auto_now_add=True)
+    edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
+
+    def get_start_datetime(self):
+        combined = datetime.combine(self.date, self.start_time)
+        timezoned = timezone.make_aware(combined, timezone.get_default_timezone())
+        return timezoned
+
+    def get_end_datetime(self):
+        combined = datetime.combine(self.date, self.end_time)
+        timezoned = timezone.make_aware(combined, timezone.get_default_timezone())
+        return timezoned
+
+    def __unicode__(self):
+        return self.title

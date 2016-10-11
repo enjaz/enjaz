@@ -432,4 +432,3 @@ class UpdateDepositoryItemForm(forms.Form):
                                       quantity=quantity, category=cleaned_category)
                 items.append(item)
         DepositoryItem.objects.bulk_create(items)
-

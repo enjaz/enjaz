@@ -1,6 +1,5 @@
 from django.conf.urls import patterns, url, include
 from django.contrib.contenttypes.models import ContentType
-
 from activities import views
 from activities.models import Activity
 from activities.utils import forms_editor_check
@@ -9,6 +8,8 @@ from niqati import views as niqati_views
 
 urlpatterns = patterns('',
     url(r'^$', views.list_activities, name='list'),
+    url(r'^invitation/(?P<pk>\d+)/$', views.show_invitation, name='show_invitation'),
+    url(r'^invitation/(?P<pk>\d+)/confirm', views.toggle_confirm_invitation, name='toggle_confirm_invitation'),
     url(r'^create/$', views.create, name='create'),
     url(r'^depository/$', views.list_depository_items, name='list_depository_items'),
     url(r'^(?P<activity_id>\d+)/$', views.show, name='show'),

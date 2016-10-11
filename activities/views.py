@@ -1,28 +1,27 @@
 # -*- coding: utf-8  -*-
 from datetime import timedelta
 from django.contrib.auth.decorators import permission_required, login_required
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.views.decorators import csrf
+from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
 import json
 
 from post_office import mail
 
-from activities.models import Activity, Review, Episode,  Assessment, DepositoryItem
+from activities.models import Activity, Review, Episode,  Assessment, DepositoryItem, Invitation
 from activities.forms import ActivityForm, ReviewerActivityForm, DirectActivityForm, DisabledActivityForm, ReviewForm, AttachmentFormSet, AssessmentForm, ItemRequestFormSet, DisabledItemRequestFormSet, UpdateDepositoryItemForm
 from accounts.utils import get_user_gender
-from activities.utils import get_club_notification_to, get_club_notification_cc, can_assess_club, \
-    get_club_assessing_club_by_user, can_assess_any_club
 from clubs.models import Club
-from clubs.utils import is_coordinator_or_member, is_coordinator_or_deputy_of_any_club, \
-    is_coordinator_of_any_club, get_media_center, \
-    is_member_of_any_club, is_employee_of_any_club, is_coordinator, is_coordinator_or_deputy, get_user_clubs, \
-    get_user_coordination_and_deputyships, has_coordination_to_activity, get_deanship, is_employee, \
-    can_review_activity, can_delete_activity, can_edit_activity, can_submit_activities, is_deanship_of_students_affairs_coordinator_or_member
-from core.utils import get_search_queryset
+from core import decorators
+from core.models import Tweet
 from media.utils import MAX_OVERDUE_REPORTS, can_assess_club_as_media_coordinator, can_assess_club_as_media_member, can_assess_club_as_media, is_media_coordinator_or_deputy, get_user_media_center, get_clubs_for_assessment_by_user
 from media.models import FollowUpReport, FollowUpReportImage, Story
+import activities.utils
+import clubs.utils
+import core.utils
 
 FORMS_CURRENT_APP = "activity_forms"
 
@@ -81,8 +80,8 @@ def list_activities(request):
             # then show all activities
             context['pending'] = Activity.objects.pending().current_year()
             context['rejected'] = Activity.objects.rejected().current_year()
-        elif is_coordinator_or_deputy_of_any_club(request.user) or \
-             is_member_of_any_club(request.user):
+        elif clubs.utils.is_coordinator_or_deputy_of_any_club(request.user) or \
+             clubs.utils.is_member_of_any_club(request.user):
             # For club coordinators, deputies, and members, show
             # approved activities as well as their own club's pending
             # and rejected activities.
@@ -90,10 +89,10 @@ def list_activities(request):
             context['rejected'] = Activity.objects.rejected().undeleted().for_user_clubs(request.user).distinct()
 
             # Only display to coordinators and deputies
-            if is_coordinator_or_deputy_of_any_club(request.user):
+            if clubs.utils.is_coordinator_or_deputy_of_any_club(request.user):
                 # For coordinators, show also the activities waiting their
                 # action.
-                user_coordination = get_user_coordination_and_deputyships(request.user)
+                user_coordination = clubs.utils.get_user_coordination_and_deputyships(request.user)
                 context['todo'] = Activity.objects.current_year().filter(assignee__in=user_coordination).undeleted()
                 user_club = user_coordination.first()
                 if not user_club.can_skip_followup_reports:
@@ -108,7 +107,7 @@ def list_activities(request):
                     # changed as well.
                     context['MAX_OVERDUE_REPORTS'] = MAX_OVERDUE_REPORTS
 
-        elif is_employee_of_any_club(request.user):
+        elif clubs.utils.is_employee_of_any_club(request.user):
             # For employees, display all approved activities, as well
             # as their clubs' approved activities in a separate table.
             #
@@ -137,7 +136,7 @@ def show(request, activity_id):
     # only the head of the Student Club, the Media Team, the members
     # of the related clubs and the person who submitted it can see it.
     if request.user.is_authenticated():
-        user_clubs = get_user_clubs(request.user)
+        user_clubs = clubs.utils.get_user_clubs(request.user)
 
         # Save a click, redirect reviewers to the appropriate
         # reviewing page.
@@ -168,10 +167,10 @@ def show(request, activity_id):
     # Elseif user is a DSA reviewer, show the activity if it's approved by presidency
     # Else (employees or others), show activity only if approved
     if request.user.is_superuser or \
-       can_review_activity(request.user, activity) or \
+       clubs.utils.can_review_activity(request.user, activity) or \
        request.user.has_perm('activities.view_activity') or \
-       is_employee(activity.primary_club, request.user) or\
-       is_deanship_of_students_affairs_coordinator_or_member(request.user) or\
+       clubs.utils.is_employee(activity.primary_club, request.user) or\
+       clubs.utils.is_deanship_of_students_affairs_coordinator_or_member(request.user) or\
        any([club in activity_clubs for club in user_clubs]):
         # Don't raise any errors
         pass
@@ -194,14 +193,14 @@ def create(request):
     # club, or has the permission to add activities (i.e. part of the
     # presidency group)
     if not request.user.has_perm("activities.add_activity") and \
-       not can_submit_activities(request.user):
+       not clubs.utils.can_submit_activities(request.user):
         raise PermissionDenied
 
     # (2) Check if the user's club has no more than 3 overdue
     # follow-up reports.  If any club coordinated by the user exceeds
     # the 3-report threshold, prevent new activity submission (again
     # in reality the user will only coordinate one club)
-    user_coordination = get_user_coordination_and_deputyships(request.user)
+    user_coordination = clubs.utils.get_user_coordination_and_deputyships(request.user)
     if any([not club.can_skip_followup_reports and club.get_overdue_report_count() > MAX_OVERDUE_REPORTS
             for club in user_coordination]):
         raise PermissionDenied
@@ -290,10 +289,10 @@ def edit(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id,
                                  is_deleted=False)
 
-    if not can_edit_activity(request.user, activity):
+    if not clubs.utils.can_edit_activity(request.user, activity):
         raise PermissionDenied
 
-    user_coordination = get_user_coordination_and_deputyships(request.user)
+    user_coordination = clubs.utils.get_user_coordination_and_deputyships(request.user)
     user_club = user_coordination.first()
 
     if request.method == 'POST':
@@ -307,7 +306,7 @@ def edit(request, activity_id):
             modified_activity = DirectActivityForm(request.POST,
                                                    instance=activity)
         elif not activity.is_editable and \
-             has_coordination_to_activity(request.user, activity):
+             clubs.utils.has_coordination_to_activity(request.user, activity):
             modified_activity = DisabledActivityForm(request.POST,
                                                      instance=activity)
             item_request_formset = None
@@ -395,7 +394,7 @@ def edit(request, activity_id):
         if request.user.has_perm('activities.directly_add_activity'):
             form = DirectActivityForm(instance=activity)
         elif not activity.is_editable and \
-             has_coordination_to_activity(request.user, activity):
+             clubs.utils.has_coordination_to_activity(request.user, activity):
             form = DisabledActivityForm(instance=activity)
             item_request_formset = DisabledItemRequestFormSet(instance=activity)
         elif activity.primary_club.possible_parents.exists():
@@ -415,7 +414,7 @@ def delete(request,activity_id):
     activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
     context = {'activity': activity}
 
-    if not can_delete_activity(request.user, activity):
+    if not clubs.utils.can_delete_activity(request.user, activity):
         raise PermissionDenied
 
     if request.method == 'POST':
@@ -454,10 +453,10 @@ def review(request, activity_id, reviewer_id):
 
     # Is the current user a coordinator/deputy of any of the reviewing
     # parents?
-    user_is_any_reviewer = can_review_activity(request.user, activity)
+    user_is_any_reviewer = clubs.utils.can_review_activity(request.user, activity)
 
     # Is the current user a coordinator/deputy of the reviewer club?
-    user_is_current_reviewer = is_coordinator_or_deputy(reviewer_club, request.user)
+    user_is_current_reviewer = clubs.utils.is_coordinator_or_deputy(reviewer_club, request.user)
 
     # The user can WRITE if they are the coordinator or deputy of the
     # reviewer club; or a superuser
@@ -467,9 +466,9 @@ def review(request, activity_id, reviewer_id):
     # activity owning club (primary or secondary); the coordinator or
     # deputy of a parent reviewer other than the ``reviewer_club``; or
     # an employee responsible for the activity owning club.
-    can_read = has_coordination_to_activity(request.user, activity) or user_is_any_reviewer or \
-               is_employee(activity.primary_club, request.user) or \
-               is_deanship_of_students_affairs_coordinator_or_member(request.user)
+    can_read = clubs.utils.has_coordination_to_activity(request.user, activity) or user_is_any_reviewer or \
+               clubs.utils.is_employee(activity.primary_club, request.user) or \
+               clubs.utils.is_deanship_of_students_affairs_coordinator_or_member(request.user)
 
     # If the user has no read or write permissions, then they can't
     # access the view.
@@ -534,8 +533,8 @@ def review(request, activity_id, reviewer_id):
                     if 'is_approved' in review.changed_data:
                         # Email notifications
                         email_context['full_url'] = activity_full_url
-                        mail.send(get_club_notification_to(activity),
-                            cc=get_club_notification_cc(activity, reviewer_club),
+                        mail.send(activities.utils.get_club_notification_to(activity),
+                            cc=activities.utils.get_club_notification_cc(activity, reviewer_club),
                             template="activity_approved_to_coordinator",
                             context=email_context)
                         if activity.primary_club.employee:
@@ -562,8 +561,8 @@ def review(request, activity_id, reviewer_id):
                 if 'is_approved' in review.changed_data:
                     email_context['last_reviewer'] = reviewer_club
                     email_context['full_url'] = last_review_full_url
-                    mail.send(get_club_notification_to(activity),
-                              cc=get_club_notification_cc(activity, reviewer_club),
+                    mail.send(activities.utils.get_club_notification_to(activity),
+                              cc=activities.utils.get_club_notification_cc(activity, reviewer_club),
                               template="activity_rejected_to_coordinator",
                               context=email_context)
 
@@ -582,8 +581,8 @@ def review(request, activity_id, reviewer_id):
                 if is_new or 'is_approved' in review.changed_data:
                     email_context['last_reviewer'] = reviewer_club
                     email_context['full_url'] = last_review_full_url
-                    mail.send(get_club_notification_to(activity),
-                              cc=get_club_notification_cc(activity, reviewer_club),
+                    mail.send(activities.utils.get_club_notification_to(activity),
+                              cc=activities.utils.get_club_notification_cc(activity, reviewer_club),
                               template="activity_held_to_coordinator",
                               context=email_context)
             activity.save()
@@ -641,7 +640,7 @@ def participate(request, activity_id):
 def assessment_index(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
 
-    if not can_assess_club(request.user, activity.primary_club):
+    if not activities.utils.can_assess_club(request.user, activity.primary_club):
         raise PermissionDenied
 
     # Determine the category.  If not Media Center (i.e. super user or
@@ -655,11 +654,11 @@ def assessment_index(request, activity_id):
 
 @login_required
 def assessment_list(request):
-    if not can_assess_any_club(request.user):
+    if not activities.utils.can_assess_any_club(request.user):
         raise PermissionDenied
 
     context = {}
-    user_assessing_clubs = get_user_clubs(request.user).filter(can_assess=True)
+    user_assessing_clubs = clubs.utils.get_user_clubs(request.user).filter(can_assess=True)
     user_media_center = get_user_media_center(request.user)
     clubs_for_user = get_clubs_for_assessment_by_user(request.user).filter(is_assessed=True)
 
@@ -705,10 +704,10 @@ def assess(request, activity_id, category):
     activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
     category = category.upper()
 
-    if not can_assess_club(request.user, activity.primary_club):
+    if not activities.utils.can_assess_club(request.user, activity.primary_club):
         raise PermissionDenied
 
-    assessor_club = get_club_assessing_club_by_user(request.user, activity.primary_club)
+    assessor_club = activities.utils.get_club_assessing_club_by_user(request.user, activity.primary_club)
 
     # Don't make it possible for Media Center to enter presidency
     # assessment and vice versa.  If no assessing clubs, we are
@@ -800,6 +799,47 @@ def autocomplete_items(request):
     qs = DepositoryItem.objects.filter(quantity__gte=0) | \
          DepositoryItem.objects.filter(quantity__isnull=True)
 
-    result_query = get_search_queryset(qs, ['name', 'category'], term)
+    result_query = core.utils.get_search_queryset(qs, ['name', 'category'], term)
     result_list = [u"{} ({})".format(r.name, r.category) for r in result_query]
     return HttpResponse(json.dumps(result_list))
+
+def show_invitation(request, pk):
+    invitation = get_object_or_404(Invitation, pk=pk)
+    if  invitation.publication_date > timezone.now():
+        raise Http404
+
+    if request.user.is_authenticated() and \
+       request.user in invitation.students.all():
+        already_on = True
+    else:
+        already_on = False
+    context = {'invitation': invitation, 'already_on': already_on}
+    return render(request, 'activities/attend.html', context)
+
+@decorators.ajax_only
+@decorators.post_only
+@csrf.csrf_exempt
+@login_required
+def toggle_confirm_invitation(request, pk):
+    invitation = get_object_or_404(Invitation, pk=pk)
+    action = request.POST.get('action')
+    if invitation.get_end_datetime() > timezone.now():
+        raise Exception(u"انتهى النشاط")
+
+    if action == "add":
+        invitation.students.add(request.user)
+        if request.user.social_auth.exists():
+            show_url = reverse('activities:show_invitation')
+            full_url = request.build_absolute_uri(show_url)
+            text = u"سأحضر %s!  يمكنك التسجيل لحضوره من هنا: %s"
+            if invitation.hashtag:
+                text += u"\n#" + invitation.hashtag
+            Tweet.objects.create(text=text.format(invitation.title),
+                                 user=request.user)
+    elif action == "remove":
+        if request.user in invitation.students.all():
+            invitation.students.remove(request.user)
+        else:
+            raise Exception(u"لا تسجيل.")
+
+    return {}

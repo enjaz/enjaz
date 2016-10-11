@@ -579,7 +579,7 @@ def indicators(request, city=""):
         book_users = User.objects.filter(common_profile__is_student=True,
                                          book_points__is_counted=True)\
                                  .annotate(point_count=Count('book_points'))\
-                                 .filter(point_count__gte=3)\
+                                 .filter(point_count__gte=4)\
                                  .filter(common_profile__city=city)
         book_contributing_male_users = User.objects.filter(common_profile__college__gender='M',
                                                            book_giveaways__isnull=False)\

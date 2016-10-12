@@ -156,7 +156,7 @@ margin-bottom: 5px;
                 {% elif user.is_authenticated and already_on %}
                 <button data-action="remove" id="confirm" class="btn btn-sm btn-danger">ألغِ تأكيد حضوري</button>
                 {% else %}
-                <a href="{% url 'userena_signin' %}?next={{ request.path }}" class="btn btn-lg btn-"success>أدخلني لإنجاز كي أؤكد الحضور</a>
+                <a href="{% url 'userena_signin' %}?next={{ request.path }}" class="btn btn-lg btn-success">أدخلني لإنجاز كي أؤكد الحضور</a>
                 {% endif %}
                 </div>
                 <!-- Footer -->

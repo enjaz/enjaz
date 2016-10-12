@@ -10,6 +10,7 @@
     <meta name="twitter:site" content="@{% if invitation.twitter_account %}{{ invitation.twitter_account }}{% else %}StudentsofKSAUH{% endif %}" />
     <meta name="twitter:title" content="{{ invitation.title }}" />
     <meta name="twitter:description" content="{{ invitation.short_description|striptags }}" />
+    {% if invitation.logo %}<meta name="twitter:image" content="{{ request.get_host }}{{ invitation.logo.url }}" />{% endif %}
     <title>إنجاز | {{ invitation.title }}</title>
     <link rel="stylesheet" href="{% static 'css/bootstrap-3.3.6.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/bootstrap-rtl-3.3.4.min.css' %}">

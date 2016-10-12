@@ -848,7 +848,7 @@ def toggle_confirm_invitation(request, pk):
         if request.user.social_auth.exists():
             show_url = reverse('activities:show_invitation', args=(invitation.pk,))
             full_url = request.build_absolute_uri(show_url)
-            text = u"سأحضر {}.\nيمكنك التسجيل لحضوره من هنا: {}"
+            text = u"سأحضر {}.\nيمكنك التسجيل للحضور من هنا: {}"
             if invitation.hashtag:
                 text += u"\n#" + invitation.hashtag
             Tweet.objects.create(text=text.format(invitation.title, full_url),

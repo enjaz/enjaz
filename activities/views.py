@@ -815,7 +815,7 @@ def show_invitation(request, pk):
     else:
         already_on = False
     context = {'invitation': invitation, 'already_on': already_on}
-    return render(request, 'activities/attend.html', context)
+    return render(request, 'activities/show_invitation.html', context)
 
 @decorators.ajax_only
 @decorators.post_only
@@ -824,18 +824,18 @@ def show_invitation(request, pk):
 def toggle_confirm_invitation(request, pk):
     invitation = get_object_or_404(Invitation, pk=pk)
     action = request.POST.get('action')
-    if invitation.get_end_datetime() > timezone.now():
+    if timezone.now() > invitation.get_end_datetime():
         raise Exception(u"انتهى النشاط")
 
     if action == "add":
         invitation.students.add(request.user)
         if request.user.social_auth.exists():
-            show_url = reverse('activities:show_invitation')
+            show_url = reverse('activities:show_invitation', args=(invitation.pk,))
             full_url = request.build_absolute_uri(show_url)
-            text = u"سأحضر %s!  يمكنك التسجيل لحضوره من هنا: %s"
+            text = u"سأحضر {}.\nيمكنك التسجيل لحضوره من هنا: {}"
             if invitation.hashtag:
                 text += u"\n#" + invitation.hashtag
-            Tweet.objects.create(text=text.format(invitation.title),
+            Tweet.objects.create(text=text.format(invitation.title, full_url),
                                  user=request.user)
     elif action == "remove":
         if request.user in invitation.students.all():

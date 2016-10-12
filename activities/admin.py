@@ -89,10 +89,18 @@ class EvaluationAdmin(admin.ModelAdmin):
 class DepositoryItemAdmin(admin.ModelAdmin):
     list_display = ('name', 'quantity', 'unit')
 
+class InvitationAdmin(admin.ModelAdmin):
+    list_display = ('title', 'get_start_datetime',
+                    'get_student_count', 'submission_date')
+    search_fields = ('title',)
+
+    def get_student_count(self, obj):
+        return obj.students.count()
+
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(Category)
 admin.site.register(Assessment)
 admin.site.register(Criterion)
 admin.site.register(Evaluation, EvaluationAdmin)
 admin.site.register(DepositoryItem, DepositoryItemAdmin)
-admin.site.register(Invitation)
+admin.site.register(Invitation, InvitationAdmin)

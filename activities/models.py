@@ -685,10 +685,10 @@ class Invitation(models.Model):
     logo = models.ImageField(upload_to='invitations/backgrounds/',
                               blank=True, null=True)
     short_description = models.TextField(verbose_name=u"وصف قصير")
-    full_description = models.TextField(verbose_name=u"وصف قصير")
+    full_description = models.TextField(verbose_name=u"ةصف مطول")
     hashtag = models.CharField(u"هاشتاغ", default="", max_length=20,
                                blank=True, help_text="بدون #")
-    publication_date = models.DateTimeField(u"تاريخ النشر", blank=True)
+    publication_date = models.DateTimeField(u"تاريخ النشر", blank=True, null=True)
     students = models.ManyToManyField(User, blank=True)
     location = models.CharField(default="",
                                 max_length=200,

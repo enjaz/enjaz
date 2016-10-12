@@ -155,6 +155,8 @@ margin-bottom: 5px;
                 <button data-action="add" id="confirm" class="btn btn-lg btn-success">أكّد حضوري</button>
                 {% elif user.is_authenticated and already_on %}
                 <button data-action="remove" id="confirm" class="btn btn-sm btn-danger">ألغِ تأكيد حضوري</button>
+                {% else %}
+                <a href="{% url 'userena_signin' %}?next={{ request.path }}" class="btn btn-lg btn-"success>أدخلني لإنجاز كي أؤكد الحضور</a>
                 {% endif %}
                 </div>
                 <!-- Footer -->
@@ -213,7 +215,7 @@ margin-bottom: 5px;
                             $("#confirm").addClass("btn-danger btn-sm")
                                          .removeClass("btn-success btn-lg");
                         } else if (action == "remove") {
-                            toastr.success("ألغِ تأكيد حضورك");
+                            toastr.success("أُلغي تأكيد حضورك");
                             $("#confirm").data("action", "add");
                             $("#confirm").html("أكّد حضوري");
                             $("#confirm").addClass("btn-success btn-lg")

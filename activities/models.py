@@ -10,13 +10,13 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 
-
 from activities.managers import ActivityQuerySet, EpisodeQuerySet
 from core.models import StudentClubYear
-from clubs.models import College, Club
+from clubs.models import College, Club, city_choices, gender_choices
 from clubs.utils import get_deanship, get_presidency
 from forms_builder.forms.models import Form
 from media.utils import REPORT_DUE_AFTER
+import accounts.utils
 
 
 class Evaluation(models.Model):
@@ -680,25 +680,45 @@ class ItemRequest(models.Model):
 class Invitation(models.Model):
     title = models.CharField(u"الاسم", default="", max_length=100)
     activity = models.ForeignKey(Activity, null=True, blank=True)
+    city = models.CharField(u"المدينة", max_length=1, blank=True,
+                            default="", choices=city_choices)
+    gender = models.CharField(u"الجندر", max_length=1,
+                              choices=gender_choices, blank=True,
+                              default="")
     background = models.ImageField(upload_to='invitations/backgrounds/',
                               blank=True, null=True)
-    logo = models.ImageField(upload_to='invitations/backgrounds/',
+    logo = models.ImageField(upload_to='invitations/logos/',
                               blank=True, null=True)
-    short_description = models.TextField(verbose_name=u"وصف قصير")
-    full_description = models.TextField(verbose_name=u"ةصف مطول")
+    short_description = models.TextField(u"وصف قصير")
+    full_description = models.TextField(u"وصف مطول")
     hashtag = models.CharField(u"هاشتاغ", default="", max_length=20,
                                blank=True, help_text="بدون #")
-    publication_date = models.DateTimeField(u"تاريخ النشر", blank=True, null=True)
+    publication_date = models.DateTimeField(u"تاريخ النشر",
+                                            blank=True, null=True)
     students = models.ManyToManyField(User, blank=True)
-    location = models.CharField(default="",
-                                max_length=200,
-                                verbose_name=u"المكان")
+    location = models.CharField(u"المكان", default="",
+                                max_length=200)
     date = models.DateField(u"التاريخ")
     start_time = models.TimeField(u"وقت البداية")
     end_time = models.TimeField(u"وقت النهاية")
     submission_date = models.DateTimeField(u'تاريخ الإرسال',
                                            auto_now_add=True)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
+    def is_available_for_user_city(self, user):
+        user_city = accounts.utils.get_user_city(user)
+        if user_city and self.city and \
+           user_city != self.city:
+            return False
+        else:
+            return True
+
+    def is_available_for_user_gender(self, user):
+        user_gender = accounts.utils.get_user_gender(user)
+        if user_gender and self.gender and \
+           user_gender != self.gender:
+            return False
+        else:
+            return True
 
     def get_start_datetime(self):
         combined = datetime.combine(self.date, self.start_time)

@@ -5,7 +5,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="أكّد حضورك أكّد حضوري في {{ activity.name }}">
+    <meta name="description" content="{{ invitation.short_description|striptags }}">
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@{% if invitation.twitter_account %}{{ invitation.twitter_account }}{% else %}StudentsofKSAUH{% endif %}" />
+    <meta name="twitter:title" content="{{ invitation.title }}" />
+    <meta name="twitter:description" content="{{ invitation.short_description|striptags }}" />
     <title>إنجاز | {{ invitation.title }}</title>
     <link rel="stylesheet" href="{% static 'css/bootstrap-3.3.6.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/bootstrap-rtl-3.3.4.min.css' %}">
@@ -127,8 +131,13 @@ margin-bottom: 5px;
                     {% if invitation.logo %}
                     <img class="bounceInDown" style="max-height: 300px;" src="{{ invitation.logo.url }}">
                     {% endif %}
+                    {% if restricted_by_city %}
+                    <p class="alert alert-warning">هذا النشاط غير مُتاح في {{ user.common_profile.get_city_display }}.</p>
+                    {% elif restricted_by_gender %}
+                    <p class="alert alert-warning">هذا النشاط لا يستهدف ال{{ user.common_profile.college.get_gender_display }} بل ال{{ invitation.get_gender_display }}.</p>
+                    {% endif %}
                     <h1>{{ invitation.title }}</h1>
-                    <p style="font-size: 1.2em;">{{ invitation.short_description }}</p>
+                    <p style="font-size: 1.2em;">{{ invitation.short_description|safe }}</p>
                 </div>
                 <p class="intro instructions">
                     {{ invitation.full_description|linebreaksbr|safe }}

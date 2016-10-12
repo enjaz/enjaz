@@ -814,7 +814,19 @@ def show_invitation(request, pk):
         already_on = True
     else:
         already_on = False
-    context = {'invitation': invitation, 'already_on': already_on}
+    if invitation.is_available_for_user_city(request.user):
+        restricted_by_city = False
+    else:
+        restricted_by_city = True
+
+    if invitation.is_available_for_user_gender(request.user):
+        restricted_by_gender = False
+    else:
+        restricted_by_gender = True
+
+    context = {'invitation': invitation, 'already_on': already_on,
+               'restricted_by_gender': restricted_by_gender,
+               'restricted_by_city': restricted_by_city}
     return render(request, 'activities/show_invitation.html', context)
 
 @decorators.ajax_only
@@ -828,6 +840,10 @@ def toggle_confirm_invitation(request, pk):
         raise Exception(u"انتهى النشاط")
 
     if action == "add":
+        if not invitation.is_available_for_user_city(request.user):
+            raise Exception(u"هذا النشاط ليس متاحًا في مدينتك.")
+        if not invitation.is_available_for_user_gender(request.user):
+            raise Exception(u"هذا النشاط يستهدف {} فقط".format(invitation.get_gender_display()))
         invitation.students.add(request.user)
         if request.user.social_auth.exists():
             show_url = reverse('activities:show_invitation', args=(invitation.pk,))

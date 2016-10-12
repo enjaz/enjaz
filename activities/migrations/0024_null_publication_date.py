@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='invitation',
             name='full_description',
-            field=models.TextField(verbose_name='\u0629\u0635\u0641 \u0645\u0637\u0648\u0644'),
+            field=models.TextField(verbose_name='\u0648\u0635\u0641 \u0645\u0637\u0648\u0644'),
         ),
         migrations.AlterField(
             model_name='invitation',

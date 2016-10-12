@@ -93,6 +93,7 @@ class InvitationAdmin(admin.ModelAdmin):
     list_display = ('title', 'get_start_datetime',
                     'get_student_count', 'submission_date')
     search_fields = ('title',)
+    filter_horizontal = ('students',)
 
     def get_student_count(self, obj):
         return obj.students.count()

@@ -805,7 +805,8 @@ def autocomplete_items(request):
 
 def show_invitation(request, pk):
     invitation = get_object_or_404(Invitation, pk=pk)
-    if  invitation.publication_date > timezone.now():
+    if invitation.publication_date and \
+       invitation.publication_date > timezone.now():
         raise Http404
 
     if request.user.is_authenticated() and \

@@ -691,6 +691,8 @@ class Invitation(models.Model):
                               blank=True, null=True)
     short_description = models.TextField(u"وصف قصير")
     full_description = models.TextField(u"وصف مطول")
+    twitter_account = models.CharField(u"حساب تويتر", default="",
+                                       max_length=20, blank=True)
     hashtag = models.CharField(u"هاشتاغ", default="", max_length=20,
                                blank=True, help_text="بدون #")
     publication_date = models.DateTimeField(u"تاريخ النشر",

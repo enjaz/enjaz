@@ -377,7 +377,10 @@ class Session(models.Model):
     objects = managers.SessionQuerySet.as_manager()
 
     def __unicode__(self):
-        return "%s (%s)" % (self.group.name, self.title)
+        if self.group:
+            return "%s (%s)" % (self.group.name, self.title)
+        else:
+            return self.title
 
 class Report(models.Model):
     session = models.OneToOneField(Session, null=True,

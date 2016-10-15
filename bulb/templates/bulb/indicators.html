@@ -64,7 +64,7 @@
                 <tbody>
                     {% for session in sessions.undeleted %}
                     <tr>
-                        <td>{{ session.title }}</td>
+                        <td>{% if session.group %}{{ session.title }}{% else %}<a href="{% url 'bulb:show_session' session.pk %}">{{ session.title }}</a>{% endif %}</td>
                         <td>{% if session.group %}<a href="{% url 'bulb:show_group' session.group.pk %}">{{ session.group.name }}</a>{% else %}جلسة حرّة{% endif %}</td>
                         <td data-order="{{ session.submission_date|date:"U" }}">{{ session.submission_date|date:"g:i a؛ j F Y" }}</td>
                         <td data-order="{{ session.date|date:"U" }}">{{ session.date }}</td>

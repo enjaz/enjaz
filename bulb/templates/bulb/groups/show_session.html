@@ -2,7 +2,11 @@
 {% block title %}{{ session.title }}{% endblock %}
 {% block content %}
         {% if user|can_edit_session:session %}
-        <p class="alert alert-warning">لا يمكنك عقد جلسات قبل أن يبلغ عدد المؤكدين والمؤكدات أربعة.  هيا، أعلن! بإمكانك حثّ أربعة على الحضور!</p>
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-3">
+                <p class="alert alert-warning">لا يمكنك عقد جلسات قبل أن يبلغ عدد المؤكدين والمؤكدات أربعة.  هيا، أعلن! بإمكانك حثّ أربعة على الحضور!</p>
+            </div>
+        </div>
         {% endif %}
        <h1 dir="auto" >{{ session.title }}</h1>
         <p dir="auto" class="group-description">
@@ -61,7 +65,7 @@
                 <i class="entypo-block"></i>
                 احذف الجلسة
             </button>
-            <button data-url="{% url 'bulb:add_report' group.pk session.pk %}" class="add-report btn btn-block  btn-xs btn-icon btn-success">
+            <button data-url="{% url 'bulb:add_report' session.pk %}" class="add-report btn btn-block  btn-xs btn-icon btn-success">
                 <i class="entypo-flag"></i>
                     ارفع محضرًا
             </button>
@@ -72,7 +76,7 @@
             <i class="entypo-flag"></i>
             أكّد الحضور
         </button>
-        {% elif user in session.confirmed_session.all %}
+        {% elif user in session.confirmed_attendees.all %}
         <button data-action="cancel" data-pk="{{ session.pk }}" class="confirm-cancel-session btn btn-xs btn-icon btn-success">
             <i class="entypo-flag"></i>
             ألغِ تأكيد الحضور

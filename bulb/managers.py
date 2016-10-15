@@ -155,7 +155,8 @@ class SessionQuerySet(BulbQuerySet):
         return self.filter(year=year) | self.filter(group__year=year)
 
     def public(self):
-        return self.filter(group__is_private=False)
+        return self.filter(group__is_private=False) | \
+               self.filter(group__isnull=True)
 
     def for_user_city(self, user=None):
         city_condition = models.Q()

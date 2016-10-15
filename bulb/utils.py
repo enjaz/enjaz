@@ -65,7 +65,7 @@ def get_indirect_request_cc(book):
 def get_session_submitted_cc(session):
     bulb_club = get_bulb_club_for_user(session.submitter)
     emails = list(bulb_club.deputies.values_list('email', flat=True))
-    return email
+    return emails
 
 def get_bulb_club_of_user(user):
     user_clubs = clubs.utils.get_user_clubs(user)

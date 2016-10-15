@@ -3,11 +3,12 @@ import re
 
 from django.contrib.auth.models import User
 from django import forms
+from django.forms import formset_factory
 from dal import autocomplete
 from tagging.fields import TagField
 
 import accounts.utils
-from bulb.models import Book, NeededBook, Request, Group, Session, Report, Membership, ReaderProfile, Recruitment, NewspaperSignup
+from bulb.models import Book, NeededBook, Request, Group, Session, Report, Membership, ReaderProfile, Recruitment, NewspaperSignup, DewanyaSuggestion
 from bulb import utils
 
 city_choices = (
@@ -283,3 +284,11 @@ class NewspaperSignupForm(forms.ModelForm):
     class Meta:
         model = NewspaperSignup
         fields = ['email']
+
+class DewanyaSuggestionForm(forms.ModelForm):
+    class Meta:
+        model = DewanyaSuggestion
+        fields = ['name', 'subject']
+        widgets = {'name': forms.widgets.TextInput(attrs={'class': 'user-autocomplete'})}
+
+DewanyaSuggestionFormSet = forms.formset_factory(DewanyaSuggestionForm, extra=3)

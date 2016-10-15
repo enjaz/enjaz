@@ -1,10 +1,11 @@
 # -*- coding: utf-8  -*-
+import json
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db.models import Count
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators import csrf
 from django.utils import timezone
@@ -15,7 +16,7 @@ from core.utils import get_search_queryset
 from core.models import StudentClubYear, Tweet
 from core import decorators
 from bulb.models import Category, Book, NeededBook, Request, Point, Group, Membership, Session, Report, ReaderProfile, Recruitment, NewspaperSignup
-from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, NeededBookForm, RequestForm, GroupForm, FreeSessionForm, SessionForm, ReportForm, ReaderProfileForm, RecruitmentForm, NewspaperSignupForm
+from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, NeededBookForm, RequestForm, GroupForm, FreeSessionForm, SessionForm, ReportForm, ReaderProfileForm, RecruitmentForm, NewspaperSignupForm, DewanyaSuggestionFormSet
 from bulb import utils
 from clubs.models import city_choices
 import accounts.utils
@@ -252,7 +253,10 @@ def confirm_book_order(request, pk):
 def show_book(request, pk):
     book = get_object_or_404(Book, pk=pk, is_deleted=False)
     book_pool = Book.objects.exclude(pk=book.pk).current_year().for_user_city(request.user).available().order_by("?")
-    sample_user_books = book_pool.filter(submitter=book.submitter)[:3]
+    if book.is_publicly_owned:
+        sample_user_books = book_pool.filter(is_publicly_owned=True)[:3]
+    else:
+        sample_user_books = book_pool.filter(submitter=book.submitter)[:3]
     sample_category_books = book_pool.exclude(pk__in=[b.pk for b in sample_user_books])\
                                      .filter(category=book.category)[:3]
     return render(request, "bulb/exchange/show_book.html",
@@ -1545,3 +1549,31 @@ class BulbUserAutocomplete(autocomplete.Select2QuerySetView):
 
     def get_result_label(self, item):
         return"%s (<span class=\"english-field\">%s</span>)" % (item.common_profile.get_ar_full_name(), item.username)
+
+def autocomplete_users(request):
+    term = request.GET.get('term')
+    if not term:
+        raise Http404
+
+    qs = User.objects.filter(common_profile__is_student=True)
+    search_fields=['common_profile__ar_first_name',
+                   'common_profile__ar_middle_name',
+                   'common_profile__ar_last_name',
+                   'common_profile__en_first_name',
+                   'common_profile__en_middle_name',
+                   'common_profile__en_last_name']
+
+    result_query = get_search_queryset(qs, search_fields, term)
+    result_list = [r.common_profile.get_ar_full_name() for r in result_query]
+    return HttpResponse(json.dumps(result_list))
+
+def handle_dewanya_suggestions(request):
+    if request.method == 'POST':
+        formset = DewanyaSuggestionFormSet(request.POST)
+        if formset.is_valid():
+            recruitment = form.save()
+            return HttpResponseRedirect(reverse('bulb:recruitment_thanks'))
+    else:
+        formset = DewanyaSuggestionFormSet()
+    context = {'formset': formset}
+    return render(request, 'bulb/recruitment_dewanya.html', context)

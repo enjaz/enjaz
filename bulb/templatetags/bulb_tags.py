@@ -62,6 +62,10 @@ def group_can_have_sessions(group):
 
 @register.simple_tag
 def reader_profile_link(user):
+    # In case, for any reason, no user was passed.
+    if not user:
+        return
+
     try:
         common_profile = user.common_profile
     except ObjectDoesNotExist:

@@ -371,8 +371,6 @@ function updateEpisodes() {
 <script src="{% static 'neon/assets/js/bootstrap-timepicker.min.js' %}"></script>
 <script>
     function initializeAutocomplete(context){
-        console.log("hi");
-        console.log($(".item-request-autocomplete"));
         $(".item-request-autocomplete", context || null).autocomplete({
             source: "{% url 'activities:autocomplete_items' %}",
             position: { my : "right top", at: "right bottom" },
@@ -402,6 +400,9 @@ function updateEpisodes() {
             }
         });
         initializeAutocomplete();
+        {% if activity and not activity.is_editable %}
+         $("#depository-formset .add-row").attr("disabled", true);
+        {% endif %}
 
     });
 </script>

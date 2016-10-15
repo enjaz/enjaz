@@ -1,4 +1,5 @@
 from django.conf.urls import patterns, url
+from django.views.generic.base import RedirectView
 from media import views
 
 urlpatterns = patterns('',
@@ -24,11 +25,18 @@ urlpatterns = patterns('',
     url(r'^activities/stories/assign/$', views.assign_story_task, name="assign_story_task"),
 
     # Articles
-    url(r'^articles/$', views.list_articles, name="list_articles"),
-    url(r'^articles/submit/$', views.submit_article, name="submit_article"),
-    url(r'^articles/(?P<pk>\d+)/$', views.show_article, name="show_article"),
-    url(r'^articles/(?P<pk>\d+)/edit/$', views.edit_article, name="edit_article"),
-    url(r'^articles/(?P<pk>\d+)/review/$', views.review_article, name="review_article"),
+    url(r'^articles/$', RedirectView.as_view(pattern_name='media:list_articles', permanent=True)),
+    url(r'^articles/submit/$', RedirectView.as_view(pattern_name='media:create_article', permanent=True)),
+    url(r'^articles/(?P<pk>\d+)/$', RedirectView.as_view(pattern_name='media:show_article', permanent=True)),
+    url(r'^articles/(?P<pk>\d+)/edit/$', RedirectView.as_view(pattern_name='media:edit_article', permanent=True)),
+    url(r'^articles/(?P<pk>\d+)/review/$', RedirectView.as_view(pattern_name='media:review_article', permanent=True)),
+
+    # Blogs
+    url(r'^blogs/$', views.list_articles, name="list_articles"),
+    url(r'^blogs/submit/$', views.submit_article, name="submit_article"),
+    url(r'^blogs/(?P<pk>\d+)/$', views.show_article, name="show_article"),
+    url(r'^blogs/(?P<pk>\d+)/edit/$', views.edit_article, name="edit_article"),
+    url(r'^blogs/(?P<pk>\d+)/review/$', views.review_article, name="review_article"),
 
     # Tasks
     url(r'^tasks/$', views.list_tasks, name="list_tasks"),

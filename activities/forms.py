@@ -201,6 +201,7 @@ class DirectActivityForm(ActivityForm):
                   'inside_collaborators', 'outside_collaborators',
                   'requirements',]
 
+
 class DisabledActivityForm(ActivityForm):
     def __init__(self, *args, **kwargs):
         # Fields to keep enabled.
@@ -275,7 +276,15 @@ class ItemRequestForm(ModelForm):
         fields = ['name', 'quantity']
         widgets = {'name': TextInput(attrs={'class': 'item-request-autocomplete text-right'})}
 
+class DisabledItemRequestForm(ItemRequestForm):
+    def __init__(self, *args, **kwargs):
+        # Initialize the form
+        super(DisabledItemRequestForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['readonly'] = 'readonly'
+
 ItemRequestFormSet = inlineformset_factory(Activity, ItemRequest, ItemRequestForm, extra=1)
+DisabledItemRequestFormSet = inlineformset_factory(Activity, ItemRequest, DisabledItemRequestForm, extra=1)
 
 class AssessmentForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -423,4 +432,3 @@ class UpdateDepositoryItemForm(forms.Form):
                                       quantity=quantity, category=cleaned_category)
                 items.append(item)
         DepositoryItem.objects.bulk_create(items)
-

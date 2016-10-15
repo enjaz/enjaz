@@ -567,16 +567,25 @@ def indicators(request, city=""):
         groups = Group.objects.current_year().filter(coordinator__common_profile__city=city)
         sessions = Session.objects.current_year().filter(group__coordinator__common_profile__city=city) | \
                    Session.objects.current_year().filter(group__isnull=True, submitter__common_profile__city=city)
+
+        detailed_users = (User.objects.filter(book_giveaways__isnull=False) |
+                          User.objects.filter(reading_group_coordination__isnull=False) |
+                          User.objects.filter(request__isnull=False))\
+                         .filter(common_profile__city=city).distinct()
+
         users = (User.objects.filter(book_giveaways__isnull=False) |
                  User.objects.filter(request__isnull=False) |
                  User.objects.filter(reading_group_coordination__isnull=False) |
                  User.objects.filter(reading_group_memberships__isnull=False) |
-                 User.objects.filter(reader_profile__isnull=False)).filter(common_profile__city=city).distinct()
+                 User.objects.filter(reader_profile__isnull=False))\
+                 .filter(common_profile__city=city).distinct()
+
+        user_count = users.count()
 
         book_users = User.objects.filter(common_profile__is_student=True,
                                          book_points__is_counted=True)\
                                  .annotate(point_count=Count('book_points'))\
-                                 .filter(point_count__gte=3)\
+                                 .filter(point_count__gte=4)\
                                  .filter(common_profile__city=city)
         book_contributing_male_users = User.objects.filter(common_profile__college__gender='M',
                                                            book_giveaways__isnull=False)\
@@ -598,16 +607,26 @@ def indicators(request, city=""):
                                                   common_profile__college__gender='F'))\
                                           .filter(common_profile__city=city).distinct().count()
 
+        newspaper_emails = [user.email for user in users if user.email]
+        newspaper_emails += [signup.get_email() for signup in NewspaperSignup.objects.all()]
+        newspaper_emails = set(newspaper_emails)
+
+        newspaper_signup_count = NewspaperSignup.objects.count()
+
         context = {'groups': groups,
                    'sessions': sessions,
                    'books': books,
                    'book_requests': book_requests,
+                   'detailed_users': detailed_users,
                    'book_users': book_users,
                    'users': users,
                    'book_contributing_male_users': book_contributing_male_users,
                    'book_contributing_female_users': book_contributing_female_users,
                    'group_male_users': group_male_users,
-                   'group_female_users': group_female_users}
+                   'group_female_users': group_female_users,
+                   'user_count': user_count,
+                   'newspaper_signup_count': newspaper_signup_count,
+                   'newspaper_emails': newspaper_emails}
 
     else:
         context = {'city_choices':

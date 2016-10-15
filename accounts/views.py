@@ -6,6 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.contrib import messages
 
 from userena.models import UserenaSignup
 from userena.utils import get_datetime_now
@@ -49,6 +50,7 @@ def edit_common_profile(request):
         form = EditStudentCommonProfile(request.POST, instance=common_profile)
         if form.is_valid():
             form.save()
+            messages.success(request, 'تم تعديل بياناتك بنجاح')
             return HttpResponseRedirect(reverse('edit_common_profile'))
     elif request.method == 'GET':
         form = EditStudentCommonProfile(instance=common_profile)

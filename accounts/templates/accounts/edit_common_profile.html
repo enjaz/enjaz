@@ -5,6 +5,16 @@
 
 {% block content %}
 
+{% if messages %}
+<div class="alert alert-success">
+    {% for message in messages %}
+    <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+	<p{% if message.tags %} class="{{ message.tags }}"{% endif %}>يمكنك العودة للصفحة الرئيسية <a href="{% url "home" %}"> من هنا</a></p>
+
+    {% endfor %}
+</div>
+{% endif %}
+
 <p class="dinar-light enjaz-warning"><i class="entypo-info"></i> أدناه معلوماتكم المسجّلة على بوابة إنجاز.  تستخدم هذه المعلومات عند التسجيل في أنشطة نادي الطلاب، ولاستصدار الشهادات، وتعرض في مختلف أجزاء البوابة مثل برنامج نقاطي ومبادرة سِراج.</p>
 
 <form method="post" role="form" id="form_register">	

@@ -31,7 +31,7 @@
                     {% for group in groups.undeleted %}
                     <tr>
                         <td><a href="{% url 'bulb:show_group' group.pk %}">{{ group.name }}</a></td>
-                        <td>{{ group.coordinator.common_profile.get_ar_full_name }}</td>
+                        <td class="detailed-user" data-tooltip-content="#user-{{ group.coordinator.pk }}">{{ group.coordinator.common_profile.get_ar_full_name }}</td>
                         <td data-order="{{ group.submission_date|date:"U" }}">{{ group.submission_date|date:"j F Y" }}</td>
                         <td>{{ group.membership_set.count }}</td>
                         <td>{{ group.session_set.undeleted.count }}</td>
@@ -90,7 +90,7 @@
                     {% for group in groups.deleted %}
                     <tr>
                         <td>{{ group.name }}</td>
-                        <td>{{ group.coordinator.common_profile.get_ar_full_name }}</td>
+                        <td class="detailed-user" data-tooltip-content="#user-{{ group.coordinator.pk }}">{{ group.coordinator.common_profile.get_ar_full_name }}</td>
                         <td data-order="{{ group.modification_date|date:"U" }}">{{ group.modification_date|date:"j F Y" }}</td>
                     </tr>
                     {% endfor %}
@@ -122,7 +122,7 @@
                     {% for book in books.undeleted %}
                     <tr>
                         <td dir="auto"><a href="{% url 'bulb:show_book' book.pk %}">{{ book.title }}</a></td>
-                        <td>{{ book.submitter.common_profile.get_ar_full_name }}</td>
+                        <td class="detailed-user" data-tooltip-content="#user-{{ book.submitter.pk }}">{{ book.submitter.common_profile.get_ar_full_name }}</td>
                         <td><a href="{% url 'bulb:show_category' book.category.code_name %}">{{ book.category.name }}</a></td>
                         <td>{{ book.get_contribution_display }}</td>
                         <td data-order="{{ book.submission_date|date:"U" }}">{{ book.submission_date|date:"g:i a؛ j F Y" }}</td>
@@ -154,9 +154,9 @@
                     {% for book_request in book_requests %}
                     <tr>
                         <td data-order="{{ book_request.submission_date|date:"U" }}">{{ book_request.submission_date|date:"g:i a؛ j F Y" }}</td>
-                        <td>{{ book_request.requester.common_profile.get_ar_full_name }}</td>
+                        <td class="detailed-user" data-tooltip-content="#user-{{ book_request.requester.pk }}">{{ book_request.requester.common_profile.get_ar_full_name }}</td>
                         <td dir="auto"><a href="{% url 'bulb:show_book' book_request.book.pk %}">{{ book_request.book.title }}</a></td>
-                        <td>{{ book_request.book.submitter.common_profile.get_ar_full_name }}{% if book.is_publicly_owned %} (كتاب عمومي){% endif %}</td>
+                        <td class="detailed-user" data-tooltip-content="#user-{{ book_request.book.submitter.pk }}">{{ book_request.book.submitter.common_profile.get_ar_full_name }}{% if book_request.book.is_publicly_owned %} (كتاب عمومي){% endif %}</td>
                         <td>{{ book_request.get_delivery_display }}</td>
                         <td>{{ book_request.get_requester_status_display }} ({{ book_request.requester_status_date|date:"g:i a؛ j F Y"|default:"لا يوجد" }})</td>
                         <td>{{ book_request.get_owner_status_display }} ({{ book_request.owner_status_date|date:"g:i a؛ j F Y"|default:"لا يوجد" }})</td>
@@ -181,7 +181,7 @@
                 <tbody>
                     {% for book_user in book_users %}
                     <tr>
-                        <td><a href="{% url 'bulb:student_report_with_username' book_user.username %}">{{ book_user.common_profile.get_ar_full_name }}</a></td>
+                        <td class="detailed-user" data-tooltip-content="#user-{{ book_user.pk }}"><a href="{% url 'bulb:student_report_with_username' book_user.username %}">{{ book_user.common_profile.get_ar_full_name }}</a></td>
                         <td>{{ book_user.book_points.count_total_giving }}</td>
                         <td>{{ book_user.book_points.count_total_lending }}</td>
                     </tr>
@@ -205,7 +205,7 @@
                     {% for book in books.deleted %}
                     <tr>
                         <td dir="auto">{{ book.title }}</td>
-                        <td>{{ book.submitter.common_profile.get_ar_full_name }}{% if book.is_publicly_owned %} (كتاب عمومي){% endif %}</td>
+                        <td class="detailed-user" data-tooltip-content="#user-{{ book.submitter.pk }}">{{ book.submitter.common_profile.get_ar_full_name }}{% if book.is_publicly_owned %} (كتاب عمومي){% endif %}</td>
                         <td data-order="{{ book.modification_date|date:"U" }}">{{ book.modification_date|date:"g:i a؛ j F Y" }}</td>
                     </tr>
                     {% endfor %}
@@ -221,16 +221,30 @@
 <div class="row">
     <div class="col-md-12">
         <h3>عناوين البريد</h3>
-        <p>أدناه قائمة بعناوين المستخدمين والمستخدمات الذين سبق أن تفاعلوا مع قسم سراج سواءً بإنشاء مجموعة أو بالانضمام إلى مجموعة أو بالمساهمة بكتاب أو بطلب كتاب أو بالتسجيل في سجل القارئات والقراء. <strong>عددهم الآن: {{ users|length }}.</strong></p>
-        <textarea style="margin-bottom: 10px;" readonly class="english-field form-control">{% for user in users %} {{ user.email }}; {% endfor %}</textarea>
+        <p>أدناه قائمة بعناوين المستخدمين والمستخدمات الذين سبق أن تفاعلوا مع قسم سراج سواءً بالاشتراك بالنشرة بالبريدية أو بإنشاء مجموعة أو بالانضمام إلى مجموعة أو بالمساهمة بكتاب أو بطلب كتاب أو بالتسجيل في سجل القارئات والقراء. إجماليهم {{ newspaper_emails|length }} مستخدمة ومستخدم، منهم {{ user_count }} تفاعلوا مع سِراج و {{ newspaper_signup_count }} سجلوا في القائمة البريدية.</p>
+        <textarea style="margin-bottom: 10px;" readonly class="english-field form-control">{% for email in newspaper_emails %} {{ email }}; {% endfor %}</textarea>
     </div>
 </div>
 {% endif %}
 {% endblock %}
 {% block customscript %}
+<div style="display: none;">
+    {% for detailed_user in detailed_users %}
+    <span id="user-{{ detailed_user.pk }}">
+        <strong>جوال:</strong> {{ detailed_user.common_profile.mobile_number }}<br>
+        <strong>الكلية:</strong> {{ detailed_user.common_profile.college }}<br>
+        <strong>البريد الجامعي:</strong> <a class="english-field" href="mailto:{{ detailed_user.email }}">{{ detailed_user.email }}</a><br>
+        {% if detailed_user.common_profile.alternative_email %}<strong>البريد البديل:</strong> <a class="english-field" href="mailto:{{ detailed_user.common_profile.alternative_email }}">{{ detailed_user.common_profile.alternative_email }}</a>{% endif %}
+    </span>
+    {% endfor %}
+</div>
+
+
 <link rel="stylesheet" href="{% static 'css/chartist.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/tooltipster.bundle.min.css' %}" />
 <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
 <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/tooltipster.bundle.min.js' %}"></script>
 <script src="{% static 'js/chartist.min.js' %}"></script>
 <script type="text/javascript">
     $(function () {
@@ -254,6 +268,10 @@
         $("#undeleted-books").DataTable({
             "order": [[ 4, "desc" ]],
             "language": language,
+        });
+        $('.detailed-user').tooltipster({
+            contentCloning: true,
+            interactive: true
         });
     });
     

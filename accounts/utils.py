@@ -6,7 +6,8 @@ from django.core.exceptions import ObjectDoesNotExist
 def get_user_city(user):
     """Return the user's city.  If unavailable, return an empty string."""
 
-    if user.is_superuser:
+    if not user.is_authenticated() or \
+       user.is_superuser:
         return ''
 
     # If the profile is absent, return None.
@@ -20,7 +21,8 @@ def get_user_city(user):
 def get_user_gender(user):
     """Return the user's city.  If unavailable, return an empty string."""
 
-    if user.is_superuser:
+    if not user.is_authenticated() or \
+       user.is_superuser:
         return ''
     
     # If either the profile or the college are absent, return an empty

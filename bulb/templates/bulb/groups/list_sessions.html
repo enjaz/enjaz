@@ -26,7 +26,13 @@
                         <tr>
                             <td>{% if session.group %}<a href="{% url 'bulb:show_group' session.group.pk %}#{{ session.pk }}">{% else %}<a href="{% url 'bulb:show_session' session.pk %}">{% endif %}{{ session.title }}</a></td>
                             <td>{% if session.group %}<a href="{% url 'bulb:show_group' session.group.pk %}">{{ session.group.title }}{% else %}جلسة حرّة{% endif %}</a></td>
-                            <td>{% reader_profile_link session.submitter %}</td>
+                            <td>
+                                {% if session.submitter %}
+                                    {% reader_profile_link session.submitter %}
+                                {% elif not session.submitter and session.group.coordinator %}
+                                    {% reader_profile_link session.group.coordinator %}
+                                {% endif %}
+                            </td>
                             <td data-order="{{ session.date|date:'U' }}">{{ session.date|date:"l j F Y" }}</td>
                             <td>{{ session.confirmed_attendees.count }}</td>
                         </tr>

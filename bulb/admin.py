@@ -3,7 +3,7 @@ from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import ObjectDoesNotExist
 
-from bulb.models import Category, Book, NeededBook, Request, Point, Membership, Session, Group, Recruitment, NewspaperSignup
+from bulb.models import Category, Book, NeededBook, Request, Point, Membership, Session, Group, Recruitment, NewspaperSignup, BookCommitment
 from bulb import utils
 
 class BulbAuthenticationForm(AdminAuthenticationForm):
@@ -120,7 +120,17 @@ class SessionAdmin(admin.ModelAdmin):
 
     list_display = ['title', 'submitter', 'submission_date']
 
-    
+class BookCommitmentAdmin(admin.ModelAdmin):
+    search_fields = ['title', 'group__name',
+                     'user__common_profile__en_first_name',
+                     'user__common_profile__en_middle_name',
+                     'user__common_profile__en_last_name',
+                     'user__common_profile__ar_first_name',
+                     'user__common_profile__ar_middle_name',
+                     'user__common_profile__ar_last_name']
+    list_filter = ['user__common_profile__city']
+    list_display = ['title', 'user', 'submission_date']
+
 bulb_admin = BulbAdmin("Bulb Admin")
 admin.site.register(Category)
 admin.site.register(Book, BookAdmin)
@@ -133,3 +143,4 @@ admin.site.register(NewspaperSignup)
 bulb_admin.register(NewspaperSignup)
 admin.site.register(Session, SessionAdmin)
 admin.site.register(Group, GroupAdmin)
+admin.site.register(BookCommitment, BookCommitmentAdmin)

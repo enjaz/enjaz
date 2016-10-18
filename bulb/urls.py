@@ -91,4 +91,12 @@ urlpatterns = patterns('',
         name="add_reader_profile_introduction"),
     url(r'^readers/(?P<reader_pk>\d+)/$', views.show_reader_profile, name='show_reader_profile'),
     url(r'^readers/(?P<reader_pk>\d+)/edit/$', views.edit_reader_profile, name='edit_reader_profile'),
+
+    # Readathon
+    url(r'^readathon/(?P<pk>\d+)/$', views.show_readathon, name="show_readathon"),
+    url(r'^readathon/(?P<readathon_pk>\d+)/add/$', views.add_book_commitment, name="add_book_commitment"),
+    url(r'^readathon/(?P<readathon_pk>\d+)/add/$', views.add_book_commitment, name="add_book_commitment"),
+    url(r'^readathon/(?P<readathon_pk>\d+)/add/intro/$', TemplateView.as_view(template_name='bulb/readathon/readathon_introduction.html'), name="readathon_introduction"),
+    url(r'^readathon/(?P<readathon_pk>\d+)/(?P<pk>\d+)/edit/$', views.edit_book_commitment, name="edit_book_commitment"),
+    url(r'^readathon/(?P<readathon_pk>\d+)/(?P<pk>\d+)/delete/$', views.delete_book_commitment, name="delete_book_commitment"),
 )

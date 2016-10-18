@@ -8,7 +8,7 @@ from dal import autocomplete
 from tagging.fields import TagField
 
 import accounts.utils
-from bulb.models import Book, NeededBook, Request, Group, Session, Report, Membership, ReaderProfile, Recruitment, NewspaperSignup, DewanyaSuggestion
+from bulb.models import Book, NeededBook, Request, Group, Session, Report, Membership, ReaderProfile, Recruitment, NewspaperSignup, DewanyaSuggestion, BookCommitment
 from bulb import utils
 
 city_choices = (
@@ -292,3 +292,9 @@ class DewanyaSuggestionForm(forms.ModelForm):
         widgets = {'name': forms.widgets.TextInput(attrs={'class': 'user-autocomplete'})}
 
 DewanyaSuggestionFormSet = forms.formset_factory(DewanyaSuggestionForm, extra=3)
+
+class BookCommitmentForm(forms.ModelForm):
+    class Meta:
+        model = BookCommitment
+        fields = ['title', 'cover', 'reason', 'wants_to_attend',
+                  'wants_to_contribute']

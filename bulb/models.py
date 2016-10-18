@@ -522,3 +522,35 @@ class DewanyaSuggestion(models.Model):
     subject = models.CharField(max_length=100, verbose_name=u"الموضوع")
     submission_date = models.DateTimeField(u"تاريخ الإرسال",
                                        auto_now_add=True)    
+
+class Readathon(models.Model):
+    publication_date = models.DateTimeField(u"تاريخ النشر", null=True, blank=True)
+    start_date = models.DateField(u"تاريخ البداية")
+    end_date = models.DateField(u"تاريخ النهاية")
+    submission_date = models.DateTimeField(u"تاريخ الإرسال",
+                                           auto_now_add=True)
+    template_name = models.CharField(u"العنوان", max_length=200)
+    objects = managers.ReadathonQuerySet.as_manager()
+
+    def __unicode__(self):
+        return self.start_date.strftime("%Y-%m-%d")
+
+class BookCommitment(models.Model):
+    user = models.ForeignKey(User,
+                             verbose_name=u"المستخدمـ/ـة")
+    readathon = models.ForeignKey(Readathon,
+                                  verbose_name=u"الريديثون")
+    title = models.CharField(u"العنوان", max_length=200)
+    cover = models.ImageField(u"الغلاف", upload_to='bulb/book_commitments/')
+    reason = models.TextField(u"لماذا تودّ/ين قراءة هذا الكتاب في الريديثون؟", blank=True, help_text=u"بناء على هذه الإجابة، سيكون الاختيار لجلسة النقاش المصغرة.")
+    wants_to_attend = models.BooleanField(u"تود/ين حضور جلسة النقاش المصغرة؟",
+                                          default=False)
+    wants_to_contribute = models.BooleanField(u"تود/ين المساهمة بمنتج ثقافي بعد إتمام خطّة القراءة؟",
+                                              default=False)
+    is_deleted = models.BooleanField(u"هل حُذف؟",
+                                     default=False)
+    submission_date = models.DateTimeField(u"تاريخ الإرسال",
+                                           auto_now_add=True)
+
+    def __unicode__(self):
+        return self.title

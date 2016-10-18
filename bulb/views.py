@@ -15,8 +15,8 @@ from post_office import mail
 from core.utils import get_search_queryset
 from core.models import StudentClubYear, Tweet
 from core import decorators
-from bulb.models import Category, Book, NeededBook, Request, Point, Group, Membership, Session, Report, ReaderProfile, Recruitment, NewspaperSignup
-from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, NeededBookForm, RequestForm, GroupForm, FreeSessionForm, SessionForm, ReportForm, ReaderProfileForm, RecruitmentForm, NewspaperSignupForm, DewanyaSuggestionFormSet
+from bulb.models import Category, Book, NeededBook, Request, Point, Group, Membership, Session, Report, ReaderProfile, Recruitment, NewspaperSignup, Readathon, BookCommitment
+from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, NeededBookForm, RequestForm, GroupForm, FreeSessionForm, SessionForm, ReportForm, ReaderProfileForm, RecruitmentForm, NewspaperSignupForm, DewanyaSuggestionFormSet, BookCommitmentForm
 from bulb import utils
 from clubs.models import city_choices
 import accounts.utils
@@ -1577,3 +1577,81 @@ def handle_dewanya_suggestions(request):
         formset = DewanyaSuggestionFormSet()
     context = {'formset': formset}
     return render(request, 'bulb/recruitment_dewanya.html', context)
+
+def show_readathon(request, pk):
+    readathon = get_object_or_404(Readathon, pk=pk)
+
+    if readathon.publication_date and \
+       readathon.publication_date > timezone.now():
+        raise Http404
+
+    if request.user.is_authenticated() and \
+       readathon.bookcommitment_set.filter(user__pk=request.user.pk, is_deleted=False).exists():
+        already_on = True
+    else:
+        already_on = False
+
+    context = {'readathon': readathon,
+               'already_on': already_on}
+
+    return render(request, readathon.template_name, context)
+
+@decorators.ajax_only
+@login_required
+def add_book_commitment(request, readathon_pk):
+    readathon = get_object_or_404(Readathon, pk=readathon_pk)
+    if request.method == 'POST':
+        instance = BookCommitment(user=request.user,
+                                  readathon=readathon)
+        form = BookCommitmentForm(request.POST, request.FILES, instance=instance)
+        if form.is_valid():
+            book_commitment = form.save()
+            show_url = reverse('bulb:show_readathon', args=(readathon.pk,))
+            full_url = request.build_absolute_uri(show_url)
+            utils.create_tweet(request.user, 'add_book_commitment', (book_commitment.title, full_url), media_path=book_commitment.cover.path)
+            return {"message": "success", "show_url": full_url}
+    elif request.method == 'GET':
+        form = BookCommitmentForm()
+
+    context = {'form': form, 'readathon': readathon}
+    return render(request, 'bulb/readathon/edit_book_commitment_form.html', context)
+
+@decorators.ajax_only
+@login_required
+def edit_book_commitment(request, readathon_pk, pk):
+    book_commitment = get_object_or_404(BookCommitment, pk=pk,
+                                        is_deleted=False)
+
+    if not utils.can_edit_book_commitment(request.user, book_commitment):
+        raise Exception(u"لا تستطيع تعديل الكتاب")
+
+    context = {'book_commitment': book_commitment}
+    if request.method == 'POST':
+        form = BookCommitmentForm(request.POST, request.FILES, instance=book_commitment)
+        if form.is_valid():
+            book_commitment = form.save()
+            show_url = reverse('bulb:show_readathon', args=(readathon.pk,))
+            full_url = request.build_absolute_uri(show_url)
+            return {"message": "success", "show_url": full_url}
+    elif request.method == 'GET':
+        form = BookCommitmentForm(instance=book_commitment, user=request.user)
+
+    context['form'] = form
+    return render(request, 'bulb/readathon/edit_book_commitment_form.html', context)
+
+@decorators.ajax_only
+@decorators.post_only
+@csrf.csrf_exempt
+@login_required
+def delete_book_commitment(request, readathon_pk, pk):
+    book_commitment = get_object_or_404(BookCommitment, pk=pk,
+                                        is_deleted=False)
+
+    if not utils.can_edit_book_commitment(request.user, book_commitment):
+        raise Exception(u"لا تستطيع تعديل الكتاب")
+
+    book_commitment.is_deleted = True
+    book_commitment.save()
+    show_url = reverse('bulb:show_readathon', args=(readathon.pk,))
+    full_url = request.build_absolute_uri(show_url)
+    return {"message": "success", "show_url": full_url}

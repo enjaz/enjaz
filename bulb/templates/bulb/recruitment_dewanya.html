@@ -1,0 +1,331 @@
+<!DOCTYPE html>{% load staticfiles %}{% load bootstrap3 %}
+<html class="detail" lang="ar">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="سراج">
+    <title>سراج | كن معنا!</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap-3.3.6.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-rtl-3.3.4.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
+    <!--<link href="css/stylish-portfolio.css" rel="stylesheet">-->
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+	    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+
+
+<style>
+@font-face {
+    font-family: 'GE Dinar One';
+    font-weight: lighter;
+    src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
+}
+		
+@font-face {
+    font-family: 'GE Dinar One';
+    font-weight: normal;
+    src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
+}
+
+body {
+  font-family: 'GE Dinar One', serif;
+}
+
+html.detail{
+    background: linear-gradient( rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8) ), url("{% static 'img/bulb/recruitment-background.jpg' %}") no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+html.detail body{
+    background-color: transparent;
+    color: white;
+}
+
+.detail a{
+    color: #85C7FF;
+}
+footer{
+    padding: 60px 0;
+}
+
+.step-section {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 10px;
+    width: 90%;
+    margin-right: auto;
+    margin-left: auto;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.checkbox label{
+    margin-right: 10px;
+}
+
+#third-phase, #promotion-step{
+    display: none;
+}
+
+#sad-child{
+    border-radius: 10px;
+    max-width: 100%;
+}
+
+#delete-button input[type='submit']:disabled{
+    background-color: #497d49;
+}
+
+p.instructions{
+    text-align: justify;
+}
+
+p.intro{
+background: rgba(0, 0, 0, 0.7);
+border-radius: 10px;
+padding: 18px;
+width: 90%;
+margin-right: auto;
+margin-left: auto;
+margin-bottom: 20px;
+color: white;
+font-size: 15px;
+}
+
+p.explaination{
+border-radius: 10px;
+padding: 10px;
+margin-right: auto;
+margin-left: auto;
+margin-bottom: 0px;
+font-size: 14px;
+color: #e8ff74;
+}
+
+hr{
+margin-bottom: 5px;
+    max-width: 100px;
+}
+
+.form-group .checkbox{
+    margin-right: 15px;
+}
+</style>
+
+    <div class="row">
+        <div class="col-md-12">
+	<form class="form" action="{% url 'bulb:handle_recruitment' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+<div class="text-center">
+<img class="bounceInDown" src="{% static 'img/bulb/logo.png' %}">
+</div>
+
+            <p class="intro instructions">
+كانت الديوانيات واحدة من أنجح أنشطة سِراج وأكثرها حضورها خلال السنة الماضية. في جلسات الديوانية، يجتمع الطلاب والطالبات للاستماع إلى متحدثـ/ـة عن موضوع ثقافي أو فكري، ويتلو ذلك نقاش مفتوح لما طُرح، يمكنك أن تشاركـ/ـي كـمتحدثـ/ـة، أو أن تنسقـ/ـي للحدث.
+
+</p>
+        
+        
+        
+    {{ formset.management_form }}
+    {{ formset.non_form_errors.as_ul }}
+    <table id="formset" class="form" style="width: 100%;">
+    {% for form in formset.forms %}
+      {% if forloop.first %}
+        <colgroup>
+            <col class="col-xs-7">
+            <col class="col-xs-2">
+        </colgroup>
+      <thead><tr>
+        {% for field in form.visible_fields %}
+        <th>{{ field.label|capfirst }}</th>
+        {% endfor %}
+      </tr></thead>
+      {% endif %}
+      <tr class="form-container">
+      {% for field in form.visible_fields %}
+        <td>
+        {# Include the hidden fields in the form #}
+        {% if forloop.first %}
+          {% for hidden in form.hidden_fields %}
+          {{ hidden }}
+          {% endfor %}
+        {% endif %}
+            <div class="form-group">
+          {{ field.errors.as_ul }}
+          {% bootstrap_field field %}
+            </div>
+        </td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+    </table>
+    <hr>
+
+		<div id="delete-button">
+				<p><input type="submit" class="form-control btn btn-block btn-success" value="انضمّـ/ـي إلى مجتمع سِراج"/></p>
+		</div>
+          </form>
+        </div><!--col-->
+    </div><!--row-->
+
+            </div> <!--col-->
+        </div><!--row-->
+    </div><!--container-->
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 col-lg-offset-1 text-center">
+                    <p class="text-muted">بُني بأيدٍ طلابيّة</p>
+                    <p class="text-muted">حقك في النسخ مكفول.</p>
+                    <a target="_blank" rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.ar"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" /></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+	<script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{% static 'bootstrap/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/jquery.formset.js' %}"></script>
+	<script src="{% static 'js/jquery-ui.min.js' %}"></script>
+
+
+<script>
+
+
+function controlCoordinationInformation(){
+	if( $('#id_coordinate').is(':checked')) {
+		$(".coordination").show();
+	} else {
+		$(".coordination").hide();
+	}
+}
+
+function controlBookContribution(){
+	if( $('#id_contribute_books').is(':checked')) {
+		$("#id_book_estimate").closest("div.form-group").show();
+	} else {
+		$("#id_book_estimate").closest("div.form-group").hide();
+	}
+}
+
+function controlGroupReading(){
+	if( $('#id_has_group_reading_subjects').is(':checked')) {
+		$("#id_reading_group_subjects").closest("div.form-group").show();
+        $("#id_reading_group_subjects").attr("required", true)
+	} else {
+		$("#id_reading_group_subjects").closest("div.form-group").hide();
+        $("#id_reading_group_subjects").attr("required", false)
+	}
+}
+
+function controlDewanya(){
+	if( $('#id_has_dewanya_subjects').is(':checked')) {
+		$("#id_dewanya_subjects").closest("div.form-group").show();
+        $("#id_dewanya_subjects").attr("required", true)
+	} else {
+		$("#id_dewanya_subjects").closest("div.form-group").hide();
+        $("#id_dewanya_subjects").attr("required", false)
+	}
+	if( $('#id_has_dewanya_guests').is(':checked')) {
+		$("#id_dewanya_guests").closest("div.form-group").show();
+        $("#id_dewanya_guests").attr("required", true)
+	} else {
+		$("#id_dewanya_guests").closest("div.form-group").hide();
+        $("#id_dewanya_guests").attr("required", false)
+	}
+}
+
+function controlDebate(){
+	if( $('#id_has_debate_subjects').is(':checked')) {
+		$("#id_debate_subjects").closest("div.form-group").show();
+        $("#id_debate_subjects").attr("required", true)
+	} else {
+		$("#id_debate_subjects").closest("div.form-group").hide();
+        $("#id_debate_subjects").attr("required", false)
+	}
+}
+    
+function controlMedia(){
+	if( $('#id_media_design').is(':checked')) {
+		$("#id_example_design").closest("div.form-group").show();
+        $("#id_example_design").attr("required", true)
+	} else {
+		$("#id_example_design").closest("div.form-group").hide();
+        $("#id_example_design").attr("required", false)
+	}
+}
+ function initializeAutocomplete(context){
+    $(".user-autocomplete", context || null).autocomplete({
+        source: "{% url 'bulb:autocomplete_users' %}",
+        position: { my : "right top", at: "right bottom" },
+        minLength: 2
+    });
+}
+$(function() {
+    
+    $("#formset .form-container").formset({
+        prefix: '{{ formset.prefix }}',
+        addText: 'أضف مقترحًا',
+        deleteText: 'احذف',
+        addCssClass: 'add-row btn btn-xs btn-primary',
+        deleteCssClass: 'delete-row btn btn-xs btn-default',
+        formCssClass: 'formset',
+        added: function(row){
+        initializeAutocomplete(row);
+        }
+    });
+    
+        controlBookContribution();
+	$('#id_contribute_books').click(controlBookContribution);
+ 	controlGroupReading();
+	$('#id_has_group_reading_subjects').click(controlGroupReading);
+ 	controlDewanya();
+	$('#id_has_dewanya_subjects, #id_has_dewanya_guests').click(controlDewanya);
+ 	controlDebate();
+	$('#id_has_debate_subjects').click(controlDebate);
+	controlCoordinationInformation()
+	$('#id_coordinate').click(controlCoordinationInformation);
+    controlMedia();
+    $('#id_media_design').click(controlMedia);
+    initializeAutocomplete();
+
+});
+</script>
+
+{% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
+	<!-- Piwik -->
+	<script type="text/javascript">
+	  var _paq = _paq || [];
+      {% if user.is_authenticated %}
+      _paq.push(['setUserId', '{{ user.username }}']);
+      {% endif %}
+	  _paq.push(['trackPageView']);
+	  _paq.push(['enableLinkTracking']);
+	  (function() {
+	    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://enjazportal.com/stats/";
+	    _paq.push(['setTrackerUrl', u+'piwik.php']);
+	    _paq.push(['setSiteId', 1]);
+	    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+	    g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+	  })();
+	</script>
+	<noscript><p><img src="//enjazportal.com/stats/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+        <!-- End Piwik Code -->
+{% endif %}
+
+</body>
+</html>
+

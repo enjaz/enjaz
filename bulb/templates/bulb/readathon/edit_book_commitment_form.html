@@ -1,0 +1,55 @@
+{% load bootstrap3 %}{% load staticfiles %}
+<form enctype="multipart/form-data" id="edit-book-commitment-form" action="post">
+{% csrf_token %}
+{% bootstrap_form form %}
+</form>
+<script type="text/javascript">
+$(function () {
+
+    // modify form submission behaviour to be ajaxy
+    $("form#edit-book-commitment-form").submit(function (event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var formData = new FormData($(this)[0]); 
+        {% if book_commitment %}{# if a book_commitment is passed, then post to edit_book_commitment url, otherwise to add_book_commitment #}
+        var url = "{% url 'bulb:edit_book_commitment' readathon.pk book_commitment.pk %}";
+        {% else %}
+        var url = "{% url 'bulb:add_book_commitment' readathon.pk %}";
+        {% endif %}
+
+        /* Send the data */
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (data) {
+                if (data.message == "success") {
+
+                    // show success message (using toastr)
+                    toastr.options.positionClass = "toast-top-left";
+                    {% if book_commitment %}
+                    toastr.success("عُدّل {{ report.session.title }} بنجاح.");
+                    {% else %}
+                    toastr.success("أضيف كتاب جديد.");
+                    {% endif %}
+
+                    // hide modal
+                    $("#edit-book-commitment-modal").modal('hide');
+                     window.location.href= data.show_url;
+                } else {
+                    $("#edit-book-commitment-modal .modal-body").html(data);
+                }}
+        });
+
+    });
+});
+            
+</script>
+{{ form.media }}

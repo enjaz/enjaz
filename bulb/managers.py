@@ -178,3 +178,9 @@ class MembershipQuerySet(models.QuerySet):
     def active(self):
         return self.filter(is_active=True)
 
+
+class ReadathonQuerySet(models.QuerySet):
+    def get_current_or_next(self):
+        today = timezone.now().date()
+        return self.filter(start_date__gte=today).order_by("start_date").first() 
+

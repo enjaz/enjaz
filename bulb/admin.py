@@ -1,7 +1,9 @@
+# -*- coding: utf-8  -*-
 from django.contrib import admin
 from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.html import format_html
 
 from bulb.models import Category, Book, NeededBook, Request, Point, Membership, Session, Group, Recruitment, NewspaperSignup, BookCommitment
 from bulb import utils
@@ -63,39 +65,31 @@ class GroupAdmin(admin.ModelAdmin):
     list_filter = ["is_deleted", ]
     inlines = [MembershipAdmin, ]
 
-class RecruitmentAdmin(admin.ModelAdmin):
-    list_display = ['get_full_ar_name', 'get_email',
-                    'get_mobile_number', 'get_college',
-                    'prefers_coordination', 'prefers_team_membership',
-                    'wants_book_exchange_organization',
-                    'wants_dewanya_organization', 'submission_date']
-
-    def get_readonly_fields(self, request, obj=None):
-        return [field.name for field in self.model._meta.fields]
-
+class BulbModelAdmin(admin.ModelAdmin):
     def get_full_ar_name(self, obj):
         try:
             return obj.user.common_profile.get_ar_full_name()
         except ObjectDoesNotExist:
             return obj.user.username
+    get_full_ar_name.short_description = u"الاسم الكامل"
 
     def get_email(self, obj):
-        return obj.user.email
-    get_email.short_description = "Email"
+        return format_html("<a href=\"mailto:{0}\">{0}</a>", obj.user.email)
+    get_email.short_description = u"البريد الإلكتروني"
 
     def get_mobile_number(self, obj):
         try:
             return obj.user.common_profile.mobile_number
         except ObjectDoesNotExist:
             return
-    get_mobile_number.short_description = "Mobile number"
+    get_mobile_number.short_description = u"رقم الجوال"
 
     def get_college(self, obj):
         try:
             return obj.user.common_profile.college.get_name_display()
         except ObjectDoesNotExist:
             return
-    get_college.short_description = "College"
+    get_college.short_description = u"الكلية"
 
     def has_module_permission(self, request, obj=None):
         return utils.is_bulb_coordinator_or_deputy(request.user) or \
@@ -106,6 +100,20 @@ class RecruitmentAdmin(admin.ModelAdmin):
         return utils.is_bulb_coordinator_or_deputy(request.user) or \
                utils.is_bulb_member(request.user) or \
                request.user.is_superuser
+
+class ModelAdminReadOnly:
+    def get_readonly_fields(self, request, obj=None):
+        return [field.name for field in self.model._meta.fields]
+
+class RecruitmentAdmin(BulbModelAdmin):
+    list_display = ['get_full_ar_name', 'get_email',
+                    'get_mobile_number', 'get_college',
+                    'prefers_coordination', 'prefers_team_membership',
+                    'wants_book_exchange_organization',
+                    'wants_dewanya_organization', 'submission_date']
+
+class RecruitmentAdminReadOnly(ModelAdminReadOnly, RecruitmentAdmin):
+    pass
 
 class SessionAdmin(admin.ModelAdmin):
     search_fields = ['title', 'group__name',
@@ -120,8 +128,8 @@ class SessionAdmin(admin.ModelAdmin):
 
     list_display = ['title', 'submitter', 'submission_date']
 
-class BookCommitmentAdmin(admin.ModelAdmin):
-    search_fields = ['title', 'group__name',
+class BookCommitmentAdmin(BulbModelAdmin):
+    search_fields = ['title', 'reason',
                      'user__common_profile__en_first_name',
                      'user__common_profile__en_middle_name',
                      'user__common_profile__en_last_name',
@@ -129,7 +137,12 @@ class BookCommitmentAdmin(admin.ModelAdmin):
                      'user__common_profile__ar_middle_name',
                      'user__common_profile__ar_last_name']
     list_filter = ['user__common_profile__city']
-    list_display = ['title', 'user', 'submission_date']
+    list_display = ['title', 'get_full_ar_name', 'get_email',
+                    'get_mobile_number', 'get_college',
+                    'submission_date']
+
+class BookCommitmentAdminReadOnly(ModelAdminReadOnly, BookCommitmentAdmin):
+    pass
 
 bulb_admin = BulbAdmin("Bulb Admin")
 admin.site.register(Category)
@@ -138,9 +151,10 @@ admin.site.register(NeededBook, NeededBookAdmin)
 admin.site.register(Request)
 admin.site.register(Point)
 admin.site.register(Recruitment, RecruitmentAdmin)
-bulb_admin.register(Recruitment, RecruitmentAdmin)
+bulb_admin.register(Recruitment, RecruitmentAdminReadOnly)
 admin.site.register(NewspaperSignup)
 bulb_admin.register(NewspaperSignup)
 admin.site.register(Session, SessionAdmin)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(BookCommitment, BookCommitmentAdmin)
+bulb_admin.register(BookCommitment, BookCommitmentAdminReadOnly)

@@ -296,5 +296,10 @@ DewanyaSuggestionFormSet = forms.formset_factory(DewanyaSuggestionForm, extra=3)
 class BookCommitmentForm(forms.ModelForm):
     class Meta:
         model = BookCommitment
-        fields = ['title', 'cover', 'reason', 'wants_to_attend',
-                  'wants_to_contribute']
+        fields = ['title', 'cover', 'pages', 'reason',
+                  'wants_to_attend', 'wants_to_contribute']
+
+class UpdateBookCommitmentForm(forms.ModelForm):
+    class Meta:
+        model = BookCommitment
+        fields = ['pages', 'completed_pages']

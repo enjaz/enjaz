@@ -121,6 +121,10 @@ margin-bottom: 5px;
 .form-group .checkbox{
     margin-right: 15px;
 }
+
+.update-book{
+    cursor: pointer;
+}
 </style>
 </head>
 
@@ -148,10 +152,25 @@ margin-bottom: 5px;
                 </div>
                 <div class="text-center">
 
-                {% if user.is_authenticated and not already_on %}
+                {% if user.is_authenticated and not user_books.exists %}
                 <button data-action="add" id="add-book" class="btn btn-lg btn-success">سجّل مشاركتي!</button>
-                {% elif user.is_authenticated and already_on %}
-                <button data-action="add" id="add-book" class="btn btn-lg btn-success">سجّل كتابًا آخر!</button>
+                {% elif user.is_authenticated and user_books.exists %}
+                    <hr>
+                    <h2 class="text-center" style="color: white;">كُتبي</h2>
+                    <p>انقر على الكتاب تُحدّثه!</p>
+                    <div class="row">                        
+                    {% for book_commitment in user_books %}
+                        <div class="{% if user_books.count == 1 %}col-sm-offset-3 {% endif %}col-sm-6 text-center">
+                                <div class="book-image update-book" data-url="{% url 'bulb:update_book_commitment' readathon.pk book_commitment.pk %}" style="background-image:url('{{ book_commitment.cover.url }}');"></div>
+                                <div class="progress">
+                                  <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="{{ book_commitment.get_progress_percentage }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ book_commitment.get_progress_percentage }}%">
+                                    {{ book_commitment.get_progress_percentage }}%
+                                  </div>
+                                </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                    {% if not readathon.has_started %}<button data-action="add" id="add-book" class="btn btn-lg btn-success">سجّل كتابًا آخر!</button>{% endif %}
                 {% else %}
                 <a style="color: white;" href="{% url 'userena_signin' %}?next={{ request.path }}" class="btn btn-lg btn-success">أدخلني لإنجاز كي أؤكد الحضور</a>
                 {% endif %}
@@ -160,14 +179,21 @@ margin-bottom: 5px;
                 <h2 class="text-center" style="color: white;">المشاركون والمشاركات</h2>
                 <div class="row">
                 {% for book_commitment in readathon.bookcommitment_set.all %}
-                <div class="col-sm-6 text-center">
-                        <div class="book-image" style="background-image:url('{{ book_commitment.cover.url }}');"></div>
-                    {% if book_commitment.user.username != "mubayrik080" %}
-                        {{ book_commitment.user.common_profile.get_ar_full_name }}
-                    {% else %}
-                        أسامة خالد
-                    {% endif %}
-                </div>
+                    <div class="col-sm-6 text-center">
+                            <div class="book-image" style="background-image:url('{{ book_commitment.cover.url }}');"></div>
+                        {% if book_commitment.user.username != "mubayrik080" %}
+                            {{ book_commitment.user.common_profile.get_ar_full_name }}
+                        {% else %}
+                            أسامة خالد
+                        {% endif %}
+                        {% if book_commitment.get_progress_percentage %}
+                            <div class="progress">
+                              <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="{{ book_commitment.get_progress_percentage }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ book_commitment.get_progress_percentage }}%">
+                                {{ book_commitment.get_progress_percentage }}%
+                              </div>
+                            </div>
+                        {% endif %}
+                    </div>
                 {% endfor %}
                 </div>
                 <!-- Footer -->
@@ -236,13 +262,13 @@ margin-bottom: 5px;
         });
         $(".edit-book").click(function () {
             // show the edit book modal {# you can find it in bulb/exchange/home.html #}
-            $("#edit-book-modal").modal('show');
+            $("#edit-book-commitment-modal").modal('show');
             var url = $(this).data('url'); 
 
-            $("#edit-book-modal .modal-title").html("عدّل كتاب");
-            $("#edit-book-modal .modal-body").load(url);
+            $("#edit-book-commitment-modal .modal-title").html("عدّل كتاب");
+            $("#edit-book-commitment-modal .modal-body").load(url);
 
-            var $submitButton = $("#edit-book-modal button.submit-button");
+            var $submitButton = $("#edit-book-commitment-modal button.submit-button");
             // Unbind any handlers previously attached to the submit button
             // This is necessary to avoid multiple submissions of the form
             $submitButton.off('click');
@@ -257,6 +283,19 @@ margin-bottom: 5px;
             $("#delete-book").data('deletion-url', deletion_url); 
             $("#confirm-delete-book-modal").modal('show');
         });
+        
+        $(".update-book").click(function(){
+            $("#update-book-commitment-modal").modal('show');
+            var url = $(this).data('url');
+            $("#update-book-commitment-modal .modal-body").load(url);
+            var $submitButton = $("#update-book-commitment-modal button.submit-button");
+            // Unbind any handlers previously attached to the submit button
+            // This is necessary to avoid multiple submissions of the form
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#update-book-form").submit();
+            });
+        });
     });
 {% include 'bulb/adjust_modal_size.js' %}
 </script>
@@ -265,9 +304,27 @@ margin-bottom: 5px;
     {% include "bulb/groups/common_edit_modal.html" %}
 {% endwith %}
 
+<!--Update modal -->
+    <div class="modal fade" id="update-book-commitment-modal">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">تحديث الإنجاز</h4>
+      </div>
+      <div class="modal-body">
+            {% include "media/polls/ajax-loader.html" %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">ألغِ</button>
+        <button id="update-book" type="button" class="btn btn-success submit-button">حدّث</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 {%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
-<!---Twitter Modal -->>
+<!---Twitter Modal -->
 <div class="modal fade" id="connect-twitter">
   <div class="modal-dialog">
     <div class="modal-content">

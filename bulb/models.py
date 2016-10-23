@@ -532,6 +532,9 @@ class Readathon(models.Model):
     template_name = models.CharField(u"العنوان", max_length=200)
     objects = managers.ReadathonQuerySet.as_manager()
 
+    def has_started(self):
+        return timezone.now().date() > self.start_date
+
     def __unicode__(self):
         return self.start_date.strftime("%Y-%m-%d")
 
@@ -547,10 +550,21 @@ class BookCommitment(models.Model):
                                           default=False)
     wants_to_contribute = models.BooleanField(u"تود/ين المساهمة بمنتج ثقافي بعد إتمام خطّة القراءة؟",
                                               default=False)
+    pages = models.PositiveSmallIntegerField(u"صفحات الكتاب",
+                                             null=True)
+    completed_pages = models.PositiveSmallIntegerField(u"صفحات الكتاب المكتملة",
+                                                       null=True)
     is_deleted = models.BooleanField(u"هل حُذف؟",
                                      default=False)
     submission_date = models.DateTimeField(u"تاريخ الإرسال",
                                            auto_now_add=True)
+
+    def get_progress_percentage(self):
+        if self.pages and self.completed_pages:
+            percentage =  float(self.completed_pages) / self.pages * 100
+            return "{0:.0f}".format(percentage)
+        else:
+            return 0
 
     def __unicode__(self):
         return self.title

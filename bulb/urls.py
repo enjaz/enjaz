@@ -98,5 +98,6 @@ urlpatterns = patterns('',
     url(r'^readathon/(?P<readathon_pk>\d+)/add/$', views.add_book_commitment, name="add_book_commitment"),
     url(r'^readathon/(?P<readathon_pk>\d+)/add/intro/$', TemplateView.as_view(template_name='bulb/readathon/readathon_introduction.html'), name="readathon_introduction"),
     url(r'^readathon/(?P<readathon_pk>\d+)/(?P<pk>\d+)/edit/$', views.edit_book_commitment, name="edit_book_commitment"),
+    url(r'^readathon/(?P<readathon_pk>\d+)/(?P<pk>\d+)/update/$', views.update_book_commitment, name="update_book_commitment"),
     url(r'^readathon/(?P<readathon_pk>\d+)/(?P<pk>\d+)/delete/$', views.delete_book_commitment, name="delete_book_commitment"),
 )

@@ -1,0 +1,15 @@
+                <div class="col-sm-6 text-center">
+                        <div class="book-image" style="background-image:url('{{ book_commitment.cover.url }}');"></div>
+                    {% if book_commitment.user.username != "mubayrik080" %}
+                        {{ book_commitment.user.common_profile.get_ar_full_name }}
+                    {% else %}
+                        أسامة خالد
+                    {% endif %}
+                    {% if book_commitment.get_progress_percentage %}
+                        <div class="progress">
+                          <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ book_commitment.get_progress_percentage }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ book_commitment.get_progress_percentage }}%">
+                            {{ book_commitment.get_progress_percentage }}%
+                          </div>
+                        </div>
+                    {% endif %}
+                </div>

@@ -87,7 +87,7 @@ class BulbModelAdmin(admin.ModelAdmin):
     def get_college(self, obj):
         try:
             return obj.user.common_profile.college.get_name_display()
-        except ObjectDoesNotExist:
+        except (ObjectDoesNotExist, AttributeError):
             return
     get_college.short_description = u"الكلية"
 
@@ -136,8 +136,9 @@ class BookCommitmentAdmin(BulbModelAdmin):
                      'user__common_profile__ar_first_name',
                      'user__common_profile__ar_middle_name',
                      'user__common_profile__ar_last_name']
-    list_filter = ['user__common_profile__city']
-    list_display = ['title', 'get_full_ar_name', 'get_email',
+    list_filter = ['user__common_profile__city', 'wants_to_attend']
+    list_display = ['title', 'wants_to_attend', 
+                    'get_full_ar_name', 'get_email',
                     'get_mobile_number', 'get_college',
                     'submission_date']
 

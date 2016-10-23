@@ -1599,7 +1599,7 @@ def add_book_commitment(request, readathon_pk):
     if request.method == 'POST':
         instance = BookCommitment(user=request.user,
                                   readathon=readathon)
-        form = BookCommitmentForm(request.POST, request.FILES, instance=instance)
+        form = BookCommitmentForm(request.POST, request.FILES, instance=instance, readathon=readathon)
         if form.is_valid():
             book_commitment = form.save()
             show_url = reverse('bulb:show_readathon', args=(readathon.pk,))
@@ -1607,7 +1607,7 @@ def add_book_commitment(request, readathon_pk):
             utils.create_tweet(request.user, 'add_book_commitment', (book_commitment.title, full_url), media_path=book_commitment.cover.path)
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
-        form = BookCommitmentForm()
+        form = BookCommitmentForm(readathon=readathon)
 
     context = {'form': form, 'readathon': readathon}
     return render(request, 'bulb/readathon/edit_book_commitment_form.html', context)
@@ -1623,14 +1623,14 @@ def edit_book_commitment(request, readathon_pk, pk):
 
     context = {'book_commitment': book_commitment}
     if request.method == 'POST':
-        form = BookCommitmentForm(request.POST, request.FILES, instance=book_commitment)
+        form = BookCommitmentForm(request.POST, request.FILES, instance=book_commitment, readathon=readathon)
         if form.is_valid():
             book_commitment = form.save()
             show_url = reverse('bulb:show_readathon', args=(book_commitment.readathon.pk,))
             full_url = request.build_absolute_uri(show_url)
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
-        form = BookCommitmentForm(instance=book_commitment)
+        form = BookCommitmentForm(instance=book_commitment, readathon=readathon)
 
     context['form'] = form
     return render(request, 'bulb/readathon/edit_book_commitment_form.html', context)

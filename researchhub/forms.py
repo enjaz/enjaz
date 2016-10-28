@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from accounts.models import CommonProfile
 from core.models import StudentClubYear
 from researchhub import utils
-from researchhub.models import Supervisor, Project, SkilledStudent
+from researchhub.models import Supervisor, Project, SkilledStudent, Domain, Skill
 from userena.forms import SignupForm
 
 class ConsultationForm(forms.Form):
@@ -29,14 +29,14 @@ class MemberProjectForm(forms.ModelForm):
 class SupervisorForm(forms.ModelForm):
     class Meta:
         model = Supervisor
-        fields = ['user', 'specialty', 'avatar', 'interests',
+        fields = ['user', 'domain', 'avatar', 'interests',
                   'communication', 'is_hidden', 'available_from',
                   'available_until']
 
 class SkilledStudentForm(forms.ModelForm):
     class Meta:
         model = SkilledStudent
-        fields = ['description', 'previous_experience',
+        fields = ['skill','description', 'previous_experience',
                   'ongoing_projects', 'condition', 'available_until']
 
 class ResearchHubSignupForm(SignupForm):

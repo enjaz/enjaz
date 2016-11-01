@@ -29,7 +29,7 @@ class MemberProjectForm(forms.ModelForm):
 class SupervisorForm(forms.ModelForm):
     class Meta:
         model = Supervisor
-        fields = ['user', 'domain', 'avatar', 'interests',
+        fields = ['user', 'avatar', 'domain', 'interests',
                   'communication', 'is_hidden', 'available_from',
                   'available_until']
 

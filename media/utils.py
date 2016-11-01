@@ -119,6 +119,7 @@ def can_submit_employeereport(user):
     return clubs.utils.is_employee_of_any_club(user) or \
         is_media_coordinator_or_member(user) or \
         clubs.utils.is_presidency_coordinator_or_deputy(user) or \
+        clubs.utils.is_deanship_of_students_affairs_coordinator_or_member(user) or \
         user.has_perms('media.add_followupreport') or \
         user.is_superuser
 

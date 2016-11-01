@@ -36,7 +36,7 @@ class SupervisorForm(forms.ModelForm):
 class SkilledStudentForm(forms.ModelForm):
     class Meta:
         model = SkilledStudent
-        fields = ['skill','description', 'previous_experience',
+        fields = ['skills','description', 'previous_experience',
                   'ongoing_projects', 'condition', 'available_until']
 
 class ResearchHubSignupForm(SignupForm):

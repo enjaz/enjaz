@@ -35,11 +35,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='skilledstudent',
             name='skill',
-            field=models.ForeignKey(default=b'', to='researchhub.Skill'),
+            field=models.ForeignKey(null=True, to='researchhub.Skill'),
         ),
         migrations.AddField(
             model_name='supervisor',
             name='domain',
-            field=models.ForeignKey(default=b'', to='researchhub.Domain'),
+            field=models.ForeignKey(null=True, to='researchhub.Domain'),
         ),
     ]

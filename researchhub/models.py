@@ -83,7 +83,7 @@ class Skill(models.Model):
         return self.name
 
 class SkilledStudent(models.Model):
-    skill = models.ManyToManyField(Skill)
+    skills = models.ManyToManyField(Skill, verbose_name=u"المهارة")
 
     year = models.ForeignKey('core.StudentClubYear', null=True,
                              on_delete=models.SET_NULL)

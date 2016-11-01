@@ -12,7 +12,7 @@ def add_domains(apps, schema_editor):
 
 def remove_domains(apps, schema_editor):
     Domain = apps.get_model('researchhub', 'Domain')
-    Domain.objects.filter(name=["Basic Sciences", "Clinical Sciences"
+    Domain.objects.filter(name__in=["Basic Sciences", "Clinical Sciences"
                                 ]).delete()
 
 def add_skills(apps, schema_editor):
@@ -29,7 +29,7 @@ def add_skills(apps, schema_editor):
 
 def remove_skills(apps, schema_editor):
     Skill = apps.get_model('researchhub', 'Skill')
-    Skill.objects.filter(name=["Data Entry", "Data Collection",
+    Skill.objects.filter(name__in=["Data Entry", "Data Collection",
                                         "Manuscript Writing", "Proposal Writing",
                                         "Literature Review", "Data Analysis",
                                         "Lab Experience"
@@ -38,7 +38,7 @@ def remove_skills(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('researchhub', '0005_add_domain_and_skill'),
+        ('researchhub', '0006_many_to_many_skill'),
     ]
 
     operations = [

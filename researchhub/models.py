@@ -42,7 +42,7 @@ class Domain(models.Model):
         return self.name
 
 class Supervisor(models.Model):
-    domain = models.ForeignKey(Domain, default="")
+    domain = models.ForeignKey(Domain, null=True)
 
     year = models.ForeignKey('core.StudentClubYear', null=True,
                              on_delete=models.SET_NULL)
@@ -83,7 +83,7 @@ class Skill(models.Model):
         return self.name
 
 class SkilledStudent(models.Model):
-    skill = models.ForeignKey(Skill, default="")
+    skill = models.ManyToManyField(Skill)
 
     year = models.ForeignKey('core.StudentClubYear', null=True,
                              on_delete=models.SET_NULL)

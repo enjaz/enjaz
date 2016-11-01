@@ -9,7 +9,7 @@ from django.utils import timezone
 from core import decorators
 from core.models import StudentClubYear
 from post_office import mail
-from researchhub.models import Supervisor, Project, SkilledStudent
+from researchhub.models import Supervisor, Project, SkilledStudent, Domain, Skill
 from researchhub.forms import ProjectForm, MemberProjectForm, SupervisorForm, SkilledStudentForm, ConsultationForm
 from researchhub import utils
 from wkhtmltopdf.views import PDFTemplateView
@@ -182,8 +182,9 @@ def list_supervisors(request):
                        'unavailable_supervisors': unavailable_supervisors})
     else:
         supervisors = Supervisor.objects.available().order_by("-submission_date")
-        return render(request, "researchhub/list_supervisors.html",
-                      {'supervisors': supervisors})
+        domains = Domain.objects.all()
+        context = {'domains': domains, 'supervisors': supervisors}
+        return render(request, "researchhub/list_supervisors.html",context)
 
 @login_required
 @csrf.csrf_exempt
@@ -285,9 +286,10 @@ def delete_supervisor(request, pk):
     return {"message": "success", "list_url": full_url}
 
 def list_skills(request):
-    skills = SkilledStudent.objects.available().order_by("-submission_date")
-    return render(request, "researchhub/list_skills.html",
-                  {'skills': skills})
+    skilledstudents = SkilledStudent.objects.available().order_by("-submission_date")
+    skills = Skill.objects.all()
+    context = {'skilledstudents': skilledstudents, 'skills': skills}
+    return render(request, "researchhub/list_skills.html", context)
 
 @login_required
 @decorators.ajax_only

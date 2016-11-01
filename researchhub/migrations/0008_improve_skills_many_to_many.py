@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('researchhub', '0005_add_domain_and_skill'),
+        ('researchhub', '0007_add_data_to_domain_and_skill'),
     ]
 
     operations = [
@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='skilledstudent',
-            name='skill',
-            field=models.ManyToManyField(to='researchhub.Skill'),
+            name='skills',
+            field=models.ManyToManyField(to='researchhub.Skill', verbose_name='\u0627\u0644\u0645\u0647\u0627\u0631\u0629'),
         ),
     ]

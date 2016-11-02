@@ -20,13 +20,13 @@
     <div class="panel panel-info">
         <div class="panel-heading">
             <h4 class="panel-title">
-            <a data-toggle="collapse" href="#collapse{{ skill }}" data-target="#collapse{{ skill }}" class="collapsed">
+            <a data-toggle="collapse" href="#collapse{{ skill.pk }}" data-target="#collapse{{ skill.pk }}" class="collapsed">
 
                     {{ skill }}
                 </a>
             </h4>
         </div>
-    <div id="collapse{{ skill }}" class="panel-collapse collapse">
+    <div id="collapse{{ skill.pk }}" class="panel-collapse collapse">
             <div class="panel-body">
                 <div class="row">
                     <table class="display datatable dt-responsive">

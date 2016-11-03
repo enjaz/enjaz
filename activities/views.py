@@ -586,8 +586,7 @@ def review(request, activity_id, reviewer_id):
                               template="activity_held_to_coordinator",
                               context=email_context)
             activity.save()
-            return HttpResponseRedirect(reverse('activities:show',
-                                                args=(activity.pk, )))
+            return HttpResponseRedirect(reverse('activities:list'))
         # TODO: if not valid, show the error messages.
 
     else:
@@ -810,7 +809,7 @@ def show_invitation(request, pk):
         raise Http404
 
     if request.user.is_authenticated() and \
-       request.user in invitation.students.all():
+       invitation.students.filter(pk=request.user.pk).exists():
         already_on = True
     else:
         already_on = False
@@ -854,7 +853,7 @@ def toggle_confirm_invitation(request, pk):
             Tweet.objects.create(text=text.format(invitation.title, full_url),
                                  user=request.user)
     elif action == "remove":
-        if request.user in invitation.students.all():
+        if invitation.students.filter(pk=request.user.pk).exists():
             invitation.students.remove(request.user)
         else:
             raise Exception(u"لا تسجيل.")

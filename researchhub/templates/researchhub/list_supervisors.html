@@ -9,13 +9,13 @@
     <div class="panel panel-info">
         <div class="panel-heading">
             <h4 class="panel-title">
-            <a data-toggle="collapse" href="#collapse{{ domain }}" data-target="#collapse{{ domain }}" class="collapsed">
+            <a data-toggle="collapse" href="#collapse{{ domain.pk }}" data-target="#collapse{{ domain.pk }}" class="collapsed">
 
                     {{ domain }}
                 </a>
             </h4>
         </div>
-    <div id="collapse{{ domain }}" class="panel-collapse collapse">
+    <div id="collapse{{ domain.pk }}" class="panel-collapse collapse">
             <div class="panel-body">
                 <div class="row">
                     <table class="display datatable dt-responsive">

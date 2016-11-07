@@ -51,7 +51,8 @@ class ResearchHubSignupForm(SignupForm):
     en_last_name = forms.CharField(max_length=30)
     badge_number = forms.IntegerField(required=False)
     job_description = forms.CharField(widget=forms.Textarea)
-    specialty = forms.CharField(max_length=100)
+    #specialty = forms.CharField(max_length=100)
+    domain = forms.IntegerField()
     interests = forms.CharField(widget=forms.Textarea)
     communication = forms.CharField(widget=forms.Textarea)
     available_from = forms.DateField(required=False)
@@ -64,6 +65,11 @@ class ResearchHubSignupForm(SignupForm):
         # We don't want usernames (We could have inherited userena's
         # SignupFormOnlyEmail, but it's more tricky to modify.)
         del self.fields['username']
+
+        domain_choices = []
+        for domain in Domain.objects.all():
+            domain_choices += (domain.pk, domain.name)
+        self.fields['domain'].widget = forms.Select(choices=domain_choices)
 
     def clean(self):
         # Call the parent class's clean function.
@@ -81,6 +87,9 @@ class ResearchHubSignupForm(SignupForm):
         self.cleaned_data['email'] = self.cleaned_data['email'].lower()
         self.cleaned_data['username'] = self.cleaned_data['email'].split('@')[0]
         self.cleaned_data['username'] = self.cleaned_data['username']
+
+        domain_pk = self.cleaned_data['domain']
+        domain = Domain.objects.get(pk=domain_pk)
         new_user = super(ResearchHubSignupForm, self).save()
         current_year = StudentClubYear.objects.get_current()
         CommonProfile.objects.create(user=new_user,
@@ -97,7 +106,8 @@ class ResearchHubSignupForm(SignupForm):
                                   year=current_year,
                                   interests=self.cleaned_data['interests'],
                                   communication=self.cleaned_data['communication'],
-                                  specialty=self.cleaned_data['specialty'],
+                                  domain=domain,
+                                  #specialty=self.cleaned_data['specialty'],
                                   available_from=self.cleaned_data.get('available_from'),
                                   available_until=self.cleaned_data.get('available_until'))
         return new_user

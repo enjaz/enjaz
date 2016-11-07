@@ -207,7 +207,7 @@
         <div class="row">
 				<!-- tabs for the profile links -->
 				<ul class="nav nav-tabs">
-			{% if user|has_coordination_to_activity:activity or user|can_review_activity:activity or user|is_employee_of_any_club or user|is_deanship_of_students_affairs_coordinator_or_member %}
+			{% if user|can_read_reviews:activity or user.is_superuser %}
 				{% for reviewer in activity|get_activity_reviewing_parents %}
 					<li{% if active_tab == reviewer.pk %} class="active"{% endif %}>
 					<a href="{% url 'activities:review' activity.id reviewer.id %}">مراجعة {{ reviewer.name }}</a>

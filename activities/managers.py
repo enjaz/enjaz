@@ -2,10 +2,9 @@ from django.db import models
 from django.db.models.aggregates import Count
 from django.utils import timezone
 
-from clubs.utils import is_coordinator_of_any_club, is_deputy_of_any_club, get_user_clubs, \
-    get_user_coordination_and_deputyships
-from accounts.utils import get_user_city, get_user_gender
 from clubs.models import Club
+import accounts.utils
+import clubs.utils
 
 
 class ActivityQuerySet(models.QuerySet):
@@ -52,7 +51,7 @@ class ActivityQuerySet(models.QuerySet):
         city_condition = models.Q()
 
         if user and user.is_authenticated():
-            city = get_user_city(user)
+            city = accounts.utils.get_user_city(user)
             if city:
                 city_condition = models.Q(primary_club__city=city) | \
                                  models.Q(primary_club__city="")
@@ -62,7 +61,7 @@ class ActivityQuerySet(models.QuerySet):
         gender_condition = models.Q()
 
         if user and user.is_authenticated():
-            gender = get_user_gender(user)
+            gender = accounts.utils.get_user_gender(user)
             if gender:
                 gender_condition = models.Q(gender=gender) | \
                                    models.Q(gender="")
@@ -73,11 +72,20 @@ class ActivityQuerySet(models.QuerySet):
         club_condition = models.Q()
 
         if user and user.is_authenticated():
-            user_coordination = get_user_coordination_and_deputyships(user)
+            user_coordination = clubs.utils.get_user_clubs(user)
             user_clubs = user_coordination | user.memberships.current_year()
             club_condition = models.Q(primary_club__in=user_clubs) | \
                              models.Q(secondary_clubs__in=user_clubs) | \
                              models.Q(review__reviewer_club__in=user_clubs)
+
+            for club in user_clubs.filter(college__isnull=True):
+                # Gender-less, yay
+                club_condition |= models.Q(primary_club__english_name=club.english_name,
+                                           primary_club__city=club.city)
+                club_condition |= models.Q(review__reviewer_club__english_name=club.english_name,
+                                           review__reviewer_club__city=club.city)
+                club_condition |= models.Q(assignee__english_name=club.english_name,
+                                           assignee__city=club.city)
 
         return self.filter(club_condition)
 
@@ -112,8 +120,8 @@ class ActivityQuerySet(models.QuerySet):
         elif user.is_superuser:
             return self.all()
 
-        elif is_coordinator_of_any_club(user) or is_deputy_of_any_club(user):
-            clubs = get_user_coordination_and_deputyships(user)
+        elif clubs.utils.is_coordinator_of_any_club(user) or clubs.utils.is_deputy_of_any_club(user):
+            clubs = clubs.utils.get_user_coordination_and_deputyships(user)
             a = self.filter(primary_club__in=clubs)
 
             def get_reviewer_children(club):

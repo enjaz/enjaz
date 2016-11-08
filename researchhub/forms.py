@@ -68,7 +68,7 @@ class ResearchHubSignupForm(SignupForm):
 
         domain_choices = []
         for domain in Domain.objects.all():
-            domain_choices += (domain.pk, domain.name)
+            domain_choices.append((domain.pk, domain.name))
         self.fields['domain'].widget = forms.Select(choices=domain_choices)
 
     def clean(self):

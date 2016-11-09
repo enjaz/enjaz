@@ -40,7 +40,7 @@
         <tbody>
             {% for skilledstudent in skill.skilledstudent_set.all %}
             <tr>
-                <td><a href="{% url 'researchhub:show_skill' skill.pk %}">{{ skilledstudent.user.common_profile.get_en_full_name }}</a></td>
+                <td><a href="{% url 'researchhub:show_skill' skilledstudent.pk %}">{{ skilledstudent.user.common_profile.get_en_full_name }}</a></td>
                 <td>{{ skilledstudent.description|truncatechars:100 }}</td>
                 <td data-order="{{ project.submission_date|date:"U" }}">{{ skilledstudent.submission_date|date:"Y-n-j" }}</td>
             </tr>

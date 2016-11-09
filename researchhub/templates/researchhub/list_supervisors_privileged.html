@@ -27,7 +27,7 @@
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Specility</th>
+                        <th>Domain</th>
                         <th class="not-mobile">Interests</th>
                         <td class="not-mobile">Date added</td>
                         <td>Action</td>
@@ -37,7 +37,7 @@
                     {% for supervisor in available_supervisors %}
                     <tr>
                         <td><a href="{% url 'researchhub:show_supervisor' supervisor.pk %}">Dr. {{ supervisor.user.common_profile.get_en_full_name }}</a></td>
-                        <td>{{ supervisor.specialty }}</td>
+                        <td>{{ supervisor.domain }}</td>
                         <td>{{ supervisor.interests|linebreaksbr }}</td>
                         <td data-order="{{ supervisor.submission_date|date:"U" }}">{{ supervisor.submission_date|date:"Y-n-j" }}</td>
                         <td>

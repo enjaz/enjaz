@@ -85,8 +85,9 @@ def list_activities(request):
             # For club coordinators, deputies, and members, show
             # approved activities as well as their own club's pending
             # and rejected activities.
-            context['pending'] = Activity.objects.pending().undeleted().for_user_clubs(request.user).distinct()
-            context['rejected'] = Activity.objects.rejected().undeleted().for_user_clubs(request.user).distinct()
+            activity_poll = Activity.objects.undeleted().current_year().for_user_clubs(request.user).distinct()
+            context['pending'] = activity_poll.pending()
+            context['rejected'] = activity_poll.rejected()
 
             # Only display to coordinators and deputies
             if clubs.utils.is_coordinator_or_deputy_of_any_club(request.user):

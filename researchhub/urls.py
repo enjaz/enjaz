@@ -21,7 +21,8 @@ urlpatterns = patterns('',
     url(r'^projects/(?P<pk>\d+)/delete/$', views.delete_project, name="delete_project"),
 
     # Supervisors
-    url(r'^supervisors/$', views.list_supervisors, name="list_supervisors"),
+    url(r'^supervisors/domains/$', views.list_domains, name="list_domains"),
+    url(r'^supervisors/domains/(?P<pk>\d+)/$', views.list_supervisors, name="list_supervisors"),
     url(r'^supervisors/control/$', views.control_supervisors, name="control_supervisors"),
     #url(r'^supervisors/invitation$', TemplateView.as_view(template_name='researchhub/invitation.html'), name="invitation"),
     url(r'^supervisors/invitation$', views.InvitationView.as_view(cmd_options = {

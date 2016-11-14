@@ -492,10 +492,13 @@ class Episode(models.Model):
         return (self.end_date - self.start_date).days
     
     def start_datetime(self):
-        return datetime.combine(self.start_date, self.start_time)
-    
+        start_datetime = datetime.combine(self.start_date, self.start_time)
+        start_datetime = timezone.make_aware(start_datetime, timezone.get_default_timezone())
+        return start_datetime
+
     def end_datetime(self):
         end_datetime = datetime.combine(self.end_date, self.end_time)
+        end_datetime = timezone.make_aware(end_datetime, timezone.get_default_timezone())
         if self.start_datetime() == end_datetime:
             return end_datetime + timedelta(seconds=1)
         else:

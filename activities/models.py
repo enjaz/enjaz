@@ -557,8 +557,7 @@ class Episode(models.Model):
         """
         return self.activity.is_approved and \
                self.requires_report and \
-               self.end_datetime() < datetime.now() < self.report_due_date() and \
-               not self.report_is_submitted()
+               self.end_datetime() < timezone.now() < self.report_due_date()
 
     def report_is_overdue(self):
         """
@@ -568,8 +567,7 @@ class Episode(models.Model):
         """
         return self.activity.is_approved and \
                self.requires_report and \
-               datetime.now() > self.report_due_date() and \
-               not self.report_is_submitted()
+               timezone.now() > self.report_due_date()
 
     def get_reviewed_niqati_orders(self):
         return self.order_set.filter(is_approved__isnull=False)

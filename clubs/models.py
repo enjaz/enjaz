@@ -164,7 +164,7 @@ class Club(models.Model):
         for activity in self.primary_activity.approved():
             episodes.extend(activity.episode_set.all())
         # Get all club's episodes whose report is overdue
-        overdue_episodes = filter(lambda x: x.report_is_overdue(),
+        overdue_episodes = filter(lambda x: x.report_is_overdue() and not x.report_is_submitted(),
                                   episodes)
         return len(overdue_episodes)
 

@@ -146,7 +146,7 @@
 			            		<a class="btn btn-primary btn-xs disabled">لم يرفع تقرير العمادة بعد</a>
                             {# only show the link if the user is not an employee #}
                             {% elif episode.requires_report and user|can_submit_employeereport %}
-                                {% if episode.report_is_due and not episode.report_is_submitted %}
+                                {% if episode.report_is_due and not episode.employee_report_is_submitted %}
                                     <a href="{% url 'media:submit_employee_report' episode.pk %}"
                                     class="btn btn-gold btn-xs">ارفع تقرير العمادة</a>
 

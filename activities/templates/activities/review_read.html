@@ -245,6 +245,13 @@
                     <p>لا يوجد.</p>
                 {% endfor %}
                 </td>
+                <td>
+                    {% if review.attachment_notes %}
+                        {{ review.attachment_notes|linebreaksbr }}
+                    {% else %}
+                        لا يوجد.
+                    {% endif %}
+                </td>
             </tr>
 			{% endif %}<tr>
 				<th>موعد تقديم الطلب</th>

@@ -86,6 +86,13 @@ def has_genderless_coordination_to_activity(user, activity):
     activity_clubs = get_activity_clubs(activity)
 
     for club in user_coordination_and_deputyships:
+        # In case of college clubs, the presence of the club itself
+        # among the activity club means that the user has coordination
+        # privileges
+        if club in activity_clubs:
+            return True
+        # In cases of specialized clubs, we need it to be genderless,
+        # so we rely on a club having the same name and city.
         if activity_clubs.filter(english_name=club.english_name,
                                  city=club.city,
                                  college__isnull=True).exists():

@@ -814,6 +814,8 @@ def toggle_confirm_invitation(request, pk):
             raise Exception(u"هذا النشاط ليس متاحًا في مدينتك.")
         if not invitation.is_available_for_user_gender(request.user):
             raise Exception(u"هذا النشاط يستهدف {} فقط".format(invitation.get_gender_display()))
+        if invitation.is_fully_booked():
+            raise Exception(u"اكتملت المقاعد الممكنة لهذا الحدث، ولم يعد ممكنا التسجيل فيه!")
         invitation.students.add(request.user)
         if request.user.social_auth.exists():
             show_url = reverse('activities:show_invitation', args=(invitation.pk,))

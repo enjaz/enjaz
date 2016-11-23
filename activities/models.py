@@ -701,6 +701,9 @@ class Invitation(models.Model):
     publication_date = models.DateTimeField(u"تاريخ النشر",
                                             blank=True, null=True)
     students = models.ManyToManyField(User, blank=True)
+    maximum_registrants = models.PositiveIntegerField(u"أقصى عدد للمسجلين والمسجلات",
+                                                      null=True,
+                                                      blank=True)
     location = models.CharField(u"المكان", default="",
                                 max_length=200)
     date = models.DateField(u"التاريخ")
@@ -734,6 +737,12 @@ class Invitation(models.Model):
         combined = datetime.combine(self.date, self.end_time)
         timezoned = timezone.make_aware(combined, timezone.get_default_timezone())
         return timezoned
+
+    def is_fully_booked(self):
+        if not self.maximum_registrants:
+            return False
+        else:
+            return self.students.count() >= self.maximum_registrants
 
     def __unicode__(self):
         return self.title

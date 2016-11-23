@@ -26,7 +26,7 @@
     font-weight: lighter;
     src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
 }
-		
+
 @font-face {
     font-family: 'GE Dinar One';
     font-weight: normal;
@@ -38,7 +38,7 @@ body {
 }
 
 html.detail{
-    background: linear-gradient( rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8) ){% if invitation.background %}, url("{{ invitation.background.url }}"){% endif %} no-repeat center center fixed; 
+    background: linear-gradient( rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8) ){% if invitation.background %}, url("{{ invitation.background.url }}"){% endif %} no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -133,10 +133,17 @@ margin-bottom: 5px;
                     {% if invitation.logo %}
                     <img class="bounceInDown" style="max-height: 300px;" src="{{ invitation.logo.url }}">
                     {% endif %}
+                    {% if invitation.is_fully_booked and not already_on or restricted_by_city or restricted_by_gender  %}
+                    <p class="alert alert-warning">
+                    <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
                     {% if restricted_by_city %}
-                    <p class="alert alert-warning">هذا النشاط غير مُتاح في {{ user.common_profile.get_city_display }}.</p>
+                    هذا النشاط غير مُتاح في {{ user.common_profile.get_city_display }}.
                     {% elif restricted_by_gender %}
-                    <p class="alert alert-warning">هذا النشاط لا يستهدف ال{{ user.common_profile.college.get_gender_display }} بل ال{{ invitation.get_gender_display }}.</p>
+                    هذا النشاط لا يستهدف ال{{ user.common_profile.college.get_gender_display }} بل ال{{ invitation.get_gender_display }}.
+                    {% elif invitation.is_fully_booked %}
+                    اكتملت المقاعد الممكنة لهذا الحدث، ولم يعد ممكنا التسجيل فيه!
+                    {% endif %}
+                    </p>
                     {% endif %}
                     <h1>{{ invitation.title }}</h1>
                     <p style="font-size: 1.2em;">{{ invitation.short_description|safe }}</p>
@@ -160,16 +167,21 @@ margin-bottom: 5px;
 								{{ invitation.location }}
 							</div>
                 </div>
+                {% if already_on or not invitation.is_fully_booked and not restricted_by_city and not restricted_by_gender  %}
                 <div class="text-center">
-
                 {% if user.is_authenticated and not already_on %}
                 <button data-action="add" id="confirm" class="btn btn-lg btn-success">أكّد حضوري</button>
+                {% if not user.social_auth.exists %}
+                <br>
+                <a style="margin-top: 5px; background-color: #1da1f3; color: white;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-lg"><i class="fa fa-twitter"></i> اربط حسابي بتويتر</a>
+                {% endif %}
                 {% elif user.is_authenticated and already_on %}
                 <button data-action="remove" id="confirm" class="btn btn-sm btn-danger">ألغِ تأكيد حضوري</button>
                 {% else %}
-                <a href="{% url 'userena_signin' %}?next={{ request.path }}" class="btn btn-lg btn-success">أدخلني لإنجاز كي أؤكد الحضور</a>
+                <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لإنجاز كي أؤكد الحضور</a>
                 {% endif %}
                 </div>
+                {% endif %}
                 <!-- Footer -->
                 <footer>
                         <div class="row">
@@ -232,14 +244,14 @@ margin-bottom: 5px;
                             $("#confirm").addClass("btn-success btn-lg")
                                          .removeClass("btn-danger btn-sm");
                         }
-                        
+
                     } else {
                         toastr.error(data.message);
                     }
                 }
             });
         });
-        
+
     });
     </script>
 {%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
@@ -291,9 +303,8 @@ $(function(){
 });
 {% endif %}
 </script>
-    
+
 
 {% endif %}
 </body>
 </html>
-

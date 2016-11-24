@@ -794,9 +794,16 @@ def show_invitation(request, pk):
     else:
         restricted_by_gender = True
 
+    if invitation.is_open_registration:
+        open_registration = True
+    else:
+        open_registration = False
+
+
     context = {'invitation': invitation, 'already_on': already_on,
                'restricted_by_gender': restricted_by_gender,
-               'restricted_by_city': restricted_by_city}
+               'restricted_by_city': restricted_by_city,
+               'open_registration':open_registration}
     return render(request, 'activities/show_invitation.html', context)
 
 @decorators.ajax_only
@@ -825,9 +832,28 @@ def toggle_confirm_invitation(request, pk):
                 text += u"\n#" + invitation.hashtag
             Tweet.objects.create(text=text.format(invitation.title, full_url),
                                  user=request.user)
+    elif action == "sign":
+        if not invitation.is_available_for_user_city(request.user):
+            raise Exception(u"هذا النشاط ليس متاحًا في مدينتك.")
+        if not invitation.is_available_for_user_gender(request.user):
+            raise Exception(u"هذا النشاط يستهدف {} فقط".format(invitation.get_gender_display()))
+        if invitation.is_fully_booked():
+            raise Exception(u"اكتملت المقاعد الممكنة لهذا الحدث، ولم يعد ممكنا التسجيل فيه!")
+        invitation.registered_students.add(request.user)
+        if request.user.social_auth.exists():
+            show_url = reverse('activities:show_invitation', args=(invitation.pk,))
+            full_url = request.build_absolute_uri(show_url)
+            text = u"سجلت للحضور {}.\nيمكنك التسجيل للحضور من هنا: {}"
+            if invitation.hashtag:
+                text += u"\n#" + invitation.hashtag
+            Tweet.objects.create(text=text.format(invitation.title, full_url),
+                                 user=request.user)
     elif action == "remove":
         if invitation.students.filter(pk=request.user.pk).exists():
             invitation.students.remove(request.user)
+    elif action == "remove-registration":
+        if invitation.registered_students.filter(pk=request.user.pk).exists():
+            invitation.registered_students.remove(request.user)
         else:
             raise Exception(u"لا تسجيل.")
 

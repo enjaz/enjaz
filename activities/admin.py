@@ -1,4 +1,9 @@
 # -*- coding: utf-8  -*-
+from django.contrib import admin
+from django.contrib.admin.forms import AdminAuthenticationForm
+from django.contrib.auth.admin import UserAdmin
+import media.utils
+
 from datetime import timedelta
 from django.utils import timezone
 from django.forms import ModelForm
@@ -6,6 +11,22 @@ from django.contrib import admin
 from activities.models import Activity, Episode, Category, Evaluation, Review, Assessment, Criterion, DepositoryItem, Invitation
 from clubs.models import Club
 from core.models import StudentClubYear
+
+class InvitationsAuthenticationForm(AdminAuthenticationForm):
+    def confirm_login_allowed(self, user):
+        if not user.is_active and \
+           not (media.utils.is_media_coordinator_or_deputy(user)):
+            raise forms.ValidationError(
+                self.error_messages['invalid_login'],
+                code='invalid_login',
+                params={'username': self.username_field.verbose_name}
+                )
+class InvitationsAdmin(admin.sites.AdminSite):
+    login_form = InvitationsAuthenticationForm
+
+    def has_permission(self, request):
+        return media.utils.is_media_coordinator_or_deputy(request.user) or \
+               request.user.is_superuser
 
 class EpisodeInline(admin.TabularInline):
     model = Episode
@@ -93,11 +114,11 @@ class InvitationAdmin(admin.ModelAdmin):
     list_display = ('title', 'get_start_datetime',
                     'get_student_count', 'submission_date')
     search_fields = ('title',)
-    filter_horizontal = ('students','registered_students')
+    filter_horizontal = ('students',)
 
     def get_student_count(self, obj):
         return obj.students.count()
-
+invitation_admin =InvitationsAdmin("Invitations Admin")
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(Category)
 admin.site.register(Assessment)
@@ -105,3 +126,5 @@ admin.site.register(Criterion)
 admin.site.register(Evaluation, EvaluationAdmin)
 admin.site.register(DepositoryItem, DepositoryItemAdmin)
 admin.site.register(Invitation, InvitationAdmin)
+invitation_admin.register(Invitation, InvitationAdmin)
+

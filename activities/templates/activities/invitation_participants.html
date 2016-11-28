@@ -1,0 +1,41 @@
+{% extends 'activities_base.html' %}{% load bootstrap3 %}
+{% block content %}
+
+<div class="panel minimal minimal-gray">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<h2>المسجلين</h2>
+		</div>
+	</div>
+	<div class="panel-body">
+		<div class="col-md-12">
+		<div class="panel panel-success panel-shadow" data-collapsed="0">
+
+
+
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>الأسم  </th>
+							<th>الكلية  </th>
+                            <th> الإيميل  </th>
+
+						</tr>
+					</thead>
+
+					<tbody>
+						<tr>
+						{% for student in invitation.students %}
+							<td dir="auto"><a href=""> {{ invitation.students.user.common_profile.get_ar_full_name  }}</a></td>
+							<td>{{ invitation.students.user.common_profile.college.get_name_display }}</td>
+							<td> {{ invitation.students.user.email }}</td>
+						{% endfor %}
+						</tr>
+					</tbody>
+				</table>
+
+			</div>
+			</div>
+
+
+{% endblock %}

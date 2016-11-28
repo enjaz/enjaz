@@ -1,4 +1,5 @@
 <!DOCTYPE html>{% load staticfiles %}
+
 <html class="detail" lang="ar">
 
 <head>
@@ -21,6 +22,7 @@
     <link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
 <style>
+
 @font-face {
     font-family: 'GE Dinar One';
     font-weight: lighter;
@@ -132,6 +134,9 @@ margin-bottom: 5px;
                 <div class="text-center">
                     {% if invitation.logo %}
                     <img class="bounceInDown" style="max-height: 300px;" src="{{ invitation.logo.url }}">
+                    {% elif invitation.club.logo %}
+                    <img class="bounceInDown" style="max-height: 300px;" src="{{ invitation.club.logo.url }}">
+                    {% else %}
                     {% endif %}
                     {% if invitation.is_fully_booked and not already_on or restricted_by_city or restricted_by_gender  %}
                     <p class="alert alert-warning">
@@ -169,20 +174,26 @@ margin-bottom: 5px;
                 </div>
                 {% if already_on or not invitation.is_fully_booked and not restricted_by_city and not restricted_by_gender  %}
                 <div class="text-center">
-                {% if user.is_authenticated and not already_on and open_registration  %}
-                <button data-action="add" id="confirm" class="btn btn-lg btn-success">أكّد حضوري</button>
+                {% if user.is_authenticated and not already_on   %}
+                    {% if open_registration %}
+                        <button data-action="add" id="confirm" class="btn btn-lg btn-success">أكّد حضوري</button>
+                    {% elif not open_registration %}
+                        <button data-action="add" id="confirm" class="btn btn-lg btn-success">سجل</button>
+                        <p> سوف ترسل رسائل تأكيد قبيل الحدث لجميع المقبولين </p>
+                        <p> والمقبولات لحضور هذا الحدث</p>
+                    {% endif %}
                 {% if not user.social_auth.exists %}
                 <br>
                 <a style="margin-top: 5px; background-color: #1da1f3; color: white;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-lg"><i class="fa fa-twitter"></i> اربط حسابي بتويتر</a>
                 {% endif %}
-                {% elif user.is_authenticated and already_on and open_registration %}
-                <button data-action="remove" id="confirm" class="btn btn-sm btn-danger">ألغِ تأكيد حضوري</button>
-                {% elif user.is_authenticated and not open_registration  %}
-                <button data-action="sign" id="confirm" class="btn btn-lg btn-success">سجل</button>
-                    <p> سوف ترسل رسائل تأكيد قبيل الحدث لجميع المقبولين </p>
-                    <p> والمقبولات لحضور هذا الحدث</p>
-                {% elif user.is_authenticated and already_on and not open_registration %}
-                <button data-action="remove-registration" id="confirm" class="btn btn-sm btn-danger">ألغِ تسجيلي</button>
+                {% elif user.is_authenticated and already_on  %}
+                    {% if open_registration %}
+                        <button data-action="add" id="confirm" class="btn btn-lg btn-success">ألغِ تأكيد حظوري </button>
+                    {% elif not open_registration %}
+                        <button data-action="add" id="confirm" class="btn btn-lg btn-success">ألغِ تسجيلي</button>
+                        <p> سوف ترسل رسائل تأكيد قبيل الحدث لجميع المقبولين </p>
+                        <p> والمقبولات لحضور هذا الحدث</p>
+                    {% endif %}
 
                 {% else %}
                 <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لإنجاز كي أؤكد الحضور</a>
@@ -260,39 +271,7 @@ margin-bottom: 5px;
         });
 
     });
-    $(function(){
-        toastr.options.positionClass = "toast-top-left";
-        $("#confirm").click(function(){
-            action = $(this).data("action");
-            $.ajax({
-                url: "{% url 'activities:toggle_confirm_invitation' invitation.pk %}",
-                type: 'POST',
-                data: {action: action},
-                cache: false,
-                success: function (data) {
-                    if (data.success) {
-                        if (action == "sign"){
-                            toastr.success("تم تسجيلك!");
-                            $("#confirm").data("action", "remove-registration");
-                            $("#confirm").html("ألغِ تسجيلي");
-                            $("#confirm").addClass("btn-danger btn-sm")
-                                         .removeClass("btn-success btn-lg");
-                        } else if (action == "remove-registration") {
-                            toastr.success("أُلغي  تسجيلك");
-                            $("#confirm").data("action", "add");
-                            $("#confirm").html(" سجل");
-                            $("#confirm").addClass("btn-success btn-lg")
-                                         .removeClass("btn-danger btn-sm");
-                        }
 
-                    } else {
-                        toastr.error(data.message);
-                    }
-                }
-            });
-        });
-
-    });
     </script>
 {%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
 <!---Twitter Modal -->>

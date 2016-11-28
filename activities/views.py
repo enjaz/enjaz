@@ -832,29 +832,23 @@ def toggle_confirm_invitation(request, pk):
                 text += u"\n#" + invitation.hashtag
             Tweet.objects.create(text=text.format(invitation.title, full_url),
                                  user=request.user)
-    elif action == "sign":
-        if not invitation.is_available_for_user_city(request.user):
-            raise Exception(u"هذا النشاط ليس متاحًا في مدينتك.")
-        if not invitation.is_available_for_user_gender(request.user):
-            raise Exception(u"هذا النشاط يستهدف {} فقط".format(invitation.get_gender_display()))
-        if invitation.is_fully_booked():
-            raise Exception(u"اكتملت المقاعد الممكنة لهذا الحدث، ولم يعد ممكنا التسجيل فيه!")
-        invitation.registered_students.add(request.user)
-        if request.user.social_auth.exists():
-            show_url = reverse('activities:show_invitation', args=(invitation.pk,))
-            full_url = request.build_absolute_uri(show_url)
-            text = u"سجلت للحضور {}.\nيمكنك التسجيل للحضور من هنا: {}"
-            if invitation.hashtag:
-                text += u"\n#" + invitation.hashtag
-            Tweet.objects.create(text=text.format(invitation.title, full_url),
-                                 user=request.user)
+
+
     elif action == "remove":
         if invitation.students.filter(pk=request.user.pk).exists():
             invitation.students.remove(request.user)
-    elif action == "remove-registration":
-        if invitation.registered_students.filter(pk=request.user.pk).exists():
-            invitation.registered_students.remove(request.user)
         else:
             raise Exception(u"لا تسجيل.")
 
     return {}
+def invitation_participants(request, pk):
+    invitation = get_object_or_404(Invitation, pk=pk)
+    activity = invitation.activity
+    if not request.user.is_superuser and not is_media_coordinator_or_member(user):
+        raise PermissionDenied
+    if invitation.activity:
+        if not clubs.utils.has_coordination_to_activity(user, activity) and not \
+            clubs.utils.is_member(activity.primary_club, user):
+            raise PermissionDenied
+    return render(request, 'activities/invitation_participants.html')
+

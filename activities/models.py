@@ -684,6 +684,7 @@ class Invitation(models.Model):
     is_open_registration = models.BooleanField(default=True, verbose_name=u"نشاط مفتوح ؟")
     title = models.CharField(u"الاسم", default="", max_length=100)
     activity = models.ForeignKey(Activity, null=True, blank=True)
+    club = models.ForeignKey(Club, null=True, blank=True)
     city = models.CharField(u"المدينة", max_length=1, blank=True,
                             default="", choices=city_choices)
     gender = models.CharField(u"الجندر", max_length=1,
@@ -702,9 +703,6 @@ class Invitation(models.Model):
     publication_date = models.DateTimeField(u"تاريخ النشر",
                                             blank=True, null=True)
     students = models.ManyToManyField(User, blank=True,verbose_name=u"المقبولين")
-    registered_students = models.ManyToManyField(User, verbose_name=u"المسجلن",
-                                      blank=True,
-                                      related_name="registered")
     maximum_registrants = models.PositiveIntegerField(u"أقصى عدد للمسجلين والمسجلات",
                                                       null=True,
                                                       blank=True)

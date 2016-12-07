@@ -3,8 +3,9 @@ Utility functions for the activities app.
 """
 from activities.models import Activity
 from clubs.models import Club
-from clubs.utils import has_coordination_to_activity, get_user_clubs, get_user_coordination_and_deputyships
-from media.utils import get_user_media_center, is_media_member
+import media.utils
+import clubs.utils
+
 
 def get_club_notification_to(activity):
     """Return the address that should be sent an email notifcation in the
@@ -48,7 +49,7 @@ def forms_editor_check(user, object):
     # Confirm that the passed object is an ``Activity`` instance
     if not isinstance(object, Activity):
         raise TypeError("Expected an Activity object, received %s" % type(object))
-    return has_coordination_to_activity(user, object) or user.is_superuser
+    return clubs.utils.has_coordination_to_activity(user, object) or user.is_superuser
 
 
 def get_club_assessing_club_by_user(user, club):
@@ -57,10 +58,10 @@ def get_club_assessing_club_by_user(user, club):
 
     media_centers = Club.objects.current_year().filter(english_name__contains='Media Center',
                                                    city=club.city)
-    user_media_center = get_user_media_center(user)
+    user_media_center = media.utils.get_user_media_center(user)
 
     if user_media_center in media_centers:
-        if is_media_member(user):
+        if media.utils.is_media_member(user):
             if club.media_assessor and club.media_assessor != user:
                 return
         return user_media_center
@@ -80,7 +81,7 @@ def get_club_assessing_club_by_user(user, club):
                                                  city=club.city,
                                                  gender=club_gender)
 
-    if presidency in get_user_coordination_and_deputyships(user):
+    if presidency in clubs.utils.get_user_coordination_and_deputyships(user):
         return presidency
 
 def can_assess_club(user, club, category=""):
@@ -105,4 +106,10 @@ def can_view_assessments(user, club):
         return False
 
 def can_assess_any_club(user):
-    return get_user_clubs(user).filter(can_assess=True).exists() or user.is_superuser
+    return clubs.utils.get_user_clubs(user).filter(can_assess=True).exists() or user.is_superuser
+
+def can_read_reviews(user, activity):
+    return clubs.utils.has_genderless_coordination_to_activity(user, activity) or \
+        clubs.utils.can_review_any_activity(user) or \
+        clubs.utils.is_employee_of_any_club(user) or \
+        clubs.utils.is_deanship_of_students_affairs_coordinator_or_member(user)

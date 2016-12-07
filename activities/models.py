@@ -492,10 +492,13 @@ class Episode(models.Model):
         return (self.end_date - self.start_date).days
     
     def start_datetime(self):
-        return datetime.combine(self.start_date, self.start_time)
-    
+        start_datetime = datetime.combine(self.start_date, self.start_time)
+        start_datetime = timezone.make_aware(start_datetime, timezone.get_default_timezone())
+        return start_datetime
+
     def end_datetime(self):
         end_datetime = datetime.combine(self.end_date, self.end_time)
+        end_datetime = timezone.make_aware(end_datetime, timezone.get_default_timezone())
         if self.start_datetime() == end_datetime:
             return end_datetime + timedelta(seconds=1)
         else:
@@ -557,7 +560,7 @@ class Episode(models.Model):
         """
         return self.activity.is_approved and \
                self.requires_report and \
-               self.end_datetime() < datetime.now() < self.report_due_date()
+               self.end_datetime() < timezone.now() < self.report_due_date()
 
     def report_is_overdue(self):
         """
@@ -567,7 +570,7 @@ class Episode(models.Model):
         """
         return self.activity.is_approved and \
                self.requires_report and \
-               datetime.now() > self.report_due_date()
+               timezone.now() > self.report_due_date()
 
     def get_reviewed_niqati_orders(self):
         return self.order_set.filter(is_approved__isnull=False)
@@ -698,6 +701,9 @@ class Invitation(models.Model):
     publication_date = models.DateTimeField(u"تاريخ النشر",
                                             blank=True, null=True)
     students = models.ManyToManyField(User, blank=True)
+    maximum_registrants = models.PositiveIntegerField(u"أقصى عدد للمسجلين والمسجلات",
+                                                      null=True,
+                                                      blank=True)
     location = models.CharField(u"المكان", default="",
                                 max_length=200)
     date = models.DateField(u"التاريخ")
@@ -731,6 +737,12 @@ class Invitation(models.Model):
         combined = datetime.combine(self.date, self.end_time)
         timezoned = timezone.make_aware(combined, timezone.get_default_timezone())
         return timezoned
+
+    def is_fully_booked(self):
+        if not self.maximum_registrants:
+            return False
+        else:
+            return self.students.count() >= self.maximum_registrants
 
     def __unicode__(self):
         return self.title

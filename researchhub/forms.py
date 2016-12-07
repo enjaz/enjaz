@@ -26,10 +26,17 @@ class MemberProjectForm(forms.ModelForm):
                   'required_role', 'prerequisites', 'duration',
                   'communication', 'is_personal']
 
-class SupervisorForm(forms.ModelForm):
+class AddSupervisorForm(forms.ModelForm):
     class Meta:
         model = Supervisor
         fields = ['user', 'avatar', 'domain', 'interests',
+                  'communication', 'is_hidden', 'available_from',
+                  'available_until']
+
+class EditSupervisorForm(forms.ModelForm):
+    class Meta:
+        model = Supervisor
+        fields = ['avatar', 'domain', 'interests',
                   'communication', 'is_hidden', 'available_from',
                   'available_until']
 
@@ -55,8 +62,8 @@ class ResearchHubSignupForm(SignupForm):
     domain = forms.IntegerField()
     interests = forms.CharField(widget=forms.Textarea)
     communication = forms.CharField(widget=forms.Textarea)
-    available_from = forms.DateField(required=False)
-    available_until = forms.DateField(required=False)
+    #available_from = forms.DateField(required=False)
+    #available_until = forms.DateField(required=False)
     city = forms.CharField(max_length=1,
                            widget=forms.Select(choices=city_choices))
 
@@ -106,8 +113,8 @@ class ResearchHubSignupForm(SignupForm):
                                   year=current_year,
                                   interests=self.cleaned_data['interests'],
                                   communication=self.cleaned_data['communication'],
-                                  domain=domain,
                                   #specialty=self.cleaned_data['specialty'],
-                                  available_from=self.cleaned_data.get('available_from'),
-                                  available_until=self.cleaned_data.get('available_until'))
+                                  #available_from=self.cleaned_data.get('available_from'),
+                                  #available_until=self.cleaned_data.get('available_until'),
+                                  domain=domain)
         return new_user

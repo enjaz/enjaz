@@ -1,10 +1,10 @@
 {% extends "researchhub_base.html" %}{% load staticfiles %}{% load researchhub_tags %}{% load l10n %}
-{% block title %}ResearchHub Supervisors{% endblock %}
+{% block title %}{{ domain }} Supervisors{% endblock %}
 {% block content %}
 {% localize off %}
 <div class="english-field">
-    <h1 class="english-field">ResearchHub Supervisors</h1>
-    <p>Below you is the list of our super-helpful supervisors who are willing to oversee student-initiated projects.</p>
+    <h1 class="english-field">{{ domain }} Supervisors</h1>
+    <p>Below you is the list of our super-helpful supervisors who are willing to oversee student-initiated projects in {{ domain }}.</p>
     <div class="row" style="margin-left: 0; margin-bottom: 5px;">
         <div style="float: right;">
             <a id="add-supervisor" class="btn btn-icon btn-success">
@@ -27,7 +27,7 @@
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Specility</th>
+                        <th>Domain</th>
                         <th class="not-mobile">Interests</th>
                         <td class="not-mobile">Date added</td>
                         <td>Action</td>
@@ -37,7 +37,7 @@
                     {% for supervisor in available_supervisors %}
                     <tr>
                         <td><a href="{% url 'researchhub:show_supervisor' supervisor.pk %}">Dr. {{ supervisor.user.common_profile.get_en_full_name }}</a></td>
-                        <td>{{ supervisor.specialty }}</td>
+                        <td>{{ supervisor.domain }}</td>
                         <td>{{ supervisor.interests|linebreaksbr }}</td>
                         <td data-order="{{ supervisor.submission_date|date:"U" }}">{{ supervisor.submission_date|date:"Y-n-j" }}</td>
                         <td>
@@ -65,7 +65,7 @@
     <div id="collapse-unavailable" class="panel-collapse collapse in">
         <div class="panel-body"><div class="row">
             <div class="col-offset-md-1 col-md-10">
-                The following list contains the supervisors that are explicitly hidden, and that are not currently available.  By clicking 'Hide', you override the specified availability dates. 
+                The following list contains the supervisors that are explicitly hidden, and that are not currently available.  By clicking 'Hide', you override the specified availability dates.
             </div>
             <table class="display datatable dt-responsive">
                 <thead>

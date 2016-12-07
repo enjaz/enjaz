@@ -36,6 +36,7 @@ class Project(models.Model):
 
 class Domain(models.Model):
     name = models.CharField(max_length=100)
+    description = models.TextField(blank= True)
     image = models.FileField(upload_to='researchhub/domain/', blank=True)
 
     def __unicode__(self):
@@ -77,13 +78,14 @@ class Supervisor(models.Model):
 
 class Skill(models.Model):
     name = models.CharField(max_length=100)
+    description = models.TextField(blank= True)
     image = models.FileField(upload_to='researchhub/skill/', blank=True)
 
     def __unicode__(self):
         return self.name
 
 class SkilledStudent(models.Model):
-    skills = models.ManyToManyField(Skill, verbose_name=u"المهارة")
+    skills = models.ManyToManyField(Skill, help_text="Hold down (Control), or (Command) on a Mac, to select more than one.")
 
     year = models.ForeignKey('core.StudentClubYear', null=True,
                              on_delete=models.SET_NULL)

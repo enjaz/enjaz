@@ -87,8 +87,8 @@ $(function(){
 
         $("#edit-supervisor-modal .modal-title").html("Edit {{ supervisor.user.common_profile.get_en_full_name }}");
         $("#edit-supervisor-modal .modal-body").load("{% url 'researchhub:edit_supervisor' supervisor.pk %}", function(){
-            $("#id_available_from").attr('data-start-view', '1').datepicker({minDate: 1});
-            $("#id_available_until").attr('data-start-view', '1').datepicker({minDate: 1});
+            $("#id_available_from").attr('data-start-view', '1').datepicker({minDate: 0});
+            $("#id_available_until").attr('data-start-view', '1').datepicker({minDate: 0});
         });
 
         var $submitButton = $("#edit-supervisor-modal button.submit-button");

@@ -8,10 +8,10 @@
     <div class="row">
 
 
-                <div class="col-md-4"><a class="book-image" style="background-image:url('{{ domain.image }}');" href="{% url 'researchhub:list_supervisors' domain.pk %}"></a>
+                <div class="col-md-4">{% if domain.image %}<a class="book-image" style="background-image:url('{{ domain.image }}');" href="{% url 'researchhub:list_supervisors' domain.pk %}"></a>{% endif %}
                 <h2><a href="{% url 'researchhub:list_supervisors' domain.pk %}">{{ domain.name }}</a></h2>
                     </div>
-                <div class="col-md-8"><p style="color: #574802; background-color: #ffefa4; border-color: #ffd78a; width: 100%; font-size: 16px; text-align: justify; margin-right: auto; margin-left: auto;" class="alert section-intro">{{domain.description|linebreaksbr}}</p>
+                <div class="col-md-8">{% if domain.description %}<p style="color: #574802; background-color: #ffefa4; border-color: #ffd78a; width: 100%; font-size: 16px; text-align: justify; margin-right: auto; margin-left: auto;" class="alert section-intro">{{domain.description|linebreaksbr}}</p>{% endif %}
                     </div>
 
     </div>
@@ -22,6 +22,3 @@
 {% block customscript %}
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
 {% endblock %}
-
-
-

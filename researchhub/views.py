@@ -10,7 +10,7 @@ from core import decorators
 from core.models import StudentClubYear
 from post_office import mail
 from researchhub.models import Supervisor, Project, SkilledStudent, Domain, Skill
-from researchhub.forms import ProjectForm, MemberProjectForm, SupervisorForm, SkilledStudentForm, ConsultationForm
+from researchhub.forms import ProjectForm, MemberProjectForm, AddSupervisorForm, EditSupervisorForm, SkilledStudentForm, ConsultationForm
 from researchhub import utils
 from wkhtmltopdf.views import PDFTemplateView
 
@@ -172,18 +172,25 @@ def delete_project(request, pk):
     full_url = request.build_absolute_uri(list_projects_url)
     return {"message": "success", "list_url": full_url}
 
-def list_supervisors(request):
+def list_domains(request):
+    domains = Domain.objects.all()
+    return render(request, "researchhub/list_domains.html",
+                      {'domains': domains})
+
+def list_supervisors(request, pk):
     if utils.is_researchhub_coordinator_or_member(request.user) or\
        request.user.is_superuser:
-        available_supervisors = Supervisor.objects.available().order_by("-submission_date")
-        unavailable_supervisors = Supervisor.objects.unavailable().order_by("-submission_date")
+        domain = get_object_or_404(Domain, pk=pk)
+        available_supervisors = Supervisor.objects.available().order_by("-submission_date").filter(domain=domain)
+        unavailable_supervisors = Supervisor.objects.unavailable().order_by("-submission_date").filter(domain=domain)
         return render(request, "researchhub/list_supervisors_privileged.html",
                       {'available_supervisors': available_supervisors,
-                       'unavailable_supervisors': unavailable_supervisors})
+                       'unavailable_supervisors': unavailable_supervisors,
+                       'domain': domain})
     else:
-        supervisors = Supervisor.objects.available().order_by("-submission_date")
-        domains = Domain.objects.all()
-        context = {'domains': domains, 'supervisors': supervisors}
+        domain = get_object_or_404(Domain, pk=pk)
+        supervisors = Supervisor.objects.available().order_by("-submission_date").filter(domain=domain)
+        context = {'domain': domain, 'supervisors': supervisors}
         return render(request, "researchhub/list_supervisors.html",context)
 
 @login_required
@@ -225,14 +232,14 @@ def add_supervisor(request):
     if request.method == 'POST':
         current_year = StudentClubYear.objects.get_current()
         instance = Supervisor(year=current_year)
-        form = SupervisorForm(request.POST, request.FILES, instance=instance)
+        form = AddSupervisorForm(request.POST, request.FILES, instance=instance)
         if form.is_valid():
             supervisor = form.save()
             show_supervisor_url = reverse('researchhub:show_supervisor', args=(supervisor.pk,))
             full_url = request.build_absolute_uri(show_supervisor_url)
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
-        form = SupervisorForm()
+        form = AddSupervisorForm()
 
     context = {'form': form}
     return render(request, 'researchhub/edit_supervisor_form.html', context)
@@ -258,14 +265,14 @@ def edit_supervisor(request, pk):
 
     context = {'supervisor': supervisor}
     if request.method == 'POST':
-        form = SupervisorForm(request.POST, instance=supervisor)
+        form = EditSupervisorForm(request.POST, instance=supervisor)
         if form.is_valid():
             supervisor = form.save()
             show_supervisor_url = reverse('researchhub:show_supervisor', args=(supervisor.pk,))
             full_url = request.build_absolute_uri(show_supervisor_url)
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
-        form = SupervisorForm(instance=supervisor)
+        form = EditSupervisorForm(instance=supervisor)
 
     context['form'] = form
     return render(request, 'researchhub/edit_supervisor_form.html', context)

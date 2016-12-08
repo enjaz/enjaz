@@ -1,5 +1,7 @@
 {% extends 'activities_base.html' %}{% load bootstrap3 %}
+{% block title %}المسجلين{% endblock %}
 {% block content %}
+
 
 <div class="panel minimal minimal-gray">
 	<div class="panel-heading">
@@ -13,7 +15,7 @@
 
 
 
-				<table class="table table-hover">
+				<table id="participants-table" class="table table-hover">
 					<thead>
 						<tr>
 							<th>الأسم  </th>
@@ -26,9 +28,9 @@
 					<tbody>
 						<tr>
 						{% for student in invitation.students %}
-							<td dir="auto"><a href=""> {{ invitation.students.user.common_profile.get_ar_full_name  }}</a></td>
-							<td>{{ invitation.students.user.common_profile.college.get_name_display }}</td>
-							<td> {{ invitation.students.user.email }}</td>
+                            <td dir="auto"> {{ student.common_profile.get_ar_full_name  }}</td>
+							<td>{{ student.common_profile.college.get_name_display }}</td>
+							<td><a href="mailto:{{ student.email }}" >{{ student.email }}</a> </td>
 						{% endfor %}
 						</tr>
 					</tbody>
@@ -37,5 +39,11 @@
 			</div>
 			</div>
 
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.css">
 
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.js">
+	$(document).ready( function () {
+    $("#participants-table").DataTable();
+} );
+</script>
 {% endblock %}

@@ -843,12 +843,12 @@ def toggle_confirm_invitation(request, pk):
     return {}
 def invitation_participants(request, pk):
     invitation = get_object_or_404(Invitation, pk=pk)
-    activity = invitation.activity
     if not request.user.is_superuser and not is_media_coordinator_or_member(user):
         raise PermissionDenied
     if invitation.activity:
         if not clubs.utils.has_coordination_to_activity(user, activity) and not \
             clubs.utils.is_member(activity.primary_club, user):
             raise PermissionDenied
-    return render(request, 'activities/invitation_participants.html')
+    context = {invitation:'invitation'}
+    return render(request, 'activities/invitation_participants.html',context)
 

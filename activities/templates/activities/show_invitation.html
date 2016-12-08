@@ -174,11 +174,11 @@ margin-bottom: 5px;
                 </div>
                 {% if already_on or not invitation.is_fully_booked and not restricted_by_city and not restricted_by_gender  %}
                 <div class="text-center">
-                {% if user.is_authenticated and not already_on   %}
+                {% if user.is_authenticated and not already_on  %}
                     {% if open_registration %}
                         <button data-action="add" id="confirm" class="btn btn-lg btn-success">أكّد حضوري</button>
                     {% elif not open_registration %}
-                        <button data-action="add" id="confirm" class="btn btn-lg btn-success">سجل</button>
+                        <button data-action="add"  id="confirm" class="btn btn-lg btn-success">سجل</button>
                         <p> سوف ترسل رسائل تأكيد قبيل الحدث لجميع المقبولين </p>
                         <p> والمقبولات لحضور هذا الحدث</p>
                     {% endif %}
@@ -186,15 +186,17 @@ margin-bottom: 5px;
                 <br>
                 <a style="margin-top: 5px; background-color: #1da1f3; color: white;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-lg"><i class="fa fa-twitter"></i> اربط حسابي بتويتر</a>
                 {% endif %}
-                {% elif user.is_authenticated and already_on  %}
-                    {% if open_registration %}
-                        <button data-action="add" id="confirm" class="btn btn-lg btn-success">ألغِ تأكيد حظوري </button>
-                    {% elif not open_registration %}
-                        <button data-action="add" id="confirm" class="btn btn-lg btn-success">ألغِ تسجيلي</button>
+                <br>
+                {% if not open_registration %}
                         <p> سوف ترسل رسائل تأكيد قبيل الحدث لجميع المقبولين </p>
                         <p> والمقبولات لحضور هذا الحدث</p>
+                {% endif %}
+                {% elif user.is_authenticated and already_on  %}
+                    {% if open_registration %}
+                        <button data-action="remove" id="confirm" class="btn btn-sm btn-danger">ألغِ تأكيد حضوري </button>
+                    {% elif not open_registration %}
+                        <button data-action="remove" id="confirm" class="btn btn-sm btn-danger">ألغِ تسجيلي</button>
                     {% endif %}
-
                 {% else %}
                 <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لإنجاز كي أؤكد الحضور</a>
                 {% endif %}
@@ -249,10 +251,25 @@ margin-bottom: 5px;
                 cache: false,
                 success: function (data) {
                     if (data.success) {
-                        if (action == "add"){
-                            toastr.success("أُكّد حضورك!");
+                    {% if not open_registration %}
+                        if (action == "add" ){
+                            toastr.success("أكد تسجيلك");
+                            $("#confirm").html("ألغِ تسجيلي");
                             $("#confirm").data("action", "remove");
+                            $("#confirm").addClass("btn-danger btn-sm")
+                                         .removeClass("btn-success btn-lg");
+                        } else if (action == "remove") {
+                            toastr.success("أُلغي تسجيلك ");
+                            $("#confirm").data("action", "add");
+                            $("#confirm").html("سجل ");
+                            $("#confirm").addClass("btn-success btn-lg")
+                                         .removeClass("btn-danger btn-sm");
+                        }
+                    {% else %}
+                        if (action == "add") {
+                            toastr.success("أُكّد حضورك!");
                             $("#confirm").html("ألغِ تأكيد حضوري");
+                            $("#confirm").data("action", "remove");
                             $("#confirm").addClass("btn-danger btn-sm")
                                          .removeClass("btn-success btn-lg");
                         } else if (action == "remove") {
@@ -262,10 +279,10 @@ margin-bottom: 5px;
                             $("#confirm").addClass("btn-success btn-lg")
                                          .removeClass("btn-danger btn-sm");
                         }
-
+                    {% endif %}
                     } else {
                         toastr.error(data.message);
-                    }
+                      }
                 }
             });
         });

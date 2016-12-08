@@ -26,13 +26,13 @@
 					</thead>
 
 					<tbody>
+						{% for student in invitation.students.all %}
 						<tr>
-						{% for student in invitation.students %}
                             <td dir="auto"> {{ student.common_profile.get_ar_full_name  }}</td>
 							<td>{{ student.common_profile.college.get_name_display }}</td>
 							<td><a href="mailto:{{ student.email }}" >{{ student.email }}</a> </td>
-						{% endfor %}
 						</tr>
+						{% endfor %}
 					</tbody>
 				</table>
 

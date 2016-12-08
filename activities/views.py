@@ -849,6 +849,6 @@ def invitation_participants(request, pk):
         if not clubs.utils.has_coordination_to_activity(user, activity) and not \
             clubs.utils.is_member(activity.primary_club, user):
             raise PermissionDenied
-    context = {invitation:'invitation'}
+    context = {'invitation': invitation}
     return render(request, 'activities/invitation_participants.html',context)
 

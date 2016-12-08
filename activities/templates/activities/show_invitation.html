@@ -179,8 +179,6 @@ margin-bottom: 5px;
                         <button data-action="add" id="confirm" class="btn btn-lg btn-success">أكّد حضوري</button>
                     {% elif not open_registration %}
                         <button data-action="add"  id="confirm" class="btn btn-lg btn-success">سجل</button>
-                        <p> سوف ترسل رسائل تأكيد قبيل الحدث لجميع المقبولين </p>
-                        <p> والمقبولات لحضور هذا الحدث</p>
                     {% endif %}
                 {% if not user.social_auth.exists %}
                 <br>

@@ -3,6 +3,8 @@ from django import forms
 from django.contrib import admin
 from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth.admin import UserAdmin
+from django.utils.html import format_html_join
+from django.utils.safestring import mark_safe
 
 from datetime import timedelta
 from django.utils import timezone
@@ -127,8 +129,27 @@ class InvitationAdmin(admin.ModelAdmin):
     search_fields = ('title',)
     readonly_fields = ['activity']
     filter_horizontal = ('students',)
+    readonly_fields = ('students', 'get_attendees')
     form = InvitationAdminForm
 
+    def get_attendees(self, instance):
+        female_attendees = instance.students.filter(common_profile__college__gender="F")
+        male_attendees = instance.students.filter(common_profile__college__gender="M")
+        female_html = u"<strong>طالبات</strong><ol>\n" + format_html_join(
+            '\n',
+            u'<li>{}</li>',
+            ((student.common_profile.get_ar_full_name(),) for student in female_attendees),
+        ) + u"\n</ol>"
+        male_html = u"<strong>طلاب</strong>\n<ol>\n" + format_html_join(
+            '\n',
+            u'<li>{}</li>',
+            ((student.common_profile.get_ar_full_name(),) for student in male_attendees),
+        ) + u"\n</ol>"
+        return u"<br>" + female_html + male_html
+
+    get_attendees.allow_tags = True
+
+    
     def get_student_count(self, obj):
         return obj.students.count()
 

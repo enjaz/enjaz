@@ -21,7 +21,7 @@
 						<tr>
               <td dir="auto"> {{ student.common_profile.get_ar_full_name  }}</td>
 							<td>{{ student.common_profile.college.get_name_display }}</td>
-							<td><a href="mailto:{{ student.email }}">{{ student.email }}</a></td>
+							<td class="english-field"><a href="mailto:{{ student.email }}">{{ student.email }}</a></td>
 						</tr>
 						{% endfor %}
 					</tbody>

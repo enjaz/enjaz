@@ -9,6 +9,7 @@ from niqati import views as niqati_views
 urlpatterns = patterns('',
     url(r'^$', views.list_activities, name='list'),
     url(r'^invitation/(?P<pk>\d+)/$', views.show_invitation, name='show_invitation'),
+    url(r'^invitation/(?P<pk>\d+)/list/$', views.list_invitation_participants, name='list_invitation_participants'),
     url(r'^invitation/(?P<pk>\d+)/confirm', views.toggle_confirm_invitation, name='toggle_confirm_invitation'),
     url(r'^create/$', views.create, name='create'),
     url(r'^depository/$', views.list_depository_items, name='list_depository_items'),

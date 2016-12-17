@@ -7,42 +7,42 @@
 <div class="invoice">
 
 	<div class="row">
-	
+
 		<div class="col-sm-6 invoice-left">
-		
+
 			<a href="#">
 				<img height="60px" src="{% static 'logo/enjaz_logo_shadow.png' %}">
 			</a>
-			
+
 		</div>
-		
+
 		<div class="col-sm-6 invoice-right">
-		
+
 				<h3>تقرير {% if employee_show %}عمادة شؤون الطلاب{% else %}المركز الإعلامي{% endif %} #{{ report.episode.pk }}</h3>
 				<span>{{ report.date_submitted }}</span>
 		</div>
-		
+
 	</div>
-	
-	
+
+
 	<hr class="margin">
-	
+
 
 	<div class="row">
-	
+
 		<div class="col-sm-3 invoice-left">
-		
+
 			<h4>الجهات المنظمة</h4>
             <a href="{% url 'clubs:show' report.episode.activity.primary_club.pk %}">{{ report.episode.activity.primary_club.name }}</a>
 			{% for club in report.episode.activity.secondary_clubs.all %}
 				<br>
                 <a href="{% url 'clubs:show' club.pk %}">{{ club.name }}</a>
 			{% endfor %}
-			
+
 		</div>
-	
+
 		<div class="col-sm-3 invoice-left">
-			 
+
 			<h4>النشاط</h4>
 			<a href="{% url 'activities:show' report.episode.activity.pk %}">{{ report.episode.activity.name }}</a>
 			<br>
@@ -51,23 +51,23 @@
 				{% if report.episode == e %}{{ forloop.counter }}{% endif %}
 			{% endfor %}
 		</div>
-		
+
 		<!--
 		<div class="col-md-6 invoice-right">
-		
+
 			<h4>Payment Details:</h4>
 			<strong>V.A.T Reg #:</strong> 542554(DEMO)78
 			<br>
 			<strong>Account Name:</strong> FoodMaster Ltd
 			<br>
 			<strong>SWIFT code:</strong> 45454DEMO545DEMO
-			
+
 		</div>-->
-		
+
 	</div>
-	
+
 	<div class="margin"></div>
-	
+
 	<table class="table table-bordered">
 		<thead>
 			<tr>
@@ -201,16 +201,16 @@
 					طباعة التقرير
 					<i class="entypo-doc-text"></i>
 				</a>
-                {% if user|can_submit_studentreport:report.episode.activity %}
+                {% if not employee_show and user|can_submit_studentreport:report.episode.activity or employee_show and user|can_submit_employeereport %}
                 <a class="btn btn-gold btn-icon icon-left" href="{% if employee_show %}{% url 'media:edit_employee_report' report.pk %}{% else %}{% url 'media:edit_report' report.pk %}{% endif %}">
                     <i class="entypo-pencil"></i>
                     عدّل التقرير
                 </a>
                 {% endif %}
 			</div>
-			
+
 		</div>
-		
+
 	</div>
 
     <br>

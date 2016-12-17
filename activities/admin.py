@@ -1,4 +1,9 @@
 # -*- coding: utf-8  -*-
+from django import forms
+from django.contrib import admin
+from django.contrib.admin.forms import AdminAuthenticationForm
+from django.contrib.auth.admin import UserAdmin
+
 from datetime import timedelta
 from django.utils import timezone
 from django.forms import ModelForm
@@ -6,6 +11,24 @@ from django.contrib import admin
 from activities.models import Activity, Episode, Category, Evaluation, Review, Assessment, Criterion, DepositoryItem, Invitation
 from clubs.models import Club
 from core.models import StudentClubYear
+import media.utils
+
+class InvitationAuthenticationForm(AdminAuthenticationForm):
+    def confirm_login_allowed(self, user):
+        if not user.is_active and \
+           not media.utils.is_media_coordinator_or_member(user):
+            raise forms.ValidationError(
+                self.error_messages['invalid_login'],
+                code='invalid_login',
+                params={'username': self.username_field.verbose_name}
+                )
+
+class InvitationAdminSite(admin.sites.AdminSite):
+    login_form = InvitationAuthenticationForm
+
+    def has_permission(self, request):
+        return media.utils.is_media_coordinator_or_member(request.user) or \
+               request.user.is_superuser
 
 class EpisodeInline(admin.TabularInline):
     model = Episode
@@ -89,15 +112,43 @@ class EvaluationAdmin(admin.ModelAdmin):
 class DepositoryItemAdmin(admin.ModelAdmin):
     list_display = ('name', 'quantity', 'unit')
 
+class InvitationAdminForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(InvitationAdminForm, self).__init__(*args, **kwargs)
+        self.fields['club'].queryset = Club.objects.current_year()
+
+    class Meta:
+        model = Invitation
+        fields = '__all__'
+
 class InvitationAdmin(admin.ModelAdmin):
     list_display = ('title', 'get_start_datetime',
                     'get_student_count', 'submission_date')
     search_fields = ('title',)
+    readonly_fields = ['activity']
     filter_horizontal = ('students',)
+    form = InvitationAdminForm
 
     def get_student_count(self, obj):
         return obj.students.count()
 
+    def has_module_permission(self, request, obj=None):
+        return media.utils.is_media_coordinator_or_member(request.user) or \
+               request.user.is_superuser
+
+    def has_change_permission(self, request, obj=None):
+        return media.utils.is_media_coordinator_or_member(request.user) or \
+               request.user.is_superuser
+
+    def has_add_permission(self, request, obj=None):
+        return media.utils.is_media_coordinator_or_member(request.user) or \
+               request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return media.utils.is_media_coordinator_or_member(request.user) or \
+               request.user.is_superuser
+
+invitation_admin = InvitationAdminSite("Invitation Admin")
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(Category)
 admin.site.register(Assessment)
@@ -105,3 +156,4 @@ admin.site.register(Criterion)
 admin.site.register(Evaluation, EvaluationAdmin)
 admin.site.register(DepositoryItem, DepositoryItemAdmin)
 admin.site.register(Invitation, InvitationAdmin)
+invitation_admin.register(Invitation, InvitationAdmin)

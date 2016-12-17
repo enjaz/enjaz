@@ -825,6 +825,8 @@ def toggle_confirm_invitation(request, pk):
                 text += u"\n#" + invitation.hashtag
             Tweet.objects.create(text=text.format(invitation.title, full_url),
                                  user=request.user)
+
+
     elif action == "remove":
         if invitation.students.filter(pk=request.user.pk).exists():
             invitation.students.remove(request.user)
@@ -832,3 +834,11 @@ def toggle_confirm_invitation(request, pk):
             raise Exception(u"لا تسجيل.")
 
     return {}
+
+@login_required
+def list_invitation_participants(request, pk):
+    invitation = get_object_or_404(Invitation, pk=pk)
+    if not activities.utils.can_view_invitation_list(request.user, invitation):
+        raise PermissionDenied
+    context = {'invitation': invitation}
+    return render(request, 'activities/list_invitation_participants.html', context)

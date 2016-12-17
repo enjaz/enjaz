@@ -40,7 +40,7 @@ class Club(models.Model):
     name = models.CharField(max_length=200, verbose_name=u"الاسم")
     english_name = models.CharField(max_length=200, verbose_name=u"الاسم الإنجليزي")
     description = models.TextField(verbose_name=u"الوصف", blank=True)
-    logo = models.ImageField(upload_to='invitations/logos/',
+    logo = models.ImageField(upload_to='clubs/logos/',
                               blank=True, null=True)
     email = models.EmailField(max_length=254, verbose_name=u"البريد الإلكتروني")
     parent = models.ForeignKey('self', null=True, blank=True,

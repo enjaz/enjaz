@@ -113,3 +113,11 @@ def can_read_reviews(user, activity):
         clubs.utils.can_review_any_activity(user) or \
         clubs.utils.is_employee_of_any_club(user) or \
         clubs.utils.is_deanship_of_students_affairs_coordinator_or_member(user)
+
+def can_view_invitation_list(user, invitation):
+    return invitation.activity and \
+       clubs.utils.has_coordination_to_activity(user, invitation.activity) or \
+       invitation.activity and \
+       clubs.utils.is_member(invitation.activity.primary_club, user) or \
+       user.is_superuser or \
+       media.utils.is_media_coordinator_or_member(user)

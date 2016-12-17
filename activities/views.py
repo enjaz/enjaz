@@ -794,16 +794,9 @@ def show_invitation(request, pk):
     else:
         restricted_by_gender = True
 
-    if invitation.is_open_registration:
-        open_registration = True
-    else:
-        open_registration = False
-
-
     context = {'invitation': invitation, 'already_on': already_on,
                'restricted_by_gender': restricted_by_gender,
-               'restricted_by_city': restricted_by_city,
-               'open_registration':open_registration}
+               'restricted_by_city': restricted_by_city}
     return render(request, 'activities/show_invitation.html', context)
 
 @decorators.ajax_only
@@ -841,14 +834,11 @@ def toggle_confirm_invitation(request, pk):
             raise Exception(u"لا تسجيل.")
 
     return {}
-def invitation_participants(request, pk):
-    invitation = get_object_or_404(Invitation, pk=pk)
-    if not request.user.is_superuser and not is_media_coordinator_or_member(user):
-        raise PermissionDenied
-    if invitation.activity:
-        if not clubs.utils.has_coordination_to_activity(user, activity) and not \
-            clubs.utils.is_member(activity.primary_club, user):
-            raise PermissionDenied
-    context = {'invitation': invitation}
-    return render(request, 'activities/invitation_participants.html',context)
 
+@login_required
+def list_invitation_participants(request, pk):
+    invitation = get_object_or_404(Invitation, pk=pk)
+    if not activities.utils.can_view_invitation_list(request.user, invitation):
+        raise PermissionDenied
+    context = {'invitation': invitation}
+    return render(request, 'activities/list_invitation_participants.html', context)

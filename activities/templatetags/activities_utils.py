@@ -16,3 +16,7 @@ def show_activity_forms(activity, user):
 @register.filter
 def can_read_reviews(user, activity):
     return utils.can_read_reviews(user, activity)
+
+@register.filter
+def can_view_invitation_list(user, activity):
+    return utils.can_view_invitation_list(user, activity)

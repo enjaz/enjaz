@@ -1,4 +1,4 @@
-<!DOCTYPE html>{% load staticfiles %}
+<!DOCTYPE html>{% load staticfiles %}{% load activities_utils %}
 
 <html class="detail" lang="ar">
 
@@ -133,10 +133,9 @@ margin-bottom: 5px;
             <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
                 <div class="text-center">
                     {% if invitation.logo %}
-                    <img class="bounceInDown" style="max-height: 300px;" src="{{ invitation.logo.url }}">
+                    <img class="bounceInDown" style="max-height: 300px; margin:20px;" src="{{ invitation.logo.url }}">
                     {% elif invitation.club.logo %}
-                    <img class="bounceInDown" style="max-height: 300px;" src="{{ invitation.club.logo.url }}">
-                    {% else %}
+                    <img class="bounceInDown" style="max-height: 300px; margin:20px;" src="{{ invitation.club.logo.url }}">
                     {% endif %}
                     {% if invitation.is_fully_booked and not already_on or restricted_by_city or restricted_by_gender  %}
                     <p class="alert alert-warning">
@@ -149,6 +148,13 @@ margin-bottom: 5px;
                     اكتملت المقاعد الممكنة لهذا الحدث، ولم يعد ممكنا التسجيل فيه!
                     {% endif %}
                     </p>
+                    {% endif %}
+                    {% if user|can_view_invitation_list:invitation %}
+                    <div class="row">
+                      <div class="col-md-4 col-md-offset-4">
+                      <a style="color: white;" class="btn btn-success btn-block" href="{% url 'activities:list_invitation_participants' invitation.pk %}">قائمة المسجلات والمسجلين</a>
+                    </div>
+                    </div>
                     {% endif %}
                     <h1>{{ invitation.title }}</h1>
                     <p style="font-size: 1.2em;">{{ invitation.short_description|safe }}</p>
@@ -175,24 +181,23 @@ margin-bottom: 5px;
                 {% if already_on or not invitation.is_fully_booked and not restricted_by_city and not restricted_by_gender  %}
                 <div class="text-center">
                 {% if user.is_authenticated and not already_on  %}
-                    {% if open_registration %}
+                    {% if invitation.is_open_registration %}
                         <button data-action="add" id="confirm" class="btn btn-lg btn-success">أكّد حضوري</button>
-                    {% elif not open_registration %}
-                        <button data-action="add"  id="confirm" class="btn btn-lg btn-success">سجل</button>
+                    {% elif not invitation.is_open_registration %}
+                        <button data-action="add"  id="confirm" class="btn btn-lg btn-success">سجلني</button>
                     {% endif %}
                 {% if not user.social_auth.exists %}
                 <br>
-                <a style="margin-top: 5px; background-color: #1da1f3; color: white;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-lg"><i class="fa fa-twitter"></i> اربط حسابي بتويتر</a>
+                <a style="margin-top: 5px; background-color: #1da1f3; color: white;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-sm"><i class="fa fa-twitter"></i> اربط حسابي بتويتر</a>
                 {% endif %}
                 <br>
-                {% if not open_registration %}
-                        <p> سوف ترسل رسائل تأكيد قبيل الحدث لجميع المقبولين </p>
-                        <p> والمقبولات لحضور هذا الحدث</p>
+                {% if not invitation.is_open_registration %}
+                        <p>سوف ترسل رسائل تأكيد قبيل الحدث لجميع المقبولين والمقبولات لحضور هذا الحدث</p>
                 {% endif %}
                 {% elif user.is_authenticated and already_on  %}
-                    {% if open_registration %}
+                    {% if invitation.is_open_registration %}
                         <button data-action="remove" id="confirm" class="btn btn-sm btn-danger">ألغِ تأكيد حضوري </button>
-                    {% elif not open_registration %}
+                    {% else %}
                         <button data-action="remove" id="confirm" class="btn btn-sm btn-danger">ألغِ تسجيلي</button>
                     {% endif %}
                 {% else %}
@@ -249,7 +254,7 @@ margin-bottom: 5px;
                 cache: false,
                 success: function (data) {
                     if (data.success) {
-                    {% if not open_registration %}
+                    {% if not invitation.is_open_registration %}
                         if (action == "add" ){
                             toastr.success("أكد تسجيلك");
                             $("#confirm").html("ألغِ تسجيلي");

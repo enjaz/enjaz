@@ -177,13 +177,11 @@ margin-bottom: 5px;
 								<i class="entypo-location"></i>
 								{{ invitation.location }}
 							</div>
-                            <div style="margin-top: 10px;">
-                                {% if not open_registration %}
-                                    <p class="entypo-mail"    >   سوف ترسل رسائل تأكيد قُبيل الحدث لجميع المقبولين و المقبولات لحضور هذا الحدث
-                                    </p>
-                                {% endif %}
-                            </div>
-
+              {% if not invitation.is_open_registration %}
+              <div style="margin-top: 10px;">
+                   <p class="entypo-mail">سوف ترسل رسائل تأكيد قُبيل الحدث لجميع المقبولين و المقبولات لحضور هذا الحدث</p>
+              </div>
+              {% endif %}
                 </div>
                 {% if already_on or not invitation.is_fully_booked and not restricted_by_city and not restricted_by_gender  %}
                 <div class="text-center">
@@ -198,9 +196,6 @@ margin-bottom: 5px;
                 <a style="margin-top: 5px; background-color: #1da1f3; color: white;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-sm"><i class="fa fa-twitter"></i> اربط حسابي بتويتر</a>
                 {% endif %}
                 <br>
-                {% if not invitation.is_open_registration %}
-                        <p>سوف ترسل رسائل تأكيد قبيل الحدث لجميع المقبولين والمقبولات لحضور هذا الحدث</p>
-                {% endif %}
                 {% elif user.is_authenticated and already_on  %}
                     {% if invitation.is_open_registration %}
                         <button data-action="remove" id="confirm" class="btn btn-sm btn-danger">ألغِ تأكيد حضوري </button>

@@ -15,12 +15,29 @@
 {% endif %}
 {% endcomment %}
 
-<p class="dinar-light enjaz-warning"><i class="entypo-info"></i> بوابة إنجاز مُخصّصة لمنسوبي جامعة الملك سعود بن عبد العزيز للعلوم الصحيّة.<br>النموذج أدناه لتسجيل الطلاب والطالبات.  إذا لم تكن طالبا فينبغي التسجيل في بوّابة إنجاز من خلال <a href="{% url 'nonstudent_signup' %}">النموذج المخصص</a>.</p>
+<p class="dinar-light enjaz-warning"><i class="entypo-info"></i> هذا النموذج مُخصص لطلاب جامعة الملك سعود بن عبدالعزيز للعلوم الصحيّة. اذا لم تكن طالبًا فينبغي اختيار النموذج المخصص. </p>
+
+<div class="btn-group";Style="width: 200px; ">
+                <a href="{% url 'nonuser_signup' %}"">
+                    <button id="nonuser-signup" class=" btn btn-success"  ">
+                            <i class="entypo-users"></i>
+من خارج الجامعة
+                    </button>
+                </a>
+        <a href="{% url 'nonstudent_signup'  %}" >
+                <button type="submit" id="add-reservation" class="btn btn-success"  ">
+                        <i class="entypo-users"></i>
+منسوبي الجامعة
+                </button>
+        <a>
+<br>
+</div>
+
 
 
 <form method="post" role="form" id="form_register">	
         {% csrf_token %}
-	<div class="dinar-light">
+	<div class="dinar-light" >
 			<div class="form-group">
                                 <label class="control-label">الاسم بالعربية</label>
 				<div class="input-group{% if form.ar_first_name.errors or form.ar_middle_name.errors or form.ar_last_name.errors %} validate-has-error{% endif %}">

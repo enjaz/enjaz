@@ -107,7 +107,7 @@
 	</div>
 	</div>
 </div>
-{% if user.common_profile.is_student %}
+{% if user.common_profile.profile_type == 'S' %}
 <div class="panel minimal minimal-gray">
 	<div class="panel-heading">
 		<div class="panel-title">
@@ -176,7 +176,7 @@
 	</div>
 </div><!-- end panel -->
 {% endif %}
-
+{% if not user.common_profile.profile_type == 'N' %}
 <div class="row">
     <div class="panel minimal minimal-gray">
         <div class="panel-heading">
@@ -230,6 +230,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% comment %}
 <div class="row">
 <div class="col-md-6">

@@ -7,6 +7,12 @@ from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from userena.models import UserenaBaseProfile
 from clubs.models import College, city_choices
 
+profile_type_choices = (
+    ('S', u'طالب'),
+    ('E', u'موظف'),
+    ('N', u'خارج الجامعة'),
+)
+
 def get_gender(user):
     return 'M' # PLACEHOLDER
 
@@ -20,6 +26,8 @@ class CommonProfile(models.Model):
                              related_name='common_profile')
     is_student = models.BooleanField(default=True,
                                      verbose_name=u"طالب؟")
+    profile_type =  models.CharField(max_length=1, choices=profile_type_choices,
+                            verbose_name=u"نوع المستخدم", default="S" )
     ar_first_name = models.CharField(max_length=30,
                                      verbose_name=u'الاسم الأول')
     ar_middle_name = models.CharField(max_length=30,
@@ -52,6 +60,11 @@ class CommonProfile(models.Model):
     # Fields specific for non-students.
     job_description = models.TextField(u"المسمى الوظيفي", blank=True)
     modification_date = models.DateTimeField(auto_now=True, null=True)
+
+    # Fields specific for non-users.
+    college_name = models.CharField(max_length=30,
+                                    verbose_name=u'جهة الدراسة / العمل')
+    nonuser_city = models.TextField(u" المدينة", blank=True)
 
     def get_ar_full_name(self):
         ar_fullname = None

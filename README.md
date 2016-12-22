@@ -59,7 +59,7 @@ In the project `urls.py`, add the following:
 # After default imports:
 
 from django.views.generic import TemplateView
-from accounts.forms import StudentSignupForm, NonStudentSignupForm, ModifiedAuthenticationForm
+from accounts.forms import StudentSignupForm, NonStudentSignupForm, NonUserSignupForm, ModifiedAuthenticationForm
 from accounts.admin import user_list_admin
 from activities.urls import activity_forms_urls
 from bulb.admin import bulb_admin
@@ -93,6 +93,7 @@ urlpatterns = [
     url(r'^accounts/signup/$', 'userena.views.signup', {'signup_form': StudentSignupForm, 'template_name': 'userena/student_signup_form.html'}),
     url(r'^accounts/resend/$', 'accounts.views.resend_confirmation_key', name='resend_confirmation_key'),
     url(r'^accounts/signup/nonstudents/$', 'userena.views.signup', {'signup_form': NonStudentSignupForm, 'template_name': 'userena/nonstudent_signup_form.html'}, name="nonstudent_signup"),
+    url(r'^accounts/signup/nonusers/$', 'userena.views.signup', {'signup_form': NonUserSignupForm, 'template_name': 'userena/nonuser_signup_form.html'}, name="nonuser_signup"),
     url(r'^accounts/signin/$', 'userena.views.signin', {'auth_form': ModifiedAuthenticationForm}),
     url(r'^accounts/edit/$', 'accounts.views.edit_common_profile', name='edit_common_profile'),
     url(r'^accounts/', include('userena.urls')),

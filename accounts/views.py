@@ -57,3 +57,4 @@ def edit_common_profile(request):
 
     return render(request, 'accounts/edit_common_profile.html', {'form': form,
                                                                  'common_profile': common_profile})
+

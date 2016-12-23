@@ -15,8 +15,22 @@
 {% endif %}
 {% endcomment %}
 
-{# =%= add employee link #}
-<p class="dinar-light enjaz-warning"><i class="entypo-info"></i> بوابة إنجاز مُخصّصة لمنسوبي جامعة الملك سعود بن عبد العزيز للعلوم الصحيّة.<br>النموذج أدناه لتسجيل المنسوبين من <strong>غير</strong> الطلاب والطالبات.  إذا كنت طالبا فينبغي التسجيل في بوّابة إنجاز من خلال <a href="{% url 'userena_signup' %}">النموذج المخصص</a>.</p>
+<p class="dinar-light enjaz-warning"><i class="entypo-info"></i> النموذج أدناه مُخصص للأشخاص من خارح جامعة الملك سعود بن عبدالعزيز للعلوم الصحيّة. اذا كنت من منسوبي الجامعة  فينبغي اختيار النموذج المخصص. </p>
+
+<div class="btn-group"; Style="margin-bottom:10px ;  ">
+       <a href="{% url 'userena_signup'  %}" >
+                <button type="submit" id="student-signup" class="btn btn-success" >
+                        <i class="entypo-users"></i>
+طلاب
+                </button>
+        </a>
+        <a href="{% url 'nonstudent_signup'  %}" >
+                <button type="submit" id="nonstudent-signup" class="btn btn-success">
+                        <i class="entypo-users"></i>
+منسوبي الجامعة
+                </button>
+        </a>
+</div>
 
 <form method="post" role="form" id="form_register">
         {% csrf_token %}

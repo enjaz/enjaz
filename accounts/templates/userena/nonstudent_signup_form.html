@@ -14,9 +14,25 @@
 </div>
 {% endif %}
 {% endcomment %}
+<p class="dinar-light enjaz-warning"><i class="entypo-info"></i>النموذج أدناه لتسجيل المنسوبين من غير الطلاب والطالبات. اذا كُنت طالب أو من خارج الجامعة فينبغي اختيار النموذج المُخصص.</p>
 
-<p class="dinar-light enjaz-warning"><i class="entypo-info"></i> بوابة إنجاز مُخصّصة لمنسوبي جامعة الملك سعود بن عبد العزيز للعلوم الصحيّة.<br>النموذج أدناه لتسجيل المنسوبين من <strong>غير</strong> الطلاب والطالبات.  إذا كنت طالبا فينبغي التسجيل في بوّابة إنجاز من خلال <a href="{% url 'userena_signup' %}">النموذج المخصص</a>.</p>
+<div class="btn-group"; Style="margin-bottom:10px ;  ">
+       <a href="{% url 'userena_signup'  %}" >
+                <button type="submit" id="student-signup" class="btn btn-success " >
+                        <i class="entypo-users"></i>
+طلاب
+                </button>
+        </a>
+         <a href="{% url 'nonuser_signup' %}">
+			<button id="nonuser-signup" type="submit" class="btn btn-success "  ;>
+    			<i class="entypo-users"></i>
+     من خارج الجامعة
+			</button>
+		 </a>
 
+</div>
+
+<br>
 
 <form method="post" role="form" id="form_register">	
         {% csrf_token %}

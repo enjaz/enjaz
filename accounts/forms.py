@@ -61,12 +61,15 @@ class StudentSignupForm(EnjazSignupForm):
     # Since the mobile number starts with a zero, store it as a
     # string.
     mobile_number = forms.CharField(label=CommonProfile._meta.get_field('mobile_number').verbose_name)
-    section = forms.CharField(label=u"القسم", max_length=2, widget=forms.Select(choices=section_choices), required=False)
-    college = forms.CharField(label=CommonProfile._meta.get_field('college').verbose_name, max_length=1, widget=forms.Select(choices=college_choices))
+    section = forms.CharField(label=u"القسم", max_length=2, widget=forms.Select(choices=section_choices),
+                              required=False)
+    college = forms.CharField(label=CommonProfile._meta.get_field('college').verbose_name, max_length=1,
+                              widget=forms.Select(choices=college_choices))
     gender = forms.CharField(label=u"الجنس", max_length=1, widget=forms.Select(choices=gender_choices))
+    alternative_email = forms.EmailField(label=CommonProfile._meta.get_field('alternative_email').verbose_name)
+
     badge_number = forms.IntegerField(label=CommonProfile._meta.get_field('badge_number').verbose_name, required=False)
     city = forms.CharField(label=u"المدينة", max_length=1, widget=forms.Select(choices=city_choices))
-    alternative_email = forms.EmailField(label=CommonProfile._meta.get_field('alternative_email').verbose_name)
 
     def __init__(self, *args, **kw):
         super(StudentSignupForm, self).__init__(*args, **kw)
@@ -78,7 +81,6 @@ class StudentSignupForm(EnjazSignupForm):
         # Call the parent class's clean function.
         cleaned_data = super(StudentSignupForm, self).clean()
 
-
         # Make sure that the email is of the university or the hospital.
         if 'email' in cleaned_data and not \
            cleaned_data['email'].endswith('ksau-hs.edu.sa') and \
@@ -87,13 +89,11 @@ class StudentSignupForm(EnjazSignupForm):
             self._errors['email'] = self.error_class([email_msg])
             del cleaned_data['email']
 
-
         # Since Jeddah and Al-Hasa have only one campus, the section
         # equals the city.
         if 'city' in cleaned_data and \
            cleaned_data['city'] in ['J', 'A']:
             cleaned_data['section'] = cleaned_data['city']
-
 
         # Make sure that the college/section choice is actually valid.
         try:
@@ -116,12 +116,14 @@ class StudentSignupForm(EnjazSignupForm):
         return cleaned_data
 
     def save(self):
-        # Save the parent form and get the user
-        new_user = super(StudentSignupForm, self).save()
-
+        # All username names should be lower-case.
         self.cleaned_data['email'] = self.cleaned_data['email'].lower()
         self.cleaned_data['username'] = self.cleaned_data['email'].split('@')[0]
         self.cleaned_data['username'] = self.cleaned_data['username']
+
+        # Save the parent form and get the user
+        new_user = super(StudentSignupForm, self).save()
+
 
         # Add initial Bulb balance.
         current_year = StudentClubYear.objects.get_current()
@@ -195,11 +197,14 @@ class NonStudentSignupForm(EnjazSignupForm):
         return cleaned_data
 
     def save(self):
-        # Save the parent form and get the user
-        new_user = super(NonStudentSignupForm, self).save()
 
+        # All username names should be lower-case.
+        self.cleaned_data['email'] = self.cleaned_data['email'].lower()
         self.cleaned_data['username'] = self.cleaned_data['email'].split('@')[0]
         self.cleaned_data['username'] = self.cleaned_data['username']
+
+        # Save the parent form and get the user
+        new_user = super(NonStudentSignupForm, self).save()
 
         mobile_number = self.cleaned_data.get('mobile_number', '')
         CommonProfile.objects.create(user=new_user,
@@ -248,6 +253,8 @@ class NonUserSignupForm  (EnjazSignupForm):
         return cleaned_data
 
     def save(self):
+        self.cleaned_data['username'] = self.cleaned_data['username']
+
         # Save the parent form and get the user
         new_user = super(NonUserSignupForm, self).save()
 

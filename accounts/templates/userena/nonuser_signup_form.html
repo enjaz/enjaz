@@ -32,10 +32,12 @@
         </a>
 </div>
 
+
 <form method="post" role="form" id="form_register">
         {% csrf_token %}
+
 	<div class="dinar-light">
-             <div class="form-group">
+            <div class="form-group">
 				<div class="input-group{% if form.username.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-user"></i>
@@ -119,6 +121,7 @@
 					{% endif %}
 				</div>
 			</div>
+			</div>
 
         {# =%= email #}
             <div class="form-group">
@@ -141,7 +144,6 @@
 					<div class="input-group-addon">
 						<i class="entypo-vcard"></i>
 					</div>
-
 					<input {% if form.college_name.value and not form.college_name.errors %}value="{{ form.college_name.value }}" {% endif %}type="text" class="form-control" name="college_name" id="college_name" placeholder="{{ form.college_name.label }}" required="required"/>
 					{% if form.college_name.errors %}
 					    {% for error in form.college_name.errors %}
@@ -154,17 +156,41 @@
 			<div class="form-group">
 				<div class="input-group{% if form.nonuser_city.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
-						<i class="entypo-location"></i>
+						<i class="entypo-vcard"></i>
 					</div>
 
 					<input {% if form.nonuser_city.value and not form.nonuser_city.errors %}value="{{ form.nonuser_city.value }}" {% endif %}type="text" class="form-control" name="nonuser_city" id="nonuser_city" placeholder="{{ form.nonuser_city.label }}" required="required"/>
-					{% if form.college_name.errors %}
-					    {% for error in form.college_name.errors %}
+					{% if form.nonuser_city.errors %}
+					    {% for error in form.nonuser_city.errors %}
 					        <label class='error' for='nonuser_city' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 				</div>
 			</div>
+
+
+			<div class="form-group">
+				<div class="input-group{% if form.nonuser_gender.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-docs"></i>
+					</div>
+					<select {% if form.nonuser_gender.value and not form.nonuser_gender.errors %}value="{{ form.nonuser_gender.value }}" {% endif %}class="form-control" id="nonuser_gender" name="nonuser_gender"  title="{{ form.nonuser_gender.label }}" required="required">
+                                                <option value="">{{ form.nonuser_gender.label }}</option>
+                                                {% for value, label in form.fields.nonuser_gender.widget.choices %}
+                                                <option {% if form.nonuser_gender.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
+					</select>
+					{% if form.nonuser_gender.errors %}
+					    {% for error in form.nonuser_gender.errors %}
+					        <label class='error' for='city' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+
+
+
+
+
 
 			<div class="form-group">
 				<div class="input-group{% if form.password1.errors or form.password2.errors %} validate-has-error{% endif %}">
@@ -183,7 +209,7 @@
 					سجّل
 				</button>
 			</div>
-	</div>
+
 </form>
 
 {% endblock %}

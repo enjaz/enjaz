@@ -13,6 +13,11 @@ profile_type_choices = (
     ('N', u'خارج الجامعة'),
 )
 
+nonuser_gender_choices = (
+    ('F', u'انثى'),
+    ('M', u'ذكر'),
+)
+
 def get_gender(user):
     return 'M' # PLACEHOLDER
 
@@ -65,6 +70,8 @@ class CommonProfile(models.Model):
     college_name = models.CharField(max_length=30,
                                     verbose_name=u'جهة الدراسة / العمل')
     nonuser_city = models.TextField(u" المدينة", blank=True)
+    nonuser_gender = models.CharField(max_length=1, choices=nonuser_gender_choices ,
+                            verbose_name=u"الجنس", default="M")
 
     def get_ar_full_name(self):
         ar_fullname = None

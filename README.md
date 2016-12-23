@@ -92,6 +92,7 @@ urlpatterns = [
     url(r'^mediacenter/', include('media.urls', namespace="media")),
     url(r'^accounts/signup/$', 'userena.views.signup', {'signup_form': StudentSignupForm, 'template_name': 'userena/student_signup_form.html'}),
     url(r'^accounts/resend/$', 'accounts.views.resend_confirmation_key', name='resend_confirmation_key'),
+    url(r'^accounts/profile_type/$', TemplateView.as_view(template_name='profile_type.html'), name='profile_type'),
     url(r'^accounts/signup/nonstudents/$', 'userena.views.signup', {'signup_form': NonStudentSignupForm, 'template_name': 'userena/nonstudent_signup_form.html'}, name="nonstudent_signup"),
     url(r'^accounts/signup/nonusers/$', 'userena.views.signup', {'signup_form': NonUserSignupForm, 'template_name': 'userena/nonuser_signup_form.html'}, name="nonuser_signup"),
     url(r'^accounts/signin/$', 'userena.views.signin', {'auth_form': ModifiedAuthenticationForm}),

@@ -63,7 +63,7 @@ class EnjazSignupForm(SignupForm):
     en_last_name = forms.CharField(label=CommonProfile._meta.get_field('en_last_name').verbose_name,
                                 max_length=30)
     mobile_number = forms.CharField(label=CommonProfile._meta.get_field('mobile_number').verbose_name)
-    city = forms.CharField(label=u"المدينة", max_length=1, widget=forms.Select(choices=city_choices))
+    city = forms.CharField(label=u"المدينة", max_length=20, widget=forms.Select(choices=city_choices))
     gender = forms.CharField(label=u"الجندر", max_length=1, widget=forms.Select(choices=general_gender_choices))
 
     def clean(self):

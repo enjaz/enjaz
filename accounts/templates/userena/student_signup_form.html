@@ -1,6 +1,6 @@
 {% extends 'userena/base_userena.html' %}{% load staticfiles %}
 
-{% block title %}تسجيل الطلاب والطالبات{% endblock %}
+{% block title %}تسجيل طالبات وطلاب الجامعة{% endblock %}
 {% block description %}فضلًا املأ النموذج التالي لإتمام عملية التسجيل.{% endblock %}
 
 {% block content %}
@@ -15,22 +15,15 @@
 {% endif %}
 {% endcomment %}
 
-<p class="dinar-light enjaz-warning"><i class="entypo-info"></i> هذا النموذج مُخصص لطلاب جامعة الملك سعود بن عبدالعزيز للعلوم الصحيّة. اذا لم تكن طالبًا فينبغي اختيار النموذج المخصص. </p>
-
-<div class="btn-group"; Style="margin-bottom:10px;  ">
-                <a href="{% url 'nonuser_signup' %}"">
-                    <button id="nonuser-signup" class=" btn btn-success"  ">
-                            <i class="entypo-users"></i>
-من خارج الجامعة
-                    </button>
-                </a>
-        <a href="{% url 'nonstudent_signup'  %}" >
-                <button type="submit" id="add-reservation" class="btn btn-success"  ">
-                        <i class="entypo-users"></i>
-منسوبي الجامعة
-                </button>
+<div class="dinar-light enjaz-warning"><i class="entypo-info"></i> هذا النموذج مُخصص لطلاب جامعة الملك سعود بن عبدالعزيز للعلوم الصحيّة. اذا لم تكن طالبًا فينبغي اختيار النموذج المخصص
+    <div style="text-align: center; margin-top: 5px; display: block;">
+        <a class="btn btn-signup" href="{% url 'nonstudent_signup'  %}" >
+                        <i class="entypo-users"></i> موظفات وموظفي الجامعة
         </a>
-<br>
+        <a href="{% url 'nonuser_signup' %}" class="btn btn-signup">
+                            <i class="entypo-users"></i> من خارج الجامعة
+        </a>
+    </div>
 </div>
 
 

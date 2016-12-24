@@ -1,3 +1,4 @@
+# -*- coding: utf-8  -*-
 """
 Utility functions for the accounts app.
 """
@@ -50,7 +51,7 @@ def get_user_college(user):
 
     return college
 
-def get_user_profile_type (user):
+def get_user_profile_type(user):
 
     if not user.is_authenticated() or \
        user.is_superuser:
@@ -63,3 +64,11 @@ def get_user_profile_type (user):
         profile_type = ''
 
     return profile_type
+
+def get_city_code(city):
+    if city == u'الرياض':
+        return 'R'
+    elif city == u'جدة':
+        return 'J'
+    elif city == u'الأحساء':
+        return 'A'

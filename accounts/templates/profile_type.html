@@ -2,8 +2,8 @@
 
 {% extends 'userena/base_userena.html' %}{% load staticfiles %}
 
-{% block title %}تسجيل الطلاب والطالبات{% endblock %}
-{% block description %}فضلًا املأ النموذج التالي لإتمام عملية التسجيل.{% endblock %}
+{% block title %}التسجيل في بوابة إنجاز{% endblock %}
+{% block description %}يتغين اختيار أحد النماذج التالية للتسجيل في البوابة{% endblock %}
 
 {% block content %}
 {% comment %}
@@ -50,16 +50,9 @@
 {% endblock %}
 {% block customscript %}
 <link rel="stylesheet" href="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.css' %}" id="style-resource-3">
-<link rel="stylesheet" href="{% static 'css/tooltipster.min.css' %}">
 <script src="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.min.js' %}" id="script-resource-11"></script>
 <script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
 <script src="{% static 'neon/assets/js/jquery.inputmask.bundle.min.js' %}"></script>
-<script src="{% static 'js/jquery.tooltipster.min.js' %}"></script>
-<script type="application/javascript">
-        $(function() {
-            $('.tooltip-jquery').tooltipster();
-        });
-</script>
 {% include 'userena/partials/college_selection.html' %}
 {% endblock %}
 

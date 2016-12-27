@@ -21,7 +21,8 @@
                         <th>المؤسس</th>
                         <th>تاريخ التأسيس</th>
                         <th># الأعضاء</th>
-                        <th># الجلسات</th>
+                        <th># الجلسات الماضية</th>
+                        <th># الجلسات المستقبلية</th>
                         <th># المحاضر</th>
                         <th>آخر جلسة</th>
                         <th>خلال 3 أسابيع؟</th>
@@ -34,7 +35,8 @@
                         <td class="detailed-user" data-tooltip-content="#user-{{ group.coordinator.pk }}">{{ group.coordinator.common_profile.get_ar_full_name }}</td>
                         <td data-order="{{ group.submission_date|date:"U" }}">{{ group.submission_date|date:"j F Y" }}</td>
                         <td>{{ group.membership_set.count }}</td>
-                        <td>{{ group.session_set.undeleted.count }}</td>
+                        <td>{{ group.get_past_sessions.count }}</td>
+                        <td>{{ group.get_future_sessions.count }}</td>
                         <td>{{ group.get_report_count }}</td>
                         {% if group.get_last_session %}
                         <td data-order="{{ group.get_last_session.date|date:"U" }}">{{ group.get_last_session.date }}
@@ -261,6 +263,7 @@
             "order": [[ 1, "desc" ]],
             "language": language,
         });
+
         $("#sessions").DataTable({
             "order": [[ 3, "desc" ]],
             "language": language,

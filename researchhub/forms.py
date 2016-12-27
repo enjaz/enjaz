@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from accounts.models import CommonProfile
 from core.models import StudentClubYear
 from researchhub import utils
-from researchhub.models import Supervisor, Project, SkilledStudent
+from researchhub.models import Supervisor, Project, SkilledStudent, Domain, Skill
 from userena.forms import SignupForm
 
 class ConsultationForm(forms.Form):
@@ -26,17 +26,24 @@ class MemberProjectForm(forms.ModelForm):
                   'required_role', 'prerequisites', 'duration',
                   'communication', 'is_personal']
 
-class SupervisorForm(forms.ModelForm):
+class AddSupervisorForm(forms.ModelForm):
     class Meta:
         model = Supervisor
-        fields = ['user', 'specialty', 'avatar', 'interests',
+        fields = ['user', 'avatar', 'domain', 'interests',
+                  'communication', 'is_hidden', 'available_from',
+                  'available_until']
+
+class EditSupervisorForm(forms.ModelForm):
+    class Meta:
+        model = Supervisor
+        fields = ['avatar', 'domain', 'interests',
                   'communication', 'is_hidden', 'available_from',
                   'available_until']
 
 class SkilledStudentForm(forms.ModelForm):
     class Meta:
         model = SkilledStudent
-        fields = ['description', 'previous_experience',
+        fields = ['skills','description', 'previous_experience',
                   'ongoing_projects', 'condition', 'available_until']
 
 class ResearchHubSignupForm(SignupForm):
@@ -51,11 +58,12 @@ class ResearchHubSignupForm(SignupForm):
     en_last_name = forms.CharField(max_length=30)
     badge_number = forms.IntegerField(required=False)
     job_description = forms.CharField(widget=forms.Textarea)
-    specialty = forms.CharField(max_length=100)
+    #specialty = forms.CharField(max_length=100)
+    domain = forms.IntegerField()
     interests = forms.CharField(widget=forms.Textarea)
     communication = forms.CharField(widget=forms.Textarea)
-    available_from = forms.DateField(required=False)
-    available_until = forms.DateField(required=False)
+    #available_from = forms.DateField(required=False)
+    #available_until = forms.DateField(required=False)
     city = forms.CharField(max_length=1,
                            widget=forms.Select(choices=city_choices))
 
@@ -64,6 +72,11 @@ class ResearchHubSignupForm(SignupForm):
         # We don't want usernames (We could have inherited userena's
         # SignupFormOnlyEmail, but it's more tricky to modify.)
         del self.fields['username']
+
+        domain_choices = []
+        for domain in Domain.objects.all():
+            domain_choices.append((domain.pk, domain.name))
+        self.fields['domain'].widget = forms.Select(choices=domain_choices)
 
     def clean(self):
         # Call the parent class's clean function.
@@ -81,6 +94,9 @@ class ResearchHubSignupForm(SignupForm):
         self.cleaned_data['email'] = self.cleaned_data['email'].lower()
         self.cleaned_data['username'] = self.cleaned_data['email'].split('@')[0]
         self.cleaned_data['username'] = self.cleaned_data['username']
+
+        domain_pk = self.cleaned_data['domain']
+        domain = Domain.objects.get(pk=domain_pk)
         new_user = super(ResearchHubSignupForm, self).save()
         current_year = StudentClubYear.objects.get_current()
         CommonProfile.objects.create(user=new_user,
@@ -97,7 +113,8 @@ class ResearchHubSignupForm(SignupForm):
                                   year=current_year,
                                   interests=self.cleaned_data['interests'],
                                   communication=self.cleaned_data['communication'],
-                                  specialty=self.cleaned_data['specialty'],
-                                  available_from=self.cleaned_data.get('available_from'),
-                                  available_until=self.cleaned_data.get('available_until'))
+                                  #specialty=self.cleaned_data['specialty'],
+                                  #available_from=self.cleaned_data.get('available_from'),
+                                  #available_until=self.cleaned_data.get('available_until'),
+                                  domain=domain)
         return new_user

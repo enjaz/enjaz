@@ -1,9 +1,10 @@
 # -*- coding: utf-8  -*-
 import re
 
-from django.contrib.auth.models import User
 from django import forms
+from django.contrib.auth.models import User
 from django.forms import formset_factory
+from django.utils import timezone
 from dal import autocomplete
 from tagging.fields import TagField
 
@@ -294,7 +295,18 @@ class DewanyaSuggestionForm(forms.ModelForm):
 DewanyaSuggestionFormSet = forms.formset_factory(DewanyaSuggestionForm, extra=3)
 
 class BookCommitmentForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        readathon = kwargs.pop('readathon')
+        super(BookCommitmentForm, self).__init__(*args, **kwargs)
+        if readathon.start_date < timezone.now().date():
+            del self.fields['wants_to_attend']
+
     class Meta:
         model = BookCommitment
-        fields = ['title', 'cover', 'reason', 'wants_to_attend',
-                  'wants_to_contribute']
+        fields = ['title', 'cover', 'pages', 'reason',
+                  'wants_to_attend', 'wants_to_contribute']
+
+class UpdateBookCommitmentForm(forms.ModelForm):
+    class Meta:
+        model = BookCommitment
+        fields = ['pages', 'completed_pages']

@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
 
-from clubs.models import Club
+from clubs.models import Club, Team
 from events.managers import RegistrationQuerySet, SessionQuerySet
 
 user_gender_choices = (
@@ -45,9 +45,12 @@ class Event(models.Model):
     abstract_submission_instruction_url = models.URLField(u"رابط تعليمات إرسال الأبحاث", max_length=255, blank=True, default="")
     abstract_revision_club = models.ForeignKey(Club, null=True, blank=True,
                                                related_name="abstract_revision_events")
+    abstract_revision_team = models.ForeignKey(Team, null=True, blank=True,
+                                               related_name="abstract_revision_events")
     is_on_telegram = models.BooleanField(default=True,
                                          verbose_name=u"على تلغرام؟")
     organizing_club = models.ForeignKey(Club)
+    organizing_team = models.ForeignKey(Team, null=True)
     priorities = models.PositiveSmallIntegerField(default=1)
 
     def is_abstract_submission_open(self):

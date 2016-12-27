@@ -40,6 +40,8 @@ class Club(models.Model):
     name = models.CharField(max_length=200, verbose_name=u"الاسم")
     english_name = models.CharField(max_length=200, verbose_name=u"الاسم الإنجليزي")
     description = models.TextField(verbose_name=u"الوصف", blank=True)
+    logo = models.ImageField(upload_to='clubs/logos/',
+                              blank=True, null=True)
     email = models.EmailField(max_length=254, verbose_name=u"البريد الإلكتروني")
     parent = models.ForeignKey('self', null=True, blank=True,
                                related_name="children",
@@ -164,7 +166,7 @@ class Club(models.Model):
         for activity in self.primary_activity.approved():
             episodes.extend(activity.episode_set.all())
         # Get all club's episodes whose report is overdue
-        overdue_episodes = filter(lambda x: x.report_is_overdue(),
+        overdue_episodes = filter(lambda x: x.report_is_overdue() and not x.report_is_submitted(),
                                   episodes)
         return len(overdue_episodes)
 

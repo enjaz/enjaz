@@ -53,15 +53,32 @@
 				</div>  
 			</div>
 			<div class="form-group">
-				<div class="input-group{% if form.specialty.errors %} validate-has-error{% endif %}">
+				<div class="input-group{% if form.domain.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="fa fa-stethoscope"></i>
 					</div>
-					
-					<input {% if form.specialty.value and not form.specialty.errors %}value="{{ form.specialty.value }}" {% endif %}type="text" class="english-field form-control" name="specialty" id="specialty" placeholder="Specialty" required="required"/>
-					{% if form.specialty.errors %}
-					    {% for error in form.specialty.errors %}
-					        <label class='error' for='specialty' style='display: inline-block'>{{ error|escape }}</label>
+
+					<select {% if form.domain.value and not form.domain.errors %}value="{{ form.domain.value }}" {% endif %}class="form-control" id="domain" name="domain"  title="{{ form.domain.label }}" required="required">
+                                                <option value="">{{ form.domain.label }}</option>
+                                                {% for value, label in form.fields.domain.widget.choices %}
+                                                <option {% if form.domain.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
+					</select>
+					{% if form.domain.errors %}
+					    {% for error in form.domain.errors %}
+					        <label class='error' for='domain' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="input-group{% if form.interests.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="fa fa-heart"></i>
+					</div>
+					<textarea {% if form.interests.value and not form.interests.errors %}value="{{ form.interests.value }}" {% endif %}type="text" class="form-control english-field" name="interests" id="interests" placeholder="Research areas of interest" required="required"></textarea>
+					{% if form.interests.errors %}
+					    {% for error in form.interests.errors %}
+					        <label class='error' for='interests' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 				</div>
@@ -124,20 +141,7 @@
 					{% endif %}
 				</div>  
 			</div>
-			<div class="form-group">
-				<div class="input-group{% if form.interests.errors %} validate-has-error{% endif %}">
-					<div class="input-group-addon">
-						<i class="fa fa-heart"></i>
-					</div>
-					<textarea {% if form.interests.value and not form.interests.errors %}value="{{ form.interests.value }}" {% endif %}type="text" class="form-control english-field" name="interests" id="interests" placeholder="Research areas of interest" required="required"></textarea>
-					{% if form.interests.errors %}
-					    {% for error in form.interests.errors %}
-					        <label class='error' for='interests' style='display: inline-block'>{{ error|escape }}</label>
-					    {% endfor %}
-					{% endif %}
-				</div>  
-			</div>
-            <div class="form-group" style="text-align: justify;">
+            <!-- <div class="form-group" style="text-align: justify;">
                 <div class="checkbox">
                     <label>
                         <input checked type="checkbox" id="available">I am currently available.
@@ -171,7 +175,7 @@
 					    {% endfor %}
 					{% endif %}
 				</div>
-			</div>
+			</div> -->
 			<div class="form-group">
 				<div class="input-group{% if form.password1.errors or form.password2.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">

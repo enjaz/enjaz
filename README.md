@@ -75,6 +75,7 @@ urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^admin/', include(admin.site.urls)),
     activity_forms_urls,
+    url(r'^activities/admin/', include(invitation_admin.urls)),
     url(r'^activities/', include('activities.urls', namespace="activities")),
     club_forms_urls,
     url(r'^clubs/', include('clubs.urls', namespace="clubs")),

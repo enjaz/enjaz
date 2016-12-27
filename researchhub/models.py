@@ -34,10 +34,20 @@ class Project(models.Model):
     def __unicode__(self):
         return self.title
 
+class Domain(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank= True)
+    image = models.FileField(upload_to='researchhub/domain/', blank=True)
+
+    def __unicode__(self):
+        return self.name
+
 class Supervisor(models.Model):
+    domain = models.ForeignKey(Domain, null=True)
+
     year = models.ForeignKey('core.StudentClubYear', null=True,
                              on_delete=models.SET_NULL)
-    specialty = models.CharField(max_length=100)
+    specialty = models.CharField(max_length=100, blank=True)
     avatar = models.FileField(upload_to='researchhub/supervisors/',
                               blank=True, help_text="Optional")
     user = models.OneToOneField(User,
@@ -66,7 +76,17 @@ class Supervisor(models.Model):
         except ObjectDoesNotExist:
             return self.user.username
 
+class Skill(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank= True)
+    image = models.FileField(upload_to='researchhub/skill/', blank=True)
+
+    def __unicode__(self):
+        return self.name
+
 class SkilledStudent(models.Model):
+    skills = models.ManyToManyField(Skill, help_text="Hold down (Control), or (Command) on a Mac, to select more than one.")
+
     year = models.ForeignKey('core.StudentClubYear', null=True,
                              on_delete=models.SET_NULL)
     user = models.ForeignKey(User,

@@ -1,0 +1,53 @@
+{% extends 'activities_base.html' %}{% load staticfiles %}
+{% block title %}المسجلات والمسجلين في {{ invitation.title }}{% endblock %}
+{% block content %}
+<div class="panel minimal minimal-gray">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<h2>المسجلات والمسجلين في <a href="{% url 'activities:show_invitation' invitation.pk %}">{{ invitation.title }}</a></h2>
+		</div>
+	</div>
+
+				<table id="participants-table" class="display datatable compact dt-responsive">
+					<thead>
+						<tr>
+							<th>الاسم</th>
+							<th class="not-mobile">الكلية</th>
+              <th>الإيميل</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for student in invitation.students.all %}
+						<tr>
+              <td dir="auto"> {{ student.common_profile.get_ar_full_name  }}</td>
+							<td>{{ student.common_profile.college.get_name_display }}</td>
+							<td class="english-field"><a href="mailto:{{ student.email }}">{{ student.email }}</a></td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+{% endblock %}
+
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/buttons/buttons.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/jszip.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/buttons.html5.min.js' %}"></script>
+<script>
+	$(function(){
+    $("#participants-table").DataTable({
+			dom: 'Bfrtip',
+			buttons: [
+					'copyHtml5',
+					'excelHtml5',
+					'csvHtml5',
+			],
+			language: {% include 'js/dataTables-arabic.json' %}
+		});
+	});
+</script>
+{% endblock %}

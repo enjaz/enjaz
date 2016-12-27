@@ -14,8 +14,8 @@ import clubs.utils
 def can_evaluate_abstracts(user, event):
     if user.is_superuser:
         return True
-    elif event.abstract_revision_club:
-        return clubs.utils.is_coordinator_or_member(event.abstract_revision_club, request.user)
+    elif event.abstract_revision_team:
+        return clubs.utils.is_team_coordinator_or_member(event.abstract_revision_team, user)
     else:
         return False
 
@@ -30,12 +30,11 @@ def get_user_organizing_events(user):
     elif user.is_superuser:
         user_events = Event.objects.all()
     else:
-        user_events = (Event.objects.filter(organizing_club__members=user) | \
-                       Event.objects.filter(organizing_club__coordinator=user) | \
-                       Event.objects.filter(organizing_club__deputies=user)).distinct()
+        user_events = (Event.objects.filter(organizing_team__members=user) | \
+                       Event.objects.filter(organizing_team__coordinator=user)).distinct()
     return user_events
 
-def is_organizing_club_member(user, event):
+def is_organizing_team_member(user, event):
     user_events = get_user_organizing_events(user)
     return user_events.filter(pk=event.pk).exists()
 

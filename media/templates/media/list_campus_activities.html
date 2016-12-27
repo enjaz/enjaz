@@ -10,7 +10,7 @@
 <p>تعرض هذه الصفحة الأنشطة المتاحة ل{% if city == 'R' %}{% if gender == 'F' %}طالبات{% elif gender == 'M' %}طلاب{% endif %} الرياض{% elif city == 'J' %}طلاب وطالبات جدة{% elif city == 'A' %}طلاب وطالبات الأحساء{% else %}جميع الطالب والطالبات في كل المدن{% endif %}.  تستخدم هذه الصفحة لتجهيز الإعلانات، كالرسالة البريدية الأسبوعية.</p>
 <hr>
 
-{% with table_type='approved' %}
+{% with table_type='media' %}
     {% include 'activities/components/activities_table.html' %}
 {% endwith %}
 

@@ -15,7 +15,21 @@
         </div>
     </div>
     {% endif %}
-    <table class="display datatable dt-responsive">
+    <br>
+    {% for skill in skills %}
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+            <a data-toggle="collapse" href="#collapse{{ skill.pk }}" data-target="#collapse{{ skill.pk }}" class="collapsed">
+
+                    {{ skill }}
+                </a>
+            </h4>
+        </div>
+    <div id="collapse{{ skill.pk }}" class="panel-collapse collapse">
+            <div class="panel-body">
+                <div class="row">
+                    <table class="display datatable dt-responsive">
         <thead>
             <tr>
                 <th>Name</th>
@@ -24,15 +38,22 @@
             </tr>
         </thead>
         <tbody>
-            {% for skill in skills %}
+            {% for skilledstudent in skill.skilledstudent_set.all %}
             <tr>
-                <td><a href="{% url 'researchhub:show_skill' skill.pk %}">{{ skill.user.common_profile.get_en_full_name }}</a></td>
-                <td>{{ skill.description|truncatechars:100 }}</td>
-                <td data-order="{{ project.submission_date|date:"U" }}">{{ project.submission_date|date:"Y-n-j" }}</td>
+                <td><a href="{% url 'researchhub:show_skill' skilledstudent.pk %}">{{ skilledstudent.user.common_profile.get_en_full_name }}</a></td>
+                <td>{{ skilledstudent.description|truncatechars:100 }}</td>
+                <td data-order="{{ project.submission_date|date:"U" }}">{{ skilledstudent.submission_date|date:"Y-n-j" }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+
 </div>
 
 {% endblock %}

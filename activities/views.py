@@ -17,11 +17,11 @@ from accounts.utils import get_user_gender
 from clubs.models import Club
 from core import decorators
 from core.models import Tweet
-from media.utils import MAX_OVERDUE_REPORTS, can_assess_club_as_media_coordinator, can_assess_club_as_media_member, can_assess_club_as_media, is_media_coordinator_or_deputy, get_user_media_center, get_clubs_for_assessment_by_user
 from media.models import FollowUpReport, FollowUpReportImage, Story
 import activities.utils
 import clubs.utils
 import core.utils
+import media.utils
 
 FORMS_CURRENT_APP = "activity_forms"
 
@@ -85,8 +85,9 @@ def list_activities(request):
             # For club coordinators, deputies, and members, show
             # approved activities as well as their own club's pending
             # and rejected activities.
-            context['pending'] = Activity.objects.pending().undeleted().for_user_clubs(request.user).distinct()
-            context['rejected'] = Activity.objects.rejected().undeleted().for_user_clubs(request.user).distinct()
+            activity_poll = Activity.objects.undeleted().current_year().for_user_clubs(request.user).distinct()
+            context['pending'] = activity_poll.pending()
+            context['rejected'] = activity_poll.rejected()
 
             # Only display to coordinators and deputies
             if clubs.utils.is_coordinator_or_deputy_of_any_club(request.user):
@@ -105,7 +106,7 @@ def list_activities(request):
                     # passing duplicated variables.  In case the following
                     # variable is changed, the templates need to be
                     # changed as well.
-                    context['MAX_OVERDUE_REPORTS'] = MAX_OVERDUE_REPORTS
+                    context['MAX_OVERDUE_REPORTS'] = media.utils.MAX_OVERDUE_REPORTS
 
         elif clubs.utils.is_employee_of_any_club(request.user):
             # For employees, display all approved activities, as well
@@ -128,16 +129,9 @@ def list_activities(request):
 @login_required
 def show(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
-
-    # The activity object is the only thing that should be in the context  [Saeed, 17 Jun 2014]
     context = {'activity': activity}
 
-    # If the activity is approved, everyone can see it.  If it is not,
-    # only the head of the Student Club, the Media Team, the members
-    # of the related clubs and the person who submitted it can see it.
     if request.user.is_authenticated():
-        user_clubs = clubs.utils.get_user_clubs(request.user)
-
         # Save a click, redirect reviewers to the appropriate
         # reviewing page.
         reviewing_parents = Club.objects.activity_reviewing_parents(activity)
@@ -148,35 +142,17 @@ def show(request, activity_id):
             return HttpResponseRedirect(reverse('activities:review',
                                                 args=(activity.pk, reviewer_club.pk)))
 
-        # Anyone can view forms; yet due to URL reversing issues it has to be restricted to this view only
-        # Otherwise, we'll end up having to specify the `current_app` attribute for every view that contains a link
-        # to the forms
+        # Anyone can view forms; yet due to URL reversing issues it
+        # has to be restricted to this view only Otherwise, we'll end
+        # up having to specify the `current_app` attribute for every
+        # view that contains a link to the forms
         context['can_view_forms'] = True
-
-    else:
-        user_clubs = Club.objects.none()
-
-    activity_primary_club = Club.objects.filter(pk=activity.primary_club.pk)
-    activity_secondary_clubs = activity.secondary_clubs.all()
-    activity_clubs = activity_primary_club | activity_secondary_clubs
 
     # --- Permission checks ---
 
-    # If the user is a superuser or part of presidency or user is the activity's club coordinator or
-    #  a coordinator of a secondary club in the activity, show the activity regardless of status
-    # Elseif user is a DSA reviewer, show the activity if it's approved by presidency
-    # Else (employees or others), show activity only if approved
-    if request.user.is_superuser or \
-       clubs.utils.can_review_activity(request.user, activity) or \
-       request.user.has_perm('activities.view_activity') or \
-       clubs.utils.is_employee(activity.primary_club, request.user) or\
-       clubs.utils.is_deanship_of_students_affairs_coordinator_or_member(request.user) or\
-       any([club in activity_clubs for club in user_clubs]):
-        # Don't raise any errors
-        pass
-    else:
-        if not activity.is_approved:
-            raise PermissionDenied
+    if not clubs.utils.can_view_activity(request.user, activity) and \
+       not activity.is_approved:
+        raise PermissionDenied
 
     return render(request, 'activities/show.html', context, current_app=FORMS_CURRENT_APP)
 
@@ -201,7 +177,7 @@ def create(request):
     # the 3-report threshold, prevent new activity submission (again
     # in reality the user will only coordinate one club)
     user_coordination = clubs.utils.get_user_coordination_and_deputyships(request.user)
-    if any([not club.can_skip_followup_reports and club.get_overdue_report_count() > MAX_OVERDUE_REPORTS
+    if any([not club.can_skip_followup_reports and club.get_overdue_report_count() > media.utils.MAX_OVERDUE_REPORTS
             for club in user_coordination]):
         raise PermissionDenied
 
@@ -451,10 +427,6 @@ def review(request, activity_id, reviewer_id):
     if not reviewing_parents.filter(pk=reviewer_club.pk).exists():
         raise Http404
 
-    # Is the current user a coordinator/deputy of any of the reviewing
-    # parents?
-    user_is_any_reviewer = clubs.utils.can_review_activity(request.user, activity)
-
     # Is the current user a coordinator/deputy of the reviewer club?
     user_is_current_reviewer = clubs.utils.is_coordinator_or_deputy(reviewer_club, request.user)
 
@@ -466,9 +438,7 @@ def review(request, activity_id, reviewer_id):
     # activity owning club (primary or secondary); the coordinator or
     # deputy of a parent reviewer other than the ``reviewer_club``; or
     # an employee responsible for the activity owning club.
-    can_read = clubs.utils.has_coordination_to_activity(request.user, activity) or user_is_any_reviewer or \
-               clubs.utils.is_employee(activity.primary_club, request.user) or \
-               clubs.utils.is_deanship_of_students_affairs_coordinator_or_member(request.user)
+    can_read = activities.utils.can_read_reviews(request.user, activity)
 
     # If the user has no read or write permissions, then they can't
     # access the view.
@@ -586,8 +556,7 @@ def review(request, activity_id, reviewer_id):
                               template="activity_held_to_coordinator",
                               context=email_context)
             activity.save()
-            return HttpResponseRedirect(reverse('activities:show',
-                                                args=(activity.pk, )))
+            return HttpResponseRedirect(reverse('activities:list'))
         # TODO: if not valid, show the error messages.
 
     else:
@@ -645,7 +614,7 @@ def assessment_index(request, activity_id):
 
     # Determine the category.  If not Media Center (i.e. super user or
     # vice president, default to the presidency review)
-    if can_assess_club_as_media(request.user, activity.primary_club):
+    if media.utils.can_assess_club_as_media(request.user, activity.primary_club):
         return HttpResponseRedirect(reverse('activities:assess',
                                     args=(activity_id, 'm')))
     else:
@@ -659,8 +628,8 @@ def assessment_list(request):
 
     context = {}
     user_assessing_clubs = clubs.utils.get_user_clubs(request.user).filter(can_assess=True)
-    user_media_center = get_user_media_center(request.user)
-    clubs_for_user = get_clubs_for_assessment_by_user(request.user).filter(is_assessed=True)
+    user_media_center = media.utils.get_user_media_center(request.user)
+    clubs_for_user = media.utils.get_clubs_for_assessment_by_user(request.user).filter(is_assessed=True)
 
     approved_activvities = Activity.objects.current_year().approved().done().filter(primary_club__in=clubs_for_user).distinct()
     # 'done' has different meanings for the Media Center, the
@@ -668,7 +637,7 @@ def assessment_list(request):
     if user_media_center: # Media
         context['category'] = 'M'
         context['todo'] = approved_activvities.exclude(assessment__criterionvalue__criterion__category='M')
-        if is_media_coordinator_or_deputy(request.user):
+        if media.utils.is_media_coordinator_or_deputy(request.user):
             context['done'] = approved_activvities.filter(assessment__criterionvalue__criterion__category='M')\
                                                   .exclude(assessment__is_reviewed=False)
         else:
@@ -689,7 +658,7 @@ def assessment_list(request):
         context['todo'] = approved_activvities.exclude(assessment__criterionvalue__criterion__category='P')
     # Only show 'toreview' to media coordinator and deputy, and to the
     # superuser.
-    if is_media_coordinator_or_deputy(request.user) or \
+    if media.utils.is_media_coordinator_or_deputy(request.user) or \
        request.user.is_superuser:
         # Jeddah has no Media Center members, so don't show them the
         # toreview table.  It is all going to be done by the Medica
@@ -714,7 +683,7 @@ def assess(request, activity_id, category):
     # dealing with the superuser, so don't preform such checks and set
     # the assessor_club to None.
     if assessor_club:
-        if can_assess_club_as_media(request.user, activity.primary_club):
+        if media.utils.can_assess_club_as_media(request.user, activity.primary_club):
             if category != 'M':
                 raise PermissionDenied
         else: # Vice president
@@ -810,7 +779,7 @@ def show_invitation(request, pk):
         raise Http404
 
     if request.user.is_authenticated() and \
-       request.user in invitation.students.all():
+       invitation.students.filter(pk=request.user.pk).exists():
         already_on = True
     else:
         already_on = False
@@ -844,6 +813,8 @@ def toggle_confirm_invitation(request, pk):
             raise Exception(u"هذا النشاط ليس متاحًا في مدينتك.")
         if not invitation.is_available_for_user_gender(request.user):
             raise Exception(u"هذا النشاط يستهدف {} فقط".format(invitation.get_gender_display()))
+        if invitation.is_fully_booked():
+            raise Exception(u"اكتملت المقاعد الممكنة لهذا الحدث، ولم يعد ممكنا التسجيل فيه!")
         invitation.students.add(request.user)
         if request.user.social_auth.exists():
             show_url = reverse('activities:show_invitation', args=(invitation.pk,))
@@ -853,10 +824,20 @@ def toggle_confirm_invitation(request, pk):
                 text += u"\n#" + invitation.hashtag
             Tweet.objects.create(text=text.format(invitation.title, full_url),
                                  user=request.user)
+
+
     elif action == "remove":
-        if request.user in invitation.students.all():
+        if invitation.students.filter(pk=request.user.pk).exists():
             invitation.students.remove(request.user)
         else:
             raise Exception(u"لا تسجيل.")
 
     return {}
+
+@login_required
+def list_invitation_participants(request, pk):
+    invitation = get_object_or_404(Invitation, pk=pk)
+    if not activities.utils.can_view_invitation_list(request.user, invitation):
+        raise PermissionDenied
+    context = {'invitation': invitation}
+    return render(request, 'activities/list_invitation_participants.html', context)

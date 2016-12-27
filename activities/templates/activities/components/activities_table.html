@@ -9,11 +9,14 @@
             {% endif %}
             <th>تاريخ الانعقاد</th>
             {# In approved, no need to show the status nor the options. #}
-            {% if privileged and not table_type == 'approved' or table_type == 'employee' %}
+            {% if privileged and not table_type == 'approved' and not table_type == 'employee' and not table_type == 'media' %}
             <th class="not-mobile">الحالة</th>
             {% endif %}
             {% if table_type == 'pending' %}
             <th class="not-mobile">الخيارات</th>
+            {% endif %}
+            {% if table_type == 'media' %}
+            <th class="not-mobile">يستهدف</th>
             {% endif %}
         </tr>
     </thead>
@@ -26,13 +29,16 @@
             <td data-order="{{ activity.submission_date|date:"U" }}">{{ activity.submission_date|date:"j F" }}</td>
             {% endif %}
             <td data-order="{{ activity.get_next_or_last_episode.start_date|date:"U" }}">{{ activity.get_next_or_last_episode.start_date|date:"j F" }}</td>
-            {% if privileged and not table_type == 'approved' or table_type == 'employee' %}
+            {% if privileged and not table_type == 'approved' and not table_type == 'employee' and not table_type == 'media' %}
             <td>{{ activity.get_approval_status_message }}</td>
             {% endif %}
             {% if table_type == 'pending' %}
             <td>
                 {{ activity.get_list_activity_action|safe }}
             </td>
+            {% endif %}
+            {% if table_type == 'media' %}
+            <td>{{ activity.get_gender_display }}</td>
             {% endif %}
         </tr>
     {% endfor %}

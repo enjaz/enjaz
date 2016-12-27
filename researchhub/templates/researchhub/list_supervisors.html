@@ -1,14 +1,14 @@
 {% extends "researchhub_base.html" %}{% load staticfiles %}{% load researchhub_tags %}
-{% block title %}ResearchHub Supervisors{% endblock %}
+{% block title %}{{ domain }} Supervisors{% endblock %}
 {% block content %}
 <div class="english-field">
-    <h1 class="english-field">ResearchHub Supervisors</h1>
-    <p>Below you is the list of our super-helpful supervisors who are willing to oversee student-initiated projects.</p>
-    <table class="display datatable dt-responsive">
+    <h1 class="english-field">{{ domain }} Supervisors</h1>
+    <p></p>
+
+<table class="display datatable dt-responsive">
         <thead>
             <tr>
                 <th>Name</th>
-                <th>Specility</th>
                 <th class="not-mobile">Interests</th>
                 <td class="not-mobile">Date added</td>
             </tr>
@@ -17,7 +17,6 @@
             {% for supervisor in supervisors %}
             <tr>
                 <td><a href="{% url 'researchhub:show_supervisor' supervisor.pk %}">Dr. {{ supervisor.user.common_profile.get_en_full_name }}</a></td>
-                <td>{{ supervisor.specialty }}</td>
                 <td>{{ supervisor.interests|linebreaksbr }}</td>
                 <td data-order="{{ supervisor.submission_date|date:"U" }}">{{ supervisor.submission_date|date:"Y-n-j" }}</td>
             </tr>
@@ -34,7 +33,7 @@
 <script type="text/javascript">
     $(function () {
         $(".datatable").DataTable({
-            "order": [[ 3, "desc" ]],
+            "order": [[ 2, "desc" ]],
         });
     });
 </script>

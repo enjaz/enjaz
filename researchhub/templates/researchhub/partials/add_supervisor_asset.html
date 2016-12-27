@@ -12,8 +12,8 @@
 
             $("#edit-supervisor-modal .modal-title").html("Add supervisor");
             $("#edit-supervisor-modal .modal-body").load("{% url 'researchhub:add_supervisor' %}", function(){
-                $("#id_available_from").attr('data-start-view', '1').datepicker({minDate: 1});
-                $("#id_available_until").attr('data-start-view', '1').datepicker({minDate: 1});
+                $("#id_available_from").attr('data-start-view', '1').datepicker({minDate: 0});
+                $("#id_available_until").attr('data-start-view', '1').datepicker({minDate: 0});
             });
 
             var $submitButton = $("#edit-supervisor-modal button.submit-button");

@@ -312,10 +312,7 @@ class Group(models.Model):
                                       .exists()
 
     def get_last_session(self):
-        try:
-            return self.session_set.filter(is_deleted=False).order_by('date').last()
-        except Session.DoesNotExist:
-            return
+        return self.session_set.filter(is_deleted=False).order_by('date').last()
 
     def get_has_recent_sessions(self):
         three_weeks_ago = timezone.now().date() - timedelta(21)
@@ -323,6 +320,16 @@ class Group(models.Model):
 
     def get_report_count(self):
         return Report.objects.filter(session__group=self).count()
+
+    def get_past_sessions(self):
+        past_days = self.session_set.filter(date__lt=timezone.now().date())
+        today = self.session_set.filter(date=timezone.now().date()).filter(end_time__lte=timezone.now().time())
+        return (past_days | today).undeleted().order_by('date')
+
+    def get_future_sessions(self):
+        future_days = self.session_set.filter(date__gt=timezone.now().date())
+        today = self.session_set.filter(date=timezone.now().date()).filter(end_time__gt=timezone.now().time())
+        return (future_days | today).undeleted().order_by('date')
 
     def __unicode__(self):
         return self.name
@@ -532,6 +539,9 @@ class Readathon(models.Model):
     template_name = models.CharField(u"العنوان", max_length=200)
     objects = managers.ReadathonQuerySet.as_manager()
 
+    def has_started(self):
+        return timezone.now().date() > self.start_date
+
     def __unicode__(self):
         return self.start_date.strftime("%Y-%m-%d")
 
@@ -547,10 +557,21 @@ class BookCommitment(models.Model):
                                           default=False)
     wants_to_contribute = models.BooleanField(u"تود/ين المساهمة بمنتج ثقافي بعد إتمام خطّة القراءة؟",
                                               default=False)
+    pages = models.PositiveSmallIntegerField(u"صفحات الكتاب",
+                                             null=True)
+    completed_pages = models.PositiveSmallIntegerField(u"صفحات الكتاب المكتملة",
+                                                       null=True)
     is_deleted = models.BooleanField(u"هل حُذف؟",
                                      default=False)
     submission_date = models.DateTimeField(u"تاريخ الإرسال",
                                            auto_now_add=True)
+
+    def get_progress_percentage(self):
+        if self.pages and self.completed_pages:
+            percentage =  float(self.completed_pages) / self.pages * 100
+            return "{0:.0f}".format(percentage)
+        else:
+            return 0
 
     def __unicode__(self):
         return self.title

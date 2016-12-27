@@ -53,7 +53,7 @@ def add_criteria(apps, schema_editor):
     Criterion.objects.create(year= year_2016_2017,
                                     ar_name="تفرع الفكرة",
                                     code_name="",
-                                    instructions="branched_idea ",
+                                    instructions="branched_idea",
                                     category='P')
     Criterion.objects.create(year= year_2016_2017,
                                 ar_name="فكرة مقترحة من طالب/ة",

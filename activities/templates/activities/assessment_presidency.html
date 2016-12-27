@@ -36,7 +36,7 @@
             </div>
         </div>
 
-<div class="panel panel-default panel-shadow" data-collapsed="0">		
+<div class="panel panel-default panel-shadow" data-collapsed="0">
 	<!-- panel body -->
 	<div class="panel-body with-table">
 		<table class="table table-bordered table-responsive">
@@ -55,216 +55,262 @@
 				<th>النقاط</th>
 			</tr>
 		</thead>
-		
+
 		<tbody>
 			<tr>
-				<th>نوع النشاط</th>
+				<th>فكرة النشاط</th>
 				<td>
 					<p class="alert alert-warning"><i class="entypo-eye"></i>
 					تصنيف النشاط: {{ activity.category }}
 					</p>
 					<label>
-						<input type="radio" value="10" name="type_option"> نشاط خارج الجامعة <span class="points">(10 نقاط)</span>
+						<input type="radio" value="3" name="idea_option"> فكرة تتفرع إلى نقاط<span class="points">(3 نقاط)</span>
 					</label>
-					<br>
-					<label>
-						<input type="radio" value="6" name="type_option"> نشاط داخل الحرم الجامعي <span class="points">(6 نقاط)</span>
-					</label>
-					<br>
-					<label>
-						<input type="radio" value="8" name="type_option"> تعاون مع رئاسة نادي الطلاب <span class="points">(8 نقاط)</span>
-					</label>
-					<br>
-					<label>
-						<input type="radio" value="10" name="type_option"> نشاط مستمر <span class="points">(10-15 نقطة)</span>
-					</label>
-					<br>
-					<label>
-						<input type="radio" value="4" name="type_option"> نشاط أكاديمي أو تعاون مع جهة خارجية<span class="points">(4 نقاط)</span>
-					</label>
-					<br>
-					<label>
-						<input data-other='true' type="radio" value="" name="type_option"> أخرى
-					</label>
-				</td>
-				<td>{{ form.criterion_type }}</td>
-			</tr>
-            <tr>
-                <th>تعاون مع الرئاسة</th>
-                <td>
-                    <label>
-                        <input type="radio" value="8" name="presidency_option"> نعم <span class="points">(8 نقاط)</span>
-                    </label>
-                    <br>
-                    <label>
-                        <input type="radio" value="0" name="presidency_option"> لا <span class="points">(لا نقاط)</span>
-                    </label>
-                </td>
-                <td>{{ form.criterion_presidency }}</td>
-            </tr>
-			<tr>
-				<th>أجزاء النشاط وسلاسل الأنشطة</th>
-				<td>
-					<p class="alert alert-warning"><i class="entypo-eye"></i>
-					{% if activity.episode_set.count > 1 %}
-					كان لهذا النشاط {{ activity.episode_set.count}} جزء.
-					{% else %}
-					لم يكن لهذا النشاط سوى جزء واحد.
-					{% endif %}
-                    </p>
-					{% if activity.episode_set.count > 1 %}
-					<label>
-						<input type="radio" value="" data-choice="episodes" name="episodes_option"> 3 نقاط لكل جزء
-					</label>
-                    <br>
-					{% endif %}
-					<label>
-						<input type="radio" value="3" name="episodes_option"> جزء من سلسلة <span class="points">(3 نقاط)</span>
-					</label>
-					<br>
-					<label>
-						<input type="radio" value="0" name="episodes_option"> نشاط منفرد <span class="points">(لا نقاط)</span>
-					</label>
-					<br>
-					<label>
-						<input data-other='true' type="radio" value="" name="episodes_option"> أخرى
-					</label>
-				</td>
-				<td>{{ form.criterion_episodes }}</td>
-			</tr>
-			<tr>
-				<th>فكرة طالب</th>
-				<td>
-					<div class="alert alert-warning"><i class="entypo-eye"></i>
-                        إذا كانت فكرة طالب، يذكر ذلك في الوصف.  وصف هذا النشاط: <blockquote>{{ activity.description }}</blockquote>
-                    </div>
 
-					<label>
-						<input type="radio" value="2" name="student_idea_option"> نعم <span class="points">(نقاطتان)</span>
-					</label>
 					<br>
 					<label>
-						<input type="radio" value="0" name="student_idea_option"> لا <span class="points">(لا نقاط)</span>
-					</label>
-					<br>
-					<label>
-						<input data-other='true' type="radio" value="" name="student_idea_option"> أخرى
+						<input data-other='true' type="radio" value="" name="idea_option"> أخرى
 					</label>
 				</td>
-				<td>{{ form.criterion_student_idea }}</td>
-			</tr>
-			<tr>
-				<th>فكرة إبداعية</th>
-				<td>
-					<label>
-						<input type="radio" value="2" name="creative_idea_option"> نعم <span class="points">(نقاطتان)</span>
-					</label>
-					<br>
-					<label>
-						<input type="radio" value="0" name="creative_idea_option"> لا <span class="points">(لا نقاط)</span>
-					</label>
-					<br>
-					<label>
-						<input data-other='true' type="radio" value="" name="creative_idea_option"> أخرى
-					</label>
-				</td>
-				<td>{{ form.criterion_creative_idea }}</td>
-			</tr>
-			<tr>
-				<th>الرفع المبكر</th>
-				<td>
-					<p class="alert alert-warning"><i class="entypo-eye"></i>
-					أرسل هذا النشاط قبل <span class="points">{{ submission_interval }} أيام</span> من عقده (أرسل يوم {{ activity.submission_date|date:"j F Y"  }} وعقد في {{ activity.get_first_date|date:"j F"  }}).
-					</p>
-					<label>
-						<input data-choice="before_time" type="radio" value="2" name="time_option"> رفع النشاط قبل الموعد المحدد <span class="points">(نقطتان)</span>
-					</label>
-					<br>
-					<label>
-						<input type="radio" value="0" name="early_sumbission_option"> رُفع بعد الموعد المحدد <span class="points">(لا نقاط)</span>
-					</label>
-					<br>
-					<label>
-						<input data-other='true' type="radio" value="" name="early_sumbission_option"> أخرى
-					</label>
-				</td>
-				<td>{{ form.criterion_early_submission }}</td>
+				<td>{{ form.criterion_idea }}</td>
 			</tr>
             <tr>
-                <th>
-                    تأجيل موعد النشاط بدون سبب وجيه
-                </th>
+                <th>فكرة غير تقليدية</th>
                 <td>
-					<label>
-						<input type="radio" value="-3" name="postponed_option"> تغيير موعد النشاط بدون سبب وجيه <span class="points">(حسم ثلاثة نقاط)</span>
-					</label>
+                    <label>
+                        <input type="radio" value="10" name="new_idea_option"> نعم <span class="points">(10 نقاط)</span>
+                    </label>
                     <br>
                     <label>
-						<input type="radio" value="0" checked name="postponed_option"> لم يغير موعد النشاط <span class="points">(لا نقاط)</span>
-					</label>
+                        <input type="radio" value="0" name="new_idea_option"> لا <span class="points">(لا نقاط)</span>
+                    </label>
                 </td>
-                <td>{{ form.criterion_postponed }}</td>
+
+              <td>{{ form.criterion_new_idea }}</td>
+
             </tr>
+
+            <tr>
+      				<th>فكرة طالب/ة</th>
+      				<td>
+      					<div class="alert alert-warning"><i class="entypo-eye"></i>
+                              إذا كانت فكرة طالب/ة، يذكر ذلك في الوصف.  وصف هذا النشاط: <blockquote>{{ activity.description }}</blockquote>
+                          </div>
+
+      					<label>
+      						<input type="radio" value="3" name="student_idea_option"> نعم <span class="points">(3 نقاط)</span>
+      					</label>
+      					<br>
+      					<label>
+      						<input type="radio" value="0" name="student_idea_option"> لا <span class="points">(لا نقاط)</span>
+      					</label>
+      					<br>
+      					<label>
+      						<input data-other='true' type="radio" value="" name="student_idea_option"> أخرى
+      					</label>
+      				</td>
+      				<td>{{ form.criterion_Student_idea }}</td>
+      			</tr>
+
+            <tr>
+      				<th>مكان النشاط</th>
+      				<td>
+      					<label>
+      						<input type="checkbox" value="5" name="place_option"> نشاط داخل كليات الجامعة<span class="points">(5 نقاط)</span>
+      					</label>
+                <br>
+                <label>
+      						<input type="checkbox" value="10" name="place_option"> نشاط خارج كليات الجامعة<span class="points">(10 نقاط)</span>
+      					</label>
+                <br>
+                <label>
+                  <input type="checkbox" value="3" name="place_option"> نشاط إلكتروني <span class="points">(3 نقاط)</span>
+                </label>
+      					<br>
+      				</td>
+      				<td>{{ form.criterion_place }}</td>
+      			</tr>
+
+            <tr>
+                <th>طرح الفكرة بطريقة غير تقليدية</th>
+                <td>
+                   <label>
+                        <input type="radio" value="10" name="creative_idea_option"> نعم <span class="points">(10 نقاط)</span>
+                    </label>
+                    <br>
+                    <label>
+                        <input type="radio" value="0" name="creative_idea_option"> لا <span class="points">(لا نقاط)</span>
+                    </label>
+                </td>
+                <td>{{ form.criterion_creative_idea }}</td>
+            </tr>
+
+            <tr>
+                <th>استعمال وسائل مصاحبة </th>
+                <td>
+                    <label>
+                        <input type="radio" value="2" name="use_resources_option"> نعم <span class="points">(2 نقاط)</span>
+                    </label>
+                    <br>
+                    <label>
+                        <input type="radio" value="0" name="use_resources_option"> لا <span class="points">(لا نقاط)</span>
+                    </label>
+                </td>
+                <td>{{ form.criterion_use_resources }}</td>
+            </tr>
+
+            <tr>
+                <th>الشكل العام لمكان النشاط</th>
+                <td>
+                    <label>
+                        <input type="radio" value="2" name="apperance_option"> نعم <span class="points">(2 نقاط)</span>
+                    </label>
+                    <br>
+                    <label>
+                        <input type="radio" value="0" name="apperance_option"> لا <span class="points">(لا نقاط)</span>
+                    </label>
+                </td>
+                <td>{{ form.criterion_apperance }}</td>
+            </tr>
+
+            <tr>
+                <th> إرشاد وتنظيم الحضور</th>
+                <td>
+                    <label>
+                        <input type="radio" value="2" name="attendes_orgnisation_option"> نعم <span class="points">(2 نقاط)</span>
+                    </label>
+                    <br>
+                    <label>
+                        <input type="radio" value="0" name="attendes_orgnisation_option"> لا <span class="points">(لا نقاط)</span>
+                    </label>
+                </td>
+                <td>{{ form.criterion_attendes_orgnisation }}</td>
+            </tr>
+            <tr>
+                <th> رضا الحضور</th>
+                <td>
+                    <label>
+                        <input type="radio" value="2" name="attendes_satisfaction_option"> نعم <span class="points">(2 نقاط)</span>
+                    </label>
+                    <br>
+                    <label>
+                        <input type="radio" value="0" name="attendes_satisfaction_option"> لا <span class="points">(لا نقاط)</span>
+                    </label>
+                </td>
+                <td>{{ form.criterion_attendees_satisfaction }}</td>
+            </tr>
+
+            <tr>
+                <th> حسن إدارة النشاط</th>
+                <td>
+                    <label>
+                        <input type="radio" value="2" name="orgnisation_option"> نعم <span class="points">(2 نقاط)</span>
+                    </label>
+                    <br>
+                    <label>
+                        <input type="radio" value="0" name="orgnisation_option"> لا <span class="points">(لا نقاط)</span>
+                    </label>
+                </td>
+                <td>{{ form.criterion_orgnisation }}</td>
+            </tr>
+
+            <tr>
+      				<th>التعاون</th>
+      				<td>
+      					<label>
+      						<input type="checkbox" value="15" name="cooperation_option"> التعاون مع رئاسة نادي الطلاب <span class="points">(15 نقاط)</span>
+      					</label>
+                <br>
+                <label>
+      						<input type="checkbox" value="10" name="cooperation_option"> الشراكة مع جهة خارجية<span class="points">(10 نقاط)</span>
+      					</label>
+                <br>
+                <label>
+                  <input type="checkbox" value="10" name="cooperation_option"> رعاية من جهة خارجية<span class="points">(10 نقاط)</span>
+                </label>
+              		</td>
+      				<td>{{ form.criterion_cooperation }}</td>
+      			</tr>
+
+
 			<tr>
-				<th>الحضور</th>
+				<th>أيام النشاط </th>
 				<td>
-					<p class="alert alert-warning"><i class="entypo-eye"></i>
-                        
-					{% if activity.get_evaluations.count %}
-						{% if activity.get_evaluations.count >= 20 %}
-							قيّم هذا النشاط أكثر من 20 طالبا <span class="points">({{ activity.get_evaluations.count }} طالب)</span>)
-						{% else %}
-							قيّم هذا النشاط <span class="points">{{ activity.get_evaluations.count }} طالب</span> فقط (منحوا النشاط {{ activity.get_quality_score_average }} في الجودة و {{ activity.get_relevance_score_average }} في الملائمة)
-						{% endif %}
-					{% else %}
-							لم يُقيّم أي طالب هذا النشاط.
+					<div class="alert alert-warning">
+            <p><i class="entypo-eye"></i>
+            {% if activity.get_days > 1 %}
+            كان لهذا النشاط  {{ activity.get_days }} أيام
+            {% else %}
+            لم يكن لهذا النشاط سوى يوم واحد.
+            {% endif %}
+            <br>
+            كان لهذا النشاط {{ activity.episode_set.count }} أجزاء وهي في الأيام التالية:
+          </p>
+              <ul>
+                  {% for episode in activity.episode_set.all %}
+                  <li>
+                    {{ episode }} من {{ episode.start_date }} إلى {{ episode.end_date }}
+                  </li>
+                  {% endfor %}
+              </ul>
+
+
+          </div>
+					{% if activity.get_days > 1 %}
+					<label>
+						<input type="radio" value="3" data-choice="episodes" name="activity_days_option"> أحسب لكل يوم 3 نقاط
+					</label>
+              <br>
 					{% endif %}
-					</p>
-					<label>
-						<input type="radio" value="2" name="attendees_option"> أكثر من 20 طالب <span class="points">(نقطتان)</span>
-					</label>
 					<br>
 					<label>
-						<input type="radio" value="0" name="attendees_option"> أقل من 20 طالب <span class="points">(لا نقاط)</span>
-					</label>
-					<br>
-					<label>
-						<input data-other='true' type="radio" value="" name="attendees_option"> أخرى
+						<input data-other='true' type="radio" value="" name="activity_days_option"> أخرى
 					</label>
 				</td>
-				<td>{{ form.criterion_attendees }}</td>
+				<td>{{ form.criterion_activity_days }}</td>
 			</tr>
-			<tr>
-				<th>
-					تقييم الطلاب
-					{{ form.criterion_student_evaluation.field.help_text }}
-				</th>
-				<td>
-					<p class="alert alert-warning"><i class="entypo-eye"></i>
-					{% if activity.get_evaluations.count %}
-						{% if activity.get_evaluations.count >= 20 %}
-							قيّم هذا النشاط أكثر من 20 طالبا <span class="points">({{ activity.get_evaluations.count }} طالب)</span>)، ومنحوه <span class="points">{{ activity.get_quality_score_average }} في الجودة</span>  و<span class="points">{{ activity.get_relevance_score_average }}في الملائمة</span>.
-						{% else %}
-							قيّم هذا النشاط <span class="points">{{ activity.get_evaluations.count }} طالب</span> فقط (منحوه <span class="points">{{ activity.get_quality_score_average }} من 5 في الجودة</span>  و<span class="points">{{ activity.get_relevance_score_average }} من 5 في الملائمة</span>؛ وكانت تقييمهم له %{{ activity.get_evaluation_percentage }} )
-						{% endif %}
-					{% else %}
-							لم يُقيّم أي طالب هذا النشاط.
-					{% endif %}
-					</p>
-					<label>
-						<input type="radio" data-choice="80percent" value="2" name="student_evaluation_option"> تقييم الطلاب أكثر من 80% بالمئة <span class="points">(نقطتان)</span>
-					</label>
-					<br>
-					<label>
-						<input type="radio" value="0" name="student_evaluation_option"> تقييم الطلاب أقل من 80% بالمئة <span class="points">(لا نقاط)</span>
-					</label>
-					<br>
-					<label>
-						<input data-other='true' type="radio" value="" name="student_evaluation_option"> أخرى
-					</label>
-				</td>
-				<td>{{ form.criterion_student_evaluation }}</td>
-			</tr>
+
+
+
+      <br>
+      <label>			<tr>
+    <th>ساعات النشاط</th>
+    <td>
+      <p class="alert alert-warning"><i class="entypo-eye"></i>
+      {% if activity.get_hours > 1 %}
+    كان لهذا النشاط  {{ activity.get_hours }}   ساعة
+      {% else %}
+      لم يكن لهذا النشاط سوى ساعة واحدة
+      {% endif %}
+                </p>
+
+                {% if activity.episode_set.count > 1 %}
+      					<label>
+      						<input type="radio" value="1" data-choice="episodes" name="activity_hours"> نقطة لكل ساعة
+  			</label>
+            <br>
+      				{% endif %}
+      <br>
+      <label>
+        <input data-other='true' type="radio" value="" name="activity_hours"> أخرى
+      </label>
+    </td>
+    <td>{{ form.criterion_activity_hours }}</td>
+  </tr>
+
+
+        <tr>
+  				<th>برنامج نقاطي</th>
+  				<td>
+  					<p class="alert alert-warning"><i class="entypo-eye"></i>
+              تحسب نقاط برنامج نقاطي بشكل ألي
+              <br>
+              وستضاف بشكل تلقائي لمجموع نقاط النادي في نهاية العام
+              <br>
+              حصل هذا النشاط على  {{ activity.get_codes }}  نقطة من برنامج نقاطي
+              <br>
+              حصل هذا النشاط على  {{ activity.get_points }}  نقطة من آلية التقيم
+
 			<tr>
 				<th>التعاون</th>
 				<td>
@@ -319,7 +365,7 @@
 		</tbody>
 	</form>
 	</table>
-		
+
 	</div>
 </div>
 <script>
@@ -338,7 +384,7 @@ $(function(){
 		criterion_code_name = $(this).prop('name').replace('criterion_', '');
 		entered_value = $(this).val()
 		entered_option = $('input[name=' + criterion_code_name +'_option][value=' + entered_value + ']:first');
-		if (entered_option.length){	
+		if (entered_option.length){
 			entered_option.prop('checked', 'checked');
 		}else{
 			other_option = $('input[name=' + criterion_code_name +'_option][data-other=true]');
@@ -347,7 +393,7 @@ $(function(){
 	}
     $.each($('input[name^=criterion_]'), link_text_to_radio);
 	$('input[name^=criterion_]').on('change', link_text_to_radio);
-	// Episode auto calculation (if the episode input is there anyway)  
+	// Episode auto calculation (if the episode input is there anyway)
 	var episode_input = $('input[data-choice=episodes][name=episodes_option]');
 	var episode_count = {{ activity.episode_set.count }};
 	var eispide_points = episode_count * 3;
@@ -387,7 +433,7 @@ $(function(){
     }
     updateTotal();
     $('input[type=number], input[type=radio]').on('click change', updateTotal);
- 
+
 	$("textarea").removeAttr("cols")
 		.removeAttr("rows")
 		.css("height", "100%")

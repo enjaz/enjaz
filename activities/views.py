@@ -129,7 +129,7 @@ def list_activities(request):
 def show(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
 
-    # The activity object is the only thing that should be in the context  [Saeed, 17 Jun 2014]    
+    # The activity object is the only thing that should be in the context  [Saeed, 17 Jun 2014]
     context = {'activity': activity}
 
     # If the activity is approved, everyone can see it.  If it is not,
@@ -182,11 +182,11 @@ def show(request, activity_id):
 
 @login_required
 def create(request):
-    
+
     # --- Permission checks ---
-    
+
     # (1) Check if the user is a coordinator
-    
+
     # To check permissions, rather than using the
     # @permission_required('activities.add_activity') decorator, it is
     # more dynamic to check whether the user is a coordinator of any
@@ -337,7 +337,7 @@ def edit(request, activity_id):
                 new_attachment.save()
             for deleted_attachment in attachment_formset.deleted_objects:
                 deleted_attachment.delete()
-            
+
             # If the choesn reviewer club was changed, the new one
             # should be the assignee (i.e. reset the stage), send them
             # a notification, and no notification should be sent to
@@ -403,7 +403,7 @@ def edit(request, activity_id):
         else:
             form = ActivityForm(instance=activity)
         context = {'form': form, 'activity_id': activity_id,
-                   'user_club': user_club, 
+                   'user_club': user_club,
                    'activity': activity, 'edit': True,
                    'attachment_formset': attachment_formset,
                    'item_request_formset': item_request_formset}
@@ -555,7 +555,7 @@ def review(request, activity_id, reviewer_id):
                        'is_approved' in review.changed_data:
                         mail.send(reviewing_parent.coordinator.email,
                                   template="activity_approved_to_next_reviewer",
-                                  context=email_context)                    
+                                  context=email_context)
             elif review.cleaned_data['is_approved'] == False:
                 activity.assignee = None
                 if 'is_approved' in review.changed_data:
@@ -648,7 +648,7 @@ def assessment_index(request, activity_id):
     if can_assess_club_as_media(request.user, activity.primary_club):
         return HttpResponseRedirect(reverse('activities:assess',
                                     args=(activity_id, 'm')))
-    else: 
+    else:
         return HttpResponseRedirect(reverse('activities:assess',
                                     args=(activity_id, 'p')))
 
@@ -698,7 +698,7 @@ def assessment_list(request):
             context['toreview'] = approved_activvities.filter(assessment__criterionvalue__criterion__category='M',
                                                               assessment__is_reviewed=False)
     return render(request, 'activities/assessment_list.html', context)
-    
+
 @login_required
 def assess(request, activity_id, category):
     activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
@@ -724,7 +724,7 @@ def assess(request, activity_id, category):
         assessor_club = None
 
     # If the assessment is already there, edit it.
-    try:  
+    try:
         assessment = Assessment.objects.distinct().get(activity=activity,
                                                        criterionvalue__criterion__category=category)
     except Assessment.DoesNotExist:
@@ -781,7 +781,7 @@ def list_depository_items(request):
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse("activities:list_depository_items"))
-    elif request.method == 'GET':            
+    elif request.method == 'GET':
         categories = DepositoryItem.objects.values_list('category', flat=True).distinct()
         categorized_items_list = []
         for category in categories:

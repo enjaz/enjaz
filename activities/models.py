@@ -1,10 +1,10 @@
 # -*- coding: utf-8  -*-
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
-from django.db.models import Avg, F, Sum
+from django.db.models import Avg, F, Sum, Count
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
@@ -17,6 +17,7 @@ from clubs.utils import get_deanship, get_presidency
 from forms_builder.forms.models import Form
 from media.utils import REPORT_DUE_AFTER
 import accounts.utils
+
 
 
 class Evaluation(models.Model):
@@ -103,7 +104,7 @@ class Activity(models.Model):
 
     def get_absolute_url(self):
         return reverse("activities:show", args=(self.id, ))
- 
+
     def registration_is_open(self):
         """
         Return ``True`` if there is 1 published form marked as primary. Return ``False`` if there isn't or,
@@ -188,19 +189,54 @@ class Activity(models.Model):
                 return ""
         else:
             return ""
-        
+
     def is_single_episode(self):
         return self.episode_set.count() == 1
-    
+
     def get_first_date(self):
         return self.get_first_episode().start_date
-        
+
     def get_first_time(self):
         return self.get_first_episode().start_time
-    
+
+    def get_last_date(self):
+        return self.get_last_episode().end_date
+
+    def get_last_time(self):
+        return self.get_last_episode().end_time
+
+    def get_hours(self):
+        # GUESS WHAT THIS IS
+        dummydate = date(2010,12,17)
+        hours = 0
+        for episode in self.episode_set.all():
+            end = episode.end_time
+            start = episode.start_time
+            difference = datetime.combine(dummydate,end) - datetime.combine(dummydate,start)
+            hours += abs(difference.total_seconds() /60/60)
+        return int(hours)
+
+    def get_days(self):
+        days = 0
+        for episode in self.episode_set.all():
+            end = episode.end_date
+            start = episode.start_date
+            difference = (end - start).days + 1
+            days += difference
+        return days
+
+    def get_codes(self):
+        activity_codes = self.episode_set.filter(order__collection__codes__user__isnull=False).aggregate(count=Count('order__collection__codes'))
+        return activity_codes['count']
+
+    def get_points(self):
+        return self.get_codes()/2
+
+
+
     def get_first_location(self):
-        return self.get_first_episode().location
-    
+        return self.get_first_episode()
+
     def get_first_episode(self):
         """
         Return the first scheduled episode for this activity.
@@ -213,7 +249,7 @@ class Activity(models.Model):
         Return the last scheduled episode for this activity.
         """
         return self.episode_set.order_by('-end_date', 'end_time').first()
-    
+
     def get_next_episode(self):
         """
         Return the next scheduled episode for this activity.
@@ -241,6 +277,7 @@ class Activity(models.Model):
         """
         evaluations = Evaluation.objects.filter(episode__activity=self)
         return evaluations
+
 
     def get_evaluation_count(self):
         return self.get_evaluations().count()
@@ -283,7 +320,7 @@ class Activity(models.Model):
 
     def get_media_assessment_points(self):
         return self.assessment_set.filter(criterionvalue__criterion__category='M').aggregate(media=Sum('criterionvalue__value'))['media']
-    
+
     def get_cooperator_points(self):
         return self.assessment_set.aggregate(cooperation=Sum('cooperator_points'))['cooperation']
 
@@ -425,7 +462,7 @@ class Episode(models.Model):
     some activities have several dates and times yet all under the same activity and same request.
     Enabling the coordinators to manually enter their custom dates has a big drawback in that these custom
     dates can't be translated into something the computer can understand.
-    
+
     Therefore, we define the "episode" model, which would be a representation of a single "unit" of
     an activity. The Activity model is related to the Episode model via a foreign key relationship. Most
     activities, however, will only require one episode, as they only consist of a single date and time.
@@ -433,33 +470,33 @@ class Episode(models.Model):
     """
     ### Fields ###
     activity = models.ForeignKey(Activity)
-    
+
     start_date = models.DateField()
     end_date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
-    
+
     # Note #1: Dates and times should be interpreted as follows:
     # start_date and end_date indicate the dates on which the episode starts and ends, respectively
     # start_time and end_time indicate the start and finish times ON EACH OF THE DATES, rather
     # than for the whole episode
-    # 
+    #
     # For example:
     # start_date = yesterday, end_date = tomorrow,
     # start_time = 4:00P.M., end_time = 10:00P.M.
     # doesn't mean the episode started yesterday 4:00P.M. and ends tomorrow 10:00P.M.
     # Rather, the episode started yesterday 4:00P.M. and ended 10:00P.M., then starts today
     # 4:00P.M. and ends 10:00P.M., and the same thing for tomorrow.
-    # 
+    #
     # Of course there is nothing by design to enforce this interpretation, but that's how
     # it's meant to be
-    
+
     # Note #2: When reading the dates as strings, especially for use with the neon calendar,
     # make sure you format them in the ISO 8601 format. This is done easily by calling
     # [date_object].isoformat() (e.g. self.start_date.isoformat())
-    
+
     location = models.CharField(max_length=128)
-    
+
     # In the future, as we add Google Calendar features, the calendar events will
     # be linked here
     # google_event = models.URLField()
@@ -479,21 +516,21 @@ class Episode(models.Model):
 
     def __unicode__(self):
         return self.activity.name + " #" + str(self.get_index())
-    
+
     def get_index(self):
         "Return the index (starting from 1) of the episode within the parent activity's episode set"
         return list(self.activity.episode_set.all()).index(self) + 1
-    
+
     def is_single_day(self):
         return self.start_date == self.end_date
-    
+
     def day_count(self):
         "Return the length of the episode in terms of days"
         return (self.end_date - self.start_date).days
-    
+
     def start_datetime(self):
         return datetime.combine(self.start_date, self.start_time)
-    
+
     def end_datetime(self):
         end_datetime = datetime.combine(self.end_date, self.end_time)
         if self.start_datetime() == end_datetime:
@@ -622,7 +659,7 @@ class Assessment(models.Model):
     notes = models.TextField(verbose_name=u"وصف النشاط", blank=True)
 
     def primary_points(self):
-        return 
+        return
 
 class Criterion(models.Model):
     year = models.ForeignKey('core.StudentClubYear', null=True,

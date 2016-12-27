@@ -1,6 +1,9 @@
 # -*- coding: utf-8  -*-
 from django.contrib import admin
 from django.core.exceptions import ObjectDoesNotExist
+from ckeditor.widgets import CKEditorWidget
+from django import forms
+
 
 from events.models import Event, Session, Registration, NonUser, Abstract, AbstractFigure
 
@@ -88,9 +91,11 @@ class NonUserAdmin(admin.ModelAdmin):
 
 class AbstractAdmin(admin.ModelAdmin):
     inlines = [AbstractFigureInline]
+    introduction = forms.CharField(widget=CKEditorWidget())
 
 admin.site.register(Event)
 admin.site.register(Session)
 admin.site.register(Registration, RegistrationAdmin)
 admin.site.register(NonUser, NonUserAdmin)
 admin.site.register(Abstract, AbstractAdmin)
+

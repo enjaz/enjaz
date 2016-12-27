@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from clubs.models import Club
 from events.managers import RegistrationQuerySet, SessionQuerySet
+from ckeditor.fields import RichTextField
 
 user_gender_choices = (
     ('F', u'طالبة'),
@@ -289,6 +290,8 @@ class Registration(models.Model):
         return self.get_en_full_name()
 
 class Abstract(models.Model):
+    user = models.ForeignKey(User, null=True, blank=True,
+                             related_name='event_Abstract')
     event = models.ForeignKey(Event, verbose_name=u"الحدث")    
     title = models.CharField(verbose_name="Title", max_length=255)
     authors = models.TextField(verbose_name=u"Name of authors")
@@ -308,11 +311,7 @@ class Abstract(models.Model):
         ('P', 'Poster')
         )
     presentation_preference = models.CharField(verbose_name="Presentation preference", max_length=1, choices=presentation_preference_choices)
-    introduction = models.TextField(u"Introduction", default="")
-    methodology = models.TextField(u"Methodology", default="")
-    results = models.TextField(u"Results", default="")
-    discussion = models.TextField(u"Discussion", default="")
-    conclusion = models.TextField(u"Conclusion", default="")
+    introduction = models.TextField(u"Introduction", default="" )
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
@@ -339,7 +338,6 @@ class Evaluation(models.Model):
 
     def get_total_score(self):
         return self.criterion_values.aggregate(Sum('value'))['value__sum'] or 0
-
 
 class Criterion(models.Model):
     event = models.ForeignKey(Event, verbose_name=u"الحدث")

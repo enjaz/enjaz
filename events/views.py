@@ -8,7 +8,7 @@ from django.utils import timezone
 from post_office import mail
 
 from clubs.models import college_choices
-from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset
+from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset,EvaluationForm
 from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation
 from events import utils
 
@@ -80,26 +80,28 @@ def list_my_abstracts(request, event_code_name):
 
 @login_required
 def show_abstract(request, event_code_name,pk):
-    abstract = get_object_or_404(Abstract,pk=pk, is_deleted=False)
+    abstract = get_object_or_404(Abstract, is_deleted=False,pk=pk)
     event = abstract.event
-    if not utils.can_evaluate_abstracts(request.user, event):
-        raise PermissionDenied
-    try:
-        evaluation = abstract.evaluation
-    except Evaluation.DoesNotExist:
-        evaluation = Evaluation(evaluator=request.user,
-                                abstract=abstract)
 
-    if request.method == 'POST':
-        form = EvaluationForm(request.POST, instance=evaluation)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('events:list_abstracts',
-                                                args=(event.code_name,)))
-    elif request.method == 'GET':
-        form = EvaluationForm(instance=evaluation)
-    context = {'event': event, 'abstract': abstract, 'form': form}
+#    if not utils.can_evaluate_abstracts(request.user, event):
+#        raise PermissionDenied
+#    try:
+#        evaluation = abstract.evaluation_set.all()
+#    except Evaluation.DoesNotExist:
+#        evaluation = Evaluation(evaluator=request.user,
+#                                abstract=abstract,
+#                                )
 
+#    if request.method == 'POST':
+#        form = EvaluationForm(request.POST, instance=evaluation)
+#        if form.is_valid():
+#            form.save()
+#            return HttpResponseRedirect(reverse('events:list_abstracts',
+#                                                args=(event.code_name,)))
+#    elif request.method == 'GET':
+#        form = EvaluationForm(instance=evaluation)
+#    context = {'event': event, 'abstract': abstract, 'form': form}
+    context= {'event':event, "abstract":abstract}
     return render(request, "events/abstracts/show_abstract.html", context)
 
 def list_sessions(request, event_code_name):

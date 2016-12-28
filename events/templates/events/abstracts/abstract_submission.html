@@ -142,6 +142,8 @@
 			</div>
             <h3 class="english-field">Post your abstract</h3>
         <p>In the {{ event.english_name }}, abstracts are divided into five sections: introduction, methodology, results, discussion and conclusion.  Make sure that you have read <a target="_blank" href="{{ event.abstract_submission_instruction_url }}">the regulations carefully</a> and post your abstract below.</p>
+            <h4 class="english-field" style="color:white">Introduction:</h4>
+
             <div class="form-group">
 				<div class="input-group{% if form.introduction.errors %} validate-has-error{% endif %}">
 					<div class="">
@@ -156,6 +158,65 @@
 				</div>
 			</div>
 
+            <h4 class="english-field" style="color:white" >Methodology:</h4>
+
+            <div class="form-group">
+				<div class="input-group{% if form.methodology.errors %} validate-has-error{% endif %}">
+
+
+					<textarea {% if form.methodology.value and not form.methodology.errors %}value="{{ form.methodology.value }}" {% endif %}type="text" class="form-control english-field" name="methodology" id="methodology" placeholder="Abstract's methodology" required="required"></textarea>
+					{% if form.methodology.errors %}
+					    {% for error in form.methodology.errors %}
+					        <label class='error' for='methodology' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+
+            <h4 class="english-field" style="color:white" >Results:</h4>
+
+            <div class="form-group">
+				<div class="input-group{% if form.results.errors %} validate-has-error{% endif %}">
+
+
+					<textarea {% if form.results.value and not form.results.errors %}value="{{ form.results.value }}" {% endif %}type="text" class="form-control english-field" name="results" id="results" placeholder="Abstract's results" required="required"></textarea>
+					{% if form.results.errors %}
+					    {% for error in form.results.errors %}
+					        <label class='error' for='results' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+
+            <h4 class="english-field" style="color:white">Discussion:</h4>
+
+            <div class="form-group">
+				<div class="input-group{% if form.discussion.errors %} validate-has-error{% endif %}">
+
+
+					<textarea {% if form.discussion.value and not form.discussion.errors %}value="{{ form.discussion.value }}" {% endif %}type="text" class="form-control english-field" name="discussion" id="discussion" placeholder="Abstract's discussion" required="required"></textarea>
+					{% if form.discussion.errors %}
+					    {% for error in form.discussion.errors %}
+					        <label class='error' for='discussion' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+
+            <h4 class="english-field" style="color:white">Conclusion:</h4>
+
+            <div class="form-group">
+				<div class="input-group{% if form.conclusion.errors %} validate-has-error{% endif %}">
+
+
+					<textarea {% if form.conclusion.value and not form.conclusion.errors %}value="{{ form.conclusion.value }}" {% endif %}type="text" class="form-control english-field" name="conclusion" id="conclusion" placeholder="Abstract's conclusion" required="required"></textarea>
+					{% if form.conclusion.errors %}
+					    {% for error in form.conclusion.errors %}
+					        <label class='error' for='conclusion' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
 
         
             <div class="form-group" style="text-align: justify;">
@@ -175,8 +236,6 @@ will result in a refusal of my application.
 			</div>
 	</div>
 </form>
-<div Style="width: 800px;  >
-
     <html>
         <head>
             <meta charset="utf-8">
@@ -185,8 +244,81 @@ will result in a refusal of my application.
         </head>
         <body>
 		{# added toolbar just to be able to remove buttons #}
+		<script>
+			CKEDITOR.replace( 'methodology' , {  toolbar: [
+    { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
+    { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+    { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
+    { name: 'forms', items: [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
+    '/',
+    { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
+    { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },
+    { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+    { name: 'insert', items: [ 'Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe' ] },
+    '/',
+    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+    { name: 'colors', items: [ 'TextColor', 'BGColor' ] },
+    { name: 'others', items: [ '-' ] },
+	]
+	});
+		</script>
+				<script>
+			CKEDITOR.replace( 'conclusion' , {  toolbar: [
+    { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
+    { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+    { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
+    { name: 'forms', items: [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
+    '/',
+    { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
+    { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },
+    { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+    { name: 'insert', items: [ 'Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe' ] },
+    '/',
+    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+    { name: 'colors', items: [ 'TextColor', 'BGColor' ] },
+    { name: 'others', items: [ '-' ] },
+	]
+	});
+		</script>
+				</script>
+		<script>
+			CKEDITOR.replace( 'results' , {  toolbar: [
+    { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
+    { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+    { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
+    { name: 'forms', items: [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
+    '/',
+    { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
+    { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },
+    { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+    { name: 'insert', items: [ 'Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe' ] },
+    '/',
+    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+    { name: 'colors', items: [ 'TextColor', 'BGColor' ] },
+    { name: 'others', items: [ '-' ] },
+	]
+	});
+		</script>
+		<script>
+			CKEDITOR.replace( 'discussion', {  toolbar: [
+    { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
+    { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+    { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
+    { name: 'forms', items: [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
+    '/',
+    { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
+    { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },
+    { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+    { name: 'insert', items: [ 'Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe' ] },
+    '/',
+    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+    { name: 'colors', items: [ 'TextColor', 'BGColor' ] },
+    { name: 'others', items: [ '-' ] },
+	]
+	});
+		</script>
             <script>
-                CKEDITOR.replace( 'introduction' , {  toolbar: [
+                CKEDITOR.replace( 'introduction', {  toolbar: [
     { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
     { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
     { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },

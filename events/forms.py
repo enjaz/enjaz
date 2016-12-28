@@ -75,7 +75,8 @@ class AbstractForm(forms.ModelForm):
         model = Abstract
         fields = ['title', 'authors', 'university', 'college',
                   'presenting_author', 'email', 'phone', 'level',
-                  'presentation_preference', 'introduction',]
+                  'presentation_preference', 'introduction','methodology',
+                  'results', 'discussion', 'conclusion']
 
 AbstractFigureFormset = inlineformset_factory(Abstract, AbstractFigure, fields=['figure'])
 

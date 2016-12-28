@@ -312,6 +312,10 @@ class Abstract(models.Model):
         )
     presentation_preference = models.CharField(verbose_name="Presentation preference", max_length=1, choices=presentation_preference_choices)
     introduction = models.TextField(u"Introduction", default="" )
+    methodology = models.TextField(u"Methodology", default="")
+    results = models.TextField(u"Results", default="")
+    discussion = models.TextField(u"Discussion", default="")
+    conclusion = models.TextField(u"Conclusion", default="")
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")

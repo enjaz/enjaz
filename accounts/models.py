@@ -97,6 +97,14 @@ class CommonProfile(models.Model):
 
         return en_fullname
 
+    def get_city_code(self):
+        if self.city == u'الرياض':
+            return 'R'
+        elif self.city == u'جدة':
+            return 'J'
+        elif self.city == u'الأحساء':
+            return 'A'
+
 
 class EnjazProfile(UserenaBaseProfile):
     user = models.OneToOneField(User,

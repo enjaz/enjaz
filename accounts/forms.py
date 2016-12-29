@@ -98,7 +98,7 @@ class StudentSignupForm(EnjazSignupForm):
     """
     A form that includes extra student-related fields.
     """
-    student_id = forms.IntegerField(label=CommonProfile._meta.get_field('student_id').verbose_name, required=False)
+    student_id = forms.IntegerField(label=CommonProfile._meta.get_field('student_id').verbose_name)
     # Since the mobile number starts with a zero, store it as a
     # string.
     section = forms.CharField(label=u"القسم", max_length=2, widget=forms.Select(choices=section_choices),
@@ -107,7 +107,7 @@ class StudentSignupForm(EnjazSignupForm):
                               widget=forms.Select(choices=college_choices))
     alternative_email = forms.EmailField(label=CommonProfile._meta.get_field('alternative_email').verbose_name)
 
-    badge_number = forms.IntegerField(label=CommonProfile._meta.get_field('badge_number').verbose_name, required=False)
+    badge_number = forms.IntegerField(label=CommonProfile._meta.get_field('badge_number').verbose_name)
 
     def __init__(self, *args, **kw):
         super(StudentSignupForm, self).__init__(*args, **kw)
@@ -179,11 +179,10 @@ class NonStudentSignupForm(EnjazSignupForm):
     """
     # Since the mobile number starts with a zero, store it as a
     # string.  For non-students, this field is going to be optional.
-    mobile_number = forms.CharField(label=CommonProfile._meta.get_field('mobile_number').verbose_name,
-                                    required=False)
+    mobile_number = forms.CharField(label=CommonProfile._meta.get_field('mobile_number').verbose_name)
     job_description = forms.CharField(label=CommonProfile._meta.get_field('job_description').verbose_name,
                                        max_length=50)
-    badge_number = forms.IntegerField(label=CommonProfile._meta.get_field('badge_number').verbose_name, required=False)
+    badge_number = forms.IntegerField(label=CommonProfile._meta.get_field('badge_number').verbose_name)
     alternative_email = forms.EmailField(label=CommonProfile._meta.get_field('alternative_email').verbose_name)
 
     def __init__(self, *args, **kw):
@@ -213,7 +212,6 @@ class NonStudentSignupForm(EnjazSignupForm):
         # Save the parent form and get the user
         new_user = super(NonStudentSignupForm, self).save()
 
-        mobile_number = self.cleaned_data.get('mobile_number', '')
         CommonProfile.objects.create(user=new_user,
                                      is_student=False,
                                      profile_type="E",

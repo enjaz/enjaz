@@ -43,9 +43,9 @@ class CommonProfile(models.Model):
                                     verbose_name=u'الاسم الأخير')
     alternative_email = models.EmailField(u"البريد الإلكتروني  الشخصي البديل",
                                           blank=True)
-    badge_number = models.IntegerField(null=True,
+    badge_number = models.IntegerField(null=True, blank=True,
                                        verbose_name=u'رقم البطاقة الجامعية')
-    mobile_number = models.CharField(max_length=20,
+    mobile_number = models.CharField(max_length=20, blank=True,
                                      verbose_name=u'رقم الجوال')
     city = models.CharField(max_length=20,
                             verbose_name=u"المدينة", default=u"الرياض")
@@ -66,7 +66,7 @@ class CommonProfile(models.Model):
     modification_date = models.DateTimeField(auto_now=True, null=True)
 
     # Fields specific for non-users.
-    affiliation = models.CharField(max_length=30, default="",
+    affiliation = models.CharField(max_length=30, default="", blank=True,
                                    verbose_name=u'جهة الدراسة / العمل')
 
     def get_ar_full_name(self):
@@ -96,6 +96,14 @@ class CommonProfile(models.Model):
             pass
 
         return en_fullname
+
+    def get_city_code(self):
+        if self.city == u'الرياض':
+            return 'R'
+        elif self.city == u'جدة':
+            return 'J'
+        elif self.city == u'الأحساء':
+            return 'A'
 
 
 class EnjazProfile(UserenaBaseProfile):

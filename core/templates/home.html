@@ -47,6 +47,54 @@
 	</div>
 </div>
 <br>
+{% if user.event_abstracts.exists %}
+<div class="panel minimal minimal-gray">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<h2>ملخصاتي</h2>
+		</div>
+	</div>
+	<div class="panel-body">
+		<div class="col-md-9">
+		<div class="panel panel-warning panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+			
+			<!-- panel head -->
+			<div class="panel-heading">
+				<div class="panel-title">ملخصاتي البحثية</div>
+				<div class="panel-options">
+					<a href="{% url 'events:list_my_abstracts' %}" type="button" class="btn btn-default">
+						 كل ملخصاتي
+					</a>
+				</div>
+			</div>
+			
+			<!-- panel body -->
+			<div class="panel-body">
+				
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>الملخص</th>
+							<th class="hidden-xs">الحدث</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						{% for abstract in user.event_abstracts.all %}
+						<tr>
+							<td dir="auto" class="english-field"><a href="{% url 'events:show_abstract' abstract.event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
+							<td class="hidden-xs">{{ abstract.event.get_html_name|safe }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				
+			</div>
+			
+		</div>
+	</div>
+</div>
+{% endif %}
 <div class="panel minimal minimal-gray">
 	<div class="panel-heading">
 		<div class="panel-title">
@@ -107,7 +155,7 @@
 	</div>
 	</div>
 </div>
-{% if user.common_profile.is_student %}
+{% if user.common_profile.profile_type == 'S' %}
 <div class="panel minimal minimal-gray">
 	<div class="panel-heading">
 		<div class="panel-title">
@@ -176,7 +224,7 @@
 	</div>
 </div><!-- end panel -->
 {% endif %}
-
+{% if not user.common_profile.profile_type == 'N' %}
 <div class="row">
     <div class="panel minimal minimal-gray">
         <div class="panel-heading">
@@ -230,6 +278,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% comment %}
 <div class="row">
 <div class="col-md-6">

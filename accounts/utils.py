@@ -13,7 +13,7 @@ def get_user_city(user):
 
     # If the profile is absent, return None.
     try: 
-        city = user.common_profile.city
+        city = user.common_profile.get_city_code()
     except (ObjectDoesNotExist, AttributeError):
         city = ''
 

@@ -14,7 +14,7 @@ djangorestframework>=3.1,<3.1.99
 future>=0.14,<0.14.99
 Unidecode>=0.4,<0.4.99
 python-twitter>=3.1,<3.1.99
-django-ckeditorr>=5.1,<5.1.99
+django-ckeditor>=5.1,<5.1.99
 django-picklefield
 Pillow
 openpyxl

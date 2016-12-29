@@ -102,7 +102,7 @@ you?
                     <span>حسابي</span>
                 </a>
                 <ul>
-                    {% if user.common_profile.is_student or user.is_superuser %}
+                    {% if user.common_profile.profile_type == 'S' or user.is_superuser %}
                     <li>
                         <a href="{% url 'bulb:my_books' %}">
                             <i class="fa fa-book"></i>
@@ -134,6 +134,14 @@ you?
                         <a href="{% url 'edit_common_profile' %}">
                             <i class="entypo-cw"></i>
                             <span>حدّث معلوماتي</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if user.event_abstracts.exists %}
+                    <li>
+                        <a href="{% url 'events:list_my_abstracts' %}">
+                            <i class="entypo-pencil"></i>
+                            <span>ملخصاتي</span>
                         </a>
                     </li>
                     {% endif %}

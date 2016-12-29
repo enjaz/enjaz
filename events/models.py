@@ -291,10 +291,11 @@ class Registration(models.Model):
 
 class Abstract(models.Model):
     user = models.ForeignKey(User, null=True, blank=True,
-                             related_name='event_Abstract')
+                             related_name='event_abstracts')
     event = models.ForeignKey(Event, verbose_name=u"الحدث")    
     title = models.CharField(verbose_name="Title", max_length=255)
     authors = models.TextField(verbose_name=u"Name of authors")
+    study_field = models.CharField(verbose_name="Field", max_length=255, default="")
     university = models.CharField(verbose_name="University", max_length=255)
     college = models.CharField(verbose_name="College", max_length=255)
     presenting_author = models.CharField(verbose_name="Presenting author", max_length=255)

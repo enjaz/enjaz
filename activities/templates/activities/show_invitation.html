@@ -177,10 +177,16 @@ margin-bottom: 5px;
 								<i class="entypo-location"></i>
 								{{ invitation.location }}
 							</div>
+
               {% if not invitation.is_open_registration %}
               <div style="margin-top: 10px;">
                    <p class="entypo-mail">سوف ترسل رسائل تأكيد قُبيل الحدث لجميع المقبولين و المقبولات لحضور هذا الحدث</p>
               </div>
+              {% if invitation.notes %}
+              <div>
+              <p class="entypo-info"> {{ invitation.notes|linebreaksbr|safe }}</p>
+              </div>
+              {% endif %}
               {% endif %}
                 </div>
                 {% if already_on or not invitation.is_fully_booked and not restricted_by_city and not restricted_by_gender  %}

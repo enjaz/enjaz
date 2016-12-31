@@ -3,6 +3,9 @@
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
+CKEDITOR.plugins.addExternal('imgupload','/ckeditor/plugin/imgupload/', 'plugin.js')
+CKEDITOR.plugins.addExternal('uploadimage','/ckeditor/plugin/uploadimage','plugin.js')
+
 CKEDITOR.editorConfig = function( config ) {
 	// Define changes to default configuration here.
 	// For complete reference see:
@@ -35,6 +38,9 @@ CKEDITOR.editorConfig = function( config ) {
 
 	// Simplify the dialog windows.
 	config.removeDialogTabs = 'image:advanced;link:advanced';
-	
+
+	config.filebrowserImageUploadUrl='/ckeditor/plugins/imgupload/imgupload.php';
+	config.extraPlugins = 'uploadimage';
+	config.uploadUrl = '/uploader/upload.php';
 };
 

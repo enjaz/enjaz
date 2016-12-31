@@ -333,10 +333,10 @@ class Abstract(models.Model):
 
     def __unicode__(self):
         return self.title
-
+    
 class AbstractFigure(models.Model):
-    abstract = models.ForeignKey(Abstract, related_name='figures')
-    figure = models.FileField(verbose_name=u"Attach the figure", upload_to="hpc/figures/")
+    abstract = models.ForeignKey(Abstract, related_name='figures', null=True)
+    upload = models.FileField(verbose_name=u"Attach the figure", upload_to="hpc/figures/")
 
 class Evaluation(models.Model):
     abstract = models.ForeignKey(Abstract)

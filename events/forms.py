@@ -70,7 +70,6 @@ class RegistrationForm(forms.Form):
         return registration
 
 class AbstractForm(forms.ModelForm):
-
     class Meta:
         model = Abstract
         fields = ['title', 'authors', 'university', 'college',
@@ -78,6 +77,11 @@ class AbstractForm(forms.ModelForm):
                   'phone', 'level', 'presentation_preference',
                   'introduction','methodology', 'results',
                   'discussion', 'conclusion']
+
+class AbstractFigureForm(forms.ModelForm):
+    class Meta:
+        model = AbstractFigure
+        fields = ['upload']
 
 AbstractFigureFormset = inlineformset_factory(Abstract, AbstractFigure, fields=['figure'])
 

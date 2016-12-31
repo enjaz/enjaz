@@ -1,14 +1,18 @@
+# -*- coding: utf-8  -*-
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
+from django.views.decorators import csrf
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from post_office import mail
+import os.path
 
+from core import decorators
 from clubs.models import college_choices
-from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset,EvaluationForm
+from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureForm, EvaluationForm
 from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation
 from events import utils
 
@@ -85,6 +89,23 @@ def show_abstract(request, event_code_name, pk):
 
     context= {'event':event, 'abstract':abstract}
     return render(request, "events/abstracts/show_abstract.html", context)
+
+@decorators.ajax_only
+@decorators.post_only
+@csrf.csrf_exempt
+@login_required
+def upload_abstract_image(request):
+    form = AbstractFigureForm(request.POST, request.FILES)
+    if form.is_valid():
+        abstract_figure = form.save()
+        return {"uploaded": 1,
+                "fileName": os.path.basename(abstract_figure.upload.url),
+                "url": abstract_figure.upload.url}
+    else:
+        return {"uploaded": 0,
+                "error": {
+                    "message": u"لم أستطع رفع الملف"}
+                }
 
 def list_sessions(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)

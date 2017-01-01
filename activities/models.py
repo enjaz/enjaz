@@ -714,6 +714,8 @@ class Invitation(models.Model):
     submission_date = models.DateTimeField(u'تاريخ الإرسال',
                                            auto_now_add=True)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
+    notes = models.TextField(u"الملاحظات",null=True,blank=True)
+
     def is_available_for_user_city(self, user):
         user_city = accounts.utils.get_user_city(user)
         if user_city and self.city and \

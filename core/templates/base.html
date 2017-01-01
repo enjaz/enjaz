@@ -177,7 +177,7 @@ you?
             <li>
                 <a>
                     <i class="entypo-calendar"></i>
-                    <span>أنشطة كبرى</span>
+                    <span>إدارة الأنشطة الكبرى</span>
                 </a>
                 <ul>
                 {% for event in user|get_user_organizing_events %}
@@ -193,6 +193,14 @@ you?
                                 <span>المسجلون والمسجلات</span>
                             </a>
                         </li>
+                        {% if event.receives_abstract_submission %}
+                        <li>
+                            <a href="{% url 'events:list_abstracts' event.code_name %}">
+                                <i class="entypo-pencil"></i>
+                                <span>الملخصات</span>
+                            </a>
+                        </li>
+                        {% endif %}
                     </ul>
                 </li>
                 {% endfor %}

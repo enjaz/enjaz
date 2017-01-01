@@ -287,13 +287,15 @@
 				</div>
 			</div>
 
-            <h4 class="english-field" style="color:white">Discussion (Optional): </h4>
+<<<<<<< HEAD
+            <h4 class="english-field" style="color:white">Discussion (Optional):</h4>
+>>>>>>> 8260869d44b699a89120dccc87b5a2ee8afae91b
 
             <div class="form-group">
 				<div class="input-group{% if form.discussion.errors %} validate-has-error{% endif %}">
 
 
-					<textarea {% if form.discussion.value and not form.discussion.errors %}value="{{ form.discussion.value }}" {% endif %}type="text" class="form-control english-field" name="discussion" id="discussion" placeholder="Abstract's discussion" required="required"></textarea>
+					<textarea {% if form.discussion.value and not form.discussion.errors %}value="{{ form.discussion.value }}" {% endif %}type="text" class="form-control english-field" name="discussion" id="discussion" placeholder="Abstract's discussion"></textarea>
 					{% if form.discussion.errors %}
 					    {% for error in form.discussion.errors %}
 					        <label class='error' for='discussion' style='display: inline-block'>{{ error|escape }}</label>
@@ -316,6 +318,7 @@
 					{% endif %}
 				</div>
 			</div>
+<<<<<<< HEAD
            <h3>Attach your figures</h3>
         <p>If your abstract cites any figures, upload them in order of reference (the first figure is figure 1, the second is figure 2, etc.)</p>
                         {# -------- #}
@@ -349,6 +352,9 @@
                         {% endfor %}
                         </table>
                         {# ------- #}
+=======
+
+>>>>>>> 8260869d44b699a89120dccc87b5a2ee8afae91b
 
             <div class="form-group" style="text-align: justify;">
                 <div class="checkbox">
@@ -449,10 +455,15 @@ will result in a refusal of my application.
 	]
 	});
 		</script>
+<<<<<<< HEAD
         <script>
         </script>
             <script type="text/javascript" scr="{% static 'ckeditor/config.js' %}">
                 CKEDITOR.replace( 'introduction',{  toolbar: [
+=======
+            <script>
+                CKEDITOR.replace( 'introduction', {  toolbar: [
+>>>>>>> 8260869d44b699a89120dccc87b5a2ee8afae91b
     { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
     { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
     { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
@@ -472,7 +483,6 @@ will result in a refusal of my application.
         </body>
     </html>
 
-                    {# "filebrowserImageUploadUrl": 'core/static/ckeditor/plugin/uploadimage/iupload.php' #}
 
 
 
@@ -487,16 +497,6 @@ will result in a refusal of my application.
 <script src="{% static 'js/jquery.autogrowtextarea.min.js' %}"></script>
 <script type="text/javascript">
     $(function(){
-        $("textarea").autoGrow();
-        // add formset controls
-        $("#figure-formset .form-container").formset({
-            prefix: '{{ figure_formset.prefix }}',
-            addText: 'Add a figure',
-            deleteText: 'Delete',
-            addCssClass: 'add-row btn btn-xs btn-primary',
-            deleteCssClass: 'delete-row btn btn-xs btn-danger',
-        });
-
 
         $('#agree').change(function(){
             if (this.checked){
@@ -519,6 +519,11 @@ will result in a refusal of my application.
             value = $(this).val();
             $('input[name=university]').val(value);
         });
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 8260869d44b699a89120dccc87b5a2ee8afae91b
         $('#study-field-list').change(function(){
             value = $(this).val();
             if ($('#study-field-list option[value=Other]:checked').length){

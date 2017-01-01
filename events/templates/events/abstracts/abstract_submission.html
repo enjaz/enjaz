@@ -4,7 +4,7 @@
 {% block description %}{% if event.abstract_submission_instruction_url %}<div class="english-field"><p class="text-center">Please fill in the following form.  Make sure that you have read <a target="_blank" href="{{ event.abstract_submission_instruction_url }}">the regulations carefully</a>.</div>{% endif %}{% endblock %}
 
 {% block content %}
-<form method="post" role="form" id="form_register" enctype="multipart/form-data">	
+<form method="post" role="form" id="form_register" enctype="multipart/form-data">
         {% csrf_token %}
 	<div class="english-field registration-form">
             <h3 class="english-field">Your details</h3>
@@ -13,28 +13,28 @@
 					<div class="input-group-addon">
 						<i class="entypo-flag"></i>
 					</div>
-					
+
 					<input {% if form.title.value and not form.title.errors %}value="{{ form.title.value }}" {% endif %}type="text" class="form-control english-field" name="title" id="title" placeholder="Abstract title" required="required"/>
 					{% if form.title.errors %}
 					    {% for error in form.title.errors %}
 					        <label class='error' for='title' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
-				</div>  
+				</div>
 			</div>
 			<div class="form-group">
 				<div class="input-group{% if form.authors.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-users"></i>
 					</div>
-					
+
 					<textarea {% if form.authors.value and not form.authors.errors %}value="{{ form.authors.value }}" {% endif %}type="text" class="form-control english-field" name="authors" id="authors" placeholder="Authors' names" required="required"></textarea>
 					{% if form.authors.errors %}
 					    {% for error in form.authors.errors %}
 					        <label class='error' for='authors' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
-				</div>  
+				</div>
 			</div>
 
 			<div class="form-group" id="university-group">
@@ -52,13 +52,13 @@
 					{% endif %}
 				</div>
 			</div>
-        
+
 			<div class="form-group">
 				<div class="english-field input-group{% if form.college.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-graduation-cap"></i>
 					</div>
-					
+
 					<input {% if form.college.value and not form.college.errors %}value="{{ form.college.value }}" {% endif %}type="text" class="form-control english-field" name="college" id="college" placeholder="College" required="required"/>
 					{% if form.college.errors %}
 					    {% for error in form.college.errors %}
@@ -185,7 +185,7 @@
 					<div class="input-group-addon">
 						<i class="entypo-user"></i>
 					</div>
-					
+
 					<input {% if form.presenting_author.value and not form.presenting_author.errors %}value="{{ form.presenting_author.value }}" {% endif %}type="text" class="form-control english-field" name="presenting_author" id="presenting_author" placeholder="Presenting author" required="required"/>
 					{% if form.presenting_author.errors %}
 					    {% for error in form.presenting_author.errors %}
@@ -199,7 +199,7 @@
 					<div class="input-group-addon">
 						<i class="entypo-mail"></i>
 					</div>
-					
+
 					<input {% if form.email.value and not form.email.errors %}value="{{ form.email.value }}" {% endif %}type="text" class="form-control english-field" name="email" id="email" {% if not form.email.errors %}placeholder="Email address"{% endif %} required="required"/>
 					{% if form.email.errors %}
 					    {% for error in form.email.errors %}
@@ -213,7 +213,7 @@
 					<div class="input-group-addon">
 						<i class="entypo-mobile"></i>
 					</div>
-					
+
 					<input {% if form.phone.value and not form.phone.errors %}value="{{ form.phone.value }}" {% endif %}type="text" class="form-control english-field" name="phone" id="phone" placeholder="Contact number" required="required"/>
 					{% if form.phone.errors %}
 					    {% for error in form.phone.errors %}
@@ -287,7 +287,7 @@
 				</div>
 			</div>
 
-            <h4 class="english-field" style="color:white">Discussion:</h4>
+            <h4 class="english-field" style="color:white">Discussion (Optional): </h4>
 
             <div class="form-group">
 				<div class="input-group{% if form.discussion.errors %} validate-has-error{% endif %}">
@@ -349,7 +349,7 @@
                         {% endfor %}
                         </table>
                         {# ------- #}
-        
+
             <div class="form-group" style="text-align: justify;">
                 <div class="checkbox">
                     <label>

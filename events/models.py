@@ -318,7 +318,7 @@ class Abstract(models.Model):
     introduction = models.TextField(u"Introduction", default="" )
     methodology = models.TextField(u"Methodology", default="")
     results = models.TextField(u"Results", default="")
-    discussion = models.TextField(u"Discussion", default="")
+    discussion = models.TextField(u"Discussion", default="",null=True, blank=True)
     conclusion = models.TextField(u"Conclusion", default="")
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
@@ -336,8 +336,8 @@ class Abstract(models.Model):
     
 class AbstractFigure(models.Model):
     abstract = models.ForeignKey(Abstract, related_name='figures', null=True)
-    figure = models.FileField(verbose_name=u"Attach the figure", upload_to="hpc/figures/")
-    upload = models.FileField(verbose_name=u"Attach the figure", upload_to="events/figures/")
+    figure = models.FileField(verbose_name=u"Attach the figure", upload_to="events/figures/")
+    upload = models.FileField(verbose_name=u"Attach the figure", upload_to="event/figures/")
 
 class Evaluation(models.Model):
     abstract = models.ForeignKey(Abstract)

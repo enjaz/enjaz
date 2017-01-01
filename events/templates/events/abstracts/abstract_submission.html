@@ -86,7 +86,7 @@
 					<div class="input-group-addon">
 						<i class="entypo-graduation-cap"></i>
 					</div>
-                    
+
 					<select {% if form.study_field.value and not form.study_field.errors %}value="{{ form.study_field.value }}" {% endif %}class="form-control" id="study-field-list" title="{{ form.study_field.label }}" required="required">
                         <option value="">{{ form.study_field.label }}</option>
 <option value="Addiction Medicine">Addiction Medicine</option>
@@ -316,7 +316,39 @@
 					{% endif %}
 				</div>
 			</div>
-
+           <h3>Attach your figures</h3>
+        <p>If your abstract cites any figures, upload them in order of reference (the first figure is figure 1, the second is figure 2, etc.)</p>
+                        {# -------- #}
+                        {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
+                        {{ figure_formset.management_form }}
+                        {{ figure_formset.non_form_errors.as_ul }}
+                        <table id="figure-formset" class="form" style="width: 100%;">
+                        {% for form in figure_formset.forms %}
+                          {% if forloop.first %}
+                            <colgroup>
+                                <col class="col-xs-8">
+                                <col class="col-xs-4">
+                            </colgroup>
+                          {% endif %}
+                          <tr class="form-container">
+                          {% for field in form.visible_fields %}
+                            <td>
+                            {# Include the hidden fields in the form #}
+                            {% if forloop.first %}
+                              {% for hidden in form.hidden_fields %}
+                              {{ hidden }}
+                              {% endfor %}
+                            {% endif %}
+                                <div class="form-group">
+                              {{ field.errors.as_ul }}
+                              {{ field }}
+                                </div>
+                            </td>
+                          {% endfor %}
+                          </tr>
+                        {% endfor %}
+                        </table>
+                        {# ------- #}
         
             <div class="form-group" style="text-align: justify;">
                 <div class="checkbox">
@@ -417,7 +449,10 @@ will result in a refusal of my application.
 	]
 	});
 		</script>
-            <script>
+        <script>
+            CKEDITOR.plugins.addExternal('image',{% static 'ckeditor/plugin/image' %},'plugin.js');
+        </script>
+            <script type="text/javascript">
                 CKEDITOR.replace( 'introduction', {  toolbar: [
     { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
     { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
@@ -438,6 +473,7 @@ will result in a refusal of my application.
         </body>
     </html>
 
+                    {# "filebrowserImageUploadUrl": 'core/static/ckeditor/plugin/uploadimage/iupload.php' #}
 
 
 
@@ -452,6 +488,16 @@ will result in a refusal of my application.
 <script src="{% static 'js/jquery.autogrowtextarea.min.js' %}"></script>
 <script type="text/javascript">
     $(function(){
+        $("textarea").autoGrow();
+        // add formset controls
+        $("#figure-formset .form-container").formset({
+            prefix: '{{ figure_formset.prefix }}',
+            addText: 'Add a figure',
+            deleteText: 'Delete',
+            addCssClass: 'add-row btn btn-xs btn-primary',
+            deleteCssClass: 'delete-row btn btn-xs btn-danger',
+        });
+
 
         $('#agree').change(function(){
             if (this.checked){
@@ -474,24 +520,6 @@ will result in a refusal of my application.
             value = $(this).val();
             $('input[name=university]').val(value);
         });
-
-
-        $('#study-field-list').change(function(){
-            value = $(this).val();
-            if ($('#study-field-list option[value=Other]:checked').length){
-                $('#study-field-text').show();
-                $('#study-field-text').attr('required', 'required');
-            } else {
-                $('#study-field-text').hide();
-                $('#study-field-text').removeAttr('required');
-                $('input[name=study_field]').val(value);
-            }
-        });
-        $('#study-field-text').change(function(){
-            value = $(this).val();
-            $('input[name=study_field]').val(value);
-        });
-
     });
 </script>
 <script src="//cdn.ckeditor.com/4.6.1/standard/ckeditor.js"></script>

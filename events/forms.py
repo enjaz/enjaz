@@ -78,12 +78,13 @@ class AbstractForm(forms.ModelForm):
                   'introduction','methodology', 'results',
                   'discussion', 'conclusion']
 
+AbstractFigureFormset = inlineformset_factory(Abstract, AbstractFigure, fields=['figure'])
+
 class AbstractFigureForm(forms.ModelForm):
     class Meta:
         model = AbstractFigure
         fields = ['upload']
 
-AbstractFigureFormset = inlineformset_factory(Abstract, AbstractFigure, fields=['figure'])
 
 class EvaluationForm(forms.Form):
     def __init__(self, *args, **kwargs):

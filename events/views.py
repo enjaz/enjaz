@@ -12,7 +12,7 @@ import os.path
 
 from core import decorators
 from clubs.models import college_choices
-from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureForm, EvaluationForm
+from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm
 from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation
 from events import utils
 
@@ -44,14 +44,18 @@ def submit_abstract(request, event_code_name):
         instance = Abstract(event=event,user=request.user)
         form = AbstractForm(request.POST, request.FILES,
                             instance=instance)
-        if form.is_valid():
+        figure_formset = AbstractFigureFormset(request.POST, request.FILES)
+        if form.is_valid() and figure_formset.is_valid():
             abstract = form.save()
+            figure_formset.instance = abstract
+            figure_formset.save()
             return HttpResponseRedirect(reverse('events:show_abstract',
                                                 args=(event.code_name, abstract.pk)))
     elif request.method == 'GET':
         form = AbstractForm()
-
+        figure_formset = AbstractFigureFormset()
     context['form'] = form
+    context['figure_formset'] = figure_formset
 
     return render(request, 'events/abstracts/abstract_submission.html', context)
 

@@ -50,7 +50,7 @@ class Event(models.Model):
                                                related_name="abstract_revision_events")
     is_on_telegram = models.BooleanField(default=True,
                                          verbose_name=u"على تلغرام؟")
-    organizing_club = models.ForeignKey(Club)
+    organizing_club = models.ForeignKey(Club , null=True)
     organizing_team = models.ForeignKey(Team, null=True)
     priorities = models.PositiveSmallIntegerField(default=1)
 

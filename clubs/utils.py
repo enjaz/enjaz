@@ -21,7 +21,7 @@ def is_employee_of_any_club(user):
     return employee_clubs.exists()
 
 def is_coordinator(club, user):
-    """Return whether the user is the coordinator of a given club."""
+    """Return whether the user is the coordinator of a given club or team."""
     return club.coordinator == user
 
 def is_deputy(club, user):
@@ -31,7 +31,7 @@ def is_deputy(club, user):
     return user in club.deputies.filter(pk=user.pk)
 
 def is_member(club, user):
-    """Return whether the user is a member of a given club."""
+    """Return whether the user is a member of a given club or team."""
     if not user.is_authenticated():
         return False
     return user in club.members.filter(pk=user.pk)
@@ -39,6 +39,10 @@ def is_member(club, user):
 def is_coordinator_or_member(club, user):
     """Return whether the user is the coordinator, a deputy or a member of a given club."""
     return is_coordinator(club, user) or is_deputy(club, user) or is_member(club, user)
+
+def is_team_coordinator_or_member(team, user):
+    """Return whether the user is the coordinator, or a member of a given team."""
+    return is_coordinator(team, user) or is_member(team, user)
 
 def is_coordinator_or_deputy(club, user):
     """Return whether the user is the coordinator or a deputy of a given club."""

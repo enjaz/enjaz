@@ -2,6 +2,7 @@
 from django.db import models
 import operator
 
+
 def hindi_to_arabic(number):
     return number.replace(u'٠', '0')\
                  .replace(u'١', '1')\
@@ -27,3 +28,4 @@ def get_search_queryset(queryset, search_fields, search_term):
             queryset = queryset.filter(reduce(operator.or_, or_queries))
 
     return queryset
+

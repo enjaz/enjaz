@@ -20,6 +20,11 @@ gender_choices = (
     ('M', u'طلاب'),
 )
 
+general_gender_choices = (
+    ('F', u'أنثى'),
+    ('M', u'ذكر'),
+)
+
 college_choices = (
     ('M', u'كلية الطب'),
     ('A', u'كلية العلوم الطبية التطبيقية'),
@@ -63,15 +68,15 @@ class Club(models.Model):
                                                    verbose_name=u"الممثلين ال الإعلاميين",
                                                    blank=True,
                                                    related_name="media_representations",
-                                                   limit_choices_to={'common_profile__is_student':
-                                                                     True})
+                                                   limit_choices_to={'common_profile__profile_type':
+                                                                     'S'})
     media_assessor = models.ForeignKey(User, null=True, blank=True,
                                        related_name="media_assessments",
                                        on_delete=models.SET_NULL,
                                        default=None,
                                        verbose_name=u"المُقيّم الإعلامي",
-                                       limit_choices_to={'common_profile__is_student':
-                                                         True})
+                                       limit_choices_to={'common_profile__profile_type':
+                                                         'S'})
     members = models.ManyToManyField(User, verbose_name=u"الأعضاء",
                                      blank=True,
                                      related_name="memberships")
@@ -80,8 +85,8 @@ class Club(models.Model):
                                  on_delete=models.SET_NULL,
                                  default=None,
                                  verbose_name=u"الموظف المسؤول",
-                                 limit_choices_to={'common_profile__is_student':
-                                                   False})
+                                 limit_choices_to={'common_profile__profile_type':
+                                                   'E'})
 
     # To make it easy to make it specific to a certain college
     # (e.g. for membership), let's add this field.  That's also one

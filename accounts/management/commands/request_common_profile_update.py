@@ -15,7 +15,7 @@ class Command(BaseCommand):
         domain = Site.objects.get_current().domain
         full_url = "https://{}{}".format(domain,
                                          reverse('edit_common_profile'))
-        for user in User.objects.filter(common_profile__is_student=True,
+        for user in User.objects.filter(common_profile__profile_type='S',
                                         is_active=True).exclude(email=""):
             try:
                 mail.send([user.email],

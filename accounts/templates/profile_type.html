@@ -1,0 +1,65 @@
+
+
+{% extends 'userena/base_userena.html' %}{% load staticfiles %}
+
+{% block title %}التسجيل في بوابة إنجاز{% endblock %}
+{% block description %}يتغين اختيار أحد النماذج التالية للتسجيل في البوابة{% endblock %}
+
+{% block content %}
+{% comment %}
+{% if form.errors %}
+<div class="form-login-error visible dinar-light">
+       <h3 class="dinar-medium">عفوًا، نرجو التأكد من الحقول التالية</h3>
+       {% for err in form.errors %}
+       <p>{{ err }}</p>
+       {% endfor %}
+</div>
+{% endif %}
+{% endcomment %}
+
+
+
+<div class="btn-group"; role="group" >
+
+        <a href="{% url 'userena_signup'  %}" >
+                <button type="submit" id="student-signup" class="btn btn-success btn-lg" Style="width: 350px; height: 70px; border-radius: 12px; font-size: 20px; border: 2px solid white;margin-top: 10px">
+                        <i class="entypo-users"></i>
+طالبات وطلاب الجامعة
+                </button>
+        </a>
+        <a href="{% url 'nonstudent_signup'  %}" >
+                <button type="submit" id="nonstudent-signup" class="btn btn-success btn-lg" Style="width: 350px; height: 70px; border-radius: 12px; font-size: 20px; border: 2px solid white;margin-top: 10px">
+                        <i class="entypo-users"></i>
+موظفات وموظفي الجامعة
+                </button>
+        </a>
+
+
+    <a href="{% url 'nonuser_signup' %}">
+<button id="nonuser-signup" type="submit" class="btn btn-success " Style="width: 350px; height: 70px; border-radius: 12px; font-size: 20px; border: 1px solid white; margin-top: 10px"  ;>
+    <i class="entypo-users"></i>
+     من خارج الجامعة
+
+</button>
+    </a>
+
+
+</div>
+
+
+{% endblock %}
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.css' %}" id="style-resource-3">
+<script src="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.min.js' %}" id="script-resource-11"></script>
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+<script src="{% static 'neon/assets/js/jquery.inputmask.bundle.min.js' %}"></script>
+{% include 'userena/partials/college_selection.html' %}
+{% endblock %}
+
+
+
+
+
+
+
+

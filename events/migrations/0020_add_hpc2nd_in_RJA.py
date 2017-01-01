@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
+
 from datetime import datetime, date
 
 
@@ -72,7 +73,7 @@ def remove_hpc(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('events', '0022_set clubs to null'),
+        ('events', '0019_set_clubs_to_null'),
     ]
 
     operations = [

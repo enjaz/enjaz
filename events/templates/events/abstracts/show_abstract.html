@@ -15,7 +15,7 @@
 				<th colspan="2" class="text-center">{{ abstract.title }}</th>
 			</tr>
 		</thead>
-		
+
 		<tbody>
             <tr>
                 <th class="text-center">Presentation preference</th>
@@ -28,7 +28,11 @@
 			<tr>
 				<th class="text-center">Presenting author</th>
 				<td>{{ abstract.presenting_author }}</td>
-            </tr>
+      </tr>
+			<tr>
+				<th class="text-center">Study field</th>
+				<td>{{ abstract.study_field }}</td>
+			</tr>
 			<tr>
 				<th class="text-center">University</th>
 				<td>{{ abstract.university }}</td>
@@ -45,7 +49,7 @@
 				<th class="text-center">Email</th>
 				<td><a href="mailto:{{ abstract.email }}">{{ abstract.email }}</a></td>
 			</tr>
-			
+
 			<tr>
 				<th class="text-center">Phone</th>
 				<td>{{ abstract.phone }}</td>

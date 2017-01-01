@@ -450,10 +450,9 @@ will result in a refusal of my application.
 	});
 		</script>
         <script>
-            CKEDITOR.plugins.addExternal('image',{% static 'ckeditor/plugin/image' %},'plugin.js');
         </script>
-            <script type="text/javascript">
-                CKEDITOR.replace( 'introduction', {  toolbar: [
+            <script type="text/javascript" scr="{% static 'ckeditor/config.js' %}">
+                CKEDITOR.replace( 'introduction',{  toolbar: [
     { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
     { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
     { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
@@ -520,6 +519,22 @@ will result in a refusal of my application.
             value = $(this).val();
             $('input[name=university]').val(value);
         });
+        $('#study-field-list').change(function(){
+            value = $(this).val();
+            if ($('#study-field-list option[value=Other]:checked').length){
+                $('#study-field-text').show();
+                $('#study-field-text').attr('required', 'required');
+            } else {
+                $('#study-field-text').hide();
+                $('#study-field-text').removeAttr('required');
+                $('input[name=study_field]').val(value);
+            }
+        });
+        $('#study-field-text').change(function(){
+            value = $(this).val();
+            $('input[name=study_field]').val(value);
+        });
+
     });
 </script>
 <script src="//cdn.ckeditor.com/4.6.1/standard/ckeditor.js"></script>

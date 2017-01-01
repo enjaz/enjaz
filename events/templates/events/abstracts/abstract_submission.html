@@ -287,9 +287,7 @@
 				</div>
 			</div>
 
-<<<<<<< HEAD
             <h4 class="english-field" style="color:white">Discussion (Optional):</h4>
->>>>>>> 8260869d44b699a89120dccc87b5a2ee8afae91b
 
             <div class="form-group">
 				<div class="input-group{% if form.discussion.errors %} validate-has-error{% endif %}">
@@ -318,7 +316,6 @@
 					{% endif %}
 				</div>
 			</div>
-<<<<<<< HEAD
            <h3>Attach your figures</h3>
         <p>If your abstract cites any figures, upload them in order of reference (the first figure is figure 1, the second is figure 2, etc.)</p>
                         {# -------- #}
@@ -352,9 +349,7 @@
                         {% endfor %}
                         </table>
                         {# ------- #}
-=======
 
->>>>>>> 8260869d44b699a89120dccc87b5a2ee8afae91b
 
             <div class="form-group" style="text-align: justify;">
                 <div class="checkbox">
@@ -455,15 +450,9 @@ will result in a refusal of my application.
 	]
 	});
 		</script>
-<<<<<<< HEAD
-        <script>
-        </script>
-            <script type="text/javascript" scr="{% static 'ckeditor/config.js' %}">
-                CKEDITOR.replace( 'introduction',{  toolbar: [
-=======
+
             <script>
                 CKEDITOR.replace( 'introduction', {  toolbar: [
->>>>>>> 8260869d44b699a89120dccc87b5a2ee8afae91b
     { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
     { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
     { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
@@ -496,7 +485,17 @@ will result in a refusal of my application.
 <script src="{% static 'js/jquery.formset.js' %}"></script>
 <script src="{% static 'js/jquery.autogrowtextarea.min.js' %}"></script>
 <script type="text/javascript">
-    $(function(){
+     $(function(){
+        $("textarea").autoGrow();
+        // add formset controls
+        $("#figure-formset .form-container").formset({
+            prefix: '{{ figure_formset.prefix }}',
+            addText: 'Add a figure',
+            deleteText: 'Delete',
+            addCssClass: 'add-row btn btn-xs btn-primary',
+            deleteCssClass: 'delete-row btn btn-xs btn-danger',
+        });
+
 
         $('#agree').change(function(){
             if (this.checked){
@@ -519,11 +518,6 @@ will result in a refusal of my application.
             value = $(this).val();
             $('input[name=university]').val(value);
         });
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 8260869d44b699a89120dccc87b5a2ee8afae91b
         $('#study-field-list').change(function(){
             value = $(this).val();
             if ($('#study-field-list option[value=Other]:checked').length){

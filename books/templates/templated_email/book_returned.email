@@ -1,6 +1,0 @@
-{% block subject %}هل أعيد كتابك {{ book.title }}؟{% endblock %}
-{% block plain %}أخبرنا {% if book_request.requester.first_name %}{{ book_request.requester.first_name }} {{ book_request.requester.last_name }}{% else %}{{ book_request.requester.username }}{% endif %} أنه أعاد كتابك {{ book.title }}.
-
-نرجو تأكيد استلام الكتاب على هنا:
-{{ review_url }}#{{ book.pk }}
-{% endblock %}

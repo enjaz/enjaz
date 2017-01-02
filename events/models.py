@@ -318,8 +318,11 @@ class Abstract(models.Model):
     introduction = models.TextField(u"Introduction", default="" )
     methodology = models.TextField(u"Methodology", default="")
     results = models.TextField(u"Results", default="")
-    discussion = models.TextField(u"Discussion", default="",null=True, blank=True)
+    discussion = models.TextField(u"Discussion", default="", blank=True)
     conclusion = models.TextField(u"Conclusion", default="")
+    was_published = models.BooleanField(u"Have you published this research?", default=False)
+    was_presented_at_others = models.BooleanField(u"Have you presented this research in any other conference before?", default=False)
+    was_presented_previously = models.BooleanField(u"Have you presented this research in a previous year of this conference?", default=False)
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")

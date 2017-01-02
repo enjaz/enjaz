@@ -1,15 +1,19 @@
+# -*- coding: utf-8  -*-
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
+from django.views.decorators import csrf
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from post_office import mail
+import os.path
 
+from core import decorators
 from clubs.models import college_choices
-from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset
-from events.models import Event, Registration, Session, Abstract, AbstractFigure
+from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm
+from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation
 from events import utils
 
 def redirect_home(request, event_code_name):
@@ -19,12 +23,13 @@ def redirect_home(request, event_code_name):
     elif event.is_registration_open():
         return HttpResponseRedirect(reverse('events:registration_introduction',
                                             args=(event.code_name,)))
-    elif event.is_abstract_submission_open():        
+    elif event.is_abstract_submission_open():
         return HttpResponseRedirect(reverse('events:submit_abstract',
                                             args=(event.code_name,)))
     else:
         raise Http404
 
+@login_required
 def submit_abstract(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name,
                               receives_abstract_submission=True)
@@ -36,21 +41,17 @@ def submit_abstract(request, event_code_name):
         return render(request, 'events/abstracts/abstract_closed.html', context)
 
     if request.method == 'POST':
-        instance = Abstract(event=event)
+        instance = Abstract(event=event,user=request.user)
         form = AbstractForm(request.POST, request.FILES,
                             instance=instance)
         figure_formset = AbstractFigureFormset(request.POST, request.FILES)
-        if form.is_valid() and figure_formset.is_valid():
+        if form.is_valid():
             abstract = form.save()
-            figure_formset.instance = abstract
-            figure_formset.save()
-            return HttpResponseRedirect(reverse('events:abstract_submision_completed',
-                                                args=(event.code_name,)))
-
+            return HttpResponseRedirect(reverse('events:show_abstract',
+                                                args=(event.code_name, abstract.pk)))
     elif request.method == 'GET':
         form = AbstractForm()
         figure_formset = AbstractFigureFormset()
-
     context['form'] = form
     context['figure_formset'] = figure_formset
 
@@ -73,30 +74,40 @@ def list_abstracts(request, event_code_name):
     return render(request, 'events/abstracts/list_abstracts.html', context)
 
 @login_required
+def list_my_abstracts(request):
+    abstracts =  Abstract.objects.filter(is_deleted=False, user=request.user)
+
+    context = {'abstracts': abstracts}
+    return render(request, 'events/abstracts/list_my_abstracts.html', context)
+
+@login_required
 def show_abstract(request, event_code_name, pk):
-    abstract = get_object_or_404(Abstract, pk=pk, is_deleted=False)
+    abstract = get_object_or_404(Abstract, is_deleted=False, pk=pk)
     event = abstract.event
 
-    if not utils.can_evaluate_abstracts(request.user, event):
+    if not abstract.user == request.user and \
+       not request.user.is_superuser:
         raise PermissionDenied
 
-    try:
-        evaluation = abstract.evaluation
-    except Evaluation.DoesNotExist:
-        evaluation = Evaluation(evaluator=request.user,
-                                abstract=abstract)
-
-    if request.method == 'POST':
-        form = EvaluationForm(request.POST, instance=evaluation)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('events:list_abstracts',
-                                                args=(event.code_name,)))
-    elif request.method == 'GET':
-        form = EvaluationForm(instance=evaluation)
-    context = {'event': event, 'abstract': abstract, 'form': form}
-
+    context= {'event':event, 'abstract':abstract}
     return render(request, "events/abstracts/show_abstract.html", context)
+
+@decorators.ajax_only
+@decorators.post_only
+@csrf.csrf_exempt
+@login_required
+def upload_abstract_image(request):
+    form = AbstractFigureForm(request.POST, request.FILES)
+    if form.is_valid():
+        abstract_figure = form.save()
+        return {"uploaded": 1,
+                "fileName": os.path.basename(abstract_figure.upload.url),
+                "url": abstract_figure.upload.url}
+    else:
+        return {"uploaded": 0,
+                "error": {
+                    "message": u"لم أستطع رفع الملف"}
+                }
 
 def list_sessions(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)

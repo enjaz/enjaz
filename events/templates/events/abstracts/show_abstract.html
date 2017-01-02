@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="english-field">
-
+<p class="alert alert-warning"><i class="fa fa-hourglass-half" aria-hidden="true"></i> This abstract is currently pending revision.</p>
 	<table class="table table-bordered">
           <colgroup>
             <col class="col-xs-4">
@@ -15,7 +15,7 @@
 				<th colspan="2" class="text-center">{{ abstract.title }}</th>
 			</tr>
 		</thead>
-		
+
 		<tbody>
             <tr>
                 <th class="text-center">Presentation preference</th>
@@ -28,7 +28,11 @@
 			<tr>
 				<th class="text-center">Presenting author</th>
 				<td>{{ abstract.presenting_author }}</td>
-            </tr>
+      </tr>
+			<tr>
+				<th class="text-center">Study field</th>
+				<td>{{ abstract.study_field }}</td>
+			</tr>
 			<tr>
 				<th class="text-center">University</th>
 				<td>{{ abstract.university }}</td>
@@ -45,23 +49,30 @@
 				<th class="text-center">Email</th>
 				<td><a href="mailto:{{ abstract.email }}">{{ abstract.email }}</a></td>
 			</tr>
-			
+
 			<tr>
 				<th class="text-center">Phone</th>
 				<td>{{ abstract.phone }}</td>
             </tr>
             <tr>
-                <th class="text-center">Attachment</th>
-                <td>
-                    <a href="{{ abstract.attachment.url }}" class="english-field">
-                        <i class="entypo-documents"></i>
-                        {{ abstract.attachment.name }}
-                    </a>
-                </td>
+
             </tr>
 		</tbody>
 	</table>
-    <h2>Evaluate</h2>
+
+<h3>Introduction</h3>
+{{ abstract.introduction|safe }}
+<h3>Methodology</h3>
+{{ abstract.methodology|safe }}
+<h3>Results</h3>
+{{ abstract.results|safe }}
+<h3>Discussion</h3>
+{{ abstract.discussion|safe }}
+<h3>Conclusion</h3>
+{{ abstract.conclusion|safe }}
+
+{% comment %}
+   {# <h2>Evaluate</h2> #}
 {% if form.errors %}
         <p class="alert alert-danger"><i class="entypo-flag"></i>Make sure that you have filled all questions.</p>
 {% endif %}
@@ -81,12 +92,12 @@
               {% endfor %}
         </div>
         {% endfor %}
-          <div class="form-group">
-              <button type="submit" class="btn btn-success">Submit</button>
-          </div>
+        {#  <div class="form-group"> #}
+            {#  <button type="submit" class="btn btn-success">Submit</button>#}
+        {#  </div>#}
     </form>
     {% endif %}
-
+{% endcomment %}
 </div>
 {% endblock %}
 

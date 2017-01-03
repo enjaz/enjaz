@@ -817,7 +817,7 @@ def toggle_confirm_invitation(request, pk):
         if invitation.is_fully_booked():
             raise Exception(u"اكتملت المقاعد الممكنة لهذا الحدث، ولم يعد ممكنا التسجيل فيه!")
         invitation.students.add(request.user)
-        if request.user.social_auth.exists() and invitation in invitation.linked_to_twitter:
+        if request.user.social_auth.exists() and invitation.linked_to_twitter:
             show_url = reverse('activities:show_invitation', args=(invitation.pk,))
             full_url = request.build_absolute_uri(show_url)
             text = u"سأحضر {}.\nيمكنك التسجيل للحضور من هنا: {}"

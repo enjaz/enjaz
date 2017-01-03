@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('activities', '0032_invitation_club'),
+        ('activities', '0034_Disscution Optional'),
     ]
 
     operations = [

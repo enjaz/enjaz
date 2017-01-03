@@ -17,7 +17,10 @@ from clubs.utils import get_deanship, get_presidency
 from forms_builder.forms.models import Form
 from media.utils import REPORT_DUE_AFTER
 import accounts.utils
-
+city_choices = (
+    ('R', u'الرياض'),
+    ('J', u'جدة'),
+    ('A', u'الأحساء'))
 
 class Evaluation(models.Model):
     """ An activity evaluation filled by students upon Niqati code submission. """
@@ -706,7 +709,7 @@ class Invitation(models.Model):
     maximum_registrants = models.PositiveIntegerField(u"أقصى عدد للمسجلين والمسجلات",
                                                       null=True,
                                                       blank=True)
-    location = models.CharField(u"المكان", default="",
+    location = models.CharField(u"المكان", default="", blank=True,
                                 max_length=200)
     date = models.DateField(u"التاريخ")
     start_time = models.TimeField(u"وقت البداية")

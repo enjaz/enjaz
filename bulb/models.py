@@ -53,7 +53,7 @@ class NeededBook(models.Model):
     objects = managers.NeededBookQuerySet.as_manager()
 
 #register(NeededBook)
-    
+
 class Book(models.Model):
     tags = TagAutocompleteField(u"الوسوم")
     year = models.ForeignKey('core.StudentClubYear', null=True,
@@ -272,7 +272,7 @@ class Point(models.Model):
 
     def __unicode__(self):
         return "%s (%s)" % (self.user.username, self.value)
-    
+
 class Group(models.Model):
     year = models.ForeignKey('core.StudentClubYear', null=True,
                              on_delete=models.SET_NULL)
@@ -528,7 +528,7 @@ class DewanyaSuggestion(models.Model):
     name = models.CharField(max_length=100, verbose_name=u"الاسم")
     subject = models.CharField(max_length=100, verbose_name=u"الموضوع")
     submission_date = models.DateTimeField(u"تاريخ الإرسال",
-                                       auto_now_add=True)    
+                                       auto_now_add=True)
 
 class Readathon(models.Model):
     publication_date = models.DateTimeField(u"تاريخ النشر", null=True, blank=True)
@@ -575,3 +575,19 @@ class BookCommitment(models.Model):
 
     def __unicode__(self):
         return self.title
+
+class ReadathonProducts(models.Model):
+    user = models.ForeignKey(User,
+                             u"المستخدمـ/ـة")
+    readathon = models.ForeignKey(Readathon,
+                                u"الريديثون")
+    username = models.CharField(u"أسم المستخدمـ\ـة", max_length=200)
+    title = models.CharField(u"العنوان", max_length=200)
+    body = models.TextField(default=False)
+
+    def __unicode__(self):
+        return self.title
+
+class ReadathonFiles(models.Model):
+    readathon_products = models.ForeignKey(ReadathonProducts, related_name='attachment')
+    attachment = models.FileField(u"ملف", upload_to="readathon/attachment/")

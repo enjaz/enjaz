@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 from django import forms
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
 from accounts import utils
@@ -296,14 +297,27 @@ class ModifiedAuthenticationForm(forms.Form):
         password = self.cleaned_data.get('password')
 
         if identification and password:
-            if '@' in identification:
+            if identification.endswith("ksau-hs.edu.sa") or \
+               identification.endswith("ngha.med.sa"):
                 username = identification.split('@')[0]
+                email = None
+            elif '@' in identification:
+                username = None
+                email = identification
             else:
                 username = identification
+                email = None
 
-            # All usernames should alwyas be lower-case and with no
-            # spaces. This will make life easier.
-            username = username.lower().strip()
+            # All usernames and emails should alwyas be lower-case and
+            # with no spaces. This will make life easier.
+            if username:
+                username = username.lower().strip()
+            elif email:
+                email = email.strip()
+                try:
+                    username = User.objects.get(email__iexact=email).username
+                except User.DoesNotExist:
+                    username = email
 
 
             # The final username should be returned to userena to

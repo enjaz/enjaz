@@ -50,7 +50,7 @@ class Event(models.Model):
                                                related_name="abstract_revision_events")
     is_on_telegram = models.BooleanField(default=True,
                                          verbose_name=u"على تلغرام؟")
-    organizing_club = models.ForeignKey(Club)
+    organizing_club = models.ForeignKey(Club , null=True)
     organizing_team = models.ForeignKey(Team, null=True)
     priorities = models.PositiveSmallIntegerField(default=1)
 
@@ -318,8 +318,11 @@ class Abstract(models.Model):
     introduction = models.TextField(u"Introduction", default="" )
     methodology = models.TextField(u"Methodology", default="")
     results = models.TextField(u"Results", default="")
-    discussion = models.TextField(u"Discussion", default="")
+    discussion = models.TextField(u"Discussion", default="", blank=True)
     conclusion = models.TextField(u"Conclusion", default="")
+    was_published = models.BooleanField(u"Have you published this research?", default=False)
+    was_presented_at_others = models.BooleanField(u"Have you presented this research in any other conference before?", default=False)
+    was_presented_previously = models.BooleanField(u"Have you presented this research in a previous year of this conference?", default=False)
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
@@ -336,8 +339,8 @@ class Abstract(models.Model):
     
 class AbstractFigure(models.Model):
     abstract = models.ForeignKey(Abstract, related_name='figures', null=True)
-    figure = models.FileField(verbose_name=u"Attach the figure", upload_to="hpc/figures/")
-    upload = models.FileField(verbose_name=u"Attach the figure", upload_to="events/figures/")
+    figure = models.FileField(verbose_name=u"Attach the figure", upload_to="events/figures/")
+    upload = models.FileField(verbose_name=u"Attach the figure", upload_to="event/figures/")
 
 class Evaluation(models.Model):
     abstract = models.ForeignKey(Abstract)

@@ -173,10 +173,12 @@ margin-bottom: 5px;
 								-
 								{{ invitation.end_time }}
 							</div>
+							{% if invitation.location %}
 							<div>
 								<i class="entypo-location"></i>
 								{{ invitation.location }}
 							</div>
+							{% endif %}
 
               {% if not invitation.is_open_registration %}
               <div style="margin-top: 10px;">
@@ -301,6 +303,7 @@ margin-bottom: 5px;
     });
 
     </script>
+    {% if invitation in linked_to_twitter %}
 {%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
 <!---Twitter Modal -->>
 <div class="modal fade" id="connect-twitter">
@@ -324,7 +327,7 @@ margin-bottom: 5px;
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-
+{% endif %}
 <script type="text/javascript">
 {%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
 $(function(){

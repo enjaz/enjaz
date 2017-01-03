@@ -52,7 +52,7 @@ def index(request):
 @login_required
 def search_books(request):
     context = {}
-    if request.GET.get('q'):        
+    if request.GET.get('q'):
         existing_books = Book.objects.current_year().undeleted().available().for_user_city(request.user)
         fields = ['title', 'authors', 'description',
                   'submitter__common_profile__ar_first_name',
@@ -68,7 +68,7 @@ def search_books(request):
 @login_required
 def search_readers(request):
     context = {}
-    if request.GET.get('q'):        
+    if request.GET.get('q'):
         existing_readers = ReaderProfile.objects.all()
         fields = ['areas_of_interests', 'favorite_books',
                   'favorite_writers', 'twitter',
@@ -176,7 +176,7 @@ def order_instructions(request, pk):
     book = get_object_or_404(Book, pk=pk, is_deleted=False)
     book_exchange_coordinator = clubs.utils.get_team_for_user("book_exchange", book.submitter).coordinator
     last_request = book.last_pending_request()
-    
+
     if not (last_request and last_request.requester == request.user) and \
        not utils.can_order_book(request.user, book):
         raise PermissionDenied
@@ -241,7 +241,7 @@ def confirm_book_order(request, pk):
                           context=email_context)
             requests_by_me_url = reverse('bulb:requests_by_me')
             full_url = request.build_absolute_uri(requests_by_me_url)
-            return {"message": "success", "list_url": full_url}            
+            return {"message": "success", "list_url": full_url}
 
     elif request.method == 'GET':
         form = RequestForm(instance=instance)
@@ -346,7 +346,7 @@ def delete_needed_book(request, pk):
     needed_book = get_object_or_404(NeededBook, pk=pk,
                                     is_deleted=False)
     if not utils.can_edit_needed_book(request.user, needed_book):
-        raise Exception(u"لا تستطيع حذف المجموعة")    
+        raise Exception(u"لا تستطيع حذف المجموعة")
 
     needed_book.is_deleted = True
     needed_book.save()
@@ -523,7 +523,7 @@ def list_my_books(request):
 
     context =  {'books': books,
                 'book_exchange_coordinator': book_exchange_coordinator}
-    return render(request, 'bulb/exchange/list_my_books.html', context)    
+    return render(request, 'bulb/exchange/list_my_books.html', context)
 
 
 @decorators.ajax_only
@@ -551,7 +551,7 @@ def list_my_requests(request):
 
     context =  {'requests': requests,
                 'book_exchange_coordinator': book_exchange_coordinator}
-    return render(request, 'bulb/exchange/list_direct_requests.html', context)    
+    return render(request, 'bulb/exchange/list_direct_requests.html', context)
 
 @login_required
 def indicators(request, city=""):
@@ -714,7 +714,7 @@ def list_indirect_requests(request):
         # * for indirect delivery,
         # * either the requester's status is done and the requester's gender is the same as the bulb's,
         # * or the owner's status is done and the owner's gender is the same as bulb's.
-        # * exclude requests that are supposed to be in the claim/return lists. 
+        # * exclude requests that are supposed to be in the claim/return lists.
         requests = Request.objects.filter(delivery='I',
                                           owner_status='D',
                                           book__submitter__common_profile__city=book_exchange_team.city,
@@ -1102,7 +1102,7 @@ def show_group(request, group_pk):
 def delete_group(request, group_pk):
     group = get_object_or_404(Group, pk=group_pk, is_deleted=False)
     if not utils.can_edit_group(request.user, group):
-        raise Exception(u"لا تستطيع حذف المجموعة")    
+        raise Exception(u"لا تستطيع حذف المجموعة")
 
     group.is_deleted = True
     group.save()
@@ -1125,7 +1125,7 @@ def list_memberships(request, group_pk):
 def add_group_session(request, group_pk):
     group = get_object_or_404(Group, pk=group_pk, is_deleted=False)
     if not utils.can_edit_group(request.user, group):
-        raise Exception(u"لا تستطيع تعديل المجموعة")    
+        raise Exception(u"لا تستطيع تعديل المجموعة")
 
     if request.method == 'POST':
         instance = Session(group=group, submitter=request.user)
@@ -1219,7 +1219,7 @@ def edit_session(request, session_pk, group_pk=None):
             form = FreeSessionForm(request.POST, instance=session, user=request.user)
             show_url = reverse('bulb:show_session', args=(session.pk,))
         if form.is_valid():
-            session = form.save()                
+            session = form.save()
             full_url = request.build_absolute_uri(show_url)
             response['show_url'] = full_url
             return response
@@ -1240,7 +1240,7 @@ def delete_session(request, session_pk, group_pk=None):
     session = get_object_or_404(Session, pk=session_pk,
                                 is_deleted=False)
     if not utils.can_edit_session(request.user, session):
-        raise Exception(u"لا تستطيع حذف المجموعة")    
+        raise Exception(u"لا تستطيع حذف المجموعة")
 
     session.is_deleted = True
     session.save()
@@ -1675,3 +1675,12 @@ def update_book_commitment(request, readathon_pk, pk):
 
     context['form'] = form
     return render(request, 'bulb/readathon/update_book_commitment_form.html', context)
+
+@decorators.ajax_only
+@login_required
+def readathon_products(request, readathon_pk, pk):
+    readathon_products = get_object_or_404(ReadathonProducts, pk=pk,
+                                            is_deleted=False)
+    context = {'readathon_products': readathon_products}
+
+    return render(request, 'bulb/readathon/products.html', context)

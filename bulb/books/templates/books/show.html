@@ -1,0 +1,91 @@
+{% extends "books_base.html" %}{% load bootstrap3 %}
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block content %}
+<h2 class="english-field">{{ book.title }}</h2>
+
+<div class="col-md-3">
+{% if user == book.submitter or not previous_requests and book.status == 'A' %}
+	<div class="panel panel-primary" data-collapsed="0">
+		<!-- panel head -->
+		<div class="panel-heading">
+			<div class="panel-title">خيارات</div>
+		</div>
+		
+		<!-- panel body -->
+		<div class="panel-body">
+			<p style="font-size:1em;"><ul class="list-unstyled">
+			{% if not user == book.submitter and book.status == 'A' and user_gender == submitter_gender and not previous_requests %}
+				<li><a href="{% url 'books:borrow' book.pk %}">استعر</a></li>
+			{% elif user == book.submitter %}
+				<li><a href="{% url 'books:review_requests' %}#book{{ book.pk }}"><span class="glyphicon glyphicon-list-alt"></span> راجع طلبات الاستعارة</a></li>
+				<li><a href="{% url 'books:edit' book.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
+				{% if book.status == 'A' or book.status == 'H' %}
+				<li><a href="{% url 'books:withdraw' book.pk %}"><span class="glyphicon glyphicon-remove"></span> اسحب</a></li>
+				{% endif %}
+			{% elif user_gender != submitter_gender %}
+				<p>هذا الكتاب متوفر {% if book.available_to == 'F' %} للطالبات{% else %} للطلاب{% endif %} فقط.</p>
+			{% endif %}
+			</ul></p>
+		</div>
+	</div>
+{% endif %}
+</div>
+
+<div class="col-md-9">
+{% if book.description or book.cover %}
+<div class="row" style="direction: ltr;">
+{% if book.cover %}
+    <img src="{{ book.cover.url }}" style="float: left; padding: 0 15px 15px 15px;"/>
+{% endif %}
+{% if book.description %}
+<blockquote class="book-description english-field">
+    <p>{{ book.description }}</p>
+</blockquote>
+{% endif %}
+</div>
+{% endif %}
+<table class="tg table-hover table">
+  <colgroup>
+    <col class="col-xs-4">
+    <col class="col-xs-4">
+  </colgroup>{% if book.authors %}
+  <tr>
+    <th>المؤلف</th>
+    <td class="english-field">{{ book.authors }}</td>
+  </tr>{% endif %}{% if book.year %}
+  <tr>
+    <th>السنة</th>
+    <td>{{ book.year }}</td>
+  </tr>{% endif %}{% if book.edition %}
+  <tr>
+    <th>الطبعة</th>
+    <td>{{ book.edition }}</td>
+  </tr>{% endif %}{% if book.available_from %}
+  <tr>
+    <th>متوفر من</th>
+    <td>{{ book.available_from|date:"j F Y" }}</td>
+  </tr>{% endif %}{% if book.available_until %}
+  <tr>
+    <th>متوفر حتى</th>
+    <td>{{ book.available_until|date:"j F Y" }}</td>
+  </tr>{% endif %}{% if book.condition %}
+  <tr>
+    <th>الحالة</th>
+    <td>{{ book.condition }}</td>
+  </tr>{% endif %}
+  <tr>
+    <th>الكتاب متوفر لـ</th>
+    <td>{% if submitter_gender == 'M' %}الطلاب{% elif submitter_gender == 'F' %}الطالبات{% endif %}</td>
+  </tr>
+  <tr>
+    <th>المساهم</th>
+    <td>{{ book.submitter.common_profile.get_ar_full_name|default:book.submitter.username }}</td>
+  </tr>{% if extra %}{% if book.holder %}
+  <tr>
+    <th>المستعير</th>
+    <td>{{ book.holder }}</td>
+  </tr>
+{% endif %}{% endif %}</table>
+</div>
+{% endblock %}

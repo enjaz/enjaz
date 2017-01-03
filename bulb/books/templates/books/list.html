@@ -1,0 +1,126 @@
+{% extends template %}{% load bootstrap3 %}{% load staticfiles %}
+{% block title %}الكتب{% endblock %}
+
+{% block content %}
+{% if not user.is_authenticated %}
+<section class="breadcrumb">
+	
+	<div class="container">
+		
+		<div class="row">
+			
+			<div class="col-sm-12">
+				
+				<h1 class="dinar-medium">الكتب</h1>
+							
+			</div>
+			
+		</div>
+		
+	</div>
+	
+</section>
+
+	<div class="container dinar-light">
+{% endif %}
+{% if page_books and user.is_authenticated %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-primary" data-collapsed="0">
+
+        <!-- panel head -->
+        <div class="panel-heading">
+            <div class="panel-title">رشح الكتب: </div>
+
+            <div class="panel-options">
+                <a class="btn btn-default filter-btn" data-filter="all"><span class="glyphicon glyphicon-book"></span> جميع الكتب</a>
+                <a class="btn btn-default filter-btn" data-filter="mine"><span class="glyphicon glyphicon-user"></span> كتبي فقط</a>
+                <a class="btn btn-default filter-btn" data-filter="available"><span class="glyphicon glyphicon-thumbs-up"></span> الكتب المتاحة</a>
+            </div>
+        </div>
+
+        </div>
+    </div>
+</div>
+{% endif %}
+<div class="row">
+	<div class="col-xs-12">
+<table id="books" class="display">
+  <thead>
+    <tr>
+      <th style="text-align: right;">اسم الكتاب</th>
+      <th style="text-align: right;">المساهم</th>
+      <th style="text-align: right;">تاريخ المساهمة</th>
+      <th style="text-align: right;">متوفر من</th>
+      <th style="text-align: right;">متوفر حتى</th>
+      <th style="text-align: right;">الحالة</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for book in page_books %}
+      <tr>
+        <td class="english-field" style="direction:ltr;"><a href="{% url 'books:show' book.pk %}">{{ book.title }}</a></td>
+        <td>{{ book.submitter.common_profile.get_ar_full_name }}</td>
+        <td data-order="{{ book.submission_date|date:"U" }}">{{ book.submission_date|date }}</td>
+        <td data-order="{{ book.available_from|date:"U" }}">{{ book.available_from }}</td>
+        <td data-order="{% if book.available_until %}{{ book.available_until|date:"U" }}{% else %}-{% endif %}">{% if book.available_until %}{{ book.available_until }}{% else %} - {% endif %}</td>
+        <td>{{ book.get_status_display }}</td>
+      </tr>
+
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+</div>
+{% if not user.is_authenticated %}
+</div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block customscript %}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+
+	<script>
+    var table = $('#books').dataTable({
+        "order": [[ 2, "desc" ]],
+        "language": {% include 'js/dataTables-arabic.json' %}
+    });
+
+    {% if user.is_authenticated %}
+    var filterBy = "";
+
+    $.fn.dataTableExt.afnFiltering.push(
+        function( oSettings, aData, iDataIndex ) {
+            switch (filterBy) {
+                case "mine":
+                    var submitter = String( aData[1] ) || null; // use data for the submitter column
+                    if (submitter == "{{ user.common_profile.get_ar_full_name }}") {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                case "available":
+                    var available = String( aData[5] ) || null;
+                    if (available == "متاح") {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                default:
+                    return true;
+            }
+        }
+    );
+
+
+    $(".filter-btn").click(function () {
+        filterBy = $(this).attr("data-filter");
+        console.log(filterBy);
+        table.fnDraw()
+    });
+    {% endif %}
+	</script>
+{% endblock %}
+

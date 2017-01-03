@@ -1,0 +1,6 @@
+{% block subject %}طُلب كتابك {{ book.title }}{% endblock %}
+{% block plain %}طلب {% if book_request.requester.first_name %}{{ book_request.requester.first_name }} {{ book_request.requester.last_name }}{% else %}{{ book_request.requester.username }}{% endif %} كتابك {{ book.title }} من {{ book_request.borrow_from|date:"j F" }} إلى {{ book_request.borrow_until|date:"j F" }}.
+
+نرجو أن تزور صفحة طلبات الاستعارة لتجيب على الطلب:
+{{ review_url }}#{{ book.pk }}
+{% endblock %}

@@ -695,7 +695,6 @@ class Invitation(models.Model):
     logo = models.ImageField(upload_to='invitations/logos/',
                               blank=True, null=True)
     linked_to_twitter = models.BooleanField(u"تفعيل الربط بتويتر" , default=True)
-
     short_description = models.TextField(u"وصف قصير")
     full_description = models.TextField(u"وصف مطول")
     twitter_account = models.CharField(u"حساب تويتر", default="",

@@ -1,0 +1,44 @@
+{% extends "books_base.html" %}{% load bootstrap3 %}{% load staticfiles %}
+{% block title %}أدخل ردمك{% endblock %}
+{% block content %}
+<!-- <script src="https://raw.githubusercontent.com/SamWM/jQuery-Plugins/master/numeric/jquery.numeric.js"></script>
+<script>
+$(function() {
+	$("#isbn").numeric("-");
+}); -->
+</script>
+<h2>{% if edit %} تعديل {{ form.title.value }} {% else %} كتاب جديد {% endif %}</h2>
+
+<div class="col-md-6 col-sm-6">
+{% if errors %}
+{% for error in errors %}
+<p class="danger"><strong>{% if error == 'short_length' %}يبدو أنك أدخلت رقما ناقصا.
+{% elif error == 'long_length' %}لقد أدخلت رقما طويلا.
+{% elif error == 'not_numbers' %}لم يكن كل ما أدخلت أرقاما.
+{% elif error == 'no_data' %}لم نعثر على أية بيانات. هل أنت متأكد أن الرقم صحيح؟
+{% elif error == 'no_isbn' %}لم تدخل ردمك!
+{% endif %}</strong></p>
+{% endfor %}
+{% endif %}
+
+
+<form action="{% url 'books:contribute' %}" method="post" class="form">
+{% csrf_token %}
+    <input type="hidden" name="is_isbn" value="1">
+
+    <div class="form-group">
+    <label for="isbn">ردمك:</label>
+    <input type="text" class="form-control" id="isbn" name="isbn" placeholder="أدخل ردمك" value="{{ previous_isbn }}" data-mask="decimal">
+    </div>
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "star" %} أرسل
+        </button>
+    {% endbuttons %}
+</form>
+</div>
+<div class="col-md-6 col-sm-6">
+<img src="{% static 'img/isbn.png' %}"/>
+</div>
+<script src="{% static 'neon/assets/js/jquery.inputmask.bundle.min.js' %}"></script>
+{% endblock %}

@@ -173,10 +173,12 @@ margin-bottom: 5px;
 								-
 								{{ invitation.end_time }}
 							</div>
+							{% if invitation.location %}
 							<div>
 								<i class="entypo-location"></i>
 								{{ invitation.location }}
 							</div>
+							{% endif %}
 
               {% if not invitation.is_open_registration %}
               <div style="margin-top: 10px;">

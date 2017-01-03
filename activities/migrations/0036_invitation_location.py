@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('activities', '0034_Disscution Optional'),
+        ('activities', '0035_invitation_linked_to_twitter'),
     ]
 
     operations = [

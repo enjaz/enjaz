@@ -93,11 +93,26 @@ class Event(models.Model):
     def __unicode__(self):
         return self.official_name
 
-class Session(models.Model):
+class TimeSlot(models.Model):
+    name = models.CharField(max_length=50)
     event = models.ForeignKey(Event)
+    date_submitted = models.DateTimeField(auto_now_add=True)
+    date_edited = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return self.name
+
+class Session(models.Model):
+    session_time_slot = models.ForeignKey(TimeSlot)
+    event = models.ForeignKey(Event, null=True, blank=True)
     name = models.CharField(max_length=255)
     limit = models.PositiveSmallIntegerField(null=True, blank=True,
                                              default=None)
+    acceptance_method_choices = (
+        ('F', 'FirstComeFirstServe'),
+        ('M', 'Manual')
+        )
+    acceptance_method = models.CharField(verbose_name="acceptance_method", max_length=1, choices=acceptance_method_choices)
     time_slot = models.PositiveSmallIntegerField(null=True, blank=True,
                                                  default=None)
     vma_id = models.PositiveSmallIntegerField(null=True, blank=True)
@@ -186,6 +201,27 @@ class NonUser(models.Model):
 
     def __unicode__(self):
         return self.get_en_full_name()
+
+class SessionRegistration(models.Model):
+    user = models.ForeignKey(User, null=True, related_name='session_registrations')
+    session = models.ForeignKey(Session)
+    date_submitted = models.DateTimeField(auto_now_add=True)
+    date_edited = models.DateTimeField(auto_now=True)
+    is_approved_choices = (
+        (True, u'معتمد'),
+        (False, u'مرفوض'),
+        (None, u'معلق'),
+        )
+                                          choices=is_approved_choices)
+    is_deleted = models.BooleanField(default=False,
+                                     verbose_name=u"محذوف؟")
+    reminder_sent = models.BooleanField(default=False,
+                                            verbose_name=u"أرسلت رسالة التذكير؟")
+    certificate_sent = models.BooleanField(default=False,
+                                            verbose_name=u"أرسلت الشهادة؟")
+
+    def __unicode__(self):
+        return self.user
 
 class Registration(models.Model):
     user = models.ForeignKey(User, null=True, blank=True,

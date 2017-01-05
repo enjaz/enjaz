@@ -212,6 +212,7 @@ class SessionRegistration(models.Model):
         (False, u'مرفوض'),
         (None, u'معلق'),
         )
+    is_approved = models.NullBooleanField(default= None, verbose_name=u"الحالة",
                                           choices=is_approved_choices)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")

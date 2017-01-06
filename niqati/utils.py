@@ -52,7 +52,7 @@ def is_niqati_closed(user=None, activity=None):
         year = activity.primary_club.year
         city = activity.primary_club.city
 
-    city_code = accounts.get_city_code(city)
+    city_code = accounts.utils..get_city_code(city)
 
     return city_code == 'A' and year.alahsa_niqati_closure_date and \
         timezone.now() >= year.alahsa_niqati_closure_date or \

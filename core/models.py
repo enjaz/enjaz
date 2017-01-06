@@ -88,9 +88,9 @@ class StudentClubYear(models.Model):
 
     def get_closing_ceremony_date(self, user):
         city = accounts.utils.get_user_city(user)
-        if city == 'A':
+        if city == u'الأحساء':
             return self.alahsa_closing_ceremony_date
-        elif city == 'J':
+        elif city == u'جدة':
             return self.jeddah_closing_ceremony_date
         else:
             return self.riyadh_closing_ceremony_date

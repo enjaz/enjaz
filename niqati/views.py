@@ -25,20 +25,21 @@ from core import decorators
 from core.models import StudentClubYear
 from core.utils import get_search_queryset
 from dal import autocomplete
-from clubs.models import Club, city_choices
-from clubs.utils import is_presidency_coordinator_or_deputy, has_coordination_to_activity, get_user_coordination_and_deputyships, can_review_any_niqati, is_coordinator_of_any_club
+from clubs.models import Club, city_code_choices
 from niqati import utils
 from niqati.models import Category, Code, Order, Collection, Review, COUPON, SHORT_LINK
 from niqati.forms import OrderForm, RedeemCodeForm
+import accounts.utils
+import clubs.utils
 
 @login_required
 def index(request):
-    if request.user.is_superuser or is_presidency_coordinator_or_deputy(request.user):
+    if request.user.is_superuser or clubs.utils.is_presidency_coordinator_or_deputy(request.user):
         return HttpResponseRedirect(reverse('niqati:general_report'))
-    elif can_review_any_niqati(request.user):
+    elif clubs.utils.can_review_any_niqati(request.user):
         return HttpResponseRedirect(reverse('niqati:list_pending_orders'))
-    elif is_coordinator_of_any_club(request.user):
-        user_clubs = get_user_coordination_and_deputyships(request.user)
+    elif clubs.utils.is_coordinator_of_any_club(request.user):
+        user_clubs = clubs.utils.get_user_coordination_and_deputyships(request.user)
         user_club = user_clubs.first()
         context = {'user_club': user_club}
         return render(request, "niqati/intro_coordinators.html", context)
@@ -58,7 +59,7 @@ def redeem(request, code=""):
         print closing_ceremony_date
         context = {'closing_ceremony_date': closing_ceremony_date}
         return render(request, "niqati/submit_closed.html", context)
-    elif is_coordinator_of_any_club(request.user):
+    elif clubs.utils.is_coordinator_of_any_club(request.user):
         user_club = request.user.coordination.current_year().first()
         context = {'user_club': user_club}
         return render(request, "niqati/submit_coordinators.html", context)
@@ -123,7 +124,7 @@ def coordinator_view(request, activity_id):
     # --- Permission checks ---
     # Only the club coordinator has the permission to view
     # niqati orders
-    if not has_coordination_to_activity(request.user, activity) \
+    if not clubs.utils.has_coordination_to_activity(request.user, activity) \
        and not request.user.is_superuser:
         raise PermissionDenied
 
@@ -185,7 +186,7 @@ def download_collection(request, pk, download_type):
     domain = Site.objects.get_current().domain
     domain =  'enjazportal.com' # REMOVE
 
-    if not has_coordination_to_activity(request.user, activity) and \
+    if not clubs.utils.has_coordination_to_activity(request.user, activity) and \
        not request.user.is_superuser:
         raise PermissionDenied
 
@@ -289,7 +290,7 @@ def review_order(request):
 
 @login_required
 def list_pending_orders(request):
-    user_clubs = get_user_coordination_and_deputyships(request.user)
+    user_clubs = clubs.utils.get_user_coordination_and_deputyships(request.user)
     user_niqati_reviewing_clubs = user_clubs.filter(can_review_niqati=True)
     if not request.user.has_perm('niqati.change_code') and \
        not user_niqati_reviewing_clubs.exists():
@@ -306,22 +307,23 @@ def list_pending_orders(request):
     return render(request, 'niqati/approve.html', context)
 
 @login_required
-def general_report(request, city=""):
+def general_report(request, city_code=""):
     if not request.user.is_superuser and \
-       not is_presidency_coordinator_or_deputy(request.user):
+       not clubs.utils.is_presidency_coordinator_or_deputy(request.user):
         raise PermissionDenied
 
-    if city:
-        city_codes = [city_pair[0] for city_pair in city_choices]
+    if city_code:
+        city_codes = [city_pair[0] for city_pair in city_code_choices]
         if not city in city_codes:
             raise Http404
+        city = accounts.utils.get_city_from_code(city)
         current_year = StudentClubYear.objects.get_current()
         users = User.objects.filter(common_profile__city=city,
                                     code__year=current_year).annotate(point_sum=Sum('code__points')).filter(point_sum__gt=0).order_by('-point_sum')
         context = {'users': users}
     else:
         context = {'city_choices':
-                   city_choices}
+                   city_code_choices}
     return render(request, 'niqati/general_report.html', context)
 
 @login_required
@@ -339,7 +341,7 @@ def get_short_url(request):
 
     # Only the coordinators and deputies of activities, niqati
     # reviewers and the superuser are allowed to access this API.
-    if not has_coordination_to_activity(request.user, activity) and \
+    if not clubs.utils.has_coordination_to_activity(request.user, activity) and \
        not user_clubs_niqati_reviewers.exists() and \
        not request.user.is_superuser:
         raise PermissionDenied

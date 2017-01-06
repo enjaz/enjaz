@@ -36,9 +36,20 @@ college_choices = (
 )
 
 city_choices = (
-    ('R', u'الرياض'),
-    ('J', u'جدة'),
-    ('A', u'الأحساء'),
+    (u'الرياض', u'الرياض'),
+    (u'جدة', u'جدة'),
+    (u'الأحساء', u'الأحساء'),
+)
+
+city_code_choices = (
+    ('R','الرياض'),
+    ('J','جدة'),
+    ('A','الأحساء'))
+
+english_city_choices = (
+    (u'الرياض', u'Riyadh'),
+    (u'جدة', u'Jeddah'),
+    (u'الأحساء', u'Alahsa'),
 )
 
 class Club(models.Model):
@@ -98,7 +109,7 @@ class Club(models.Model):
     creation_date = models.DateTimeField(u'تاريخ الإنشاء',
                                          auto_now_add=True)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
-    city = models.CharField(max_length=1, choices=city_choices, verbose_name=u"المدينة")
+    city = models.CharField(max_length=20, choices=city_choices, verbose_name=u"المدينة")
     gender = models.CharField(max_length=1, choices=gender_choices,
                               verbose_name=u"الجنس", blank=True,
                               default="")
@@ -226,9 +237,9 @@ class Club(models.Model):
         if self.gender and not self.city:
             return u"%s (%s)" % (self.name, self.get_gender_display())
         elif self.city and not self.gender:
-            return u"%s (%s)" % (self.name, self.get_city_display())
+            return u"%s (%s)" % (self.name, self.city)
         elif self.city and self.gender:
-            return u"%s (%s/%s)" % (self.name, self.get_city_display(),
+            return u"%s (%s/%s)" % (self.name, self.city,
                                     self.get_gender_display())
         else:
             return self.name
@@ -236,7 +247,7 @@ class Club(models.Model):
 class College(models.Model):
     section = models.CharField(max_length=2, choices=section_choices, verbose_name=u"القسم")
     name = models.CharField(max_length=1, choices=college_choices, verbose_name=u"الاسم")
-    city = models.CharField(max_length=1, choices=city_choices, verbose_name=u"المدينة")
+    city = models.CharField(max_length=20, choices=city_choices, verbose_name=u"المدينة")
     gender = models.CharField(max_length=1, choices=gender_choices, verbose_name=u"الجنس")
 
     def __unicode__(self):
@@ -257,7 +268,7 @@ class Team(models.Model):
     year = models.ForeignKey(StudentClubYear, null=True, blank=True,
                              on_delete=models.SET_NULL, default=None,
                              verbose_name=u"السنة")
-    city = models.CharField(max_length=1, choices=city_choices,
+    city = models.CharField(max_length=20, choices=city_choices,
                             blank=True, default="",
                             verbose_name=u"المدينة")
     gender = models.CharField(max_length=1, choices=gender_choices,
@@ -282,9 +293,9 @@ class Team(models.Model):
         if self.gender and not self.city:
             return u"%s (%s)" % (self.name, self.get_gender_display())
         elif self.city and not self.gender:
-            return u"%s (%s)" % (self.name, self.get_city_display())
+            return u"%s (%s)" % (self.name, self.city)
         elif self.city and self.gender:
-            return u"%s (%s/%s)" % (self.name, self.get_city_display(),
+            return u"%s (%s/%s)" % (self.name, self.city,
                                     self.get_gender_display())
         else:
             return self.name

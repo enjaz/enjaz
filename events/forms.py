@@ -80,7 +80,11 @@ class AbstractForm(forms.ModelForm):
                   'was_presented_at_others',
                   'was_presented_previously']
 
-AbstractFigureFormset = inlineformset_factory(Abstract, AbstractFigure, fields=['figure'])
+AbstractFigureFormset = inlineformset_factory(Abstract,
+                                              AbstractFigure,
+                                              fields=['figure'],
+                                              max_num=1,
+                                              validate_max=True)
 
 class AbstractFigureForm(forms.ModelForm):
     class Meta:

@@ -14,9 +14,9 @@ from bulb import utils
 
 city_choices = (
     ('-', u'الرياض وجدة والأحساء'),
-    ('R', u'الرياض فقط'),
-    ('J', u'جدة فقط'),
-    ('A', u'الأحساء فقط'),
+    (u'الرياض', u'الرياض فقط'),
+    (u'جدة', u'جدة فقط'),
+    (u'الأخساء', u'الأحساء فقط'),
 )
 gender_choices = (
     ('-', u'الطلاب والطالبات'),
@@ -140,17 +140,17 @@ class GroupForm(forms.ModelForm, CommonControl):
            not utils.is_bulb_coordinator_or_deputy(self.user):
             self.control_gender()
 
-            if self.user_city == 'R':
+            if self.user_city == u'الرياض':
                 self.fields['city'].choices = (
                     ('-', u'الرياض وجدة والأحساء'),
                     ('R', u'الرياض فقط'),
                 )
-            elif self.user_city == 'J':
+            elif self.user_city == u'الأحساء':
                 self.fields['city'].choices = (
                     ('-', u'الرياض وجدة والأحساء'),
                     ('A', u'الأحساء فقط'),
                 )
-            elif self.user_city == 'J':
+            elif self.user_city == u'جدة':
                 self.fields['city'].choices = (
                     ('-', u'الرياض وجدة والأحساء'),
                     ('J', u'جدة فقط'),

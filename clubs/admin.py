@@ -3,7 +3,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from clubs.models import Club, Team, College, city_choices, gender_choices
+from clubs.models import Club, Team, College
 from core.models import StudentClubYear
 
 

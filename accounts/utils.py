@@ -11,16 +11,16 @@ def get_user_city(user):
        user.is_superuser:
         return ''
 
-    # If the profile is absent, return None.
+    # If the profile is absent, return an empty string.
     try: 
-        city = user.common_profile.get_city_code()
+        city = user.common_profile.city
     except (ObjectDoesNotExist, AttributeError):
         city = ''
 
     return city
 
 def get_user_gender(user):
-    """Return the user's city.  If unavailable, return an empty string."""
+    """Return the user's gender.  If unavailable, return an empty string."""
 
     if not user.is_authenticated() or \
        user.is_superuser:
@@ -72,3 +72,11 @@ def get_city_code(city):
         return 'J'
     elif city == u'الأحساء':
         return 'A'
+
+def get_city_from_code(city_code):
+    if city == 'R': 
+        return u'الرياض'
+    elif city == 'J':
+        return u'جدة'
+    elif city == 'A':
+        return u'الأحساء'

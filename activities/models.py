@@ -13,14 +13,10 @@ from django.utils import timezone
 from activities.managers import ActivityQuerySet, EpisodeQuerySet
 from core.models import StudentClubYear
 from clubs.models import College, Club, city_choices, gender_choices
-from clubs.utils import get_deanship, get_presidency
 from forms_builder.forms.models import Form
 from media.utils import REPORT_DUE_AFTER
 import accounts.utils
-city_choices = (
-    ('R', u'الرياض'),
-    ('J', u'جدة'),
-    ('A', u'الأحساء'))
+import clubs.utils
 
 class Evaluation(models.Model):
     """ An activity evaluation filled by students upon Niqati code submission. """
@@ -293,9 +289,9 @@ class Activity(models.Model):
     def get_presidency_assessor(self):
         current_year = StudentClubYear.objects.get_current()
         # In Riyadh, there are two presidencies for each gender.
-        if self.primary_club.city == 'R' and self.primary_club.gender:
+        if clubs.utils.is_riyadh_club(self.primary_club) and self.primary_club.gender:
             presidency_gender = self.primary_club.gender
-        elif self.primary_club.city == 'R' and not self.primary_club.gender:
+        elif clubs.utils.is_riyadh_club(self.primary_club) and not self.primary_club.gender:
             # Just in case a Riyadh club doesn't have a gender fall
             # back to male presidency.
             presidency_gender = 'M'
@@ -312,9 +308,9 @@ class Activity(models.Model):
         current_year = StudentClubYear.objects.get_current()
 
         # In Riyadh, there are two Media Centers for each gender.
-        if self.primary_club.city == 'R' and self.primary_club.gender:
+        if clubs.utils.is_riyadh_club(self.primary_club) and self.primary_club.gender:
             media_center_gender = self.primary_club.gender
-        elif self.primary_club.city == 'R' and not self.primary_club.gender:
+        elif clubs.utils.is_riyadh_club(self.primary_club) and not self.primary_club.gender:
             # Just in case a Riyadh club doesn't have a gender fall
             # back to male Media Center.
             media_center_gender = 'M'
@@ -688,7 +684,7 @@ class Invitation(models.Model):
     title = models.CharField(u"الاسم", default="", max_length=100)
     activity = models.ForeignKey(Activity, null=True, blank=True)
     club = models.ForeignKey(Club, null=True, blank=True)
-    city = models.CharField(u"المدينة", max_length=1, blank=True,
+    city = models.CharField(u"المدينة", max_length=20, blank=True,
                             default="", choices=city_choices)
     gender = models.CharField(u"الجندر", max_length=1,
                               choices=gender_choices, blank=True,

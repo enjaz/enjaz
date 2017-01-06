@@ -74,9 +74,9 @@ def get_city_code(city):
         return 'A'
 
 def get_city_from_code(city_code):
-    if city == 'R': 
+    if city_code == 'R': 
         return u'الرياض'
-    elif city == 'J':
+    elif city_code == 'J':
         return u'جدة'
-    elif city == 'A':
+    elif city_code == 'A':
         return u'الأحساء'

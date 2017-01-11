@@ -92,6 +92,8 @@ class SkilledStudent(models.Model):
     user = models.ForeignKey(User,
                              related_name="researchhub_skill_profiles")
     description = models.TextField(help_text="Describe your skills in as much detail as you can.")
+    fields_of_interest = models.CharField(help_text="In what fields you are interested?",
+                                           default="", max_length=250)
     previous_experience = models.TextField(help_text="In what projects have you utilized your skills in the past?  (Optional)",
                                            blank=True)
     ongoing_projects = models.TextField(help_text="Do you have ongoing projects in which you have used these skills? (Optional)", blank=True)

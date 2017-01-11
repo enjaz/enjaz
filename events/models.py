@@ -103,19 +103,18 @@ class TimeSlot(models.Model):
         return self.name
 
 class Session(models.Model):
-    session_time_slot = models.ForeignKey(TimeSlot, default="",)
     event = models.ForeignKey(Event, null=True, blank=True)
+    time_slot = models.ForeignKey(TimeSlot, default="", null=True)
     name = models.CharField(max_length=255)
     limit = models.PositiveSmallIntegerField(null=True, blank=True,
                                              default=None)
     acceptance_method_choices = (
-        ('F', 'FirstComeFirstServe'),
+        ('F', 'First ComeFirst Serve'),
         ('M', 'Manual')
         )
     acceptance_method = models.CharField(verbose_name="acceptance_method", max_length=1,
                                          default="", choices=acceptance_method_choices)
-    time_slot = models.PositiveSmallIntegerField(null=True, blank=True,
-                                                 default=None)
+    description = models.TextField(blank=True, default="")
     vma_id = models.PositiveSmallIntegerField(null=True, blank=True)
     vma_time_code = models.PositiveSmallIntegerField(null=True,
                                                      blank=True,

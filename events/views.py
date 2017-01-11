@@ -12,8 +12,8 @@ import os.path
 
 from core import decorators
 from clubs.models import college_choices
-from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm
-from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation
+from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm, SessionRegistrationForm
+from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation, TimeSlot, SessionRegistration
 from events import utils
 
 def redirect_home(request, event_code_name):
@@ -111,7 +111,9 @@ def upload_abstract_image(request):
 
 def list_sessions(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
-    context = {'sessions': Session.objects.filter(event=event),
+    time_slot= TimeSlot.objects.all()
+    context = {'sessions': Session.objects.filter(time_slot=time_slot),
+               'time_slot': time_slot,
                'event': event}
     return render(request, 'events/session_list.html', context)
 

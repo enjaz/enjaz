@@ -5,7 +5,7 @@ from ckeditor.widgets import CKEditorWidget
 from django import forms
 
 
-from events.models import Event, Session, Registration, NonUser, Abstract, AbstractFigure, TimeSlot
+from events.models import Event, Session, Registration, NonUser, Abstract, AbstractFigure, TimeSlot, SessionRegistration
 
 class AbstractFigureInline(admin.TabularInline):
     model = AbstractFigure
@@ -99,4 +99,5 @@ admin.site.register(Registration, RegistrationAdmin)
 admin.site.register(NonUser, NonUserAdmin)
 admin.site.register(Abstract, AbstractAdmin)
 admin.site.register(TimeSlot)
+admin.site.register(SessionRegistration)
 

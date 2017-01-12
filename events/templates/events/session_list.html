@@ -12,21 +12,24 @@
 <div class="row">
     <div class="col-md-12">
         <div class="row text-center">
-            {% for session in time_slot.session_set.all %}
             {% autoescape off %}{% cycle '<div class="row">' '' '' '' %}{% endautoescape %}
+            {% for session in time_slot.session_set.all %}
             <div class="col-md-3 col-xs-6">
                 <h2>{{ session.name }}</h2>
+                <button class="btn btn-success signup" data-action="signup" data-url="{{ session.pk }}">سجلني!</button>
             </div>
+            {% endfor %}
+
             {% autoescape off %}
             {% cycle '' '' '' '</div>' %}
             {%  if forloop.last and not forloop.counter|divisibleby:4 %}</div>{% endif %}
             {% endautoescape %}
             {% endfor %}
         <hr>
-        {% endfor %}
-        </div>
-    </div>
 
+        </div>
+
+    </div>
 
 
 
@@ -34,5 +37,30 @@
 {% endblock %}
 
 {% block customscript %}
+<script>
+$(document).ready(function(){
+	$(".signup").click(function(){
+		url = $(this).data("url");
+		action = $(this).data("action");
+		$.ajax("{% url 'events:handle_ajax' %}", {
+		    method: "POST",
+		    data: {url: url, action: action},
+		});
+		$
 
+		if (action == 'cancel'){
+                    $(this).html('سجلني!');
+                    $(this).data('action', 'signup');
+                    $(this).addClass('btn-success')
+                    $(this).removeClass('btn-danger')
+                } else if (action == 'signup'){
+                    $(this).html('ألغِ تسجيلي!');
+                    $(this).data('action', 'cancel');
+                    $(this).addClass('btn-danger')
+                    $(this).removeClass('btn-success')
+                }
+
+	})
+});
+</script>
 {% endblock %}

@@ -12,7 +12,7 @@ import os.path
 
 from core import decorators
 from clubs.models import college_choices
-from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm, SessionRegistrationForm
+from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm
 from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation, TimeSlot, SessionRegistration
 from events import utils
 
@@ -111,7 +111,7 @@ def upload_abstract_image(request):
 
 def list_sessions(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
-    time_slot= TimeSlot.objects.all()
+    time_slot= TimeSlot.objects.all().filter(event=event)
     context = {'sessions': Session.objects.filter(time_slot=time_slot),
                'time_slot': time_slot,
                'event': event}
@@ -122,6 +122,22 @@ def show_session(request, event_code_name, pk):
     session = get_object_or_404(Session, pk=pk, event=event)
     return render(request, 'events/session_show.html',
                   {'session': session})
+
+@decorators.post_only
+@decorators.ajax_only
+@csrf.csrf_exempt
+def handle_ajax(request):
+    action = request.POST.get('action')
+    session_pk = request.POST.get('url')
+    session = get_object_or_404(Session, pk=session_pk)
+
+    if action == 'signup':
+        SessionRegistration.objects.create(session=session, user=request.user)
+    elif action == 'cancel':
+        SessionRegistration.objects.create(session=session, user=request.user).delete()
+
+    return {}
+
 
 def introduce_registration(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)

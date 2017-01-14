@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta, date
 
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.db.models import Sum, Count
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -84,10 +84,10 @@ def indicators(request, city_code=""):
         raise PermissionDenied
 
     if city_code:
-        city_codes = [city_pair[0] for city_pair in city_code_choices]
-        if not city in city_codes:
+        city = accounts.utils.get_city_from_code(city_code)
+        # To avoid user fuck-ups entering non-standard city-code.
+        if not city:
             raise Http404
-        city = accounts.utils.get_city_from_code(city)
         current_year = StudentClubYear.objects.get_current()
         last_month = timezone.now().date() - timedelta(30)
         city_clubs = Club.objects.current_year()\

@@ -31,13 +31,22 @@
                     <td>{{ skill.description|linebreaksbr }}</td>
                 </tr>
                 <tr>
+                    <th>Fields of interest</th>
+                    <td>{{ skill.fields_of_interest }}</td>
+                </tr>
+                {% if skill.previous_experience %}
+                <tr>
                     <th>Previous experience</th>
                     <td>{{ skill.previous_experience|linebreaksbr }}</td>
                 </tr>
+                {% endif %}
+                {% if skill.ongoing_projects %}
                 <tr>
                     <th>Ongoing projects</th>
                     <td>{{ skill.ongoing_projects|linebreaksbr }}</td>
-                </tr>{% if skill.condition %}
+                </tr>
+                {% endif %}
+                {% if skill.condition %}
                 <tr>
                     <th>Condition</th>
                     <td>{{ skill.condition }}</td>

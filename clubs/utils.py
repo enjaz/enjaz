@@ -1,3 +1,4 @@
+# -*- coding: utf-8  -*-
 """Utility functions related to the clubs app."""
 from .models import Club, Team
 from core.models import StudentClubYear
@@ -112,7 +113,7 @@ def get_presidency():
 
 def get_media_center():
     return Club.objects.current_year().get(english_name="Media Center",
-                                           city='R', gender='M')
+                                           city=u'الرياض', gender='M')
 
 def get_user_clubs(user):
     if not user.is_authenticated():
@@ -263,29 +264,35 @@ def can_submit_activities(user):
 def get_club_for_user(english_name, user):
     targeted_clubs = Club.objects.current_year().filter(english_name=english_name)
     user_city = accounts.utils.get_user_city(user)
-    if user_city == 'R':
+    if user_city == u'الرياض':
         user_gender = accounts.utils.get_user_gender(user)
         if user_gender == 'F':
-            return targeted_clubs.get(city="R", gender="F")
+            return targeted_clubs.get(city=user_city, gender=user_gender)
         else:
-            return targeted_clubs.get(city="R", gender="M")
+            return targeted_clubs.get(city=user_city, gender="M")
     elif user_city:
         return targeted_clubs.get(city=user_city)
     else:
         # If the no city was found, default to Riyadh female club.
-        return targeted_clubs.get(city="R", gender="F")
+        return targeted_clubs.get(city=u"الرياض", gender="F")
 
 def get_team_for_user(code_name, user, gender_specific=True, city_specific=True):
     targeted_teams = Team.objects.current_year().filter(code_name=code_name)
     if city_specific:
         team_city = accounts.utils.get_user_city(user)
         if not team_city:
-            team_city = "R"
+            team_city = "الرياض"
         targeted_teams = targeted_teams.filter(city=team_city)
     if gender_specific:
         team_gender = accounts.utils.get_user_gender(user)
         if not team_gender:
-            team_gender = "R"
+            team_gender = "F"
         targeted_teams = targeted_teams.filter(gender=team_gender)
 
     return targeted_teams.first()
+
+def is_riyadh_club(club):
+    return club.city == u"الرياض"
+
+def is_jeddah_club(club):
+    return club.city == u"جدة"

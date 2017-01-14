@@ -14,13 +14,13 @@ from django.utils import timezone
 from core import decorators
 from .models import Announcement, Publication, StudentClubYear
 from .forms import DebateForm
-from accounts.utils import get_user_gender
 from activities.models import Activity, Episode
 from bulb.models import Book
-from clubs.models import Club, College, city_choices
+from clubs.models import Club, College, city_code_choices
 from constance import config
 from niqati.models import Order, Code
 from media.models import FollowUpReport, Story
+import accounts.utils
 import clubs.utils
 
 
@@ -78,16 +78,17 @@ def about_sc(request, template_name="about_sc.html"):
     return render(request, template_name, {"publications": Publication.objects.all()}) # the dashboard
 
 @login_required
-def indicators(request, city=""):
+def indicators(request, city_code=""):
     if not request.user.is_superuser and \
        not clubs.utils.is_presidency_coordinator_or_deputy(request.user):
         raise PermissionDenied
 
-    if city:
-        current_year = StudentClubYear.objects.get_current()
-        city_codes = [city_pair[0] for city_pair in city_choices]
+    if city_code:
+        city_codes = [city_pair[0] for city_pair in city_code_choices]
         if not city in city_codes:
             raise Http404
+        city = accounts.utils.get_city_from_code(city)
+        current_year = StudentClubYear.objects.get_current()
         last_month = timezone.now().date() - timedelta(30)
         city_clubs = Club.objects.current_year()\
                                  .visible()\
@@ -178,7 +179,7 @@ def indicators(request, city=""):
         male_count = 0
         female_count = 0
         for user in users_by_niqati_points:
-            gender = get_user_gender(user)
+            gender = accounts.utils.get_user_gender(user)
             if gender == 'M':
                 male_count += 1
             elif gender == 'F':
@@ -231,7 +232,7 @@ def indicators(request, city=""):
                    }
     else:
         context = {'city_choices':
-                   city_choices}
+                   city_code_choices}
 
     return render(request, 'indicators.html', context)
 

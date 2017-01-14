@@ -377,7 +377,6 @@ class Abstract(models.Model):
 class AbstractFigure(models.Model):
     abstract = models.ForeignKey(Abstract, related_name='figures', null=True)
     figure = models.FileField(verbose_name=u"Attach the figure", upload_to="events/figures/")
-    upload = models.FileField(verbose_name=u"Attach the figure", upload_to="event/figures/")
 
 class Evaluation(models.Model):
     abstract = models.ForeignKey(Abstract)

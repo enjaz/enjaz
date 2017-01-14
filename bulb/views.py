@@ -12,13 +12,13 @@ from django.utils import timezone
 from dal import autocomplete
 from post_office import mail
 
+from clubs.models import city_code_choices
 from core.utils import get_search_queryset
 from core.models import StudentClubYear, Tweet
 from core import decorators
 from bulb.models import Category, Book, NeededBook, Request, Point, Group, Membership, Session, Report, ReaderProfile, Recruitment, NewspaperSignup, Readathon, BookCommitment
 from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, NeededBookForm, RequestForm, GroupForm, FreeSessionForm, SessionForm, ReportForm, ReaderProfileForm, RecruitmentForm, NewspaperSignupForm, DewanyaSuggestionFormSet, BookCommitmentForm, UpdateBookCommitmentForm
 from bulb import utils
-from clubs.models import city_choices
 import accounts.utils
 import clubs.utils
 
@@ -554,14 +554,15 @@ def list_my_requests(request):
     return render(request, 'bulb/exchange/list_direct_requests.html', context)
 
 @login_required
-def indicators(request, city=""):
+def indicators(request, city_code=""):
     if not utils.is_bulb_coordinator_or_deputy(request.user) and \
        not utils.is_bulb_member(request.user) and \
        not utils.is_in_book_exchange_team(request.user) and \
        not request.user.is_superuser:
         raise PermissionDenied
 
-    if city:
+    if city_code:
+        city = accounts.utils.get_city_from_code(city_code)
         books = Book.objects.current_year().filter(submitter__common_profile__city=city)
         book_requests = Request.objects.current_year().filter(requester__common_profile__city=city)
         groups = Group.objects.current_year().filter(coordinator__common_profile__city=city)
@@ -630,7 +631,7 @@ def indicators(request, city=""):
 
     else:
         context = {'city_choices':
-                   city_choices}
+                   city_code_choices}
 
     return render(request, 'bulb/indicators.html', context)
 

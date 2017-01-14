@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
 from userena.models import UserenaBaseProfile
-from clubs.models import College, city_choices, general_gender_choices
+from clubs.models import College, general_gender_choices
 
 profile_type_choices = (
     ('S', u'طالبـ/ـة'),

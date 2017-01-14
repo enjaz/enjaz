@@ -664,7 +664,7 @@ def assessment_list(request):
         # Jeddah has no Media Center members, so don't show them the
         # toreview table.  It is all going to be done by the Medica
         # Center President.
-        if not (user_media_center and user_media_center.city == 'J'):
+        if not (user_media_center and clubs.utils.is_jeddah_club(user_media_center)):
             context['toreview'] = approved_activvities.filter(assessment__criterionvalue__criterion__category='M',
                                                               assessment__is_reviewed=False)
     return render(request, 'activities/assessment_list.html', context)

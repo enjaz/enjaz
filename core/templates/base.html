@@ -244,7 +244,7 @@ you?
 				</a>
 			</li>
 
-            {% if user.common_profile.city == 'R' or user.is_superuser %}
+            {% if user.common_profile.get_city_code == "R" or user.is_superuser %}
 			<li class="highlighted-section">
 				<a href="{% url 'researchhub:index' %}">
 					<i class="fa fa-search"></i>

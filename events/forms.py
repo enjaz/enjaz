@@ -89,7 +89,7 @@ AbstractFigureFormset = inlineformset_factory(Abstract,
 class AbstractFigureForm(forms.ModelForm):
     class Meta:
         model = AbstractFigure
-        fields = ['upload']
+        fields = ['figure']
 
 
 class EvaluationForm(forms.Form):

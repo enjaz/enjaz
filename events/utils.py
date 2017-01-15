@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect
 from django.utils import timezone
 
 from core.utils import hindi_to_arabic
-from events.models import Event
+from events.models import Event, SessionRegistration
 import clubs.utils
 
 def can_evaluate_abstracts(user, event):
@@ -92,3 +92,7 @@ def send_onsite_confirmation(registration, event):
                context=email_context)
     registration.reminder_sent = True
     registration.save()
+
+def is_registered(user, session):
+    if SessionRegistration.objects.filter(session=session, user=user, is_deleted = False).exists():
+        return True

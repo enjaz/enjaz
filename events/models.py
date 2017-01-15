@@ -222,7 +222,7 @@ class SessionRegistration(models.Model):
                                             verbose_name=u"أرسلت الشهادة؟")
 
     def __unicode__(self):
-        return self.user
+        return unicode(self.user)
 
 class Registration(models.Model):
     user = models.ForeignKey(User, null=True, blank=True,

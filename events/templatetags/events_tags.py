@@ -23,3 +23,7 @@ def get_session_priority(registration, session):
         return 1
     elif session in registration.second_priority_sessions.all():
         return 2
+
+@register.filter
+def is_registered(user, session):
+    return utils.is_registered(user, session)

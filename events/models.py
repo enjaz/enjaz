@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from clubs.models import Club, Team
 from events.managers import RegistrationQuerySet, SessionQuerySet
+from ckeditor.fields import RichTextField
 
 user_gender_choices = (
     ('F', u'طالبة'),
@@ -49,7 +50,7 @@ class Event(models.Model):
                                                related_name="abstract_revision_events")
     is_on_telegram = models.BooleanField(default=True,
                                          verbose_name=u"على تلغرام؟")
-    organizing_club = models.ForeignKey(Club)
+    organizing_club = models.ForeignKey(Club , null=True)
     organizing_team = models.ForeignKey(Team, null=True)
     priorities = models.PositiveSmallIntegerField(default=1)
 
@@ -292,9 +293,12 @@ class Registration(models.Model):
         return self.get_en_full_name()
 
 class Abstract(models.Model):
+    user = models.ForeignKey(User, null=True, blank=True,
+                             related_name='event_abstracts')
     event = models.ForeignKey(Event, verbose_name=u"الحدث")    
     title = models.CharField(verbose_name="Title", max_length=255)
     authors = models.TextField(verbose_name=u"Name of authors")
+    study_field = models.CharField(verbose_name="Field", max_length=255, default="")
     university = models.CharField(verbose_name="University", max_length=255)
     college = models.CharField(verbose_name="College", max_length=255)
     presenting_author = models.CharField(verbose_name="Presenting author", max_length=255)
@@ -311,11 +315,14 @@ class Abstract(models.Model):
         ('P', 'Poster')
         )
     presentation_preference = models.CharField(verbose_name="Presentation preference", max_length=1, choices=presentation_preference_choices)
-    introduction = models.TextField(u"Introduction", default="")
+    introduction = models.TextField(u"Introduction", default="" )
     methodology = models.TextField(u"Methodology", default="")
     results = models.TextField(u"Results", default="")
-    discussion = models.TextField(u"Discussion", default="")
+    discussion = models.TextField(u"Discussion", default="", blank=True)
     conclusion = models.TextField(u"Conclusion", default="")
+    was_published = models.BooleanField(u"Have you published this research?", default=False)
+    was_presented_at_others = models.BooleanField(u"Have you presented this research in any other conference before?", default=False)
+    was_presented_previously = models.BooleanField(u"Have you presented this research in a previous year of this conference?", default=False)
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
@@ -329,10 +336,10 @@ class Abstract(models.Model):
 
     def __unicode__(self):
         return self.title
-
+    
 class AbstractFigure(models.Model):
-    abstract = models.ForeignKey(Abstract, related_name='figures')
-    figure = models.FileField(verbose_name=u"Attach the figure", upload_to="hpc/figures/")
+    abstract = models.ForeignKey(Abstract, related_name='figures', null=True)
+    figure = models.FileField(verbose_name=u"Attach the figure", upload_to="events/figures/")
 
 class Evaluation(models.Model):
     abstract = models.ForeignKey(Abstract)
@@ -342,7 +349,6 @@ class Evaluation(models.Model):
 
     def get_total_score(self):
         return self.criterion_values.aggregate(Sum('value'))['value__sum'] or 0
-
 
 class Criterion(models.Model):
     event = models.ForeignKey(Event, verbose_name=u"الحدث")

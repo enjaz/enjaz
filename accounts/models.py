@@ -5,10 +5,17 @@ from django.utils.translation import ugettext as _
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
 from userena.models import UserenaBaseProfile
-from clubs.models import College, city_choices
+from clubs.models import College, general_gender_choices
+
+profile_type_choices = (
+    ('S', u'طالبـ/ـة'),
+    ('E', u'موظفـ/ـة'),
+    ('N', u'خارج الجامعة'),
+)
+
 
 def get_gender(user):
-    return 'M' # PLACEHOLDER
+    return 'F' # PLACEHOLDER
 
 
 class CommonProfile(models.Model):
@@ -20,6 +27,8 @@ class CommonProfile(models.Model):
                              related_name='common_profile')
     is_student = models.BooleanField(default=True,
                                      verbose_name=u"طالب؟")
+    profile_type =  models.CharField(max_length=1, choices=profile_type_choices,
+                            verbose_name=u"نوع المستخدمـ/ـة", default="S" )
     ar_first_name = models.CharField(max_length=30,
                                      verbose_name=u'الاسم الأول')
     ar_middle_name = models.CharField(max_length=30,
@@ -34,12 +43,15 @@ class CommonProfile(models.Model):
                                     verbose_name=u'الاسم الأخير')
     alternative_email = models.EmailField(u"البريد الإلكتروني  الشخصي البديل",
                                           blank=True)
-    badge_number = models.IntegerField(null=True,
+    badge_number = models.IntegerField(null=True, blank=True,
                                        verbose_name=u'رقم البطاقة الجامعية')
-    mobile_number = models.CharField(max_length=20,
+    mobile_number = models.CharField(max_length=20, blank=True,
                                      verbose_name=u'رقم الجوال')
-    city = models.CharField(max_length=1, choices=city_choices,
-                            verbose_name=u"المدينة", default="R")
+    city = models.CharField(max_length=20,
+                            verbose_name=u"المدينة", default=u"الرياض")
+    gender = models.CharField(max_length=1, choices=general_gender_choices,
+                              verbose_name=u"الجندر", default="")
+
     canceled_twitter_connection = models.BooleanField(default=False,
                                                       verbose_name=u"ألغى طلب الربط بتويتر؟")
     # Fields specific for students
@@ -52,6 +64,10 @@ class CommonProfile(models.Model):
     # Fields specific for non-students.
     job_description = models.TextField(u"المسمى الوظيفي", blank=True)
     modification_date = models.DateTimeField(auto_now=True, null=True)
+
+    # Fields specific for non-users.
+    affiliation = models.CharField(max_length=30, default="", blank=True,
+                                   verbose_name=u'جهة الدراسة / العمل')
 
     def get_ar_full_name(self):
         ar_fullname = None
@@ -80,6 +96,14 @@ class CommonProfile(models.Model):
             pass
 
         return en_fullname
+
+    def get_city_code(self):
+        if self.city == u'الرياض':
+            return 'R'
+        elif self.city == u'جدة':
+            return 'J'
+        elif self.city == u'الأحساء':
+            return 'A'
 
 
 class EnjazProfile(UserenaBaseProfile):

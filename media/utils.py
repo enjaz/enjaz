@@ -165,7 +165,7 @@ def get_clubs_for_assessment_by_user(user):
 
 def get_club_media_center(club):
     media_cetnrs = Club.objects.current_year().filter(english_name__contains="Media Center")
-    if club.city == 'R':
+    if clubs.utils.is_riyadh_club(club):
         if club.gender:
             return media_cetnrs.get(city=club.city,
                                     gender=club.gender)

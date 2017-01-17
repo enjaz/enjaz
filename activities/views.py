@@ -663,7 +663,7 @@ def assessment_list(request):
         # Jeddah has no Media Center members, so don't show them the
         # toreview table.  It is all going to be done by the Medica
         # Center President.
-        if not (user_media_center and user_media_center.city == 'J'):
+        if not (user_media_center and clubs.utils.is_jeddah_club(user_media_center)):
             context['toreview'] = approved_activvities.filter(assessment__criterionvalue__criterion__category='M',
                                                               assessment__is_reviewed=False)
     return render(request, 'activities/assessment_list.html', context)
@@ -816,7 +816,7 @@ def toggle_confirm_invitation(request, pk):
         if invitation.is_fully_booked():
             raise Exception(u"اكتملت المقاعد الممكنة لهذا الحدث، ولم يعد ممكنا التسجيل فيه!")
         invitation.students.add(request.user)
-        if request.user.social_auth.exists():
+        if request.user.social_auth.exists() and invitation.linked_to_twitter:
             show_url = reverse('activities:show_invitation', args=(invitation.pk,))
             full_url = request.build_absolute_uri(show_url)
             text = u"سأحضر {}.\nيمكنك التسجيل للحضور من هنا: {}"

@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 
 from accounts.models import CommonProfile
+from clubs.models import english_city_choices
 from core.models import StudentClubYear
 from researchhub import utils
 from researchhub.models import Supervisor, Project, SkilledStudent, Domain, Skill
@@ -43,16 +44,10 @@ class EditSupervisorForm(forms.ModelForm):
 class SkilledStudentForm(forms.ModelForm):
     class Meta:
         model = SkilledStudent
-        fields = ['skills','description', 'previous_experience',
+        fields = ['skills','description', 'fields_of_interest', 'previous_experience',
                   'ongoing_projects', 'condition', 'available_until']
 
 class ResearchHubSignupForm(SignupForm):
-    city_choices = (
-        ('R', u'Riyadh'),
-        ('J', u'Jeddah'),
-        ('A', u'Alahsa'),
-    )
-
     en_first_name = forms.CharField(max_length=30)
     en_middle_name = forms.CharField(max_length=30)
     en_last_name = forms.CharField(max_length=30)
@@ -64,8 +59,8 @@ class ResearchHubSignupForm(SignupForm):
     communication = forms.CharField(widget=forms.Textarea)
     #available_from = forms.DateField(required=False)
     #available_until = forms.DateField(required=False)
-    city = forms.CharField(max_length=1,
-                           widget=forms.Select(choices=city_choices))
+    city = forms.CharField(max_length=20,
+                           widget=forms.Select(choices=english_city_choices))
 
     def __init__(self, *args, **kw):
         super(ResearchHubSignupForm, self).__init__(*args, **kw)

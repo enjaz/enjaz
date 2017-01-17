@@ -1,3 +1,4 @@
+# -*- coding: utf-8  -*-
 """
 Utility functions for the accounts app.
 """
@@ -10,7 +11,7 @@ def get_user_city(user):
        user.is_superuser:
         return ''
 
-    # If the profile is absent, return None.
+    # If the profile is absent, return an empty string.
     try: 
         city = user.common_profile.city
     except (ObjectDoesNotExist, AttributeError):
@@ -19,7 +20,7 @@ def get_user_city(user):
     return city
 
 def get_user_gender(user):
-    """Return the user's city.  If unavailable, return an empty string."""
+    """Return the user's gender.  If unavailable, return an empty string."""
 
     if not user.is_authenticated() or \
        user.is_superuser:
@@ -49,3 +50,33 @@ def get_user_college(user):
         college = None
 
     return college
+
+def get_user_profile_type(user):
+
+    if not user.is_authenticated() or \
+       user.is_superuser:
+        return ''
+
+    # If the profile is absent, return None.
+    try:
+        profile_type = user.common_profile.profile_type
+    except (ObjectDoesNotExist, AttributeError):
+        profile_type = ''
+
+    return profile_type
+
+def get_city_code(city):
+    if city == u'الرياض':
+        return 'R'
+    elif city == u'جدة':
+        return 'J'
+    elif city == u'الأحساء':
+        return 'A'
+
+def get_city_from_code(city_code):
+    if city_code == 'R': 
+        return u'الرياض'
+    elif city_code == 'J':
+        return u'جدة'
+    elif city_code == 'A':
+        return u'الأحساء'

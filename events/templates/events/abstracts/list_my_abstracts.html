@@ -1,0 +1,55 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}
+
+{% block title %}My abstracts{% endblock %}
+
+{% block content %}
+<div class="english-field">
+<h1 class="english-field">My abstracts</h1>
+            <div class="panel-body">
+                <div class="row">
+                    <table id="abstracts" class="display datatable dt-responsive">
+                        <thead>
+                            <tr>
+                                <th class="all">Title</th>
+                                <th class="not-mobile">Presenting author</th>
+                                <th class="not-mobile">Presentation preference</th>
+                                <th class="not-mobile">Submission date</th>
+                                <th class="not-mobile">ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for abstract in abstracts %}
+                            <tr>
+                                <td><a href="{% url 'events:show_abstract' abstract.event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
+                                <td>{{ abstract.presenting_author }}</td>
+                                <td>{{ abstract.get_presentation_preference_display }}</td>
+                                <td data-order="{{ abstract.date_submitted|date:"U" }}">{{ abstract.date_submitted|date:"Y-m-d" }}</td>
+                                <td>{{ abstract.pk }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+</div>
+{% endblock %}
+
+{% block customscript %}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<style type="text/css">
+    th, td{
+        text-align: left;
+    }
+</style>
+	<script>
+    $(function(){
+        $("#abstracts").dataTable({
+            "order": [[ 3, "asc" ]]
+        });
+    });
+    </script>
+{% endblock %}

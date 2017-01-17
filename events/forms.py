@@ -73,11 +73,24 @@ class AbstractForm(forms.ModelForm):
     class Meta:
         model = Abstract
         fields = ['title', 'authors', 'university', 'college',
-                  'presenting_author', 'email', 'phone', 'level',
-                  'presentation_preference', 'introduction', 'methodology',
-                  'results', 'discussion', 'conclusion']
+                  'study_field', 'presenting_author', 'email',
+                  'phone', 'level', 'presentation_preference',
+                  'introduction','methodology', 'results',
+                  'discussion', 'conclusion', 'was_published',
+                  'was_presented_at_others',
+                  'was_presented_previously']
 
-AbstractFigureFormset = inlineformset_factory(Abstract, AbstractFigure, fields=['figure'])
+AbstractFigureFormset = inlineformset_factory(Abstract,
+                                              AbstractFigure,
+                                              fields=['figure'],
+                                              max_num=1,
+                                              validate_max=True)
+
+class AbstractFigureForm(forms.ModelForm):
+    class Meta:
+        model = AbstractFigure
+        fields = ['figure']
+
 
 class EvaluationForm(forms.Form):
     def __init__(self, *args, **kwargs):

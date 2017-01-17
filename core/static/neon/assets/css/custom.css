@@ -791,6 +791,7 @@ body.loaded{
     color: #ffffff;
     padding: 10px;
     text-align: justify;
+    margin-bottom: 10px;
 }
 .registration-form a, .enjaz-warning a {
     text-decoration: underline;
@@ -819,4 +820,14 @@ body.login-page .checkbox label{
 
 .panel-researchhub{
     border-color: #D5CD7F;
+}
+
+a.btn-signup{
+    background-color: #7ea128;
+    border-color: #556C1F;
+    text-decoration: none;
+}
+
+a.btn-signup:hover{
+    background-color: #acd547;
 }

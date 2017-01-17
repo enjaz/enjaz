@@ -13,11 +13,10 @@ from django.utils import timezone
 from activities.managers import ActivityQuerySet, EpisodeQuerySet
 from core.models import StudentClubYear
 from clubs.models import College, Club, city_choices, gender_choices
-from clubs.utils import get_deanship, get_presidency
 from forms_builder.forms.models import Form
 from media.utils import REPORT_DUE_AFTER
 import accounts.utils
-
+import clubs.utils
 
 
 class Evaluation(models.Model):
@@ -232,10 +231,9 @@ class Activity(models.Model):
     def get_points(self):
         return self.get_codes()/2
 
-
-
     def get_first_location(self):
-        return self.get_first_episode()
+        return self.get_first_episode().location
+
 
     def get_first_episode(self):
         """
@@ -327,9 +325,9 @@ class Activity(models.Model):
     def get_presidency_assessor(self):
         current_year = StudentClubYear.objects.get_current()
         # In Riyadh, there are two presidencies for each gender.
-        if self.primary_club.city == 'R' and self.primary_club.gender:
+        if clubs.utils.is_riyadh_club(self.primary_club) and self.primary_club.gender:
             presidency_gender = self.primary_club.gender
-        elif self.primary_club.city == 'R' and not self.primary_club.gender:
+        elif clubs.utils.is_riyadh_club(self.primary_club) and not self.primary_club.gender:
             # Just in case a Riyadh club doesn't have a gender fall
             # back to male presidency.
             presidency_gender = 'M'
@@ -346,9 +344,9 @@ class Activity(models.Model):
         current_year = StudentClubYear.objects.get_current()
 
         # In Riyadh, there are two Media Centers for each gender.
-        if self.primary_club.city == 'R' and self.primary_club.gender:
+        if clubs.utils.is_riyadh_club(self.primary_club) and self.primary_club.gender:
             media_center_gender = self.primary_club.gender
-        elif self.primary_club.city == 'R' and not self.primary_club.gender:
+        elif clubs.utils.is_riyadh_club(self.primary_club) and not self.primary_club.gender:
             # Just in case a Riyadh club doesn't have a gender fall
             # back to male Media Center.
             media_center_gender = 'M'
@@ -722,7 +720,7 @@ class Invitation(models.Model):
     title = models.CharField(u"الاسم", default="", max_length=100)
     activity = models.ForeignKey(Activity, null=True, blank=True)
     club = models.ForeignKey(Club, null=True, blank=True)
-    city = models.CharField(u"المدينة", max_length=1, blank=True,
+    city = models.CharField(u"المدينة", max_length=20, blank=True,
                             default="", choices=city_choices)
     gender = models.CharField(u"الجندر", max_length=1,
                               choices=gender_choices, blank=True,
@@ -731,6 +729,7 @@ class Invitation(models.Model):
                               blank=True, null=True)
     logo = models.ImageField(upload_to='invitations/logos/',
                               blank=True, null=True)
+    linked_to_twitter = models.BooleanField(u"تفعيل الربط بتويتر" , default=True)
     short_description = models.TextField(u"وصف قصير")
     full_description = models.TextField(u"وصف مطول")
     twitter_account = models.CharField(u"حساب تويتر", default="",
@@ -743,7 +742,7 @@ class Invitation(models.Model):
     maximum_registrants = models.PositiveIntegerField(u"أقصى عدد للمسجلين والمسجلات",
                                                       null=True,
                                                       blank=True)
-    location = models.CharField(u"المكان", default="",
+    location = models.CharField(u"المكان", default="", blank=True,
                                 max_length=200)
     date = models.DateField(u"التاريخ")
     start_time = models.TimeField(u"وقت البداية")
@@ -751,6 +750,8 @@ class Invitation(models.Model):
     submission_date = models.DateTimeField(u'تاريخ الإرسال',
                                            auto_now_add=True)
     edit_date = models.DateTimeField(u'تاريخ التعديل', auto_now=True)
+    notes = models.TextField(u"الملاحظات",null=True,blank=True)
+
     def is_available_for_user_city(self, user):
         user_city = accounts.utils.get_user_city(user)
         if user_city and self.city and \

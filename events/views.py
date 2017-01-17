@@ -129,16 +129,17 @@ def handle_ajax(request):
     action = request.POST.get('action')
     session_pk = request.POST.get('pk')
     session = get_object_or_404(Session, pk=session_pk)
+    SessionRegistration.objects.filter(session=session, user=request.user)
 
     if action == 'signup':
-        if not SessionRegistration.objects.filter(session=session, user=request.user).count() <= session.limit :
+        if not SessionRegistration.objects.filter(session=session, user=request.user, is_deleted=False).count() <= session.limit :
             raise Exception(u'Session is full')
         else:
             if not SessionRegistration.objects.filter(session=session, user=request.user).exists():
                 SessionRegistration.objects.create(session=session, user=request.user)
 
-            elif SessionRegistration.is_deleted:
-                SessionRegistration.is_deleted = False
+            elif SessionRegistration.objects.filter(session=session, user=request.user, is_deleted=True).exists():
+                SessionRegistration.objects.filter(session=session, user=request.user).update(is_deleted=False)
 
             else:
                 raise Exception(u'You are already registered!')
@@ -148,9 +149,7 @@ def handle_ajax(request):
             raise Exception(u'You did not registered yet!')
 
         else:
-            SessionRegistration.is_deleted = True
-            
-    SessionRegistration.save()
+            SessionRegistration.objects.filter(session=session, user=request.user).update(is_deleted=True)
 
     return {}
 

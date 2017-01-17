@@ -16,7 +16,7 @@
             {% for session in time_slot.session_set.all %}
             <div class="col-md-3 col-xs-6">
                 <h2>{{ session.name }}</h2>
-                {% if not user.is_registered %}
+                {% if not user|is_registered:session %}
                 <button class="btn btn-success signup" data-action="signup" data-pk="{{ session.pk }}">سجلني!</button>
                 {% else %}
                 <button class="btn btn-danger cancel" data-action="cancel" data-pk="{{ session.pk }}">ألغِ تسجيلي!</button>

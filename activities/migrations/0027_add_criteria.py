@@ -9,11 +9,6 @@ def add_criteria(apps, schema_editor):
     year_2016_2017 = StudentClubYear.objects.get(start_date__year= 2016,
                                                 end_date__year=2017)
     Criterion.objects.create(year= year_2016_2017,
-                            ar_name="الفكرة",
-                            code_name="idea",
-                            instructions="",
-                            category='P')
-    Criterion.objects.create(year= year_2016_2017,
                             ar_name="مكان النشاط",
                             code_name="place",
                             instructions="",
@@ -33,15 +28,9 @@ def add_criteria(apps, schema_editor):
                             code_name="activity_hours",
                             instructions="",
                             category='P')
-
-    Criterion.objects.create(year= year_2016_2017,
-                            ar_name="برنامج نقاطي",
-                            code_name="niqati",
-                            instructions="",
-                            category='P')
     Criterion.objects.create(year= year_2016_2017,
                                 ar_name="عدد الحضور",
-                                code_name="attendes",
+                                code_name="attendees",
                                 instructions="",
                                 category='P')
     Criterion.objects.create(year= year_2016_2017,
@@ -49,11 +38,10 @@ def add_criteria(apps, schema_editor):
                                 code_name="new_idea",
                                 instructions="",
                                 category='P')
-
     Criterion.objects.create(year= year_2016_2017,
                                     ar_name="تفرع الفكرة",
-                                    code_name="",
-                                    instructions="branched_idea",
+                                    code_name="branched_idea",
+                                    instructions="",
                                     category='P')
     Criterion.objects.create(year= year_2016_2017,
                                 ar_name="فكرة مقترحة من طالب/ة",
@@ -68,8 +56,8 @@ def add_criteria(apps, schema_editor):
                             category='P')
     Criterion.objects.create(year= year_2016_2017,
                                               ar_name="استعمال وسائل مصاحبة",
-                                              code_name="",
-                                              instructions="use_resources",
+                                              code_name="use_resources",
+                                              instructions="",
                                               category='P')
     Criterion.objects.create(year= year_2016_2017,
                             ar_name="الشكل العام",
@@ -78,18 +66,18 @@ def add_criteria(apps, schema_editor):
                             category='P')
     Criterion.objects.create(year= year_2016_2017,
                                               ar_name="تنظيم الحضور",
-                                              code_name="",
-                                              instructions="attendes_orgnisation",
+                                              code_name="attendees_orgnisation",
+                                              instructions="",
                                               category='P')
     Criterion.objects.create(year= year_2016_2017,
                                                   ar_name="رضا الحضور",
-                                                  code_name="",
-                                                  instructions="attendes_satisfaction",
+                                                  code_name="attendees_satisfaction",
+                                                  instructions="",
                                                   category='P')
     Criterion.objects.create(year= year_2016_2017,
                                                   ar_name="إدارة النشاط",
-                                                  code_name="",
-                                                  instructions="orgnisation",
+                                                  code_name="orgnisation",
+                                                  instructions="",
                                                   category='P')
 
 def remove_criteria(apps, schema_editor):

@@ -36,8 +36,8 @@
                 {% endif %}
             </td>
             {% elif table_type == 'done' and category == 'P' %}
-            <td>{{ activity.get_presidency_assessment_points }}</td>
-            <td>{{ activity.get_media_assessment_points }}</td>
+            <td><a href="{% url 'activities:assess' activity.pk 'p' %}">{{ activity.get_presidency_assessment_points }}</a></td>
+            <td><a href="{% url 'activities:assess' activity.pk 'm' %}">{{ activity.get_media_assessment_points }}</a></td>
             {% endif %}
         </tr>
     {% endfor %}

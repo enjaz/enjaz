@@ -14,6 +14,8 @@ from clubs.models import Club
 from core.models import StudentClubYear
 from dal import autocomplete
 from media.utils import can_assess_club_as_media_coordinator
+import accounts.utils
+
 
 class ActivityForm(ModelForm):
     """A general form, which doesn't include 'Presidency'."""
@@ -148,13 +150,10 @@ class ActivityForm(ModelForm):
                                   location=location)
                 new_episodes.append(episode)
 
-        print "PK list: ", pk_list
-
         activity = super(ActivityForm, self).save(*args, **kwargs)
 
         # Check if any episodes have been deleted and delete them
         for episode in activity.episode_set.all():
-            print "PK: ", episode.pk, " is in list: " if episode.pk in pk_list else " is not in list: ", pk_list
             if episode.pk not in pk_list:
                 # If the pk is not in the submitted pk's, then it has been deleted
                 # by the user, so delete it from the database
@@ -237,8 +236,6 @@ class DisabledActivityForm(ActivityForm):
                             cleaned_data[field] = getattr(self.instance, field)
                     except AttributeError: # For episode fields
                         pass
-        else:
-            print "No instance!"
 
         return cleaned_data
 
@@ -309,19 +306,17 @@ class AssessmentForm(ModelForm):
         if self.category == 'M':
             del self.fields['cooperator_points']
 
-        current_year = StudentClubYear.objects.get_current()
-        for criterion in Criterion.objects.filter(year=current_year,
+        city = accounts.utils.get_city_code(self.activity.primary_club.city)
+        for criterion in Criterion.objects.filter(year=self.activity.primary_club.year,
                                                   category=self.category,
-                                                  city__contains=self.activity.primary_club.city):
-            print criterion.code_name
+                                                  city__contains=city):
             field_name = 'criterion_' + str(criterion.code_name)
+            initial_value = 0
             if self.instance.id:
                 try:
                     initial_value = CriterionValue.objects.get(assessment=self.instance, criterion=criterion).value
                 except CriterionValue.DoesNotExist:
-                    initial_value = 0
-            else:
-                initial_value = 0
+                    pass
             self.fields[field_name] = forms.IntegerField(label=criterion.ar_name, initial=initial_value,
                                                                                       required=True,
                                                                                       help_text=criterion.instructions)
@@ -330,6 +325,7 @@ class AssessmentForm(ModelForm):
 
     def save(self):
         notes = self.cleaned_data.pop('notes', '')
+        has_shared_points = self.cleaned_data.pop('has_shared_points', False)
         cooperator_points = self.cleaned_data.pop('cooperator_points', 0)
 
         # If we are dealing with a Media Center assessment, check if
@@ -354,6 +350,7 @@ class AssessmentForm(ModelForm):
             assessment = Assessment.objects.create(activity=self.activity,
                                                    assessor=self.user,
                                                    assessor_club=self.club,
+                                                   has_shared_points=has_shared_points,
                                                    cooperator_points=cooperator_points,
                                                    notes=notes,
                                                    is_reviewed=is_reviewed,
@@ -366,19 +363,26 @@ class AssessmentForm(ModelForm):
             assessment.cooperator_points = cooperator_points
             assessment.is_reviewed = is_reviewed
             assessment.review_date = review_date
+            assessment.has_shared_points = has_shared_points
             assessment.save()
 
         for field_name in self.cleaned_data:
             value = self.cleaned_data[field_name]
             criterion_name = field_name.replace('criterion_', '')
-            criterion = Criterion.objects.get(code_name=criterion_name)
-            if not self.instance.id:
+            criterion = Criterion.objects.get(code_name=criterion_name,
+                                              year=self.activity.primary_club.year)
+
+            try:
+                if self.instance.id:
+                    criterion_value = CriterionValue.objects.get(criterion=criterion,
+                                                                 assessment=assessment)
+                else:
+                    raise CriterionValue.DoesNotExist
+            except CriterionValue.DoesNotExist:
                 CriterionValue.objects.create(criterion=criterion,
                                               assessment=assessment,
                                               value=value)
             else:
-                criterion_value = CriterionValue.objects.get(criterion=criterion,
-                                                             assessment=assessment)
                 criterion_value.value = value
                 criterion_value.save()
 
@@ -386,7 +390,7 @@ class AssessmentForm(ModelForm):
 
     class Meta:
         model = Assessment
-        fields = ['notes', 'cooperator_points', 'is_reviewed']
+        fields = ['notes', 'cooperator_points', 'is_reviewed', 'has_shared_points']
 
 class UpdateDepositoryItemForm(forms.Form):
     excel_file = forms.FileField()

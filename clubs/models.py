@@ -2,7 +2,7 @@
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models import Sum
+from django.db.models import Sum, Count
 
 from forms_builder.forms.models import Form
 from core.models import StudentClubYear
@@ -212,12 +212,16 @@ class Club(models.Model):
 
     def get_total_points(self):
         points = 0
-        primary_points = self.primary_activity.aggregate(primary_points=Sum('assessment__criterionvalue__value'))['primary_points']
-        if primary_points:
-            points += primary_points
+        for primary_activity in self.primary_activity.all():
+            points += primary_activity.get_presidency_assessment_points()
+
         secondary_points = self.secondary_activity.aggregate(secondary_points=Sum('assessment__cooperator_points'))['secondary_points']
         if secondary_points:
             points += secondary_points
+        niqati_codes =  self.primary_activity.filter(episode__order__collection__codes__user__isnull=False)\
+                                             .aggregate(count=Count('episode__order__collection__codes'))['count'] 
+        if niqati_codes:
+            points += niqati_codes / 10 * 2
 
         return points
     get_total_points.short_description = u'إجمالي النقاط'

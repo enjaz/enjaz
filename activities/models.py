@@ -1,10 +1,10 @@
 # -*- coding: utf-8  -*-
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
-from django.db.models import Avg, F, Sum
+from django.db.models import Avg, F, Sum, Count
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
@@ -17,6 +17,7 @@ from forms_builder.forms.models import Form
 from media.utils import REPORT_DUE_AFTER
 import accounts.utils
 import clubs.utils
+
 
 class Evaluation(models.Model):
     """ An activity evaluation filled by students upon Niqati code submission. """
@@ -197,6 +198,24 @@ class Activity(models.Model):
     def get_first_time(self):
         return self.get_first_episode().start_time
 
+    def get_last_date(self):
+        return self.get_last_episode().end_date
+
+    def get_last_time(self):
+        return self.get_last_episode().end_time
+
+    def get_total_hours(self):
+        hours = 0
+        for episode in self.episode_set.all():
+            hours += episode.get_total_hours()
+        return hours
+
+    def get_total_days(self):
+        days = 0
+        for episode in self.episode_set.all():
+            days += episode.get_total_days()
+        return days
+
     def get_first_location(self):
         return self.get_first_episode().location
 
@@ -241,6 +260,7 @@ class Activity(models.Model):
         evaluations = Evaluation.objects.filter(episode__activity=self)
         return evaluations
 
+
     def get_evaluation_count(self):
         return self.get_evaluations().count()
     get_evaluation_count.short_description = u"عدد التقييمات"
@@ -266,7 +286,7 @@ class Activity(models.Model):
         return percentage
 
     def get_presidency_assessment(self):
-        return self.assessment_set.distinct().get(criterionvalue__criterion__category='P', activity=self)
+        return self.assessment_set.filter(criterionvalue__criterion__category='P').distinct().first()
 
     def get_media_assessment(self):
         return self.assessment_set.distinct().get(criterionvalue__criterion__category='M', activity=self)
@@ -275,7 +295,20 @@ class Activity(models.Model):
         return self.assessment_set.aggregate(total=Sum('criterionvalue__value'))['total']
 
     def get_presidency_assessment_points(self):
-        return self.assessment_set.filter(criterionvalue__criterion__category='P').aggregate(presidency=Sum('criterionvalue__value'))['presidency']
+        assessment = self.get_presidency_assessment()
+
+        if not assessment:
+            return 0
+
+        points = self.assessment_set.filter(criterionvalue__criterion__category='P').aggregate(presidency=Sum('criterionvalue__value'))['presidency']
+
+        if assessment.has_shared_points:
+            # Clubs that share points take half of the points, plus
+            # three for submitting the activity.
+            points /= 2.0
+            points += 3
+
+        return points
 
     def get_media_assessment_points(self):
         return self.assessment_set.filter(criterionvalue__criterion__category='M').aggregate(media=Sum('criterionvalue__value'))['media']
@@ -284,6 +317,7 @@ class Activity(models.Model):
         return self.assessment_set.filter(criterionvalue__criterion__category='M').aggregate(media=Sum('criterionvalue__value'))['media']
 
     def get_cooperator_points(self):
+        print self.assessment_set.all()
         return self.assessment_set.aggregate(cooperation=Sum('cooperator_points'))['cooperation']
 
     def get_presidency_assessor(self):
@@ -486,9 +520,18 @@ class Episode(models.Model):
     def is_single_day(self):
         return self.start_date == self.end_date
 
-    def day_count(self):
+    def get_total_days(self):
         "Return the length of the episode in terms of days"
-        return (self.end_date - self.start_date).days
+        return (self.end_date - self.start_date).days + 1
+
+    def get_total_hours(self):
+        "Return the length of the episode in terms of hours"
+        # GUESS WHAT THIS IS
+        dummydate = date(2010, 12, 17)
+        difference = datetime.combine(dummydate, self.end_time) - datetime.combine(dummydate, self.start_time)
+        days = self.get_total_days()
+        hours = (difference.total_seconds() / 60 / 60.0) * days
+        return int(hours)
 
     def start_datetime(self):
         start_datetime = datetime.combine(self.start_date, self.start_time)
@@ -619,9 +662,14 @@ class Assessment(models.Model):
                                        blank=True)
     submission_date = models.DateTimeField(u'تاريخ الإرسال',
                                            auto_now_add=True)
-    cooperator_points = models.IntegerField(default=0,
+    has_shared_points = models.BooleanField(default=False,
+                                        verbose_name=u"نقاط التقييم متقاسمة؟")
+    cooperator_points = models.FloatField(default=0,
                                             verbose_name=u"نقاط التعاون")
     notes = models.TextField(verbose_name=u"وصف النشاط", blank=True)
+
+    def __unicode__(self):
+        return "{} ({})".format(self.activity.name, self.assessor_club.name)
 
     def primary_points(self):
         return
@@ -635,12 +683,12 @@ class Criterion(models.Model):
     code_name = models.CharField(max_length=200,
                                  verbose_name=u"اسم المعيار البرمجي")
     city = models.CharField(max_length=10, default="RAJ", verbose_name=u"المدينة")
-    instructions = models.TextField(verbose_name=u"تعليمات")
+    instructions = models.TextField(verbose_name=u"تعليمات", blank=True)
     category_choices  = (
         ('P', u'رئاسة نادي الطلاب'),
         ('M', u'المركز الإعلامي')
         )
-    category = models.CharField(max_length=1, verbose_name=u"التصنيف")
+    category = models.CharField(max_length=1, verbose_name=u"التصنيف", choices=category_choices)
 
     def __unicode__(self):
         return self.code_name

@@ -9,11 +9,13 @@ from django.forms.models import inlineformset_factory
 from django.utils import timezone
 from openpyxl import load_workbook
 
-from activities.models import Activity, Episode, Review, Evaluation, Attachment, Assessment, Criterion, CriterionValue, DepositoryItem, ItemRequest 
+from activities.models import Activity, Episode, Review, Evaluation, Attachment, Assessment, Criterion, CriterionValue, DepositoryItem, ItemRequest
 from clubs.models import Club
 from core.models import StudentClubYear
 from dal import autocomplete
 from media.utils import can_assess_club_as_media_coordinator
+import accounts.utils
+
 
 class ActivityForm(ModelForm):
     """A general form, which doesn't include 'Presidency'."""
@@ -23,7 +25,7 @@ class ActivityForm(ModelForm):
                                     help_text=Activity.secondary_clubs.field.help_text,
                                     required=False)
     episode_count = forms.CharField(widget=forms.HiddenInput())
-    
+
     class Meta:
         model = Activity
         fields = ['name', 'category', 'description',
@@ -44,7 +46,7 @@ class ActivityForm(ModelForm):
         # This will be used in populating the episode fields when an instance
         # is passed.
         instance = kwargs.get('instance', None)
-                
+
         # Initialize the form
         super(ActivityForm, self).__init__(*args, **kwargs)
 
@@ -52,22 +54,22 @@ class ActivityForm(ModelForm):
         episode_count = 1 # default value
         # First check if an instance is passed. If true, then get the episode count of that instance
         if instance: episode_count = instance.episode_set.count()
-        
+
         # If data is passed (whether it's for a new activity or editing),
         # set episode_count to the episode count within the data.
         # This may override the value obtained from the instance if there is an update in the episodes
         if self['episode_count'].value(): episode_count = self['episode_count'].value()
-        
+
         # In any case, the episode count should be at least 1
         if episode_count < 1: episode_count = 1
-        
+
         #  Set the value of the hidden field to the episode count
         self.fields['episode_count'].initial = episode_count
-        
+
         # If an instance is passed and is saved (has a pk), load its episodes
         if instance and instance.pk:
             instance_episodes = instance.episode_set.all()
-        
+
         # Now add the custom date, time and location fields
         for i in range(int(episode_count)):
             # The disability status is the opposite of is_editable
@@ -77,7 +79,7 @@ class ActivityForm(ModelForm):
             self.fields['start_time{i}'.format(i=i)] = forms.TimeField(label='وقت البداية')
             self.fields['end_time{i}'.format(i=i)] = forms.TimeField(label='وقت النهاية')
             self.fields['location{i}'.format(i=i)] = forms.CharField(max_length=128, label='المكان')
-            
+
             # If an instance exists (has a pk), then load the fields
             # with the instance episode values.  An IndexError arises
             # when submitting an edit form in which new episodes have
@@ -101,23 +103,23 @@ class ActivityForm(ModelForm):
         # Remove spaces at the start and end of all text fields.
         for field in cleaned_data:
             if isinstance(cleaned_data[field], unicode):
-                cleaned_data[field] = cleaned_data[field].strip()                
+                cleaned_data[field] = cleaned_data[field].strip()
         # TODO: Check if end_date is after start_date
 
         return cleaned_data
-    
+
     def save(self, *args, **kwargs):
         # Extract and save the episodes, perform a normal save,
         # and link the episodes to the activity
-        
+
         # First, check how many episodes we have
         episode_count = self.cleaned_data['episode_count']
         new_episodes = []
         pk_list = [] # A list for storing any pk's submitted through the form
                      # Comparing this list to the list of episode pk's from the
                      # the database will tell us which episodes, if any, have
-                     # been deleted 
-        
+                     # been deleted
+
         for i in range(int(episode_count)):
             # Get the details of each episode and store them in an Episode object
             pk = self.cleaned_data.pop('episode_pk{i}'.format(i=i), None)
@@ -126,19 +128,19 @@ class ActivityForm(ModelForm):
             start_time = self.cleaned_data.pop('start_time{i}'.format(i=i))
             end_time = self.cleaned_data.pop('end_time{i}'.format(i=i))
             location = self.cleaned_data.pop('location{i}'.format(i=i))
-            
+
             # If there is a pk, i.e. the episode already exists in the database, just update it
             # Otherwise create a new one
             if pk:
                 pk_list.append(int(pk))
                 episode = Episode.objects.get(pk=pk)
-                
+
                 episode.start_date = start_date
                 episode.end_date = end_date
                 episode.start_time = start_time
                 episode.end_time = end_time
                 episode.location = location
-                
+
                 episode.save()
             else:
                 episode = Episode(start_date=start_date,
@@ -148,25 +150,22 @@ class ActivityForm(ModelForm):
                                   location=location)
                 new_episodes.append(episode)
 
-        print "PK list: ", pk_list
-
         activity = super(ActivityForm, self).save(*args, **kwargs)
-        
+
         # Check if any episodes have been deleted and delete them
         for episode in activity.episode_set.all():
-            print "PK: ", episode.pk, " is in list: " if episode.pk in pk_list else " is not in list: ", pk_list
             if episode.pk not in pk_list:
                 # If the pk is not in the submitted pk's, then it has been deleted
                 # by the user, so delete it from the database
                 episode.delete()
-        
+
         # Save the new episodes
         for episode in new_episodes:
             episode.activity = activity
             episode.save()
 
-            
-        return activity            
+
+        return activity
 
 class ReviewerActivityForm(ActivityForm):
     """A form which allows the submitter to choose the reviewer."""
@@ -181,7 +180,7 @@ class ReviewerActivityForm(ActivityForm):
                   'organizers', 'participants', 'secondary_clubs',
                   'inside_collaborators', 'outside_collaborators',
                   'requirements']
-    
+
 class DirectActivityForm(ActivityForm):
     """A form which has 'Presidency' as an option."""
     queryset = Club.objects.current_year()
@@ -237,8 +236,6 @@ class DisabledActivityForm(ActivityForm):
                             cleaned_data[field] = getattr(self.instance, field)
                     except AttributeError: # For episode fields
                         pass
-        else:
-            print "No instance!"
 
         return cleaned_data
 
@@ -309,18 +306,17 @@ class AssessmentForm(ModelForm):
         if self.category == 'M':
             del self.fields['cooperator_points']
 
-        current_year = StudentClubYear.objects.get_current()
-        for criterion in Criterion.objects.filter(year=current_year,
+        city = accounts.utils.get_city_code(self.activity.primary_club.city)
+        for criterion in Criterion.objects.filter(year=self.activity.primary_club.year,
                                                   category=self.category,
-                                                  city__contains=self.activity.primary_club.city):
+                                                  city__contains=city):
             field_name = 'criterion_' + str(criterion.code_name)
+            initial_value = 0
             if self.instance.id:
                 try:
                     initial_value = CriterionValue.objects.get(assessment=self.instance, criterion=criterion).value
                 except CriterionValue.DoesNotExist:
-                    initial_value = 0
-            else:
-                initial_value = 0
+                    pass
             self.fields[field_name] = forms.IntegerField(label=criterion.ar_name, initial=initial_value,
                                                                                       required=True,
                                                                                       help_text=criterion.instructions)
@@ -329,12 +325,13 @@ class AssessmentForm(ModelForm):
 
     def save(self):
         notes = self.cleaned_data.pop('notes', '')
+        has_shared_points = self.cleaned_data.pop('has_shared_points', False)
         cooperator_points = self.cleaned_data.pop('cooperator_points', 0)
 
         # If we are dealing with a Media Center assessment, check if
         # the reviewer is the presidency of the Media Center or the
         # superuser, take the input of is_reviewed.  If it is being
-        # edited by a Media Center member, mark is_reviewed as false.  If the 
+        # edited by a Media Center member, mark is_reviewed as false.  If the
         if self.category == 'M' \
            and (can_assess_club_as_media_coordinator(self.user, self.activity.primary_club) \
            or self.user.is_superuser):
@@ -353,6 +350,7 @@ class AssessmentForm(ModelForm):
             assessment = Assessment.objects.create(activity=self.activity,
                                                    assessor=self.user,
                                                    assessor_club=self.club,
+                                                   has_shared_points=has_shared_points,
                                                    cooperator_points=cooperator_points,
                                                    notes=notes,
                                                    is_reviewed=is_reviewed,
@@ -365,19 +363,26 @@ class AssessmentForm(ModelForm):
             assessment.cooperator_points = cooperator_points
             assessment.is_reviewed = is_reviewed
             assessment.review_date = review_date
+            assessment.has_shared_points = has_shared_points
             assessment.save()
 
         for field_name in self.cleaned_data:
             value = self.cleaned_data[field_name]
             criterion_name = field_name.replace('criterion_', '')
-            criterion = Criterion.objects.get(code_name=criterion_name)
-            if not self.instance.id:
+            criterion = Criterion.objects.get(code_name=criterion_name,
+                                              year=self.activity.primary_club.year)
+
+            try:
+                if self.instance.id:
+                    criterion_value = CriterionValue.objects.get(criterion=criterion,
+                                                                 assessment=assessment)
+                else:
+                    raise CriterionValue.DoesNotExist
+            except CriterionValue.DoesNotExist:
                 CriterionValue.objects.create(criterion=criterion,
                                               assessment=assessment,
                                               value=value)
             else:
-                criterion_value = CriterionValue.objects.get(criterion=criterion,
-                                                             assessment=assessment)
                 criterion_value.value = value
                 criterion_value.save()
 
@@ -385,7 +390,7 @@ class AssessmentForm(ModelForm):
 
     class Meta:
         model = Assessment
-        fields = ['notes', 'cooperator_points', 'is_reviewed']
+        fields = ['notes', 'cooperator_points', 'is_reviewed', 'has_shared_points']
 
 class UpdateDepositoryItemForm(forms.Form):
     excel_file = forms.FileField()

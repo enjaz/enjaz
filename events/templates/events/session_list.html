@@ -4,7 +4,7 @@
 
 
 <div class="row">
-        {% for time_slot in time_slot %}
+        {% for time_slot in time_slots %}
     <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
         <h2 class="mentor-section-header">{{ time_slot.name }}</h2>
     </div>
@@ -16,7 +16,11 @@
             {% for session in time_slot.session_set.all %}
             <div class="col-md-3 col-xs-6">
                 <h2>{{ session.name }}</h2>
-                <button class="btn btn-success signup" data-action="signup" data-url="{{ session.pk }}">سجلني!</button>
+                {% if not user|is_registered:session %}
+                <button class="btn btn-success signup" data-action="signup" data-pk="{{ session.pk }}">سجلني!</button>
+                {% else %}
+                <button class="btn btn-danger cancel" data-action="cancel" data-pk="{{ session.pk }}">ألغِ تسجيلي!</button>
+                {% endif %}
             </div>
             {% endfor %}
 
@@ -40,11 +44,11 @@
 <script>
 $(document).ready(function(){
 	$(".signup").click(function(){
-		url = $(this).data("url");
+		pk = $(this).data("pk");
 		action = $(this).data("action");
 		$.ajax("{% url 'events:handle_ajax' %}", {
 		    method: "POST",
-		    data: {url: url, action: action},
+		    data: {pk: pk, action: action},
 		});
 		$
 

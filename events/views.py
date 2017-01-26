@@ -111,9 +111,8 @@ def upload_abstract_image(request):
 
 def list_sessions(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
-    time_slot= TimeSlot.objects.all().filter(event=event)
-    context = {'sessions': Session.objects.filter(time_slot=time_slot),
-               'time_slot': time_slot,
+    time_slots = TimeSlot.objects.filter(event=event)
+    context = {'time_slots': time_slots,
                'event': event}
     return render(request, 'events/session_list.html', context)
 
@@ -128,13 +127,29 @@ def show_session(request, event_code_name, pk):
 @csrf.csrf_exempt
 def handle_ajax(request):
     action = request.POST.get('action')
-    session_pk = request.POST.get('url')
+    session_pk = request.POST.get('pk')
     session = get_object_or_404(Session, pk=session_pk)
+    SessionRegistration.objects.filter(session=session, user=request.user)
 
     if action == 'signup':
-        SessionRegistration.objects.create(session=session, user=request.user)
+        if not SessionRegistration.objects.filter(session=session, user=request.user, is_deleted=False).count() <= session.limit :
+            raise Exception(u'Session is full')
+        else:
+            if not SessionRegistration.objects.filter(session=session, user=request.user).exists():
+                SessionRegistration.objects.create(session=session, user=request.user)
+
+            elif SessionRegistration.objects.filter(session=session, user=request.user, is_deleted=True).exists():
+                SessionRegistration.objects.filter(session=session, user=request.user).update(is_deleted=False)
+
+            else:
+                raise Exception(u'You are already registered!')
+
     elif action == 'cancel':
-        SessionRegistration.objects.create(session=session, user=request.user).delete()
+        if not SessionRegistration.objects.filter(session=session, user=request.user).exists():
+            raise Exception(u'You did not registered yet!')
+
+        else:
+            SessionRegistration.objects.filter(session=session, user=request.user).update(is_deleted=True)
 
     return {}
 

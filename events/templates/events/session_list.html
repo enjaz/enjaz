@@ -41,30 +41,39 @@
 {% endblock %}
 
 {% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+
 <script>
 $(document).ready(function(){
-	$(".signup").click(function(){
+  toastr.options.positionClass = "toast-top-left";
+	$(".signup, .cancel").click(function(){
+    button = this;
 		pk = $(this).data("pk");
 		action = $(this).data("action");
 		$.ajax("{% url 'events:handle_ajax' %}", {
 		    method: "POST",
 		    data: {pk: pk, action: action},
+        success: function(data){
+            if (data['success'] == 1){
+              		if (action == 'cancel'){
+                    toastr.success("ألغي تسجيلك");
+                    $(button).html('سجلني!');
+                    $(button).data('action', 'signup');
+                    $(button).addClass('btn-success');
+                    $(button).removeClass('btn-danger');
+                  } else if (action == 'signup'){
+                    toastr.success("تمّ تسجيلك!");
+                      $(button).html('ألغِ تسجيلي!');
+                      $(button).data('action', 'cancel');
+                      $(button).addClass('btn-danger');
+                      $(button).removeClass('btn-success');
+                  }
+            } else if (data['success'] == 0){
+              toastr.error(data['message']);
+            }
+        }
 		});
-		$
-
-		if (action == 'cancel'){
-                    $(this).html('سجلني!');
-                    $(this).data('action', 'signup');
-                    $(this).addClass('btn-success')
-                    $(this).removeClass('btn-danger')
-                } else if (action == 'signup'){
-                    $(this).html('ألغِ تسجيلي!');
-                    $(this).data('action', 'cancel');
-                    $(this).addClass('btn-danger')
-                    $(this).removeClass('btn-success')
-                }
-
-	})
+  });
 });
 </script>
 {% endblock %}

@@ -1,7 +1,7 @@
 from django import template
 
 from events import utils
-
+from events.models import SessionRegistration
 
 register = template.Library()
 
@@ -27,3 +27,8 @@ def get_session_priority(registration, session):
 @register.filter
 def is_registered(user, session):
     return utils.is_registered(user, session)
+
+@register.filter
+def get_status(user, session):
+    session_registration = SessionRegistration.objects.get(session=session, user=user)
+    return session_registration.is_approved

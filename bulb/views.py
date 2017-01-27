@@ -563,6 +563,9 @@ def indicators(request, city_code=""):
 
     if city_code:
         city = accounts.utils.get_city_from_code(city_code)
+        # To avoid user fuck-ups entering non-standard city-code.
+        if not city:
+            raise Http404
         books = Book.objects.current_year().filter(submitter__common_profile__city=city)
         book_requests = Request.objects.current_year().filter(requester__common_profile__city=city)
         groups = Group.objects.current_year().filter(coordinator__common_profile__city=city)

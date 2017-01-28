@@ -39,6 +39,10 @@ class Event(models.Model):
     twitter = models.CharField(max_length=255,
                                blank=True,
                                default="KSAU_Events")
+    receives_initiation_submission = models.BooleanField(default=False,
+                                                         verbose_name=u"يستقبل مبادرات؟")
+    initiation_submission_opening_date = models.DateTimeField(u"تاريخ فتح استقبال المبادرات", null=True, blank=True)
+    initiation_submission_closing_date = models.DateTimeField(u"تاريخ انتهاء إغلاق استقبال المبادرات", null=True, blank=True)
     receives_abstract_submission = models.BooleanField(default=False,
                                                        verbose_name=u"يستقبل ملخصات بحثية؟")
     abstract_submission_opening_date = models.DateTimeField(u"تاريخ فتح استقبال الملخصات البحثية", null=True, blank=True)
@@ -408,3 +412,30 @@ class CriterionValue(models.Model):
 
     def __unicode__(self):
         return "{}: {}".format(self.criterion.code_name, self.value)
+
+class Initiation(models.Model):
+    user = models.ForeignKey(User, null=True, related_name='initiator')
+    event = models.ForeignKey(Event, verbose_name=u"الحدث")
+    name = models.CharField(verbose_name=u"اسم المبادرة", max_length=255)
+    definition = models.TextField(verbose_name=u"تعريف المبادرة")
+    goals = models.TextField(verbose_name=u"أهداف المبادرة")
+    target = models.TextField(verbose_name=u"الفئة المستهدفة")
+    achievements = models.TextField(verbose_name=u"منجزات المبادرة حتى الآن")
+    future_goals = models.TextField(verbose_name=u"ما الذي تتطلع المبادرة لإنجازه مستقبلًا؟")
+    goals_from_participating = models.TextField(verbose_name=u"ما الذي تطمح البادرة للوصول إليه من خلال المؤتمر؟")
+    members = models.TextField(verbose_name=u"من هم القائمون على العمل؟")
+    sponsors = models.TextField(verbose_name=u"إسم الجهة الراعية", help_text=u"إن وجدت",
+                                blank=True)
+    email = models.EmailField(verbose_name=u"البريد الإلكتروني")
+    social = models.TextField(verbose_name=u"حسابات التواصل الإجتماعي والموقع الإلكتروني", help_text=u"إن وجدت",
+                              blank=True)
+    date_submitted = models.DateTimeField(auto_now_add=True)
+    is_deleted = models.BooleanField(default=False,
+                                     verbose_name=u"محذوف؟")
+
+    def __unicode__(self):
+        return self.name
+
+class InitiationFigure(models.Model):
+    initiation = models.ForeignKey(Initiation, related_name='figures', null=True)
+    figure = models.FileField(verbose_name=u"Attach the figure", upload_to="events/figures/initiations/")

@@ -1,0 +1,15 @@
+{% extends 'events_submission_base.html' %}{% load staticfiles %}
+{% block meta_description %}{{ event.english_name }} Initiation Submission{% endblock %}
+{% block title %}Initiation submission{% endblock %}
+
+{% block content %}
+<div class="form-register-success visible english-field">
+	<i class="entypo-check"></i>
+	<h3>تم إستقبال مبادرتك بنجاح</h3>
+    <p style="text-align: justify;">سيتم التواصل معك عبر البريد الإلكتروني</p>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+{% endblock %}

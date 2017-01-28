@@ -2,7 +2,7 @@
 from django import forms
 
 from accounts.utils import get_user_gender
-from events.models import NonUser, Session, Registration, Abstract, AbstractFigure
+from events.models import NonUser, Session, Registration, Abstract, AbstractFigure, Initiation, InitiationFigure
 from django.forms.models import inlineformset_factory
 
 class NonUserForm(forms.ModelForm):
@@ -142,3 +142,15 @@ class EvaluationForm(forms.Form):
                 criterion_value.save()
 
         return evaluation
+
+class InitiationForm(forms.ModelForm):
+    class Meta:
+        model = Initiation
+        fields = ['name', 'definition', 'goals',
+                  'target','achievements', 'future_goals',
+                  'goals_from_participating', 'members',
+                  'sponsors', 'email', 'social']
+
+InitiationFigureFormset = inlineformset_factory(Initiation,
+                                              InitiationFigure,
+                                              fields=['figure'])

@@ -1,0 +1,16 @@
+{% extends 'events_submission_base.html' %}{% load staticfiles %}
+{% block meta_description %}{{ event.english_name }} Initiation Submission{% endblock %}
+{% block title %}Initiation submission closed!{% endblock %}
+
+
+{% block content %}
+<div class="form-register-success visible english-field">
+	<i class="entypo-info"></i>
+	<h3 class="english-field">إستقبال المبادرات إنتهى!</h3>
+    <p style="text-align: justify;">نحن لم نستقبل المبادرات ل{{ event.official_name }}</p>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+{% endblock %}

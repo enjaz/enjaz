@@ -23,7 +23,7 @@ urlpatterns = patterns('',
     url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/thanks/$', TemplateView.as_view(template_name='events/abstracts/abstract_submission_completed.html'), name="abstract_submision_completed"),
     url(r'^abstracts/img/$',views.upload_abstract_image, name="upload_abstract_image"),
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
-    url(r'^(?P<event_code_name>[\d\w_\-]+)/initiations/$', views.submit_initiation, name="submit_initiation"),
-    url(r'^(?P<event_code_name>[\d\w_\-]+)/initiations/thanks/$', TemplateView.as_view(template_name='events/initiations/initiation_submission_completed.html'), name="initiation_submission_completed"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/initiatives/$', views.submit_initiation, name="submit_initiative"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/initiatives/thanks/$', TemplateView.as_view(template_name='events/initiatives/initiatives_submission_completed.html'), name="initiative_submission_completed"),
 
 )

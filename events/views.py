@@ -12,8 +12,8 @@ import os.path
 
 from core import decorators
 from clubs.models import college_choices
-from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm, InitiationForm, InitiationFigureFormset
-from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation, TimeSlot, SessionRegistration, Initiation
+from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm, InitiativeForm, InitiativeFigureFormset
+from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation, TimeSlot, SessionRegistration, Initiative
 from events import utils
 
 def redirect_home(request, event_code_name):
@@ -282,29 +282,29 @@ def registration_closed(request, event_code_name):
                   {'event': event})
 
 @login_required
-def submit_initiation(request, event_code_name):
+def submit_initiative(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name,
-                              receives_initiation_submission=True)
+                              receives_initiative_submission=True)
     context = {'event': event}
 
-    if event.initiation_submission_opening_date and timezone.now() < event.initiation_submission_opening_date:
-        return render(request, 'events/initiations/initiation_not_started.html', context)
-    elif event.initiation_submission_closing_date and timezone.now() > event.initiation_submission_closing_date:
-        return render(request, 'events/initiations/initiation_closed.html', context)
+    if event.initiative_submission_opening_date and timezone.now() < event.initiative_submission_opening_date:
+        return render(request, 'events/initiatives/initiatives_not_started.html', context)
+    elif event.initiative_submission_closing_date and timezone.now() > event.initiative_submission_closing_date:
+        return render(request, 'events/initiatives/initiatives_closed.html', context)
 
     if request.method == 'POST':
-        instance = Initiation(event=event,user=request.user)
-        form = InitiationForm(request.POST, request.FILES,
+        instance = Initiative(event=event,user=request.user)
+        form = InitiativeForm(request.POST, request.FILES,
                             instance=instance)
-        figure_formset = InitiationFigureFormset(request.POST, request.FILES)
+        figure_formset = InitiativeFigureFormset(request.POST, request.FILES)
         if form.is_valid():
-            initiation = form.save()
-            return HttpResponseRedirect(reverse('events:initiation_submission_completed',
+            initiative = form.save()
+            return HttpResponseRedirect(reverse('events:initiative_submission_completed',
                                                 args=(event.code_name)))
     elif request.method == 'GET':
-        form = InitiationForm()
-        figure_formset = InitiationFigureFormset()
+        form = InitiativeForm()
+        figure_formset = InitiativeFigureFormset()
     context['form'] = form
     context['figure_formset'] = figure_formset
 
-    return render(request, 'events/initiations/initiation_submission.html', context)
+    return render(request, 'events/initiatives/initiatives_submission.html', context)

@@ -45,7 +45,7 @@ def submit_abstract(request, event_code_name):
         form = AbstractForm(request.POST, request.FILES,
                             instance=instance)
         figure_formset = AbstractFigureFormset(request.POST, request.FILES)
-        if form.is_valid():
+        if form.is_valid() and figure_formset.is_valid():
             abstract = form.save()
             figure_formset.instance = abstract
             figure_formset.save()

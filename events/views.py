@@ -47,6 +47,8 @@ def submit_abstract(request, event_code_name):
         figure_formset = AbstractFigureFormset(request.POST, request.FILES)
         if form.is_valid():
             abstract = form.save()
+            figure_formset.instance = abstract
+            figure_formset.save()
             return HttpResponseRedirect(reverse('events:show_abstract',
                                                 args=(event.code_name, abstract.pk)))
     elif request.method == 'GET':
@@ -297,10 +299,12 @@ def submit_initiative(request, event_code_name):
         form = InitiativeForm(request.POST, request.FILES,
                             instance=instance)
         figure_formset = InitiativeFigureFormset(request.POST, request.FILES)
-        if form.is_valid():
+        if form.is_valid() and figure_formset.is_valid():
             initiative = form.save()
+            figure_formset.instance = initiative
+            figure_formset.save()
             return HttpResponseRedirect(reverse('events:initiative_submission_completed',
-                                                args=(event.code_name)))
+                                                args=(event.code_name,)))
     elif request.method == 'GET':
         form = InitiativeForm()
         figure_formset = InitiativeFigureFormset()

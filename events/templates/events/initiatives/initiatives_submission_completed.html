@@ -1,12 +1,13 @@
 {% extends 'events_submission_base.html' %}{% load staticfiles %}
-{% block meta_description %}{{ event.english_name }} Initiation Submission{% endblock %}
-{% block title %}Initiation submission{% endblock %}
+{% block meta_description %}إرسال المبادرات{% endblock %}
+{% block title %}أرسلت المبادرة{% endblock %}
+{% block description %}<h1 style="color: white;">إرسال المبادرات</h1>{% endblock %}
 
 {% block content %}
-<div class="form-register-success visible english-field">
+<div style="direction: rtl;" class="form-register-success visible">
 	<i class="entypo-check"></i>
-	<h3>تم إستقبال مبادرتك بنجاح</h3>
-    <p style="text-align: justify;">سيتم التواصل معك عبر البريد الإلكتروني</p>
+	<h3>تم استقبال مبادرتك بنجاح</h3>
+    <p style="text-align: justify;">سيتم التواصل معك عبر البريد الإلكتروني.</p>
 </div>
 {% endblock %}
 

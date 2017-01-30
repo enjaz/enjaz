@@ -151,6 +151,6 @@ class InitiativeForm(forms.ModelForm):
                   'goals_from_participating', 'members',
                   'sponsors', 'email', 'social']
 
-InitiationFigureFormset = inlineformset_factory(Initiative,
+InitiativeFigureFormset = inlineformset_factory(Initiative,
                                               InitiativeFigure,
                                               fields=['figure'])

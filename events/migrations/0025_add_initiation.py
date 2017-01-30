@@ -37,7 +37,6 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('figure', models.FileField(upload_to=b'events/figures/initiations/', verbose_name='Attach the figure')),
-                ('initiations', models.ForeignKey(related_name='figures', to='events.Initiation', null=True)),
             ],
         ),
         migrations.AddField(
@@ -56,12 +55,12 @@ class Migration(migrations.Migration):
             field=models.BooleanField(default=False, verbose_name='\u064a\u0633\u062a\u0642\u0628\u0644 \u0645\u0628\u0627\u062f\u0631\u0627\u062a\u061f'),
         ),
         migrations.AddField(
-            model_name='initiations',
+            model_name='initiation',
             name='event',
             field=models.ForeignKey(verbose_name='\u0627\u0644\u062d\u062f\u062b', to='events.Event'),
         ),
         migrations.AddField(
-            model_name='initiations',
+            model_name='initiation',
             name='user',
             field=models.ForeignKey(related_name='initiator', to=settings.AUTH_USER_MODEL, null=True),
         ),

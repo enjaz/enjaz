@@ -1,13 +1,13 @@
 {% extends 'events_submission_base.html' %}{% load staticfiles %}
-{% block meta_description %}{{ event.english_name }} Initiation Submission{% endblock %}
-{% block title %}Initiation submission{% endblock %}
-{% block description %}<div class="english-field"><p class="text-center">مبادرات {{ event.official_name }}</div>{% endblock %}
+{% block meta_description %}{{ event.official_name }} إرسال المبادرات{% endblock %}
+{% block title %}إرسال المبادرات{% endblock %}
+{% block description %}<h1 style="color: white;">{{ event.official_name }}: إرسال المبادرات</h1>{% endblock %}
 
 {% block content %}
-
-<div class="dinar-light enjaz-warning" align="right"><p style="text-align:center"> <i class="entypo-info"></i>من خلال سعي المؤتمر لتمكين طلبة التخصصات الصحية وإبراز ما لديهم من منجزات وأفكار إبداعية، يتيح المؤتمر الفرصة للطلاب عرض مباداراتهم ومشاريعهم المتعلقة بالمجال الصحي، سواء عن طريق الحديث عنها خلال برنامج المؤتمر أو عرضها في ركن من أركان معرض المؤتمر
+<div style="direction: rtl;">
+<div class="dinar-light enjaz-warning" align="right"><p style="text-align:justify"> <i class="entypo-info"></i>من خلال سعي المؤتمر لتمكين طلبة التخصصات الصحية وإبراز ما لديهم من منجزات وأفكار إبداعية، يتيح المؤتمر الفرصة للطالبات والطلاب عرض مباداراتهم ومشاريعهم المتعلقة بالمجال الصحي، سواء عن طريق الحديث عنها خلال برنامج المؤتمر أو عرضها في ركن من أركان معرض
 <br>
-لعرض مبادرتك أو مشروعك الصحي، عليك بتعبأة النموذج التالي
+لعرض مبادرتك أو مشروعك الصحي، عليك بتعبأة النموذج التالي:
 </p>
 </div>
 
@@ -235,6 +235,7 @@
 
 
 
+</div>
 </div>
 {% endblock %}
 {% block customscript %}

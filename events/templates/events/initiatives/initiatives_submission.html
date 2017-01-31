@@ -5,12 +5,12 @@
 
 {% block content %}
 <div style="direction: rtl;">
-<div class="dinar-light enjaz-warning" align="right"><p style="text-align:justify"> <i class="entypo-info"></i>من خلال سعي المؤتمر لتمكين طلبة التخصصات الصحية وإبراز ما لديهم من منجزات وأفكار إبداعية، يتيح المؤتمر الفرصة للطالبات والطلاب عرض مباداراتهم ومشاريعهم المتعلقة بالمجال الصحي، سواء عن طريق الحديث عنها خلال برنامج المؤتمر أو عرضها في ركن من أركان معرض
+<div class="dinar-light enjaz-warning" align="right"><p style="text-align:justify"> <i class="entypo-info"></i>من خلال سعي المؤتمر لتمكين طلبة التخصصات الصحية وإبراز ما لديهم من منجزات وأفكار إبداعية، يتيح المؤتمر الفرصة للطالبات والطلاب عرض مباداراتهم ومشاريعهم المتعلقة بالمجال الصحي، سواء عن طريق الحديث عنها خلال برنامج المؤتمر أو عرضها في ركن من أركان المعرض المصاحب للمؤتمر.
 <br>
 لعرض مبادرتك أو مشروعك الصحي، عليك بتعبأة النموذج التالي:
 </p>
 </div>
-
+<br>
 <form method="post" role="form" id="form_register" enctype="multipart/form-data">
         {% csrf_token %}
 	<div class="registration-form">
@@ -141,7 +141,7 @@
 						<i class="entypo-users"></i>
 					</div>
 
-					<textarea {% if form.sponsors.value and not form.sponsors.errors %}value="{{ form.sponsors.value }}" {% endif %}type="text" class="form-control" name="sponsors" id="sponsors" placeholder="{{ form.sponsors.label }}" ></textarea>
+					<textarea {% if form.sponsors.value and not form.sponsors.errors %}value="{{ form.sponsors.value }}" {% endif %}type="text" class="form-control" name="sponsors" id="sponsors" placeholder="{{ form.sponsors.label }} (اختياري)" ></textarea>
 					{% if form.sponsors.errors %}
 					    {% for error in form.sponsors.errors %}
 					        <label class='error' for='sponsors' style='display: inline-block'>{{ error|escape }}</label>
@@ -171,7 +171,7 @@
 						<i class="glyphicon glyphicon-bullhorn"></i>
 					</div>
 
-					<textarea {% if form.social.value and not form.social.errors %}value="{{ form.social.value }}" {% endif %}type="text" class="form-control" name="social" id="social" placeholder="{{ form.social.label }}"></textarea>
+					<textarea {% if form.social.value and not form.social.errors %}value="{{ form.social.value }}" {% endif %}type="text" class="form-control" name="social" id="social" placeholder="{{ form.social.label }} (اختياري)"></textarea>
 					{% if form.social.errors %}
 					    {% for error in form.social.errors %}
 					        <label class='error' for='social' style='display: inline-block'>{{ error|escape }}</label>

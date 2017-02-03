@@ -63,7 +63,8 @@ def submit_abstract(request, event_code_name):
 def list_abstracts(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name,
                               receives_abstract_submission=True)
-    if not utils.can_evaluate_abstracts(request.user, event):
+    if not utils.can_evaluate_abstracts(request.user, event) and \
+            not utils.is_organizing_team_member(request.user, event):
         raise PermissionDenied
 
     pending_abstracts = Abstract.objects.filter(event=event, is_deleted=False, evaluation__isnull=True)
@@ -88,7 +89,9 @@ def show_abstract(request, event_code_name, pk):
     event = abstract.event
 
     if not abstract.user == request.user and \
-       not request.user.is_superuser:
+            not request.user.is_superuser and \
+            not utils.can_evaluate_abstracts(request.user, event) and \
+            not utils.is_organizing_team_member(request.user, event):
         raise PermissionDenied
 
     context= {'event':event, 'abstract':abstract}

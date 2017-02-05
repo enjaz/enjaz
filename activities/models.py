@@ -292,7 +292,7 @@ class Activity(models.Model):
         return self.assessment_set.distinct().get(criterionvalue__criterion__category='M', activity=self)
 
     def get_total_assessment_points(self):
-        return self.assessment_set.aggregate(total=Sum('criterionvalue__value'))['total']
+        return self.assessment_set.distinct().aggregate(total=Sum('criterionvalue__value'))['total']
 
     def get_presidency_assessment_points(self):
         assessment = self.get_presidency_assessment()

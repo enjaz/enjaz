@@ -218,10 +218,13 @@ class Club(models.Model):
         secondary_points = self.secondary_activity.aggregate(secondary_points=Sum('assessment__cooperator_points'))['secondary_points']
         if secondary_points:
             points += secondary_points
-        niqati_codes =  self.primary_activity.filter(episode__order__collection__codes__user__isnull=False)\
-                                             .aggregate(count=Count('episode__order__collection__codes'))['count'] 
-        if niqati_codes:
-            points += niqati_codes / 10 * 2
+
+        # Niqati is only included in Riyadh assessment
+        if self.city == u"الرياض":
+            niqati_codes =  self.primary_activity.filter(episode__order__collection__codes__user__isnull=False)\
+                                                 .aggregate(count=Count('episode__order__collection__codes'))['count'] 
+            if niqati_codes:
+                points += niqati_codes / 10 * 2
 
         return points
     get_total_points.short_description = u'إجمالي النقاط'

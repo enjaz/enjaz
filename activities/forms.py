@@ -379,9 +379,9 @@ class AssessmentForm(ModelForm):
                 else:
                     raise CriterionValue.DoesNotExist
             except CriterionValue.DoesNotExist:
-                CriterionValue.objects.create(criterion=criterion,
-                                              assessment=assessment,
-                                              value=value)
+                print CriterionValue.objects.create(criterion=criterion,
+                                                    assessment=assessment,
+                                                    value=value)
             else:
                 criterion_value.value = value
                 criterion_value.save()

@@ -266,7 +266,7 @@ def view_assessments(request, club_id):
     if not can_view_assessments(request.user, club):
         raise PermissionDenied
 
-    assessed_primary_activities = Activity.objects.approved().filter(primary_club=club, assessment__isnull=False)
+    assessed_primary_activities = Activity.objects.approved().filter(primary_club=club, assessment__isnull=False).distinct()
     assessed_secondary_activities = Activity.objects.approved().filter(secondary_clubs=club, assessment__isnull=False).distinct()
 
     context = {'club': club,

@@ -48,7 +48,6 @@ def add_criteria(apps, schema_editor):
                                 code_name="student_idea",
                                 instructions="",
                                 category='P')
-
     Criterion.objects.create(year= year_2016_2017,
                             ar_name="طرح الفكرة بطريقة غير تقليدية",
                             code_name="creative_idea",

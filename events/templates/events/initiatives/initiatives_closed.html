@@ -1,0 +1,16 @@
+{% extends 'events_submission_base.html' %}{% load staticfiles %}
+{% block meta_description %}{{ event.official_name }}: إرسال المبادرات{% endblock %}
+{% block title %}انتهى استقبال المبادرات!{% endblock %}
+{% block description %}<h1 style="color: white;">{{ event.official_name }}: إرسال المبادرات</h1>{% endblock %}
+
+{% block content %}
+<div style="direction: rtl;" class="form-register-success visible">
+	<i class="entypo-info"></i>
+	<h3>استقبال المبادرات انتهى!</h3>
+    <p style="text-align: justify;">لم نعد نستقبل المبادرات ل{{ event.official_name }}</p>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+{% endblock %}

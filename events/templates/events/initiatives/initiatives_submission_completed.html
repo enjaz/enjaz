@@ -1,0 +1,16 @@
+{% extends 'events_submission_base.html' %}{% load staticfiles %}
+{% block meta_description %}إرسال المبادرات{% endblock %}
+{% block title %}أرسلت المبادرة{% endblock %}
+{% block description %}<h1 style="color: white;">إرسال المبادرات</h1>{% endblock %}
+
+{% block content %}
+<div style="direction: rtl;" class="form-register-success visible">
+	<i class="entypo-check"></i>
+	<h3>تم استقبال مبادرتك بنجاح</h3>
+    <p style="text-align: justify;">سيتم التواصل معك عبر البريد الإلكتروني.</p>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+{% endblock %}

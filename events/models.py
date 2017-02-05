@@ -39,6 +39,10 @@ class Event(models.Model):
     twitter = models.CharField(max_length=255,
                                blank=True,
                                default="KSAU_Events")
+    receives_initiative_submission = models.BooleanField(default=False,
+                                                         verbose_name=u"يستقبل مبادرات؟")
+    initiative_submission_opening_date = models.DateTimeField(u"تاريخ فتح استقبال المبادرات", null=True, blank=True)
+    initiative_submission_closing_date = models.DateTimeField(u"تاريخ انتهاء إغلاق استقبال المبادرات", null=True, blank=True)
     receives_abstract_submission = models.BooleanField(default=False,
                                                        verbose_name=u"يستقبل ملخصات بحثية؟")
     abstract_submission_opening_date = models.DateTimeField(u"تاريخ فتح استقبال الملخصات البحثية", null=True, blank=True)
@@ -93,13 +97,28 @@ class Event(models.Model):
     def __unicode__(self):
         return self.official_name
 
-class Session(models.Model):
+class TimeSlot(models.Model):
+    name = models.CharField(max_length=50)
     event = models.ForeignKey(Event)
+    date_submitted = models.DateTimeField(auto_now_add=True)
+    date_edited = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return self.name
+
+class Session(models.Model):
+    event = models.ForeignKey(Event, null=True, blank=True)
+    time_slot = models.ForeignKey(TimeSlot, default="", null=True)
     name = models.CharField(max_length=255)
     limit = models.PositiveSmallIntegerField(null=True, blank=True,
                                              default=None)
-    time_slot = models.PositiveSmallIntegerField(null=True, blank=True,
-                                                 default=None)
+    acceptance_method_choices = (
+        ('F', 'First ComeFirst Serve'),
+        ('M', 'Manual')
+        )
+    acceptance_method = models.CharField(verbose_name="acceptance_method", max_length=1,
+                                         default="", choices=acceptance_method_choices)
+    description = models.TextField(blank=True, default="")
     vma_id = models.PositiveSmallIntegerField(null=True, blank=True)
     vma_time_code = models.PositiveSmallIntegerField(null=True,
                                                      blank=True,
@@ -186,6 +205,28 @@ class NonUser(models.Model):
 
     def __unicode__(self):
         return self.get_en_full_name()
+
+class SessionRegistration(models.Model):
+    user = models.ForeignKey(User, null=True, related_name='session_registrations')
+    session = models.ForeignKey(Session)
+    date_submitted = models.DateTimeField(auto_now_add=True)
+    date_edited = models.DateTimeField(auto_now=True)
+    is_approved_choices = (
+        (True, u'معتمد'),
+        (False, u'مرفوض'),
+        (None, u'معلق'),
+        )
+    is_approved = models.NullBooleanField(default= None, verbose_name=u"الحالة",
+                                          choices=is_approved_choices)
+    is_deleted = models.BooleanField(default=False,
+                                     verbose_name=u"محذوف؟")
+    reminder_sent = models.BooleanField(default=False,
+                                            verbose_name=u"أرسلت رسالة التذكير؟")
+    certificate_sent = models.BooleanField(default=False,
+                                            verbose_name=u"أرسلت الشهادة؟")
+
+    def __unicode__(self):
+        return unicode(self.user)
 
 class Registration(models.Model):
     user = models.ForeignKey(User, null=True, blank=True,
@@ -371,3 +412,30 @@ class CriterionValue(models.Model):
 
     def __unicode__(self):
         return "{}: {}".format(self.criterion.code_name, self.value)
+
+class Initiative(models.Model):
+    user = models.ForeignKey(User, null=True, related_name='initiator')
+    event = models.ForeignKey(Event, verbose_name=u"الحدث")
+    name = models.CharField(verbose_name=u"اسم المبادرة", max_length=255)
+    definition = models.TextField(verbose_name=u"تعريف المبادرة")
+    goals = models.TextField(verbose_name=u"أهداف المبادرة")
+    target = models.TextField(verbose_name=u"الفئة المستهدفة")
+    achievements = models.TextField(verbose_name=u"منجزات المبادرة حتى الآن")
+    future_goals = models.TextField(verbose_name=u"ما الذي تتطلع المبادرة لإنجازه مستقبلًا؟")
+    goals_from_participating = models.TextField(verbose_name=u"ما الذي تطمح البادرة للوصول إليه من خلال المؤتمر؟")
+    members = models.TextField(verbose_name=u"من هم القائمون على العمل؟")
+    sponsors = models.TextField(verbose_name=u"إسم الجهة الراعية", help_text=u"إن وجدت",
+                                blank=True)
+    email = models.EmailField(verbose_name=u"البريد الإلكتروني")
+    social = models.TextField(verbose_name=u"حسابات التواصل الإجتماعي والموقع الإلكتروني", help_text=u"إن وجدت",
+                              blank=True)
+    date_submitted = models.DateTimeField(auto_now_add=True)
+    is_deleted = models.BooleanField(default=False,
+                                     verbose_name=u"محذوف؟")
+
+    def __unicode__(self):
+        return self.name
+
+class InitiativeFigure(models.Model):
+    initiative = models.ForeignKey(Initiative, related_name='figures', null=True)
+    figure = models.FileField(verbose_name=u"Attach the figure", upload_to="events/figures/initiatives/")

@@ -292,7 +292,9 @@ class Activity(models.Model):
         return self.assessment_set.distinct().get(criterionvalue__criterion__category='M', activity=self)
 
     def get_total_assessment_points(self):
-        return self.assessment_set.distinct().aggregate(total=Sum('criterionvalue__value'))['total']
+        return CriterionValue.objects.filter(assessment__in=self.assessment_set.all())\
+                                     .distinct()\
+                                     .aggregate(total=Sum('value'))['total']
 
     def get_presidency_assessment_points(self):
         assessment = self.get_presidency_assessment()
@@ -300,7 +302,10 @@ class Activity(models.Model):
         if not assessment:
             return 0
 
-        points = self.assessment_set.filter(criterionvalue__criterion__category='P').aggregate(presidency=Sum('criterionvalue__value'))['presidency']
+        points = CriterionValue.objects.filter(assessment__in=self.assessment_set.all(),
+                                               criterion__category='P')\
+                                       .distinct()\
+                                       .aggregate(presidency=Sum('value'))['presidency']
 
         if assessment.has_shared_points:
             # Clubs that share points take half of the points, plus
@@ -311,13 +316,12 @@ class Activity(models.Model):
         return points
 
     def get_media_assessment_points(self):
-        return self.assessment_set.filter(criterionvalue__criterion__category='M').aggregate(media=Sum('criterionvalue__value'))['media']
-
-    def get_media_assessment_points(self):
-        return self.assessment_set.filter(criterionvalue__criterion__category='M').aggregate(media=Sum('criterionvalue__value'))['media']
+        return CriterionValue.objects.filter(assessment__in=self.assessment_set.all(),
+                                             criterion__category='M')\
+                                     .distinct()\
+                                     .aggregate(media=Sum('value'))['media']
 
     def get_cooperator_points(self):
-        print self.assessment_set.all()
         return self.assessment_set.aggregate(cooperation=Sum('cooperator_points'))['cooperation']
 
     def get_presidency_assessor(self):

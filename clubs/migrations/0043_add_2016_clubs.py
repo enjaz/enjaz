@@ -58,6 +58,7 @@ def add_clubs(apps, schema_editor):
                                           email="sc-m@ksau-hs.edu.sa",
                                           parent=presidency,
                                           can_review=True,
+                                          can_assess=True,
                                           visible=False,
                                           is_assessed=False,
                                           gender="M",
@@ -69,6 +70,7 @@ def add_clubs(apps, schema_editor):
                                             email="sc-m@ksau-hs.edu.sa",
                                             parent=presidency,
                                             can_review=True,
+                                            can_assess=True,
                                             visible=False,
                                             is_assessed=False,
                                             gender="F",
@@ -80,6 +82,7 @@ def add_clubs(apps, schema_editor):
                                             email="sc-j@ksau-hs.edu.sa",
                                             parent=presidency,
                                             can_review=True,
+                                            can_assess=True,
                                             visible=False,
                                             is_assessed=False,
                                             city="J")
@@ -90,6 +93,7 @@ def add_clubs(apps, schema_editor):
                                             email="sc-ah@ksau-hs.edu.sa",
                                             parent=alahsa_deanship,
                                             can_review=True,
+                                            can_assess=True,
                                             visible=False,
                                             is_assessed=False,
                                             city="A")

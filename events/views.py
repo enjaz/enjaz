@@ -315,3 +315,31 @@ def submit_initiative(request, event_code_name):
     context['figure_formset'] = figure_formset
 
     return render(request, 'events/initiatives/initiatives_submission.html', context)
+
+@login_required
+def list_initiatives(request, event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name,
+                              receives_initiative_submission=True)
+    if not utils.can_evaluate_abstracts(request.user, event) and \
+            not utils.is_organizing_team_member(request.user, event):
+        raise PermissionDenied
+
+    initiatives = Initiative.objects.filter(event=event, is_deleted=False)
+
+    context = {'event': event, 'initiatives':initiatives}
+
+    return render(request, 'events/initiatives/list_initiatives.html', context)
+
+@login_required
+def show_initiative(request, event_code_name, pk):
+    initiative = get_object_or_404(Initiative, is_deleted=False, pk=pk)
+    event = initiative.event
+
+    if not initiative.user == request.user and \
+            not request.user.is_superuser and \
+            not utils.can_evaluate_initiatives(request.user, event) and \
+            not utils.is_organizing_team_member(request.user, event):
+        raise PermissionDenied
+
+    context= {'event':event, 'initiative':initiative}
+    return render(request, "events/initiatives/show_initiative.html", context)

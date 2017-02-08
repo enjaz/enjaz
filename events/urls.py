@@ -24,6 +24,8 @@ urlpatterns = patterns('',
     url(r'^abstracts/img/$',views.upload_abstract_image, name="upload_abstract_image"),
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/initiatives/$', views.submit_initiative, name="submit_initiative"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/initiatives/list/$', views.list_initiatives, name="list_initiatives"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/initiatives/(?P<pk>\d+)/$', views.show_initiative, name="show_initiative"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/initiatives/thanks/$', TemplateView.as_view(template_name='events/initiatives/initiatives_submission_completed.html'), name="initiative_submission_completed"),
 
 )

@@ -1,0 +1,75 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}{% load bootstrap3 %}
+
+{% block title %}{{ initiative.event.english_name }}: {{ initiative.name }}{% endblock %}
+
+{% block content %}
+<div>
+	<table class="table table-bordered">
+          <colgroup>
+            <col class="col-xs-4">
+            <col class="col-xs-8">
+          </colgroup>
+		<thead>
+			<tr>
+				<th colspan="2" class="text-center">{{ initiative.name }}</th>
+			</tr>
+		</thead>
+
+		<tbody>
+            <tr>
+                <th class="text-center">تعريف المبادرة</th>
+                <td>{{ initiative.definition|linebreaksbr }}</td>
+            </tr>
+			<tr>
+				<th class="text-center">أهداف المبادرة</th>
+				<td class="activity-description">{{ initiative.goals|linebreaksbr }}</td>
+			</tr>
+			<tr>
+				<th class="text-center">الفئة المستهدفة</th>
+				<td>{{ initiative.target|linebreaksbr }}</td>
+      </tr>
+			<tr>
+				<th class="text-center">منجزات المبادرة حتى الآن</th>
+				<td>{{ initiative.achievements|linebreaksbr }}</td>
+			</tr>
+			<tr>
+				<th class="text-center">ما الذي تتطلع المبادرة لإنجازه مستقبلًا؟</th>
+				<td>{{ initiative.future_goals|linebreaksbr }}</td>
+			</tr>
+			<tr>
+				<th class="text-center">ما الذي تطمح البادرة للوصول إليه من خلال المؤتمر؟</th>
+				<td>{{ initiative.goals_from_participating|linebreaksbr }}</td>
+			</tr>
+            <tr>
+                <th class="text-center">القائمون على العمل</th>
+				<td>{{ initiative.members|linebreaksbr }}</td>
+			</tr>
+            {% if initiative.sponsors %}
+            <tr>
+				<th class="text-center">إسم الجهة الراعية</th>
+				<td>{{ initiative.sponsors|linebreaksbr }}</td>
+            </tr>
+            {% endif %}
+            {% if initiative.social %}
+            <tr>
+				<th class="text-center">حسابات التواصل الإجتماعي والموقع الإلكتروني</th>
+				<td>{{ initiative.social|linebreaksbr }}</td>
+            </tr>
+            {% endif %}
+            <tr>
+				<th class="text-center">البريد الإلكتروني</th>
+				<td><a href="mailto:{{ initiative.email }}">{{ initiative.email }}</a></td>
+			</tr>
+		</tbody>
+	</table>
+
+
+{% endblock %}
+
+{% block customscript %}
+<style type="text/css">
+    th, td{
+        text-align: right;
+    }
+</style>
+{% endblock %}

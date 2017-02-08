@@ -320,8 +320,7 @@ def submit_initiative(request, event_code_name):
 def list_initiatives(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name,
                               receives_initiative_submission=True)
-    if not utils.can_evaluate_abstracts(request.user, event) and \
-            not utils.is_organizing_team_member(request.user, event):
+    if not utils.is_organizing_team_member(request.user, event):
         raise PermissionDenied
 
     initiatives = Initiative.objects.filter(event=event, is_deleted=False)
@@ -337,7 +336,6 @@ def show_initiative(request, event_code_name, pk):
 
     if not initiative.user == request.user and \
             not request.user.is_superuser and \
-            not utils.can_evaluate_initiatives(request.user, event) and \
             not utils.is_organizing_team_member(request.user, event):
         raise PermissionDenied
 

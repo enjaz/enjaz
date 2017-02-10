@@ -144,6 +144,9 @@ class Session(models.Model):
         return (self.first_priority_registrations.all() | \
                 self.second_priority_registrations.all()).distinct()
 
+    def get_remaining_seats(self):
+        return  self.limit - SessionRegistration.objects.filter(session=self, is_deleted=False).count()
+
     def __unicode__(self):
         if self.gender:
             return u"%s (%s)" % (self.name, self.get_gender_display())

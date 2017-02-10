@@ -137,7 +137,7 @@ def handle_ajax(request):
     SessionRegistration.objects.filter(session=session, user=request.user)
 
     if action == 'signup':
-        if not SessionRegistration.objects.filter(session=session, user=request.user, is_deleted=False).count() <= session.limit :
+        if not SessionRegistration.objects.filter(session=session, is_deleted=False).count() <= session.limit :
             raise Exception(u'Session is full')
         else:
             if not SessionRegistration.objects.filter(session=session, user=request.user).exists():

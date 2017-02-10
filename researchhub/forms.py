@@ -8,6 +8,16 @@ from researchhub import utils
 from researchhub.models import Supervisor, Project, SkilledStudent, Domain, Skill
 from userena.forms import SignupForm
 
+was_helpful_choices = (
+    ('Y','Yes'),
+    ('N','No')
+)
+
+class FeedbackForm(forms.Form):
+    was_helpful = forms.CharField(max_length=20,
+                           widget=forms.Select(choices=was_helpful_choices))
+    why = forms.CharField(widget=forms.Textarea)
+
 class ConsultationForm(forms.Form):
     description = forms.CharField(widget=forms.Textarea)
     first_date = forms.DateField()

@@ -97,6 +97,8 @@
 
 </div>
 
+<p class="english-field">Let's hear from you <a id="submit-feedback"><i class="fa fa-commenting-o"></i> Submit A FeedBack</a></p>
+
 {% endblock %}
 {% block customscript %}
 <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
@@ -129,4 +131,5 @@
     });
 </script>
 {% include "researchhub/partials/add_project_asset.html" %}
+{% include "researchhub/partials/submit_feedback_asset.html" %}
 {% endblock %}

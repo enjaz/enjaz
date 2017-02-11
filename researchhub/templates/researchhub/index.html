@@ -203,26 +203,7 @@
 </div>
 </div>
 
-<hr style="margin: 50px 0 50px 0;">
-<div class="english-field">
-    <h1 style="    font-size: 4em;
-    margin-bottom: 50px;
-    text-align: center;" class="english-field"><span style="border-bottom: 4px solid black;">FeedBack</span></h1>
-    <div class="row">
-        <div class="col-sm-8 col-sm-offset-2 mentor-section-intro">
-            <p class="section-intro">Did you get benefit from ResearchHub? </p>
-            <form style="text-align: center;" class="form" method="post" action="{% url 'researchhub:submit_feedback' %}">
-                {% csrf_token %}
-                <input class="english-field" type="radio" id="yes" name="feedback-radio" value="Y" style="margin: 5px;" checked required>Yes<br>
-                <input class="english-field" type="radio" id="no" name="feedback-radio" value="N" style="margin: 5px;" required>No
-            <p class="section-intro"><strong>Why?</strong></p>
-                <textarea class="english-field  autogrow form-control" required name="why"></textarea>
-                <input style="margin: 5px;" type="submit" class="btn btn-success" value="Submit Feedback!">
-            </form>
-        </div>
-    </div>
-</div>
-
+<p class="english-field">Let's hear from you <a id="submit-feedback"><i class="fa fa-commenting-o"></i> Submit A FeedBack</a></p>
 
 {% endlocalize %}
 {% endblock %}
@@ -230,6 +211,7 @@
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
 {% include "researchhub/partials/add_project_asset.html" %}
 {% include "researchhub/partials/add_skill_asset.html" %}
+{% include "researchhub/partials/submit_feedback_asset.html" %}
 {% endblock %}
 {% block customstyles %}
     <link href='https://fonts.googleapis.com/css?family=Candal' rel='stylesheet' type='text/css'>

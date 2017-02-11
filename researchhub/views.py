@@ -73,6 +73,7 @@ def submit_consultation(request):
     return render(request, 'researchhub/submit_consultation.html',
                   {'form': form})
 
+@decorators.ajax_only
 @login_required
 def submit_feedback(request):
     if request.method == 'POST':
@@ -87,6 +88,12 @@ def submit_feedback(request):
                        template="researchhub_feedback_submitted_to_team",
                        context=email_context,
                        headers={'Reply-to': request.user.email})
+            return {"message": "success"}
+    elif request.method == 'GET':
+        form = FeedbackForm()
+
+    context = {'form': form}
+    return render(request, 'researchhub/submit_feedback_form.html', context)
 
 
 @login_required

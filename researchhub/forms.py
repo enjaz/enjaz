@@ -15,9 +15,9 @@ Did_you_get_benefit_from_ReserachHub = (
 )
 
 class FeedbackForm(forms.Form):
-    Did_you_get_benefit_from_ReserachHub = forms.CharField(max_length=20,
-                           widget=forms.Select(choices=Did_you_get_benefit_from_ReserachHub))
-    why = forms.CharField(widget=forms.Textarea)
+    get_benefit = forms.CharField(label="Did you get benefit from ResearchHub?",
+                                        max_length=20,widget=forms.Select(choices=Did_you_get_benefit_from_ReserachHub))
+    why = forms.CharField(label="Why?",widget=forms.Textarea)
 
 class ConsultationForm(forms.Form):
     description = forms.CharField(widget=forms.Textarea)

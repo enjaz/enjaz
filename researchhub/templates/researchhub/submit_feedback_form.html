@@ -28,6 +28,7 @@ $(function () {
             enctype: 'multipart/form-data',
             processData: false,
             success: function (data) {
+            console.log(data)
                 if (data.message == "success") {
 
                     // show success message (using toastr)

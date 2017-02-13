@@ -15,7 +15,7 @@ $(function () {
         event.preventDefault();
 
         /* get some values from elements on the page: */
-        var formData = new FormData($(this)[0]);
+        var formData = new FormData($(this)[0]); 
         var url = "{% url 'researchhub:submit_feedback' %}";
 
         /* Send the data */
@@ -28,7 +28,6 @@ $(function () {
             enctype: 'multipart/form-data',
             processData: false,
             success: function (data) {
-            console.log(data)
                 if (data.message == "success") {
 
                     // show success message (using toastr)

@@ -338,7 +338,7 @@ def edit(request, activity_id):
                                template="activity_submitted",
                                context=email_context)
             elif activity.assignee == activity.primary_club:
-                pending_review = activity.review_set.get(is_approved=None)
+                pending_review = activity.review_set.filter(is_approved=None).first()
                 activity.assignee = pending_review.reviewer_club
                 activity.save()
                 review_url = reverse('activities:review',

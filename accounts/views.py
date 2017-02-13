@@ -8,9 +8,10 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib import messages
 
+from accounts.forms import EditStudentCommonProfile, ResendForm
+from clubs.models import city_choices
 from userena.models import UserenaSignup
 from userena.utils import get_datetime_now
-from accounts.forms import EditStudentCommonProfile, ResendForm
 
 
 def resend_confirmation_key(request):
@@ -56,5 +57,6 @@ def edit_common_profile(request):
         form = EditStudentCommonProfile(instance=common_profile)
 
     return render(request, 'accounts/edit_common_profile.html', {'form': form,
+                                                                 'city_choices': city_choices,
                                                                  'common_profile': common_profile})
 

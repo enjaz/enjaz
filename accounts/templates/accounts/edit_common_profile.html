@@ -17,7 +17,7 @@
 
 <p class="dinar-light enjaz-warning"><i class="entypo-info"></i> أدناه معلوماتكم المسجّلة على بوابة إنجاز.  تستخدم هذه المعلومات عند التسجيل في أنشطة نادي الطلاب، ولاستصدار الشهادات، وتعرض في مختلف أجزاء البوابة مثل برنامج نقاطي ومبادرة سِراج.</p>
 
-<form method="post" role="form" id="form_register">	
+<form method="post" role="form" id="form_register">
         {% csrf_token %}
 	<div class="dinar-light">
 			<div class="form-group">
@@ -26,7 +26,7 @@
 					<div class="input-group-addon">
 						<i class="entypo-user"></i>
 					</div>
-					
+
 					<input {% if form.ar_first_name.value and not form.ar_first_name.errors %}value="{{ form.ar_first_name.value }}" {% endif %}type="text" class="form-control" name="ar_first_name" id="ar_first_name" placeholder="{{ form.ar_first_name.label }}" required="required"/>
 					{% if form.ar_first_name.errors %}
 					    {% for error in form.ar_first_name.errors %}
@@ -54,7 +54,7 @@
 					<div class="input-group-addon">
 						<i class="entypo-user"></i>
 					</div>
-					
+
 					<input {% if form.en_first_name.value and not form.en_first_name.errors %}value="{{ form.en_first_name.value }}" {% endif %}type="text" class="form-control" name="en_first_name" id="en_first_name" placeholder="{{ form.en_first_name.label }}" required="required"/>
 					{% if form.en_first_name.errors %}
 					    {% for error in form.en_first_name.errors %}
@@ -82,7 +82,7 @@
 					<div class="input-group-addon">
 						<i class="entypo-mail"></i>
 					</div>
-					
+
 					<input {% if form.alternative_email.value and not form.alternative_email.errors %}value="{{ form.alternative_email.value }}" {% endif %}type="text" class="tooltip-jquery form-control" name="alternative_email" id="alternative_email" placeholder="{{ form.alternative_email.label }}" title="البريد الشخصي، مثلا بريدك على Gmail أو Hotmail" required="required"/>
 					{% if form.alternative_email.errors %}
 					    {% for error in form.alternative_email.errors %}
@@ -98,7 +98,7 @@
 					<div class="input-group-addon">
 						<i class="entypo-mobile"></i>
 					</div>
-					
+
 					<input {% if form.mobile_number.value and not form.mobile_number.errors %}value="{{ form.mobile_number.value }}" {% endif %}type="text" class="form-control" name="mobile_number" id="mobile_number" placeholder="{{ form.mobile_number.label }}" required="required"/>
 					{% if form.mobile_number.errors %}
 					    {% for error in form.mobile_number.errors %}
@@ -113,7 +113,7 @@
 					<div class="input-group-addon">
 						<i class="entypo-vcard"></i>
 					</div>
-					
+
 					<input {% if form.badge_number.value and not form.badge_number.errors %}value="{{ form.badge_number.value }}" {% endif %}type="text" class="form-control" name="badge_number" id="badge_number" placeholder="{{ form.badge_number.label }}" required="required"/>
 					{% if form.badge_number.errors %}
 					    {% for error in form.badge_number.errors %}
@@ -144,7 +144,7 @@
 					</div>
 					<select {% if form.city.value and not form.city.errors %}value="{{ form.city.value }}" {% endif %}class="form-control" id="city" name="city"  title="{{ form.city.label }}" required="required">
                                                 <option value="">{{ form.city.label }}</option>
-                                                {% for value, label in form.fields.city.widget.choices %}
+                                                {% for value, label in city_choices %}
                                                 <option {% if form.city.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
 					</select>
 					{% if form.city.errors %}
@@ -205,7 +205,7 @@
 					{% endif %}
 				</div>
 			</div>
-			
+
 			<div class="form-group">
 				<button type="submit" class="btn btn-success btn-block btn-login">
 					<i class="entypo-left-open-mini"></i>

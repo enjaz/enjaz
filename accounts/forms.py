@@ -25,13 +25,13 @@ class CollegeCheckMaxin(object):
 
             city_code = utils.get_city_code(cleaned_data['city'])
             if city_code in ['J', 'A']:
-                cleaned_data['section'] = cleaned_data['city']
+                cleaned_data['section'] = city_code
 
             # Make sure that the college/section choice is actually valid.
             try:
                 self.college = College.objects.get(
                     name=cleaned_data['college'],
-                    city=city_code,
+                    city=cleaned_data['city'],
                     section=cleaned_data['section'],
                     gender=cleaned_data['gender'])
             except College.DoesNotExist:
@@ -95,7 +95,7 @@ class EnjazSignupForm(SignupForm):
         return cleaned_data
 
 
-class StudentSignupForm(EnjazSignupForm):
+class StudentSignupForm(CollegeCheckMaxin, EnjazSignupForm):
     """
     A form that includes extra student-related fields.
     """
@@ -338,7 +338,7 @@ class ModifiedAuthenticationForm(forms.Form):
             self._errors['email'] = self.error_class([email_msg])
             del cleaned_data['email']
 
-class EditStudentCommonProfile(forms.ModelForm):
+class EditStudentCommonProfile(CollegeCheckMaxin, forms.ModelForm):
     section = forms.CharField(label=u"القسم", max_length=2, widget=forms.Select(choices=section_choices), required=False)
     college = forms.CharField(label=CommonProfile._meta.get_field('college').verbose_name, max_length=1, widget=forms.Select(choices=college_choices))
 

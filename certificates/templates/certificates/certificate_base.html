@@ -1,0 +1,22 @@
+{% extends 'base.html' %}{% load bulb_tags %}
+
+{% block title %}الشهادات{% endblock %}
+
+{% block pageheaderurl %}
+    {% url 'certificates:index' %}
+{% endblock %}
+{% block pageheader %}الشهادات{% endblock %}
+
+{% block navbar %}
+    <li><a href="{% url 'bulb:list_groups' %}"><i class="fa fa-book"></i> شهاداتي</a></li>
+    <li><a href="{% url 'bulb:list_book_categories' %}"><i class=""></i> المكتبة الطلابية التعاونية</a></li>
+    <li><a href="{% url 'bulb:list_reader_profiles' %}"><i class="entypo-users"></i> قارئات وقراء الجامعة</a></li>
+    {% if user|is_bulb_coordinator_or_deputy or user.is_superuser %}
+    <li><a href="{% url 'bulb:indicators' %}"><span class="glyphicon glyphicon-stats"></span> مؤشرات سِراج</a></li>
+    {% endif %}
+{% endblock %}
+
+{% block content %}{% endblock %}
+
+{% block customscript %}
+{% endblock %}

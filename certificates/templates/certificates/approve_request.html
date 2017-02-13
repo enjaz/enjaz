@@ -1,0 +1,134 @@
+{% extends 'certificates/certificate_base.html' %}{% load bootstrap3 %}{% load staticfiles %}
+{% block title %}نظام استصدار الشهادات: اعتماد شهادة {{ certificate_request.description }}{% endblock %}
+{% block content %}
+<style>
+    #live-div{
+        cursor: pointer;
+    }
+</style>
+<h1>مراجعة شهادة {{ certificate_request.description }}</h1>
+<div id="live-div" {% if not request.session.template_image and not certificate_request.certificatetemplate.image  %}style="display: none;"{% else %}style="background-image:url({% if certificate_request.certificatetemplate.image %}{{ certificate_request.certificatetemplate.image.url }}{% else %}data:image/png;base64,{{ request.session.template_image }}{% endif %}); width: {% if certificate_request.certificatetemplate.image %} {{ certificate_request.certificatetemplate.image.width }}{% else %}{{ request.session.width }}{% endif %}px; height: {% if certificate_request.certificatetemplate.image %} {{ certificate_request.certificatetemplate.image.height }}{% else %}{{ request.session.height }}{% endif %}px; "{% endif %}></div>
+<div class="row">
+    <div class="col-md-4 col-md-offset-4">
+        <form method="post" class="form">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <a type="button" href="{% url 'certificates:delete_template' certificate_request.pk %}" class="btn btn-danger">احذف القالب</a>
+            <input id="save" {% if not request.session.template_image %}style="display: none;"{% endif %} type="submit" value="اعتمد وأرسل" class="btn btn-success">
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="{% static 'js/jscolor.min.js' %}"></script>
+
+<script type="text/javascript">
+    
+$(function(){
+    var font_size = $("#id_font_size").val();
+    var color = $("#id_color").val();
+    var example_text = $("#id_example_text").val();
+    var image_format = $("#image_format").val();
+
+    function update_image(){
+        $.ajax({method: 'POST',
+                url: "{% url 'certificates:update_image' certificate_request.pk %}",
+                data: {example_text: example_text,
+                       image_format: image_format,
+                       font_size: font_size,
+                       color: color,
+                       x:  $("#id_x_position").val(),
+                       y:  $("#id_y_position").val()},
+                success: function(data){
+                    var base64 = data['img_str'];
+                    $("#live-certificate, #live-div").show();
+                    $("#live-certificate").attr("src", "data:image/png;base64," + base64);
+                    $("#live-div").show();
+                    $("#live-div").css("background-image", "url(data:image/png;base64," + base64 + ")")
+                }
+        });
+    }
+    
+    $("#live-certificate, #live-div").click(function(event){
+        img = this;
+        var offset = $(this).offset();
+        posX = event.offsetX?(event.offsetX):event.pageX-document.getElementById("live-div").offsetLeft;
+        posY = event.offsetY?(event.offsetY):event.pageY-document.getElementById("live-div").offsetTop;
+        $("#id_x_position").val(posX);
+        $("#id_y_position").val(posY);
+        console.log(posX);
+        console.log(posY);
+        update_image();
+    });
+{% comment %}
+    $("#delete").click(function(){
+        //event.preventDefault();
+        $.ajax({method: 'POST',
+                url: "{% url 'certificates:delete_image' certificate_request.pk %}",
+                success: function(){
+                    $("#live-certificate, #live-div, #delete, #save").hide();
+                    $("#live-certificate").attr("src", false);
+                    $("#live-div").css("background-image", "none");
+                }
+        });
+    });
+    $("#save").click(function(){
+        //event.preventDefault();
+        $.ajax({method: 'POST',
+                url: "{% url 'certificates:save_image' certificate_request.pk %}",
+                data: {description: $("#description").val(),
+                       image_format: image_format,
+                       x_position:  $("#id_x_position").val(),
+                       y_position:  $("#id_y_position").val(),
+                       font_size: font_size,
+                       color: color
+                       },
+                success: function(){
+                    $("#live-certificate").hide();
+                    $("#delete, #save").hide();
+                    $("#live-certificate").attr("src", false);
+                    $("#live-div").css("background-image", "none");
+                }
+        });
+    });
+{% endcomment %}
+
+    $("#id_color, #id_text, #id_font_size, #id_image_format").change(function(){
+        color = $("#id_color").val();
+        font_size = $("#id_font_size").val();
+        example_text = $("#id_example_text").val();
+        image_format = $("#id_image_format").val();
+        update_image();
+    });
+    
+    $("#id_image").change(function () {
+        /* get some values from elements on the page: */
+        var formData = new FormData(); 
+        formData.append("image", $("#id_image").prop('files')[0]);
+        formData.append("image_format", $("#id_image_format").val());
+        $.ajax({
+            url: "{% url 'certificates:upload_image' certificate_request.pk %}",
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function(data){
+                var base64 = data['img_str'];
+                var width = data['width'];
+                var height = data['height'];
+                $("#live-certificate, #live-div, #delete, #save").show();
+                //$("#live-certificate").attr("src", "data:image/png;base64," + base64);
+                $("#live-div").css("background-image", "url(data:image/png;base64," + base64 + ")")
+                $("#live-div").css('width', width + "px");
+                $("#live-div").css('height', height + "px");
+            }
+        });
+    });
+});
+    
+</script>
+{% endblock %}

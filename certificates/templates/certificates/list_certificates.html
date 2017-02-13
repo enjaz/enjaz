@@ -1,0 +1,38 @@
+{% extends 'certificates/certificate_base.html' %}
+
+{% block content %}
+<h1>نظام الشهادات</h1>
+
+<table class="display datatable compact dt-responsive">
+    <thead>
+        <th>الشهادة</th>
+        <th class="not-mobile">الرمز</th>
+        <th class="not-mobile">التاريخ</th>
+    </thead>
+    <tbody>
+        {% for certificate in certificate %}
+        <tr>
+            <td><a href="{% url 'certifiactes:show_certifiacte' certifiacte.verification_code %}">{{ certificate.certificate_request.certificate_template.describtion }}</a></td>
+            <td class="english-field">{{ certifiacte.verification_code }}</td>
+            <td data-order="{{ certificate.submission_date|date:'U' }}">{{ certificate.submission_date|date:"j F Y" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}
+{% block customscript %}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<script type="text/javascript">
+    $(function(){
+        $('.datatable').DataTable({
+            order: [[ 2, "asc" ]],
+            language: {% include 'js/dataTables-arabic.json' %}
+        });
+    });
+</script>
+{% endblock %}

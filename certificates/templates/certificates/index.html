@@ -1,0 +1,14 @@
+{% extends 'certificates/certificate_base.html' %}
+
+{% block content %}
+<h1>نظام الشهادات</h1>
+
+<a id="add-request" href="{% url 'certificates:add_certificate_request' %}" class="btn btn-success">أضف طلب شهادة</a>
+
+{% endblock %}
+
+{% block customscript %}
+
+{% include 'bulb/groups/components/autocomplete_asset.html' %}
+
+{% endblock %}

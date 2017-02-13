@@ -1,0 +1,60 @@
+{% extends 'certificates/certificate_base.html' %}{% load bootstrap3 %}
+
+{% block content %}
+<h1>إضافة طلب شهادة جديد</h1>
+<form method="post">
+    {% csrf_token %}
+{% bootstrap_form form %}
+<input class="btn btn-success" type="submit" value="أضف">
+</form>
+{% endblock %}
+
+{% block customscript %}
+<style>
+    span.select2{
+        visibility: visible;
+    }
+</style>
+{{ form.media }}
+
+
+<script type="text/javascript">
+$(function(){
+        $('input[type=text], textarea').attr('dir', 'auto');
+		// By default, hide the autocomplete input field and label.
+         {% if certificates.student_list %}
+		$('#id_students').closest('div.form-group').hide();
+          {% else %}
+          $('#id_student_list').closest('div.form-group').hide();
+           {% endif %}
+		// Show a link that would display it.
+		$('label[for=id_student_list]').before(" (<a data-action='autocomplete'>ادخال مباشر!</a>)");
+		$('label[for=id_students]').before(" (<a data-action='file'>ألغِ الإدخال المباشر!</a>)");
+	$('a[data-action]').click(function(){
+        console.log("ping");
+		var action = $(this).data('action');
+		if (action == 'autocomplete'){
+            console.log("show autocomplete");
+			// remove previous selection
+			$('#id_student_list').val('');
+			// Hide number selection
+			$('#id_student_list').closest('div.form-group').hide(300, function(){
+				$('#id_students').closest('div.form-group').show(300)
+                //$('#id_students').closest("div.form-group").children("span.select2").removeClass("select2-hidden-accessible");
+			});
+		}else{
+			// remove previous selection
+			$('#id_students').select2("val", "");
+			// Hide autocomplete selection
+			$('#id_students').closest('div.form-group').hide(300, function(){
+				$('#id_student_list').closest('div.form-group').show(300);
+                //$('#id_students').closest("div").children("span.select2").removeClass("select2-hidden-accessible");
+			});
+		}
+	});
+});
+
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'certificates/certificate_base.html' %}
+
+{% block title %}نظام الشهادات: {{ certificate_request.description }}{% endblock %}
+{% block content %}
+<h1>نظام الشهادات: {{ certificate_request.description }}</h1>
+<a id="edit-request" href="{% url 'certificates:edit_certificate_request' certificate_request.pk %}" class="btn btn-success">عدّل طلب شهادة</a>
+<a id="approve-request" href="{% url 'certificates:approve_certificate_request' certificate_request.pk %}" class="btn btn-success">الموافقة على طلب شهادة</a>
+
+<table class="table table-hover">
+    <colgroup>
+      <col class="col-xs-4 col-md-2 col-sm-3">
+      <col class="col-xs-8 col-md-10 col-sm-9">
+    </colgroup>
+    <tr>
+        <th>تاريخ الإرسال</th>
+        <td>{{ certificate_request.submission_date }}</td>
+    </tr>
+    <tr>
+        <th>تقديم</th>
+        <td>{{ certificate_request.submitter.common_profile.ger_ar_full_name|default:certificate_request.submitter.username }}</td>
+    </tr>
+    <tr>
+        <th>النادي</th>
+        <td>{{ certificate_request.submitter_club }}</td>
+    </tr>
+    <tr>
+        <th>الصيغة</th>
+        <td dir="auto" class="english-field">{{ certificate_request.text }}</td>
+    </tr>
+    <tr>
+        <th>المستحقين والمستحقات</th>
+        <td>
+            {% if certificate_request.student_list %}
+                <a href="{{ certificate_request.student_list.url }}">{{ certificate_request.student_list }}</a>
+            {% elif certificate_request.students %}
+            <ul>
+                {% for student in certificate_request.students.all %}
+                    <li>{{ student.common_profile.get_ar_full_name }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </td>
+    </tr>
+</table>
+{% endblock %}

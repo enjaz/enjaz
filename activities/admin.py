@@ -169,11 +169,15 @@ class InvitationAdmin(admin.ModelAdmin):
         return media.utils.is_media_coordinator_or_member(request.user) or \
                request.user.is_superuser
 
+
+class CriterionAdmin(admin.ModelAdmin):
+    list_filter = ['year', 'category']
+
 invitation_admin = InvitationAdminSite("Invitation Admin")
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(Category)
 admin.site.register(Assessment)
-admin.site.register(Criterion)
+admin.site.register(Criterion, CriterionAdmin)
 admin.site.register(Evaluation, EvaluationAdmin)
 admin.site.register(DepositoryItem, DepositoryItemAdmin)
 admin.site.register(Invitation, InvitationAdmin)

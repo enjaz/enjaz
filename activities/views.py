@@ -1,9 +1,12 @@
 # -*- coding: utf-8  -*-
 from datetime import timedelta
+from django.db.models import Count
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.template import TemplateDoesNotExist
+from django.template.loader import get_template
 from django.views.decorators import csrf
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
@@ -18,6 +21,7 @@ from clubs.models import Club
 from core import decorators
 from core.models import Tweet
 from media.models import FollowUpReport, FollowUpReportImage, Story
+import accounts.utils
 import activities.utils
 import clubs.utils
 import core.utils
@@ -129,7 +133,6 @@ def list_activities(request):
 @login_required
 def show(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
-
     context = {'activity': activity}
 
     if request.user.is_authenticated():
@@ -632,31 +635,33 @@ def assessment_list(request):
     user_media_center = media.utils.get_user_media_center(request.user)
     clubs_for_user = media.utils.get_clubs_for_assessment_by_user(request.user).filter(is_assessed=True)
 
-    approved_activvities = Activity.objects.current_year().approved().done().filter(primary_club__in=clubs_for_user).distinct()
+    approved_activities = Activity.objects.current_year().approved().done().filter(primary_club__in=clubs_for_user).distinct()
+    print approved_activities
     # 'done' has different meanings for the Media Center, the
     # Presidency and the superuser.
     if user_media_center: # Media
         context['category'] = 'M'
-        context['todo'] = approved_activvities.exclude(assessment__criterionvalue__criterion__category='M')
+        context['todo'] = approved_activities.exclude(assessment__criterionvalue__criterion__category='M')
         if media.utils.is_media_coordinator_or_deputy(request.user):
-            context['done'] = approved_activvities.filter(assessment__criterionvalue__criterion__category='M')\
-                                                  .exclude(assessment__is_reviewed=False)
+            context['done'] = approved_activities.filter(assessment__criterionvalue__criterion__category='M')\
+                                                 .exclude(assessment__is_reviewed=False)
         else:
-            context['done'] = approved_activvities.filter(assessment__criterionvalue__criterion__category='M')
+            context['done'] = approved_activities.filter(assessment__criterionvalue__criterion__category='M')
     elif user_assessing_clubs.exists(): # Presidency
         context['category'] = 'P'
-        context['done'] = approved_activvities.filter(assessment__criterionvalue__criterion__category='P')
-        context['todo'] = approved_activvities.exclude(assessment__criterionvalue__criterion__category='P')
+        context['done'] = approved_activities.filter(assessment__criterionvalue__criterion__category='P')
+        context['todo'] = approved_activities.exclude(assessment__criterionvalue__criterion__category='P')
     else: # Superuser
         context['category'] = 'P'
-        context['done'] = approved_activvities.filter(assessment__criterionvalue__criterion__category='P')\
-                                              .filter(assessment__criterionvalue__criterion__category='M')\
-                                              .exclude(assessment__is_reviewed=False)
+        context['done'] = approved_activities.filter(assessment__criterionvalue__criterion__category='P')
+        #                                     .exclude(assessment__is_reviewed=False)
+        #                                     .filter(assessment__criterionvalue__criterion__category='M')
+        print context['done']
         # FIXME: The following query is buggy (#24525)
-        #context['todo'] = (approved_activvities.exclude(assessment__criterionvalue__criterion__category='M') | \
-        #                   approved_activvities.exclude(assessment__criterionvalue__criterion__category='P')\
+        #context['todo'] = (approved_activities.exclude(assessment__criterionvalue__criterion__category='M') | \
+        #                   approved_activities.exclude(assessment__criterionvalue__criterion__category='P')\
         #                                       .exclude(assessment__is_reviewed=False))
-        context['todo'] = approved_activvities.exclude(assessment__criterionvalue__criterion__category='P')
+        context['todo'] = approved_activities.exclude(assessment__criterionvalue__criterion__category='P')
     # Only show 'toreview' to media coordinator and deputy, and to the
     # superuser.
     if media.utils.is_media_coordinator_or_deputy(request.user) or \
@@ -665,7 +670,7 @@ def assessment_list(request):
         # toreview table.  It is all going to be done by the Medica
         # Center President.
         if not (user_media_center and clubs.utils.is_jeddah_club(user_media_center)):
-            context['toreview'] = approved_activvities.filter(assessment__criterionvalue__criterion__category='M',
+            context['toreview'] = approved_activities.filter(assessment__criterionvalue__criterion__category='M',
                                                               assessment__is_reviewed=False)
     return render(request, 'activities/assessment_list.html', context)
 
@@ -673,7 +678,7 @@ def assessment_list(request):
 def assess(request, activity_id, category):
     activity = get_object_or_404(Activity, pk=activity_id, is_deleted=False)
     category = category.upper()
-
+    context = {'activity': activity, 'active_tab': 'assessment'}
     if not activities.utils.can_assess_club(request.user, activity.primary_club):
         raise PermissionDenied
 
@@ -697,6 +702,7 @@ def assess(request, activity_id, category):
     try:
         assessment = Assessment.objects.distinct().get(activity=activity,
                                                        criterionvalue__criterion__category=category)
+        context['assessment'] = assessment
     except Assessment.DoesNotExist:
         assessment = Assessment(activity=activity,
                                 assessor=request.user,
@@ -715,13 +721,15 @@ def assess(request, activity_id, category):
             # If the presidency assess it, but the Media Center is
             # still lacking, it will be assigned to the Media Center,
             # otherwise, it will be assigned to no one (#yay).
-            if category  == 'P':
-                media_center = activity.get_media_assessor()
-                if media_center.assessment_set.filter(activity=activity).exists():
-                    activity.assignee = None
-                else:
-                    activity.assignee = media_center
-                activity.save()
+
+            # (As of Janurary 2017, no media assessment is expected)
+            # if category  == 'P':
+            #     media_center = activity.get_media_assessor()
+            #     if media_center.assessment_set.filter(activity=activity).exists():
+            #         activity.assignee = None
+            #     else:
+            #         activity.assignee = media_center
+            #     activity.save()
 
             return HttpResponseRedirect(reverse('activities:assessment_list'))
 
@@ -730,19 +738,64 @@ def assess(request, activity_id, category):
                               user=request.user, club=assessor_club,
                               category=category)
 
-    context = {'activity': activity, 'form': form, 'active_tab': 'assessment'}
+    context['form'] = form
+
+    # We have three ways of customizing assessment interfaces:
+    #
+    #     1) assessment_p_2017_2018_j.html
+    #     2) assessment_p_2017_2018.html
+    #     3) assessment_not_ready.html
+    #
+    # If two cities use the exact same interface, we would use a soft
+    # link.
+
+    city_code = accounts.utils.get_city_code(activity.primary_club.city)
+    template_names = ["assessment_{}_{}_{}_{}.html".format(category.lower(),
+                                                          activity.primary_club.year.start_date.year,
+                                                          activity.primary_club.year.end_date.year,
+                                                          city_code.lower()),
+                      "assessment_{}_{}_{}.html".format(category.lower(),
+                                                       activity.primary_club.year.start_date.year,
+                                                       activity.primary_club.year.end_date.year),
+                      "assessment_not_ready.html"]
+
+    for template_name in template_names:
+        full_template_name = "activities/" + template_name
+        try:
+            get_template(full_template_name)
+        except TemplateDoesNotExist:
+            continue
+        else:
+            break
+
     if category == 'P':
-        template_name = 'activities/assessment_presidency.html'
-        # Presidency-specific helper calculations
-        submission_interval = (activity.get_first_date() - activity.submission_date.date()).days
-        context['submission_interval'] = submission_interval
+        # These variables depend on the city.  We should keep previous
+        # years variables so the assessment interface of previous
+        # years can still be viewed.
+        if city_code == 'R' and \
+           activity.primary_club.year.start_date.year == 2016 and \
+           activity.primary_club.year.end_date.year == 2017:
+            # These context variables are only needed in
+            # assessemtn_p_2016_2017_r.html.
+            context['total_activity_codes'] = activity.episode_set\
+                                                      .filter(order__collection__codes__user__isnull=False)\
+                                                      .aggregate(count=Count('order__collection__codes'))['count']
+            context['total_participation_codes'] = activity.episode_set\
+                                                           .filter(order__collection__codes__user__isnull=False,
+                                                                   order__collection__category__label="Participation")\
+                                                           .aggregate(count=Count('order__collection__codes'))['count']
+            context['total_niqati_points'] = context['total_activity_codes'] / 10 * 2
+        else:
+            # These were needed by all city for 2015/2016 and by
+            # Jeddah and Alahsa for 2016/2017.
+            submission_interval = (activity.get_first_date() - activity.submission_date.date()).days
+            context['submission_interval'] = submission_interval            
     elif category == 'M':
         context['reports'] = FollowUpReport.objects.filter(episode__activity=activity)
         context['images'] = FollowUpReportImage.objects.filter(report__episode__activity=activity)
         context['stories'] = Story.objects.filter(episode__activity=activity)
-        template_name = 'activities/assessment_media_center.html'
 
-    return render(request, template_name, context)
+    return render(request, full_template_name, context)
 
 def list_depository_items(request):
     context = {}

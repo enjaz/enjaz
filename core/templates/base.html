@@ -201,6 +201,14 @@ you?
                             </a>
                         </li>
                         {% endif %}
+                        {% if event.receives_initiative_submission %}
+                        <li>
+                            <a href="{% url 'events:list_initiatives' event.code_name %}">
+                                <i class="entypo-pencil"></i>
+                                <span>المبادرات</span>
+                            </a>
+                        </li>
+                        {% endif %}
                     </ul>
                 </li>
                 {% endfor %}

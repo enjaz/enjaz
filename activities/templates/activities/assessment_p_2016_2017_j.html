@@ -36,7 +36,7 @@
             </div>
         </div>
 
-<div class="panel panel-default panel-shadow" data-collapsed="0">		
+<div class="panel panel-default panel-shadow" data-collapsed="0">
 	<!-- panel body -->
 	<div class="panel-body with-table">
 		<table class="table table-bordered table-responsive">
@@ -55,7 +55,7 @@
 				<th>النقاط</th>
 			</tr>
 		</thead>
-		
+
 		<tbody>
 			<tr>
 				<th>نوع النشاط</th>
@@ -177,15 +177,15 @@
 					أرسل هذا النشاط قبل <span class="points">{{ submission_interval }} أيام</span> من عقده (أرسل يوم {{ activity.submission_date|date:"j F Y"  }} وعقد في {{ activity.get_first_date|date:"j F"  }}).
 					</p>
 					<label>
-						<input data-choice="before_time" type="radio" value="2" name="time_option"> رفع النشاط قبل الموعد المحدد <span class="points">(نقطتان)</span>
+						<input data-choice="before_time" type="radio" value="2" name="early_submission_option"> رفع النشاط قبل الموعد المحدد <span class="points">(نقطتان)</span>
 					</label>
 					<br>
 					<label>
-						<input type="radio" value="0" name="early_sumbission_option"> رُفع بعد الموعد المحدد <span class="points">(لا نقاط)</span>
+						<input type="radio" value="0" name="early_submission_option"> رُفع بعد الموعد المحدد <span class="points">(لا نقاط)</span>
 					</label>
 					<br>
 					<label>
-						<input data-other='true' type="radio" value="" name="early_sumbission_option"> أخرى
+						<input data-other='true' type="radio" value="" name="early_submission_option"> أخرى
 					</label>
 				</td>
 				<td>{{ form.criterion_early_submission }}</td>
@@ -209,7 +209,7 @@
 				<th>الحضور</th>
 				<td>
 					<p class="alert alert-warning"><i class="entypo-eye"></i>
-                        
+
 					{% if activity.get_evaluations.count %}
 						{% if activity.get_evaluations.count >= 20 %}
 							قيّم هذا النشاط أكثر من 20 طالبا <span class="points">({{ activity.get_evaluations.count }} طالب)</span>)
@@ -319,7 +319,7 @@
 		</tbody>
 	</form>
 	</table>
-		
+
 	</div>
 </div>
 <script>
@@ -338,7 +338,7 @@ $(function(){
 		criterion_code_name = $(this).prop('name').replace('criterion_', '');
 		entered_value = $(this).val()
 		entered_option = $('input[name=' + criterion_code_name +'_option][value=' + entered_value + ']:first');
-		if (entered_option.length){	
+		if (entered_option.length){
 			entered_option.prop('checked', 'checked');
 		}else{
 			other_option = $('input[name=' + criterion_code_name +'_option][data-other=true]');
@@ -347,7 +347,7 @@ $(function(){
 	}
     $.each($('input[name^=criterion_]'), link_text_to_radio);
 	$('input[name^=criterion_]').on('change', link_text_to_radio);
-	// Episode auto calculation (if the episode input is there anyway)  
+	// Episode auto calculation (if the episode input is there anyway)
 	var episode_input = $('input[data-choice=episodes][name=episodes_option]');
 	var episode_count = {{ activity.episode_set.count }};
 	var eispide_points = episode_count * 3;
@@ -360,7 +360,7 @@ $(function(){
     }
     // Time of submission
     if ({{ submission_interval }} >= 14 ){
-        $('input[data-choice=before_time][name=early_sumbission_option]').prop('checked', 'checked').trigger('change');
+        $('input[data-choice=before_time][name=early_submission_option]').prop('checked', 'checked').trigger('change');
     }
     // Cooperation
     {% if activity.secondary_clubs.exists %}
@@ -387,7 +387,7 @@ $(function(){
     }
     updateTotal();
     $('input[type=number], input[type=radio]').on('click change', updateTotal);
- 
+
 	$("textarea").removeAttr("cols")
 		.removeAttr("rows")
 		.css("height", "100%")

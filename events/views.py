@@ -12,8 +12,8 @@ import os.path
 
 from core import decorators
 from clubs.models import college_choices
-from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm
-from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation
+from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm, InitiativeForm, InitiativeFigureFormset
+from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation, TimeSlot, SessionRegistration, Initiative
 from events import utils
 
 def redirect_home(request, event_code_name):
@@ -45,8 +45,10 @@ def submit_abstract(request, event_code_name):
         form = AbstractForm(request.POST, request.FILES,
                             instance=instance)
         figure_formset = AbstractFigureFormset(request.POST, request.FILES)
-        if form.is_valid():
+        if form.is_valid() and figure_formset.is_valid():
             abstract = form.save()
+            figure_formset.instance = abstract
+            figure_formset.save()
             return HttpResponseRedirect(reverse('events:show_abstract',
                                                 args=(event.code_name, abstract.pk)))
     elif request.method == 'GET':
@@ -61,7 +63,8 @@ def submit_abstract(request, event_code_name):
 def list_abstracts(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name,
                               receives_abstract_submission=True)
-    if not utils.can_evaluate_abstracts(request.user, event):
+    if not utils.can_evaluate_abstracts(request.user, event) and \
+            not utils.is_organizing_team_member(request.user, event):
         raise PermissionDenied
 
     pending_abstracts = Abstract.objects.filter(event=event, is_deleted=False, evaluation__isnull=True)
@@ -86,7 +89,9 @@ def show_abstract(request, event_code_name, pk):
     event = abstract.event
 
     if not abstract.user == request.user and \
-       not request.user.is_superuser:
+            not request.user.is_superuser and \
+            not utils.can_evaluate_abstracts(request.user, event) and \
+            not utils.is_organizing_team_member(request.user, event):
         raise PermissionDenied
 
     context= {'event':event, 'abstract':abstract}
@@ -111,7 +116,8 @@ def upload_abstract_image(request):
 
 def list_sessions(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
-    context = {'sessions': Session.objects.filter(event=event),
+    time_slots = TimeSlot.objects.filter(event=event)
+    context = {'time_slots': time_slots,
                'event': event}
     return render(request, 'events/session_list.html', context)
 
@@ -120,6 +126,38 @@ def show_session(request, event_code_name, pk):
     session = get_object_or_404(Session, pk=pk, event=event)
     return render(request, 'events/session_show.html',
                   {'session': session})
+
+@decorators.post_only
+@decorators.ajax_only
+@csrf.csrf_exempt
+def handle_ajax(request):
+    action = request.POST.get('action')
+    session_pk = request.POST.get('pk')
+    session = get_object_or_404(Session, pk=session_pk)
+    SessionRegistration.objects.filter(session=session, user=request.user)
+
+    if action == 'signup':
+        if not SessionRegistration.objects.filter(session=session, user=request.user, is_deleted=False).count() <= session.limit :
+            raise Exception(u'Session is full')
+        else:
+            if not SessionRegistration.objects.filter(session=session, user=request.user).exists():
+                SessionRegistration.objects.create(session=session, user=request.user)
+
+            elif SessionRegistration.objects.filter(session=session, user=request.user, is_deleted=True).exists():
+                SessionRegistration.objects.filter(session=session, user=request.user).update(is_deleted=False)
+
+            else:
+                raise Exception(u'You are already registered!')
+
+    elif action == 'cancel':
+        if not SessionRegistration.objects.filter(session=session, user=request.user).exists():
+            raise Exception(u'You did not registered yet!')
+
+        else:
+            SessionRegistration.objects.filter(session=session, user=request.user).update(is_deleted=True)
+
+    return {}
+
 
 def introduce_registration(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
@@ -247,3 +285,59 @@ def registration_closed(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
     return render(request, 'events/registration_closed.html',
                   {'event': event})
+
+@login_required
+def submit_initiative(request, event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name,
+                              receives_initiative_submission=True)
+    context = {'event': event}
+
+    if event.initiative_submission_opening_date and timezone.now() < event.initiative_submission_opening_date:
+        return render(request, 'events/initiatives/initiatives_not_started.html', context)
+    elif event.initiative_submission_closing_date and timezone.now() > event.initiative_submission_closing_date:
+        return render(request, 'events/initiatives/initiatives_closed.html', context)
+
+    if request.method == 'POST':
+        instance = Initiative(event=event,user=request.user)
+        form = InitiativeForm(request.POST, request.FILES,
+                            instance=instance)
+        figure_formset = InitiativeFigureFormset(request.POST, request.FILES)
+        if form.is_valid() and figure_formset.is_valid():
+            initiative = form.save()
+            figure_formset.instance = initiative
+            figure_formset.save()
+            return HttpResponseRedirect(reverse('events:initiative_submission_completed',
+                                                args=(event.code_name,)))
+    elif request.method == 'GET':
+        form = InitiativeForm()
+        figure_formset = InitiativeFigureFormset()
+    context['form'] = form
+    context['figure_formset'] = figure_formset
+
+    return render(request, 'events/initiatives/initiatives_submission.html', context)
+
+@login_required
+def list_initiatives(request, event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name,
+                              receives_initiative_submission=True)
+    if not utils.is_organizing_team_member(request.user, event):
+        raise PermissionDenied
+
+    initiatives = Initiative.objects.filter(event=event, is_deleted=False)
+
+    context = {'event': event, 'initiatives':initiatives}
+
+    return render(request, 'events/initiatives/list_initiatives.html', context)
+
+@login_required
+def show_initiative(request, event_code_name, pk):
+    initiative = get_object_or_404(Initiative, is_deleted=False, pk=pk)
+    event = initiative.event
+
+    if not initiative.user == request.user and \
+            not request.user.is_superuser and \
+            not utils.is_organizing_team_member(request.user, event):
+        raise PermissionDenied
+
+    context= {'event':event, 'initiative':initiative}
+    return render(request, "events/initiatives/show_initiative.html", context)

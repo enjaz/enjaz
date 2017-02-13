@@ -1,0 +1,17 @@
+{% extends 'activities/show.html' %}
+{% block review_content %}
+<div class="page-error-404">
+
+	<div class="error-symbol">
+		<i class="entypo-infinity"></i>
+	</div>
+
+	<div class="error-text">
+		<h2>واجهة التقييم غير مُتاحة</h2>
+        <p>لا تدعم بوابة إنجاز تقييم أنشطة {{ activity.primary_club.name }}.   نرجو التواصل مع <a href="mailto:hello@enjazportal.com">فريق إنجاز</a> للتفاصيل.</p>
+    </div>
+
+	<hr />
+
+</div>
+{% endblock %}

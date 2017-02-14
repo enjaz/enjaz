@@ -17,7 +17,7 @@
             <div class="col-md-3 col-xs-6">
                 <h2>{{ session.name }}</h2>
                  {% if session.acceptance_method == 'F' %}
-                <h5>عدد المقاعد المتبقية: {{ session.get_remaining_seats }}</h5>
+                <h5>عدد المقاعد المتبقية: <span id="count-{{ session.pk}}">{{ session.get_remaining_seats }}</span></h5>
                 {% else %}
                 <br>
                 {% endif %}
@@ -77,6 +77,7 @@ $(document).ready(function(){
 		    data: {pk: pk, action: action},
         success: function(data){
             if (data['success'] == 1){
+                $("#count-" + pk).html(data['remaining_seats']);
               		if (action == 'cancel'){
                     toastr.success("ألغي تسجيلك");
                     $(button).html('سجلني!');

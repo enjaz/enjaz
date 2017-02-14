@@ -156,7 +156,7 @@ def handle_ajax(request):
         else:
             SessionRegistration.objects.filter(session=session, user=request.user).update(is_deleted=True)
 
-    return {}
+    return {'remaining_seats': session.get_remaining_seats()}
 
 
 def introduce_registration(request, event_code_name):

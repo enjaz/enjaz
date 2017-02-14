@@ -28,7 +28,7 @@
                 {% endif %}
                 <h5>
 					حالة التسجيل:
-                    {% if session.acceptance_method == 'M' %}
+
 					{% if user|get_status:session == True %}
 						<div class="label label-success">مؤكّد</div>
 					{% elif user|get_status:session == None %}
@@ -36,9 +36,7 @@
 					{% else %}
 						<div class="label label-danger">مرفوض</div>
 					{% endif %}
-                    {% else %}
-                        <div id="F-status" class="label label-warning">معلَّق</div>
-                    {% endif %}
+
 				</h5>
 
             </div>
@@ -79,21 +77,18 @@ $(document).ready(function(){
             if (data['success'] == 1){
                 $("#count-" + pk).html(data['remaining_seats']);
               		if (action == 'cancel'){
-                    toastr.success("ألغي تسجيلك");
+                    toastr.error("ألغي تسجيلك");
                     $(button).html('سجلني!');
                     $(button).data('action', 'signup');
                     $(button).addClass('btn-success');
                     $(button).removeClass('btn-danger');
-                    $("#F-status").removeClass('label-success');
-                    $("#F-status").addClass('label-warning');
+
                   } else if (action == 'signup'){
                     toastr.success("تمّ تسجيلك!");
                       $(button).html('ألغِ تسجيلي!');
                       $(button).data('action', 'cancel');
                       $(button).addClass('btn-danger');
                       $(button).removeClass('btn-success');
-                      $("#F-status").removeClass('label-warning');
-                      $("#F-status").addClass('label-success');
                   }
             } else if (data['success'] == 0){
               toastr.error(data['message']);

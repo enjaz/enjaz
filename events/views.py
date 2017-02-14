@@ -142,9 +142,17 @@ def handle_ajax(request):
         else:
             if not SessionRegistration.objects.filter(session=session, user=request.user).exists():
                 SessionRegistration.objects.create(session=session, user=request.user)
+                if session.acceptance_method == 'F':
+                    SessionRegistration.objects.filter(session=session, user=request.user).update(is_approved=True)
+                else:
+                    pass
 
             elif SessionRegistration.objects.filter(session=session, user=request.user, is_deleted=True).exists():
                 SessionRegistration.objects.filter(session=session, user=request.user).update(is_deleted=False)
+                if session.acceptance_method == 'F':
+                    SessionRegistration.objects.filter(session=session, user=request.user).update(is_approved=True)
+                else:
+                    pass
 
             else:
                 raise Exception(u'You are already registered!')
@@ -155,6 +163,10 @@ def handle_ajax(request):
 
         else:
             SessionRegistration.objects.filter(session=session, user=request.user).update(is_deleted=True)
+            if session.acceptance_method == 'F':
+                    SessionRegistration.objects.filter(session=session, user=request.user).update(is_approved=None)
+            else:
+                pass
 
     return {'remaining_seats': session.get_remaining_seats()}
 

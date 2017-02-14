@@ -10,8 +10,8 @@ from userena.forms import SignupForm
 
 Did_you_get_benefit_from_ReserachHub = (
     ('','Choose'),
-    ('Y','Yes'),
-    ('N','No')
+    ('Yes','Yes'),
+    ('No','No')
 )
 
 class FeedbackForm(forms.Form):

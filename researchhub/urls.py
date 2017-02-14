@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     url(r'^join_us/$', TemplateView.as_view(template_name='researchhub/join_us.html'), name="join_us"),
     url(r'^consultation/$', views.submit_consultation, name="submit_consultation"),
     url(r'^consultation/received/$', TemplateView.as_view(template_name='researchhub/consultation_received.html'), name="consultation_received"),
+    url(r'^feedback/$', views.submit_feedback, name="submit_feedback"),
 
     # Projects
     url(r'^projects/$', views.list_projects, name="list_projects"),

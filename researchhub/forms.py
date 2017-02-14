@@ -8,6 +8,17 @@ from researchhub import utils
 from researchhub.models import Supervisor, Project, SkilledStudent, Domain, Skill
 from userena.forms import SignupForm
 
+Did_you_get_benefit_from_ReserachHub = (
+    ('','Choose'),
+    ('Yes','Yes'),
+    ('No','No')
+)
+
+class FeedbackForm(forms.Form):
+    get_benefit = forms.CharField(label="Did you get benefit from ResearchHub?",
+                                        max_length=20,widget=forms.Select(choices=Did_you_get_benefit_from_ReserachHub))
+    why = forms.CharField(label="Why?",widget=forms.Textarea)
+
 class ConsultationForm(forms.Form):
     description = forms.CharField(widget=forms.Textarea)
     first_date = forms.DateField()

@@ -18,7 +18,11 @@
     <hr>
     {% endfor %}
 
+    {% include "researchhub/partials/feedback_footer.html" %}
+
+
 {% endblock %}
 {% block customscript %}
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+{% include "researchhub/partials/submit_feedback_asset.html" %}
 {% endblock %}

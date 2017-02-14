@@ -56,6 +56,8 @@
 
 </div>
 
+{% include "researchhub/partials/feedback_footer.html" %}
+
 {% endblock %}
 {% block customscript %}
 <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
@@ -69,4 +71,5 @@
     });
 </script>
 {% include "researchhub/partials/add_skill_asset.html" %}
+{% include "researchhub/partials/submit_feedback_asset.html" %}
 {% endblock %}

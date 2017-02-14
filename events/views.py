@@ -135,38 +135,29 @@ def handle_ajax(request):
     session_pk = request.POST.get('pk')
     session = get_object_or_404(Session, pk=session_pk)
     SessionRegistration.objects.filter(session=session, user=request.user)
+    if session.acceptance_method == 'F':
+        is_approved = True
+    else:
+        is_approved = False
 
     if action == 'signup':
         if not SessionRegistration.objects.filter(session=session, is_deleted=False).count() <= session.limit :
             raise Exception(u'Session is full')
         else:
             if not SessionRegistration.objects.filter(session=session, user=request.user).exists():
-                SessionRegistration.objects.create(session=session, user=request.user)
-                if session.acceptance_method == 'F':
-                    SessionRegistration.objects.filter(session=session, user=request.user).update(is_approved=True)
-                else:
-                    pass
-
+                SessionRegistration.objects.create(session=session,
+                                                   user=request.user,
+                                                   is_approved=is_approved)
             elif SessionRegistration.objects.filter(session=session, user=request.user, is_deleted=True).exists():
-                SessionRegistration.objects.filter(session=session, user=request.user).update(is_deleted=False)
-                if session.acceptance_method == 'F':
-                    SessionRegistration.objects.filter(session=session, user=request.user).update(is_approved=True)
-                else:
-                    pass
-
+                SessionRegistration.objects.filter(session=session, user=request.user).update(is_deleted=False, is_approved=is_approved)
             else:
                 raise Exception(u'You are already registered!')
 
     elif action == 'cancel':
         if not SessionRegistration.objects.filter(session=session, user=request.user).exists():
             raise Exception(u'You did not registered yet!')
-
         else:
             SessionRegistration.objects.filter(session=session, user=request.user).update(is_deleted=True)
-            if session.acceptance_method == 'F':
-                    SessionRegistration.objects.filter(session=session, user=request.user).update(is_approved=None)
-            else:
-                pass
 
     return {'remaining_seats': session.get_remaining_seats()}
 

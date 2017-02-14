@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
 
-from clubs.models import Club, Team
+from clubs.models import Club, Team, city_choices
 from events.managers import RegistrationQuerySet, SessionQuerySet
 from ckeditor.fields import RichTextField
 
@@ -57,6 +57,15 @@ class Event(models.Model):
     organizing_club = models.ForeignKey(Club , null=True)
     organizing_team = models.ForeignKey(Team, null=True)
     priorities = models.PositiveSmallIntegerField(default=1)
+    #city = models.CharField(max_length=20, choices=city_choices, verbose_name=u"المدينة")
+
+    def is_on_sidebar(self, user):
+        if user.is_superuser or \
+           (user.common_profile.city == self.city and \
+            end_date > timezone.now().date()):
+            return True
+        else:
+            return False
 
     def is_abstract_submission_open(self):
         #If we have abstract_submission_opening_date and/or

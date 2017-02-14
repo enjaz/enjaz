@@ -26,7 +26,9 @@
                 {% else %}
                 <button class="btn btn-danger cancel" data-action="cancel" data-pk="{{ session.pk }}">ألغِ تسجيلي!</button>
                 {% endif %}
-                <h5>
+          <div id="status-{{ session.pk }}" {% if not user|is_registered:session %}style="display: none;" {% endif %}>\
+          <h5>
+
 					حالة التسجيل:
 
 					{% if user|get_status:session == True %}
@@ -36,9 +38,8 @@
 					{% else %}
 						<div class="label label-danger">مرفوض</div>
 					{% endif %}
-
 				</h5>
-
+        </div>
             </div>
             {% endfor %}
 

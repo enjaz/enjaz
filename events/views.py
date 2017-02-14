@@ -138,7 +138,7 @@ def handle_ajax(request):
     if session.acceptance_method == 'F':
         is_approved = True
     else:
-        is_approved = False
+        is_approved = None
 
     if action == 'signup':
         if not SessionRegistration.objects.filter(session=session, is_deleted=False).count() <= session.limit :
@@ -159,7 +159,8 @@ def handle_ajax(request):
         else:
             SessionRegistration.objects.filter(session=session, user=request.user).update(is_deleted=True)
 
-    return {'remaining_seats': session.get_remaining_seats()}
+    return {'remaining_seats': session.get_remaining_seats(),
+            'get_status': utils.get_status(request.user, session)}
 
 
 def introduce_registration(request, event_code_name):

@@ -26,7 +26,7 @@
                 {% else %}
                 <button class="btn btn-danger cancel" data-action="cancel" data-pk="{{ session.pk }}">ألغِ تسجيلي!</button>
                 {% endif %}
-          <div id="status-{{ session.pk }}" {% if not user|is_registered:session %}style="display: none;" {% endif %}>\
+          <div id="status-{{ session.pk }}" {% if not user|is_registered:session %}style="display: none;" {% endif %}>
           <h5>
 
 					حالة التسجيل:

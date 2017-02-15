@@ -27,7 +27,7 @@
                 <button class="btn btn-danger cancel" data-action="cancel" data-pk="{{ session.pk }}">ألغِ تسجيلي!</button>
                 {% endif %}
           <div id="status-{{ session.pk }}" {% if not user|is_registered:session %}style="display: none;" {% endif %}>
-          <h5>
+                <h5>
 
 					حالة التسجيل:
 
@@ -39,7 +39,7 @@
 						<div class="label label-danger">مرفوض</div>
 					{% endif %}
 				</h5>
-        </div>
+          </div>
             </div>
             {% endfor %}
 
@@ -83,6 +83,7 @@ $(document).ready(function(){
                     $(button).data('action', 'signup');
                     $(button).addClass('btn-success');
                     $(button).removeClass('btn-danger');
+                    $("#status-" + pk).hide();
 
                   } else if (action == 'signup'){
                     toastr.success("تمّ تسجيلك!");
@@ -90,6 +91,7 @@ $(document).ready(function(){
                       $(button).data('action', 'cancel');
                       $(button).addClass('btn-danger');
                       $(button).removeClass('btn-success');
+                      $("#status-" + pk).show();
                   }
             } else if (data['success'] == 0){
               toastr.error(data['message']);

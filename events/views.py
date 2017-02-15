@@ -5,7 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
 from django.views.decorators import csrf
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from post_office import mail
 import os.path
@@ -119,6 +119,13 @@ def list_sessions(request, event_code_name):
     time_slots = TimeSlot.objects.filter(event=event)
     context = {'time_slots': time_slots,
                'event': event}
+
+    if event.registration_opening_date and timezone.now() < event.registration_opening_date:
+        return redirect('https://hpc.enjazportal.com')
+    elif event.registration_closing_date and timezone.now() > event.registration_closing_date:
+        return HttpResponseRedirect(reverse('events:registration_closed',
+                                                args=(event.code_name,)))
+
     return render(request, 'events/session_list.html', context)
 
 def show_session(request, event_code_name, pk):
@@ -130,11 +137,13 @@ def show_session(request, event_code_name, pk):
 @decorators.post_only
 @decorators.ajax_only
 @csrf.csrf_exempt
+@login_required
 def handle_ajax(request):
     action = request.POST.get('action')
     session_pk = request.POST.get('pk')
     session = get_object_or_404(Session, pk=session_pk)
     SessionRegistration.objects.filter(session=session, user=request.user)
+
     if session.acceptance_method == 'F':
         is_approved = True
     else:
@@ -159,8 +168,7 @@ def handle_ajax(request):
         else:
             SessionRegistration.objects.filter(session=session, user=request.user).update(is_deleted=True)
 
-    return {'remaining_seats': session.get_remaining_seats(),
-            'get_status': utils.get_status(request.user, session)}
+    return {'remaining_seats': session.get_remaining_seats()}
 
 
 def introduce_registration(request, event_code_name):

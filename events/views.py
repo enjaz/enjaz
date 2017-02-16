@@ -114,6 +114,7 @@ def upload_abstract_image(request):
                     "message": u"لم أستطع رفع الملف"}
                 }
 
+@login_required
 def list_sessions(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
     time_slots = TimeSlot.objects.filter(event=event)
@@ -121,6 +122,7 @@ def list_sessions(request, event_code_name):
                'event': event}
 
     if event.registration_opening_date and timezone.now() < event.registration_opening_date:
+        #TODO: Not
         return redirect('https://hpc.enjazportal.com')
     elif event.registration_closing_date and timezone.now() > event.registration_closing_date:
         return HttpResponseRedirect(reverse('events:registration_closed',
@@ -149,27 +151,32 @@ def handle_ajax(request):
     else:
         is_approved = None
 
+    registration = SessionRegistration.objects.filter(session=session, user=request.user).first()
     if action == 'signup':
-        if not SessionRegistration.objects.filter(session=session, is_deleted=False).count() <= session.limit :
+        if not session.get_remaining_seats() > 0:
             raise Exception(u'Session is full')
         else:
-            if not SessionRegistration.objects.filter(session=session, user=request.user).exists():
-                SessionRegistration.objects.create(session=session,
+            
+            if not registration:
+                registration = SessionRegistration.objects.create(session=session,
                                                    user=request.user,
                                                    is_approved=is_approved)
-            elif SessionRegistration.objects.filter(session=session, user=request.user, is_deleted=True).exists():
-                SessionRegistration.objects.filter(session=session, user=request.user).update(is_deleted=False, is_approved=is_approved)
+            elif registration.is_deleted:
+                registration.is_deleted = False
+                registration.is_approved = is_approved
             else:
                 raise Exception(u'You are already registered!')
 
     elif action == 'cancel':
-        if not SessionRegistration.objects.filter(session=session, user=request.user).exists():
+        if not registration:
             raise Exception(u'You did not registered yet!')
         else:
-            SessionRegistration.objects.filter(session=session, user=request.user).update(is_deleted=True)
+            registration.is_deleted = True
 
-    return {'remaining_seats': session.get_remaining_seats()}
+    registration.save()
 
+    return {'remaining_seats': session.get_remaining_seats(),
+            'status': registration.get_status()}
 
 def introduce_registration(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)

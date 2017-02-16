@@ -237,6 +237,12 @@ class SessionRegistration(models.Model):
     certificate_sent = models.BooleanField(default=False,
                                             verbose_name=u"أرسلت الشهادة؟")
 
+    def get_status(self):
+        if self.is_deleted == True:
+            return "غير مسجل"
+        else:
+            return self.get_is_approved_display()
+
     def __unicode__(self):
         return unicode(self.user)
 

@@ -4,19 +4,19 @@ $(function(){
     if ($("#city").val() == ""){
         $("#section").prop("disabled", true);
         $("#college").prop("disabled", true);
-    }else if($("#city").val() == "A" || $("#city").val() == "J"){
+    }else if($("#city").val() == "الأحساء" || $("#city").val() == "جدة"){
         $("#section-group").hide();
     }
-    // Then let's change the college and section fields based on the city choice. 
+    // Then let's change the college and section fields based on the city choice.
     $("#city").change(function(){
         $("#college").prop("disabled", true);
         $("#college").html("<option value=\"\">الكلية</option>");
-        if ($(this).val() == 'R'){
+        if ($(this).val() == "الرياض"){
             // College choice for Riyadh student shoudl only be done after specifying the section.  Don't enable it now.
             $("#section-group").show();
             $("#section").prop("disabled", false);
             $("#section").prop("required", true);
-        }else if ($(this).val() == 'J'){
+        }else if ($(this).val() == 'جدة'){
             $("#section-group").hide();
             $("#section").prop("required", false);
             $("#section").val("")
@@ -31,7 +31,7 @@ $(function(){
                             .attr("value", key)
                             .text(value));
             });
-        }else if ($(this).val() == 'A'){
+        }else if ($(this).val() == 'الأحساء'){
             $("#section-group").hide();
             $("#section").prop("required", false);
             $("#section").val("")

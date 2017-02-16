@@ -115,6 +115,25 @@ class TimeSlot(models.Model):
     def __unicode__(self):
         return self.name
 
+class SessionGroup(models.Model):
+    event = models.ForeignKey(Event, null=True, blank=True)
+    sessions = models.ManyToManyField('Session', blank=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, default="")
+    background = models.ImageField(upload_to='session_group/backgrounds/',
+                                   blank=True, null=True)
+    code_name = models.CharField(max_length=50, default="",
+                                 blank=True,
+                                 verbose_name=u"الاسم البرمجي",
+                                 help_text=u"حروف لاتينية صغيرة وأرقام")
+    is_limited_to_one = models.BooleanField(default=False,
+                                            verbose_name=u"هل التسجيل مقتصر على جلسة واحدة؟")
+
+    def is_user_already_on(self, user):
+        return SessionRegistration.objects.filter(session__session_group=self,
+                                                  is_deleted=False,
+                                                  user=user).exists()
+
 class Session(models.Model):
     event = models.ForeignKey(Event, null=True, blank=True)
     time_slot = models.ForeignKey(TimeSlot, default="", null=True)

@@ -15,6 +15,7 @@ from clubs.models import college_choices
 from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm, InitiativeForm, InitiativeFigureFormset
 from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation, TimeSlot, SessionRegistration, Initiative
 from events import utils
+import core.utils
 
 def redirect_home(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
@@ -144,32 +145,45 @@ def handle_ajax(request):
     action = request.POST.get('action')
     session_pk = request.POST.get('pk')
     session = get_object_or_404(Session, pk=session_pk)
-    SessionRegistration.objects.filter(session=session, user=request.user)
+    session_group_pk = request.POST.get('session_group_pk')
+    if session_group_pk:
+        session_group = get_object_or_404(SessionGroup, pk=session_group_pk)
+        already_on = session_group.is_user_already_on(request.user)
+        if session_group.is_limited_to_one and already_on:
+            raise Exception(u'سبق أن سجّلت!')
 
     if session.acceptance_method == 'F':
         is_approved = True
     else:
         is_approved = None
 
+    has_previous_sessions = SessionRegistration.objects.filter(session__event=session.event, user=request.user).exists()
+
     registration = SessionRegistration.objects.filter(session=session, user=request.user).first()
     if action == 'signup':
         if not session.get_remaining_seats() > 0:
-            raise Exception(u'Session is full')
+            raise Exception(u'لا توجد مقاعد شاغرة')
         else:
-            
             if not registration:
                 registration = SessionRegistration.objects.create(session=session,
                                                    user=request.user,
                                                    is_approved=is_approved)
+                if not has_previous_sessions:
+                    if session_group_pk:
+                        relative_url = reverse("events:show_session_group", args=(events.code_name, session_group.code_name))
+                    else:
+                        relative_url = reverse("events:list_sessions", args=(events.code_name,))
+                    full_url = request.build_absolute_uri(relative_url)
+                    core.utils.create_tweet(request.user, "سجّلت في {}!  يمكنك التسجيل من خلال: ".format(event.official_name, full_url))
             elif registration.is_deleted:
                 registration.is_deleted = False
                 registration.is_approved = is_approved
             else:
-                raise Exception(u'You are already registered!')
+                raise Exception(u'سبق التسجيل!')
 
     elif action == 'cancel':
         if not registration:
-            raise Exception(u'You did not registered yet!')
+            raise Exception(u'لم يسبق لك التسجيل!')
         else:
             registration.is_deleted = True
 
@@ -360,3 +374,40 @@ def show_initiative(request, event_code_name, pk):
 
     context= {'event':event, 'initiative':initiative}
     return render(request, "events/initiatives/show_initiative.html", context)
+
+def show_session_group(request, event_code_name, code_name):
+    session_group = get_object_or_404(SessionGroup,
+                                      event__code_name=event_code_name,
+                                      code_name=code_name)
+    if event.registration_opening_date and timezone.now() < event.registration_opening_date:
+        raise Http404
+    elif event.registration_closing_date and timezone.now() > event.registration_closing_date:
+        return HttpResponseRedirect(reverse('events:registration_closed',
+                                                args=(event.code_name,)))
+
+    if session_group.is_limited_to_one:
+        already_on = session_group.is_user_already_on(request.user)
+        # {% if already_on %}disabled=disabled{% endif %}
+
+    return render(request, "events/session_group/show_session_group.html",
+                  {'session_group': session_group,
+                   'already_on': already_on})
+
+def review_registrations(request, event_code_name, pk):
+    session = get_object_or_404(Session,
+                                event__code_name=event_code_name,
+                                pk=pk)
+    if request.method == "POST":
+        action = request.POST.get('action')
+        pks = [int(field.lstrip('pk_')) for field in request.POST if field.startswith('pk_')]
+        print pks
+        if action == "approve":
+            SessionRegistration.objects.filter(pk__in=pks).update(is_approved=True)
+        elif action == "reject":
+            SessionRegistration.objects.filter(pk__in=pks).update(is_approved=False)
+        elif action == "pend":
+            SessionRegistration.objects.filter(pk__in=pks).update(is_approved=None)
+        return HttpResponseRedirect(reverse('events:review_registrations',
+                                                args=(session.event.code_name, session.pk)))
+    elif request.method == "GET":
+        return render(request, "events/review_registrations.html", {'session': session})

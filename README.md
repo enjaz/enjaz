@@ -61,6 +61,7 @@ In the project `urls.py`, add the following:
 from django.views.generic import TemplateView
 from accounts.forms import StudentSignupForm, NonStudentSignupForm, NonUserSignupForm, ModifiedAuthenticationForm
 from accounts.admin import user_list_admin
+from activities.admin import invitation_admin
 from activities.urls import activity_forms_urls
 from bulb.admin import bulb_admin
 from clubs.urls import club_forms_urls
@@ -129,7 +130,6 @@ INSTALLED_APPS = (
     'accounts',
     'core',
     'userena',
-    'taggit',
     'guardian',
     'easy_thumbnails',
     'bootstrap3',
@@ -137,7 +137,6 @@ INSTALLED_APPS = (
     'constance',
     'constance.backends.database',
     'activities',
-    'books',
     'clubs',
     'niqati',
     'media',

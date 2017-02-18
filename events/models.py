@@ -130,7 +130,7 @@ class SessionGroup(models.Model):
                                             verbose_name=u"هل التسجيل مقتصر على جلسة واحدة؟")
 
     def is_user_already_on(self, user):
-        return SessionRegistration.objects.filter(session__session_group=self,
+        return SessionRegistration.objects.filter(session__sessiongroup=self,
                                                   is_deleted=False,
                                                   user=user).exists()
 

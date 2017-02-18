@@ -41,24 +41,29 @@ def add_cp(apps, schema_editor):
                                       start_date=start_date,
                                       end_date=end_date,
                                       organizing_team=cp_a_team)
-    cp_r_session_group = SessionGroup.objects.create(event=cp_r_event,
-                                                     title="محاضرات البرنامج الثقافي الخامس",
-                                                     code_name="lectures")
-    cp_j_session_group = SessionGroup.objects.create(event=cp_j_event,
-                                                     title="محاضرات البرنامج الثقافي الخامس",
-                                                     code_name="lectures")
-    cp_a_session_group = SessionGroup.objects.create(event=cp_a_event,
-                                                     title="محاضرات البرنامج الثقافي الخامس",
-                                                     code_name="lectures")
-    
-    session_names = {datetime.date(2017,2,28): ["أصبوحة شعرية", "الاختلاف مع النسق"],
-                      datetime.date(2017,3,1): ["كيف تخرج من الصدفة", "التفكير الإبداعي", "سر الإبداع"]}
-    for date in session_names:
-        for name in session_names[date]:
+    cp_r_session_group_lectures = SessionGroup.objects.create(event=cp_r_event,
+                                                              title="محاضرات البرنامج الثقافي الخامس",
+                                                              code_name="lectures")
+    cp_r_session_group_workshops = SessionGroup.objects.create(event=cp_r_event,
+                                                               is_limited_to_one=True,
+                                                               title="ورش عمل البرنامج الثقافي الخامس",
+                                                               code_name="workshops")
+    lecture_names = {datetime.date(2017,2,28): ["أصبوحة شعرية", "الاختلاف مع النسق"],
+                     datetime.date(2017,3,1): ["كيف تخرج من الصدفة", "التفكير الإبداعي", "سر الإبداع"]}
+    for date in lecture_names:
+        for name in lecture_names[date]:
             session = Session.objects.create(name=name,
                                              date=date,
                                              event=cp_r_event)
-            cp_r_session_group.sessions.add(session)
+            cp_r_session_group_lectures.sessions.add(session)
+    workshop_names = {datetime.date(2017,2,28): ["سكامبر، طرق ووسائل الإبداع", "تمارين وتطبيقات لتنمية الإبداع"],
+                      datetime.date(2017,3,1): ["تجسيد أفكار منتجات باستخدام الليقو", "صناعة الفكرة الإبداعية"]}
+    for date in workshop_names:
+        for name in workshop_names[date]:
+            session = Session.objects.create(name=name,
+                                             date=date,
+                                             event=cp_r_event)
+            cp_r_session_group_workshops.sessions.add(session)
 
 
 def remove_cp(apps, schema_editor):

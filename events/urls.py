@@ -28,5 +28,5 @@ urlpatterns = patterns('',
     url(r'^(?P<event_code_name>[\d\w_\-]+)/initiatives/list/$', views.list_initiatives, name="list_initiatives"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/initiatives/(?P<pk>\d+)/$', views.show_initiative, name="show_initiative"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/initiatives/thanks/$', TemplateView.as_view(template_name='events/initiatives/initiatives_submission_completed.html'), name="initiative_submission_completed"),
-
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<code_name>[\d\w\-]+)/$', views.show_session_group, name="show_session_group"),
 )

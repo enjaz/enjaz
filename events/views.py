@@ -13,7 +13,7 @@ import os.path
 from core import decorators
 from clubs.models import college_choices
 from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm, InitiativeForm, InitiativeFigureFormset
-from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation, TimeSlot, SessionRegistration, Initiative
+from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation, TimeSlot, SessionRegistration, Initiative, SessionGroup
 from events import utils
 import core.utils
 
@@ -379,19 +379,16 @@ def show_session_group(request, event_code_name, code_name):
     session_group = get_object_or_404(SessionGroup,
                                       event__code_name=event_code_name,
                                       code_name=code_name)
-    if event.registration_opening_date and timezone.now() < event.registration_opening_date:
+    context = {'session_group': session_group}
+    if session_group.event.registration_opening_date and timezone.now() < session_group.event.registration_opening_date:
         raise Http404
-    elif event.registration_closing_date and timezone.now() > event.registration_closing_date:
+    elif session_group.event.registration_closing_date and timezone.now() > session_group.event.registration_closing_date:
         return HttpResponseRedirect(reverse('events:registration_closed',
                                                 args=(event.code_name,)))
+    if request.user.is_authenticated() and session_group.is_limited_to_one:
+        context['already_on'] = session_group.is_user_already_on(request.user)
 
-    if session_group.is_limited_to_one:
-        already_on = session_group.is_user_already_on(request.user)
-        # {% if already_on %}disabled=disabled{% endif %}
-
-    return render(request, "events/session_group/show_session_group.html",
-                  {'session_group': session_group,
-                   'already_on': already_on})
+    return render(request, "events/session_group/show_session_group.html", context)
 
 def review_registrations(request, event_code_name, pk):
     session = get_object_or_404(Session,
@@ -411,3 +408,4 @@ def review_registrations(request, event_code_name, pk):
                                                 args=(session.event.code_name, session.pk)))
     elif request.method == "GET":
         return render(request, "events/review_registrations.html", {'session': session})
+

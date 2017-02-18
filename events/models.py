@@ -173,7 +173,8 @@ class Session(models.Model):
                 self.second_priority_registrations.all()).distinct()
 
     def get_remaining_seats(self):
-        return  self.limit - SessionRegistration.objects.filter(session=self, is_deleted=False).count()
+        if not self.limit is None:
+            return  self.limit - SessionRegistration.objects.filter(session=self, is_deleted=False).count()
 
     def __unicode__(self):
         if self.gender:

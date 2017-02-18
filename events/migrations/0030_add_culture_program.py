@@ -61,6 +61,7 @@ def add_cp(apps, schema_editor):
     for date in workshop_names:
         for name in workshop_names[date]:
             session = Session.objects.create(name=name,
+                                             limit=50,
                                              date=date,
                                              event=cp_r_event)
             cp_r_session_group_workshops.sessions.add(session)

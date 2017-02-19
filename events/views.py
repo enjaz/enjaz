@@ -161,7 +161,8 @@ def handle_ajax(request):
 
     registration = SessionRegistration.objects.filter(session=session, user=request.user).first()
     if action == 'signup':
-        if not session.get_remaining_seats() > 0:
+        if not session.limit is None and\
+           not session.get_remaining_seats() > 0:
             raise Exception(u'لا توجد مقاعد شاغرة')
         else:
             if not registration:
@@ -170,11 +171,14 @@ def handle_ajax(request):
                                                    is_approved=is_approved)
                 if not has_previous_sessions:
                     if session_group_pk:
-                        relative_url = reverse("events:show_session_group", args=(events.code_name, session_group.code_name))
+                        relative_url = reverse("events:show_session_group", args=(session.event.code_name, session_group.code_name))
                     else:
-                        relative_url = reverse("events:list_sessions", args=(events.code_name,))
+                        relative_url = reverse("events:list_sessions", args=(session.event.code_name,))
                     full_url = request.build_absolute_uri(relative_url)
-                    core.utils.create_tweet(request.user, "سجّلت في {}!  يمكنك التسجيل من خلال: ".format(event.official_name, full_url))
+                    text = u"سجّلت في {}!  يمكنك التسجيل من: {}"
+                    if session.event.hashtag:
+                        text += u"\n#" + session.event.hashtag
+                    core.utils.create_tweet(request.user, text.format(session.event.official_name, full_url))
             elif registration.is_deleted:
                 registration.is_deleted = False
                 registration.is_approved = is_approved

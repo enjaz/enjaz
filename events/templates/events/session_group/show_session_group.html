@@ -132,9 +132,13 @@ margin-bottom: 5px;
     <div class="container">
       <div class="row">
         <br>
-          <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
+          <div class="col-sm-6 col-sm-offset-3 mentor-section-intro text-center">
               <h1 class="mentor-section-header">{{ session_group.title }}</h2>
                 <p class="section-intro">{{ session_group.description }}</p>
+                {% if not user.social_auth.exists %}
+                <br>
+                <a style="margin-top: 5px; background-color: #1da1f3; color: white;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-sm"><i class="fa fa-twitter"></i> اربط حسابي بتويتر</a>
+                {% endif %}
           </div>
       </div>
       {% for session in session_group.sessions.all  %}
@@ -164,18 +168,18 @@ margin-bottom: 5px;
               <div style="margin-top: 10px;">
                    <p class="entypo-mail">سوف ترسل رسائل تأكيد قُبيل الحدث لجميع المقبولين و المقبولات لحضور هذا الحدث</p>
               </div>
-              {% else %}
+              {% elif session.limit != None %}
               <p>عدد المقاعد المتبقية: <span id="count-{{ session.pk}}">{{ session.get_remaining_seats }}</span></h5>
               {% endif %}
                 </div>
 
                 <div class="text-center">
                 {% if user.is_authenticated and not user|is_registered:session %}
-                        <button class="btn btn-success signup" data-action="signup" data-pk="{{ session.pk }}"{% if already_on and session_group.is_limited_to_one %} disabled {% endif %} >سجلني!</button>
-                {% if not user.social_auth.exists %}
-                <br>
-                <a style="margin-top: 5px; background-color: #1da1f3; color: white;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-sm"><i class="fa fa-twitter"></i> اربط حسابي بتويتر</a>
-                {% endif %}
+			{% if already_on and session_group.is_limited_to_one %}
+                        <button class="btn btn-warning signup" data-action="signup" data-pk="{{ session.pk }}" disabled>يمكنك التسجيل جلسة واحدة فقط</button>
+			{% else %}
+                        <button class="btn btn-success signup" data-action="signup" data-pk="{{ session.pk }}">سجلني!</button>
+			{% endif %}
                 <br>
                 {% elif user.is_authenticated and user|is_registered:session  %}
                         <button class="btn btn-danger cancel" data-action="cancel" data-pk="{{ session.pk }}">ألغِ تسجيلي!</button>
@@ -183,6 +187,7 @@ margin-bottom: 5px;
                 <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لإنجاز كي أؤكد الحضور</a>
                 {% endif %}
                 <br>
+              {% if session.acceptance_method == 'F' %}
                 <div {% if not user|is_registered:session %}style="display: none;" {% endif %} id="status-{{ session.pk }}" class="btn btn-xs {% if user|get_status:session == True %}
                 btn-success">معتمد
                 {% elif user|get_status:session == None %}
@@ -191,6 +196,7 @@ margin-bottom: 5px;
                 btn-danger">مرفوض
                 {% endif %}
                 </div>
+             {% endif %}
                 </div>
 
             </div> <!--col-->
@@ -249,24 +255,32 @@ margin-bottom: 5px;
                       signup_button = $(".signup");
                   		if (action == 'cancel'){
                         toastr.error("ألغي تسجيلك");
-                        $(button).html('سجلني!');
-                        $(button).data('action', 'signup');
-                        $(button).addClass('btn-success');
-                        $(button).removeClass('btn-danger');
                         {% if session_group.is_limited_to_one %}
                         $(".signup").removeAttr("disabled", "disabled");
+                        $(".signup").removeClass('btn-warning');
+                        $(".signup").html('سجلني!');
+                        $(".signup").addClass('btn-success');
+                        {% else %}
+                        $(button).html('سجلني!');
                         {% endif %}
+                        $(button).data('action', 'signup');
+                        $(button).removeClass('btn-danger');
                         status_button.hide();
                       } else if (action == 'signup'){
                         toastr.success("تمّ تسجيلك!");
-                          $(button).html('ألغِ تسجيلي!');
-                          $(button).data('action', 'cancel');
-                          $(button).addClass('btn-danger');
-                          $(button).removeClass('btn-success');
                           {% if session_group.is_limited_to_one %}
                           $(".signup").attr("disabled", "disabled");
-                          $(button).removeAttr("disabled", "disabled");
+                          $(".signup").removeClass('btn-success');
+                          $(".signup").addClass('btn-warning');
+                          $(".signup").html("يمكنك التسجيل جلسة واحدة فقط");
+                          {% else %}
+                          $(button).removeClass('btn-success');
                           {% endif %}
+                          $(button).html('ألغِ تسجيلي!');
+                          $(button).removeAttr("disabled", "disabled");
+                          $(button).data('action', 'cancel');
+                          $(button).addClass('btn-danger');
+
                           status_button.show();
                           status_button.removeClass("btn-danger");
                           status_button.html(data['status']);

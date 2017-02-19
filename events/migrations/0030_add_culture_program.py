@@ -23,19 +23,19 @@ def add_cp(apps, schema_editor):
     cp_a_team = Team.objects.create(name="فريق تنظيم البرنامج الثقافي - الأحساء",
                                     code_name="cp5-r", year=year_2016_2017,
                                     city="الأحساء", gender="")
-    cp_r_event = Event.objects.create(official_name="البرنامج الثقافي - الرياض",
+    cp_r_event = Event.objects.create(official_name="البرنامج الثقافي",
                                       english_name="Culutre Program - Riyadh",
                                       code_name="cp5-r",
                                       start_date=start_date,
                                       end_date=end_date,
                                       organizing_team=cp_r_team)
-    cp_j_event = Event.objects.create(official_name="البرنامج الثقافي - جدة",
+    cp_j_event = Event.objects.create(official_name="البرنامج الثقافي",
                                       english_name="Culutre Program - Jeddah",
                                       code_name="cp5-j",
                                       start_date=start_date,
                                       end_date=end_date,
                                       organizing_team=cp_j_team)
-    cp_a_event = Event.objects.create(official_name="البرنامج الثقافي - الأحساء",
+    cp_a_event = Event.objects.create(official_name="البرنامج الثقافي",
                                       english_name="Culutre Program - Alahsa",
                                       code_name="cp5-a",
                                       start_date=start_date,
@@ -53,6 +53,7 @@ def add_cp(apps, schema_editor):
     for date in lecture_names:
         for name in lecture_names[date]:
             session = Session.objects.create(name=name,
+                                             acceptance_method="F",
                                              date=date,
                                              event=cp_r_event)
             cp_r_session_group_lectures.sessions.add(session)
@@ -61,11 +62,11 @@ def add_cp(apps, schema_editor):
     for date in workshop_names:
         for name in workshop_names[date]:
             session = Session.objects.create(name=name,
+                                             acceptance_method="F",
                                              limit=50,
                                              date=date,
                                              event=cp_r_event)
             cp_r_session_group_workshops.sessions.add(session)
-
 
 def remove_cp(apps, schema_editor):
     Team = apps.get_model('clubs', 'Team')

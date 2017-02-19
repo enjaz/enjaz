@@ -96,3 +96,10 @@ def send_onsite_confirmation(registration, event):
 def is_registered(user, session):
     if SessionRegistration.objects.filter(session=session, user=user, is_deleted = False).exists():
         return True
+
+def get_status(user, session):
+    session_registration = SessionRegistration.objects.get(session=session, user=user)
+    if session_registration.is_deleted:
+        return False
+    else:
+        return session_registration.is_approved

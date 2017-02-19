@@ -1,0 +1,31 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}{% load events_tags %}
+{% block title %}{{ session.event.official_name }}{% endblock %}
+{% block content %}
+<form method="post">
+  {% csrf_token %}
+<select name="action">
+  <option value="reject">ارفض</option>
+  <option value="approve">اعتمد</option>
+</select>
+
+<table class="table-hover">
+  <thead>
+    <tr>
+      <th></th>
+      <th>الاسم</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for registration in session.sessionregistration_set.all %}
+    <tr>
+      <td><input type="checkbox" value="1" name="pk_{{ registration.pk }}"></td>
+      <td>{{ registration.user.username }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<input type="submit">
+</form>
+<!--Panel for pending, approved and rejected-->
+
+{% endblock %}

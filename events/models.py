@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
 
-from clubs.models import Club, Team
+from clubs.models import Club, Team, city_choices
 from events.managers import RegistrationQuerySet, SessionQuerySet
 from ckeditor.fields import RichTextField
 
@@ -36,6 +36,8 @@ class Event(models.Model):
     onsite_after = models.DateTimeField(u"التسجيل في الموقع يبدأ من", null=True, blank=True)
     url = models.URLField(max_length=255, blank=True, default="")
     location_url = models.URLField(max_length=255, blank=True, default="")
+    hashtag = models.CharField(u"هاشتاغ", default="", max_length=20,
+                               blank=True, help_text="بدون #")
     twitter = models.CharField(max_length=255,
                                blank=True,
                                default="KSAU_Events")
@@ -57,6 +59,15 @@ class Event(models.Model):
     organizing_club = models.ForeignKey(Club , null=True, blank=True)
     organizing_team = models.ForeignKey(Team, null=True, blank=True)
     priorities = models.PositiveSmallIntegerField(default=1)
+    #city = models.CharField(max_length=20, choices=city_choices, verbose_name=u"المدينة")
+
+    def is_on_sidebar(self, user):
+        if user.is_superuser or \
+           (user.common_profile.city == self.city and \
+            end_date > timezone.now().date()):
+            return True
+        else:
+            return False
 
     def is_abstract_submission_open(self):
         #If we have abstract_submission_opening_date and/or
@@ -106,6 +117,28 @@ class TimeSlot(models.Model):
     def __unicode__(self):
         return self.name
 
+class SessionGroup(models.Model):
+    event = models.ForeignKey(Event, null=True, blank=True)
+    sessions = models.ManyToManyField('Session', blank=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, default="")
+    background = models.ImageField(upload_to='session_group/backgrounds/',
+                                   blank=True, null=True)
+    code_name = models.CharField(max_length=50, default="",
+                                 blank=True,
+                                 verbose_name=u"الاسم البرمجي",
+                                 help_text=u"حروف لاتينية صغيرة وأرقام")
+    is_limited_to_one = models.BooleanField(default=False,
+                                            verbose_name=u"هل التسجيل مقتصر على جلسة واحدة؟")
+
+    def is_user_already_on(self, user):
+        return SessionRegistration.objects.filter(session__sessiongroup=self,
+                                                  is_deleted=False,
+                                                  user=user).exists()
+
+    def __unicode__(self):
+        return self.title
+
 class Session(models.Model):
     event = models.ForeignKey(Event, null=True, blank=True)
     time_slot = models.ForeignKey(TimeSlot, default="", null=True)
@@ -143,6 +176,10 @@ class Session(models.Model):
     def get_all_registrations(self):
         return (self.first_priority_registrations.all() | \
                 self.second_priority_registrations.all()).distinct()
+
+    def get_remaining_seats(self):
+        if not self.limit is None:
+            return  self.limit - SessionRegistration.objects.filter(session=self, is_deleted=False).count()
 
     def __unicode__(self):
         if self.gender:
@@ -224,6 +261,12 @@ class SessionRegistration(models.Model):
                                             verbose_name=u"أرسلت رسالة التذكير؟")
     certificate_sent = models.BooleanField(default=False,
                                             verbose_name=u"أرسلت الشهادة؟")
+
+    def get_status(self):
+        if self.is_deleted == True:
+            return "غير مسجل"
+        else:
+            return self.get_is_approved_display()
 
     def __unicode__(self):
         return unicode(self.user)

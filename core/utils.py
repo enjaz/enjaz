@@ -1,7 +1,14 @@
 # -*- coding: utf-8  -*-
+from core.models import Tweet
 from django.db import models
 import operator
 
+
+def create_tweet(user, text):
+    if not user.social_auth.exists():
+        return
+    else:
+        Tweet.objects.create(user=user, text=text)
 
 def hindi_to_arabic(number):
     return number.replace(u'٠', '0')\

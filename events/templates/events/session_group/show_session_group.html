@@ -1,0 +1,357 @@
+<!DOCTYPE html>{% load staticfiles %}{% load events_tags %}
+
+<html class="detail" lang="ar">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{ invitation.short_description|striptags }}">
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@{% if invitation.twitter_account %}{{ invitation.twitter_account }}{% else %}StudentsofKSAUH{% endif %}" />
+    <meta name="twitter:title" content="{{ invitation.title }}" />
+    <meta name="twitter:description" content="{{ invitation.short_description|striptags }}" />
+    {% if invitation.logo %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ invitation.logo.url }}" />{% endif %}
+    <title>إنجاز | {{ session_group.title }}</title>
+    <link rel="icon" href="{% static 'logo/favicon.png' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-3.3.6.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-rtl-3.3.4.min.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/entypo/css/entypo.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/neon-forms.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
+<style>
+
+@font-face {
+    font-family: 'GE Dinar One';
+    font-weight: lighter;
+    src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
+}
+
+@font-face {
+    font-family: 'GE Dinar One';
+    font-weight: normal;
+    src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
+}
+
+body {
+  font-family: 'GE Dinar One', serif;
+}
+
+html.detail{
+    background: linear-gradient( rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8) ){% if session_group.background %}, url("{{ session_group.background.url }}"){% endif %} no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+html.detail body, h1{
+    background-color: transparent;
+    color: white;
+}
+
+.modal{
+color: black;
+}
+
+.detail a{
+    color: #85C7FF;
+}
+footer{
+    padding: 60px 0;
+}
+
+.step-section {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 10px;
+    width: 90%;
+    margin-right: auto;
+    margin-left: auto;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.checkbox label{
+    margin-right: 10px;
+}
+
+#third-phase, #promotion-step{
+    display: none;
+}
+
+#sad-child{
+    border-radius: 10px;
+    max-width: 100%;
+}
+
+#delete-button input[type='submit']:disabled{
+    background-color: #497d49;
+}
+
+p.instructions{
+    text-align: justify;
+}
+
+p.intro{
+background: rgba(0, 0, 0, 0.7);
+border-radius: 10px;
+padding: 18px;
+width: 90%;
+margin-right: auto;
+margin-left: auto;
+margin-bottom: 20px;
+color: white;
+font-size: 15px;
+}
+
+p.explaination{
+border-radius: 10px;
+padding: 10px;
+margin-right: auto;
+margin-left: auto;
+margin-bottom: 0px;
+font-size: 14px;
+color: #e8ff74;
+}
+
+hr{
+margin-bottom: 5px;
+    max-width: 100px;
+}
+
+.form-group .checkbox{
+    margin-right: 15px;
+}
+</style>
+</head>
+
+<body>
+
+    <div class="container">
+      <div class="row">
+        <br>
+          <div class="col-sm-6 col-sm-offset-3 mentor-section-intro text-center">
+              <h1 class="mentor-section-header">{{ session_group.title }}</h2>
+                <p class="section-intro">{{ session_group.description }}</p>
+                {% if not user.social_auth.exists %}
+                <br>
+                <a style="margin-top: 5px; background-color: #1da1f3; color: white;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-sm"><i class="fa fa-twitter"></i> اربط حسابي بتويتر</a>
+                {% endif %}
+          </div>
+      </div>
+      {% for session in session_group.sessions.all  %}
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+                <div class="text-center">
+                    <h1>{{ session.name }}</h1>
+                    <p style="font-size: 1.2em;">{{ invitation.short_description|safe }}</p>
+                </div>
+                <p class="intro instructions">
+                    {{ session.description|linebreaksbr|safe }}
+                </p>
+                <div class="row text-center" style="font-size: 1.2em; margin-bottom: 10px;">
+							<div>
+								<i class="entypo-calendar"></i>
+                                {{ session.date|date:"l j F Y" }}
+							</div>
+              {% if session.start_time and session.end_time %}
+							<div>
+								<i class="entypo-clock"></i>
+								{{ session.start_time }}
+								-
+								{{ session.end_time }}
+							</div>
+              {% endif %}
+              {% if session.acceptance_method == 'M' %}
+              <div style="margin-top: 10px;">
+                   <p class="entypo-mail">سوف ترسل رسائل تأكيد قُبيل الحدث لجميع المقبولين و المقبولات لحضور هذا الحدث</p>
+              </div>
+              {% elif session.limit != None %}
+              <p>عدد المقاعد المتبقية: <span id="count-{{ session.pk}}">{{ session.get_remaining_seats }}</span></h5>
+              {% endif %}
+                </div>
+
+                <div class="text-center">
+                {% if user.is_authenticated and not user|is_registered:session %}
+			{% if already_on and session_group.is_limited_to_one %}
+                        <button class="btn btn-warning signup" data-action="signup" data-pk="{{ session.pk }}" disabled>يمكنك التسجيل جلسة واحدة فقط</button>
+			{% else %}
+                        <button class="btn btn-success signup" data-action="signup" data-pk="{{ session.pk }}">سجلني!</button>
+			{% endif %}
+                <br>
+                {% elif user.is_authenticated and user|is_registered:session  %}
+                        <button class="btn btn-danger cancel" data-action="cancel" data-pk="{{ session.pk }}">ألغِ تسجيلي!</button>
+                {% else %}
+                <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لإنجاز كي أؤكد الحضور</a>
+                {% endif %}
+                <br>
+              {% if session.acceptance_method == 'F' %}
+                <div {% if not user|is_registered:session %}style="display: none;" {% endif %} id="status-{{ session.pk }}" class="btn btn-xs {% if user|get_status:session == True %}
+                btn-success">معتمد
+                {% elif user|get_status:session == None %}
+                btn-warning">معلق
+                {% else %}
+                btn-danger">مرفوض
+                {% endif %}
+                </div>
+             {% endif %}
+                </div>
+
+            </div> <!--col-->
+        </div><!--row-->
+    </div><!--container-->
+    <br>
+    {% endfor %}
+    <!-- Footer -->
+    <footer>
+            <div class="row">
+                <div class="col-lg-10 col-lg-offset-1 text-center">
+                    <p class="text-muted">بُني بأيدٍ طلابيّة</p>
+                    <p class="text-muted">حقك في النسخ مكفول.</p>
+                    <a target="_blank" rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.ar"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" /></a>
+                </div>
+            </div>
+    </footer>
+{% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
+	<!-- Piwik -->
+	<script type="text/javascript">
+	  var _paq = _paq || [];
+      {% if user.is_authenticated %}
+      _paq.push(['setUserId', '{{ user.username }}']);
+      {% endif %}
+	  _paq.push(['trackPageView']);
+	  _paq.push(['enableLinkTracking']);
+	  (function() {
+	    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://enjazportal.com/stats/";
+	    _paq.push(['setTrackerUrl', u+'piwik.php']);
+	    _paq.push(['setSiteId', 1]);
+	    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+	    g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+	  })();
+	</script>
+	<noscript><p><img src="//enjazportal.com/stats/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+        <!-- End Piwik Code -->
+    {% endif %}
+	<script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
+    <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+    <script type="text/javascript">
+    $(function(){
+      toastr.options.positionClass = "toast-top-left";
+    	$(".signup, .cancel").click(function(){
+        button = this;
+    		pk = $(this).data("pk");
+    		action = $(this).data("action");
+    		$.ajax("{% url 'events:handle_ajax' %}", {
+    		    method: "POST",
+    		    data: {pk: pk, action: action},
+            success: function(data){
+                if (data['success'] == 1){
+                    $("#count-" + pk).html(data['remaining_seats']);
+                      status_button = $("#status-" + pk);
+                      signup_button = $(".signup");
+                  		if (action == 'cancel'){
+                        toastr.error("ألغي تسجيلك");
+                        {% if session_group.is_limited_to_one %}
+                        $(".signup").removeAttr("disabled", "disabled");
+                        $(".signup").removeClass('btn-warning');
+                        $(".signup").html('سجلني!');
+                        $(".signup").addClass('btn-success');
+                        {% else %}
+                        $(button).html('سجلني!');
+                        {% endif %}
+                        $(button).data('action', 'signup');
+                        $(button).removeClass('btn-danger');
+                        status_button.hide();
+                      } else if (action == 'signup'){
+                        toastr.success("تمّ تسجيلك!");
+                          {% if session_group.is_limited_to_one %}
+                          $(".signup").attr("disabled", "disabled");
+                          $(".signup").removeClass('btn-success');
+                          $(".signup").addClass('btn-warning');
+                          $(".signup").html("يمكنك التسجيل جلسة واحدة فقط");
+                          {% else %}
+                          $(button).removeClass('btn-success');
+                          {% endif %}
+                          $(button).html('ألغِ تسجيلي!');
+                          $(button).removeAttr("disabled", "disabled");
+                          $(button).data('action', 'cancel');
+                          $(button).addClass('btn-danger');
+
+                          status_button.show();
+                          status_button.removeClass("btn-danger");
+                          status_button.html(data['status']);
+                          if (data['status'] == "معلق"){
+                            status_button.addClass("btn-warning");
+                          } else if (data['status'] == "معتمد"){
+                            status_button.addClass("btn-success");
+                          }
+                      }
+                } else {
+                        toastr.error(data.message);
+                      }
+                }
+            });
+        });
+
+    });
+
+    </script>
+    {% if invitation in linked_to_twitter %}
+{%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
+<!---Twitter Modal -->>
+<div class="modal fade" id="connect-twitter">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">أغلق</span></button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body ativa-scroll text-center">
+          <h2>بات الآن ممكنا إخبار الأصدقاء عن أنشطة النادي!</h2>
+          <p>يتيح ربط حساب بوابة إنجاز بحسابك على تويتر إخبار متابعيك ومتابعاتك عن أنشطة النادي، ومساعدتهم في اكتشافها!</p>
+          <p>بعد الربط، سوف تُكتب تغريدة آلية في حسابك عندما تؤكد انضمامك لأحد الأنشطة، ويمكنك إلغاء الربط في أي وقت.</p>
+          <div class="row">
+              <a style="color: #1da1f3;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-lg"><i class="fa fa-twitter fa-4x"></i><br>اربط حسابي بتويتر</a>
+          </div>
+          <div class="row">
+                  <a id="cancel-twitter-connection" style="color: rgb(243, 29, 89)"><i class="fa fa-times fa-4x"></i><br> لا تسألني مُجدًدا</a>
+          </div>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+{% endif %}
+<script type="text/javascript">
+{%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
+$(function(){
+    $('#connect-twitter').modal({
+      keyboard: true,
+      backdrop: 'static',
+    });
+    $("#cancel-twitter-connection").click(function(){
+        $.ajax({
+            url: "{% url 'cancel_twitter_connection' %}",
+            type: 'GET',
+            cache: false,
+            success: function(data){
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                toastr.success("لن يظهر السؤال مُجددًا.");
+                // hide modal
+                $("#connect-twitter").modal('hide');
+            }
+        });
+
+    });
+});
+{% endif %}
+</script>
+
+
+{% endif %}
+</body>
+</html>

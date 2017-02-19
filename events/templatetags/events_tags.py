@@ -31,4 +31,11 @@ def is_registered(user, session):
 @register.filter
 def get_status(user, session):
     session_registration = SessionRegistration.objects.get(session=session, user=user)
-    return session_registration.is_approved
+    if session_registration.is_deleted:
+        return False
+    else:
+        return session_registration.is_approved
+
+@register.filter
+def is_on_sidebar(user, event):
+    return event.is_on_sidebar(user)

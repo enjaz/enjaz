@@ -90,11 +90,11 @@ footer{
     background-color: #497d49;
 }
 
-p.instructions{
+div.instructions, p.instructions{
     text-align: justify;
 }
 
-p.intro{
+div.intro, p.intro{
 background: rgba(0, 0, 0, 0.7);
 border-radius: 10px;
 padding: 18px;
@@ -148,9 +148,9 @@ margin-bottom: 5px;
                     <h1>{{ session.name }}</h1>
                     <p style="font-size: 1.2em;">{{ invitation.short_description|safe }}</p>
                 </div>
-                <p class="intro instructions">
-                    {{ session.description|linebreaksbr|safe }}
-                </p>
+                <div class="intro instructions">
+                    {% autoescape off %}{{ session.description|safe }}{% endautoescape %}
+                </div>
                 <div class="row text-center" style="font-size: 1.2em; margin-bottom: 10px;">
 							<div>
 								<i class="entypo-calendar"></i>
@@ -164,12 +164,18 @@ margin-bottom: 5px;
 								{{ session.end_time }}
 							</div>
               {% endif %}
+							{% if session.location %}
+							<div>
+							  <i class="entypo-location"></i>
+							  {{ session.location }}
+							  </div>
+							{% endif %}
               {% if session.acceptance_method == 'M' %}
               <div style="margin-top: 10px;">
                    <p class="entypo-mail">سوف ترسل رسائل تأكيد قُبيل الحدث لجميع المقبولين و المقبولات لحضور هذا الحدث</p>
               </div>
               {% elif session.limit != None %}
-              <p>عدد المقاعد المتبقية: <span id="count-{{ session.pk}}">{{ session.get_remaining_seats }}</span></h5>
+              <p>عدد المقاعد المتبقية: <span id="count-{{ session.pk}}">{{ session.get_remaining_seats }}</span></p>
               {% endif %}
                 </div>
 
@@ -198,12 +204,11 @@ margin-bottom: 5px;
                 </div>
              {% endif %}
                 </div>
-
             </div> <!--col-->
         </div><!--row-->
+    {% endfor %}
     </div><!--container-->
     <br>
-    {% endfor %}
     <!-- Footer -->
     <footer>
             <div class="row">

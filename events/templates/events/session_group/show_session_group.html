@@ -193,7 +193,7 @@ margin-bottom: 5px;
                 <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لإنجاز كي أؤكد الحضور</a>
                 {% endif %}
                 <br>
-              {% if session.acceptance_method == 'F' %}
+              {% if session.acceptance_method == 'M' %}
                 <div {% if not user|is_registered:session %}style="display: none;" {% endif %} id="status-{{ session.pk }}" class="btn btn-xs {% if user|get_status:session == True %}
                 btn-success">معتمد
                 {% elif user|get_status:session == None %}

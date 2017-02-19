@@ -46,7 +46,7 @@ html.detail{
   -o-background-size: cover;
   background-size: cover;
 }
-html.detail body, h1, h2{
+html.detail body, h1{
     background-color: transparent;
     color: white;
 }
@@ -141,7 +141,8 @@ margin-bottom: 5px;
         <div class="row">
             <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
                 <div class="text-center">
-                    <h2>{{ session.name }}</h2>
+                    <h1>{{ session.name }}</h1>
+                    <p style="font-size: 1.2em;">{{ invitation.short_description|safe }}</p>
                 </div>
                 <p class="intro instructions">
                     {{ session.description|linebreaksbr|safe }}
@@ -151,31 +152,32 @@ margin-bottom: 5px;
 								<i class="entypo-calendar"></i>
                                 {{ session.date|date:"l j F Y" }}
 							</div>
+              {% if session.start_time and session.end_time %}
 							<div>
 								<i class="entypo-clock"></i>
 								{{ session.start_time }}
 								-
 								{{ session.end_time }}
 							</div>
-
+              {% endif %}
               {% if session.acceptance_method == 'M' %}
               <div style="margin-top: 10px;">
                    <p class="entypo-mail">سوف ترسل رسائل تأكيد قُبيل الحدث لجميع المقبولين و المقبولات لحضور هذا الحدث</p>
               </div>
-              {% elif session.limit %}
+              {% else %}
               <p>عدد المقاعد المتبقية: <span id="count-{{ session.pk}}">{{ session.get_remaining_seats }}</span></h5>
               {% endif %}
                 </div>
-                {% if already_on %}
+
                 <div class="text-center">
-                {% if user.is_authenticated and not already_on  %}
-                        <button class="btn btn-success signup" data-action="signup" data-pk="{{ session.pk }}">سجلني!</button>
+                {% if user.is_authenticated and not user|is_registered:session %}
+                        <button class="btn btn-success signup" data-action="signup" data-pk="{{ session.pk }}"{% if already_on and session_group.is_limited_to_one %} disabled {% endif %}>سجلني!</button>
                 {% if not user.social_auth.exists %}
                 <br>
                 <a style="margin-top: 5px; background-color: #1da1f3; color: white;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-sm"><i class="fa fa-twitter"></i> اربط حسابي بتويتر</a>
                 {% endif %}
                 <br>
-                {% elif user.is_authenticated and already_on  %}
+                {% elif user.is_authenticated and user|is_registered:session  %}
                         <button class="btn btn-danger cancel" data-action="cancel" data-pk="{{ session.pk }}">ألغِ تسجيلي!</button>
                 {% else %}
                 <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لإنجاز كي أؤكد الحضور</a>
@@ -190,7 +192,7 @@ margin-bottom: 5px;
                 {% endif %}
                 </div>
                 </div>
-                {% endif %}
+
             </div> <!--col-->
         </div><!--row-->
     </div><!--container-->
@@ -244,12 +246,14 @@ margin-bottom: 5px;
                 if (data['success'] == 1){
                     $("#count-" + pk).html(data['remaining_seats']);
                       status_button = $("#status-" + pk);
+                      signup_button = $(".signup");
                   		if (action == 'cancel'){
                         toastr.error("ألغي تسجيلك");
                         $(button).html('سجلني!');
                         $(button).data('action', 'signup');
                         $(button).addClass('btn-success');
                         $(button).removeClass('btn-danger');
+                        signup_button.removeAttr("disabled", "disabled");
                         status_button.hide();
                       } else if (action == 'signup'){
                         toastr.success("تمّ تسجيلك!");
@@ -257,6 +261,8 @@ margin-bottom: 5px;
                           $(button).data('action', 'cancel');
                           $(button).addClass('btn-danger');
                           $(button).removeClass('btn-success');
+                          signup_button.attr("disabled", "disabled");
+                          $(button).removeAttr("disabled", "disabled");
                           status_button.show();
                           status_button.removeClass("btn-danger");
                           status_button.html(data['status']);
@@ -276,6 +282,7 @@ margin-bottom: 5px;
     });
 
     </script>
+    {% if invitation in linked_to_twitter %}
 {%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
 <!---Twitter Modal -->>
 <div class="modal fade" id="connect-twitter">
@@ -300,9 +307,8 @@ margin-bottom: 5px;
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 {% endif %}
-{%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
 <script type="text/javascript">
-
+{%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
 $(function(){
     $('#connect-twitter').modal({
       keyboard: true,
@@ -324,7 +330,10 @@ $(function(){
 
     });
 });
+{% endif %}
 </script>
+
+
 {% endif %}
 </body>
 </html>

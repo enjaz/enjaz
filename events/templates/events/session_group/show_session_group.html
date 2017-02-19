@@ -171,7 +171,7 @@ margin-bottom: 5px;
 
                 <div class="text-center">
                 {% if user.is_authenticated and not user|is_registered:session %}
-                        <button class="btn btn-success signup" data-action="signup" data-pk="{{ session.pk }}"{% if already_on and session_group.is_limited_to_one %} disabled {% endif %}>سجلني!</button>
+                        <button class="btn btn-success signup" data-action="signup" data-pk="{{ session.pk }}"{% if already_on and session_group.is_limited_to_one %} disabled {% endif %} >سجلني!</button>
                 {% if not user.social_auth.exists %}
                 <br>
                 <a style="margin-top: 5px; background-color: #1da1f3; color: white;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-sm"><i class="fa fa-twitter"></i> اربط حسابي بتويتر</a>
@@ -253,7 +253,9 @@ margin-bottom: 5px;
                         $(button).data('action', 'signup');
                         $(button).addClass('btn-success');
                         $(button).removeClass('btn-danger');
-                        signup_button.removeAttr("disabled", "disabled");
+                        {% if session_group.is_limited_to_one %}
+                        $(".signup").removeAttr("disabled", "disabled");
+                        {% endif %}
                         status_button.hide();
                       } else if (action == 'signup'){
                         toastr.success("تمّ تسجيلك!");
@@ -261,8 +263,10 @@ margin-bottom: 5px;
                           $(button).data('action', 'cancel');
                           $(button).addClass('btn-danger');
                           $(button).removeClass('btn-success');
-                          signup_button.attr("disabled", "disabled");
+                          {% if session_group.is_limited_to_one %}
+                          $(".signup").attr("disabled", "disabled");
                           $(button).removeAttr("disabled", "disabled");
+                          {% endif %}
                           status_button.show();
                           status_button.removeClass("btn-danger");
                           status_button.html(data['status']);

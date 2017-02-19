@@ -252,7 +252,7 @@ margin-bottom: 5px;
     		action = $(this).data("action");
     		$.ajax("{% url 'events:handle_ajax' %}", {
     		    method: "POST",
-    		    data: {pk: pk, action: action},
+    		    data: {pk: pk, action: action, session_group_pk: {{ session_group.pk }}},
             success: function(data){
                 if (data['success'] == 1){
                     $("#count-" + pk).html(data['remaining_seats']);

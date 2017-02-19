@@ -134,6 +134,9 @@ class SessionGroup(models.Model):
                                                   is_deleted=False,
                                                   user=user).exists()
 
+    def __unicode__(self):
+        return self.title
+
 class Session(models.Model):
     event = models.ForeignKey(Event, null=True, blank=True)
     time_slot = models.ForeignKey(TimeSlot, default="", null=True)

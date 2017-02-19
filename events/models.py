@@ -36,7 +36,7 @@ class Event(models.Model):
     onsite_after = models.DateTimeField(u"التسجيل في الموقع يبدأ من", null=True, blank=True)
     url = models.URLField(max_length=255, blank=True, default="")
     location_url = models.URLField(max_length=255, blank=True, default="")
-    hashtag = models.CharField(u"هاشتاغ", default="", max_length=20,
+    hashtag = models.CharField(u"هاشتاغ", default="", max_length=30,
                                blank=True, help_text="بدون #")
     twitter = models.CharField(max_length=255,
                                blank=True,
@@ -141,7 +141,7 @@ class SessionGroup(models.Model):
 
 class Session(models.Model):
     event = models.ForeignKey(Event, null=True, blank=True)
-    time_slot = models.ForeignKey(TimeSlot, default="", null=True)
+    time_slot = models.ForeignKey(TimeSlot, blank=True, null=True)
     name = models.CharField(max_length=255)
     limit = models.PositiveSmallIntegerField(null=True, blank=True,
                                              default=None)

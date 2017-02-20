@@ -145,12 +145,6 @@ def handle_ajax(request):
     action = request.POST.get('action')
     session_pk = request.POST.get('pk')
     session = get_object_or_404(Session, pk=session_pk)
-    session_group_pk = request.POST.get('session_group_pk')
-    if session_group_pk:
-        session_group = get_object_or_404(SessionGroup, pk=session_group_pk)
-        already_on = session_group.is_user_already_on(request.user)
-        if session_group.is_limited_to_one and already_on:
-            raise Exception(u'سبق أن سجّلت!')
 
     if session.acceptance_method == 'F':
         is_approved = True
@@ -161,6 +155,13 @@ def handle_ajax(request):
 
     registration = SessionRegistration.objects.filter(session=session, user=request.user).first()
     if action == 'signup':
+        session_group_pk = request.POST.get('session_group_pk')
+        if session_group_pk:
+            session_group = get_object_or_404(SessionGroup, pk=session_group_pk)
+            already_on = session_group.is_user_already_on(request.user)
+            if session_group.is_limited_to_one and already_on:
+                raise Exception(u'سبق أن سجّلت!')
+
         if not session.limit is None and\
            not session.get_remaining_seats() > 0:
             raise Exception(u'لا توجد مقاعد شاغرة')
@@ -175,10 +176,14 @@ def handle_ajax(request):
                     else:
                         relative_url = reverse("events:list_sessions", args=(session.event.code_name,))
                     full_url = request.build_absolute_uri(relative_url)
-                    text = u"سجّلت في {}!  يمكنك التسجيل من: {}"
+                    if session.event.twitter:
+                        twitter_text = " (@{})".format(session.event.twitter)
+                    else:
+                        twitter_text = ""
+                    text = u"سجّلت في {}{}!  يمكنك التسجيل من: {}"
                     if session.event.hashtag:
                         text += u"\n#" + session.event.hashtag
-                    core.utils.create_tweet(request.user, text.format(session.event.official_name, full_url))
+                    core.utils.create_tweet(request.user, text.format(session.event.official_name, twitter_text, full_url))
             elif registration.is_deleted:
                 registration.is_deleted = False
                 registration.is_approved = is_approved

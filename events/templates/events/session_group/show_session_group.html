@@ -6,12 +6,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{{ invitation.short_description|striptags }}">
+    <meta name="description" content="{{ session_group.description|striptags }}">
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@{% if invitation.twitter_account %}{{ invitation.twitter_account }}{% else %}StudentsofKSAUH{% endif %}" />
-    <meta name="twitter:title" content="{{ invitation.title }}" />
-    <meta name="twitter:description" content="{{ invitation.short_description|striptags }}" />
-    {% if invitation.logo %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ invitation.logo.url }}" />{% endif %}
+    <meta name="twitter:site" content="@{% if session_group.event.twitter %}{{ session_group.event.twitter }}{% else %}StudentsofKSAUH{% endif %}" />
+    <meta name="twitter:title" content="{{ session_group.title }}" />
+    <meta name="twitter:description" content="{{ session_group.short_description|striptags }}" />
     <title>إنجاز | {{ session_group.title }}</title>
     <link rel="icon" href="{% static 'logo/favicon.png' %}">
     <link rel="stylesheet" href="{% static 'css/bootstrap-3.3.6.min.css' %}">
@@ -133,7 +132,7 @@ margin-bottom: 5px;
       <div class="row">
         <br>
           <div class="col-sm-6 col-sm-offset-3 mentor-section-intro text-center">
-              <h1 class="mentor-section-header">{{ session_group.title }}</h2>
+              <h1 class="mentor-section-header">{{ session_group.title }}</h1>
                 <p class="section-intro">{{ session_group.description }}</p>
                 {% if not user.social_auth.exists %}
                 <br>
@@ -207,9 +206,6 @@ margin-bottom: 5px;
             </div> <!--col-->
         </div><!--row-->
     {% endfor %}
-    </div><!--container-->
-    <br>
-    <!-- Footer -->
     <footer>
             <div class="row">
                 <div class="col-lg-10 col-lg-offset-1 text-center">
@@ -219,6 +215,9 @@ margin-bottom: 5px;
                 </div>
             </div>
     </footer>
+    </div><!--container-->
+
+
 {% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
 	<!-- Piwik -->
 	<script type="text/javascript">
@@ -305,7 +304,6 @@ margin-bottom: 5px;
     });
 
     </script>
-    {% if invitation in linked_to_twitter %}
 {%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
 <!---Twitter Modal -->>
 <div class="modal fade" id="connect-twitter">
@@ -329,9 +327,8 @@ margin-bottom: 5px;
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-{% endif %}
+
 <script type="text/javascript">
-{%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
 $(function(){
     $('#connect-twitter').modal({
       keyboard: true,
@@ -353,10 +350,7 @@ $(function(){
 
     });
 });
-{% endif %}
 </script>
-
-
 {% endif %}
 </body>
 </html>

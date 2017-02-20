@@ -60,6 +60,67 @@ def submit_abstract(request, event_code_name):
 
     return render(request, 'events/abstracts/abstract_submission.html', context)
 
+@decorators.ajax_only
+@login_required
+def edit_abstract(request, event_code_name, pk):
+    abstract = get_object_or_404(Abstract, is_deleted=False, pk=pk)
+    event = abstract.event
+
+    context = {'event': event}
+
+    if not abstract.user == request.user and \
+            not request.user.is_superuser and \
+            not utils.is_organizing_team_member(request.user, event):
+        raise PermissionDenied
+
+    if event.abstract_submission_closing_date and timezone.now() > event.abstract_submission_closing_date:
+        raise Exception(u"انتهت المدة المتاحة لتعديل الملخص ")
+
+    if request.method == 'POST':
+        instance = Abstract(event=event,user=request.user)
+        form = AbstractForm(request.POST, request.FILES,
+                            instance=instance)
+        figure_formset = AbstractFigureFormset(request.POST, request.FILES)
+        if form.is_valid() and figure_formset.is_valid():
+            abstract = form.save()
+            figure_formset.instance = abstract
+            figure_formset.save()
+            show_project_url = reverse('events:show_abstract', args=(abstract.pk,))
+            full_url = request.build_absolute_uri(show_project_url)
+
+            return {"message": "success", "show_url": full_url}
+    elif request.method == 'GET':
+        form = AbstractForm()
+        figure_formset = AbstractFigureFormset()
+    context['form'] = form
+    context['figure_formset'] = figure_formset
+
+    return render(request, 'events/abstracts/edit_abstract_form.html', context)
+
+@login_required
+@decorators.ajax_only
+@decorators.post_only
+@csrf.csrf_exempt
+def delete_abstract(request, event_code_name, pk):
+    abstract = get_object_or_404(Abstract, is_deleted=False, pk=pk)
+    event = abstract.event
+
+    context = {'event': event}
+
+    if not abstract.user == request.user and \
+            not request.user.is_superuser and \
+            not utils.is_organizing_team_member(request.user, event):
+        raise PermissionDenied
+
+    if event.abstract_submission_closing_date and timezone.now() > event.abstract_submission_closing_date:
+        raise Exception(u"انتهت المدة المتاحة لحذف الملخص ")
+
+    abstract.is_deleted = True
+    abstract.save()
+    list_my_abstracts_url = reverse('event:list_my_abstracts')
+    full_url = request.build_absolute_uri(list_my_abstracts_url)
+    return {"message": "success", "list_url": full_url}
+
 @login_required
 def list_abstracts(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name,
@@ -417,4 +478,3 @@ def review_registrations(request, event_code_name, pk):
                                                 args=(session.event.code_name, session.pk)))
     elif request.method == "GET":
         return render(request, "events/review_registrations.html", {'session': session})
-

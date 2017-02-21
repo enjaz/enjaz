@@ -101,6 +101,7 @@ urlpatterns = [
     url(r'^accounts/', include('userena.urls')),
     url(r'^books/', RedirectView.as_view(pattern_name='bulb:index')),
     url(r'^arshidni/', RedirectView.as_view(pattern_name='studentguide:index')),
+    url(r'^tagging_autocomplete/', include('tagging_autocomplete.urls')),
 ]
 ```
 

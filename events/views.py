@@ -63,21 +63,22 @@ def submit_abstract(request, event_code_name):
 @decorators.ajax_only
 @login_required
 def edit_abstract(request, event_code_name, pk):
-    abstract = get_object_or_404(Abstract, is_deleted=False, pk=pk)
-    event = abstract.event
+    abstract = get_object_or_404(Abstract, is_deleted=False,
+                                 event__code_name=event_code_name,
+                                 pk=pk)
 
-    context = {'event': event}
+    context = {'abstract': abstract}
 
     if not abstract.user == request.user and \
             not request.user.is_superuser and \
-            not utils.is_organizing_team_member(request.user, event):
+            not utils.is_organizing_team_member(request.user, abstract.event):
         raise PermissionDenied
 
-    if event.abstract_submission_closing_date and timezone.now() > event.abstract_submission_closing_date:
+    if abstract.event.abstract_submission_closing_date and timezone.now() > abstract.event.abstract_submission_closing_date:
         raise Exception(u"انتهت المدة المتاحة لتعديل الملخص ")
 
     if request.method == 'POST':
-        instance = Abstract(event=event,user=request.user)
+        instance = Abstract(event=abstract.event,user=request.user)
         form = AbstractForm(request.POST, request.FILES,
                             instance=instance)
         figure_formset = AbstractFigureFormset(request.POST, request.FILES)
@@ -105,11 +106,9 @@ def delete_abstract(request, event_code_name, pk):
     abstract = get_object_or_404(Abstract, is_deleted=False, pk=pk)
     event = abstract.event
 
-    context = {'event': event}
-
     if not abstract.user == request.user and \
-            not request.user.is_superuser and \
-            not utils.is_organizing_team_member(request.user, event):
+       not request.user.is_superuser and \
+       not utils.is_organizing_team_member(request.user, event):
         raise PermissionDenied
 
     if event.abstract_submission_closing_date and timezone.now() > event.abstract_submission_closing_date:
@@ -117,7 +116,7 @@ def delete_abstract(request, event_code_name, pk):
 
     abstract.is_deleted = True
     abstract.save()
-    list_my_abstracts_url = reverse('event:list_my_abstracts')
+    list_my_abstracts_url = reverse('events:list_my_abstracts')
     full_url = request.build_absolute_uri(list_my_abstracts_url)
     return {"message": "success", "list_url": full_url}
 

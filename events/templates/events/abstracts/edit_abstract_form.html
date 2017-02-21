@@ -57,7 +57,7 @@ $(function () {
 
         /* get some values from elements on the page: */
         var formData = new FormData($(this)[0]);
-        var url = "{% url 'events:edit_abstract' event.code_name abstract.pk %}";
+        var url = "{% url 'events:edit_abstract' abstract.event.code_name abstract.pk %}";
 
         /* Send the data */
         $.ajax({

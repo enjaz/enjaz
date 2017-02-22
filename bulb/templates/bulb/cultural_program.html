@@ -1,0 +1,54 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}{% load bootstrap3 %}
+{% block title %}{{ book.title }}{% endblock %}
+{% block navbar %}
+    {% include "bulb/exchange/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+
+<h3>ركن سِراج في البرنامج الثقافي</h3>
+<p>
+أهلًا بك في ركن سِراج في البرنامج الثقافي
+بامكانك استعارة كتاب من الكتب المعروضة في مكتبة ركن سِراج.
+</p>
+<form action= "{% url 'bulb:handle_cultural_program' %}" method="post">
+    {% csrf_token %}
+      {% bootstrap_form form %}
+    <input id="button-submit" type="submit" value="OK">
+</form>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+
+<script>
+
+$(document).ready(function(){
+  $("#button-submit").click(function(event){
+    // STOP!!!!!!!!!!!!!
+      event.preventDefault();
+
+      email = $("#id_email").val();
+      book_pk = $("#id_book_pk").val();
+      data = {email: email,
+              book_pk: book_pk}
+              /* Send the data */
+      $.ajax({
+          url: "{% url 'bulb:handle_cultural_program_ajax' %}",
+          type: 'POST',
+          data: data,
+          cache: false,
+          success: function (data) {
+              if (data.success == 1) {
+                  // show success message (using toastr)
+                  toastr.options.positionClass = "toast-top-left";
+                  toastr.success("تم استعارة الكتاب بنجاح");
+              } else {
+                  toastr.error(data.message);
+              }}
+      });
+    });
+});
+
+</script>
+
+{% endblock %}

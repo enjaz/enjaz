@@ -31,7 +31,7 @@ class CommonControl:
         # default option, but it's just to make sure that people know
         # what are chosing.
         if self.user_gender == 'F':
-            if not self.instance.id: 
+            if not self.instance.id:
                 self.fields['gender'].initial = 'F'
             self.fields['gender'].choices = (
                 ('-', u'الطلاب والطالبات'),
@@ -310,3 +310,7 @@ class UpdateBookCommitmentForm(forms.ModelForm):
     class Meta:
         model = BookCommitment
         fields = ['pages', 'completed_pages']
+
+class CulturalProgramForm(forms.Form):
+    email = forms.EmailField(label="البريد الإكتروني")
+    book_pk = forms.IntegerField(label= "الكتاب")

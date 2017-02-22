@@ -17,7 +17,7 @@ from core.utils import get_search_queryset
 from core.models import StudentClubYear, Tweet
 from core import decorators
 from bulb.models import Category, Book, NeededBook, Request, Point, Group, Membership, Session, Report, ReaderProfile, Recruitment, NewspaperSignup, Readathon, BookCommitment
-from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, NeededBookForm, RequestForm, GroupForm, FreeSessionForm, SessionForm, ReportForm, ReaderProfileForm, RecruitmentForm, NewspaperSignupForm, DewanyaSuggestionFormSet, BookCommitmentForm, UpdateBookCommitmentForm
+from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, NeededBookForm, RequestForm, GroupForm, FreeSessionForm, SessionForm, ReportForm, ReaderProfileForm, RecruitmentForm, NewspaperSignupForm, DewanyaSuggestionFormSet, BookCommitmentForm, UpdateBookCommitmentForm, CulturalProgramForm
 from bulb import utils
 import accounts.utils
 import clubs.utils
@@ -1688,3 +1688,44 @@ def readathon_products(request, readathon_pk, pk):
     context = {'readathon_products': readathon_products}
 
     return render(request, 'bulb/readathon/products.html', context)
+
+
+def handle_cultural_program(request):
+    form = CulturalProgramForm()
+    context = {'form':form}
+    return render(request, 'bulb/cultural_program.html', context)
+
+@decorators.ajax_only
+@decorators.post_only
+@csrf.csrf_exempt
+@login_required
+def handle_cultural_program_ajax(request):
+    form = CulturalProgramForm(request.POST)
+    current_year = StudentClubYear.objects.get_current()
+    balance = request.user.book_points.count_total_lending()
+    if form.is_valid():
+        user = User.objects.get(email=form.cleaned_data['email'])
+        book = Book.objects.get(pk=form.cleaned_data['book_pk'])
+    if book.is_available == False:
+        raise Exception(u"سبق وطلب الكتاب")
+    if balance < 0:
+        raise Exception(u"لا يوجد لديك نقاط استعارة")
+        book_request = Request.objects.create(book=book,
+                                        requester=request.user,
+                                        delivery='D',
+                                        status='D',
+                                        requester_status='D',
+                                        owner_status='D',
+                                        owner_status_date=timezone.now(),
+                                        requester_status_date=timezone.now(),
+                                        borrowing_end_date=timezone.now() + timezone.timedelta(days=21))
+        Point.objects.create(year=current_year,
+                             category='L',
+                             request=book_request,
+                             user=request.user,
+                             value=-1)
+        book_request.save()
+        book.is_available = False
+        book.save
+    else:
+        raise Exception(u"لم يعبآ النموذج بشكل صحيح ")

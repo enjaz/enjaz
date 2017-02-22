@@ -312,5 +312,18 @@ class UpdateBookCommitmentForm(forms.ModelForm):
         fields = ['pages', 'completed_pages']
 
 class CulturalProgramForm(forms.Form):
-    email = forms.EmailField(label="البريد الإكتروني")
-    book_pk = forms.IntegerField(label= "الكتاب")
+    user = forms.ModelChoiceField(
+        widget=autocomplete.ModelSelect2(url='bulb:bulb-user-autocomplete',
+                                                             attrs={
+                                                                 'data-html': 'true',
+                                                                 'data-placeholder': 'أَضف شخصا',
+                                                             }),
+                    label=u"الكتاب",
+                    queryset=User.objects.filter(is_active=True))
+    book = forms.ModelChoiceField(
+        widget=autocomplete.ModelSelect2(url='bulb:bulb-book-autocomplete',
+                                                             attrs={
+                                                                 'data-placeholder': 'أَضف كتابا',
+                                                             }),
+                    label=u"الكتاب",
+                    queryset=Book.objects.available())

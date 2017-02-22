@@ -1538,7 +1538,7 @@ class BulbUserAutocomplete(autocomplete.Select2QuerySetView):
         if not self.request.user.is_authenticated():
             return User.objects.none()
 
-        qs = User.objects.filter(common_profile__is_student=True, is_active=True)
+        qs = User.objects.filter(common_profile__profile_type='S', is_active=True)
 
         if self.q:
             search_fields=['email', 'common_profile__ar_first_name',
@@ -1553,6 +1553,22 @@ class BulbUserAutocomplete(autocomplete.Select2QuerySetView):
 
     def get_result_label(self, item):
         return"%s (<span class=\"english-field\">%s</span>)" % (item.common_profile.get_ar_full_name(), item.username)
+
+class BulbBookAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated():
+            return Book.objects.none()
+
+        qs = Book.objects.available()
+
+        if self.q:
+            search_fields=['title', 'authors']
+            qs = get_search_queryset(qs, search_fields, self.q)
+
+        return qs
+
+    def get_result_label(self, item):
+        return item.title
 
 def autocomplete_users(request):
     term = request.GET.get('term')
@@ -1704,28 +1720,28 @@ def handle_cultural_program_ajax(request):
     current_year = StudentClubYear.objects.get_current()
     balance = request.user.book_points.count_total_lending()
     if form.is_valid():
-        user = User.objects.get(email=form.cleaned_data['email'])
-        book = Book.objects.get(pk=form.cleaned_data['book_pk'])
-    if book.is_available == False:
-        raise Exception(u"سبق وطلب الكتاب")
-    if balance < 0:
-        raise Exception(u"لا يوجد لديك نقاط استعارة")
-        book_request = Request.objects.create(book=book,
-                                        requester=request.user,
-                                        delivery='D',
-                                        status='D',
-                                        requester_status='D',
-                                        owner_status='D',
-                                        owner_status_date=timezone.now(),
-                                        requester_status_date=timezone.now(),
-                                        borrowing_end_date=timezone.now() + timezone.timedelta(days=21))
-        Point.objects.create(year=current_year,
-                             category='L',
-                             request=book_request,
-                             user=request.user,
-                             value=-1)
-        book_request.save()
-        book.is_available = False
-        book.save
+        user = form.cleaned_data['user']
+        book = form.cleaned_data['book']
+        if book.is_available == False:
+            raise Exception(u"سبق وطلب الكتاب")
+        if balance < 0:
+            raise Exception(u"لا يوجد لديك نقاط استعارة")
+            book_request = Request.objects.create(book=book,
+                                            requester=user,
+                                            delivery='D',
+                                            status='D',
+                                            requester_status='D',
+                                            owner_status='D',
+                                            owner_status_date=timezone.now(),
+                                            requester_status_date=timezone.now(),
+                                            borrowing_end_date=timezone.now() + timezone.timedelta(days=21))
+            Point.objects.create(year=current_year,
+                                 category='L',
+                                 request=book_request,
+                                 user=user,
+                                 value=-1)
+            book_request.save()
+            book.is_available = False
+            book.save
     else:
         raise Exception(u"لم يعبآ النموذج بشكل صحيح ")

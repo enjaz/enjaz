@@ -19,6 +19,13 @@
 
 {% block customscript %}
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+{{ form.media }}
+
+<style>
+.select2{
+  visibility: visible;
+}
+</style>
 
 <script>
 
@@ -27,10 +34,10 @@ $(document).ready(function(){
     // STOP!!!!!!!!!!!!!
       event.preventDefault();
 
-      email = $("#id_email").val();
-      book_pk = $("#id_book_pk").val();
-      data = {email: email,
-              book_pk: book_pk}
+      user = $("#id_user").val();
+      book = $("#id_book").val();
+      data = {user: user,
+              book: book}
               /* Send the data */
       $.ajax({
           url: "{% url 'bulb:handle_cultural_program_ajax' %}",
@@ -42,6 +49,7 @@ $(document).ready(function(){
                   // show success message (using toastr)
                   toastr.options.positionClass = "toast-top-left";
                   toastr.success("تم استعارة الكتاب بنجاح");
+                  $("select").select2("val", "");
               } else {
                   toastr.error(data.message);
               }}

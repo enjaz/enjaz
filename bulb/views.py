@@ -1726,22 +1726,22 @@ def handle_cultural_program_ajax(request):
             raise Exception(u"سبق وطلب الكتاب")
         if balance < 0:
             raise Exception(u"لا يوجد لديك نقاط استعارة")
-            book_request = Request.objects.create(book=book,
-                                            requester=user,
-                                            delivery='D',
-                                            status='D',
-                                            requester_status='D',
-                                            owner_status='D',
-                                            owner_status_date=timezone.now(),
-                                            requester_status_date=timezone.now(),
-                                            borrowing_end_date=timezone.now() + timezone.timedelta(days=21))
-            Point.objects.create(year=current_year,
-                                 category='L',
-                                 request=book_request,
-                                 user=user,
-                                 value=-1)
-            book_request.save()
-            book.is_available = False
-            book.save
+        book_request = Request.objects.create(book=book,
+                                        requester=user,
+                                        delivery='D',
+                                        status='D',
+                                        requester_status='D',
+                                        owner_status='D',
+                                        owner_status_date=timezone.now(),
+                                        requester_status_date=timezone.now(),
+                                        borrowing_end_date=timezone.now() + timezone.timedelta(days=21))
+        Point.objects.create(year=current_year,
+                             category='L',
+                             request=book_request,
+                             user=user,
+                             value=-1)
+        book_request.save()
+        book.is_available = False
+        book.save
     else:
         raise Exception(u"لم يعبآ النموذج بشكل صحيح ")

@@ -86,13 +86,13 @@ def edit_abstract(request, event_code_name, pk):
             abstract = form.save()
             figure_formset.instance = abstract
             figure_formset.save()
-            show_project_url = reverse('events:show_abstract', args=(abstract.pk,))
-            full_url = request.build_absolute_uri(show_project_url)
+            show_abstract_url = reverse('events:show_abstract', args=(event.code_name, abstract.pk))
+            full_url = request.build_absolute_uri(show_abstract_url)
 
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
-        form = AbstractForm()
-        figure_formset = AbstractFigureFormset()
+        form = AbstractForm(instance=abstract)
+        figure_formset = AbstractFigureFormset(instance=abstract)
     context['form'] = form
     context['figure_formset'] = figure_formset
 

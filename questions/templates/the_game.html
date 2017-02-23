@@ -60,10 +60,7 @@
                             var choicesLength = choices.length;
                             var lable_counter=1
                             for (var m = 0; m < choicesLength; m++) {
-                            var $thelabel =  $('<label>').attr({
-                                                type: 'visible',
-                                                id: lable_counter,
-                                            }).appendTo($thedive);
+                            var $thelabel =  $('<label>').appendTo($thedive);
                             lable_counter +=1;
                             var $thechoice = $('<input>').attr({
                                                     type: 'radio',
@@ -74,7 +71,7 @@
                                                     name: 'question-choice'
                                                 }).appendTo($thelabel);
                             var choice = document.createTextNode(questionsArray[i].choices[m].text);
-                            $thechoice.append(choice);
+                            $(choice).appendTo($thelabel);
 
                             }
 

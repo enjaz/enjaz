@@ -7,7 +7,7 @@ def get_presidency_and_deanship(apps):
     Club = apps.get_model('clubs', 'Club')
     StudentClubYear = apps.get_model('core', 'StudentClubYear')
     year2014_2015 = StudentClubYear.objects.get(start_date__year=2014, end_date__year=2015)
-    presidency = Club.objects.get(english_name="Presidency", city="R", gender="", year=year2014_2015)
+    presidency = Club.objects.get(english_name="Presidency", city="الرياض", gender="", year=year2014_2015)
     deanship = Club.objects.get(english_name="Deanship of Student Affairs", year=year2014_2015)
     return presidency, deanship
 

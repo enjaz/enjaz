@@ -1,106 +1,16 @@
-{% extends 'events_evaluation_base.html' %}{% load staticfiles %}{% load events_tags %}
-{% block title %}{{ event.official_name }}{% endblock %}
+{% extends 'front/front_base.html' %}{% load staticfiles %}{% load events_tags %}
+{% block title %}المقبولون في {{ event.official_name }}{% endblock %}
 {% block content %}
-
-
 <div class="row">
-        {% for time_slot in time_slots %}
-    <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
-        <h2 class="mentor-section-header">{{ time_slot.name }}</h2>
+    <div class="col-sm-8 col-sm-offset-2">
+        <h1>المقبولون في {{ event.get_html_name|safe }}</h1>
+        <p style="text-align: justify; color: #373E4A; font-size: 1.2em;">أهلا بكم في {{ event.get_html_name|safe }}!  أدناه قائمة بالمقبولين والمقبولات في الفعاليات التي يتضمّنها الحدث.  في حال لم تعثر على اسمك، فهذا يعني أن المقاعد اكتملت قبل أن نتمكّن من ضمّ اسمك، مع تطلّعنا لأن تمضي وقتا ماتعًا ومفيدا!</p>
+        <ul>
+        {% for session in event.sessions %}
+            <li><a href="{% url 'events:show_session' event.code_name session.pk %}">{{ session }}</a></li>
+        {% endfor %}
+        </ul>
+
     </div>
 </div>
-<div class="row">
-    <div class="col-md-12">
-        <div class="row text-center">
-            {% autoescape off %}{% cycle '<div class="row">' '' '' '' %}{% endautoescape %}
-            {% for session in time_slot.session_set.all %}
-            <div class="col-md-3 col-xs-6">
-                <h2>{{ session.name }}</h2>
-                 {% if session.acceptance_method == 'F' %}
-                <h5>عدد المقاعد المتبقية: <span id="count-{{ session.pk}}">{{ session.get_remaining_seats }}</span></h5>
-                {% else %}
-                <br>
-                {% endif %}
-                {% if not user|is_registered:session %}
-                <button class="btn btn-success signup" data-action="signup" data-pk="{{ session.pk }}">سجلني!</button>
-                {% else %}
-                <button class="btn btn-danger cancel" data-action="cancel" data-pk="{{ session.pk }}">ألغِ تسجيلي!</button>
-                {% endif %}
-                <br>
-          <div {% if not user|is_registered:session %}style="display: none;" {% endif %} id="status-{{ session.pk }}" class="btn btn-xs {% if user|get_status:session == True %}
-						btn-success">معتمد
-					{% elif user|get_status:session == None %}
-						btn-warning">معلق
-					{% else %}
-						 btn-danger">مرفوض
-					{% endif %}
-          </div>
-            </div>
-            {% endfor %}
-
-            {% autoescape off %}
-            {% cycle '' '' '' '</div>' %}
-            {%  if forloop.last and not forloop.counter|divisibleby:4 %}</div>{% endif %}
-            {% endautoescape %}
-
-
-
-    </div>
-        <hr>
-        {% endfor %}
-
-    </div>
-
-
-
-
-{% endblock %}
-
-{% block customscript %}
-<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
-
-<script>
-$(document).ready(function(){
-  toastr.options.positionClass = "toast-top-left";
-	$(".signup, .cancel").click(function(){
-    button = this;
-		pk = $(this).data("pk");
-		action = $(this).data("action");
-		$.ajax("{% url 'events:handle_ajax' %}", {
-		    method: "POST",
-		    data: {pk: pk, action: action},
-        success: function(data){
-            if (data['success'] == 1){
-                $("#count-" + pk).html(data['remaining_seats']);
-                  status_button = $("#status-" + pk);
-              		if (action == 'cancel'){
-                    toastr.error("ألغي تسجيلك");
-                    $(button).html('سجلني!');
-                    $(button).data('action', 'signup');
-                    $(button).addClass('btn-success');
-                    $(button).removeClass('btn-danger');
-                    status_button.hide();
-                  } else if (action == 'signup'){
-                    toastr.success("تمّ تسجيلك!");
-                      $(button).html('ألغِ تسجيلي!');
-                      $(button).data('action', 'cancel');
-                      $(button).addClass('btn-danger');
-                      $(button).removeClass('btn-success');
-                      status_button.show();
-                      status_button.removeClass("btn-danger");
-                      status_button.html(data['status']);
-                      if (data['status'] == "معلق"){
-                        status_button.addClass("btn-warning");
-                      } else if (data['status'] == "معتمد"){
-                        status_button.addClass("btn-success");
-                      }
-                  }
-            } else if (data['success'] == 0){
-              toastr.error(data['message']);
-            }
-        }
-		});
-  });
-});
-</script>
 {% endblock %}

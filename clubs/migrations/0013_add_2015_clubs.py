@@ -89,7 +89,7 @@ def add_clubs(apps, schema_editor):
                         parent=male_presidency,
                         gender="M",
                         year=year_2015_2016,
-                        city="R",
+                        city="الرياض",
                         college=r_b_m)
     Club.objects.create(name="كلية العلوم و المهن الصحية",
                         english_name="College of Science and Health Professions",
@@ -98,7 +98,7 @@ def add_clubs(apps, schema_editor):
                         parent=female_presidency,
                         gender="F",
                         year=year_2015_2016,
-                        city="R",
+                        city="الرياض",
                         college=r_b_f)
     Club.objects.create(name="كلية الطب",
                         english_name="College of Medicine",
@@ -107,7 +107,7 @@ def add_clubs(apps, schema_editor):
                         parent=male_presidency,
                         gender="M",
                         year=year_2015_2016,
-                        city="R",
+                        city="الرياض",
                         college=r_m_m)
     Club.objects.create(name="كلية الطب",
                         english_name="College of Medicine",
@@ -116,7 +116,7 @@ def add_clubs(apps, schema_editor):
                         parent=female_presidency,
                         gender="F",
                         year=year_2015_2016,
-                        city="R",
+                        city="الرياض",
                         college=r_m_f)
     Club.objects.create(name="كلية طب الأسنان",
                         english_name="College of Dentistry",
@@ -125,7 +125,7 @@ def add_clubs(apps, schema_editor):
                         parent=male_presidency,
                         gender="M",
                         year=year_2015_2016,
-                        city="R",
+                        city="الرياض",
                         college=r_d_m)
     Club.objects.create(name="كلية طب الأسنان",
                         english_name="College of Dentistry",
@@ -134,7 +134,7 @@ def add_clubs(apps, schema_editor):
                         parent=female_presidency,
                         gender="F",
                         year=year_2015_2016,
-                        city="R",
+                        city="الرياض",
                         college=r_d_f)
     Club.objects.create(name="كلية العلوم الطبية التطبيقية",
                         english_name="College of Applied Medical Sciences",
@@ -143,7 +143,7 @@ def add_clubs(apps, schema_editor):
                         parent=male_presidency,
                         gender="M",
                         year=year_2015_2016,
-                        city="R",
+                        city="الرياض",
                         college=r_a_m)
     Club.objects.create(name="كلية العلوم الطبية التطبيقية",
                         english_name="College of Applied Medical Sciences",
@@ -152,7 +152,7 @@ def add_clubs(apps, schema_editor):
                         parent=female_presidency,
                         gender="F",
                         year=year_2015_2016,
-                        city="R",
+                        city="الرياض",
                         college=r_a_f)
     Club.objects.create(name="كلية الصيدلة",
                         english_name="College of Pharmacy",
@@ -161,7 +161,7 @@ def add_clubs(apps, schema_editor):
                         parent=male_presidency,
                         gender="M",
                         year=year_2015_2016,
-                        city="R",
+                        city="الرياض",
                         college=r_p_m)
     Club.objects.create(name="كلية الصيدلة",
                         english_name="College of Pharmacy",
@@ -170,7 +170,7 @@ def add_clubs(apps, schema_editor):
                         parent=female_presidency,
                         gender="F",
                         year=year_2015_2016,
-                        city="R",
+                        city="الرياض",
                         college=r_p_f)
     Club.objects.create(name="كلية الصحة العامة والمعلوماتية الصحية",
                         english_name="College of Public Health and Health Informatics",
@@ -179,7 +179,7 @@ def add_clubs(apps, schema_editor):
                         parent=male_presidency,
                         gender="M",
                         year=year_2015_2016,
-                        city="R",
+                        city="الرياض",
                         college=r_i_m)
     Club.objects.create(name="كلية التمريض",
                         english_name="College of Nursing",
@@ -188,7 +188,7 @@ def add_clubs(apps, schema_editor):
                         parent=female_presidency,
                         gender="F",
                         year=year_2015_2016,
-                        city="R",
+                        city="الرياض",
                         college=r_n_f)
     Club.objects.create(name="نادي الفنون",
                         english_name="Arts Club",
@@ -197,7 +197,7 @@ def add_clubs(apps, schema_editor):
                         parent=male_presidency,
                         gender="M",
                         year=year_2015_2016,
-                        city="R")
+                        city="الرياض")
     Club.objects.create(name="نادي الفنون",
                         english_name="Arts Club",
                         description="",
@@ -205,7 +205,7 @@ def add_clubs(apps, schema_editor):
                         parent=female_presidency,
                         gender="F",
                         year=year_2015_2016,
-                        city="R")
+                        city="الرياض")
     Club.objects.create(name="نادي خير أمة",
                         english_name="Best Nation Club",
                         description="",
@@ -213,7 +213,7 @@ def add_clubs(apps, schema_editor):
                         parent=male_presidency,
                         gender="M",
                         year=year_2015_2016,
-                        city="R")
+                        city="الرياض")
     Club.objects.create(name="نادي خير أمة",
                         english_name="Best Nation Club",
                         description="",
@@ -221,7 +221,7 @@ def add_clubs(apps, schema_editor):
                         parent=female_presidency,
                         gender="F",
                         year=year_2015_2016,
-                        city="R")
+                        city="الرياض")
     Club.objects.create(name="نادي البحث والابتكار والتقنية",
                         english_name="Research, Innovation and Technology Club",
                         description="",
@@ -229,7 +229,7 @@ def add_clubs(apps, schema_editor):
                         parent=male_presidency,
                         gender="M",
                         year=year_2015_2016,
-                        city="R")
+                        city="الرياض")
     Club.objects.create(name="نادي البحث والابتكار والتقنية",
                         english_name="Research, Innovation and Technology Club",
                         description="",
@@ -237,7 +237,7 @@ def add_clubs(apps, schema_editor):
                         parent=female_presidency,
                         gender="F",
                         year=year_2015_2016,
-                        city="R")
+                        city="الرياض")
     Club.objects.create(name="نادي لين التطوعي",
                         english_name="Leen Club",
                         description="",
@@ -245,7 +245,7 @@ def add_clubs(apps, schema_editor):
                         parent=male_presidency,
                         gender="M",
                         year=year_2015_2016,
-                        city="R")
+                        city="الرياض")
     Club.objects.create(name="نادي لين التطوعي",
                         english_name="Leen Club",
                         description="",
@@ -253,7 +253,7 @@ def add_clubs(apps, schema_editor):
                         parent=female_presidency,
                         gender="F",
                         year=year_2015_2016,
-                        city="R")
+                        city="الرياض")
     Club.objects.create(name="أرشدني",
                         english_name="Arshidni",
                         description="",
@@ -261,7 +261,7 @@ def add_clubs(apps, schema_editor):
                         parent=male_presidency,
                         gender="M",
                         year=year_2015_2016,
-                        city="R")
+                        city="الرياض")
     Club.objects.create(name="أرشدني",
                         english_name="Arshidny",
                         description="",
@@ -269,7 +269,7 @@ def add_clubs(apps, schema_editor):
                         parent=female_presidency,
                         gender="F",
                         year=year_2015_2016,
-                        city="R")
+                        city="الرياض")
 
     # Jeddah clubs
     # No female College of Medicine in Jeddah, yet. 

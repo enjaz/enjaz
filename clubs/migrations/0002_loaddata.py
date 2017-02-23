@@ -15,70 +15,70 @@ def load_default_clubs(apps, shema_editor):
         return
 
     ng_male_medicine = College.objects.create(
-      city="R", 
+      city="الرياض",
       section="NG", 
       name="M", 
       gender="M"
     )
 
     ng_male_pharmacy = College.objects.create(
-      city="R", 
+      city="الرياض",
       section="NG", 
       name="P", 
       gender="M"
     )
 
     ng_male_dentistry = College.objects.create(
-      city="R", 
+      city="الرياض",
       section="NG", 
       name="D", 
       gender="M"
     )
 
     ng_male_basic = College.objects.create(
-      city="R", 
+      city="الرياض",
       section="NG", 
       name="B", 
       gender="M"
     )
 
     ng_male_applied = College.objects.create(
-      city="R", 
+      city="الرياض",
       section="NG", 
       name="A", 
       gender="M"
     )
 
     ng_female_medicine = College.objects.create(
-      city="R", 
+      city="الرياض",
       section="NG", 
       name="M", 
       gender="F"
     )
 
     ng_female_nursing = College.objects.create(
-      city="R", 
+      city="الرياض",
       section="NG", 
       name="N", 
       gender="F"
     )
 
     kfmc_male_medicine = College.objects.create(
-      city="R", 
+      city="الرياض",
       section="KF", 
       name="M", 
       gender="M"
     )
 
     ng_female_basic = College.objects.create(
-      city="R", 
+      city="الرياض",
       section="NG", 
       name="B", 
       gender="F"
     )
 
     ng_female_dentistry = College.objects.create(
-      city="R", 
+      city="الرياض",
       section="NG", 
       name="D", 
       gender="F"
@@ -93,7 +93,7 @@ def load_default_clubs(apps, shema_editor):
     )
     
     Club.objects.create(
-      city="R", 
+      city="الرياض",
       name="\u0627\u0644\u0645\u0631\u0643\u0632 \u0627\u0644\u0625\u0639\u0644\u0627\u0645\u064a", 
       english_name="Media Center", 
       email="sc-media@ksau-hs.edu.sa", 
@@ -119,7 +119,7 @@ def load_default_clubs(apps, shema_editor):
     )
     
     Club.objects.create(
-      city="R", 
+      city="الرياض",
       name="\u0643\u0644\u064a\u0629 \u0627\u0644\u0637\u0628 - \u0637\u0644\u0627\u0628", 
       college=ng_male_medicine, 
       english_name="College of Medicine - Male", 
@@ -137,7 +137,7 @@ def load_default_clubs(apps, shema_editor):
     )
     
     Club.objects.create(
-      city="R", 
+      city="الرياض",
       name="\u0643\u0644\u064a\u0629 \u0637\u0628 \u0627\u0644\u0623\u0633\u0646\u0627\u0646 - \u0637\u0644\u0627\u0628", 
       college=ng_male_dentistry, 
       english_name="College of Dentistry - Male", 
@@ -164,7 +164,7 @@ def load_default_clubs(apps, shema_editor):
     )
     
     Club.objects.create(
-      city="R", 
+      city="الرياض",
       name="\u0643\u0644\u064a\u0629 \u0627\u0644\u0635\u064a\u062f\u0644\u0629", 
       college=ng_male_pharmacy, 
       english_name="College of Pharmacy", 
@@ -173,7 +173,7 @@ def load_default_clubs(apps, shema_editor):
     )
     
     Club.objects.create(
-      city="R", 
+      city="الرياض",
       name="\u0643\u0644\u064a\u0629 \u0627\u0644\u062a\u0645\u0631\u064a\u0636", 
       college=ng_female_nursing, 
       english_name="College of Nursing", 
@@ -182,7 +182,7 @@ def load_default_clubs(apps, shema_editor):
     )
     
     Club.objects.create(
-      city="R", 
+      city="الرياض",
       name="\u0646\u0627\u062f\u064a \u0627\u0644\u0642\u0631\u0627\u0621\u0629", 
       english_name="Reading Club", 
       email="reading.club@ksau-hs.edu.sa", 
@@ -190,7 +190,7 @@ def load_default_clubs(apps, shema_editor):
     )
     
     Club.objects.create(
-      city="R", 
+      city="الرياض",
       name="\u0646\u0627\u062f\u064a \u0627\u0644\u062a\u0635\u0648\u064a\u0631 \u0627\u0644\u0641\u0648\u062a\u0648\u063a\u0631\u0627\u0641\u064a", 
       english_name="Photography Club", 
       email="photo.club@ksau-hs.edu.sa", 
@@ -198,7 +198,7 @@ def load_default_clubs(apps, shema_editor):
     )
     
     Club.objects.create(
-      city="R", 
+      city="الرياض",
       name="\u0646\u0627\u062f\u064a \u0627\u0644\u0628\u062d\u062b \u0627\u0644\u0639\u0644\u0645\u064a", 
       english_name="Research Club", 
       email="research.club@ksau-hs.edu.sa", 
@@ -206,7 +206,7 @@ def load_default_clubs(apps, shema_editor):
     )
     
     Club.objects.create(
-      city="R", 
+      city="الرياض",
       name="\u0646\u0627\u062f\u064a \u062e\u064a\u0631 \u0623\u0645\u0629", 
       english_name="Best Nation Club", 
       email="bestnation.club@ksau-hs.edu.sa", 
@@ -214,7 +214,7 @@ def load_default_clubs(apps, shema_editor):
     )
     
     Club.objects.create(
-      city="R", 
+      city="الرياض",
       name="\u0646\u0627\u062f\u064a \u0627\u0644\u0641\u0646\u0648\u0646", 
       english_name="Arts Club", 
       email="arts.club@ksau-hs.edu.sa", 
@@ -222,7 +222,7 @@ def load_default_clubs(apps, shema_editor):
     )
     
     Club.objects.create(
-      city="R", 
+      city="الرياض",
       name="\u0646\u0627\u062f\u064a \u0627\u0644\u062d\u0648\u0627\u0633\u064a\u0628", 
       english_name="Computers Club", 
       email="computers.club@ksau-hs.edu.sa", 

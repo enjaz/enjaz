@@ -1,0 +1,82 @@
+{% extends 'the_game_base.html' %}
+
+
+{% block content %}
+
+
+
+
+<div id="pre-game">
+ <p> Hello to this Quick Quiz to start click here </p>
+
+<button id = "hide" onclick="demoVisibility()" class="btn btn-sm btn-danger">أبدء اللعبة </button>
+
+</div>
+
+
+<div id="start-game" style="visibility:hidden;">
+
+<p>Quiz have started</p>
+<h1 id="question">
+<p>"who did what ?"</p>
+<label>
+        <input type="radio">
+
+</label>
+</h1>
+<h2 id="choices">  </h2>
+
+<button data-action="next" id="button"  class="btn btn-sm btn-danger">السؤال التالي </button>
+
+</div>
+
+     {# would be better if remove instead of hide #}
+
+ <script type="text/javascript">
+
+        function demoVisibility() {
+                            document.getElementById("start-game").style.visibility = "visible";
+                            document.getElementById("pre-game").style.visibility = "hidden";
+        }
+
+
+
+        $(function(){
+        $("#button").click(function(){
+            action = $(this).data("action");
+            $.ajax({
+                url: "{% url 'questions:toggle_new_game' %}",
+                type: 'POST',
+                data: {action: action},
+                cache: false,
+                success: function (data) {
+                    if (data.success) {
+                        var questionsArray = data.questions ;
+                        var arrayLength = questionsArray.length;
+                        {# var choices = questionsArray[choices] #}
+                        for (var i = 0; i < arrayLength; i++) {
+                            console.log(questionsArray[i].choices);
+                            alert(questionsArray[i].choices);
+                            $('<div>').attr({
+                                type: 'hidden',
+                                id: questionsArray[i].pk,
+                                name: 'question-div'
+                            }).appendTo('start-game');
+                            var choices = questionsArray[i].choices
+                            var choicesLength = choices.length;
+                            for (var i = 0; i < choicesLength; i++) {
+
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+    });
+        {# console.log(questionsArray[i]); #}
+        {# alert(questionsArray[i]); #}
+
+    </script>
+
+{% endblock %}

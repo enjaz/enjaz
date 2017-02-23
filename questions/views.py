@@ -36,7 +36,7 @@ def toggle_new_game(request):
             if question.question_type == 'Q':
                 text_result.append({"text": question.text})
             elif question.question_type == 'F':
-                for image in question.questionfigure.figure_set.all():
+                for image in question.question.questionfigure.figure_set.all():
                     text_result.append({"pk":image.pk,"image":image.url})
             elif question.question_type == 'S':
                 text_result.append = ({"image":question.questionfigure.figure_set.first().url})

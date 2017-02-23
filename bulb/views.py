@@ -1568,8 +1568,12 @@ class BulbBookAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
     def get_result_label(self, item):
-        return item.title
+        try:
+            name = item.submitter.common_profile.ar_first_name
+        except ObjectDoesNotExist:
+            name = item.submitter.username
 
+        return u"%s من %s" % (item.title, name)
 def autocomplete_users(request):
     term = request.GET.get('term')
     if not term:

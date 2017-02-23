@@ -5,18 +5,22 @@
 {% endblock %}
 {% block content %}
 
-<h3>ركن سِراج في البرنامج الثقافي</h3>
-<p>
-أهلًا بك في ركن سِراج في البرنامج الثقافي
-بامكانك استعارة كتاب من الكتب المعروضة في مكتبة ركن سِراج.
-</p>
-<form action= "{% url 'bulb:handle_cultural_program' %}" method="post">
-    {% csrf_token %}
-      {% bootstrap_form form %}
-    <input id="button-submit" type="submit" value="OK">
-</form>
-{% endblock %}
+<div class="col-sm-6 col-sm-offset-3 mentor-section-intro text-center">
+  <h3>ركن سِراج في البرنامج الثقافي</h3>
+  <p>
+  أهلًا بك في ركن سِراج في البرنامج الثقافي
+  بامكانك استعارة كتاب من الكتب المعروضة في مكتبة ركن سِراج.
+  </p>
+  <form action= "{% url 'bulb:handle_cultural_program' %}" method="post">
+      {% csrf_token %}
+        {% bootstrap_form form %}
+      <button type="submit" class="btn btn-primary btn-block">
+      		{% bootstrap_icon "ok-sign" %} أرسل
+      	</button>
+  </form>
+</div>
 
+{% endblock %}
 {% block customscript %}
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
 {{ form.media }}

@@ -318,7 +318,7 @@ class CulturalProgramForm(forms.Form):
                                                                  'data-html': 'true',
                                                                  'data-placeholder': 'أَضف شخصا',
                                                              }),
-                    label=u"الكتاب",
+                    label=u"المستعير/ة",
                     queryset=User.objects.filter(is_active=True))
     book = forms.ModelChoiceField(
         widget=autocomplete.ModelSelect2(url='bulb:bulb-book-autocomplete',

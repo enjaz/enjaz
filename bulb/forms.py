@@ -31,7 +31,7 @@ class CommonControl:
         # default option, but it's just to make sure that people know
         # what are chosing.
         if self.user_gender == 'F':
-            if not self.instance.id: 
+            if not self.instance.id:
                 self.fields['gender'].initial = 'F'
             self.fields['gender'].choices = (
                 ('-', u'الطلاب والطالبات'),
@@ -310,3 +310,20 @@ class UpdateBookCommitmentForm(forms.ModelForm):
     class Meta:
         model = BookCommitment
         fields = ['pages', 'completed_pages']
+
+class CulturalProgramForm(forms.Form):
+    user = forms.ModelChoiceField(
+        widget=autocomplete.ModelSelect2(url='bulb:bulb-user-autocomplete',
+                                                             attrs={
+                                                                 'data-html': 'true',
+                                                                 'data-placeholder': 'أَضف شخصا',
+                                                             }),
+                    label=u"المستعير/ة",
+                    queryset=User.objects.filter(is_active=True))
+    book = forms.ModelChoiceField(
+        widget=autocomplete.ModelSelect2(url='bulb:bulb-book-autocomplete',
+                                                             attrs={
+                                                                 'data-placeholder': 'أَضف كتابا',
+                                                             }),
+                    label=u"الكتاب",
+                    queryset=Book.objects.available())

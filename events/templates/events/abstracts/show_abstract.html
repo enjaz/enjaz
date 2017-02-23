@@ -71,6 +71,19 @@
 <h3>Conclusion</h3>
 {{ abstract.conclusion|safe }}
 
+<div class="row" style="margin-left: 0; margin-bottom: 5px;">
+<div style="float: right;">
+	<!-- <button id="edit-abstract" class="btn btn-icon btn-success">
+			<i class="entypo-pencil"></i>
+			Edit
+	</button> -->
+	<button data-url="{% url 'events:delete_abstract' event.code_name abstract.pk %}" class="confirm-delete-abstract btn btn-icon btn-danger">
+			<i class="entypo-block"></i>
+			Delete
+	</button>
+</div>
+</div>
+
 {% comment %}
    {# <h2>Evaluate</h2> #}
 {% if form.errors %}
@@ -102,9 +115,36 @@
 {% endblock %}
 
 {% block customscript %}
-	<script>
-    $(function(){
-
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<script type="text/javascript">
+$(function(){
+    $('#edit-abstract-modal').modal({
+      keyboard: false,
+      backdrop: 'static',
+      show    : false,
     });
-    </script>
+    $("button#edit-abstract").click(function () {
+        $("#edit-abstract-modal").modal('show');
+        $("#edit-abstract-modal .modal-title").html("Edit {{ abstract.title }}");
+        $("#edit-abstract-modal .modal-body").load("{% url 'events:edit_abstract' event.code_name abstract.pk %}");
+        var $submitButton = $("#edit-abstract-modal button.submit-button");
+        $submitButton.off('click');
+        $submitButton.click(function () {
+            $("form#edit-abstract-form").submit();
+        });
+    });
+});
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+<style>
+p{
+    font-size: 17px;
+}
+</style>
+{% with modal_id='edit-abstract-modal' %}
+    {% include "events/abstracts/partials/common_edit_modal.html" %}
+{% endwith %}
+{% with model='abstract' %}
+    {% include "events/abstracts/partials/delete_asset.html" %}
+{% endwith %}
 {% endblock %}

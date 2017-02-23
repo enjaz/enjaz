@@ -1,0 +1,88 @@
+{% load bootstrap3 %}
+<form enctype="multipart/form-data" id="edit-abstract-form" action="post">
+{% csrf_token %}
+<div class="english-field">
+{% bootstrap_form form %}
+</div>
+<h3>Attach your figures</h3>
+<p>One figure is allowed with each abstract submission.</p>
+             {# -------- #}
+             {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
+             {{ figure_formset.management_form }}
+             {{ figure_formset.non_form_errors.as_ul }}
+             <table id="figure-formset" class="form" style="width: 100%;">
+             {% for form in figure_formset.forms %}
+               {% if forloop.first %}
+                 <colgroup>
+                     <col class="col-xs-8">
+                     <col class="col-xs-4">
+                 </colgroup>
+               {% endif %}
+               <tr class="form-container">
+               {% for field in form.visible_fields %}
+                 <td>
+                 {# Include the hidden fields in the form #}
+                 {% if forloop.first %}
+                   {% for hidden in form.hidden_fields %}
+                   {{ hidden }}
+                   {% endfor %}
+                 {% endif %}
+                     <div class="form-group">
+                   {{ field.errors.as_ul }}
+                   {{ field }}
+                     </div>
+                 </td>
+               {% endfor %}
+               </tr>
+             {% endfor %}
+             </table>
+             {# ------- #}
+</form>
+<script type="text/javascript">
+$(function () {
+
+    // modify form submission behaviour to be ajaxy
+    $("#figure-formset .form-container").formset({
+        prefix: '{{ figure_formset.prefix }}',
+        addText: 'Add a figure',
+        deleteText: 'Delete',
+        addCssClass: 'add-row btn btn-xs btn-primary',
+        deleteCssClass: 'delete-row btn btn-xs btn-danger',
+    });
+
+    $("form#edit-abstract-form").submit(function (event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var formData = new FormData($(this)[0]);
+        var url = "{% url 'events:edit_abstract' abstract.event.code_name abstract.pk %}";
+
+        /* Send the data */
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (data) {
+                if (data.message == "success") {
+
+                    // show success message (using toastr)
+                    toastr.options.positionClass = "toast-top-left";
+                    toastr.success("The porject has been successfully edited");
+
+                    // hide modal
+                    $("#edit-abstract-modal").modal('hide');
+                     window.location.href= data.show_url;
+                } else {
+                    $("#edit-abstract-modal .modal-body").html(data);
+                }}
+        });
+
+    });
+});
+</script>

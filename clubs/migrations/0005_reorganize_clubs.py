@@ -24,7 +24,7 @@ def upgrade_clubs(apps, schema_editor):
                           english_name="Presidency (Male)",
                           description="",
                           email="sc-m@ksau-hs.edu.sa",
-                          city="R",
+                          city="الرياض",
                           visible=False,
                           can_review=True,
                           parent=presidency,  # assign parent
@@ -33,7 +33,7 @@ def upgrade_clubs(apps, schema_editor):
                           english_name="Presidency (Female)",
                           description="",
                           email="sc-f@ksau-hs.edu.sa",
-                          city="R",
+                          city="الرياض",
                           visible=False,
                           can_review=True,
                           parent=presidency,  # assign parent

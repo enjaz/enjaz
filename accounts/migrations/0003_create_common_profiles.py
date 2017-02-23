@@ -38,7 +38,7 @@ def create_common_profiles(apps, schema_editor):
                                      en_last_name=nonstudent_profile.en_last_name,
                                      badge_number=nonstudent_profile.badge_number,
                                      mobile_number=nonstudent_profile.mobile_number,
-                                     city="R",
+                                     city="الرياض",
                                      college=None,
                                      job_description=nonstudent_profile.job_description)
         nonstudent_profile.delete()

@@ -13,7 +13,7 @@ def add_hpc(apps, schema_editor):
     year_2016_2017 = StudentClubYear.objects.get(start_date__year=2016,
                                                  end_date__year=2017)
     presidency = Club.objects.get(english_name="Presidency",
-                                  year=year_2016_2017, gender="", city="R")
+                                  year=year_2016_2017, gender="", city="الرياض")
     hpc_2nd_club = Club.objects.create(english_name="Organizing Committee of the 2nd HPC",
                         name="لجنة تنظيم مؤتمر التخصصات الصحية الثاني",
                         gender="",

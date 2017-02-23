@@ -12,7 +12,7 @@ def add_criteria(apps, schema_editor):
     # still shared)
     Criterion.objects.filter(year=year_2016_2017).exclude(code_name__in=['creative_idea',
                                                                          'student_idea'])\
-                                                 .update(city="R")
+                                                 .update(city="الرياض")
 
     Criterion.objects.create(year=year_2016_2017,
                              ar_name="النوع",

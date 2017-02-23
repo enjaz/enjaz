@@ -10,7 +10,7 @@ def add_clubs(apps, schema_editor):
                                                  end_date__year=2017)
     presidency = Club.objects.get(english_name="Presidency",
                                   year=year_2016_2017, gender="",
-                                  city="R")
+                                  city="الرياض")
 
     Club.objects.create(english_name="Bulb",
                         name="سراج",
@@ -18,7 +18,7 @@ def add_clubs(apps, schema_editor):
                         year=year_2016_2017,
                         parent=presidency,
                         email="bulb@enjazportal.com",
-                        city="R",
+                        city="الرياض",
                         visible=False,
                         can_view_assessments=False,
                         is_assessed=False,
@@ -30,7 +30,7 @@ def add_clubs(apps, schema_editor):
                         year=year_2016_2017,
                         parent=presidency,
                         email="bulb@enjazportal.com",
-                        city="R",
+                        city="الرياض",
                         visible=False,
                         can_view_assessments=False,
                         is_assessed=False,

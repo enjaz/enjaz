@@ -10,7 +10,7 @@ def add_teams(apps, schema_editor):
     year_2016_2017 = StudentClubYear.objects.get(start_date__year=2016,
                                                  end_date__year=2017)
     bulb_riyadh_female = Club.objects.get(english_name="Bulb",
-                                          year=year_2016_2017, city="R",
+                                          year=year_2016_2017, city="الرياض",
                                           gender='F')
     Team.objects.create(name="فريق الريديثون",
                         code_name="readathon",

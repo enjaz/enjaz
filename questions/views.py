@@ -1,11 +1,12 @@
-# Create your views here
+# -*- coding: utf-8  -*-
 
 from questions.models import Question,QuestionFigure,Booth,Choice,Game
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.views.decorators import csrf
 from core import decorators
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+
 
 
 def game_home(request):
@@ -27,6 +28,7 @@ def toggle_new_game(request):
                }
     for booth in Booth.objects.all():
         questions = booth.question_set.all()
+        #questions =booth.question_set.order_by('?').first()
         for question in questions:
             options = question.choice_set.all()
             choices =[]
@@ -36,8 +38,8 @@ def toggle_new_game(request):
             if question.question_type == 'Q':
                 text_result.append({"text": question.text})
             elif question.question_type == 'F':
-                for image in question.question.questionfigure.figure_set.all():
-                    text_result.append({"pk":image.pk,"image":image.url})
+                for image in question.questionfigure_set.all():
+                    text_result.append({"pk":image.figure.pk,"image":image.figure.url})
             elif question.question_type == 'S':
                 text_result.append = ({"image":question.questionfigure.figure_set.first().url})
             question_result = {"type": question.question_type,
@@ -56,6 +58,27 @@ def toggle_new_game(request):
 #             }
 
     return results
+
+
+@decorators.ajax_only
+@decorators.post_only
+@login_required
+@csrf.csrf_exempt
+def toggle_right_answer(request):
+    choice_pk = request.POST.get('choice_pk')
+    choice = get_object_or_404(Choice, pk=choice_pk)
+    question_pk = request.POST.get('question_pk')
+    question = get_object_or_404(Question,pk=question_pk)
+    game_pk = request.POST.get('game_pk')
+    game = get_object_or_404(Game, pk=game_pk)
+    score = game.right_answers
+    if choice.is_answer:
+        right= True
+    else:
+        right = False
+    return {"right":right,"score":score}
+
+
 
 
 

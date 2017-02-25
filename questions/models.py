@@ -27,10 +27,8 @@ class Question(models.Model):
         return self.text
 
 
-
-
 class QuestionFigure (models.Model):
-    question = models.ForeignKey(Question, related_name='figures')
+    question = models.ForeignKey(Question)
     figure = models.FileField(upload_to="questions/question_image",blank=True, null=True)
 
 class Choice(models.Model):

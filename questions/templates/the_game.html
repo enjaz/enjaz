@@ -90,7 +90,7 @@ word-break:break-all;
 
 
     $(function(){
-        $('input [type=radio]').change(function(){
+        $("input [type='radio']").click (function(){
             choice_pk = $(this).data("choice_pk");
             question_pk = $(this).data("question_pk");
             counter =  $(this).data("counter");
@@ -102,8 +102,7 @@ word-break:break-all;
                 cache: false,
                 success: function (data) {
                         if (data.success) {
-                            console.log(data.pk);
-                            $('#pre-game').show();
+                           $('#pre-game').show();
                         }
                 }
             });

@@ -3,8 +3,11 @@
 
 {% block content %}
 
-
-
+<style>
+.english-field {
+word-break:break-all;
+}
+</style>
 
 <div id="pre-game">
  <p> Hello to this Quick Quiz to start click here </p>
@@ -22,17 +25,11 @@
      {# would be better if remove instead of hide #}
 
  <script type="text/javascript">
-        $(function() {
-            $("#hide").click(function () {
-                $('#pre-game').hide();
-                $('#start-game').show();
-                $('#button').show();
-            });
-        });
 
 
-        $(function(){
-        $("#button").click(function(){
+
+     $(function(){
+        $("#hide").click(function(){
             action = $(this).data("action");
             $.ajax({
                 url: "{% url 'questions:toggle_new_game' %}",
@@ -41,39 +38,47 @@
                 cache: false,
                 success: function (data) {
                     if (data.success) {
+                        $('#pre-game').hide();
+                        $('#start-game').show();
+                        $('#button').show();
                         var counter = 1;
                         var questionsArray = data.questions;
                         var arrayLength = questionsArray.length;
                         for (var i = 0; i < arrayLength; i++) {
-                            console.log();
-                            var $thedive =  $('<div>').attr({
-                                                type: 'visible',
-                                                id: counter,
-                                                name: 'question-div',
-                                                question_pk:questionsArray[i].pk,
-                                            }).appendTo('#start-game');
-                            counter +=1;
-                            var content = document.createTextNode(questionsArray[i].text);
-                            $thedive.append(content);
+                                console.log(questionsArray);
+                                var $thedive = $('<div>').attr({
+                                    type: 'visible',
+                                    id: 'container-' + counter,
+                                    name: 'question-div',
+                                    class: "english-field",
+                                    style: 'word-break:break-all;'
+                                }).appendTo('#start-game');
+                                $($thedive).attr('data-question_pk', questionsArray[i].pk); // sets
+                                var content = document.createTextNode(questionsArray[i].text);
+                                $thedive.append(content);
+                                var choices = questionsArray[i].choices;
+                                var choicesLength = choices.length;
+                                for (var m = 0; m < choicesLength; m++) {
+                                    var $thelabel = $('<label>').appendTo($thedive);
+                                    var $thechoice = $('<input>').attr({
+                                        type: 'radio',
+                                        id: questionsArray[i].choices[m].pk,
+                                        name: 'question-choice',
+                                        style: 'word-wrap:break-word;',
+                                        class: 'Try'
+                                    }).appendTo($thelabel);
+                                    $($thechoice).attr('data-question_pk', questionsArray[i].pk); // sets
+                                    $($thechoice).attr('data-counter', counter); // sets
+                                    $($thechoice).attr('data-game_pk', data.game_pk); // sets
+                                    $($thechoice).attr('data-choice_pk', questionsArray[i].choices[m].pk); // sets
+                                    var choice = document.createTextNode(questionsArray[i].choices[m].text);
+                                    $(choice).appendTo($thelabel);
+                                    $($thelabel).attr('style', 'word-wrap:break-word;')
+                                }
+                                counter += 1;
 
-                            var choices = questionsArray[i].choices;
-                            var choicesLength = choices.length;
-                            var lable_counter=1
-                            for (var m = 0; m < choicesLength; m++) {
-                            var $thelabel =  $('<label>').appendTo($thedive);
-                            lable_counter +=1;
-                            var $thechoice = $('<input>').attr({
-                                                    type: 'radio',
-                                                    game_pk:data.game_pk,
-                                                    id:questionsArray[i].choices[m].pk,
-                                                    counter:counter,
-                                                    question_pk:questionsArray[i].pk,
-                                                    name: 'question-choice'
-                                                }).appendTo($thelabel);
-                            var choice = document.createTextNode(questionsArray[i].choices[m].text);
-                            $(choice).appendTo($thelabel);
 
-                            }
+
 
                         }
                     }
@@ -81,9 +86,33 @@
             });
         });
 
+     });
+
+
+    $(function(){
+        $('input [type=radio]').change(function(){
+            choice_pk = $(this).data("choice_pk");
+            question_pk = $(this).data("question_pk");
+            counter =  $(this).data("counter");
+            game_pk = $(this).data("game_pk");
+            $.ajax({
+                url: "{% url 'questions:toggle_right_answer' %}",
+                type: 'POST',
+                data: {choice_pk: choice_pk,question_pk:question_pk,counter:counter,game_pk:game_pk},
+                cache: false,
+                success: function (data) {
+                        if (data.success) {
+                            console.log(data.pk);
+                            $('#pre-game').show();
+                        }
+                }
+            });
+        });
     });
-        {# console.log(questionsArray[i]); #}
+
+     {# console.log(questionsArray[i]); #}
         {# alert(questionsArray[i]); #}
+
 
     </script>
 

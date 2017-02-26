@@ -1569,7 +1569,7 @@ class BulbBookAutocomplete(autocomplete.Select2QuerySetView):
 
     def get_result_label(self, item):
         try:
-            name = item.submitter.common_profile.ar_first_name
+            name = item.submitter.common_profile.ar_first_name + " " + item.submitter.common_profile.ar_last_name
         except ObjectDoesNotExist:
             name = item.submitter.username
 

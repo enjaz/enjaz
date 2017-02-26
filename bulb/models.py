@@ -580,21 +580,21 @@ class BookCommitment(models.Model):
     def __unicode__(self):
         return self.title
 
-class ReadathonProduct(models.Model):
-    user = models.ForeignKey(User,
-                             u"المستخدمـ/ـة")
-    readathon = models.ForeignKey(Readathon,
-                                u"الريديثون")
-    username = models.CharField(u"أسم المستخدمـ\ـة", max_length=200)
-    title = models.CharField(u"العنوان", max_length=200)
-    body = models.TextField(default=False)
-    submission_date = models.DateTimeField(u"تاريخ الإرسال",
-                                           auto_now_add=True)
+# class ReadathonProduct(models.Model):
+#     user = models.ForeignKey(User,
+#                              u"المستخدمـ/ـة")
+#     readathon = models.ForeignKey(Readathon,
+#                                 u"الريديثون")
+#     username = models.CharField(u"أسم المستخدمـ\ـة", max_length=200)
+#     title = models.CharField(u"العنوان", max_length=200)
+#     body = models.TextField(default=False)
+#     submission_date = models.DateTimeField(u"تاريخ الإرسال",
+#                                            auto_now_add=True)
 
 
-    def __unicode__(self):
-        return self.title
+#     def __unicode__(self):
+#         return self.title
 
-class ReadathonFiles(models.Model):
-    readathon_products = models.ForeignKey(ReadathonProduct, related_name='attachment')
-    attachment = models.FileField(u"ملف", upload_to="readathon/attachment/")
+# class ReadathonFiles(models.Model):
+#     readathon_products = models.ForeignKey(ReadathonProduct, related_name='attachment')
+#     attachment = models.FileField(u"ملف", upload_to="readathon/attachment/")

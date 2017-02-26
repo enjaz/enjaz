@@ -3,8 +3,10 @@ import locale
 import os
 import subprocess
 
-from django.core.management.base import BaseCommand
 from django.conf import settings
+from django.contrib.sites.models import Site
+from django.core.management.base import BaseCommand
+from django.core.urlresolvers import reverse
 from django.utils import timezone 
 from bulb.models import Book
 from core.utils import create_tweet_by_access
@@ -19,6 +21,9 @@ class Command(BaseCommand):
         cities = {'R': u'الرياض',
                   'J': u'جدة',
                   'A': u'الأحساء'}
+        domain = Site.objects.get_current().domain
+        full_url = "https://{}{}".format(domain,
+                                         reverse('bulb:index'))
         city_code = options['city_code']
         city = cities[city_code] 
         locale.setlocale(locale.LC_ALL,'ar_EG.utf8')
@@ -38,4 +43,4 @@ class Command(BaseCommand):
             return
         collection_photo = directory + today.strftime("%Y%m%d-{}.jpg".format(city_code))
         subprocess.call(u"montage -geometry 200x300>+10+10 {} {}".format(u" ".join(covers), collection_photo), shell=True)
-        create_tweet_by_access("bulb", u"{} | آخر الكتب التي أضافتها الطالبات والطلاب ليوم {}!\n#مبادرة_سِراج".format(city, day_string), collection_photo)
+        create_tweet_by_access("bulb", u"{} | آخر الكتب التي أضافتها الطالبات والطلاب ليوم {}!\n{} #مبادرة_سِراج".format(city, day_string, full_url), collection_photo)

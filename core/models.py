@@ -109,6 +109,8 @@ class Tweet(models.Model):
                                                      default=0)
     user = models.ForeignKey(User, null=True,
                              on_delete=models.SET_NULL)
+    access = models.ForeignKey("TwitterAccess", null=True,
+                               on_delete=models.SET_NULL)
     was_sent = models.BooleanField(u"أرسلت؟", default=False)
     modification_date = models.DateTimeField(u"تاريخ التعديل",
                                            auto_now=True)

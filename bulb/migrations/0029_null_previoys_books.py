@@ -10,6 +10,9 @@ def mark_was_announced_null(apps, schema_editor):
         last_four = Book.objects.filter(submitter__common_profile__city=city)\
                                 .order_by("-submission_date")[:4]\
                                 .values_list("pk", flat=True)
+        # WebFaction version of MySQL is a little bit old fashioned
+        # that we have to do the following one line:
+        last_four = list(last_four)
         Book.objects.filter(submitter__common_profile__city=city)\
                     .exclude(pk__in=last_four)\
                     .order_by("-submission_date")\

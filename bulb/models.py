@@ -103,6 +103,10 @@ class Book(models.Model):
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
     objects = managers.BookQuerySet.as_manager()
+    featured_announcement_date = models.DateField(u"تاريخ الإعلان", null=True,
+                                                    default=None)
+    is_featured = models.NullBooleanField(u"هل الكتاب مختار؟", default=False)
+    was_announced = models.NullBooleanField(u"أعلن عنه؟", default=False)
 
 
     def is_in_user_city(self, user):
@@ -576,7 +580,7 @@ class BookCommitment(models.Model):
     def __unicode__(self):
         return self.title
 
-class ReadathonProducts(models.Model):
+class ReadathonProduct(models.Model):
     user = models.ForeignKey(User,
                              u"المستخدمـ/ـة")
     readathon = models.ForeignKey(Readathon,
@@ -584,10 +588,13 @@ class ReadathonProducts(models.Model):
     username = models.CharField(u"أسم المستخدمـ\ـة", max_length=200)
     title = models.CharField(u"العنوان", max_length=200)
     body = models.TextField(default=False)
+    submission_date = models.DateTimeField(u"تاريخ الإرسال",
+                                           auto_now_add=True)
+
 
     def __unicode__(self):
         return self.title
 
 class ReadathonFiles(models.Model):
-    readathon_products = models.ForeignKey(ReadathonProducts, related_name='attachment')
+    readathon_products = models.ForeignKey(ReadathonProduct, related_name='attachment')
     attachment = models.FileField(u"ملف", upload_to="readathon/attachment/")

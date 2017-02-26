@@ -13,7 +13,7 @@ from dal import autocomplete
 from post_office import mail
 
 from clubs.models import city_code_choices
-from core.utils import get_search_queryset
+from core.utils import get_search_queryset, create_tweet_by_access
 from core.models import StudentClubYear, Tweet
 from core import decorators
 from bulb.models import Category, Book, NeededBook, Request, Point, Group, Membership, Session, Report, ReaderProfile, Recruitment, NewspaperSignup, Readathon, BookCommitment
@@ -1139,6 +1139,7 @@ def add_group_session(request, group_pk):
             show_group_url = reverse('bulb:show_group', args=(group.pk,))
             full_url = request.build_absolute_uri(show_group_url)
             utils.create_tweet(request.user, 'add_session', (session.title, full_url))
+            create_tweet_by_access("bulb", u"أعلنت مجموعة {} عن جلسة بعنوان {}! للتفاصيل: {}\n#مبادرة_سِراج".format(group.name, session.title, full_url))
             email_context = {'session': session, 'full_url': full_url}
             if session.date >= timezone.now().date():
                 # If the coordinator is not already a group member, email
@@ -1184,6 +1185,7 @@ def add_free_session(request):
             show_session_url = reverse('bulb:show_session', args=(session.pk,))
             full_url = request.build_absolute_uri(show_session_url)
             utils.create_tweet(request.user, 'add_session', (session.title, full_url))
+            create_tweet_by_access("bulb", u"أُعلن عن جلسة حرّة بعنوان {}! للتفاصيل: {}\n#مبادرة_سِراج".format(session.title, full_url))
             email_context = {'session': session, 'full_url': full_url}
             if session.date >= timezone.now().date():
                 bulb_coordinator = utils.get_bulb_club_for_user(session.submitter).coordinator

@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-from core.models import Tweet
+from core.models import Tweet, TwitterAccess
 from django.db import models
 import operator
 
@@ -9,6 +9,13 @@ def create_tweet(user, text):
         return
     else:
         Tweet.objects.create(user=user, text=text)
+
+def create_tweet_by_access(access_code_name, text, media_path=None):
+    try:
+        access = TwitterAccess.objects.get(code_name=access_code_name)
+    except TwitterAccess.DoesNotExist:
+        return
+    Tweet.objects.create(access=access, text=text, media_path=media_path)
 
 def hindi_to_arabic(number):
     return number.replace(u'٠', '0')\

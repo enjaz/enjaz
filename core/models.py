@@ -30,10 +30,10 @@ class Announcement(models.Model):
     date_created = models.DateTimeField(auto_now_add=True,
                                         verbose_name=u"تاريخ الإنشاء")
     # TODO: announcements should be flexible as to who can see them (eg, different announcements for different campuses)
-    
+
     def __unicode__(self):
         return self.title
-    
+
     class Meta:
         verbose_name = u"إعلان"
         verbose_name_plural = u"الإعلانات"
@@ -117,3 +117,8 @@ class Tweet(models.Model):
 
     def __unicode__(self):
         return self.text
+
+class TwitterAccess(models.Model):
+    access_token = models.CharField(max_length=200)
+    access_token_secret = models.CharField(max_length=200)
+    code_name = models.CharField(max_length=20)

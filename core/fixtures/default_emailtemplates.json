@@ -1228,5 +1228,35 @@
   },
   "model": "post_office.emailtemplate",
   "pk": 85
+},
+{
+  "fields": {
+    "last_updated": "2017-02-26T10:21:26.772Z",
+    "name": "researchhub_feedback_submitted_to_team",
+    "language": "",
+    "created": "2017-02-26T10:21:26.772Z",
+    "html_content": "",
+    "description": "\u064a\u0631\u0633\u0644 \u0625\u0644\u0649 \u0641\u0631\u064a\u0642 \u0631\u064a\u0633\u064a\u0631\u062a\u0634 \u0647\u0628 \u0628\u0639\u062f \u062a\u0642\u062f\u064a\u0645 \u0627\u0644\u062a\u063a\u0630\u064a\u0629 \u0627\u0644\u0631\u0627\u062c\u0639\u0629",
+    "content": "Dear ResearchHub Team,\r\n\r\n{{ user.common_profile.get_en_full_name }} just sent the following feedback:\r\n\r\nDid you get benefit from ResearchHub?\r\n{{ data.get_benefit }}\r\n\r\nWhy?\r\n{{ data.why}}\r\n\r\nYou can answer them by replying to this email.\r\n\r\nBest,",
+    "default_template": null,
+    "subject": "A new feedback from {{ user.common_profile.get_en_full_name }}"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 86
+},
+{
+  "fields": {
+    "last_updated": "2017-02-26T10:21:57.212Z",
+    "name": "researchhub_feedback_submitted_to_user",
+    "language": "",
+    "created": "2017-02-26T10:21:57.212Z",
+    "html_content": "",
+    "description": "\u064a\u0631\u0633\u0644 \u0625\u0644\u0649 \u0645\u0642\u062f\u0645 \u0627\u0644\u062a\u063a\u0630\u064a\u0629 \u0627\u0644\u0631\u0627\u062c\u0639\u0629",
+    "content": "Dear {{ user.common_profile.ar_first_name }},\r\n\r\nWe just received the following feedback:\r\n\r\nDid you get benefit from ResearchHub?\r\n{{ data.get_benefit }}\r\n\r\nWhy?\r\n{{ data.why}}\r\n\r\nIf you have any inquires do not hesitate to contact us on Researchhub@enjazportal.com.\r\n\r\nBest,",
+    "default_template": null,
+    "subject": "We received your feedback!"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 87
 }
 ]

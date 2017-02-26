@@ -124,3 +124,6 @@ class TwitterAccess(models.Model):
     access_token = models.CharField(max_length=200)
     access_token_secret = models.CharField(max_length=200)
     code_name = models.CharField(max_length=20)
+
+    def __unicode__(self):
+        return self.code_name

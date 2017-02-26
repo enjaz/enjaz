@@ -10,8 +10,8 @@ class Command(BaseCommand):
     help = "Get access token."
 
     def handle(self, *args, **options):
-        consumer_key = settings.SOCIAL_AUTH_TWITTER_KEY
-        consumer_secret = settings.SOCIAL_AUTH_TWITTER_SECRET
+        consumer_key = settings.ENJAZACCOUNTS_TWITTER_KEY
+        consumer_secret = settings.ENJAZACCOUNTS_TWITTER_SECRET
 
         request_token_url = 'https://api.twitter.com/oauth/request_token'
         access_token_url = 'https://api.twitter.com/oauth/access_token'
@@ -25,7 +25,9 @@ class Command(BaseCommand):
             raise Exception("Invalid response %s." % resp['status'])
 
         request_token = dict(urlparse.parse_qsl(content))
-
+        print "Go to the following link in your browser:"
+        print "%s?oauth_token=%s" % (authorize_url, request_token['oauth_token'])
+        print 
         accepted = 'n'
         while accepted.lower() == 'n':
             accepted = raw_input('Have you authorized me? (y/n) ')

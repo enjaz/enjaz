@@ -1,4 +1,4 @@
-﻿[
+[
 {
   "fields": {
     "last_updated": "2015-06-15T17:14:56Z",
@@ -1216,32 +1216,17 @@
 },
 {
   "fields": {
-    "last_updated": "2017-02-13T17:15:25.589Z",
-    "name": "researchhub_feedback_submitted_to_user",
+    "last_updated": "2017-02-26T10:16:20.545Z",
+    "name": "event_session_reminder",
     "language": "",
-    "created": "2017-02-11T13:06:15.755Z",
+    "created": "2017-02-26T10:10:57.292Z",
     "html_content": "",
-    "description": "\u064a\u0631\u0633\u0644 \u0625\u0644\u0649 \u0645\u0642\u062f\u0645 \u0627\u0644\u062a\u063a\u0630\u064a\u0629 \u0627\u0644\u0631\u0627\u062c\u0639\u0629",
-    "content": "Dear {{ user.common_profile.ar_first_name }},\r\n\r\nWe just received the following feedback:\r\n\r\nDid you get benefit from ResearchHub?\r\n{{ data.get_benefit }}\r\n\r\nWhy?\r\n{{ data.why}}\r\n\r\nIf you have any inquires do not hesitate to contact us on Researchhub@enjazportal.com.\r\n\r\nBest,",
+    "description": "\u064a\u064f\u0631\u0633\u0644 \u0625\u0644\u0649 \u0627\u0644\u0645\u0633\u062c\u0644\u0627\u062a \u0648\u0627\u0644\u0645\u0633\u062c\u0644\u064a\u0646 \u0641\u064a \u062c\u0644\u0633\u0627\u062a \u0627\u0644\u0623\u0646\u0634\u0637\u0629 \u0627\u0644\u0643\u0628\u0631\u0649 \u0642\u0628\u0644 \u064a\u0648\u0645 \u0645\u0646 \u0639\u0642\u062f\u0647\u0627",
+    "content": "{{ first_name }}\u060c \u0637\u0627\u0628\u062a \u0623\u064a\u0627\u0645\u0643 \u0628\u0643\u0644 \u062e\u064a\u0631!\r\n\r\n\u0646\u0648\u062f \u062a\u0630\u0643\u064a\u0631\u0643\u0645 \u0628\u0627\u0644\u062c\u0644\u0633\u0627\u062a \u0627\u0644\u062a\u064a \u0633\u062c\u0651\u0644\u062a\u0645 \u0628\u0647\u0627 \u0641\u064a {{ event.official_name }} \u0648\u0627\u0644\u062a\u064a \u0633\u062a\u0639\u0642\u062f \u063a\u062f\u064b\u0627 {{ tomorrow_date|date:\"l\" }}!\r\n\r\n\u0627\u0644\u062c\u0644\u0633\u0627\u062a \u0647\u064a:\r\n{% for registration in tomorrow_registrations %}\r\n* {{ registration.session.name }}{% if registration.session.location %} \u0648\u0627\u0644\u062a\u064a \u0633\u062a\u0642\u0627\u0645 \u0641\u064a {{ registration.session.location }}{% endif %}{% if registration.session.start_time and registration.session.end_time %} \u0645\u0646 {{ registration.session.start_time }}-{{ registration.session.end_time }}{% endif %}.{% endfor %}\r\n\r\n\u0646\u062a\u0637\u0644\u0639 \u0644\u0631\u0624\u064a\u062a\u0643\u0645 \u063a\u062f\u064b\u0627!",
     "default_template": null,
-    "subject": "We received your feedback! "
+    "subject": "\u062a\u0630\u0643\u064a\u0631 \u0628\u062a\u0633\u062c\u064a\u0644\u0643 \u0641\u064a {{ event.official_name }}"
   },
   "model": "post_office.emailtemplate",
-  "pk": 83
-},
-{
-  "fields": {
-    "last_updated": "2017-02-13T17:15:55.413Z",
-    "name": "researchhub_feedback_submitted_to_team",
-    "language": "",
-    "created": "2017-02-11T13:09:05.103Z",
-    "html_content": "",
-    "description": "\u064a\u0631\u0633\u0644 \u0625\u0644\u0649 \u0641\u0631\u064a\u0642 \u0631\u064a\u0633\u064a\u0631\u062a\u0634 \u0647\u0628 \u0628\u0639\u062f \u062a\u0642\u062f\u064a\u0645 \u0627\u0644\u062a\u063a\u0630\u064a\u0629 \u0627\u0644\u0631\u0627\u062c\u0639\u0629",
-    "content": "Dear ResearchHub Team,\r\n\r\n{{ user.common_profile.get_en_full_name }} just sent the following feedback:\r\n\r\nDid you get benefit from ResearchHub?\r\n{{ data.get_benefit }}\r\n\r\nWhy?\r\n{{ data.why}}\r\n\r\nYou can answer them by replying to this email.\r\n\r\nBest,",
-    "default_template": null,
-    "subject": "A new feedback from {{ user.common_profile.get_en_full_name }}"
-  },
-  "model": "post_office.emailtemplate",
-  "pk": 84
+  "pk": 85
 }
 ]

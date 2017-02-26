@@ -31,16 +31,21 @@ class Command(BaseCommand):
         day_string = today.strftime(u'%A %-d %B %Y').decode("utf-8")
         directory = os.path.join(settings.MEDIA_ROOT, "bulb_channel/")
         covers = []
-        for book in Book.objects.current_year().available().undeleted()\
-                                .order_by("submission_date")\
-                                .filter(submitter__common_profile__city=city,
-                                        was_announced=False)[:4]:
+        targetted_books = Book.objects.current_year().available()\
+                                      .undeleted()\
+                                      .order_by("submission_date")\
+                                      .filter(submitter__common_profile__city=city,
+                                              was_announced=False)
+
+        # Don't continue if we have less than two covers to report
+        if targetted_books.count() < 2:
+            return
+
+        for book in targetted_books[:4]:
             covers.append(book.cover.path)
             book.was_announced = True
             book.save()
 
-        if not covers:
-            return
         collection_photo = directory + today.strftime("%Y%m%d-{}.jpg".format(city_code))
         subprocess.call(u"montage -geometry 200x300>+10+10 {} {}".format(u" ".join(covers), collection_photo), shell=True)
         create_tweet_by_access("bulb", u"{} | آخر الكتب التي أضافتها الطالبات والطلاب ليوم {}!\n{} #مبادرة_سِراج".format(city, day_string, full_url), collection_photo)

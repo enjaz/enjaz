@@ -1,0 +1,21 @@
+{% extends 'the_game_base.html' %}{% load staticfiles %}
+{% block content %}
+<div class="text-center">
+    <table id="club-members" class="table datatable">
+            <thead>
+                <tr>
+                    <th style="text-align:center" >اللاعبـ/ـة</th>
+                    <th style="text-align:center" >الدرجة</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for game in highest_games %}
+                <tr>
+                    <td>  {{ game.user.common_profile.get_ar_full_name }} </td>
+                    <td style="text-align:center" >{{ game.right_answers }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+    </table>
+</div>
+{% endblock %}

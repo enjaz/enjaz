@@ -1,0 +1,220 @@
+{% extends 'game_base.html' %}{% load staticfiles %}
+{% block content %}
+    <div id="pre-game" class="text-center">
+      <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+        <img class="animated bounceInDown" style="max-height: 200px; margin:20px;" src="{% static 'logo/cultural_program.png' %}">
+            <h2 class="animated bounceInDow large-text">مسابقة أركان معرض البرنامج الثقافي</h2>
+            <p>أهلا بكم في لعبة شفرة البرنامج الثقافي!يهدف البرنامج الثقافي الخامس لكشف تجليات الإبداع في أرجاء الوطن العربي والعالم الإسلامي، ويستعرض المعرض في أركانه المختلفة شتّى جوانب الإبداع. بعد المرور على أجزاء المعرض، يمكن الإجابة على أسئلة هذه الشفرة،
+                لكن <span style="background: rgba(193, 153, 28, 0.8)">تذكروا: يمكن خوض هذه اللعبة مرة واحدة فقط،</a> فلتكن بعد المرور على المعرض!</p>
+        {% if user.is_authenticated %}
+         <button id="hide" style="color: white;" class="animated fadeInUp btn btn-lg btn-success">
+             ابدء اللعبة
+         </button>
+         {% else %}
+         <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لإنجاز كي ألعب</a>
+         {% endif %}
+       </div>
+     </div>
+   </div>
+    {% if user.is_authenticated %}
+
+    <div id="start-game" class="text-center">
+
+    </div>
+
+    <div id="post-game" style="display:none;"  class="container">
+
+          <div id="post-game"  class="text-center">
+                <img class="bounceInDown" style="max-height: 300px; margin:20px;" src="{% static 'logo/cultural_program.png' %}">
+                <h2 class="large-text">مسابقة أركان معرض البرنامج الثقافي</h2>
+          <div id ='post-game-text'>
+              <h2>
+                  تهانينا!
+              </h2>
+          </div>
+              <a  href="{% url 'cultural_program_code:show_scores' %}" class="animated fadeInUp btn btn-lg btn-success">سلم النتائج </a>
+    </div>
+</div>
+    {% endif %}
+
+
+
+
+<script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
+  <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+
+<script type="text/javascript">
+
+function initiate_radio(){
+    toastr.options.positionClass = "toast-top-left";
+    choice_pk = $(this).data("choice_pk");
+    question_pk = $(this).data("question_pk");
+    counter =  $(this).data("counter");
+    game_pk = $(this).data("game_pk");
+        $.ajax({
+            url: "{% url 'cultural_program_code:check_answer' %}",
+            type: 'POST',
+            data: {choice_pk: choice_pk,question_pk:question_pk,counter:counter,game_pk:game_pk},
+            cache: false,
+            success: function (data) {
+                if (data.success) {
+                    if (data.right) {
+                        toastr.success('الله عليك !');
+                    }
+                    else {
+                        toastr.error('خيرها بغيرها !');
+                    }
+                    $("#container-" + (counter - 1)).hide();
+                    if ($("#container-" + (counter)).length == 0) {
+                        $("#container-" + (counter - 1)).hide();
+                        $('#post-game').css('display','block');
+                        var $thedive = $('<div>').attr({
+                                    id: 'container',
+                                    name: 'score'
+                                    }).appendTo('#post-game-text');
+                        var content = document.createTextNode("عدد اجوبتك الصحيحه ["+(data.score)+"]");
+                        $thedive.append(content);
+                    }
+                    else {
+                        $("#container-" + (counter)).show();
+
+                    }
+                }
+            }
+        });
+    }
+
+
+     $(function(){
+        $("#hide").click(function(){
+            action = $(this).data("action");
+            $.ajax({
+                url: "{% url 'cultural_program_code:start_new_game' %}",
+                type: 'POST',
+                data: {action: action},
+                cache: false,
+                success: function (data) {
+                    if (data.success) {
+                        $('#pre-game').css('display','none');
+                        var counter = 1;
+                        var questionsArray = data.questions;
+                        var arrayLength = questionsArray.length;
+                        for (var i = 0; i < arrayLength; i++) {
+                            var $thedive = $('<div>').attr({
+                                    id: 'container-' + counter,
+                                    name: 'question-div',
+                                    class: "text-center",
+                                    style: 'display:none'
+                                }).appendTo('#start-game');
+                            var number = counter ;
+                            counter += 1;
+                            if (questionsArray[i].type == 'Q') {
+                                $($thedive).attr('data-question_pk', questionsArray[i].pk); // sets
+                                var $thequestion = $('<h1>').appendTo($thedive);
+                                var content = document.createTextNode(questionsArray[i].text);
+                                $thequestion.append(content);
+                                var choices = questionsArray[i].choices;
+                                var choicesLength = choices.length;
+                                for (var m = 0; m < choicesLength; m++) {
+                                    var $thelabel = $('<label>').appendTo($thedive);
+                                    var $thechoice = $('<input>').attr({
+                                        type: 'radio',
+                                        id: questionsArray[i].choices[m].pk,
+                                        name: 'question-choice',
+                                        style: 'word-wrap:break-word;'
+                                    }).appendTo($thelabel);
+                                    $($thechoice).attr('data-question_pk', questionsArray[i].pk); // sets
+                                    $($thechoice).attr('data-counter', counter); // sets
+                                    $($thechoice).attr('data-game_pk', data.game_pk); // sets
+                                    $($thechoice).attr('data-choice_pk', questionsArray[i].choices[m].pk); // sets
+                                    $($thechoice).change(initiate_radio);
+                                    var choice = document.createTextNode(questionsArray[i].choices[m].text);
+                                    $(choice).appendTo($thelabel);
+                                }
+                            }
+                            else if (questionsArray[i].type == 'S'){
+                                $($thedive).attr('data-question_pk', questionsArray[i].pk); // sets
+                                var images = questionsArray[i].content;
+                                var imagesLength = images.length;
+                                for (var s = 0; s < imagesLength; s++) {
+                                    var $theimage = $('<img>').attr({
+                                        id: 'container',
+                                        name: 'img-div',
+                                        class:'img-responsive center-block',
+                                        src: questionsArray[i].content[s].image
+                                    }).appendTo($thedive);
+                                }
+                                var $thequestion = $('<h1>').appendTo($thedive);
+                                var content = document.createTextNode(questionsArray[i].text);
+                                $thequestion.append(content);
+                                var choices = questionsArray[i].choices;
+                                var choicesLength = choices.length;
+                                for (var m = 0; m < choicesLength; m++) {
+                                    var $thelabel = $('<label>').appendTo($thedive);
+                                    var $thechoice = $('<input>').attr({
+                                        type: 'radio',
+                                        id: questionsArray[i].choices[m].pk,
+                                        name: 'question-choice',
+                                        style: 'word-wrap:break-word;'
+                                    }).appendTo($thelabel);
+                                    $($thechoice).attr('data-question_pk', questionsArray[i].pk); // sets
+                                    $($thechoice).attr('data-counter', counter); // sets
+                                    $($thechoice).attr('data-game_pk', data.game_pk); // sets
+                                    $($thechoice).attr('data-choice_pk', questionsArray[i].choices[m].pk); // sets
+                                    $($thechoice).change(initiate_radio);
+                                    var choice = document.createTextNode(questionsArray[i].choices[m].text);
+                                    $(choice).appendTo($thelabel);
+                                }
+                            }
+                            else if (questionsArray[i].type == 'F') {
+                                $($thedive).attr('data-question_pk', questionsArray[i].pk); // sets
+                                var images = questionsArray[i].content;
+                                var imagesLength = images.length;
+                                var $content_img = $('<div>').appendTo($thedive);
+                                $($content_img).attr('class', 'row'); // sets
+                                for (var s = 0; s < imagesLength; s++) {
+                                    var $imgediv = $('<div>').appendTo($content_img);
+                                    $($imgediv).attr('class', 'col-xs-6 col-md-6'); // sets
+                                    var $theimage = $('<img>').attr({
+                                        id: "#img-container",
+                                        name: 'img-div',
+                                        src: questionsArray[i].content[s].image,
+                                        class:'img-responsive',
+                                    }).appendTo($imgediv);
+                                }
+                                var $thequestion = $('<h1>').appendTo($thedive);
+                                var content = document.createTextNode(questionsArray[i].text);
+                                $thequestion.append(content);
+                                var choices = questionsArray[i].choices;
+                                var choicesLength = choices.length;
+                                for (var m = 0; m < choicesLength; m++) {
+                                    var $thelabel = $('<label>').appendTo($thedive);
+                                    var $thechoice = $('<input>').attr({
+                                        type: 'radio',
+                                        id: questionsArray[i].choices[m].pk,
+                                        name: 'question-choice',
+                                        style: 'word-wrap:break-word;'
+                                    }).appendTo($thelabel);
+                                    $($thechoice).attr('data-question_pk', questionsArray[i].pk); // sets
+                                    $($thechoice).attr('data-counter', counter); // sets
+                                    $($thechoice).attr('data-game_pk', data.game_pk); // sets
+                                    $($thechoice).attr('data-choice_pk', questionsArray[i].choices[m].pk); // sets
+                                    $($thechoice).change(initiate_radio);
+                                    var choice = document.createTextNode(questionsArray[i].choices[m].text);
+                                    $(choice).appendTo($thelabel);
+                                }
+                            }
+                        }
+
+                    }
+                    $('#container-1').show();
+                }
+            });
+        });
+
+     });
+</script>
+{% endblock %}

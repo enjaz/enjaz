@@ -27,8 +27,8 @@ def toggle_new_game(request):
                "questions":[]
                }
     for booth in Booth.objects.all():
-        questions = booth.question_set.all()
-        #questions =booth.question_set.order_by('?').first()
+        questions =booth.question_set.order_by('?')
+
         for question in questions:
             options = question.choice_set.all()
             choices =[]
@@ -76,6 +76,7 @@ def toggle_right_answer(request):
         right= True
     else:
         right = False
+    game.save()
     return {"right":right,"score":score}
 
 

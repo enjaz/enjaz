@@ -34,13 +34,18 @@
     font-weight: normal;
     src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
 }
-
+label{
+     display: block;
+    text-align: right;
+    margin-left: 40%;
+}
 body {
   font-family: 'GE Dinar One', serif;
+  color:black
 }
 
 html.detail{
-    background: linear-gradient( rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8) ), url("http://gallery.imagicity.com/melbourne-street-scenes-11.jpg") no-repeat center center fixed;
+    background: linear-gradient( rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.8) ),  url("https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?dpr=1&auto=format&fit=crop&w=1500&h=1000&q=80&cs=tinysrgb&crop=") no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -48,11 +53,19 @@ html.detail{
 }
 html.detail body, h1{
     background-color: transparent;
-    color: white;
+    color: black;
 }
 
 .modal{
 color: black;
+}
+
+.img-responsive{
+    padding: 0;
+    max-width: 100%;
+    max-height: 100%;
+    width:100%;
+    height: 100%;
 }
 
 .detail a{
@@ -61,6 +74,7 @@ color: black;
 footer{
     padding: 60px 0;
 }
+
 
 .step-section {
     background: rgba(255, 255, 255, 0.1);
@@ -72,6 +86,13 @@ footer{
     margin-bottom: 20px;
     color: white;
 }
+.container{
+    width: 90%;
+    float: none;
+    margin-top: 30px;
+
+}
+
 
 .checkbox label{
     margin-right: 10px;
@@ -118,6 +139,10 @@ margin-bottom: 0px;
 font-size: 14px;
 color: #e8ff74;
 }
+.large-text{
+    font-size:36px;
+    color:black
+}
 
 hr{
 margin-bottom: 5px;
@@ -127,10 +152,23 @@ margin-bottom: 5px;
 .form-group .checkbox{
     margin-right: 15px;
 }
+
+
+button {
+    margin: 20px;
+    position: relative;
+    padding: 15px;
+    top: 50%;
+}
+.col-xs-6 col-md-6{
+    max-height: 100%;
+    max-width: 100%;
+}
+
 </style>
 </head>
 
-<body>
+<body class = container>
 {% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
 	<!-- Piwik -->
 	<script type="text/javascript">
@@ -155,24 +193,65 @@ margin-bottom: 5px;
     <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
 
-<div id="pre-game"  class="container">
- <p> Hello to this Quick Quiz to start click here </p>
 
-<button id = "hide"  class="btn btn-sm btn-danger">أبدء اللعبة </button>
+
+{% if user.is_authenticated %}
+      <div id="pre-game"  class="text-center">
+                <img class="bounceInDown" style="max-height: 300px; margin:20px;" src="{% static 'logo/cultural_program.png' %}">
+                <p class="large-text">
+مسابقه اركان معرض البرنامج الثقافي                 </p>
+ <h2>أهلا بكم في لعبة شفرة البرنامج الثقافي!
+
+يهدف البرنامج الثقافي الخامس لكشف تجليات الإبداع في أرجاء الوطن العربي والعالم الإسلامي، ويستعرض المعرض في أركانه المختلفة شتّى جوانب الإبداع.  بعد المرور على أجزاء المعرض، يمكن الإجابة على أسئلة هذه الشفرة، لكن <span style="background: rgba(193, 153, 28, 0.8)">تذكروا: يمكن خوض هذه اللعبة مرة واحدة فقط،</a> فلتكن بعد المرور على المعرض!
+    </h2>
+         <button id = "hide"  class="animated fadeInUp btn btn-lg btn-success">
+             <h4> أبدء اللعبة</h4>
+         </button>
+
+    </div>
+
+
+    <div id="start-game" class="text-center">
+
+    </div>
+
+    <div id="post-game" style="display:none;"  class="container">
+
+          <div id="post-game"  class="text-center">
+                <img class="bounceInDown" style="max-height: 300px; margin:20px;" src="{% static 'logo/cultural_program.png' %}">
+                <p class="large-text">
+مسابقه اركان معرض البرنامج الثقافي                 </p>
+          <div id ='post-game-text'>
+              <h2>
+                  تهانينا !!
+
+              </h2>
+          </div>
+              <a  href="{% url 'CulturalProgramCode:show_scores' %}">    <button id = "link"  class="animated fadeInUp btn btn-lg btn-success">سلم النتائج </button>
+</a>
+
+    </div>
+
 
 </div>
+{% else %}
+    <div>
 
+          <div id="post-game"  class="text-center">
+                <img class="bounceInDown" style="max-height: 300px; margin:20px;" src="{% static 'logo/cultural_program.png' %}">
+                <p class="large-text">
+مسابقه اركان معرض البرنامج الثقافي                 </p>
+          <div id ='post-game-text'>
+              <h2>
+البدء باللعبه يتطلب تسجيل الدخول في بوابة إنجاز
+              </h2>
+          </div>
+</a>
 
-<div id="start-game" class="container">
+     <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لإنجاز كي ألعب</a>
 
-</div>
-
-<div id="post-game" style="display:none;"  class="container">
- <p> The End </p>
-
-</div>
-
-
+          </div>
+{% endif %}
 
 
 
@@ -182,13 +261,13 @@ margin-bottom: 5px;
 <script type="text/javascript">
 
 function initiate_radio(){
-    toastr.options.positionClass = "toast-top-center";
+    toastr.options.positionClass = "toast-top-left";
     choice_pk = $(this).data("choice_pk");
     question_pk = $(this).data("question_pk");
     counter =  $(this).data("counter");
     game_pk = $(this).data("game_pk");
         $.ajax({
-            url: "{% url 'questions:toggle_right_answer' %}",
+            url: "{% url 'CulturalProgramCode:check_answer' %}",
             type: 'POST',
             data: {choice_pk: choice_pk,question_pk:question_pk,counter:counter,game_pk:game_pk},
             cache: false,
@@ -198,24 +277,23 @@ function initiate_radio(){
                         toastr.success('الله عليك !');
                     }
                     else {
-                        alert('خيرها بغيرها !');
+                        toastr.error('خيرها بغيرها !');
                     }
                     $("#container-" + (counter - 1)).hide();
                     if ($("#container-" + (counter)).length == 0) {
                         $("#container-" + (counter - 1)).hide();
                         $('#post-game').css('display','block');
                         var $thedive = $('<div>').attr({
-                                    type: 'hidden',
                                     id: 'container',
                                     name: 'score'
-                                    }).appendTo('#post-game');
-                        var content = document.createTextNode("عال العال اجوبتك الصحيحه "+(data.score));
+                                    }).appendTo('#post-game-text');
+                        var content = document.createTextNode("عدد اجوبتك الصحيحه ["+(data.score)+"]");
                         $thedive.append(content);
                     }
                     else {
                         $("#container-" + (counter)).show();
-                    }
 
+                    }
                 }
             }
         });
@@ -226,7 +304,7 @@ function initiate_radio(){
         $("#hide").click(function(){
             action = $(this).data("action");
             $.ajax({
-                url: "{% url 'questions:toggle_new_game' %}",
+                url: "{% url 'CulturalProgramCode:start_new_game' %}",
                 type: 'POST',
                 data: {action: action},
                 cache: false,
@@ -238,18 +316,18 @@ function initiate_radio(){
                         var arrayLength = questionsArray.length;
                         for (var i = 0; i < arrayLength; i++) {
                             var $thedive = $('<div>').attr({
-                                    type: 'hidden',
                                     id: 'container-' + counter,
                                     name: 'question-div',
-                                    class: "imges",
+                                    class: "text-center",
                                     style: 'display:none'
                                 }).appendTo('#start-game');
                             var number = counter ;
                             counter += 1;
                             if (questionsArray[i].type == 'Q') {
                                 $($thedive).attr('data-question_pk', questionsArray[i].pk); // sets
+                                var $thequestion = $('<h1>').appendTo($thedive);
                                 var content = document.createTextNode(questionsArray[i].text);
-                                $thedive.append(content);
+                                $thequestion.append(content);
                                 var choices = questionsArray[i].choices;
                                 var choicesLength = choices.length;
                                 for (var m = 0; m < choicesLength; m++) {
@@ -275,15 +353,15 @@ function initiate_radio(){
                                 var imagesLength = images.length;
                                 for (var s = 0; s < imagesLength; s++) {
                                     var $theimage = $('<img>').attr({
-                                        type: 'hidden',
                                         id: 'container',
                                         name: 'img-div',
-                                        class:'imges',
+                                        class:'img-responsive center-block',
                                         src: questionsArray[i].content[s].image
                                     }).appendTo($thedive);
                                 }
+                                var $thequestion = $('<h1>').appendTo($thedive);
                                 var content = document.createTextNode(questionsArray[i].text);
-                                $thedive.append(content);
+                                $thequestion.append(content);
                                 var choices = questionsArray[i].choices;
                                 var choicesLength = choices.length;
                                 for (var m = 0; m < choicesLength; m++) {
@@ -292,8 +370,7 @@ function initiate_radio(){
                                         type: 'radio',
                                         id: questionsArray[i].choices[m].pk,
                                         name: 'question-choice',
-                                        style: 'word-wrap:break-word;',
-                                        class: 'Try'
+                                        style: 'word-wrap:break-word;'
                                     }).appendTo($thelabel);
                                     $($thechoice).attr('data-question_pk', questionsArray[i].pk); // sets
                                     $($thechoice).attr('data-counter', counter); // sets
@@ -308,39 +385,33 @@ function initiate_radio(){
                                 $($thedive).attr('data-question_pk', questionsArray[i].pk); // sets
                                 var images = questionsArray[i].content;
                                 var imagesLength = images.length;
-                                var img_counter = 1;
-                                var $content = $('<div>').appendTo($thedive);
-                                $($content).attr('class', 'row'); // sets
+                                var $content_img = $('<div>').appendTo($thedive);
+                                $($content_img).attr('class', 'row'); // sets
                                 for (var s = 0; s < imagesLength; s++) {
+                                    var $imgediv = $('<div>').appendTo($content_img);
+                                    $($imgediv).attr('class', 'col-xs-6 col-md-6'); // sets
                                     var $theimage = $('<img>').attr({
-                                        type: 'hidden',
-                                        id: "#container-"+img_counter,
+                                        id: "#img-container",
                                         name: 'img-div',
-                                        height: '400',
-                                        width: '500',
-                                         class:"col-xs-6 col-md-6",
-                                        src: questionsArray[i].content[s].image
-                                    }).appendTo($content);
-                                    img_counter += 1;
+                                        src: questionsArray[i].content[s].image,
+                                        class:'img-responsive',
+                                    }).appendTo($imgediv);
                                 }
-                                var $question = $('<div>').appendTo($content);
-                                $($question).attr('class', 'text-center'); // sets
+                                var $thequestion = $('<h1>').appendTo($thedive);
                                 var content = document.createTextNode(questionsArray[i].text);
-                                $question.append(content);
+                                $thequestion.append(content);
                                 var choices = questionsArray[i].choices;
                                 var choicesLength = choices.length;
                                 for (var m = 0; m < choicesLength; m++) {
-                                    var $choice = $('<div>').appendTo($thedive);
-                                    $($choice).attr('class', 'text-center'); // sets
-                                    var $thelabel = $('<label>').appendTo($choice);
+                                    var $thelabel = $('<label>').appendTo($thedive);
                                     var $thechoice = $('<input>').attr({
                                         type: 'radio',
                                         id: questionsArray[i].choices[m].pk,
                                         name: 'question-choice',
-                                        style: 'word-wrap:break-word;',
-                                        class: 'Try'
+                                        style: 'word-wrap:break-word;'
                                     }).appendTo($thelabel);
                                     $($thechoice).attr('data-question_pk', questionsArray[i].pk); // sets
+                                    $($thechoice).attr('data-counter', counter); // sets
                                     $($thechoice).attr('data-game_pk', data.game_pk); // sets
                                     $($thechoice).attr('data-choice_pk', questionsArray[i].choices[m].pk); // sets
                                     $($thechoice).change(initiate_radio);
@@ -359,7 +430,6 @@ function initiate_radio(){
      });
 
 </script>
-
 
 </body>
 </html>

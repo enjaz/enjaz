@@ -34,13 +34,16 @@
     font-weight: normal;
     src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
 }
-
+label{
+     display: block
+}
 body {
   font-family: 'GE Dinar One', serif;
+  color:black
 }
 
 html.detail{
-    background: linear-gradient( rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8) ), url("http://gallery.imagicity.com/melbourne-street-scenes-11.jpg") no-repeat center center fixed;
+    background: linear-gradient( rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.8) ),  url("https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?dpr=1&auto=format&fit=crop&w=1500&h=1000&q=80&cs=tinysrgb&crop=") no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -48,11 +51,15 @@ html.detail{
 }
 html.detail body, h1{
     background-color: transparent;
-    color: white;
+    color: black;
 }
 
 .modal{
 color: black;
+}
+
+.img-responsive{
+    width: 80%;
 }
 
 .detail a{
@@ -61,6 +68,7 @@ color: black;
 footer{
     padding: 60px 0;
 }
+
 
 .step-section {
     background: rgba(255, 255, 255, 0.1);
@@ -72,6 +80,13 @@ footer{
     margin-bottom: 20px;
     color: white;
 }
+.container{
+    width: 90%;
+    float: none;
+    margin-top: 30px;
+
+}
+
 
 .checkbox label{
     margin-right: 10px;
@@ -86,7 +101,9 @@ footer{
     max-width: 100%;
 }
 .text-center{
-    font-size: 20px;
+    margin-top: 30px;
+    font-size: 23px;
+    text-align: right;
 
 }
 #delete-button input[type='submit']:disabled{
@@ -118,6 +135,10 @@ margin-bottom: 0px;
 font-size: 14px;
 color: #e8ff74;
 }
+.large-text{
+    font-size:36px;
+    color:black
+}
 
 hr{
 margin-bottom: 5px;
@@ -127,10 +148,24 @@ margin-bottom: 5px;
 .form-group .checkbox{
     margin-right: 15px;
 }
+
+
+button {
+    margin: 20px;
+    position: relative;
+    padding: 15px;
+    top: 50%;
+}
+.col-xs-6 col-md-6{
+    max-height: 100%;
+    max-width: 100%;
+}
+
 </style>
 </head>
 
-<body>
+<body class = container>
+
 {% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
 	<!-- Piwik -->
 	<script type="text/javascript">
@@ -154,24 +189,25 @@ margin-bottom: 5px;
 	<script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
     <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
+<div class="text-center">
     <table id="club-members" class="table datatable">
             <thead>
-                <tr>
-                    <th>اللاعب </th>
-                    <th>الدرجه</th>
+                <tr >
+                    <th style="text-align:center" >اللاعب </th>
+                    <th style="text-align:center" >الدرجه</th>
                 </tr>
             </thead>
             <tbody>
-                {% for score in scores %}
+                {% for game in highest_games %}
                 <tr>
-                    <td>{{ score }}</td>
-                    <td>example</td>
+                    <td>  {{ game.user.common_profile.get_ar_full_name }} </td>
+                    <td style="text-align:center" >{{ game.right_answers }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
     </table>
 
-
+</div>
 
 
 </body>

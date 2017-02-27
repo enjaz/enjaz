@@ -2,6 +2,8 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+
 
 
 question_type_choices = (
@@ -43,3 +45,5 @@ class Game (models.Model):
     user = models.ForeignKey(User)
     choices = models.ForeignKey(Choice, null=True )
     right_answers = models.IntegerField(default=0)
+    submission_date = models.DateTimeField(auto_now_add=True, verbose_name=u"تاريخ الإرسال")
+

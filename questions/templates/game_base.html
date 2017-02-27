@@ -1,0 +1,198 @@
+<!DOCTYPE html>{% load staticfiles %}{% load activities_utils %}
+
+<html class="detail" lang="ar">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{ invitation.short_description|striptags }}">
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@StudentsofKSAUH" />
+    <meta name="twitter:title" content="مسابقة البرنامج الثقافي" />
+    <meta name="twitter:description" content="لعبة معرض البرنامج الثقافي!" />
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'logo/cultural_program.png' %}" />
+    <title>إنجاز | مسابقة البرنامج الثقافي</title>
+    <link rel="icon" href="{% static 'logo/favicon.png' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-3.3.6.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-rtl-3.3.4.min.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/entypo/css/entypo.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/neon-forms.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
+    <style>
+        @font-face {
+            font-family: 'GE Dinar One';
+            font-weight: lighter;
+            src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
+        }
+
+        @font-face {
+            font-family: 'GE Dinar One';
+            font-weight: normal;
+            src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
+        }
+
+        label {
+            display: block;
+            text-align: right;
+            margin-left: 40%;
+        }
+
+        body {
+            font-family: 'GE Dinar One', serif;
+            color: black
+        }
+
+        html.detail {
+            background: linear-gradient( rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.8)), url("https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?dpr=1&auto=format&fit=crop&w=1500&h=1000&q=80&cs=tinysrgb&crop=") no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+        }
+
+        html.detail body,
+        h1 {
+            background-color: transparent;
+            color: black;
+        }
+
+        .modal {
+            color: black;
+        }
+
+        .img-responsive {
+            padding: 0;
+            max-width: 100%;
+            max-height: 100%;
+            width: 100%;
+            height: 100%;
+        }
+
+        .detail a {
+            color: #85C7FF;
+        }
+
+        footer {
+            padding: 60px 0;
+        }
+
+        .step-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            width: 90%;
+            margin-right: auto;
+            margin-left: auto;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .container {
+            width: 90%;
+            float: none;
+            margin-top: 30px;
+        }
+
+        .checkbox label {
+            margin-right: 10px;
+        }
+
+        #third-phase,
+        #promotion-step {
+            display: none;
+        }
+
+        #sad-child {
+            border-radius: 10px;
+            max-width: 100%;
+        }
+
+        .text-center {
+            font-size: 20px;
+        }
+
+        #delete-button input[type='submit']:disabled {
+            background-color: #497d49;
+        }
+
+        p.instructions {
+            text-align: justify;
+        }
+
+        p.intro {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 18px;
+            width: 90%;
+            margin-right: auto;
+            margin-left: auto;
+            margin-bottom: 20px;
+            color: white;
+            font-size: 15px;
+        }
+
+        p.explaination {
+            border-radius: 10px;
+            padding: 10px;
+            margin-right: auto;
+            margin-left: auto;
+            margin-bottom: 0px;
+            font-size: 14px;
+            color: #e8ff74;
+        }
+
+        .large-text {
+            font-size: 36px;
+            color: black
+        }
+
+        hr {
+            margin-bottom: 5px;
+            max-width: 100px;
+        }
+
+        .form-group .checkbox {
+            margin-right: 15px;
+        }
+
+        button {
+            margin: 20px;
+            position: relative;
+            padding: 15px;
+            top: 50%;
+        }
+
+        .col-xs-6 col-md-6 {
+            max-height: 100%;
+            max-width: 100%;
+        }
+    </style>
+</head>
+
+<body class="container">
+{% block content %}{% endblock %}
+{% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
+	<!-- Piwik -->
+	<script type="text/javascript">
+	  var _paq = _paq || [];
+      {% if user.is_authenticated %}
+      _paq.push(['setUserId', '{{ user.username }}']);
+      {% endif %}
+	  _paq.push(['trackPageView']);
+	  _paq.push(['enableLinkTracking']);
+	  (function() {
+	    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://enjazportal.com/stats/";
+	    _paq.push(['setTrackerUrl', u+'piwik.php']);
+	    _paq.push(['setSiteId', 1]);
+	    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+	    g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+	  })();
+	</script>
+	<noscript><p><img src="//enjazportal.com/stats/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+        <!-- End Piwik Code -->
+    {% endif %}
+</body>
+</html>

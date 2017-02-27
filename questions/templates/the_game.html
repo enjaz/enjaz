@@ -1,215 +1,23 @@
-<!DOCTYPE html>{% load staticfiles %}{% load activities_utils %}
-
-<html class="detail" lang="ar">
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{{ invitation.short_description|striptags }}">
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@{% if invitation.twitter_account %}{{ invitation.twitter_account }}{% else %}StudentsofKSAUH{% endif %}" />
-    <meta name="twitter:title" content="{{ invitation.title }}" />
-    <meta name="twitter:description" content="{{ invitation.short_description|striptags }}" />
-    {% if invitation.logo %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ invitation.logo.url }}" />{% endif %}
-    <title>إنجاز | {{ invitation.title }}</title>
-    <link rel="icon" href="{% static 'logo/favicon.png' %}">
-    <link rel="stylesheet" href="{% static 'css/bootstrap-3.3.6.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/bootstrap-rtl-3.3.4.min.css' %}">
-    <link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/entypo/css/entypo.css' %}">
-    <link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/font-awesome/css/font-awesome.min.css' %}">
-    <link rel="stylesheet" href="{% static 'neon/assets/css/neon-forms.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
-	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
-<style>
-
-@font-face {
-    font-family: 'GE Dinar One';
-    font-weight: lighter;
-    src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
-}
-
-@font-face {
-    font-family: 'GE Dinar One';
-    font-weight: normal;
-    src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
-}
-label{
-     display: block;
-    text-align: right;
-    margin-left: 40%;
-}
-body {
-  font-family: 'GE Dinar One', serif;
-  color:black
-}
-
-html.detail{
-    background: linear-gradient( rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.8) ),  url("https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?dpr=1&auto=format&fit=crop&w=1500&h=1000&q=80&cs=tinysrgb&crop=") no-repeat center center fixed;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
-}
-html.detail body, h1{
-    background-color: transparent;
-    color: black;
-}
-
-.modal{
-color: black;
-}
-
-.img-responsive{
-    padding: 0;
-    max-width: 100%;
-    max-height: 100%;
-    width:100%;
-    height: 100%;
-}
-
-.detail a{
-    color: #85C7FF;
-}
-footer{
-    padding: 60px 0;
-}
-
-
-.step-section {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    padding: 10px;
-    width: 90%;
-    margin-right: auto;
-    margin-left: auto;
-    margin-bottom: 20px;
-    color: white;
-}
-.container{
-    width: 90%;
-    float: none;
-    margin-top: 30px;
-
-}
-
-
-.checkbox label{
-    margin-right: 10px;
-}
-
-#third-phase, #promotion-step{
-    display: none;
-}
-
-#sad-child{
-    border-radius: 10px;
-    max-width: 100%;
-}
-.text-center{
-    font-size: 20px;
-
-}
-#delete-button input[type='submit']:disabled{
-    background-color: #497d49;
-}
-
-p.instructions{
-    text-align: justify;
-}
-
-p.intro{
-background: rgba(0, 0, 0, 0.7);
-border-radius: 10px;
-padding: 18px;
-width: 90%;
-margin-right: auto;
-margin-left: auto;
-margin-bottom: 20px;
-color: white;
-font-size: 15px;
-}
-
-p.explaination{
-border-radius: 10px;
-padding: 10px;
-margin-right: auto;
-margin-left: auto;
-margin-bottom: 0px;
-font-size: 14px;
-color: #e8ff74;
-}
-.large-text{
-    font-size:36px;
-    color:black
-}
-
-hr{
-margin-bottom: 5px;
-    max-width: 100px;
-}
-
-.form-group .checkbox{
-    margin-right: 15px;
-}
-
-
-button {
-    margin: 20px;
-    position: relative;
-    padding: 15px;
-    top: 50%;
-}
-.col-xs-6 col-md-6{
-    max-height: 100%;
-    max-width: 100%;
-}
-
-</style>
-</head>
-
-<body class = container>
-{% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
-	<!-- Piwik -->
-	<script type="text/javascript">
-	  var _paq = _paq || [];
-      {% if user.is_authenticated %}
-      _paq.push(['setUserId', '{{ user.username }}']);
-      {% endif %}
-	  _paq.push(['trackPageView']);
-	  _paq.push(['enableLinkTracking']);
-	  (function() {
-	    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://enjazportal.com/stats/";
-	    _paq.push(['setTrackerUrl', u+'piwik.php']);
-	    _paq.push(['setSiteId', 1]);
-	    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
-	    g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-	  })();
-	</script>
-	<noscript><p><img src="//enjazportal.com/stats/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
-        <!-- End Piwik Code -->
-    {% endif %}
-	<script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
-    <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-
-
-
-{% if user.is_authenticated %}
-      <div id="pre-game"  class="text-center">
-                <img class="bounceInDown" style="max-height: 300px; margin:20px;" src="{% static 'logo/cultural_program.png' %}">
-                <p class="large-text">
-مسابقه اركان معرض البرنامج الثقافي                 </p>
- <h2>أهلا بكم في لعبة شفرة البرنامج الثقافي!
-
-يهدف البرنامج الثقافي الخامس لكشف تجليات الإبداع في أرجاء الوطن العربي والعالم الإسلامي، ويستعرض المعرض في أركانه المختلفة شتّى جوانب الإبداع.  بعد المرور على أجزاء المعرض، يمكن الإجابة على أسئلة هذه الشفرة، لكن <span style="background: rgba(193, 153, 28, 0.8)">تذكروا: يمكن خوض هذه اللعبة مرة واحدة فقط،</a> فلتكن بعد المرور على المعرض!
-    </h2>
-         <button id = "hide"  class="animated fadeInUp btn btn-lg btn-success">
-             <h4> أبدء اللعبة</h4>
+{% extends 'game_base.html' %}{% load staticfiles %}
+{% block content %}
+    <div id="pre-game" class="text-center">
+      <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+        <img class="animated bounceInDown" style="max-height: 200px; margin:20px;" src="{% static 'logo/cultural_program.png' %}">
+            <h2 class="animated bounceInDow large-text">مسابقة أركان معرض البرنامج الثقافي</h2>
+            <p>أهلا بكم في لعبة شفرة البرنامج الثقافي!يهدف البرنامج الثقافي الخامس لكشف تجليات الإبداع في أرجاء الوطن العربي والعالم الإسلامي، ويستعرض المعرض في أركانه المختلفة شتّى جوانب الإبداع. بعد المرور على أجزاء المعرض، يمكن الإجابة على أسئلة هذه الشفرة،
+                لكن <span style="background: rgba(193, 153, 28, 0.8)">تذكروا: يمكن خوض هذه اللعبة مرة واحدة فقط،</a> فلتكن بعد المرور على المعرض!</p>
+        {% if user.is_authenticated %}
+         <button id="hide" style="color: white;" class="animated fadeInUp btn btn-lg btn-success">
+             ابدء اللعبة
          </button>
-
-    </div>
-
+         {% else %}
+         <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لإنجاز كي ألعب</a>
+         {% endif %}
+       </div>
+     </div>
+   </div>
+    {% if user.is_authenticated %}
 
     <div id="start-game" class="text-center">
 
@@ -219,43 +27,23 @@ button {
 
           <div id="post-game"  class="text-center">
                 <img class="bounceInDown" style="max-height: 300px; margin:20px;" src="{% static 'logo/cultural_program.png' %}">
-                <p class="large-text">
-مسابقه اركان معرض البرنامج الثقافي                 </p>
+                <h2 class="large-text">مسابقة أركان معرض البرنامج الثقافي</h2>
           <div id ='post-game-text'>
               <h2>
-                  تهانينا !!
-
+                  تهانينا!
               </h2>
           </div>
-              <a  href="{% url 'CulturalProgramCode:show_scores' %}">    <button id = "link"  class="animated fadeInUp btn btn-lg btn-success">سلم النتائج </button>
-</a>
-
+              <a  href="{% url 'cultural_program_code:show_scores' %}" class="animated fadeInUp btn btn-lg btn-success">سلم النتائج </a>
     </div>
-
-
 </div>
-{% else %}
-    <div>
-
-          <div id="post-game"  class="text-center">
-                <img class="bounceInDown" style="max-height: 300px; margin:20px;" src="{% static 'logo/cultural_program.png' %}">
-                <p class="large-text">
-مسابقه اركان معرض البرنامج الثقافي                 </p>
-          <div id ='post-game-text'>
-              <h2>
-البدء باللعبه يتطلب تسجيل الدخول في بوابة إنجاز
-              </h2>
-          </div>
-</a>
-
-     <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لإنجاز كي ألعب</a>
-
-          </div>
-{% endif %}
+    {% endif %}
 
 
 
 
+<script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
+  <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
 
 
 <script type="text/javascript">
@@ -267,7 +55,7 @@ function initiate_radio(){
     counter =  $(this).data("counter");
     game_pk = $(this).data("game_pk");
         $.ajax({
-            url: "{% url 'CulturalProgramCode:check_answer' %}",
+            url: "{% url 'cultural_program_code:check_answer' %}",
             type: 'POST',
             data: {choice_pk: choice_pk,question_pk:question_pk,counter:counter,game_pk:game_pk},
             cache: false,
@@ -304,7 +92,7 @@ function initiate_radio(){
         $("#hide").click(function(){
             action = $(this).data("action");
             $.ajax({
-                url: "{% url 'CulturalProgramCode:start_new_game' %}",
+                url: "{% url 'cultural_program_code:start_new_game' %}",
                 type: 'POST',
                 data: {action: action},
                 cache: false,
@@ -428,8 +216,5 @@ function initiate_radio(){
         });
 
      });
-
 </script>
-
-</body>
-</html>
+{% endblock %}

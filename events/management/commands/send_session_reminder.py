@@ -14,9 +14,9 @@ class Command(BaseCommand):
         tomorrow_date = timezone.now().date() + timezone.timedelta(days=1)
 
         for user in User.objects.filter(session_registrations__session__date=tomorrow_date).distinct():
-            tomorrow_registrations = user.session_registrations.filter(session__date=tomorrow_date)
+            tomorrow_registrations = user.session_registrations.filter(session__date=tomorrow_date,
+                                                                       is_deleted=False)
             event = tomorrow_registrations.first().session.event
-            print event
             
             try:
                 first_name = user.common_profile.ar_first_name

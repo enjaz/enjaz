@@ -71,13 +71,22 @@ def toggle_right_answer(request):
     question = get_object_or_404(Question,pk=question_pk)
     game_pk = request.POST.get('game_pk')
     game = get_object_or_404(Game, pk=game_pk)
-    score = game.right_answers
     if choice.is_answer:
         right= True
+        game.right_answers += 1
+        game.save()
     else:
         right = False
-    game.save()
+    score = game.right_answers
     return {"right":right,"score":score}
+
+def scores (request):
+    game =Game.objects.all()
+    scores = game.order_by('-right_answers')
+    return render(request, 'the_game_score.html')
+
+
+
 
 
 

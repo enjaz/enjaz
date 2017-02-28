@@ -4,12 +4,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-
-
 question_type_choices = (
-    ('F', u'اربع صور'),
+    ('F', u'أربع صور'),
     ('Q', u'سؤال'),
-    ('S', u'لقطه'),
+    ('S', u'لقطة'),
 )
 
 class Booth(models.Model):
@@ -31,7 +29,7 @@ class Question(models.Model):
 
 class QuestionFigure (models.Model):
     question = models.ForeignKey(Question)
-    figure = models.FileField(upload_to="questions/question_image",blank=True, null=True)
+    figure = models.FileField(upload_to="questions/question_image", blank=True, null=True)
 
 class Choice(models.Model):
     is_answer = models.BooleanField(default=False)
@@ -47,3 +45,5 @@ class Game (models.Model):
     right_answers = models.IntegerField(default=0)
     submission_date = models.DateTimeField(auto_now_add=True, verbose_name=u"تاريخ الإرسال")
 
+    def __unicode__(self):
+        return user.username

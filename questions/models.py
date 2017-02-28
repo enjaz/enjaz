@@ -16,7 +16,6 @@ class Booth(models.Model):
     def __unicode__(self):
         return self.name
 
-
 class Question(models.Model):
     booth = models.ForeignKey(Booth, null=True)
     question_type = models.CharField(max_length=1, choices=question_type_choices,
@@ -25,7 +24,6 @@ class Question(models.Model):
 
     def __unicode__(self):
         return self.text
-
 
 class QuestionFigure (models.Model):
     question = models.ForeignKey(Question)
@@ -46,4 +44,4 @@ class Game (models.Model):
     submission_date = models.DateTimeField(auto_now_add=True, verbose_name=u"تاريخ الإرسال")
 
     def __unicode__(self):
-        return user.username
+        return self.user.username

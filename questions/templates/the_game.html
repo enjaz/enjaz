@@ -3,37 +3,40 @@
     <div id="pre-game" class="text-center">
       <div class="row">
         <div class="col-sm-6 col-sm-offset-3">
-        <img class="animated bounceInDown" style="max-height: 200px; margin:20px;" src="{% static 'logo/cultural_program.png' %}">
-            <h2 class="animated bounceInDow large-text">مسابقة أركان معرض البرنامج الثقافي</h2>
-            <p>أهلا بكم في لعبة شفرة البرنامج الثقافي!يهدف البرنامج الثقافي الخامس لكشف تجليات الإبداع في أرجاء الوطن العربي والعالم الإسلامي، ويستعرض المعرض في أركانه المختلفة شتّى جوانب الإبداع. بعد المرور على أجزاء المعرض، يمكن الإجابة على أسئلة هذه الشفرة،
+        <img class="animated fadeInDown" style="max-height: 200px; margin:20px;" src="{% static 'logo/cultural_program.png' %}">
+            <h2 class="animated fadeInDown large-text">مسابقة أركان معرض البرنامج الثقافي</h2>
+            <p class="animated fadeInDown">أهلا بكم في لعبة شفرة البرنامج الثقافي! يهدف البرنامج الثقافي الخامس لكشف تجليات الإبداع في أرجاء الوطن العربي والعالم الإسلامي، ويستعرض المعرض في أركانه المختلفة شتّى جوانب الإبداع. بعد المرور على أجزاء المعرض، يمكن الإجابة على أسئلة هذه الشفرة،
                 لكن <span style="background: rgba(193, 153, 28, 0.8)">تذكروا: يمكن خوض هذه اللعبة مرة واحدة فقط،</a> فلتكن بعد المرور على المعرض!</p>
-        {% if user.is_authenticated %}
+        {% if user.is_authenticated and not user_game %}
          <button id="hide" style="color: white;" class="animated fadeInUp btn btn-lg btn-success">
              ابدء اللعبة
          </button>
+         {% elif user.is_authenticated and  user_game %}
+         <button class="btn btn-lg btn-danger" disabled>
+           سبق أن لعبت!
+         </button>
          {% else %}
-         <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لإنجاز كي ألعب</a>
+         <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لبوّابة إنجاز كي ألعب</a>
          {% endif %}
        </div>
      </div>
    </div>
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated and not user_game %}
 
     <div id="start-game" class="text-center">
 
     </div>
 
-    <div id="post-game" style="display:none;"  class="container">
-
-          <div id="post-game"  class="text-center">
-                <img class="bounceInDown" style="max-height: 300px; margin:20px;" src="{% static 'logo/cultural_program.png' %}">
+    <div id="post-game" style="display:none;">
+          <div id="post-game" class="text-center">
+                <img style="max-height: 200px; margin:20px;" src="{% static 'logo/cultural_program.png' %}">
                 <h2 class="large-text">مسابقة أركان معرض البرنامج الثقافي</h2>
           <div id ='post-game-text'>
               <h2>
                   تهانينا!
               </h2>
           </div>
-              <a  href="{% url 'cultural_program_code:show_scores' %}" class="animated fadeInUp btn btn-lg btn-success">سلم النتائج </a>
+              <a href="{% url 'cultural_program_code:show_scores' %}" class="animated fadeInUp btn btn-lg btn-success">سلم النتائج</a>
     </div>
 </div>
     {% endif %}
@@ -75,7 +78,7 @@ function initiate_radio(){
                                     id: 'container',
                                     name: 'score'
                                     }).appendTo('#post-game-text');
-                        var content = document.createTextNode("عدد اجوبتك الصحيحه ["+(data.score)+"]");
+                        var content = document.createTextNode("عدد إجاباتك الصحيحة: " + data.score);
                         $thedive.append(content);
                     }
                     else {

@@ -1222,7 +1222,6 @@ def delete_buzz(request, buzz_id):
     buzz.save()
     return {"message": "success"}
 
-@login_required
 def show_post(request, slug):
     post = get_object_or_404(Post, slug=slug)
     if not post.is_published():

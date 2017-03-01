@@ -7,6 +7,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
+        # We manusally added these dependencies because all of them
+        # store city code instead of the full city name.  So they have
+        # to be applied before this one.
+        ('hpc', '0003_add_hpc_clubs'),
+        ('researchhub', '0002_add_club'),
+        ('events', '0013_add_2nd_hpc'),
+        ('bulb', '0017_add_2017_bulb_clubs'),
+        ('studentguide', '0012_add_studentguide_clubs'),
         ('clubs', '0049_logo_path'),
     ]
 

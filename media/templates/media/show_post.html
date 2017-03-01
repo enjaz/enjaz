@@ -1,0 +1,37 @@
+{% extends 'front/front_base.html' %}{% load staticfiles %} {% block title %}{{ post.title }}{% endblock %} {% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-8 col-sm-offset-2">
+            <div id="statement" class="text-center">
+                <h1 class="text-right">{{ post.title }}</h1> {% if post.image %}<img id="post-image" src="{{ post.image.url }}">{% endif %} {{ post.body|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    #statement p,
+    #statement blockquote p {
+        text-align: right;
+        font-size: 16px;
+        color: rgb(48, 54, 65);
+    }
+
+    .highlight {
+        background: #ffff89;
+    }
+
+    #post-image {
+        float: left;
+        width: 40%;
+        margin: 0 15px 15px 15px;
+    }
+
+    @media only screen and (max-width: 767px) {
+        #post-image {
+            float: none;
+            width: 80%;
+            margin: 0 15px 15px 15px;
+        }
+    }
+</style>
+{% endblock %}

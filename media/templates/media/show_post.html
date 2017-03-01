@@ -1,9 +1,20 @@
-{% extends 'front/front_base.html' %}{% load staticfiles %} {% block title %}{{ post.title }}{% endblock %} {% block content %}
+{% extends 'front/front_base.html' %}{% load staticfiles %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block custommeta %}
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@StudentsofKSAUH" />
+    <meta name="twitter:title" content="{{ post.title }}" />
+    <meta name="twitter:description" content="{{ post.body|striptags|truncatewords:20 }}" />{% if post.image %}
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ post.image.url }}" />{% endif %}
+{% endblock %}
+{% block content %}
 <div class="container">
     <div class="row">
         <div class="col-sm-8 col-sm-offset-2">
             <div id="statement" class="text-center">
-                <h1 class="text-right">{{ post.title }}</h1> {% if post.image %}<img id="post-image" src="{{ post.image.url }}">{% endif %} {{ post.body|safe }}
+                <h1 class="text-right">{{ post.title }}</h1>
+                {% if post.image %}<img id="post-image" src="{{ post.image.url }}">{% endif %}
+                {{ post.body|safe }}
             </div>
         </div>
     </div>

@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, url, include
 from django.views.generic import TemplateView
+from django.views.generic.base import RedirectView
 
 urlpatterns = patterns('',
     url(r'^$', 'core.views.portal_home', name='home'),
@@ -9,7 +10,7 @@ urlpatterns = patterns('',
     url(r'^debate/$', 'core.views.debate', name='debate'),
     url(r'^indicators/$', 'core.views.indicators', name='indicators'),
     url(r'^indicators/(?P<city_code>\w)/$', 'core.views.indicators', name='indicators_for_city'),
-    url(r'^aboutsc/deanship_cp4/$', TemplateView.as_view(template_name='cp4_bader.html'), name='cp4_bader'),
+    url(r'^aboutsc/(deanship_cp4)/$', RedirectView.as_view(pattern_name='media:show_post'), name='cp4_bader'),
     url(r'^visit/(?P<pk>\d+)/$', "core.views.visit_announcement", name='visit_announcement'),
     url(r'^cancel_twitter_connection$', "core.views.cancel_twitter_connection", name='cancel_twitter_connection'),
     url('', include('social.apps.django_app.urls', namespace='social')),

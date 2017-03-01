@@ -4,6 +4,7 @@ from media import views
 
 urlpatterns = patterns('',
     url(r'^$', views.index, name='index'),
+    url(r'^posts/(?P<slug>[\d\w\-]+)/$', views.show_post, name="show_post"),
     url(r'^activities/$', views.list_activities, name="list_activities"),
     url(r'^activities/campus/$', views.list_campus_activities, name="list_campus_activities"),
                        

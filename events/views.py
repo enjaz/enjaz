@@ -12,8 +12,8 @@ import os.path
 
 from core import decorators
 from clubs.models import college_choices
-from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm, InitiativeForm, InitiativeFigureFormset
-from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation, TimeSlot, SessionRegistration, Initiative, SessionGroup
+from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm, InitiativeForm, InitiativeFigureFormset,CaseReportForm
+from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation, TimeSlot, SessionRegistration, Initiative, SessionGroup,CaseReport
 from events import utils
 import core.utils
 
@@ -139,9 +139,9 @@ def list_abstracts(request, event_code_name):
 
 @login_required
 def list_my_abstracts(request):
-    abstracts =  Abstract.objects.filter(is_deleted=False, user=request.user)
-
-    context = {'abstracts': abstracts}
+    abstracts = Abstract.objects.filter(is_deleted=False, user=request.user)
+    casereports = CaseReport.objects.filter(is_deleted=False, user=request.user)
+    context = {'abstracts': abstracts,'casereports':casereports}
     return render(request, 'events/abstracts/list_my_abstracts.html', context)
 
 @login_required
@@ -445,6 +445,7 @@ def show_initiative(request, event_code_name, pk):
     return render(request, "events/initiatives/show_initiative.html", context)
 
 def show_session_group(request, event_code_name, code_name):
+    event = SessionGroup.event
     session_group = get_object_or_404(SessionGroup,
                                       event__code_name=event_code_name,
                                       code_name=code_name)
@@ -477,3 +478,70 @@ def review_registrations(request, event_code_name, pk):
                                                 args=(session.event.code_name, session.pk)))
     elif request.method == "GET":
         return render(request, "events/review_registrations.html", {'session': session})
+
+
+
+@login_required
+def submit_case_report(request, event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name,
+                              receives_abstract_submission=True)
+    context = {'event': event}
+
+    if event.abstract_submission_opening_date and timezone.now() < event.abstract_submission_opening_date:
+        return render(request, 'events/abstracts/abstract_not_started.html', context)
+    elif event.abstract_submission_closing_date and timezone.now() > event.abstract_submission_closing_date:
+        return render(request, 'events/abstracts/abstract_closed.html', context)
+
+    if request.method == 'POST':
+        instance = CaseReport(event=event,user=request.user)
+        form = CaseReportForm(request.POST, request.FILES,
+                             instance=instance)
+        if form.is_valid():
+            abstract = form.save()
+            return HttpResponseRedirect(reverse('events:show_casereport',
+                                                args=(event.code_name, abstract.pk)))
+    elif request.method == 'GET':
+        form = CaseReportForm()
+    context['form'] = form
+
+    return render(request, 'events/abstracts/casereports/casereport_submission.html', context)
+
+@login_required
+def show_casereport(request, event_code_name, pk):
+    casereport = get_object_or_404(CaseReport, is_deleted=False, pk=pk)
+    event = casereport.event
+
+    if not casereport.user == request.user and \
+            not request.user.is_superuser and \
+            not utils.can_evaluate_abstracts(request.user, event) and \
+            not utils.is_organizing_team_member(request.user, event):
+        raise PermissionDenied
+
+    context= {'event':event, 'casereport':casereport}
+    return render(request, "events/abstracts/casereports/show_casereport.html", context)
+
+
+@login_required
+@decorators.ajax_only
+@decorators.post_only
+@csrf.csrf_exempt
+def delete_casereport(request, event_code_name, pk):
+    casereport = get_object_or_404(CaseReport, is_deleted=False, pk=pk)
+    event = casereport.event
+
+    if not casereport.user == request.user and \
+            not request.user.is_superuser and \
+            not utils.is_organizing_team_member(request.user, event):
+        raise PermissionDenied
+
+    if event.abstract_submission_closing_date and timezone.now() > event.abstract_submission_closing_date:
+        raise Exception(u"انتهت المدة المتاحة لحذف الملخص ")
+
+    casereport.is_deleted = True
+    casereport.save()
+    list_my_abstracts_url = reverse('events:list_my_abstracts')
+    full_url = request.build_absolute_uri(list_my_abstracts_url)
+    return {"message": "success", "list_url": full_url}
+
+
+

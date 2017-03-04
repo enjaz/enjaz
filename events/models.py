@@ -482,3 +482,39 @@ class Initiative(models.Model):
 class InitiativeFigure(models.Model):
     initiative = models.ForeignKey(Initiative, related_name='figures', null=True)
     figure = models.FileField(verbose_name=u"Attach the figure", upload_to="events/figures/initiatives/")
+
+class CaseReport(models.Model):
+    user = models.ForeignKey(User, null=True, blank=True,
+                             related_name='event_casereport')
+    event = models.ForeignKey(Event, verbose_name=u"الحدث")
+    title = models.CharField(verbose_name="Title", max_length=255)
+    authors = models.TextField(verbose_name=u"Name of authors")
+    study_field = models.CharField(verbose_name="Field", max_length=255, default="")
+    university = models.CharField(verbose_name="University", max_length=255)
+    college = models.CharField(verbose_name="College", max_length=255)
+    email = models.EmailField(verbose_name="Email")
+    phone = models.CharField(verbose_name="Phone number", max_length=20)
+    introduction = models.TextField(u"Introduction", default="")
+    patient_info = models.TextField(u"Patient info", default="")
+    clinical_presentation = models.TextField(u"clinical presentation", default="")
+    diagnosis = models.TextField(u"Diagnosis", default="")
+    treatment = models.TextField(u"Treatment", default="")
+    outcome = models.TextField(u"Outcome", default="")
+    discussion = models.TextField(u"Discussion", default="")
+    conclusion = models.TextField(u"Conclusion", default="")
+    was_published = models.BooleanField(u"Have you published this research?", default=False)
+    was_presented_at_others = models.BooleanField(u"Have you presented this research in any other conference before?", default=False)
+    was_presented_previously = models.BooleanField(u"Have you presented this research in a previous year of this conference?", default=False)
+    date_submitted = models.DateTimeField(auto_now_add=True)
+    is_deleted = models.BooleanField(default=False,
+                                     verbose_name=u"محذوف؟")
+
+
+
+
+
+
+# Intro
+# Patient info and clinical presentation
+# Diagnosis, treatment and outcome
+# Discussion

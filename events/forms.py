@@ -2,7 +2,7 @@
 from django import forms
 
 from accounts.utils import get_user_gender
-from events.models import NonUser, Session, Registration, Abstract, AbstractFigure, Initiative, InitiativeFigure
+from events.models import NonUser, Session, Registration, Abstract, AbstractFigure, Initiative, InitiativeFigure,Criterion,CriterionValue,Evaluation,CaseReport
 from django.forms.models import inlineformset_factory
 
 class NonUserForm(forms.ModelForm):
@@ -90,6 +90,17 @@ class AbstractFigureForm(forms.ModelForm):
     class Meta:
         model = AbstractFigure
         fields = ['figure']
+
+class CaseReportForm(forms.ModelForm):
+    class Meta:
+        model = CaseReport
+        fields = ['title', 'authors', 'university', 'college', 'email','phone',
+                  'introduction','patient_info', 'clinical_presentation',
+                  'diagnosis', 'treatment', 'outcome','discussion','conclusion',
+                  'was_published',
+                  'was_presented_at_others',
+                  'was_presented_previously'
+                  ]
 
 
 class EvaluationForm(forms.Form):

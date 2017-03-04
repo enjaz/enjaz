@@ -99,7 +99,7 @@ class CaseReportForm(forms.ModelForm):
                   'diagnosis', 'treatment', 'outcome','discussion','conclusion',
                   'was_published',
                   'was_presented_at_others',
-                  'was_presented_previously'
+                  'was_presented_previously','study_field'
                   ]
 
 

@@ -245,7 +245,7 @@ def handle_ajax(request):
                     text = u"سجّلت في {}{}!  يمكنك التسجيل من: {}"
                     if session.event.hashtag:
                         text += u"\n#" + session.event.hashtag
-                    core.utils.create_tweet(request.user, text.format(session.event.twitter_event_name, twitter_text, full_url))
+                    core.utils.create_tweet(request.user, text.format(session.event.twitter_event_name or session.event.official_name, twitter_text, full_url))
             elif registration.is_deleted:
                 registration.is_deleted = False
                 registration.is_approved = is_approved

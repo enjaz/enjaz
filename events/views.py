@@ -175,7 +175,6 @@ def upload_abstract_image(request):
                     "message": u"لم أستطع رفع الملف"}
                 }
 
-@login_required
 def list_sessions(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
     timeslots = TimeSlot.objects.filter(event=event)
@@ -183,8 +182,7 @@ def list_sessions(request, event_code_name):
                'event': event}
 
     if event.registration_opening_date and timezone.now() < event.registration_opening_date:
-        #TODO: Not
-        return redirect('https://hpc.enjazportal.com')
+        raise Http404
     elif event.registration_closing_date and timezone.now() > event.registration_closing_date:
         return HttpResponseRedirect(reverse('events:registration_closed',
                                                 args=(event.code_name,)))

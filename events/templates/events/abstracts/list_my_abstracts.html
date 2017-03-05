@@ -33,6 +33,32 @@
             </div>
         </div>
 </div>
+<div class="english-field">
+<h1 class="english-field">My Casereports</h1>
+            <div class="panel-body">
+                <div class="row">
+                    <table id="casereports" class="display datatable dt-responsive">
+                        <thead>
+                            <tr>
+                                <th class="all">Title</th>
+                                <th class="not-mobile">Submission date</th>
+                                <th class="not-mobile">ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for casereport in casereports %}
+                            <tr>
+                                <td><a href="{% url 'events:show_casereport' casereport.event.code_name casereport.pk %}">{{ casereport.title }}</a></td>
+                                <td data-order="{{ casereport.date_submitted|date:"U" }}">{{ casereport.date_submitted|date:"Y-m-d" }}</td>
+                                <td>{{ casereport.pk }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+</div>
 {% endblock %}
 
 {% block customscript %}
@@ -48,6 +74,10 @@
 	<script>
     $(function(){
         $("#abstracts").dataTable({
+            "order": [[ 3, "asc" ]]
+        });
+
+        $("#casereports").dataTable({
             "order": [[ 3, "asc" ]]
         });
     });

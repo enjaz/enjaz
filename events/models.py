@@ -23,7 +23,7 @@ session_gender_choices = (
 class Event(models.Model):
     official_name = models.CharField(u"الاسم الرسمي", max_length=255)
     english_name = models.CharField(u"الاسم الإنجليزي", max_length=255, default="", blank=True)
-
+    twitter_event_name = models.CharField(u"الاسم في تغريدة تويتر", default="", max_length=30, blank=True)
     is_official_name_english = models.BooleanField(u"هل اسم الحدث الرسمي إنجليزي", default=False)
     code_name = models.CharField(max_length=50, default="",
                                  blank=True,

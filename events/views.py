@@ -178,8 +178,8 @@ def upload_abstract_image(request):
 @login_required
 def list_sessions(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
-    time_slots = TimeSlot.objects.filter(event=event)
-    context = {'time_slots': time_slots,
+    timeslots = TimeSlot.objects.filter(event=event)
+    context = {'timeslots': timeslots,
                'event': event}
 
     if event.registration_opening_date and timezone.now() < event.registration_opening_date:
@@ -220,6 +220,10 @@ def handle_ajax(request):
             session_group = get_object_or_404(SessionGroup, pk=session_group_pk)
             already_on = session_group.is_user_already_on(request.user)
             if session_group.is_limited_to_one and already_on:
+                raise Exception(u'سبق أن سجّلت!')
+        else:
+            timeslot = session.time_slot
+            if timeslot and timeslot.is_user_already_on(request.user):
                 raise Exception(u'سبق أن سجّلت!')
 
         if not session.limit is None and\
@@ -542,6 +546,3 @@ def delete_casereport(request, event_code_name, pk):
     list_my_abstracts_url = reverse('events:list_my_abstracts')
     full_url = request.build_absolute_uri(list_my_abstracts_url)
     return {"message": "success", "list_url": full_url}
-
-
-

@@ -1,7 +1,7 @@
 from django import template
 
 from events import utils
-from events.models import SessionRegistration
+from events.models import SessionRegistration, TimeSlot
 
 register = template.Library()
 
@@ -39,3 +39,7 @@ def get_status(user, session):
 @register.filter
 def is_on_sidebar(user, event):
     return event.is_on_sidebar(user)
+
+@register.filter
+def is_already_on_timeslot(user, timeslot):
+    return timeslot.is_user_already_on(user)

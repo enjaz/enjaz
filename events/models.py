@@ -114,6 +114,11 @@ class TimeSlot(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True)
     date_edited = models.DateTimeField(auto_now=True)
 
+    def is_user_already_on(self, user):
+        return SessionRegistration.objects.filter(session__time_slot=self,
+                                                  is_deleted=False,
+                                                  user=user).exists()
+
     def __unicode__(self):
         return self.name
 
@@ -343,7 +348,7 @@ class Registration(models.Model):
         elif self.nonuser:
             return self.nonuser.ar_first_name
 
-        
+
     def get_ar_full_name(self):
         if self.user:
             try:
@@ -372,14 +377,14 @@ class Registration(models.Model):
             return self.nonuser.gender
         except AttributeError:
             return ''
-        
+
     def __unicode__(self):
         return self.get_en_full_name()
 
 class Abstract(models.Model):
     user = models.ForeignKey(User, null=True, blank=True,
                              related_name='event_abstracts')
-    event = models.ForeignKey(Event, verbose_name=u"الحدث")    
+    event = models.ForeignKey(Event, verbose_name=u"الحدث")
     title = models.CharField(verbose_name="Title", max_length=255)
     authors = models.TextField(verbose_name=u"Name of authors")
     study_field = models.CharField(verbose_name="Field", max_length=255, default="")
@@ -420,7 +425,7 @@ class Abstract(models.Model):
 
     def __unicode__(self):
         return self.title
-    
+
 class AbstractFigure(models.Model):
     abstract = models.ForeignKey(Abstract, related_name='figures', null=True)
     figure = models.FileField(verbose_name=u"Attach the figure", upload_to="events/figures/")

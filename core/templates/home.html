@@ -86,6 +86,13 @@
 							<td class="hidden-xs">{{ abstract.event.get_html_name|safe }}</td>
 						</tr>
 						{% endfor %}
+
+						{% for casereport in user.event_casereport.all %}
+						<tr>
+							<td dir="auto" class="english-field"><a href="{% url 'events:show_casereport' casereport.event.code_name casereport.pk %}">{{ casereport.title }}</a></td>
+							<td class="hidden-xs">{{ casereport.event.get_html_name|safe }}</td>
+						</tr>
+						{% endfor %}
 					</tbody>
 				</table>
 				

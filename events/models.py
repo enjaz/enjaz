@@ -41,6 +41,7 @@ class Event(models.Model):
     twitter = models.CharField(max_length=255,
                                blank=True,
                                default="KSAU_Events")
+    is_auto_tweet = models.BooleanField(default=True, verbose_name=u"تغريد تلقائي؟")
     receives_initiative_submission = models.BooleanField(default=False,
                                                          verbose_name=u"يستقبل مبادرات؟")
     initiative_submission_opening_date = models.DateTimeField(u"تاريخ فتح استقبال المبادرات", null=True, blank=True)

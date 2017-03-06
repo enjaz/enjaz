@@ -232,7 +232,7 @@ def handle_ajax(request):
                 registration = SessionRegistration.objects.create(session=session,
                                                    user=request.user,
                                                    is_approved=is_approved)
-                if not has_previous_sessions:
+                if not has_previous_sessions and session.event.is_auto_tweet:
                     if session_group_pk:
                         relative_url = reverse("events:show_session_group", args=(session.event.code_name, session_group.code_name))
                     else:

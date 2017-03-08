@@ -14,10 +14,19 @@
         </div>
         <div id="collapseThree-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
+              {% if user|is_organizing_team_member:event %}
+              <form method="post">
+                {% csrf_token %}
+                    <select name="action">
+                      <option>Choose Action</option>
+                      <option value="delete">Delete</option>
+                    </select>
+                {% endif %}
                 <div class="row">
                     <table id="pending" class="display datatable dt-responsive">
                         <thead>
                             <tr>
+                                <th></th>
                                 <th class="all">Title</th>
                                 <th class="not-mobile">Presenting author</th>
                                 <th class="not-mobile">Presentation preference</th>
@@ -27,6 +36,7 @@
                         <tbody>
                         {% for abstract in pending_abstracts %}
                             <tr>
+                                <td><input type="checkbox" value="1" name="pk_{{ abstract.pk }}"></td>
                                 <td><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
                                 <td>{{ abstract.presenting_author }}</td>
                                 <td>{{ abstract.get_presentation_preference_display }}</td>
@@ -36,6 +46,10 @@
                         </tbody>
                     </table>
                 </div>
+                {% if user|is_organizing_team_member:event %}
+                <button type="submit" class="btn btn-warning">Submit</button>
+                    </form>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -94,7 +108,7 @@
 	<script>
     $(function(){
         $("#pending").dataTable({
-            "order": [[ 3, "asc" ]]
+            "order": [[ 4, "asc" ]]
         });
         $("#evaluated").dataTable({
             "order": [[ 4, "desc" ]]

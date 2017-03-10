@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         ('hpc', '0003_add_hpc_clubs'),
         ('researchhub', '0002_add_club'),
         ('events', '0013_add_2nd_hpc'),
-        ('bulb', '0017_add_2017_bulb_clubs'),
+        ('bulb', '0027_readathon_team'),
         ('studentguide', '0012_add_studentguide_clubs'),
         ('clubs', '0049_logo_path'),
     ]

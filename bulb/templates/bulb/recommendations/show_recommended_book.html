@@ -1,0 +1,9 @@
+<h2>توصيات {{ recommended_book.title }}</h2>
+{% for recommendation in recommended_book.bookrecommendation_set.all %}
+<p>أوصـ/ـت {{ recommendation.user.common_profile.first_name }} {{ recommendation.user.common_profile.last_name }}:</p>
+{% if recommendation.comment %}
+<blockquote>
+  {{ recommendation.comment }}
+</blockquote>
+{% endif %}
+{% endfor %}

@@ -135,7 +135,17 @@ def list_abstracts(request, event_code_name):
                'pending_abstracts': pending_abstracts,
                'evaluated_abstracts': evaluated_abstracts}
 
-    return render(request, 'events/abstracts/list_abstracts.html', context)
+    if request.method == "POST":
+        action = request.POST.get('action')
+        pks = [int(field.lstrip('pk_')) for field in request.POST if field.startswith('pk_')]
+        print pks
+        if action == "delete":
+            Abstract.objects.filter(pk__in=pks).update(is_deleted=True)
+        return HttpResponseRedirect(reverse('events:list_abstracts',
+                                                args=(event.code_name,)))
+
+    elif request.method == "GET":
+        return render(request, 'events/abstracts/list_abstracts.html', context)
 
 @login_required
 def list_my_abstracts(request):
@@ -232,7 +242,7 @@ def handle_ajax(request):
                 registration = SessionRegistration.objects.create(session=session,
                                                    user=request.user,
                                                    is_approved=is_approved)
-                if not has_previous_sessions:
+                if not has_previous_sessions and session.event.is_auto_tweet:
                     if session_group_pk:
                         relative_url = reverse("events:show_session_group", args=(session.event.code_name, session_group.code_name))
                     else:
@@ -462,10 +472,19 @@ def show_session_group(request, event_code_name, code_name):
 
     return render(request, "events/session_group/show_session_group.html", context)
 
+@login_required
 def review_registrations(request, event_code_name, pk):
     session = get_object_or_404(Session,
                                 event__code_name=event_code_name,
                                 pk=pk)
+    event = session.event
+    if not utils.is_organizing_team_member(request.user, event):
+        raise PermissionDenied
+
+    approved_registrations = SessionRegistration.objects.filter(session=session, is_deleted=False, is_approved=True)
+    pending_registrations = SessionRegistration.objects.filter(session=session, is_deleted=False, is_approved=None)
+    regected_registrations = SessionRegistration.objects.filter(session=session, is_deleted=False, is_approved=False)
+
     if request.method == "POST":
         action = request.POST.get('action')
         pks = [int(field.lstrip('pk_')) for field in request.POST if field.startswith('pk_')]
@@ -479,9 +498,10 @@ def review_registrations(request, event_code_name, pk):
         return HttpResponseRedirect(reverse('events:review_registrations',
                                                 args=(session.event.code_name, session.pk)))
     elif request.method == "GET":
-        return render(request, "events/review_registrations.html", {'session': session})
-
-
+        return render(request, "events/review_registrations.html", {'session': session,
+                                                                    'approved_registrations': approved_registrations,
+                                                                    'pending_registrations': pending_registrations,
+                                                                    'regected_registrations': regected_registrations})
 
 @login_required
 def submit_case_report(request, event_code_name):

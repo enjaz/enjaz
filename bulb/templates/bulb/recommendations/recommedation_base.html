@@ -52,13 +52,19 @@
           border-bottom: 3px solid #ffda00;
           padding-bottom: 4px;
         }
+        h2 span a{
+          color: black;
+        }
+        h2 span a:hover{
+          text-decoration: none;
+        }
         h1 {
             color: white;
             font-size: 50px;
         }
 
         header {
-            color: whote;
+            color: white;
             height: 70%;
             margin-bottom: 40px;
             background-image: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://osamakhalid.com/mirror/library.jpg');
@@ -68,7 +74,7 @@
             background-attachment: fixed;
         }
 
-        .detail a {
+        a {
             color: #85C7FF;
         }
 
@@ -185,6 +191,76 @@
     </div>
     <!--container-->
     {% block customscript %}{% endblock %}
+    {% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
+    	<!-- Piwik -->
+    	<script type="text/javascript">
+    	  var _paq = _paq || [];
+          {% if user.is_authenticated %}
+          _paq.push(['setUserId', '{{ user.username }}']);
+          {% endif %}
+    	  _paq.push(['trackPageView']);
+    	  _paq.push(['enableLinkTracking']);
+    	  (function() {
+    	    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://enjazportal.com/stats/";
+    	    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    	    _paq.push(['setSiteId', 1]);
+    	    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+    	    g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+    	  })();
+    	</script>
+    	<noscript><p><img src="//enjazportal.com/stats/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+            <!-- End Piwik Code -->
+        {% endif %}
+        {%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
+        <!---Twitter Modal -->
+        <div class="modal fade" id="connect-twitter">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">أغلق</span></button>
+                <h4 class="modal-title"></h4>
+              </div>
+              <div class="modal-body ativa-scroll text-center">
+                  <h2>بات الآن ممكنا إخبار الأصدقاء والصديقات عن أنشطة سِراج!</h2>
+                  <p>يتيح ربط حساب بوابة إنجاز بحسابك على تويتر إخبار متابعيك ومتابعاتك عن أنشطة النادي، ومساعدتهم في اكتشافها!</p>
+                  <p>بعد الربط، سوف تُكتب تغريدة آلية في حسابك عندما تؤكد انضمامك لأحد الأنشطة، ويمكنك إلغاء الربط في أي وقت.</p>
+                  <div class="row">
+                      <a style="color: #1da1f3;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-lg"><i class="fa fa-twitter fa-4x"></i><br>اربط حسابي بتويتر</a>
+                  </div>
+                  <div class="row">
+                          <a id="cancel-twitter-connection" style="color: rgb(243, 29, 89)"><i class="fa fa-times fa-4x"></i><br> لا تسألني مُجدًدا</a>
+                  </div>
+              </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        {%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
+        <script type="text/javascript">
+        $(function(){
+            $('#connect-twitter').modal({
+              keyboard: true,
+              backdrop: 'static',
+            });
+            $("#cancel-twitter-connection").click(function(){
+                $.ajax({
+                    url: "{% url 'cancel_twitter_connection' %}",
+                    type: 'GET',
+                    cache: false,
+                    success: function(data){
+                        // show success message (using toastr)
+                        toastr.options.positionClass = "toast-top-left";
+                        toastr.success("لن يظهر السؤال مُجددًا.");
+                        // hide modal
+                        $("#connect-twitter").modal('hide');
+                    }
+                });
+
+            });
+        });
+        {% endif %}
+        </script>
+        {% endif %}
+
 </body>
 
 </html>

@@ -3,35 +3,19 @@
   <div class="text-center">
   {% if user.is_authenticated and not user_books.exists %}
   <button data-action="add" id="add-book" class="btn btn-lg btn-success">أضف تزكية!</button>
-  {% elif user.is_authenticated and user_books.exists %}
-      <hr>
-      <h2 class="text-center" style="color: white;">تزكياتي</h2>
-      <p>تُنقر التزكية لتُعدّل</p>
-      <div class="row">
-      {% for book_recommendation in user_recommendations %}
-          <div class="{% if user_recommendations.count == 1 %}col-sm-offset-3 {% endif %}col-sm-6 text-center">
-                  <div class="book-image update-book" data-url="{% url 'bulb:edit_book_recommendation' book_recommendation.pk %}" style="background-image:url('{{ book_recommendation.recommended_book.cover.url }}');"></div>
-          </div>
-      {% endfor %}
-      </div>
   {% else %}
   <a style="color: white;" href="{% url 'userena_signin' %}?next={{ request.path }}" class="btn btn-lg btn-success">أدخلني لإنجاز كي أضيف تزكياتي</a>
   {% endif %}
   </div>
   <hr>
-  <h2 class="text-center">الكتب المُزكّاة</h2>
-
-  {% for category in categories %}
   <div class="row">
-  <h2><span><a href="{% url 'bulb:show_recommendation_category' category.code_name %}">{{ category.name }}</a></span></h2>
+  <h2 class="text-center">الكتب المُزكّاة في مجال "{{ category.name }}"</h2>
   {% for recommended_book in category.get_top_recommended_books %}
       <div class="col-xs-6 text-center">
               <div class="book-image" style="background-image:url('{{ recommended_book.cover.url }}');"></div>
       </div>
-
   {% endfor %}
-  </div>
-  {% endfor %}
+</div>
 {% endblock %}
 {% block customscript %}
 <script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>

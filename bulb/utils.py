@@ -67,8 +67,10 @@ def get_indirect_request_cc(book):
     return emails
 
 def get_session_submitted_cc(session):
+    group_team = clubs.utils.get_team_for_user("bulb_group", session.submitter, gender_specific=False)
+    group_team
     bulb_club = get_bulb_club_for_user(session.submitter)
-    emails = list(bulb_club.deputies.values_list('email', flat=True))
+    emails = list(values_list('email', flat=True))
     return emails
 
 def get_bulb_club_of_user(user):
@@ -97,6 +99,11 @@ def can_edit_book_commitment(user, book_commitment):
     return is_bulb_coordinator_or_deputy(user) or \
        user.is_superuser or \
        book_commitment.user == user
+
+def can_edit_book_recommendation(user, book_recommendation):
+    return is_bulb_coordinator_or_deputy(user) or \
+       user.is_superuser or \
+       book_recommendation.user == user
 
 def can_edit_owner_status(user, book):
     return is_bulb_coordinator_or_deputy(user) or \

@@ -1779,9 +1779,8 @@ def show_recommendation_index(request):
     return render(request, 'bulb/recommendations/show_index.html', context)
 
 def show_user_recommendations(request, pk):
-    user = get_object_or_404(User, pk=pk)
-    book_recommendations = BookRecommendation.objects.filter(user=request.user, is_deleted=False)
-    context = {'book_recommendations': book_recommendations}
+    recommendation_user = get_object_or_404(User, pk=pk)
+    context = {'recommendation_user': recommendation_user}
     return render(request, 'bulb/recommendations/show_user.html', context)
 
 @decorators.ajax_only

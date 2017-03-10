@@ -1849,8 +1849,12 @@ def delete_book_recommendation(request, pk):
     full_url = request.build_absolute_uri(list_url)
     return {"message": "success", "list_url": full_url}
 
-@login_required
 def show_recommendation_category(request, code_name):
     category = get_object_or_404(Category, code_name=code_name)
     context = {'category': category}
     return render(request, "bulb/recommendations/show_category.html", context)
+
+def show_recommended_book(request, pk):
+    recommended_book = get_object_or_404(RecommendedBook, pk=pk)    
+    context = {'recommended_book': recommended_book}
+    return render(request, "bulb/recommendations/show_recommended_book.html", context)

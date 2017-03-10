@@ -5,8 +5,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.html import format_html
 
-from bulb.models import Category, Book, NeededBook, Request, Point, Membership, Session, Group, Recruitment, NewspaperSignup, BookCommitment
-from bulb import utils
+from bulb import models, utils
 
 class BulbAuthenticationForm(AdminAuthenticationForm):
     def confirm_login_allowed(self, user):
@@ -27,8 +26,12 @@ class BulbAdmin(admin.sites.AdminSite):
             utils.is_bulb_member(request.user) or \
             request.user.is_superuser
 
-class MembershipAdmin(admin.TabularInline):
-    model = Membership
+class BookRecommendationInline(admin.TabularInline):
+    model = models.BookRecommendation
+    extra = 1
+
+class MembershipInline(admin.TabularInline):
+    model = models.Membership
     extra = 0
     readonly_fields = ['get_name', ]
 
@@ -63,7 +66,7 @@ class NeededBookAdmin(admin.ModelAdmin):
 
 class GroupAdmin(admin.ModelAdmin):
     list_filter = ["is_deleted", ]
-    inlines = [MembershipAdmin, ]
+    inlines = [MembershipInline, ]
 
 class BulbModelAdmin(admin.ModelAdmin):
     def get_full_ar_name(self, obj):
@@ -145,17 +148,30 @@ class BookCommitmentAdmin(BulbModelAdmin):
 class BookCommitmentAdminReadOnly(ModelAdminReadOnly, BookCommitmentAdmin):
     pass
 
+class RecommendedBookAdmin(admin.ModelAdmin):
+    list_display = ['title', 'category', 'get_recommendation_count']
+    list_filter = ['category']
+    inlines = [BookRecommendationInline]
+
+    def get_recommendation_count(self, obj):
+        return obj.bookrecommendation_set.count()
+
+class RecommendedBookAdminReadOnly(ModelAdminReadOnly, RecommendedBookAdmin):
+    pass
+
 bulb_admin = BulbAdmin("Bulb Admin")
-admin.site.register(Category)
-admin.site.register(Book, BookAdmin)
-admin.site.register(NeededBook, NeededBookAdmin)
-admin.site.register(Request)
-admin.site.register(Point)
-admin.site.register(Recruitment, RecruitmentAdmin)
-bulb_admin.register(Recruitment, RecruitmentAdminReadOnly)
-admin.site.register(NewspaperSignup)
-bulb_admin.register(NewspaperSignup)
-admin.site.register(Session, SessionAdmin)
-admin.site.register(Group, GroupAdmin)
-admin.site.register(BookCommitment, BookCommitmentAdmin)
-bulb_admin.register(BookCommitment, BookCommitmentAdminReadOnly)
+admin.site.register(models.Category)
+admin.site.register(models.Book, BookAdmin)
+admin.site.register(models.NeededBook, NeededBookAdmin)
+admin.site.register(models.Request)
+admin.site.register(models.Point)
+admin.site.register(models.Recruitment, RecruitmentAdmin)
+bulb_admin.register(models.Recruitment, RecruitmentAdminReadOnly)
+admin.site.register(models.NewspaperSignup)
+bulb_admin.register(models.NewspaperSignup)
+admin.site.register(models.Session, SessionAdmin)
+admin.site.register(models.Group, GroupAdmin)
+admin.site.register(models.BookCommitment, BookCommitmentAdmin)
+bulb_admin.register(models.BookCommitment, BookCommitmentAdminReadOnly)
+admin.site.register(models.RecommendedBook, RecommendedBookAdmin)
+bulb_admin.register(models.RecommendedBook, RecommendedBookAdminReadOnly)

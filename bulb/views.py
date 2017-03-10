@@ -1794,7 +1794,7 @@ def add_book_recommendation(request):
             if request.user.bookrecommendation_set.count() == 1:
                 relative_url = reverse('bulb:show_recommendation_index')
                 full_url = request.build_absolute_uri(relative_url)
-                utils.create_tweet(request.user, 'add_book_recommendation', (book_recommendation.recommended_book.title, full_url))
+                utils.create_tweet(request.user, 'add_book_recommendation', (full_url,))
             show_url = reverse('bulb:show_user_recommendations', args=(request.user.pk,))
             return {"message": "success", 'show_url': show_url}
     elif request.method == 'GET':

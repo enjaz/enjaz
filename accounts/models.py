@@ -105,6 +105,11 @@ class CommonProfile(models.Model):
         elif self.city == u'الأحساء':
             return 'A'
 
+    def get_university_or_affiliation(self):
+        if self.profile_type == 'S':
+            return "KSAU-HS"
+        else:
+            return self.affiliation
 
 class EnjazProfile(UserenaBaseProfile):
     user = models.OneToOneField(User,

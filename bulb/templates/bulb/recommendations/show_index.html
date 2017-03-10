@@ -5,16 +5,13 @@
       <p>تُنقر التزكية لتُعدّل</p>
       <div class="row">
       {% for book_recommendation in user_recommendations %}
-          <div class="{% if user_recommendations.count == 1 %}col-sm-offset-3 {% endif %}col-sm-6 text-center">
+          <div class="{% if user_recommendations.count == 1 %}col-sm-offset-4 {% endif %}col-sm-4 col-xs-6 text-center">
                   <div class="book-image update-book" data-url="{% url 'bulb:edit_book_recommendation' book_recommendation.pk %}" style="background-image:url('{{ book_recommendation.recommended_book.cover.url }}');"></div>
           </div>
       {% endfor %}
       </div>
       <hr>
   {% endif %}
-
-  <h2 class="text-center">الكتب المُزكّاة</h2>
-
   {% for category in categories %}
   <div class="row">
   <h2><span><a href="{% url 'bulb:show_recommendation_category' category.code_name %}">{{ category.name }}</a></span></h2>

@@ -1,11 +1,7 @@
 {% extends 'bulb/recommendations/recommedation_base.html' %}{% load staticfiles %}
 {% block content %}
-  <div class="text-center">
-  {% if user.is_authenticated and not user_books.exists %}
-  <button data-action="add" id="add-book" class="btn btn-lg btn-success">أضف تزكية!</button>
-  {% elif user.is_authenticated and user_books.exists %}
-      <hr>
-      <h2 class="text-center" style="color: white;">تزكياتي</h2>
+  {% if user.is_authenticated and user_books.exists %}
+      <h2 class="text-center"><span><a href="{% url 'bulb:show_user_recommendations' user.pk %}">تزكياتي</a></span></h2>
       <p>تُنقر التزكية لتُعدّل</p>
       <div class="row">
       {% for book_recommendation in user_recommendations %}
@@ -14,11 +10,9 @@
           </div>
       {% endfor %}
       </div>
-  {% else %}
-  <a style="color: white;" href="{% url 'userena_signin' %}?next={{ request.path }}" class="btn btn-lg btn-success">أدخلني لإنجاز كي أضيف تزكياتي</a>
+      <hr>
   {% endif %}
-  </div>
-  <hr>
+
   <h2 class="text-center">الكتب المُزكّاة</h2>
 
   {% for category in categories %}

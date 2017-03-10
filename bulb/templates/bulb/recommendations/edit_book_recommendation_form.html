@@ -68,7 +68,7 @@ $(function () {
                     {% else %}
                     toastr.success("أضيفت تزكية الكتاب بنجاح!");
                     {% endif %}
-                    $('#edit-book-recommendation-modal').modal('hide');
+                    window.location.href= data.show_url;
                 } else {
                     $("#edit-book-recommendation-modal .modal-body").html(data);
                 }}

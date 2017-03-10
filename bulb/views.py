@@ -1771,7 +1771,9 @@ def handle_cultural_program_ajax(request):
 
 def show_recommendation_index(request):
     categories = Category.objects.distinct().filter(recommendedbook__bookrecommendation__isnull=False)
-    context = {'categories': categories}
+    top_users = User.objects.annotate(recommendations=Count('bookrecommendation')).filter(recommendations__gt=1).order_by('recommendations')[:10]
+    context = {'categories': categories,
+               'top_users': top_users}
     if request.user.is_authenticated():
         user_recommendations = BookRecommendation.objects.filter(user=request.user, is_deleted=False)
         context['user_recommendations'] = user_recommendations

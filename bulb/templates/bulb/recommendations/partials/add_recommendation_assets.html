@@ -1,0 +1,51 @@
+<script type="text/javascript">
+    $(function () {
+        // initialize session edit modal
+        $('#edit-book-recommendation-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        });
+        $("#add-book").click(function () {
+            $("#edit-book-recommendation-modal").modal('show');
+            $("#edit-book-recommendation-modal .modal-title").html("إضافة تزكية");
+            $("#edit-book-recommendation-modal .modal-body").load("{% url 'bulb:add_book_recommendation' %}");
+
+            var $submitButton = $("#edit-book-recommendation-modal button.submit-button");
+            // Unbind any handlers previously attached to the submit button
+            // This is necessary to avoid multiple submissions of the form
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-book-recommendation-form").submit();
+            });
+        });
+        $(".edit-book").click(function () {
+            // show the edit book modal {# you can find it in bulb/exchange/home.html #}
+            $("#edit-book-recommendation-modal").modal('show');
+            var url = $(this).data('url');
+
+            $("#edit-book-recommendation-modal .modal-title").html("تعديل تزكية");
+            $("#edit-book-recommendation-modal .modal-body").load(url);
+
+            var $submitButton = $("#edit-book-recommendation-modal button.submit-button");
+            // Unbind any handlers previously attached to the submit button
+            // This is necessary to avoid multiple submissions of the form
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-book-recommendation-form").submit();
+            });
+        });
+        $("button.confirm-delete-book").click(function(){
+            var deletion_url = $(this).data('deletion-url');
+            var title = $(this).data('title');
+            $('#confirm-delete-book-modal .modal-body').html("هل حذف " + title + " مؤكد؟");
+            $("#delete-book").data('deletion-url', deletion_url);
+            $("#confirm-delete-book-modal").modal('show');
+        });
+    });
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+
+{% with modal_id='edit-book-recommendation-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}

@@ -1,6 +1,6 @@
 <h2>توصيات {{ recommended_book.title }}</h2>
 {% for recommendation in recommended_book.bookrecommendation_set.all %}
-<p>أوصـ/ـت {{ recommendation.user.common_profile.first_name }} {{ recommendation.user.common_profile.last_name }}:</p>
+<p>أوصـ/ـت <a href="{% url 'bulb:show_user_recommendations' recommendation.user.pk %}">{{ recommendation.user.common_profile.ar_first_name }} {{ recommendation.user.common_profile.ar_middle_name }}</a>:</p>
 {% if recommendation.comment %}
 <blockquote>
   {{ recommendation.comment }}

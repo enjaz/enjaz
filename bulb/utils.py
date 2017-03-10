@@ -28,6 +28,8 @@ def create_tweet(user, action, arguments, media_path=""):
         text = u"التزمت بقراءة {} ضمن #ماراثون_قراءة_سِراج.  للمشاركة: {}"
     elif action == 'update_book_commitment':
         text = u"أنجزت قراءة {}% من {} ضمن #ماراثون_قراءة_سِراج: {}"
+    elif action == 'add_book_recommendation':
+        text = u"أنشأت قائمة بالكتب التي أعجبتني في معرض الرياض الدولي للكتاب:\n{}\n#مبادرة_سِراج"
 
     try:
         Tweet.objects.create(text=text.format(*arguments), user=user,

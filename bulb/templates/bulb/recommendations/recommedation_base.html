@@ -74,6 +74,10 @@
             background-attachment: fixed;
         }
 
+        header a:hover{
+          text-decoration: none;
+        }
+
         a {
             color: #85C7FF;
         }
@@ -162,8 +166,10 @@
 <body>
     <header>
         <div class="text-center">
+          <a href="{% url 'bulb:show_recommendation_index' %}">
             <img class="animated bounceInDown" src="{% static 'img/bulb/logo.png' %}">
             <h1>تزكيات سِراج</h1>
+          </a>
         </div>
     </header>
     <div class="container">
@@ -172,6 +178,14 @@
                 <p class="intro instructions">
                     هنا يتشارك طلاب وطالبات جامعة الملك سعود بن عبد العزيز للعلوم الصحيّة تزكياتهم للكتب المتوفّرة في معرض الرياض الدولي للكتاب.
                 </p>
+                <div class="text-center">
+                {% if user.is_authenticated and not user_books.exists %}
+                <button data-action="add" id="add-book" class="btn btn-lg btn-success">أضف تزكية!</button>
+                {% else %}
+                <a style="color: white;" href="{% url 'userena_signin' %}?next={{ request.path }}" class="btn btn-lg btn-success">أدخلني لإنجاز كي أضيف تزكياتي</a>
+                {% endif %}
+                </div>
+                <hr>
                 {% block content %}{% endblock %}
 
                 <!-- Footer -->

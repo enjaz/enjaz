@@ -626,6 +626,7 @@ class BookRecommendation(models.Model):
                                           auto_now_add=True)
     date_modified = models.DateTimeField(u"تاريخ التعديل",
                                           auto_now=True)
+    objects = managers.BulbQuerySet.as_manager()
 
     def __unicode__(self):
         return self.recommended_book.title

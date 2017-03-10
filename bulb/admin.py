@@ -149,6 +149,7 @@ class BookCommitmentAdminReadOnly(ModelAdminReadOnly, BookCommitmentAdmin):
     pass
 
 class RecommendedBookAdmin(admin.ModelAdmin):
+    search_fields = ['title', 'authors']
     list_display = ['title', 'category', 'get_recommendation_count']
     list_filter = ['category']
     inlines = [BookRecommendationInline]

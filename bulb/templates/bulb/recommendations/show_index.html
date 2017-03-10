@@ -1,0 +1,166 @@
+{% extends 'bulb/recommendations/recommedation_base.html' %}{% load staticfiles %}
+{% block content %}
+                <div class="text-center">
+                {% if user.is_authenticated and not user_books.exists %}
+                <button data-action="add" id="add-book" class="btn btn-lg btn-success">أضف تزكية!</button>
+                {% elif user.is_authenticated and user_books.exists %}
+                    <hr>
+                    <h2 class="text-center" style="color: white;">تزكياتي</h2>
+                    <p>تُنقر التزكية لتُعدّل</p>
+                    <div class="row">
+                    {% for book_recommendation in user_recommendations %}
+                        <div class="{% if user_recommendations.count == 1 %}col-sm-offset-3 {% endif %}col-sm-6 text-center">
+                                <div class="book-image update-book" data-url="{% url 'bulb:edit_book_recommendation' book_recommendation.pk %}" style="background-image:url('{{ book_recommendation.recommended_book.cover.url }}');"></div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                <a style="color: white;" href="{% url 'userena_signin' %}?next={{ request.path }}" class="btn btn-lg btn-success">أدخلني لإنجاز كي أضيف تزكياتي</a>
+                {% endif %}
+                </div>
+                <hr>
+                <h2 class="text-center" style="color: white;">الكتب المُزكّاة</h2>
+
+                {% for category in categories %}
+                <div class="row">
+                <h2><span>{{ category.name }}</span></h2>
+                {% for recommended_book in category.get_top_recommended_books %}
+                    <div class="col-sm-6 text-center">
+                            <div class="book-image" style="background-image:url('{{ recommended_book.cover.url }}');"></div>
+                    </div>
+
+                {% endfor %}
+                </div>
+                {% endfor %}
+                {% endblock %}
+{% block customscript %}{% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
+	<!-- Piwik -->
+	<script type="text/javascript">
+	  var _paq = _paq || [];
+      {% if user.is_authenticated %}
+      _paq.push(['setUserId', '{{ user.username }}']);
+      {% endif %}
+	  _paq.push(['trackPageView']);
+	  _paq.push(['enableLinkTracking']);
+	  (function() {
+	    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://enjazportal.com/stats/";
+	    _paq.push(['setTrackerUrl', u+'piwik.php']);
+	    _paq.push(['setSiteId', 1]);
+	    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+	    g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+	  })();
+	</script>
+	<noscript><p><img src="//enjazportal.com/stats/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+        <!-- End Piwik Code -->
+    {% endif %}
+	<script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
+    <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+
+<script type="text/javascript">
+    $(function () {
+        // initialize session edit modal
+        $('#edit-book-recommendation-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        });
+        $("#add-book").click(function () {
+            $("#edit-book-recommendation-modal").modal('show');
+            $("#edit-book-recommendation-modal .modal-title").html("إضافة تزكية");
+            $("#edit-book-recommendation-modal .modal-body").load("{% url 'bulb:add_book_recommendation' %}");
+
+            var $submitButton = $("#edit-book-recommendation-modal button.submit-button");
+            // Unbind any handlers previously attached to the submit button
+            // This is necessary to avoid multiple submissions of the form
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-book-recommendation-form").submit();
+            });
+        });
+        $(".edit-book").click(function () {
+            // show the edit book modal {# you can find it in bulb/exchange/home.html #}
+            $("#edit-book-recommendation-modal").modal('show');
+            var url = $(this).data('url');
+
+            $("#edit-book-recommendation-modal .modal-title").html("تعديل تزكية");
+            $("#edit-book-recommendation-modal .modal-body").load(url);
+
+            var $submitButton = $("#edit-book-recommendation-modal button.submit-button");
+            // Unbind any handlers previously attached to the submit button
+            // This is necessary to avoid multiple submissions of the form
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-book-recommendation-form").submit();
+            });
+        });
+        $("button.confirm-delete-book").click(function(){
+            var deletion_url = $(this).data('deletion-url');
+            var title = $(this).data('title');
+            $('#confirm-delete-book-modal .modal-body').html("هل حذف " + title + " مؤكد؟");
+            $("#delete-book").data('deletion-url', deletion_url);
+            $("#confirm-delete-book-modal").modal('show');
+        });
+    });
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+
+{% with modal_id='edit-book-recommendation-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}
+
+{% include "bulb/exchange/delete_modal.html" %}
+{% include 'bulb/groups/components/autocomplete_asset.html' %}
+
+{%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
+<!---Twitter Modal -->
+<div class="modal fade" id="connect-twitter">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">أغلق</span></button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body ativa-scroll text-center">
+          <h2>بات الآن ممكنا إخبار الأصدقاء والصديقات عن أنشطة سِراج!</h2>
+          <p>يتيح ربط حساب بوابة إنجاز بحسابك على تويتر إخبار متابعيك ومتابعاتك عن أنشطة النادي، ومساعدتهم في اكتشافها!</p>
+          <p>بعد الربط، سوف تُكتب تغريدة آلية في حسابك عندما تؤكد انضمامك لأحد الأنشطة، ويمكنك إلغاء الربط في أي وقت.</p>
+          <div class="row">
+              <a style="color: #1da1f3;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-lg"><i class="fa fa-twitter fa-4x"></i><br>اربط حسابي بتويتر</a>
+          </div>
+          <div class="row">
+                  <a id="cancel-twitter-connection" style="color: rgb(243, 29, 89)"><i class="fa fa-times fa-4x"></i><br> لا تسألني مُجدًدا</a>
+          </div>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script type="text/javascript">
+{%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
+$(function(){
+    $('#connect-twitter').modal({
+      keyboard: true,
+      backdrop: 'static',
+    });
+    $("#cancel-twitter-connection").click(function(){
+        $.ajax({
+            url: "{% url 'cancel_twitter_connection' %}",
+            type: 'GET',
+            cache: false,
+            success: function(data){
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                toastr.success("لن يظهر السؤال مُجددًا.");
+                // hide modal
+                $("#connect-twitter").modal('hide');
+            }
+        });
+
+    });
+});
+{% endif %}
+</script>
+{% endif %}
+{% endblock %}

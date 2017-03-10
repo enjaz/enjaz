@@ -1,0 +1,190 @@
+<!DOCTYPE html>{% load staticfiles %}
+<html class="detail" lang="ar" dir="rtl">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="يقترح طلاب وطالبات جامعة الملك سعود بن عبد العزيز للعلوم الصحية الكتب القيّمة!">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@Seraj_Init">
+    <meta name="twitter:title" content="تزكيات سِراج">
+    <meta name="twitter:description" content="يقترح طلاب وطالبات جامعة الملك سعود بن عبد العزيز للعلوم الصحية الكتب القيّمة!">
+    <title>إنجاز | تزكيات سِراج</title>
+    <link rel="icon" href="{% static 'logo/favicon.png' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-3.3.6.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-rtl-3.3.4.min.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/entypo/css/entypo.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/neon-forms.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
+    <style>
+        @font-face {
+            font-family: 'GE Dinar One';
+            font-weight: lighter;
+            src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
+        }
+
+        @font-face {
+            font-family: 'GE Dinar One';
+            font-weight: normal;
+            src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body,
+        h2,
+        .modal {
+            font-family: 'GE Dinar One';
+            color: black;
+        }
+        h2{
+          text-align: center;
+          margin-bottom: 20px;
+          font-size: 35px;
+        }
+        h2 span{
+          border-bottom: 3px solid #ffda00;
+          padding-bottom: 4px;
+        }
+        h1 {
+            color: white;
+            font-size: 50px;
+        }
+
+        header {
+            color: whote;
+            height: 70%;
+            margin-bottom: 40px;
+            background-image: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://osamakhalid.com/mirror/library.jpg');
+            background-position: bottom;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .detail a {
+            color: #85C7FF;
+        }
+
+        footer {
+            padding: 60px 0;
+        }
+
+        .step-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            width: 90%;
+            margin-right: auto;
+            margin-left: auto;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .checkbox label {
+            margin-right: 10px;
+        }
+
+        #third-phase,
+        #promotion-step {
+            display: none;
+        }
+
+        #sad-child {
+            border-radius: 10px;
+            max-width: 100%;
+        }
+
+        #delete-button input[type='submit']:disabled {
+            background-color: #497d49;
+        }
+
+        p.instructions {
+            text-align: justify;
+        }
+
+        p.intro {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 18px;
+            width: 90%;
+            margin-right: auto;
+            margin-left: auto;
+            margin-bottom: 20px;
+            color: white;
+            font-size: 15px;
+        }
+
+        p.explaination {
+            border-radius: 10px;
+            padding: 10px;
+            margin-right: auto;
+            margin-left: auto;
+            margin-bottom: 0px;
+            font-size: 14px;
+            color: #e8ff74;
+        }
+
+        hr {
+            margin-bottom: 5px;
+            max-width: 100px;
+        }
+
+        .form-group .checkbox {
+            margin-right: 15px;
+        }
+
+        .update-book {
+            cursor: pointer;
+        }
+        .cover-thumbnail{
+          width: 50px;
+        }
+        .select2-selection.select2-selection--single{
+          height: 50px !important;
+          padding-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="text-center">
+            <img class="animated bounceInDown" src="{% static 'img/bulb/logo.png' %}">
+            <h1>تزكيات سِراج</h1>
+        </div>
+    </header>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+                <p class="intro instructions">
+                    هنا يتشارك طلاب وطالبات جامعة الملك سعود بن عبد العزيز للعلوم الصحيّة تزكياتهم للكتب المتوفّرة في معرض الرياض الدولي للكتاب.
+                </p>
+                {% block content %}{% endblock %}
+
+                <!-- Footer -->
+                <footer>
+                    <div class="row">
+                        <div class="col-lg-10 col-lg-offset-1 text-center">
+                            <p class="text-muted">بُني بأيدٍ طلابيّة</p>
+                            <p class="text-muted">حقك في النسخ مكفول.</p>
+                            <a target="_blank" rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.ar"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" /></a>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+            <!--col-->
+        </div>
+        <!--row-->
+    </div>
+    <!--container-->
+    {% block customscript %}{% endblock %}
+</body>
+
+</html>

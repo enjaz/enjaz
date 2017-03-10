@@ -16,8 +16,8 @@ from clubs.models import city_code_choices
 from core.utils import get_search_queryset, create_tweet_by_access
 from core.models import StudentClubYear, Tweet
 from core import decorators
-from bulb.models import Category, Book, NeededBook, Request, Point, Group, Membership, Session, Report, ReaderProfile, Recruitment, NewspaperSignup, Readathon, BookCommitment
-from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, NeededBookForm, RequestForm, GroupForm, FreeSessionForm, SessionForm, ReportForm, ReaderProfileForm, RecruitmentForm, NewspaperSignupForm, DewanyaSuggestionFormSet, BookCommitmentForm, UpdateBookCommitmentForm, CulturalProgramForm
+from bulb.models import Category, Book, NeededBook, Request, Point, Group, Membership, Session, Report, ReaderProfile, Recruitment, NewspaperSignup, Readathon, BookCommitment, RecommendedBook, BookRecommendation
+from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, NeededBookForm, RequestForm, GroupForm, FreeSessionForm, SessionForm, ReportForm, ReaderProfileForm, RecruitmentForm, NewspaperSignupForm, DewanyaSuggestionFormSet, BookCommitmentForm, UpdateBookCommitmentForm, CulturalProgramForm, EditBookRecommendationForm, AddBookRecommendationForm
 from bulb import utils
 import accounts.utils
 import clubs.utils
@@ -1576,6 +1576,23 @@ class BulbBookAutocomplete(autocomplete.Select2QuerySetView):
             name = item.submitter.username
 
         return u"%s من %s" % (item.title, name)
+
+class BulbRecommendedBookAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated():
+            return RecommendedBook.objects.none()
+
+        qs = RecommendedBook.objects.all()
+
+        if self.q:
+            search_fields=['title', 'authors']
+            qs = get_search_queryset(qs, search_fields, self.q)
+
+        return qs
+
+    def get_result_label(self, item):
+        return u"<img class='cover-thumbnail' src='%s'>%s تأليف %s" % (item.cover.url, item.title, item.authors)
+
 def autocomplete_users(request):
     term = request.GET.get('term')
     if not term:
@@ -1711,7 +1728,7 @@ def readathon_products(request, readathon_pk, pk):
 
     return render(request, 'bulb/readathon/products.html', context)
 
-
+@login_required
 def handle_cultural_program(request):
     form = CulturalProgramForm()
     context = {'form':form}
@@ -1751,3 +1768,83 @@ def handle_cultural_program_ajax(request):
         book.save
     else:
         raise Exception(u"لم يعبآ النموذج بشكل صحيح ")
+
+def show_recommendation_index(request):
+    categories = Category.objects.distinct().filter(recommendedbook__bookrecommendation__isnull=False)
+    context = {'categories': categories}
+    if request.user.is_authenticated():
+        user_recommendations = BookRecommendation.objects.filter(user=request.user, is_deleted=False)
+        context['user_recommendations'] = user_recommendations
+
+    return render(request, 'bulb/recommendations/show_index.html', context)
+
+def show_user_recommendations(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    book_recommendations = BookRecommendation.objects.filter(user=request.user, is_deleted=False)
+    context = {'book_recommendations': book_recommendations}
+    return render(request, 'bulb/recommendations/show_user.html', context)
+
+@decorators.ajax_only
+@login_required
+def add_book_recommendation(request):
+    if request.method == 'POST':
+        form = AddBookRecommendationForm(request.POST, request.FILES)
+        if form.is_valid():
+            book_recommendation = form.save(request.user)
+            relative_url = reverse('bulb:show_recommendation_index')
+            full_url = request.build_absolute_uri(relative_url)
+            utils.create_tweet(request.user, 'add_book_recommendation', (book_recommendation.recommended_book.title, full_url))
+            return {"message": "success"}
+    elif request.method == 'GET':
+        form = AddBookRecommendationForm()
+
+    context = {'form': form}
+    return render(request, 'bulb/recommendations/edit_book_recommendation_form.html', context)
+
+@decorators.ajax_only
+@login_required
+def edit_book_recommendation(request, pk):
+    book_recommendation = get_object_or_404(BookRecommendation, pk=pk,
+                                            is_deleted=False)
+    if request.method == 'POST':
+        form = EditBookRecommendationForm(request.POST, instance=book_recommendation)
+        if form.is_valid():
+            form.save()
+            return {"message": "success"}
+    elif request.method == 'GET':
+        form = EditBookRecommendationForm(instance=book_recommendation)
+
+    context = {'form': form, 'book_recommendation': book_recommendation}
+    return render(request, 'bulb/recommendations/edit_book_recommendation_form.html', context)
+
+@decorators.ajax_only
+@decorators.post_only
+@login_required
+@csrf.csrf_exempt
+def duplicate_book_recommendation(request, pk):
+    book_recommendation = get_object_or_404(BookRecommendation, pk=pk,
+                                            is_deleted=False)
+    if BookRecommendation.objects.filter(recommended_book=book_recommendation.recommended_book,
+                                         user=request.user).exists():
+        raise Exception(u"سبق أن زكّيت هذا الكتاب")
+    BookRecommendation.objects.create(recommended_book=book_recommendation.recommended_book,
+                                      user=request.user)
+    list_url = reverse('bulb:show_needed_category', args=(needed_book.category.code_name,))
+    full_url = request.build_absolute_uri(list_url)
+    return {"message": "success", "list_url": full_url}
+
+@decorators.ajax_only
+@decorators.post_only
+@login_required
+@csrf.csrf_exempt
+def delete_book_recommendation(request, pk):
+    book_recommendation = get_object_or_404(BookRecommendation, pk=pk,
+                                            is_deleted=False)
+    if not utils.can_edit_book_recommendation(request.user, book_recommendation):
+        raise Exception(u"لا تستطيع حذف هذه التزكية")
+
+    book_recommendation.is_deleted = True
+    book_recommendation.save()
+    list_url = reverse('bulb:show_needed_category', args=(needed_book.category.code_name,))
+    full_url = request.build_absolute_uri(list_url)
+    return {"message": "success", "list_url": full_url}

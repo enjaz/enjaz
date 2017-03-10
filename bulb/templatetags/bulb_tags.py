@@ -3,7 +3,7 @@ from django import template
 from django.core.exceptions import ObjectDoesNotExist
 
 from bulb import utils
-
+from bulb.models import BookRecommendation
 from media.models import RED, GREEN, BLUE, AERO, GREY, ORANGE, YELLOW, PINK, PURPLE
 
 register = template.Library()
@@ -83,3 +83,8 @@ def reader_profile_link(user):
 @register.filter
 def can_edit_reader_profile(user, reader_profile):
     return utils.can_edit_reader_profile(user, reader_profile)
+
+@register.filter
+def can_duplicate_book_recommendation(user, book_recommendation):
+    return BookRecommendation.objects.filter(recommended_book=book_recommendation.recommended_book,
+                                             user=request.user).exists()

@@ -16,7 +16,7 @@
   <div class="row">
   <h2><span><a href="{% url 'bulb:show_recommendation_category' category.code_name %}">{{ category.name }}</a></span></h2>
   {% for recommended_book in category.get_top_recommended_books %}
-      <div class="col-xs-6 text-center">
+      <div class="col-sm-4 col-xs-6 text-center">
               <div data-url="{% url 'bulb:show_recommended_book' recommended_book.pk %}" class="recommendation book-image" style="background-image:url('{{ recommended_book.cover.url }}');"></div>
       </div>
 

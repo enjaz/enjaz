@@ -35,7 +35,7 @@ urlpatterns = patterns('',
     url(r'^(?P<event_code_name>[\d\w_\-]+)/casereports/(?P<pk>\d+)/delete/$', views.delete_casereport,name="delete_casereport"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<code_name>[\d\w\-]+)/$', views.show_session_group,name="show_session_group"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/(?P<pk>\d+)/evaluate/$', views.evaluate, name="evlauate"),
-    url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/evaluate/(?P<pk>\d+)/$', views.edit_evaluation,name="edit_evaluation"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/(?P<pk>\d+)/evaluate/(?P<evaluation_id>[\d\w\-]+)/$', views.edit_evaluation,name="edit_evaluation"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/evaluators/$', views.evaluators_homepage,name="evaluators_homepage"),
                        )
 

@@ -598,11 +598,23 @@ def edit_evaluation (request,event_code_name, pk):
     return render(request, "events/abstracts/edit_evaluation.html", context)
 
 @login_required
-def evaluators_homepage(request):
+def evaluators_homepage(request,event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name,
+                              receives_abstract_submission=True)
+    if not utils.is_organizing_team_member(request.user, event) and \
+       not utils.can_evaluate_abstracts(request.user,event) and \
+       not request.user.is_superuser:
+        raise PermissionDenied
+
     user_evaluations = Evaluation.objects.filter(evaluator=request.user)
-    pending_abstracts=Abstract.objects.filter(is_deleted=False,evaluators__pk=request.user.pk).exclude(evaluation__user=user_evaluations).distinct()
+    pending_abstracts = Abstract.objects.filter(is_deleted=False, evaluators__pk=request.user.pk)\
+                                        .exclude(evaluation__user=user_evaluations)\
+                                        .distinct()
     riyadh_evaluators = Team.objects.get(code_name='hpc2-r-e')
     jeddah_evaluators = Team.objects.get(code_name='hpc2-j-e')
     alahsa_evaluators = Team.objects.get(code_name='hpc2-a-e')
-    return render(request, 'events/abstracts/evaluator_homepage.html',{'riyadh_evaluators': riyadh_evaluators,'pending_abstracts':pending_abstracts,'jeddah_evaluators':jeddah_evaluators,'alahsa_evaluators':alahsa_evaluators})
-
+    context = {'riyadh_evaluators': riyadh_evaluators,
+               'jeddah_evaluators':jeddah_evaluators,
+               'alahsa_evaluators':alahsa_evaluators,
+               'pending_abstracts':pending_abstracts}
+    return render(request, 'events/abstracts/evaluator_homepage.html', context)

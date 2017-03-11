@@ -32,7 +32,7 @@ class Category(models.Model):
     def get_ordered_recommended_books(self):
         return self.recommendedbook_set.annotate(recommendation_count=Count('bookrecommendation'))\
                                        .filter(recommendation_count__gte=1)\
-                                       .order_by('recommendation_count')
+                                       .order_by('-recommendation_count')
 
     def __unicode__(self):
         return self.name

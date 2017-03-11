@@ -3,7 +3,8 @@
 {% block title %}{{ abstract.event.english_name }}: {{ abstract.title }}{% endblock %}
 
 {% block content %}
-<div class="english-field">
+<link href="https://fonts.googleapis.com/css?family=Bitter" rel="stylesheet">
+<div class="english-field" style="font-family:'Bitter', serif; ">
 
 	<table class="table table-bordered">
           <colgroup>
@@ -63,8 +64,29 @@
             </tr>
 		</tbody>
 	</table>
-    <h2>Evaluate</h2>
 
+<h3>Introduction</h3>
+{{ abstract.introduction|safe }}
+<h3>Methodology</h3>
+{{ abstract.methodology|safe }}
+<h3>Results</h3>
+{{ abstract.results|safe }}
+<h3>Discussion</h3>
+{{ abstract.discussion|safe }}
+<h3>Conclusion</h3>
+{{ abstract.conclusion|safe }}
+
+<table class="table table-bordered">
+          <colgroup>
+            <col class="col-xs-4">
+            <col class="col-xs-8">
+          </colgroup>
+		<thead>
+			<tr>
+				<th colspan="2" class="text-center">Evaluate</th>
+			</tr>
+        </thead>
+</table>
 {% if form.errors %}
         <p class="alert alert-danger"><i class="entypo-flag"></i>Make sure that you have filled all questions.</p>
 {% endif %}
@@ -73,11 +95,9 @@
         <form class="form-horizontal"  action="{% if edit %}{% url 'events:edit_evaluation' event.code_name evaluation.pk %}{% else %}{% url 'events:abstracts_evaluation_form' event.code_name abstract.pk %}{% endif %}" method="post" role="form">
         {% csrf_token %}
         {% for field in form %}
-          <div class="form-group" >
-            <h4 class="english-field">{{ field.label }}</h4>
-            <div class="help-tip">
-              <p>{{ field.help_text }} </p>
-            </div>
+            <div class="form-group" style="margin-left:5%;">
+            <p class="english-field"  style="font-size: 17px;color:black;font-family:'Bitter', serif;"; title="{{ field.help_text }}">{{ field.label }}</p>
+
               {% for choice in field %}
                {% if not forloop.first %}
                  {{ choice }}
@@ -85,8 +105,8 @@
               {% endfor %}
         </div>
         {% endfor %}
-        <button type="submit" class="btn btn-primary">
-            {% bootstrap_icon "ok-sign" %} {% if edit %} عدّل {% else %} أضف {% endif %}
+        <button type="submit" class="btn btn-primary" style="float: right;margin-bottom: 1%">
+            {% bootstrap_icon "ok-sign" %} {% if edit %} Edit {% else %} Add {% endif %}
         </button>
 </form>
 {% endif %}

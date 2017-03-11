@@ -23,7 +23,7 @@ session_gender_choices = (
 class Event(models.Model):
     official_name = models.CharField(u"الاسم الرسمي", max_length=255)
     english_name = models.CharField(u"الاسم الإنجليزي", max_length=255, default="", blank=True)
-
+    twitter_event_name = models.CharField(u"الاسم في تغريدة تويتر", default="", max_length=50, blank=True)
     is_official_name_english = models.BooleanField(u"هل اسم الحدث الرسمي إنجليزي", default=False)
     code_name = models.CharField(max_length=50, default="",
                                  blank=True,
@@ -41,6 +41,7 @@ class Event(models.Model):
     twitter = models.CharField(max_length=255,
                                blank=True,
                                default="KSAU_Events")
+    is_auto_tweet = models.BooleanField(default=True, verbose_name=u"تغريد تلقائي؟")
     receives_initiative_submission = models.BooleanField(default=False,
                                                          verbose_name=u"يستقبل مبادرات؟")
     initiative_submission_opening_date = models.DateTimeField(u"تاريخ فتح استقبال المبادرات", null=True, blank=True)
@@ -113,6 +114,11 @@ class TimeSlot(models.Model):
     event = models.ForeignKey(Event)
     date_submitted = models.DateTimeField(auto_now_add=True)
     date_edited = models.DateTimeField(auto_now=True)
+
+    def is_user_already_on(self, user):
+        return SessionRegistration.objects.filter(session__time_slot=self,
+                                                  is_deleted=False,
+                                                  user=user).exists()
 
     def __unicode__(self):
         return self.name
@@ -372,7 +378,7 @@ class Registration(models.Model):
             return self.nonuser.gender
         except AttributeError:
             return ''
-        
+
     def __unicode__(self):
         return self.get_en_full_name()
 
@@ -421,7 +427,7 @@ class Abstract(models.Model):
 
     def __unicode__(self):
         return self.title
-    
+
 class AbstractFigure(models.Model):
     abstract = models.ForeignKey(Abstract, related_name='figures', null=True)
     figure = models.FileField(verbose_name=u"Attach the figure", upload_to="events/figures/")
@@ -514,9 +520,3 @@ class CaseReport(models.Model):
 
 
 
-
-
-# Intro
-# Patient info and clinical presentation
-# Diagnosis, treatment and outcome
-# Discussion

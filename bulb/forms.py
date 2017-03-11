@@ -4,13 +4,14 @@ import re
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import formset_factory
+from django.forms.widgets import TextInput
 from django.utils import timezone
 from dal import autocomplete
 from tagging.fields import TagField
 
 import accounts.utils
-from bulb.models import Book, NeededBook, Request, Group, Session, Report, Membership, ReaderProfile, Recruitment, NewspaperSignup, DewanyaSuggestion, BookCommitment
-from bulb import utils
+from bulb.models import Book, NeededBook, Request, Group, Session, Report, Membership, ReaderProfile, Recruitment, NewspaperSignup, DewanyaSuggestion, BookCommitment, RecommendedBook, BookRecommendation
+from bulb import models, utils
 
 city_choices = (
     ('-', u'الرياض وجدة والأحساء'),
@@ -47,7 +48,7 @@ class CommonControl:
 
 class NeededBookForm(forms.ModelForm):
     class Meta:
-        model = NeededBook
+        model = models.NeededBook
         fields = ['title', 'authors', 'description', 'cover', 'tags',
                   'category']
 
@@ -66,21 +67,21 @@ class BookEditForm(GenericBookForm):
        giving to lending."""
     tags = TagField()
     class Meta:
-        model = Book
+        model = models.Book
         fields = ['title', 'authors', 'edition', 'pages', 'condition',
                   'description', 'cover', 'tags', 'category',
                   'contribution', 'available_until', 'is_publicly_owned']
 
 class BookGiveForm(GenericBookForm):
     class Meta:
-        model = Book
+        model = models.Book
         fields = ['title', 'authors', 'edition', 'pages',
                   'condition', 'description', 'cover', 'tags',
                   'category', 'is_publicly_owned']
 
 class BookLendForm(GenericBookForm):
     class Meta:
-        model = Book
+        model = models.Book
         fields = ['title', 'authors', 'edition', 'pages', 'condition',
                   'description', 'cover', 'category', 'tags',
                   'available_until', 'is_publicly_owned']
@@ -110,7 +111,7 @@ class RequestForm(forms.ModelForm):
         return delivery
 
     class Meta:
-        model = Request
+        model = models.Request
         fields = ['delivery', 'borrowing_end_date']
         widgets  = {'delivery': forms.HiddenInput()}
 
@@ -185,7 +186,7 @@ class GroupForm(forms.ModelForm, CommonControl):
         return group
 
     class Meta:
-        model = Group
+        model = models.Group
         fields = ['name', 'image', 'description', 'category',
                   'is_private']
 
@@ -215,13 +216,13 @@ class FreeSessionForm(forms.ModelForm, CommonControl):
     gender = forms.ChoiceField(choices=gender_choices, label=u"الجلسة تقبل حضور")
 
     class Meta:
-        model = Session
+        model = models.Session
         fields = ['title', 'agenda', 'location', 'date', 'start_time',
                   'end_time']
 
 class SessionForm(forms.ModelForm):
     class Meta:
-        model = Session
+        model = models.Session
         fields = ['title', 'agenda', 'location', 'date', 'start_time',
                   'end_time']
 
@@ -237,7 +238,7 @@ class ReportForm(forms.ModelForm):
         required=False)
 
     class Meta:
-        model = Report
+        model = models.Report
         fields = ['attendees']#, 'description']
 
 class ReaderProfileForm(forms.ModelForm):
@@ -270,25 +271,25 @@ class ReaderProfileForm(forms.ModelForm):
             return data
 
     class Meta:
-        model = ReaderProfile
+        model = models.ReaderProfile
         fields = ['areas_of_interests', 'favorite_books',
                   'favorite_writers', 'average_reading',
                   'goodreads', 'twitter']
 
 class RecruitmentForm(forms.ModelForm):
     class Meta:
-        model = Recruitment
+        model = models.Recruitment
         exclude = ['user']
 
 class NewspaperSignupForm(forms.ModelForm):
     email = forms.EmailField(required=True)
     class Meta:
-        model = NewspaperSignup
+        model = models.NewspaperSignup
         fields = ['email']
 
 class DewanyaSuggestionForm(forms.ModelForm):
     class Meta:
-        model = DewanyaSuggestion
+        model = models.DewanyaSuggestion
         fields = ['name', 'subject']
         widgets = {'name': forms.widgets.TextInput(attrs={'class': 'user-autocomplete'})}
 
@@ -302,13 +303,13 @@ class BookCommitmentForm(forms.ModelForm):
             del self.fields['wants_to_attend']
 
     class Meta:
-        model = BookCommitment
+        model = models.BookCommitment
         fields = ['title', 'cover', 'pages', 'reason',
                   'wants_to_attend', 'wants_to_contribute']
 
 class UpdateBookCommitmentForm(forms.ModelForm):
     class Meta:
-        model = BookCommitment
+        model = models.BookCommitment
         fields = ['pages', 'completed_pages']
 
 class CulturalProgramForm(forms.Form):
@@ -326,4 +327,52 @@ class CulturalProgramForm(forms.Form):
                                                                  'data-placeholder': 'أَضف كتابا',
                                                              }),
                     label=u"الكتاب",
-                    queryset=Book.objects.available())
+                    queryset=models.Book.objects.available())
+
+class EditBookRecommendationForm(forms.ModelForm):
+    class Meta:
+        model = models.BookRecommendation
+        fields = ['comment']
+
+class AddBookRecommendationForm(forms.Form):
+    recommended_book = forms.ModelChoiceField(required=False,
+    widget=autocomplete.ModelSelect2(url='bulb:bulb-recommended-book-autocomplete',
+                                                         attrs={
+                                                             'data-html': 'true',
+                                                             'data-placeholder': 'أَضف كتابا',
+                                                         }),
+                label=u"الكتاب",
+                queryset=models.RecommendedBook.objects.all())
+    category = forms.ModelChoiceField(label=u"التصنيف",
+                                      required=False,
+                                      queryset=models.Category.objects.filter(is_meta=False))
+    title = forms.CharField(required=False, max_length=200, label=u"العنوان")
+    authors = forms.CharField(required=False, max_length=200, label=u"تأليف")
+    cover = forms.ImageField(required=False, label=u"الغلاف")
+    comment = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control input-lg'}), label=u"تعليق")
+
+    def clean(self):
+        cleaned_data = super(AddBookRecommendationForm, self).clean()
+        self.recommended_book = self.cleaned_data.get('recommended_book')
+        self.recommended_book_fields = {'title': self.cleaned_data['title'],
+                                        'authors': self.cleaned_data['authors'],
+                                        'category': self.cleaned_data['category'],
+                                        'cover': self.cleaned_data['cover']}
+
+        if not self.recommended_book and\
+           not all(self.recommended_book_fields.values()):
+            raise forms.ValidationError(u"لم تدخل بيانات كافية عن الكتاب")
+
+    def save(self, user):
+        if self.recommended_book:
+            book_recommendation = models.BookRecommendation.objects\
+                                                           .create(recommended_book=self.recommended_book,
+                                                                   user=user,
+                                                                   comment=self.cleaned_data['comment'])
+        else:
+            recommended_book = models.RecommendedBook.objects.create(**self.recommended_book_fields)
+            book_recommendation = models.BookRecommendation.objects\
+                                                           .create(recommended_book=recommended_book,
+                                                                   user=user,
+                                                                   comment=self.cleaned_data['comment'])
+        return book_recommendation

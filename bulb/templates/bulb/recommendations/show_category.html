@@ -1,0 +1,32 @@
+{% extends 'bulb/recommendations/recommedation_base.html' %}{% load staticfiles %}
+{% block content %}
+  <div class="row">
+  <h2 class="text-center">الكتب المُزكّاة في مجال "{{ category.name }}"</h2>
+  {% for recommended_book in category.get_ordered_recommended_books %}
+      <div class="col-sm-4 col-xs-6 text-center">
+              <div data-url="{% url 'bulb:show_recommended_book' recommended_book.pk %}" class="recommendation book-image" style="background-image:url('{{ recommended_book.cover.url }}');"></div>
+      </div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block customscript %}
+<script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        $("button.confirm-delete-book").click(function(){
+            var deletion_url = $(this).data('deletion-url');
+            var title = $(this).data('title');
+            $('#confirm-delete-book-modal .modal-body').html("هل حذف " + title + " مؤكد؟");
+            $("#delete-book").data('deletion-url', deletion_url);
+            $("#confirm-delete-book-modal").modal('show');
+        });
+    });
+</script>
+
+{% include 'bulb/recommendations/partials/add_recommendation_assets.html' %}
+{% include 'bulb/recommendations/partials/show_recommended_book_assets.html' %}
+{% include "bulb/exchange/delete_modal.html" %}
+{% include 'bulb/groups/components/autocomplete_asset.html' %}
+{% endblock %}

@@ -21,8 +21,24 @@
     <tbody>
       {% for top_user in top_users %}
       <tr>
-        <td><a href="{% url 'bulb:show_user_recommendations' top_user.pk %}">{{ top_user.common_profile.get_ar_full_name }}</a></td>
+        <td><a href="{% url 'bulb:show_user_recommendations' top_user.pk %}">{{ top_user.common_profile.get_ar_short_name }}</a></td>
         <td>{{ top_user.bookrecommendation_set.undeleted.count }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <hr>
+  <h2>أكثر الكتب تزكية</h2>
+  <table class="table hover">
+    <thead>
+      <th>الكتاب</th>
+      <th>عدد التزكيات</th>
+    </thead>
+    <tbody>
+      {% for top_book in top_books %}
+      <tr>
+        <td><a data-url="{% url 'bulb:show_recommended_book' top_book.pk %}" class="recommendation">{{ top_book.title }}</a></td>
+        <td>{{ top_book.bookrecommendation_set.undeleted.count }}</td>
       </tr>
       {% endfor %}
     </tbody>

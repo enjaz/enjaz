@@ -601,8 +601,13 @@ def edit_evaluation (request,event_code_name, pk):
 
     return render(request, "events/abstracts/edit_evaluation.html", context)
 
+@login_required
+def evaluators_homepage(request,event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name,
+                              receives_abstract_submission=True)
+    if not utils.is_organizing_team_member(request.user, event) and not utils.can_evaluate_abstracts(request.user,event):
+        raise PermissionDenied
 
-def evaluators_homepage(request):
     user_evaluations = Evaluation.objects.filter(evaluator=request.user)
     pending_abstracts=Abstract.objects.filter(is_deleted=False,evaluators__pk=request.user.pk).exclude(evaluation__user=user_evaluations).distinct()
     riyadh_evaluators = Team.objects.get(code_name='hpc2-r-e')

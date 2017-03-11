@@ -33,9 +33,9 @@ urlpatterns = patterns('',
     url(r'^(?P<event_code_name>[\d\w_\-]+)/casereports/$', views.submit_case_report,name="submit_case_report"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/casereports/(?P<pk>\d+)/$', views.show_casereport,name="show_casereport"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/casereports/(?P<pk>\d+)/delete/$', views.delete_casereport,name="delete_casereport"),
-#    url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<code_name>[\d\w\-]+)/$', views.show_session_group,name="show_session_group"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<code_name>[\d\w\-]+)/$', views.show_session_group,name="show_session_group"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/(?P<pk>\d+)/evaluate/$', views.evaluate, name="evlauate"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/evaluate/(?P<pk>\d+)/$', views.edit_evaluation,name="edit_evaluation"),
-    url(r'^abstracts/evaluators/$', views.evaluators_homepage,name="evaluators_homepage"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/evaluators/$', views.evaluators_homepage,name="evaluators_homepage"),
                        )
 

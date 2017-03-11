@@ -1,4 +1,4 @@
-{% load staticfiles %}{% load studentguide_tags %}{% load events_tags %}{% load clubs_utils %}
+{% load staticfiles %}{% load studentguide_tags %}{% load events_tags %}  {% load clubs_utils %}
 <!DOCTYPE html>
 <html lang="en" dir="rtl">
 <!--
@@ -49,7 +49,7 @@ you?
 		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 	<![endif]-->
 	
-	
+
 </head>
 <body class="page-body skin-green" data-url="http://neon.dev">
 <div class="page-container right-sidebar"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->	
@@ -304,6 +304,14 @@ you?
                 </ul>
 			</li>
             {% endif %}
+            <li>
+                <a href="{% url 'events:evaluators_homepage' %}">
+					<i class="entypo-megaphone"></i>
+					<span>تقييم الأبحاث</span>
+				</a>
+            </li>
+
+
             {% comment %}
 			<li>
 				<a href="{% url 'studentvoice:home' %}">

@@ -103,11 +103,11 @@ class CaseReportForm(forms.ModelForm):
                   ]
 
 
-class EvaluationForm(forms.Form):
+class EvaluationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop("event")
         self.abstract = kwargs.pop("abstract")
-        self.user = kwargs.pop("user", None)
+        self.user = kwargs.pop("evaluator")
         super(EvaluationForm, self).__init__(*args, **kwargs)
 
         default_choices = [(i, i) for i in range(1, 6)]
@@ -121,9 +121,9 @@ class EvaluationForm(forms.Form):
                     initial_value = criterion_value.value
                 except CriterionValue.DoesNotExist:
                     pass
-            
+
             self.fields[field_name] = forms.IntegerField(label=criterion.human_name, initial=initial_value,
-                                                         widget=forms.RadioSelect, choices=default_choices,
+                                                         widget=forms.RadioSelect(choices=default_choices, ),
                                                          required=True,
                                                          help_text=criterion.instructions)
 
@@ -154,6 +154,9 @@ class EvaluationForm(forms.Form):
 
         return evaluation
 
+    class Meta:
+        model = Evaluation
+        exclude = ['evaluator', 'abstract']
 class InitiativeForm(forms.ModelForm):
     class Meta:
         model = Initiative

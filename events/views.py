@@ -552,8 +552,7 @@ def evaluate(request, event_code_name, pk):
     abstract = get_object_or_404(Abstract, is_deleted=False, pk=pk)
     event = abstract.event
     if not utils.is_organizing_team_member(request.user, event) and \
-       not utils.can_evaluate_abstracts(request.user,event) and \
-       not request.user.is_superuser:
+       not utils.can_evaluate_abstracts(request.user, event):
         raise PermissionDenied
 
     evaluation = Evaluation(evaluator=request.user,
@@ -567,7 +566,7 @@ def evaluate(request, event_code_name, pk):
     elif request.method == 'GET':
         form = EvaluationForm(instance=evaluation,
                               evaluator=request.user)
-    context = {'abstract': abstract, 'form': form}
+    context = {'event': event, 'abstract': abstract, 'form': form}
 
     return render(request, "events/abstracts/abstracts_evaluation_form.html", context)
 
@@ -578,7 +577,9 @@ def edit_evaluation(request,event_code_name,evaluation_id, pk):
     event = abstract.event
     evaluator= evaluation.evaluator
 
-    if not evaluation.evaluator == request.user and not utils.is_organizing_team_member(request.user, event) and not request.user.is_superuser:
+    if not evaluation.evaluator == request.user and \
+       not utils.is_organizing_team_member(request.user, event) and \
+       not request.user.is_superuser:
         raise PermissionDenied
 
     context = {'event': event, 'abstract': abstract, 'evaluation': evaluation,'edit':True}
@@ -592,7 +593,7 @@ def edit_evaluation(request,event_code_name,evaluation_id, pk):
         else:
             context['form'] = form
     elif request.method == 'GET':
-        form = EvaluationForm(instance=evaluation,evaluator=evaluator)
+        form = EvaluationForm(instance=evaluation, evaluator=evaluator)
         context['form'] = form
 
     return render(request, "events/abstracts/abstracts_evaluation_form.html", context)

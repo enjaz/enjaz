@@ -5,8 +5,21 @@
 <script src="{% static 'autocomplete_light/vendor/select2/dist/js/select2.full.js' %}"></script>
 <script src="{% static 'autocomplete_light/select2.js' %}"></script>
 
+<script>
+$.fn.modal.Constructor.prototype.enforceFocus = function() {};
+</script>
+
 <style>
 span.select2{
     visibility: visible;
+}
+
+.select2-container{
+  text-align: right;
+  direction: rtl;
+}
+
+.select2-results{
+  color: black;
 }
 </style>

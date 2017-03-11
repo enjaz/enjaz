@@ -56,6 +56,7 @@ def is_on_sidebar(user, event):
 def is_already_on_timeslot(user, timeslot):
     return timeslot.is_user_already_on(user)
 
+
 @register.filter
 def can_evaluate_abstracts(user, event):
     return utils.can_evaluate_abstracts(user, event)

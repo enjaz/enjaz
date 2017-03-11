@@ -1,0 +1,270 @@
+<!DOCTYPE html>{% load staticfiles %}
+<html class="detail" lang="ar" dir="rtl">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="يقترح طلاب وطالبات جامعة الملك سعود بن عبد العزيز للعلوم الصحية الكتب القيّمة!">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@Seraj_Init">
+    <meta name="twitter:title" content="تزكيات سِراج">
+    <meta name="twitter:description" content="يقترح طلاب وطالبات جامعة الملك سعود بن عبد العزيز للعلوم الصحية الكتب القيّمة!">
+    <title>إنجاز | تزكيات سِراج</title>
+    <link rel="icon" href="{% static 'logo/favicon.png' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-3.3.6.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-rtl-3.3.4.min.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/entypo/css/entypo.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/neon-forms.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
+    <style>
+        @font-face {
+            font-family: 'GE Dinar One';
+            font-weight: lighter;
+            src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
+        }
+
+        @font-face {
+            font-family: 'GE Dinar One';
+            font-weight: normal;
+            src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body,
+        h2,
+        .modal {
+            font-family: 'GE Dinar One';
+            color: black;
+        }
+        h2{
+          font-size: 35px;
+        }
+        h2, h3{
+          text-align: center;
+          margin-bottom: 20px;
+        }
+        h2 span, h3 span{
+          border-bottom: 3px solid #ffda00;
+          padding-bottom: 4px;
+        }
+        .category a{
+          color: black;
+        }
+        .category a:hover{
+          text-decoration: none;
+        }
+        h1 {
+            color: white;
+            font-size: 50px;
+        }
+
+        header {
+            color: white;
+            height: 70%;
+            margin-bottom: 40px;
+            background-image: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://osamakhalid.com/mirror/library.jpg');
+            background-position: bottom;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        header a:hover{
+          text-decoration: none;
+        }
+
+        a {
+            color: #85C7FF;
+        }
+
+        footer {
+            padding: 60px 0;
+        }
+
+        .step-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            width: 90%;
+            margin-right: auto;
+            margin-left: auto;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .checkbox label {
+            margin-right: 10px;
+        }
+
+        p.instructions {
+            text-align: justify;
+        }
+
+        p.intro {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 18px;
+            width: 90%;
+            margin-right: auto;
+            margin-left: auto;
+            margin-bottom: 20px;
+            color: white;
+            font-size: 15px;
+        }
+
+        p.explaination {
+            border-radius: 10px;
+            padding: 10px;
+            margin-right: auto;
+            margin-left: auto;
+            margin-bottom: 0px;
+            font-size: 14px;
+            color: #e8ff74;
+        }
+
+        hr {
+            margin-bottom: 5px;
+            max-width: 100px;
+        }
+
+        .form-group .checkbox {
+            margin-right: 15px;
+        }
+        th{
+          text-align: right;
+        }
+        .update-book {
+            cursor: pointer;
+        }
+        .cover-thumbnail{
+          width: 50px;
+        }
+        .select2-selection.select2-selection--single{
+          height: 50px !important;
+          padding-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="text-center">
+          <a href="{% url 'bulb:show_recommendation_index' %}">
+            <img class="animated bounceInDown" src="{% static 'img/bulb/logo.png' %}">
+            <h1>تزكيات سِراج</h1>
+          </a>
+        </div>
+    </header>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+                <p class="intro instructions">
+                    هنا يتشارك طلاب وطالبات جامعة الملك سعود بن عبد العزيز للعلوم الصحيّة تزكياتهم للكتب المتوفّرة في معرض الرياض الدولي للكتاب. يمكن العثور على الدور التي توفّر الكتب أدناه بتنزيل تطبيق  على <a target="_blank" href="https://play.google.com/store/apps/details?id=org.riyadhbookfair.bookfair">آندرويد</a> أو <a target="_blank" href="https://itunes.apple.com/sa/app/معرض-الرياض-للكتاب/id606219590">آيفون</a>.
+                </p>
+                <div class="text-center">
+                {% if user.is_authenticated and not user_books.exists %}
+                <button data-action="add" id="add-book" class="btn btn-lg btn-success">أضف تزكية!</button>
+                {% else %}
+                <a style="color: white;" href="{% url 'userena_signin' %}?next={{ request.path }}" class="btn btn-lg btn-success">أدخلني لإنجاز كي أضيف تزكياتي</a>
+                {% endif %}
+                </div>
+                <hr>
+                {% block content %}{% endblock %}
+
+                <!-- Footer -->
+                <footer>
+                    <div class="row">
+                        <div class="col-lg-10 col-lg-offset-1 text-center">
+                            <p class="text-muted">بُني بأيدٍ طلابيّة</p>
+                            <p class="text-muted">حقك في النسخ مكفول.</p>
+                            <a target="_blank" rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.ar"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" /></a>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+            <!--col-->
+        </div>
+        <!--row-->
+    </div>
+    <!--container-->
+    {% block customscript %}{% endblock %}
+    {% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
+    	<!-- Piwik -->
+    	<script type="text/javascript">
+    	  var _paq = _paq || [];
+          {% if user.is_authenticated %}
+          _paq.push(['setUserId', '{{ user.username }}']);
+          {% endif %}
+    	  _paq.push(['trackPageView']);
+    	  _paq.push(['enableLinkTracking']);
+    	  (function() {
+    	    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://enjazportal.com/stats/";
+    	    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    	    _paq.push(['setSiteId', 1]);
+    	    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+    	    g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+    	  })();
+    	</script>
+    	<noscript><p><img src="//enjazportal.com/stats/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+            <!-- End Piwik Code -->
+        {% endif %}
+        {%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
+        <!---Twitter Modal -->
+        <div class="modal fade" id="connect-twitter">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">أغلق</span></button>
+                <h4 class="modal-title"></h4>
+              </div>
+              <div class="modal-body ativa-scroll text-center">
+                  <h2>بات الآن ممكنا إخبار الأصدقاء والصديقات عن أنشطة سِراج!</h2>
+                  <p>يتيح ربط حساب بوابة إنجاز بحسابك على تويتر إخبار متابعيك ومتابعاتك عن أنشطة النادي، ومساعدتهم في اكتشافها!</p>
+                  <p>بعد الربط، سوف تُكتب تغريدة آلية في حسابك عندما تؤكد انضمامك لأحد الأنشطة، ويمكنك إلغاء الربط في أي وقت.</p>
+                  <div class="row">
+                      <a style="color: #1da1f3;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-lg"><i class="fa fa-twitter fa-4x"></i><br>اربط حسابي بتويتر</a>
+                  </div>
+                  <div class="row">
+                          <a id="cancel-twitter-connection" style="color: rgb(243, 29, 89)"><i class="fa fa-times fa-4x"></i><br> لا تسألني مُجدًدا</a>
+                  </div>
+              </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        {%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
+        <script type="text/javascript">
+        $(function(){
+            $('#connect-twitter').modal({
+              keyboard: true,
+              backdrop: 'static',
+            });
+            $("#cancel-twitter-connection").click(function(){
+                $.ajax({
+                    url: "{% url 'cancel_twitter_connection' %}",
+                    type: 'GET',
+                    cache: false,
+                    success: function(data){
+                        // show success message (using toastr)
+                        toastr.options.positionClass = "toast-top-left";
+                        toastr.success("لن يظهر السؤال مُجددًا.");
+                        // hide modal
+                        $("#connect-twitter").modal('hide');
+                    }
+                });
+
+            });
+        });
+        {% endif %}
+        </script>
+        {% endif %}
+
+</body>
+
+</html>

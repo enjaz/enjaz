@@ -3,100 +3,29 @@
 {% block title %}{% if edit %}Editing {{ evaluation.abstract.title }}evaluation{% else %}Evaluating {{ abstract.event.english_name }}: {{ abstract.title }}{% endif %}{% endblock %}
 {% block content %}
 <style>
-.h3 {
+.h3, h2 {
     font-family: 'Bitter', serif;;
+}
+h2{
+  font-size: 20px;
+  border: 1px solid #ebebeb;
+  background-color: #f5f5f6;
+  color: #a6a7aa;
+  padding: 10px;
 }
 </style>
 
 <link href="https://fonts.googleapis.com/css?family=Bitter" rel="stylesheet">
 <div class="english-field" style="font-family:'Bitter', serif; ">
+{% include 'events/abstracts/partials/abstract_table.html' %}
 
-	<table class="table table-bordered">
-          <colgroup>
-            <col class="col-xs-4">
-            <col class="col-xs-8">
-          </colgroup>
-		<thead>
-			<tr>
-				<th colspan="2" class="text-center">{{ abstract.title }}</th>
-			</tr>
-		</thead>
-		
-		<tbody>
-		    {% if not user|can_evaluate_abstracts:event  %}
-            <tr>
-				<th class="text-center">Authors</th>
-				<td class="activity-description">{{ abstract.authors|linebreaksbr }}</td>
-			</tr>
-			<tr>
-				<th class="text-center">Presenting author</th>
-				<td>{{ abstract.presenting_author }}</td>
-            </tr>
-            {% endif %}
-			<tr>
-				<th class="text-center">Presenting author</th>
-				<td>{{ abstract.presenting_author }}</td>
-            </tr>
-			<tr>
-				<th class="text-center">University</th>
-				<td>{{ abstract.university }}</td>
-			</tr>
-			<tr>
-				<th class="text-center">College</th>
-				<td>{{ abstract.college }}</td>
-			</tr>
-            <tr>
-                <th class="text-center">Level</th>
-				<td>{{ abstract.get_level_display }}</td>
-			</tr>
-            <tr>
-				<th class="text-center">Email</th>
-				<td><a href="mailto:{{ abstract.email }}">{{ abstract.email }}</a></td>
-			</tr>
-			
-			<tr>
-				<th class="text-center">Phone</th>
-				<td>{{ abstract.phone }}</td>
-            </tr>
-            <tr>
-                <th class="text-center">Attachment</th>
-                <td>
-                    <a href="{{ abstract.attachment.url }}" class="english-field">
-                        <i class="entypo-documents"></i>
-                        {{ abstract.attachment.name }}
-                    </a>
-                </td>
-            </tr>
-		</tbody>
-	</table>
-
-    <h3>Introduction</h3>
-    {{ abstract.introduction|safe }}
-    <h3>Methodology</h3>
-    {{ abstract.methodology|safe }}
-    <h3>Results</h3>
-    {{ abstract.results|safe }}
-    <h3>Discussion</h3>
-    {{ abstract.discussion|safe }}
-    <h3>Conclusion</h3>
-    {{ abstract.conclusion|safe }}
-<table class="table table-bordered">
-          <colgroup>
-            <col class="col-xs-4">
-            <col class="col-xs-8">
-          </colgroup>
-		<thead>
-			<tr>
-				<th colspan="2" class="text-center">Evaluate</th>
-			</tr>
-        </thead>
-</table>
+<h2>Evaluate</h2>
 {% if form.errors %}
         <p class="alert alert-danger"><i class="entypo-flag"></i>Make sure that you have filled all questions.</p>
 {% endif %}
 
-    {% if  abstract.evaluation.evaluator == user or user.is_superuser %}
-    <form class="form" method="post"  action="{% if edit %}{% url 'events:edit_evaluation' event.code_name evaluation.abstract.pk evaluation.id %}{% else %}{% url 'events:abstracts_evaluation_form' event.code_name abstract.pk %}{% endif %}" method="post" role="form">
+    {% if  evaluation.evaluator == user or not edit and user|can_evaluate_abstracts:event or user.is_superuser %}
+    <form class="form" method="post"  action="{% if edit %}{% url 'events:edit_evaluation' evaluation.abstract.event.code_name evaluation.abstract.pk evaluation.pk %}{% else %}{% url 'events:evaluate' event.code_name abstract.pk %}{% endif %}" method="post" role="form">
         {% csrf_token %}
         {% for field in form %}
           <div class="form-group" style="margin-left:5%;">
@@ -117,11 +46,4 @@
     {% endif %}
 
 </div>
-{% endblock %}
-
-{% block customscript %}
-	<script>
-    $(function(){
-    });
-    </script>
 {% endblock %}

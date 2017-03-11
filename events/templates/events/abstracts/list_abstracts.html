@@ -1,4 +1,4 @@
-{% extends 'events_evaluation_base.html' %}{% load staticfiles %}
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %} {%  load events_tags %}
 
 {% block title %}{{ event.english_name }}: Abstract list{% endblock %}
 
@@ -19,7 +19,9 @@
                         <thead>
                             <tr>
                                 <th class="all">Title</th>
+                                {% if not user|can_evaluate_abstracts:event or user.is_superuser  %}
                                 <th class="not-mobile">Presenting author</th>
+                                {% endif %}
                                 <th class="not-mobile">Presentation preference</th>
                                 <th class="not-mobile">Submission date</th>
                             </tr>
@@ -28,7 +30,9 @@
                         {% for abstract in pending_abstracts %}
                             <tr>
                                 <td><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
-                                <td>{{ abstract.presenting_author }}</td>
+                                {% if not user|can_evaluate_abstracts:event or user.is_superuser  %}
+                                <th class="not-mobile">Presenting author</th>
+                                {% endif %}
                                 <td>{{ abstract.get_presentation_preference_display }}</td>
                                 <td data-order="{{ abstract.date_submitted|date:"U" }}">{{ abstract.date_submitted|date:"Y-m-d" }}</td>
                             </tr>
@@ -39,6 +43,8 @@
             </div>
         </div>
     </div>
+</div>
+<div class="english-field">
     <div class="panel panel-success">
         <div class="panel-heading">
             <h4 class="panel-title">
@@ -54,22 +60,33 @@
                         <thead>
                             <tr>
                                 <th class="all">Title</th>
+                                {% if not user|can_evaluate_abstracts:event  %}
                                 <th class="not-mobile">Presenting author</th>
+                                {% endif %}
                                 <th class="not-mobile">Presentation preference</th>
                                 <th class="not-mobile">Score</th>
                                 <th class="not-mobile">Evaluation date</th>
-                                <th class="not-mobile">Evaluator</th>
+                                <th class="not-mobile">Evaluators</th>
                             </tr>
                         </thead>
                         <tbody>
                         {% for abstract in evaluated_abstracts %}
                             <tr>
                                 <td><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
+                                {% if not user|can_evaluate_abstracts:event %}
                                 <td>{{ abstract.presenting_author }}</td>
+                                {% endif %}
                                 <td>{{ abstract.get_presentation_preference_display }}</td>
-                                <td>ِ{{ abstract.evaluation.get_total_score }}</td>
-                                <td data-order="{{ abstract.evaluation.date_submitted|date:"U" }}">{{ abstract.evaluation.date_submitted|date:"Y-m-d" }}</td>
-                                <td>ِ{{ abstract.evaluation.evaluator.common_profile.en_last_name|default:abstract.evaluation.evaluator }}</td>
+                                <td>ِ{{ abstract.get_average_score }}</td>
+                                <td data-order="{{ abstract.evaluation_set.last.date_submitted|date:"U" }}">{{ evaluation.date_submitted|date:"Y-m-d" }}</td>
+                                <td>
+                                  <ul>
+                                  {% for evaluator in abstract.evaluators.all %}
+                                    <li>{{ evaluator.common_profile.en_last_name|default:evaluator.username }}</li>
+                                  {% endfor %}
+                                  </ul>
+                                </td>
+
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -94,10 +111,10 @@
 	<script>
     $(function(){
         $("#pending").dataTable({
-            "order": [[ 3, "asc" ]]
+            "order": [[ 2, "asc" ]]
         });
         $("#evaluated").dataTable({
-            "order": [[ 4, "desc" ]]
+            "order": [[ 3, "desc" ]]
         });
     });
     </script>

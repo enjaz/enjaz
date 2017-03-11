@@ -2,7 +2,7 @@
 from django import forms
 
 from accounts.utils import get_user_gender
-from events.models import NonUser, Session, Registration, Abstract, AbstractFigure, Initiative, InitiativeFigure
+from events.models import NonUser, Session, Registration, Abstract, AbstractFigure, Initiative, InitiativeFigure,Criterion,CriterionValue,Evaluation,CaseReport
 from django.forms.models import inlineformset_factory
 
 class NonUserForm(forms.ModelForm):
@@ -91,16 +91,23 @@ class AbstractFigureForm(forms.ModelForm):
         model = AbstractFigure
         fields = ['figure']
 
+class CaseReportForm(forms.ModelForm):
+    class Meta:
+        model = CaseReport
+        fields = ['title', 'authors', 'university', 'college', 'email','phone',
+                  'introduction','patient_info', 'clinical_presentation',
+                  'diagnosis', 'treatment', 'outcome','discussion','conclusion',
+                  'was_published',
+                  'was_presented_at_others',
+                  'was_presented_previously','study_field']
 
-class EvaluationForm(forms.Form):
+class EvaluationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop("event")
-        self.abstract = kwargs.pop("abstract")
-        self.user = kwargs.pop("user", None)
+        self.evaluator = kwargs.pop("evaluator")
         super(EvaluationForm, self).__init__(*args, **kwargs)
 
-        default_choices = [(i, i) for i in range(1, 6)]
-        for criterion in Criterion.objects.filter(event=self.event):
+        default_choices = [(i, i) for i in range(1, 10)]
+        for criterion in Criterion.objects.filter(event=self.instance.abstract.event):
             field_name = 'criterion_' + str(criterion.code_name)
             initial_value = None
             if self.instance.id:
@@ -110,9 +117,9 @@ class EvaluationForm(forms.Form):
                     initial_value = criterion_value.value
                 except CriterionValue.DoesNotExist:
                     pass
-            
+
             self.fields[field_name] = forms.IntegerField(label=criterion.human_name, initial=initial_value,
-                                                         widget=forms.RadioSelect, choices=default_choices,
+                                                         widget=forms.RadioSelect(choices=default_choices, ),
                                                          required=True,
                                                          help_text=criterion.instructions)
 
@@ -120,28 +127,37 @@ class EvaluationForm(forms.Form):
         # Create only if the instance has not been saved (i.e. we are
         # not editing)
         if not self.instance.id:
-            evaluation = Evaluation.objects.create(abstract=self.abstract,
-                                                   evaluator=self.user)
+            evaluation = Evaluation.objects.create(abstract=self.instance.abstract,
+                                                   evaluator=self.evaluator)
         else:
             evaluation = self.instance
-            evaluation.evaluator = self.user
+            evaluation.evaluator = self.evaluator
             evaluation.save()
 
         for field_name in self.cleaned_data:
             value = self.cleaned_data[field_name]
             criterion_name = field_name.replace('criterion_', '')
             criterion = Criterion.objects.get(code_name=criterion_name)
-            if not self.instance.id:
+
+            try:
+                if self.instance.id:
+                    criterion_value = CriterionValue.objects.get(criterion=criterion,
+                                                                 evaluation=evaluation)
+                else:
+                    raise CriterionValue.DoesNotExist
+            except CriterionValue.DoesNotExist:
                 CriterionValue.objects.create(criterion=criterion,
                                               evaluation=evaluation,
                                               value=value)
             else:
-                criterion_value = CriterionValue.objects.get(criterion=criterion,
-                                                             evaluation=evaluation)
                 criterion_value.value = value
                 criterion_value.save()
 
         return evaluation
+
+    class Meta:
+        model = Evaluation
+        exclude = ['evaluator', 'abstract']
 
 class InitiativeForm(forms.ModelForm):
     class Meta:

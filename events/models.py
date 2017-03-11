@@ -379,7 +379,8 @@ class Registration(models.Model):
 class Abstract(models.Model):
     user = models.ForeignKey(User, null=True, blank=True,
                              related_name='event_abstracts')
-    event = models.ForeignKey(Event, verbose_name=u"الحدث")    
+    event = models.ForeignKey(Event, verbose_name=u"الحدث")
+    evaluators = models.ManyToManyField(User, blank=True, verbose_name=u"المقيمين")
     title = models.CharField(verbose_name="Title", max_length=255)
     authors = models.TextField(verbose_name=u"Name of authors")
     study_field = models.CharField(verbose_name="Field", max_length=255, default="")
@@ -415,7 +416,7 @@ class Abstract(models.Model):
         evaluation_number = self.evaluation_set.count()
         if not evaluation_number:
             return 0
-        total_score = CriterionValue.objects.filter(evaluation__in=self.evaluation_set).aggregate(Sum('value'))['value__sum']
+        total_score = CriterionValue.objects.filter(evaluation__in=self.evaluation_set.all()).aggregate(Sum('value'))['value__sum']
         return total_score / evaluation_number
 
     def __unicode__(self):
@@ -508,6 +509,7 @@ class CaseReport(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
+
 
 
 

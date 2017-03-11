@@ -1,0 +1,102 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}{% load bootstrap3 %} {% load events_tags %}
+
+{% block title %}{{ abstract.event.english_name }}: {{ abstract.title }}{% endblock %}
+
+{% block content %}
+<div class="english-field">
+
+	<table class="table table-bordered">
+          <colgroup>
+            <col class="col-xs-4">
+            <col class="col-xs-8">
+          </colgroup>
+		<thead>
+			<tr>
+				<th colspan="2" class="text-center">{{ abstract.title }}</th>
+			</tr>
+		</thead>
+		
+		<tbody>
+            <tr>
+                <th class="text-center">Presentation preference</th>
+                <td>{{ abstract.get_presentation_preference_display }}</td>
+            </tr>
+		    {% if not user|can_evaluate_abstracts:event  %}
+            <tr>
+				<th class="text-center">Authors</th>
+				<td class="activity-description">{{ abstract.authors|linebreaksbr }}</td>
+			</tr>
+			<tr>
+				<th class="text-center">Presenting author</th>
+				<td>{{ abstract.presenting_author }}</td>
+            </tr>
+            {% endif %}
+			<tr>
+				<th class="text-center">University</th>
+				<td>{{ abstract.university }}</td>
+			</tr>
+			<tr>
+				<th class="text-center">College</th>
+				<td>{{ abstract.college }}</td>
+			</tr>
+            <tr>
+                <th class="text-center">Level</th>
+				<td>{{ abstract.get_level_display }}</td>
+			</tr>
+            <tr>
+				<th class="text-center">Email</th>
+				<td><a href="mailto:{{ abstract.email }}">{{ abstract.email }}</a></td>
+			</tr>
+			
+			<tr>
+				<th class="text-center">Phone</th>
+				<td>{{ abstract.phone }}</td>
+            </tr>
+            <tr>
+                <th class="text-center">Attachment</th>
+                <td>
+                    <a href="{{ abstract.attachment.url }}" class="english-field">
+                        <i class="entypo-documents"></i>
+                        {{ abstract.attachment.name }}
+                    </a>
+                </td>
+            </tr>
+		</tbody>
+	</table>
+    <h2>Evaluate</h2>
+
+{% if form.errors %}
+        <p class="alert alert-danger"><i class="entypo-flag"></i>Make sure that you have filled all questions.</p>
+{% endif %}
+
+    {% if  evaluation.evaluator == user or user.is_superuser %}
+        <form class="form-horizontal"  action="{% if edit %}{% url 'events:edit_evaluation' event.code_name evaluation.pk %}{% else %}{% url 'events:abstracts_evaluation_form' event.code_name abstract.pk %}{% endif %}" method="post" role="form">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="form-group" >
+            <h4 class="english-field">{{ field.label }}</h4>
+            <div class="help-tip">
+              <p>{{ field.help_text }} </p>
+            </div>
+              {% for choice in field %}
+               {% if not forloop.first %}
+                 {{ choice }}
+               {% endif %}
+              {% endfor %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "ok-sign" %} {% if edit %} عدّل {% else %} أضف {% endif %}
+        </button>
+</form>
+{% endif %}
+</div>
+
+{% endblock %}
+
+{% block customscript %}
+	<script>
+    $(function(){
+    });
+    </script>
+{% endblock %}

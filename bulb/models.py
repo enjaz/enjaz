@@ -27,7 +27,7 @@ class Category(models.Model):
     image = models.ImageField(upload_to='bulb/categories/', blank=True, null=True)
 
     def get_top_recommended_books(self):
-        return self.get_ordered_recommended_books()[:10]
+        return self.get_ordered_recommended_books()[:9]
 
     def get_ordered_recommended_books(self):
         return self.recommendedbook_set.annotate(recommendation_count=Count('bookrecommendation'))\

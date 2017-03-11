@@ -29,11 +29,12 @@ class BulbAdmin(admin.sites.AdminSite):
 class BookRecommendationInline(admin.TabularInline):
     model = models.BookRecommendation
     extra = 1
+    readonly_fields = ['user']
 
 class MembershipInline(admin.TabularInline):
     model = models.Membership
     extra = 0
-    readonly_fields = ['get_name', ]
+    readonly_fields = ['get_name']
 
     def get_name(self, obj):
         try:

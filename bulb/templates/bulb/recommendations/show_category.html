@@ -2,7 +2,7 @@
 {% block content %}
   <div class="row">
   <h2 class="text-center">الكتب المُزكّاة في مجال "{{ category.name }}"</h2>
-  {% for recommended_book in category.recommendedbook_set.all %}
+  {% for recommended_book in category.get_ordered_recommended_books %}
       <div class="col-sm-4 col-xs-6 text-center">
               <div data-url="{% url 'bulb:show_recommended_book' recommended_book.pk %}" class="recommendation book-image" style="background-image:url('{{ recommended_book.cover.url }}');"></div>
       </div>

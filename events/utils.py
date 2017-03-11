@@ -34,6 +34,26 @@ def get_user_organizing_events(user):
                        Event.objects.filter(organizing_team__coordinator=user)).distinct()
     return user_events
 
+def get_user_abstract_revision_events(user):
+    if not user.is_authenticated():
+        return Event.objects.none()
+    elif user.is_superuser:
+        user_events = Event.objects.all()
+    else:
+        user_events = (Event.objects.filter(abstract_revision_team__members=user) | \
+                       Event.objects.filter(abstract_revision_team__coordinator=user)).distinct()
+    return user_events
+
+def get_user_admistrative_events(user):
+    if not user.is_authenticated():
+        return Event.objects.none()
+    elif user.is_superuser:
+        user_events = Event.objects.all()
+    else:
+        user_events = get_user_abstract_revision_events(user) | \
+                      get_user_organizing_events(user)
+    return user_events
+
 def is_organizing_team_member(user, event):
     user_events = get_user_organizing_events(user)
     return user_events.filter(pk=event.pk).exists()

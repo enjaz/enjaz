@@ -171,26 +171,26 @@ you?
                 </a>
             </li>
             {% endif %}
-            {% if user|has_user_organizing_events %}
+            {% if user|has_user_organizing_events or user|has_user_abstract_revision_events %}
             <li>
                 <a>
                     <i class="entypo-calendar"></i>
                     <span>إدارة الأنشطة الكبرى</span>
                 </a>
                 <ul>
-                {% for event in user|get_user_organizing_events %}
+                {% for event in user|get_user_admistrative_events %}
                 <li>
                     <a>
                         <i class="entypo-calendar"></i>
                         <span class="english-field">{{ event.official_name }}</span>
                     </a>
-                    <ul>
+                    <ul>{% if user|is_organizing_team_member:event or user.is_superuser %}
                         <li>
                             <a href="{% url 'events:list_registrations' event.code_name %}">
                                 <i class="entypo-chart-pie"></i>
                                 <span>المسجلون والمسجلات</span>
                             </a>
-                        </li>
+                        </li>{% endif %}
                         {% if event.receives_abstract_submission %}
                         <li>
                             <a href="{% url 'events:list_abstracts' event.code_name %}">
@@ -199,18 +199,18 @@ you?
                             </a>
                         </li>
                         {% endif %}
-                        {% if event.receives_initiative_submission %}
+                        {% if event.receives_initiative_submission and user|is_organizing_team_member:event or event.receives_initiative_submission and user.is_superuser %}
                         <li>
                             <a href="{% url 'events:list_initiatives' event.code_name %}">
-                                <i class="entypo-pencil"></i>
+                                <i class="entypo-network"></i>
                                 <span>المبادرات</span>
                             </a>
                         </li>
                         {% endif %}
-												{% if  user|can_evaluate_abstracts:event %}
+												{% if user|can_evaluate_abstracts:event %}
 						            <li>
 						                <a href="{% url 'events:evaluators_homepage' event.code_name %}">
-															<i class="entypo-pencil"></i>
+															<i class="entypo-flow-tree"></i>
 															<span>تقييم الأبحاث</span>
 														</a>
 						            </li>

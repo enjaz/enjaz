@@ -25,7 +25,7 @@
     font-weight: lighter;
     src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
 }
-		
+
 @font-face {
     font-family: 'GE Dinar One';
     font-weight: normal;
@@ -37,7 +37,7 @@ body {
 }
 
 html.detail{
-    background: linear-gradient( rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8) ), url("{% static 'img/bulb/recruitment-background.jpg' %}") no-repeat center center fixed; 
+    background: linear-gradient( rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8) ), url("{% static 'img/bulb/recruitment-background.jpg' %}") no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -158,7 +158,7 @@ margin-bottom: 5px;
                     <hr>
                     <h2 class="text-center" style="color: white;">كُتبي</h2>
                     <p>انقر على الكتاب تُحدّثه!</p>
-                    <div class="row">                        
+                    <div class="row">
                     {% for book_commitment in user_books %}
                         <div class="{% if user_books.count == 1 %}col-sm-offset-3 {% endif %}col-sm-6 text-center">
                                 <div class="book-image update-book" data-url="{% url 'bulb:update_book_commitment' readathon.pk book_commitment.pk %}" style="background-image:url('{{ book_commitment.cover.url }}');"></div>
@@ -181,11 +181,7 @@ margin-bottom: 5px;
                 {% for book_commitment in readathon.bookcommitment_set.all %}
                     <div class="col-sm-6 text-center">
                             <div class="book-image" style="background-image:url('{{ book_commitment.cover.url }}');"></div>
-                        {% if book_commitment.user.username != "mubayrik080" %}
-                            {{ book_commitment.user.common_profile.get_ar_full_name }}
-                        {% else %}
-                            أسامة خالد
-                        {% endif %}
+                            {{ book_commitment.user.common_profile.get_ar_short_name }}
                         {% if book_commitment.get_progress_percentage %}
                             <div class="progress">
                               <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="{{ book_commitment.get_progress_percentage }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ book_commitment.get_progress_percentage }}%">
@@ -233,7 +229,7 @@ margin-bottom: 5px;
     <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
 
-    
+
 <script type="text/javascript">
     $(function () {
         // initialize session edit modal
@@ -263,7 +259,7 @@ margin-bottom: 5px;
         $(".edit-book").click(function () {
             // show the edit book modal {# you can find it in bulb/exchange/home.html #}
             $("#edit-book-commitment-modal").modal('show');
-            var url = $(this).data('url'); 
+            var url = $(this).data('url');
 
             $("#edit-book-commitment-modal .modal-title").html("عدّل كتاب");
             $("#edit-book-commitment-modal .modal-body").load(url);
@@ -280,10 +276,10 @@ margin-bottom: 5px;
             var confirm_url = $(this).data('confirm-url');
             var deletion_url = $(this).data('deletion-url');
             $('#confirm-delete-book-modal .modal-body').load(confirm_url);
-            $("#delete-book").data('deletion-url', deletion_url); 
+            $("#delete-book").data('deletion-url', deletion_url);
             $("#confirm-delete-book-modal").modal('show');
         });
-        
+
         $(".update-book").click(function(){
             $("#update-book-commitment-modal").modal('show');
             var url = $(this).data('url');
@@ -372,9 +368,8 @@ $(function(){
 });
 {% endif %}
 </script>
-    
+
 
 {% endif %}
 </body>
 </html>
-

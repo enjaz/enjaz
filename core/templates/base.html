@@ -304,13 +304,15 @@ you?
                 </ul>
 			</li>
             {% endif %}
+            {% if  user|can_evaluate_abstracts:event %}
+
             <li>
                 <a href="{% url 'events:evaluators_homepage' %}">
 					<i class="entypo-pencil"></i>
 					<span>تقييم الأبحاث</span>
 				</a>
             </li>
-
+            {% endif %}
 
             {% comment %}
 			<li>

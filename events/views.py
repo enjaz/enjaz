@@ -553,7 +553,7 @@ def delete_casereport(request, event_code_name, pk):
 def evaluate (request,event_code_name, pk):
     abstract = get_object_or_404(Abstract, is_deleted=False, pk=pk)
     event = abstract.event
-    if not utils.is_organizing_team_member(request.user, event) or not utils.can_evaluate_abstracts(request.user,event):
+    if not utils.is_organizing_team_member(request.user, event) and not utils.can_evaluate_abstracts(request.user,event):
         raise PermissionDenied
 
     evaluation = Evaluation(evaluator=request.user,
@@ -582,7 +582,7 @@ def edit_evaluation (request,event_code_name, pk):
     event = abstract.event
     evaluator= evaluation.evaluator
 
-    if not evaluation.evaluator == request.user or not utils.is_organizing_team_member(request.user, event) or not request.user.is_superuser :
+    if not evaluation.evaluator == request.user and not utils.is_organizing_team_member(request.user, event) and not request.user.is_superuser:
         raise PermissionDenied
 
     context = {'event': event, 'abstract': abstract, 'evaluation': evaluation,'edit':True}

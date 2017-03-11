@@ -46,4 +46,4 @@ def is_already_on_timeslot(user, timeslot):
 
 @register.filter
 def can_evaluate_abstracts(user, event):
-    return can_evaluate_abstracts(event,user)
+    return utils.can_evaluate_abstracts(event,user)

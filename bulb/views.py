@@ -1798,9 +1798,9 @@ def add_book_recommendation(request):
         form = AddBookRecommendationForm(request.POST, request.FILES)
         if form.is_valid():
             book_recommendation = form.save(request.user)
+            relative_url = reverse('bulb:show_user_recommendations', args=(request.user.pk,))
             # Only tweet with the first book added.
             if request.user.bookrecommendation_set.count() == 1:
-                relative_url = reverse('bulb:show_user_recommendations', args=(request.user.pk,))
                 full_url = request.build_absolute_uri(relative_url)
                 utils.create_tweet(request.user, 'add_book_recommendation', (full_url,))
             return {"message": "success", 'show_url': relative_url}

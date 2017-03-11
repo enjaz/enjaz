@@ -18,6 +18,18 @@ def get_user_organizing_events(user):
     return utils.get_user_organizing_events(user)
 
 @register.filter
+def get_user_admistrative_events(user):
+    return utils.get_user_admistrative_events(user)
+
+@register.filter
+def has_user_abstract_revision_events(user):
+    return utils.get_user_abstract_revision_events(user).exists()
+
+@register.filter
+def get_user_abstract_revision_events(user):
+    return utils.get_user_abstract_revision_events(user)
+
+@register.filter
 def get_session_priority(registration, session):
     if session in registration.first_priority_sessions.all():
         return 1

@@ -548,7 +548,7 @@ def delete_casereport(request, event_code_name, pk):
     return {"message": "success", "list_url": full_url}
 
 @login_required
-def evaluate (request, event_code_name, pk):
+def evaluate(request, event_code_name, pk):
     abstract = get_object_or_404(Abstract, is_deleted=False, pk=pk)
     event = abstract.event
     if not utils.is_organizing_team_member(request.user, event) and \
@@ -572,9 +572,9 @@ def evaluate (request, event_code_name, pk):
     return render(request, "events/abstracts/abstracts_evaluation_form.html", context)
 
 @login_required
-def edit_evaluation (request,event_code_name, pk):
-    evaluation = get_object_or_404(Evaluation, pk=pk)
-    abstract = evaluation.abstract
+def edit_evaluation(request,event_code_name,evaluation_id, pk):
+    evaluation = get_object_or_404(Evaluation, pk=evaluation_id)
+    abstract = get_object_or_404(Abstract,pk=pk)
     event = abstract.event
     evaluator= evaluation.evaluator
 
@@ -584,7 +584,7 @@ def edit_evaluation (request,event_code_name, pk):
     context = {'event': event, 'abstract': abstract, 'evaluation': evaluation,'edit':True}
 
     if request.method == 'POST':
-        form = EvaluationForm(request.POST, instance=evaluation,event=event,abstract=abstract,evaluator=evaluator)
+        form = EvaluationForm(request.POST, instance=evaluation,evaluator=evaluator)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse('events:evaluators_homepage',
@@ -592,10 +592,10 @@ def edit_evaluation (request,event_code_name, pk):
         else:
             context['form'] = form
     elif request.method == 'GET':
-        form = EvaluationForm(instance=evaluation,event=event,abstract=abstract,evaluator=evaluator)
+        form = EvaluationForm(instance=evaluation,evaluator=evaluator)
         context['form'] = form
 
-    return render(request, "events/abstracts/edit_evaluation.html", context)
+    return render(request, "events/abstracts/abstracts_evaluation_form.html", context)
 
 @login_required
 def evaluators_homepage(request,event_code_name):

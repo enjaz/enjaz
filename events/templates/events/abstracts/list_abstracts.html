@@ -19,7 +19,7 @@
                         <thead>
                             <tr>
                                 <th class="all">Title</th>
-                                {% if not user|can_evaluate_abstracts:event  %}
+                                {% if not user|can_evaluate_abstracts:event or user.is_superuser  %}
                                 <th class="not-mobile">Presenting author</th>
                                 {% endif %}
                                 <th class="not-mobile">Presentation preference</th>
@@ -30,7 +30,7 @@
                         {% for abstract in pending_abstracts %}
                             <tr>
                                 <td><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
-                                {% if not user|can_evaluate_abstracts:event  %}
+                                {% if not user|can_evaluate_abstracts:event or user.is_superuser  %}
                                 <th class="not-mobile">Presenting author</th>
                                 {% endif %}
                                 <td>{{ abstract.get_presentation_preference_display }}</td>
@@ -65,10 +65,8 @@
                                 {% endif %}
                                 <th class="not-mobile">Presentation preference</th>
                                 <th class="not-mobile">Score</th>
-                                <th class="not-mobile"> Evaluations date</th>
-                                <th class="not-mobile"> </th>
+                                <th class="not-mobile">Evaluation date</th>
                                 <th class="not-mobile">Evaluators</th>
-                                <th class="not-mobile"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -80,12 +78,15 @@
                                 {% endif %}
                                 <td>{{ abstract.get_presentation_preference_display }}</td>
                                 <td>ِ{{ abstract.get_average_score }}</td>
-                                {% for evaluation in abstract.evaluation_set.all %}
-                                <td data-order="{{ evaluation.date_submitted|date:"U" }}">{{ evaluation.date_submitted|date:"Y-m-d" }}</td>
-                                {% endfor %}
-                                {% for evaluator in abstract.evaluators.all %}
-                                <td>ِ{{ evaluator.common_profile.en_last_name|default:evaluator.username }}</td>
-                                {% endfor %}
+                                <td data-order="{{ abstract.evaluation_set.last.date_submitted|date:"U" }}">{{ evaluation.date_submitted|date:"Y-m-d" }}</td>
+                                <td>
+                                  <ul>
+                                  {% for evaluator in abstract.evaluators.all %}
+                                    <li>{{ evaluator.common_profile.en_last_name|default:evaluator.username }}</li>
+                                  {% endfor %}
+                                  </ul>
+                                </td>
+
                             </tr>
                         {% endfor %}
                         </tbody>

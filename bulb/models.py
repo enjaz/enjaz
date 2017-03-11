@@ -27,9 +27,12 @@ class Category(models.Model):
     image = models.ImageField(upload_to='bulb/categories/', blank=True, null=True)
 
     def get_top_recommended_books(self):
+        return self.get_ordered_recommended_books()[:10]
+
+    def get_ordered_recommended_books(self):
         return self.recommendedbook_set.annotate(recommendation_count=Count('bookrecommendation'))\
                                        .filter(recommendation_count__gte=1)\
-                                       .order_by('recommendation_count')[:10]
+                                       .order_by('recommendation_count')
 
     def __unicode__(self):
         return self.name

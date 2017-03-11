@@ -563,7 +563,7 @@ def evaluate(request, event_code_name, pk):
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse('events:evaluators_homepage',
-                                                ))
+                                                args=(event.code_name,)))
     elif request.method == 'GET':
         form = EvaluationForm(instance=evaluation,
                               evaluator=request.user)
@@ -588,7 +588,7 @@ def edit_evaluation(request,event_code_name,evaluation_id, pk):
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse('events:evaluators_homepage',
-                                                 ))
+                                                args=(event.code_name,)))
         else:
             context['form'] = form
     elif request.method == 'GET':

@@ -6,7 +6,7 @@
   <p>{% if recommendation.user.common_profile.gender == 'F' %}أوصت{% elif recommendation.user.common_profile.gender == 'M' %}أوصى{% else %}أوصـ/ـت{% endif %} <a href="{% url 'bulb:show_user_recommendations' recommendation.user.pk %}">{{ recommendation.user.common_profile.get_ar_short_name }}</a>:</p>
   {% if recommendation.comment %}
     <blockquote>
-        {{ recommendation.comment }}
+        {{ recommendation.comment|linebreaksbr }}
     </blockquote>
   {% endif %}
 {% endfor %}

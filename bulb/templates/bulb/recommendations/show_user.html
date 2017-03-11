@@ -1,7 +1,7 @@
 {% extends 'bulb/recommendations/recommedation_base.html' %}{% load staticfiles %}
 {% block content %}
   <div class="row">
-  <h2 class="text-center">كتب {{ recommendation_user.user.common_profile.get_ar_short_name }}</h2>
+  <h2 class="text-center">كتب {{ recommendation_user.common_profile.get_ar_short_name }}</h2>
   {% for book_recommendation in recommendation_user.bookrecommendation_set.all %}
       <div class="col-xs-6 text-center">
               <div data-url="{% url 'bulb:show_recommended_book' book_recommendation.recommended_book.pk %}" class="recommendation book-image" style="background-image:url('{{ book_recommendation.recommended_book.cover.url }}');"></div>

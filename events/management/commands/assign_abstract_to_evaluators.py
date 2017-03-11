@@ -13,7 +13,7 @@ class Command(BaseCommand):
     help = "Assign abstract to evaluators"
 
     def handle(self, *args, **options):
-        event= Event.objects.filter(code_name='hpc2-r')
+        event= Event.objects.get(code_name='hpc2-r')
         abstracrs_count = Abstract.objects.filter(event=event).count()
         evaluatin_team_members_count = Team.objects.get(code_name="hpc2-r-e").members.count()
         assigened_abstrsts_count = int(abstracrs_count/evaluatin_team_members_count)

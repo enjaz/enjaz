@@ -547,33 +547,29 @@ def delete_casereport(request, event_code_name, pk):
     full_url = request.build_absolute_uri(list_my_abstracts_url)
     return {"message": "success", "list_url": full_url}
 
-
-
 @login_required
-def evaluate (request,event_code_name, pk):
+def evaluate (request, event_code_name, pk):
     abstract = get_object_or_404(Abstract, is_deleted=False, pk=pk)
     event = abstract.event
-    if not utils.is_organizing_team_member(request.user, event) and not utils.can_evaluate_abstracts(request.user,event):
+    if not utils.is_organizing_team_member(request.user, event) and \
+       not utils.can_evaluate_abstracts(request.user,event) and \
+       not request.user.is_superuser:
         raise PermissionDenied
 
     evaluation = Evaluation(evaluator=request.user,
-                            abstract=abstract,
-                            )
+                            abstract=abstract)
     if request.method == 'POST':
-        form = EvaluationForm(request.POST, instance=evaluation, abstract=abstract,event=event,evaluator=request.user)
+        form = EvaluationForm(request.POST, instance=evaluation, evaluator=request.user)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse('events:evaluators_homepage',
                                                 ))
     elif request.method == 'GET':
         form = EvaluationForm(instance=evaluation,
-                              abstract=abstract,
-                              event=event,
                               evaluator=request.user)
-    context = {'event': event, 'abstract': abstract, 'form': form}
+    context = {'abstract': abstract, 'form': form}
 
     return render(request, "events/abstracts/abstracts_evaluation_form.html", context)
-
 
 @login_required
 def edit_evaluation (request,event_code_name, pk):
@@ -601,7 +597,7 @@ def edit_evaluation (request,event_code_name, pk):
 
     return render(request, "events/abstracts/edit_evaluation.html", context)
 
-
+@login_required
 def evaluators_homepage(request):
     user_evaluations = Evaluation.objects.filter(evaluator=request.user)
     pending_abstracts=Abstract.objects.filter(is_deleted=False,evaluators__pk=request.user.pk).exclude(evaluation__user=user_evaluations).distinct()

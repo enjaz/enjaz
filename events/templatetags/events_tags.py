@@ -1,13 +1,13 @@
 from django import template
 
 from events import utils
-from events.models import SessionRegistration
+from events.models import SessionRegistration, TimeSlot
 
 register = template.Library()
 
 @register.filter
-def is_organizing_committee_member(user, event):
-    return utils.is_organizing_committee_member(user, event)
+def is_organizing_team_member(user, event):
+    return utils.is_organizing_team_member(user, event)
 
 @register.filter
 def has_user_organizing_events(user):
@@ -16,6 +16,18 @@ def has_user_organizing_events(user):
 @register.filter
 def get_user_organizing_events(user):
     return utils.get_user_organizing_events(user)
+
+@register.filter
+def get_user_admistrative_events(user):
+    return utils.get_user_admistrative_events(user)
+
+@register.filter
+def has_user_abstract_revision_events(user):
+    return utils.get_user_abstract_revision_events(user).exists()
+
+@register.filter
+def get_user_abstract_revision_events(user):
+    return utils.get_user_abstract_revision_events(user)
 
 @register.filter
 def get_session_priority(registration, session):
@@ -39,3 +51,11 @@ def get_status(user, session):
 @register.filter
 def is_on_sidebar(user, event):
     return event.is_on_sidebar(user)
+
+@register.filter
+def is_already_on_timeslot(user, timeslot):
+    return timeslot.is_user_already_on(user)
+
+@register.filter
+def can_evaluate_abstracts(user, event):
+    return utils.can_evaluate_abstracts(user, event)

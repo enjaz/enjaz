@@ -30,5 +30,12 @@ urlpatterns = patterns('',
     url(r'^(?P<event_code_name>[\d\w_\-]+)/initiatives/list/$', views.list_initiatives, name="list_initiatives"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/initiatives/(?P<pk>\d+)/$', views.show_initiative, name="show_initiative"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/initiatives/thanks/$', TemplateView.as_view(template_name='events/initiatives/initiatives_submission_completed.html'), name="initiative_submission_completed"),
-    url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<code_name>[\d\w\-]+)/$', views.show_session_group, name="show_session_group"),
-)
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/casereports/$', views.submit_case_report,name="submit_case_report"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/casereports/(?P<pk>\d+)/$', views.show_casereport,name="show_casereport"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/casereports/(?P<pk>\d+)/delete/$', views.delete_casereport,name="delete_casereport"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<code_name>[\d\w\-]+)/$', views.show_session_group,name="show_session_group"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/(?P<pk>\d+)/evaluate/$', views.evaluate, name="evaluate"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/(?P<pk>\d+)/evaluate/(?P<evaluation_id>[\d\w\-]+)/$', views.edit_evaluation,name="edit_evaluation"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/evaluators/$', views.evaluators_homepage,name="evaluators_homepage"),
+                       )
+

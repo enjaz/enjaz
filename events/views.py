@@ -603,12 +603,8 @@ def edit_evaluation (request,event_code_name, pk):
 
 
 def evaluators_homepage(request):
-
-    # for abstract in Abstract.objects.filter(is_deleted=False,evaluators__pk=request.user.pk):
-    #     if abstract.evaluation_set.filter(evaluator=request.user):
-    #         pending_abstracts=Abstract.objects.filter(is_deleted=False,evaluators__pk=request.user.pk).exclude(abstract)
-
-    pending_abstracts=Abstract.objects.filter(is_deleted=False,evaluators__pk=request.user.pk)
+    user_evaluations = Evaluation.objects.filter(evaluator=request.user)
+    pending_abstracts=Abstract.objects.filter(is_deleted=False,evaluators__pk=request.user.pk).exclude(evaluation__user=user_evaluations).distinct()
     riyadh_evaluators = Team.objects.get(code_name='hpc2-r-e')
     jeddah_evaluators = Team.objects.get(code_name='hpc2-j-e')
     alahsa_evaluators = Team.objects.get(code_name='hpc2-a-e')

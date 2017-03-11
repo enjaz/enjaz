@@ -603,8 +603,7 @@ def evaluators_homepage(request,event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name,
                               receives_abstract_submission=True)
     if not utils.is_organizing_team_member(request.user, event) and \
-       not utils.can_evaluate_abstracts(request.user,event) and \
-       not request.user.is_superuser:
+       not utils.can_evaluate_abstracts(request.user,event):
         raise PermissionDenied
 
     user_evaluations = Evaluation.objects.filter(evaluator=request.user)
@@ -617,5 +616,6 @@ def evaluators_homepage(request,event_code_name):
     context = {'riyadh_evaluators': riyadh_evaluators,
                'jeddah_evaluators':jeddah_evaluators,
                'alahsa_evaluators':alahsa_evaluators,
-               'pending_abstracts':pending_abstracts}
+               'pending_abstracts':pending_abstracts,
+               'event': event}
     return render(request, 'events/abstracts/evaluator_homepage.html', context)

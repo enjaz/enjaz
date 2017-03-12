@@ -116,7 +116,8 @@ def delete_abstract(request, event_code_name, pk):
        not utils.is_organizing_team_member(request.user, event):
         raise PermissionDenied
 
-    if event.abstract_submission_closing_date and timezone.now() > event.abstract_submission_closing_date:
+    if event.abstract_submission_closing_date and timezone.now() > event.abstract_submission_closing_date and \
+        not utils.is_organizing_team_member(request.user, event):
         raise Exception(u"انتهت المدة المتاحة لحذف الملخص ")
 
     abstract.is_deleted = True
@@ -189,7 +190,6 @@ def upload_abstract_image(request):
                     "message": u"لم أستطع رفع الملف"}
                 }
 
-@login_required
 def list_sessions(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
     timeslots = TimeSlot.objects.filter(event=event)

@@ -16,6 +16,11 @@ from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFi
 from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation, TimeSlot, SessionRegistration, Initiative, SessionGroup,CaseReport
 from events import utils
 import core.utils
+from django.db.models import Count
+from clubs.models import Team
+
+import clubs.utils
+
 
 def redirect_home(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
@@ -111,7 +116,8 @@ def delete_abstract(request, event_code_name, pk):
        not utils.is_organizing_team_member(request.user, event):
         raise PermissionDenied
 
-    if event.abstract_submission_closing_date and timezone.now() > event.abstract_submission_closing_date:
+    if event.abstract_submission_closing_date and timezone.now() > event.abstract_submission_closing_date and \
+        not utils.is_organizing_team_member(request.user, event):
         raise Exception(u"انتهت المدة المتاحة لحذف الملخص ")
 
     abstract.is_deleted = True
@@ -128,9 +134,8 @@ def list_abstracts(request, event_code_name):
             not utils.is_organizing_team_member(request.user, event):
         raise PermissionDenied
 
-    pending_abstracts = Abstract.objects.filter(event=event, is_deleted=False, evaluation__isnull=True)
-    evaluated_abstracts = Abstract.objects.filter(event=event, is_deleted=False, evaluation__isnull=False)
-
+    pending_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=2)
+    evaluated_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=2)
     context = {'event': event,
                'pending_abstracts': pending_abstracts,
                'evaluated_abstracts': evaluated_abstracts}
@@ -564,3 +569,76 @@ def delete_casereport(request, event_code_name, pk):
     list_my_abstracts_url = reverse('events:list_my_abstracts')
     full_url = request.build_absolute_uri(list_my_abstracts_url)
     return {"message": "success", "list_url": full_url}
+
+@login_required
+def evaluate(request, event_code_name, pk):
+    abstract = get_object_or_404(Abstract, is_deleted=False, pk=pk)
+    event = abstract.event
+    if not utils.is_organizing_team_member(request.user, event) and \
+       not utils.can_evaluate_abstracts(request.user, event):
+        raise PermissionDenied
+
+    evaluation = Evaluation(evaluator=request.user,
+                            abstract=abstract)
+    if request.method == 'POST':
+        form = EvaluationForm(request.POST, instance=evaluation, evaluator=request.user)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('events:evaluators_homepage',
+                                                args=(event.code_name,)))
+    elif request.method == 'GET':
+        form = EvaluationForm(instance=evaluation,
+                              evaluator=request.user)
+    context = {'event': event, 'abstract': abstract, 'form': form}
+
+    return render(request, "events/abstracts/abstracts_evaluation_form.html", context)
+
+@login_required
+def edit_evaluation(request,event_code_name,evaluation_id, pk):
+    evaluation = get_object_or_404(Evaluation, pk=evaluation_id)
+    abstract = get_object_or_404(Abstract,pk=pk)
+    event = abstract.event
+    evaluator= evaluation.evaluator
+
+    if not evaluation.evaluator == request.user and \
+       not utils.is_organizing_team_member(request.user, event) and \
+       not request.user.is_superuser:
+        raise PermissionDenied
+
+    context = {'event': event, 'abstract': abstract, 'evaluation': evaluation,'edit':True}
+
+    if request.method == 'POST':
+        form = EvaluationForm(request.POST, instance=evaluation,evaluator=evaluator)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('events:evaluators_homepage',
+                                                args=(event.code_name,)))
+        else:
+            context['form'] = form
+    elif request.method == 'GET':
+        form = EvaluationForm(instance=evaluation, evaluator=evaluator)
+        context['form'] = form
+
+    return render(request, "events/abstracts/abstracts_evaluation_form.html", context)
+
+@login_required
+def evaluators_homepage(request,event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name,
+                              receives_abstract_submission=True)
+    if not utils.is_organizing_team_member(request.user, event) and \
+       not utils.can_evaluate_abstracts(request.user,event):
+        raise PermissionDenied
+
+    user_evaluations = Evaluation.objects.filter(evaluator=request.user)
+    pending_abstracts = Abstract.objects.filter(is_deleted=False, evaluators__pk=request.user.pk)\
+                                        .exclude(evaluation__user=user_evaluations)\
+                                        .distinct()
+    riyadh_evaluators = Team.objects.get(code_name='hpc2-r-e')
+    jeddah_evaluators = Team.objects.get(code_name='hpc2-j-e')
+    alahsa_evaluators = Team.objects.get(code_name='hpc2-a-e')
+    context = {'riyadh_evaluators': riyadh_evaluators,
+               'jeddah_evaluators':jeddah_evaluators,
+               'alahsa_evaluators':alahsa_evaluators,
+               'pending_abstracts':pending_abstracts,
+               'event': event}
+    return render(request, 'events/abstracts/evaluator_homepage.html', context)

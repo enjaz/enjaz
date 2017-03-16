@@ -349,7 +349,7 @@ class Registration(models.Model):
         elif self.nonuser:
             return self.nonuser.ar_first_name
 
-
+        
     def get_ar_full_name(self):
         if self.user:
             try:
@@ -386,6 +386,7 @@ class Abstract(models.Model):
     user = models.ForeignKey(User, null=True, blank=True,
                              related_name='event_abstracts')
     event = models.ForeignKey(Event, verbose_name=u"الحدث")
+    evaluators = models.ManyToManyField(User, blank=True, verbose_name=u"المقيمين")
     title = models.CharField(verbose_name="Title", max_length=255)
     authors = models.TextField(verbose_name=u"Name of authors")
     study_field = models.CharField(verbose_name="Field", max_length=255, default="")
@@ -421,7 +422,7 @@ class Abstract(models.Model):
         evaluation_number = self.evaluation_set.count()
         if not evaluation_number:
             return 0
-        total_score = CriterionValue.objects.filter(evaluation__in=self.evaluation_set).aggregate(Sum('value'))['value__sum']
+        total_score = CriterionValue.objects.filter(evaluation__in=self.evaluation_set.all()).aggregate(Sum('value'))['value__sum']
         return total_score / evaluation_number
 
     def __unicode__(self):
@@ -519,8 +520,3 @@ class CaseReport(models.Model):
 
 
 
-
-# Intro
-# Patient info and clinical presentation
-# Diagnosis, treatment and outcome
-# Discussion

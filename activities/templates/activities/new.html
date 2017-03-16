@@ -10,20 +10,20 @@
     {% csrf_token %}
 	{% bootstrap_form form %}
 	<div id="episode_panel" class="panel panel-primary" data-collapsed="0">
-			
+
 			<!-- panel head -->
 			<div class="panel-heading">
 				<div class="panel-title">المواعيد</div>
-				
+
 				<div class="panel-options">
 					<a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
 				</div>
 			</div>
-			
+
 			<!-- panel body -->
     </div>
     {{ item_request_formset.management_form }}
-    {% if user_club.city == 'R' or user.is_superuser %}
+    {% if user_club.city == 'الرياض' or user.is_superuser %}
     <div id="item-request-section">
         <h3>طلبات مخازن العمادة</h3>
         <p>يمكن من هنا طلب موجودات عمادة شؤون الطلاب من المخازن. يمكن الاطلاع على <a href="{% url 'activities:list_depository_items' %}">القائمة الكاملة بموجودات مخازن العمادة</a>.</p>
@@ -106,7 +106,7 @@
     		{% bootstrap_icon "ok-sign" %} أرسل
     	</button>
     {% endbuttons %}
-    
+
 </form>
 
 <script>
@@ -117,9 +117,9 @@ $('input[type=text], textarea').attr('dir', 'auto');
 // Move the episode panel to the 6th position in the form
 // (after the description field)
 $('#episode_panel').insertAfter('form .form-group:nth-child(8)');
-    
+
 $('#item-request-section').insertAfter('form .form-group:nth-child(14)');
-	
+
 // Wrap all the fields related to episodes in a single div.
 // This makes it much easier for styling.
 
@@ -140,7 +140,7 @@ for (i=0; i<episode_count; i++) {
 		.addClass('episode_field').addClass('episode_' + i).addClass('time_field');
 	$('input[name="location' + i + '"]').parent()
 		.addClass('episode_field').addClass('episode_' + i).addClass('loc_field');;
-	
+
 	// Wrap each episode in a div
 	$('.episode_' + i).wrapAll("<div id='episode_" + i + "_container' class='episode_container row' />");
 }
@@ -168,15 +168,15 @@ $('.time_field input').timepicker({showMeridian: false})
   });
 
 for (i=0; i<episode_count; i++) {
-	
+
 	// Wrap all fields together, as to separate them from the label
 	$('.episode_field.episode_' + i)
 		.wrapAll("<div class='col-md-11' />");
-	
+
 	// Add episode label
 	$('#episode_' + i + '_container')
 		.prepend("<div class='col-md-1'><h4>الموعد " + (i+1) + "</h4></div>");
-	
+
 	// Arrange episode fields into columns
 	$('.episode_field.episode_' + i + '.date_field')
 		.wrapAll("<div id='episode_" + i + "_dates' class='col-md-5' />");
@@ -184,14 +184,14 @@ for (i=0; i<episode_count; i++) {
 		.wrapAll("<div id='episode_" + i + "_times' class='col-md-4' />");
 	$('.episode_field.episode_' + i + '.loc_field')
 		.wrapAll("<div id='episode_" + i + "_loc' class='col-md-3' />");
-		
+
 	$('.episode_field.episode_' + i + '.date_field')
-		.addClass('col-md-6');	
+		.addClass('col-md-6');
 	$('.episode_field.episode_' + i + '.time_field')
 		.addClass('col-md-6');
 	$('.episode_field.episode_' + i + '.loc_field')
 		.addClass('col-md-12');
-	
+
 } // end loop
 
 // Append the 'add episode' button
@@ -205,32 +205,32 @@ for (i=0; i<episode_count; i++) {
 		var episode = '<div id="episode_{i}_container" class="episode_container row"><div class="col-md-1"><h4>الموعد {i+1}</h4></div><div class="col-md-11"><div id="episode_{i}_dates" class="col-md-5"><div class="form-group episode_field episode_{i} date_field col-md-6"><label>تاريخ البداية</label><input class="form-control" id="id_start_date{i}" name="start_date{i}" placeholder="تاريخ البداية" required="required" type="text" data-start-view="1"></div><div class="form-group episode_field episode_{i} date_field col-md-6"><label>تاريخ النهاية</label><input class="form-control" id="id_end_date{i}" name="end_date{i}" placeholder="تاريخ النهاية" required="required" type="text" data-start-view="1"></div></div><div id="episode_{i}_times" class="col-md-4"><div class="form-group episode_field episode_{i} time_field col-md-6"><label>وقت البداية</label><input class="form-control" id="id_start_time{i}" name="start_time{i}" placeholder="وقت البداية" required="required" type="text"></div><div class="form-group episode_field episode_{i} time_field col-md-6"><label>وقت النهاية</label><input class="form-control" id="id_end_time{i}" name="end_time{i}" placeholder="وقت النهاية" required="required" type="text"></div></div><div id="episode_{i}_loc" class="col-md-3"><div class="form-group episode_field episode_{i} loc_field col-md-12"><label>المكان</label><input class="form-control" id="id_location{i}" maxlength="128" name="location{i}" placeholder="المكان" required="required" type="text"></div></div></div></div>'.replace(/{i}/g, episode_count).replace('{i+1}', parseInt(episode_count)+1);
 		$(episode).insertBefore('#btn_add_episode');
 		// Initialize date and time pickers
-		
+
 		// Configure date pickers
 		// add attributes and init datepickers
 		$('#episode_' + episode_count + '_dates .date_field input').attr('data-start-view', '1').datepicker({isRTL: true});
-		
+
 		// console.log($('#episode_' + episode_count + '_dates .date_field input'));
-		
+
 		// Configure time pickers
 		$('#episode_' + episode_count + '_times .time_field input').timepicker({showMeridian: false})
 			.on('show.timepicker', function(e) {
 		    $('.bootstrap-timepicker-widget').attr('dir', 'ltr'); // It appears reversed in rtl
 		  });
-		
+
 		// Update episode_count
 		episode_count++;
 		$('input[name="episode_count"]').val(episode_count);
 		addOrRemoveEpisodeDeleteButtons()
 	});
-	
+
 	// Add the delete buttons if necessary
 	addOrRemoveEpisodeDeleteButtons()
 });
 
 function addOrRemoveEpisodeDeleteButtons() {
 	var episode_count = $('input[name="episode_count"]').val();
-	
+
 	if (episode_count > 1) {
 		// delete buttons should be visible
 		$(".episode_container").each(function (index) {
@@ -244,7 +244,7 @@ function addOrRemoveEpisodeDeleteButtons() {
 				var deleteButton = '<div class="col-md-1"><button class="btn btn-xs btn-red episode_delete_btn"><i class="fa fa-trash-o"></i></button></div>';
 				// Add the delete button to every episode container
 				$(this).append(deleteButton);
-	
+
 				// Attach a delete function to the button
 				$(this).find(".episode_delete_btn").click(function () {
 					var episode_count = $('input[name="episode_count"]').val();
@@ -262,10 +262,10 @@ function addOrRemoveEpisodeDeleteButtons() {
 				});
 			};
 		});
-		
+
 	} else if (episode_count == 1) {
 		$(".episode_delete_btn").remove()
-		$(".episode_container .col-md-10").removeClass("col-md-10").addClass("col-md-11");	
+		$(".episode_container .col-md-10").removeClass("col-md-10").addClass("col-md-11");
 	}
 }
 
@@ -279,12 +279,12 @@ function updateEpisodes() {
 	// regardless of what their previous indices are.
 	$(".episode_container").each(function (index) {
 		var old_index = $(this).attr("id").split("_")[1];
-		
+
 		$(this).attr("id", "episode_" + index + "_container");
-		
+
 		// Update the text of the title
 		$(this).find("div h4").text("الموعد " + (parseInt(index) + 1));
-		
+
 		// Update fields
 		// pk field
 		$(this).find("div #id_episode_pk" + old_index)
@@ -292,38 +292,38 @@ function updateEpisodes() {
 			.attr("name", "episode_pk" + index)
 			.removeClass("episode_" + old_index)
 			.addClass("episode_" + index)
-		
+
 		// Date, time, and location containers
 		$(this).find("div #episode_" + old_index + "_dates")
 			.attr("id", "episode_" + index + "_dates");
-			
+
 		$(this).find("div #episode_" + old_index + "_times")
 			.attr("id", "episode_" + index + "_times");
-			
+
 		$(this).find("div #episode_" + old_index + "_loc")
 			.attr("id", "episode_" + index + "_loc");
-		
+
 		// .episode_X class
 		$(this).find(".episode_" + old_index)
 			.removeClass("episode_" + old_index)
 			.addClass("episode_" + index);
-		
+
 		$(this).find("#id_start_date" + old_index)
 			.attr("id", "id_start_date" + index)
 			.attr("name", "start_date" + index)
-		
+
 		$(this).find("#id_end_date" + old_index)
 			.attr("id", "id_end_date" + index)
 			.attr("name", "end_date" + index)
-			
+
 		$(this).find("#id_start_time" + old_index)
 			.attr("id", "id_start_time" + index)
 			.attr("name", "start_time" + index)
-			
+
 		$(this).find("#id_end_time" + old_index)
 			.attr("id", "id_end_time" + index)
 			.attr("name", "end_time" + index)
-			
+
 		$(this).find("#id_location" + old_index)
 			.attr("id", "id_location" + index)
 			.attr("name", "location" + index)
@@ -332,7 +332,7 @@ function updateEpisodes() {
 
 /*
  * For reference, this is how episodes are organized
- * 
+ *
  * |--div #episodes .panel-body
  *    |--input #id_episode_count
  *    |--div #episode_X_container .episode_container .row
@@ -407,4 +407,3 @@ function updateEpisodes() {
     });
 </script>
 {% endblock %}
-

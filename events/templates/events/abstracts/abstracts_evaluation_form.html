@@ -1,0 +1,49 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}{% load bootstrap3 %}{% load events_tags %}
+
+{% block title %}{% if edit %}Editing {{ evaluation.abstract.title }}evaluation{% else %}Evaluating {{ abstract.event.english_name }}: {{ abstract.title }}{% endif %}{% endblock %}
+{% block content %}
+<style>
+.h3, h2 {
+    font-family: 'Bitter', serif;;
+}
+h2{
+  font-size: 20px;
+  border: 1px solid #ebebeb;
+  background-color: #f5f5f6;
+  color: #a6a7aa;
+  padding: 10px;
+}
+</style>
+
+<link href="https://fonts.googleapis.com/css?family=Bitter" rel="stylesheet">
+<div class="english-field" style="font-family:'Bitter', serif; ">
+{% include 'events/abstracts/partials/abstract_table.html' %}
+
+<h2>Evaluate</h2>
+{% if form.errors %}
+        <p class="alert alert-danger"><i class="entypo-flag"></i>Make sure that you have filled all questions.</p>
+{% endif %}
+
+    {% if  evaluation.evaluator == user or not edit and user|can_evaluate_abstracts:event or user.is_superuser %}
+    <form class="form" method="post"  action="{% if edit %}{% url 'events:edit_evaluation' evaluation.abstract.event.code_name evaluation.abstract.pk evaluation.pk %}{% else %}{% url 'events:evaluate' event.code_name abstract.pk %}{% endif %}" method="post" role="form">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="form-group" style="margin-left:5%;">
+          <p class="english-field"  style="font-size: 17px;color:black;font-family:'Bitter', serif;"; title="{{ field.help_text }}">{{ field.label }}</p>
+
+              {% for choice in field %}
+               {% if not forloop.first %}
+                 {{ choice }}
+               {% endif %}
+              {% endfor %}
+        </div>
+        {% endfor %}
+          <div class="form-group" style="float: right;">
+              <button  type="submit" class="btn btn-success">Submit</button>
+          </div>
+    </form>
+
+    {% endif %}
+
+</div>
+{% endblock %}

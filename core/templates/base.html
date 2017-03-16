@@ -208,10 +208,10 @@ you?
                         </li>
                         {% endif %}
 												{% if user|can_evaluate_abstracts:event %}
-						            <li>
+						            <li class="english-field">
 						                <a href="{% url 'events:evaluators_homepage' event.code_name %}">
 															<i class="entypo-flow-tree"></i>
-															<span>تقييم الأبحاث</span>
+															<span>Evaluate abstracts</span>
 														</a>
 						            </li>
 						            {% endif %}

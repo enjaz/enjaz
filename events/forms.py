@@ -106,8 +106,8 @@ class EvaluationForm(forms.ModelForm):
         self.evaluator = kwargs.pop("evaluator")
         super(EvaluationForm, self).__init__(*args, **kwargs)
 
-        default_choices = [(i, i) for i in range(1, 10)]
-        for criterion in Criterion.objects.filter(event=self.instance.abstract.event):
+        default_choices = [(i, i) for i in range(11)]
+        for criterion in Criterion.objects.filter(events=self.instance.abstract.event):
             field_name = 'criterion_' + str(criterion.code_name)
             initial_value = None
             if self.instance.id:

@@ -1,0 +1,80 @@
+{% load bootstrap3 %}{% load staticfiles %}
+<style>
+label[for=id_category], #id_category, label[for=id_title], #id_title, label[for=id_authors], #id_authors, #id_cover, label[for=id_cover]{
+  display: none;
+}
+.select2-close-mask{
+    z-index: 2099;
+}
+.select2-dropdown{
+    z-index: 3051;
+}
+</style>
+
+<p class="text-center alert alert-success">تحتوي مكتبة سِراج مئات الكتب التي أضافها الطلاب والطالبات؛ ويمكنك تزكية أحدها مباشرة بكتابة اسمه أدناه.  في حال كان الكتاب غير متوفّر يمكنك أيضا إضافة كتاب جديد.<br><a style="color: red;" data-action='show' id='add-book-directly' style='color: green;'>(الكتاب الذي أريد غير موجود)</a></p>
+
+<form enctype="multipart/form-data" id="edit-book-recommendation-form" action="post">
+{% csrf_token %}
+{% bootstrap_form form %}
+</form>
+
+<script type="text/javascript">
+$(function () {
+    $("#add-book-directly").click(function(){
+      action = $(this).data("action");
+      selectors = "label[for=id_category], #id_category, label[for=id_title], #id_title, label[for=id_authors], #id_authors, #id_cover, label[for=id_cover]";
+      if (action == "show"){
+        $("#id_recommended_book").closest(".form-group").hide();
+        $("#id_recommended_book").select2("val", "");
+        $(selectors).show();
+        $(this).html("(الكتاب الذي أريد موجود)");
+        $(this).data('action', 'hide');
+      } else if (action == "hide"){
+        $("#id_recommended_book").closest(".form-group").show();
+        $(selectors).hide();
+        $(this).html("(الكتاب الذي أريد غير موجود)");
+        $(this).data('action', 'show');
+      }
+    });
+
+    // modify form submission behaviour to be ajaxy
+    $("form#edit-book-recommendation-form").submit(function (event) {
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var formData = new FormData($(this)[0]);
+        {% if book_recommednation %}
+        var url = "{% url 'bulb:edit_book_recommednation' book_recommednation.pk %}";
+        {% else %}
+        // This will change depending the lend/give choice.
+        var url = "{% url 'bulb:add_book_recommendation' %}";
+        {% endif %}
+        /* Send the data */
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (data) {
+                if (data.message == "success") {
+                    // show success message (using toastr)
+                    toastr.options.positionClass = "toast-top-left";
+                    {% if book_recommednation %}
+                    toastr.success("عدُلت تزكية الكتاب بنجاح!");
+                    {% else %}
+                    toastr.success("أضيفت تزكية الكتاب بنجاح!");
+                    {% endif %}
+                    window.location.href= data.show_url;
+                } else {
+                    $("#edit-book-recommendation-modal .modal-body").html(data);
+                }}
+        });
+
+    });
+});
+</script>
+{{ form.media }}

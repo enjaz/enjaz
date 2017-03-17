@@ -442,12 +442,12 @@ class Evaluation(models.Model):
         return self.criterion_values.aggregate(Sum('value'))['value__sum'] or 0
 
 class Criterion(models.Model):
-    event = models.ForeignKey(Event, verbose_name=u"الحدث")
+    events = models.ManyToManyField(Event, verbose_name=u"الحدث")
     human_name = models.CharField(max_length=200,
                                verbose_name=u"اسم المعيار الذي سيظهر")
     code_name = models.CharField(max_length=200,
                                  verbose_name=u"اسم المعيار البرمجي")
-    instructions = models.TextField(verbose_name=u"تعليمات")
+    instructions = models.TextField(u"تعليمات", default="")
 
     def __unicode__(self):
         return self.code_name
@@ -515,8 +515,4 @@ class CaseReport(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
-
-
-
-
 

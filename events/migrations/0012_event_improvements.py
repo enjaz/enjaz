@@ -132,7 +132,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='criterion',
             name='event',
-            field=models.ForeignKey(verbose_name='\u0627\u0644\u062d\u062f\u062b', to='events.Event'),
+            field=models.ForeignKey(verbose_name='\u0627\u0644\u062d\u062f\u062b', to='events.Event', null=True),
         ),
         migrations.AddField(
             model_name='abstract',

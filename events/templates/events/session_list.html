@@ -3,40 +3,80 @@
 {% block content %}
 
 
+<div class="text-center">
+    <h1>التسجيل في {{ event.official_name }}</h1>
+
+{% if not user.social_auth.exists %}
+<a style="margin-top: 5px; background-color: #1da1f3; color: white;" align="center" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-sm"><i class="fa fa-twitter"></i> اربط حسابي بتويتر</a>
+{% endif %}
+</div>
+
+<br>
 <div class="row">
-        {% for time_slot in time_slots %}
+        {% for timeslot in timeslots %}
+        <br>
     <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
-        <h2 class="mentor-section-header">{{ time_slot.name }}</h2>
+        <h2 class="mentor-section-header">{{ timeslot.name }}</h2>
     </div>
 </div>
 <div class="row">
     <div class="col-md-12">
         <div class="row text-center">
             {% autoescape off %}{% cycle '<div class="row">' '' '' '' %}{% endautoescape %}
-            {% for session in time_slot.session_set.all %}
+            {% for session in timeslot.session_set.all %}
             <div class="col-md-3 col-xs-6">
-                <h2>{{ session.name }}</h2>
-                 {% if session.acceptance_method == 'F' %}
+                <h2><a {% if user|is_organizing_team_member:event %} href="{% url 'events:review_registrations' session.event.code_name session.pk %}" {% endif %}>{{ session.name }}</a></h2>
+                <div>
+  								<i class="entypo-calendar"></i>
+                                  {{ session.date|date:"l j F Y" }}
+  							</div>
+                {% if session.start_time and session.end_time %}
+  							<div>
+  								<i class="entypo-clock"></i>
+  								{{ session.start_time }}
+  								-
+  								{{ session.end_time }}
+  							</div>
+                {% endif %}
+  							{% if session.location %}
+  							<div>
+  							  <i class="entypo-location"></i>
+  							  {{ session.location }}
+  							  </div>
+  							{% endif %}
+                {% if session.acceptance_method == 'M' %}
+                     <br>
+                 {% elif session.limit != None %}
                 <h5>عدد المقاعد المتبقية: <span id="count-{{ session.pk}}">{{ session.get_remaining_seats }}</span></h5>
                 {% else %}
                 <br>
                 {% endif %}
-                {% if not user|is_registered:session %}
-                <button class="btn btn-success signup" data-action="signup" data-pk="{{ session.pk }}">سجلني!</button>
+                {% if user.is_authenticated and not user|is_registered:session %}
+          {% if user|is_already_on_timeslot:timeslot %}
+                <button class="btn btn-warning signup" data-action="signup" data-pk="{{ session.pk }}" data-timeslot-pk="{{ timeslot.pk }}" disabled>يمكنك التسجيل جلسة واحدة فقط</button>
+          {% else %}
+                <button class="btn btn-success signup" data-action="signup" data-pk="{{ session.pk }}" data-timeslot-pk="{{ timeslot.pk }}">سجلني!</button>
+          {% endif %}
+                {% elif user.is_authenticated and user|is_registered:session %}
+                <button class="btn btn-danger cancel" data-action="cancel" data-pk="{{ session.pk }}" data-timeslot-pk="{{ timeslot.pk }}">ألغِ تسجيلي!</button>
                 {% else %}
-                <button class="btn btn-danger cancel" data-action="cancel" data-pk="{{ session.pk }}">ألغِ تسجيلي!</button>
+                <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لإنجاز كي أؤكد الحضور</a>
                 {% endif %}
                 <br>
-          <div {% if not user|is_registered:session %}style="display: none;" {% endif %} id="status-{{ session.pk }}" class="btn btn-xs {% if user|get_status:session == True %}
-						btn-success">معتمد
-					{% elif user|get_status:session == None %}
-						btn-warning">معلق
-					{% else %}
-						 btn-danger">مرفوض
-					{% endif %}
-          </div>
-            </div>
-            {% endfor %}
+            {% if session.acceptance_method == 'M' %}
+                <div {% if not user|is_registered:session %}style="display: none;" {% endif %} id="status-{{ session.pk }}" class="btn btn-xs {% if user|get_status:session == True %}
+      						btn-success">معتمد
+      					{% elif user|get_status:session == None %}
+      						btn-warning">معلق
+      					{% else %}
+      						 btn-danger">مرفوض
+      			    {% endif %}
+                </div>
+                {% else %}
+                <br>
+            {% endif %}
+                </div>
+                {% endfor %}
 
             {% autoescape off %}
             {% cycle '' '' '' '</div>' %}
@@ -66,6 +106,7 @@ $(document).ready(function(){
     button = this;
 		pk = $(this).data("pk");
 		action = $(this).data("action");
+    timeslot_pk = $(this).data("timeslot-pk");
 		$.ajax("{% url 'events:handle_ajax' %}", {
 		    method: "POST",
 		    data: {pk: pk, action: action},
@@ -73,19 +114,36 @@ $(document).ready(function(){
             if (data['success'] == 1){
                 $("#count-" + pk).html(data['remaining_seats']);
                   status_button = $("#status-" + pk);
+                  timeslot_buttons = $("button[data-timeslot-pk=" + timeslot_pk + "]");
               		if (action == 'cancel'){
                     toastr.error("ألغي تسجيلك");
-                    $(button).html('سجلني!');
-                    $(button).data('action', 'signup');
-                    $(button).addClass('btn-success');
-                    $(button).removeClass('btn-danger');
-                    status_button.hide();
+
+                      $(button).html('سجلني!');
+                      $(button).data('action', 'signup');
+                      $(button).addClass('btn-success');
+                      $(button).removeClass('btn-danger');
+
+                      timeslot_buttons.removeAttr("disabled", "disabled");
+                      timeslot_buttons.removeClass('btn-warning');
+                      timeslot_buttons.html('سجلني!');
+                      timeslot_buttons.addClass('btn-success');
+
+                      status_button.hide();
+
                   } else if (action == 'signup'){
                     toastr.success("تمّ تسجيلك!");
+
+                      timeslot_buttons.attr("disabled", "disabled");
+                      timeslot_buttons.removeClass('btn-success');
+                      timeslot_buttons.addClass('btn-warning');
+                      timeslot_buttons.html("يمكنك التسجيل جلسة واحدة فقط");
+
                       $(button).html('ألغِ تسجيلي!');
                       $(button).data('action', 'cancel');
                       $(button).addClass('btn-danger');
                       $(button).removeClass('btn-success');
+                      $(button).removeAttr("disabled", "disabled");
+
                       status_button.show();
                       status_button.removeClass("btn-danger");
                       status_button.html(data['status']);
@@ -102,5 +160,54 @@ $(document).ready(function(){
 		});
   });
 });
+
 </script>
+{%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
+<!---Twitter Modal -->>
+<div class="modal fade" id="connect-twitter">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">أغلق</span></button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body ativa-scroll text-center">
+          <h2>بات الآن ممكنا إخبار الأصدقاء عن أنشطة النادي!</h2>
+          <p>يتيح ربط حساب بوابة إنجاز بحسابك على تويتر إخبار متابعيك ومتابعاتك عن أنشطة النادي، ومساعدتهم في اكتشافها!</p>
+          <p>بعد الربط، سوف تُكتب تغريدة آلية في حسابك عندما تؤكد انضمامك لأحد الأنشطة، ويمكنك إلغاء الربط في أي وقت.</p>
+          <div class="row">
+              <a style="color: #1da1f3;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-lg"><i class="fa fa-twitter fa-4x"></i><br>اربط حسابي بتويتر</a>
+          </div>
+          <div class="row">
+                  <a id="cancel-twitter-connection" style="color: rgb(243, 29, 89)"><i class="fa fa-times fa-4x"></i><br> لا تسألني مُجدًدا</a>
+          </div>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script type="text/javascript">
+$(function(){
+    $('#connect-twitter').modal({
+      keyboard: true,
+      backdrop: 'static',
+    });
+    $("#cancel-twitter-connection").click(function(){
+        $.ajax({
+            url: "{% url 'cancel_twitter_connection' %}",
+            type: 'GET',
+            cache: false,
+            success: function(data){
+                // show success message (using toastr)
+                toastr.options.positionClass = "toast-top-left";
+                toastr.success("لن يظهر السؤال مُجددًا.");
+                // hide modal
+                $("#connect-twitter").modal('hide');
+            }
+        });
+
+    });
+});
+</script>
+{% endif %}
 {% endblock %}

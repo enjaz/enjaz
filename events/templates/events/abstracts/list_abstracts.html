@@ -31,7 +31,7 @@
                             <tr>
                                 <td><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
                                 {% if not user|can_evaluate_abstracts:event or user.is_superuser  %}
-                                <th class="not-mobile">Presenting author</th>
+                                <th class="not-mobile">{{ abstract.presenting_author }}</th>
                                 {% endif %}
                                 <td>{{ abstract.get_presentation_preference_display }}</td>
                                 <td data-order="{{ abstract.date_submitted|date:"U" }}">{{ abstract.date_submitted|date:"Y-m-d" }}</td>

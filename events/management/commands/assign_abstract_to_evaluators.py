@@ -1,11 +1,10 @@
-from django.conf import settings
-from django.core.management.base import BaseCommand
-from django.core.exceptions import ObjectDoesNotExist
-from django.utils import translation, timezone
 from django.contrib.auth.models import User
-from events.models import Event,Abstract
-from clubs.models import Team
+from django.core.management.base import BaseCommand
 from django.db.models import Count
+from django.utils import timezone
+from events.models import Event, Abstract
+
+import math
 
 
 class Command(BaseCommand):
@@ -19,21 +18,31 @@ class Command(BaseCommand):
             print "No event code name was provided."
             return
 
-        event= Event.objects.get(code_name=options['event_code_name'])
+        event = Event.objects.get(code_name=options['event_code_name'])
 
         if not event.abstract_revision_team:
             print "Event has no abstract revision team."
             return
 
-        abstracrs_count = Abstract.objects.filter(event=event).count()
-        evaluatin_team_members_count = Team.objects.get(code_name=event.abstract_revision_team).members.count()
+        abstract_count = Abstract.objects.filter(event=event, is_deleted=False).count()
+        evaluatin_team_members_count = event.abstract_revision_team.members.count()
+        target_abstracts_per_evaluator = float(abstract_count)/evaluatin_team_members_count
+        target_abstracts_per_evaluator = math.ceil(target_abstracts_per_evaluator)
+        target_abstracts_per_evaluator = int(target_abstracts_per_evaluator)
 
-        target_count = int(abstracrs_count/evaluatin_team_members_count)
-        avalabile_members= Team.objects.get(code_name=event.abstract_revision_team).members.annotate(num_b=Count('abstract')).filter(num_b__lt=target_count)
-
-        unassigned_abstracts = Abstract.objects.annotate(num_b=Count('evaluators')).filter(event=event, is_deleted=False,num_b__lt=2)
+        unassigned_abstracts = Abstract.objects.annotate(evaluator_count=Count('evaluators'))\
+                                               .filter(event=event, is_deleted=False,
+                                                       evaluator_count__lt=event.evaluators_per_abstract)
         for abstract in unassigned_abstracts:
-            for member in avalabile_members:
-                if member not in abstract.evaluators.all():
-                    abstract.evaluators.add(member)
-                    abstract.save()
+            remaining_evaluators = event.evaluators_per_abstract - abstract.evaluator_count
+            for i in range(remaining_evaluators):
+                evaluator_pks = abstract.evaluators.values_list("pk", flat=True)
+                evaluator = event.abstract_revision_team.members\
+                                                        .annotate(abstract_count=Count('abstract'))\
+                                                        .filter(abstract_count__lt=target_abstracts_per_evaluator)\
+                                                        .exclude(pk__in=evaluator_pks)\
+                                                        .first()
+                if not evaluator:
+                    print "No available evalautors!"
+                    return
+                abstract.evaluators.add(evaluator)

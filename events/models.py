@@ -55,11 +55,14 @@ class Event(models.Model):
                                                related_name="abstract_revision_events")
     abstract_revision_team = models.ForeignKey(Team, null=True, blank=True,
                                                related_name="abstract_revision_events")
+    evaluators_per_abstract = models.PositiveSmallIntegerField(u"عدد المقيمين والمقيمات لكل ملخص بحثي",
+                                                              null=True, blank=True, default=2)
     is_on_telegram = models.BooleanField(default=True,
                                          verbose_name=u"على تلغرام؟")
     organizing_club = models.ForeignKey(Club , null=True, blank=True)
     organizing_team = models.ForeignKey(Team, null=True, blank=True)
     priorities = models.PositiveSmallIntegerField(default=1)
+    notification_email = models.EmailField(u'البريد الإلكتروني للتنبيهات', blank=True)
     #city = models.CharField(max_length=20, choices=city_choices, verbose_name=u"المدينة")
 
     def is_on_sidebar(self, user):
@@ -105,6 +108,9 @@ class Event(models.Model):
             return True
         else:
             return False
+
+    def get_notification_email(self):
+        return self.notification_email or settings.DEFAULT_FROM_EMAIL
 
     def __unicode__(self):
         return self.official_name

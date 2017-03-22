@@ -34,7 +34,7 @@ class Command(BaseCommand):
         csv_reader = unicodecsv.reader(open(csv_file), encoding="utf-8")
 
         for row in csv_reader:
-            email = row[0].strip()
+            email = row[0].strip().lower()
             try:
                 validate_email(email)
             except ValidationError:

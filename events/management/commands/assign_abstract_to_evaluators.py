@@ -42,7 +42,8 @@ class Command(BaseCommand):
         for evaluator in overworked_evaluators:
             print "* {} ({})".format(evaluator.username, evaluator.abstract_count)
             extra_abstract_count = evaluator.abstract_count - target_abstracts_per_evaluator
-            extra_abstracts = evaluator.abstract_set.all()[:extra_abstract_count]
+            # Exclude already-evaluated abstracts
+            extra_abstracts = evaluator.abstract_set.exclude(evaluation__evaluator=evaluator).distinct()[:extra_abstract_count]
             for abstract in extra_abstracts:
                 abstract.evaluators.remove(evaluator)
 

@@ -296,7 +296,7 @@ class Team(models.Model):
         verbose_name = u"فريق"
         verbose_name_plural = u"الفرق"
 
-    def get_member_count():
+    def get_member_count(self):
         return self.members.count()
 
     def __unicode__(self):

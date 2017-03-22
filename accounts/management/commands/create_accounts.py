@@ -77,6 +77,6 @@ class Command(BaseCommand):
                 print "Created an account for", email
             if event:
                 event.abstract_revision_team.members.add(user)
-            mail.send([user.email], template=email_template,
+            mail.send([user.email], sender_email, template=email_template,
                       context={'user': user, 'random_password': random_password,
                                'preexisting': preexisting, 'event': event})

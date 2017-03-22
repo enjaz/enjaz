@@ -83,7 +83,7 @@ class TeamAdminForm(forms.ModelForm):
 
     
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'city', 'gender', 'coordinator')
+    list_display = ('__unicode__', 'city', 'gender', 'coordinator', 'get_member_count')
     list_filter = ('city', 'gender', 'year')
     search_fields = ('name', 'city', 'gender', 'code_name', 'email')
     filter_horizontal = ('members',)

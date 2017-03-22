@@ -25,10 +25,14 @@ class Command(BaseCommand):
             return
 
         abstract_count = Abstract.objects.filter(event=event, is_deleted=False).count()
-        evaluatin_team_members_count = event.abstract_revision_team.members.count()
-        target_abstracts_per_evaluator = float(abstract_count) * event.evaluators_per_abstract / evaluatin_team_members_count
+        evaluation_team_members_count = event.abstract_revision_team.members.count()
+        target_abstracts_per_evaluator = float(abstract_count) * event.evaluators_per_abstract / evaluation_team_members_count
         target_abstracts_per_evaluator = math.ceil(target_abstracts_per_evaluator)
         target_abstracts_per_evaluator = int(target_abstracts_per_evaluator)
+
+        print "Total abstracts:", abstract_count
+        print "Evaluation team members count:", evaluation_team_members_count
+        print "Target abstracts per evaluator:", target_abstracts_per_evaluator
 
         # Relieve over-worked evaluators
         overworked_evaluators = event.abstract_revision_team.members\

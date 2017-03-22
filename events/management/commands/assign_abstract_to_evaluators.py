@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
         abstract_count = Abstract.objects.filter(event=event, is_deleted=False).count()
         evaluatin_team_members_count = event.abstract_revision_team.members.count()
-        target_abstracts_per_evaluator = float(abstract_count)/evaluatin_team_members_count
+        target_abstracts_per_evaluator = float(abstract_count) * event.evaluators_per_abstract / evaluatin_team_members_count
         target_abstracts_per_evaluator = math.ceil(target_abstracts_per_evaluator)
         target_abstracts_per_evaluator = int(target_abstracts_per_evaluator)
 

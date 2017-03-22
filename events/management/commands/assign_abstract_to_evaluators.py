@@ -41,6 +41,7 @@ class Command(BaseCommand):
                                                         .annotate(abstract_count=Count('abstract'))\
                                                         .filter(abstract_count__lt=target_abstracts_per_evaluator)\
                                                         .exclude(pk__in=evaluator_pks)\
+                                                        .order_by("?")\
                                                         .first()
                 if not evaluator:
                     print "No available evalautors!"

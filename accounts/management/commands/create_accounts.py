@@ -43,7 +43,7 @@ class Command(BaseCommand):
             tokens = email.split('@')
             username = tokens[0]
             random_password = "".join([random.choice(string.digits + string.uppercase) for i in range(8)])
-            user = User.objects.filter(email=email).first()
+            user = (User.objects.filter(email=email) | User.objects.filter(username=username)).first()
             if user:
                 preexisting = True
                 user.set_password(random_password)

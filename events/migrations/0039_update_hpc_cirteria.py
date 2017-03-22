@@ -32,7 +32,6 @@ def add_criteria(apps, schema_editor):
 
     for criterion in [c1, c2, c3, c4, c5, c6, c7]:
         criterion.events.add(hpc_r, hpc_a, hpc_j)
-        print criterion.events.all()
 
 def remove_criteria(apps, schema_editor):
     Criterion = apps.get_model('events', 'Criterion')

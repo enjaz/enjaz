@@ -47,6 +47,7 @@ class Command(BaseCommand):
             if user:
                 preexisting = True
                 user.set_password(random_password)
+                user.save()
                 print email, "already has an account!  Sending a new password..."
             else:
                 preexisting = False

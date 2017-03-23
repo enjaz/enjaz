@@ -3,6 +3,7 @@ from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
+from django.db.models import Count
 from django.http import HttpResponseRedirect, Http404
 from django.views.decorators import csrf
 from django.shortcuts import render, get_object_or_404, redirect
@@ -11,14 +12,11 @@ from post_office import mail
 import os.path
 
 from core import decorators
-from clubs.models import college_choices
+from clubs.models import Team, college_choices
 from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm, InitiativeForm, InitiativeFigureFormset,CaseReportForm
 from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation, TimeSlot, SessionRegistration, Initiative, SessionGroup,CaseReport
 from events import utils
 import core.utils
-from django.db.models import Count
-from clubs.models import Team
-
 import clubs.utils
 
 
@@ -629,10 +627,25 @@ def evaluators_homepage(request,event_code_name):
        not utils.can_evaluate_abstracts(request.user,event):
         raise PermissionDenied
 
-    user_evaluations = Evaluation.objects.filter(evaluator=request.user)
-    pending_abstracts = Abstract.objects.filter(is_deleted=False, evaluators__pk=request.user.pk)\
-                                        .exclude(evaluation__user=user_evaluations)\
-                                        .distinct()
+    if request.user.is_superuser:
+        user_evaluations = Evaluation.objects.annotate(evaluation_count=Count("abstract__evaluation"))\
+                                             .filter(abstract__event=event,
+                                                     evaluation_count__gte=event.evaluators_per_abstract,
+                                                     abstract__is_deleted=False)
+        pending_abstracts = Abstract.objects.annotate(evaluation_count=Count("evaluation"))\
+                                            .filter(is_deleted=False,
+                                                    event=event,
+                                                    evaluation_count__lt=event.evaluators_per_abstract)
+                                                    
+    else:
+        user_evaluations = Evaluation.objects.filter(evaluator=request.user,
+                                                     abstract__event=event,
+                                                     abstract__is_deleted=False)
+        pending_abstracts = Abstract.objects.filter(is_deleted=False,
+                                                    evaluators=request.user,
+                                                    event=event)\
+                                            .exclude(evaluation__user=user_evaluations)\
+                                            .distinct()
     riyadh_evaluators = Team.objects.get(code_name='hpc2-r-e')
     jeddah_evaluators = Team.objects.get(code_name='hpc2-j-e')
     alahsa_evaluators = Team.objects.get(code_name='hpc2-a-e')

@@ -23,11 +23,10 @@
     </div>
 </div>
 
-    <div class="col-md-12">
         <div class="row text-center">
             {% autoescape off %}<div class="row"> {% endautoescape %}
             {% for session in timeslot.session_set.all %}
-            <div class="col-md-4 col-xs-6 {% if timeslot.session_set.count == 1 %}col-md-offset-4 col-xs-offset-3{% elif timeslot.session_set.count == 2 %}col-md-offset-2{% endif %}">
+            <div class="col-md-4 col-xs-8 col-xs-offset-2 {% if timeslot.session_set.count == 1 %}col-md-offset-4{% elif timeslot.session_set.count == 2 %}col-md-offset-2{% endif %}">
                 <h3 class="session-title"><a {% if user|is_organizing_team_member:event %} href="{% url 'events:review_registrations' session.event.code_name session.pk %}" {% endif %}>{{ session.name }}</a></h3>
                 <div>
   								<i class="entypo-calendar"></i>
@@ -91,11 +90,6 @@
     </div>
         <hr>
         {% endfor %}
-
-    </div>
-
-
-
 
 {% endblock %}
 

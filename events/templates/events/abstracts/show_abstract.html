@@ -3,12 +3,47 @@
 {% block title %}{{ abstract.event.english_name }}: {{ abstract.title }}{% endblock %}
 
 {% block content %}
+<style>
+h2{
+  font-size: 20px;
+  border: 1px solid #ebebeb;
+  background-color: #f5f5f6;
+  color: #a6a7aa;
+  padding: 10px;
+  text-align: center;
+}
+</style>
 <div class="english-field">
 <p class="alert alert-warning"><i class="fa fa-hourglass-half" aria-hidden="true"></i> This abstract is currently pending revision.</p>
+<p class="alert alert-warning"><i class="fa fa-hourglass-half" aria-hidden="true"></i> This abstract acceptance status is : {{ abstract.get_status_display }}</p>
 
-	{% include 'events/abstracts/partials/abstract_table.html' %}
+{% include 'events/abstracts/partials/abstract_table.html' %}
+<div class="row" style="margin-left: 0; margin-bottom: 5px; ">
+{%  if abstract.status == 'A' %}
+    {% if  abstract.posters.exists %}
+    {% else %}
+        <h2>Accepted</h2>
+        <h3><b>Congratulations!</b><br> Your abstact has been accepted.  We require all accepted abstract submitters to upload their poser image and powerpoint,make sure you have followed the poster template : </h3>
+        <div class="submit" style="margin-left: 9%; margin-bottom: 10px; margin-right: 9%; >
+        <form method="post" action="{% url 'events:show_abstract' event.code_name abstract.pk %}" enctype="multipart/form-data">
+            {% csrf_token %}
+                <p>{{ form.non_field_errors }}</p>
+                    <p>
+                        Poster:
+                        {{ form.poster.errors }}
+                        {{ form.poster }}
+                    </p>
+                    <p>
+                        Powerpoint:
+                        {{ form.poster_powerpoint.errors }}
+                        {{ form.poster_powerpoint }}
+                    </p>
+            <input type="submit" class="btn btn-success" value="submit">
+        </form></div>
+    {% endif %}
+{% endif %}
+</div>
 
-<div class="row" style="margin-left: 0; margin-bottom: 5px;">
 <div style="float: right;">
 	<!-- <button id="edit-abstract" class="btn btn-icon btn-success">
 			<i class="entypo-pencil"></i>
@@ -22,7 +57,10 @@
 </div>
 
 
+
+
 </div>
+
 {% endblock %}
 
 {% block customscript %}

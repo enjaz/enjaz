@@ -39,7 +39,7 @@
             <th class="text-center">Level</th>
             <td>{{ abstract.get_level_display }}</td>
         </tr>
-        {% if abstract.figures.exists %}
+        {% if abstract.figures.exists  %}
         <tr>
             <th class="text-center">Attachment</th>
             <td>
@@ -48,6 +48,39 @@
                 <li>
                 <a href="{{ figure.figure.url }}" class="english-field">
                     <i class="entypo-documents"></i> {{ figure.figure.name }}
+                </a>
+              </li>
+              {% endfor %}
+              </ul>
+            </td>
+        </tr>
+
+        {% endif %}
+        {% if abstract.posters.exists %}
+        <tr>
+            <th class="text-center">Poster Image</th>
+            <td>
+              <ul>
+                {% for poster in abstract.posters.all %}
+                <li>
+                <a href="{{ poster.poster.url }}" class="english-field">
+                    <i class="entypo-documents"></i> {{ poster.poster.name }}
+                </a>
+              </li>
+              {% endfor %}
+              </ul>
+            </td>
+        </tr>
+        {% endif %}
+        {% if abstract.poster_powerpoints.exists %}
+        <tr>
+            <th class="text-center">Poster Powerpoint</th>
+            <td>
+              <ul>
+                {% for poster_powerpoint in abstract.poster_powerpoints.all %}
+                <li>
+                <a href="{{  poster_powerpoint.poster_powerpoint.url }}" class="english-field">
+                    <i class="entypo-documents"></i> {{ poster_powerpoint.poster_powerpoint.name }}
                 </a>
               </li>
               {% endfor %}

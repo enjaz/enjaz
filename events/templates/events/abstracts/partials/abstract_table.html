@@ -72,12 +72,12 @@
             </td>
         </tr>
         {% endif %}
-        {% if abstract.poster_powerpoints.exists %}
+        {% if abstract.posters.exists %}
         <tr>
             <th class="text-center">Poster Powerpoint</th>
             <td>
               <ul>
-                {% for poster_powerpoint in abstract.poster_powerpoints.all %}
+                {% for poster_powerpoint in abstract.posters.all %}
                 <li>
                 <a href="{{  poster_powerpoint.poster_powerpoint.url }}" class="english-field">
                     <i class="entypo-documents"></i> {{ poster_powerpoint.poster_powerpoint.name }}

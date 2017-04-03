@@ -88,7 +88,7 @@ footer{
     </style>
     </head>
     <body>
-  
+
 		<!-- Top menu -->
 		<nav class="navbar navbar-inverse navbar-no-bg" role="navigation">
 			<div class="container">
@@ -134,6 +134,12 @@ footer{
                         <div class="description">
                        	  <p class="intro">
 			 ينظّم نادي الطلاب في جامعة الملك سعود بن عبد العزيز للعلوم الصحية" <a href="https://tedxksauhs.com/"><b><strong>تدكس "لو أن"</strong></b></a> في يوم السبت 15 أبريل في مركز المؤتمرات في جامعةالملك سعود بن عبدالعزيز للعلوم الصحية!
+       {% if not user.is_authenticated %}
+       <br>
+       <span style="background: yellow; padding: 4px;">
+       هل لديك حساب على إنجاز؟ <a href="{% url 'userena_signin' %}?next={{ request.path }}">نأمل الحرص على تسجيل الدخول لتسهيل التواصل معك</a>!
+     </span>
+       {% endif %}
 
 			    </p>
                         </div>
@@ -142,7 +148,7 @@ footer{
 
                 <div class="row">
                     {% block content %}{% endblock %}
-                    
+
                 </div>
 <footer>
   <p class="text-center">بُني بأيدٍ طلابية. حقّك في النسخ مكفول.</p>

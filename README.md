@@ -68,7 +68,7 @@ from clubs.urls import club_forms_urls
 from core.views import visit_announcement
 from django.views.generic.base import RedirectView
 from researchhub.forms import ResearchHubSignupForm
-
+from tedx.admin import tedx_admin
 
 urlpatterns = [
     url(r'^', include('core.urls')),
@@ -102,6 +102,8 @@ urlpatterns = [
     url(r'^books/', RedirectView.as_view(pattern_name='bulb:index')),
     url(r'^arshidni/', RedirectView.as_view(pattern_name='studentguide:index')),
     url(r'^tagging_autocomplete/', include('tagging_autocomplete.urls')),
+    url(r'^tedx/admin/', include(tedx_admin.urls)),
+    url(r'^tedx/', include('tedx.urls', namespace="tedx")),
 ]
 ```
 
@@ -156,6 +158,7 @@ INSTALLED_APPS = (
     'wkhtmltopdf',
     'events',
     'social.apps.django_app.default',
+    'tedx',
 )
 ```
 

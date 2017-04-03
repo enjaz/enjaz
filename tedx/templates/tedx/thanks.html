@@ -1,0 +1,135 @@
+{% load static %}{% load bootstrap3 %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" >
+
+    <head>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>TEDxKSAUHS لو أن</title>
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
+	<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-theme-rtl.min.css' %}">
+        <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+        <link rel="stylesheet" href="{% static 'font-awesome/css/font-awesome.min.css' %}">
+		    <link rel="stylesheet" href="{% static 'css/form-elements.css' %}">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <!-- Favicon and touch icons -->
+        <link rel="shortcut icon" href="{% static 'img/logo.png' %}">
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{% static 'ico/apple-touch-icon-144-precomposed.png' %}">
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{% static 'ico/apple-touch-icon-114-precomposed.png' %}">
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{% static 'ico/apple-touch-icon-72-precomposed.png' %}">
+        <link rel="apple-touch-icon-precomposed" href="{% static 'ico/apple-touch-icon-57-precomposed.png' %}">
+
+    </head>
+
+    <style>
+      @font-face {
+    font-family: 'GE Dinar One';
+    font-weight: normal;
+    src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
+}
+
+      body {
+  font-family: 'GE Dinar One'
+}
+
+    </style>
+    <body>
+
+		<!-- Top menu -->
+		<nav class="navbar navbar-inverse navbar-no-bg" role="navigation">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#top-navbar-1">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="index.html">TEDxKSAUHS</a>
+				</div>
+				<!-- Collect the navstatic filesstatic files links, forms, and other content for toggling -->
+				<div class="collapse navbar-collapse" id="top-navbar-1">
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<span class="li-text">
+								لمتابعة مستجدات
+							</span>
+							<a href="#"><strong>TEDxKSAUSH</strong></a>
+
+							<span class="li-social">
+
+		<a href="https://twitter.com/TEDxKSAUHS" target="_blank"><i class="fa fa-twitter"></i></a>
+		<a href="https://tedxksauhs.com/" target="_blank"><i class="fa fa-dribbble"></i></a>
+		<a href="https://t.me/StudentsofKSAUH" target="_blank"><i class="fa fa-paper-plane"></i></a>
+
+		<a href="https://www.snapchat.com/add/studentsofksauh" target="_blank"><i class="fa fa-snapchat-ghost"></i></a>
+							</span>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+
+        <!-- Top content -->
+        <div class="top-content">
+            <div class="container">
+
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2 text">
+                        <h1>تسجيل حضور<br>  <span style="color: #ff2b06;">TED<sup>x</sup></span></b> KSAUHS.</h1>
+                        <div class="description">
+                       	  <p>
+			 "ينظّم نادي الطلاب في جامعة الملك سعود بن عبد العزيز للعلوم الصحية" <a href="https://tedxksauhs.com/"><b><strong>تدكس "لو أن"</strong></b></a> في يوم السبت 15 أبريل في مركز المؤتمرات في جامعةالملك سعود بن عبدالعزيز للعلوم الصحية!
+
+			    </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3 form-box">
+                      <form role="form" action="" method="post" class="f1">
+                    		<h3>شكرًا لاتمامك النموذج</h3>
+                    		<p>(نظرا لعدد المقاعد المحدود تعبئتك للنموذج لا تعني حصولك على تذكرة سيتم التواصل مع المقبولين من قبل فريق  TEDxKSAUHS </p>
+
+                    		<fieldset>
+
+                            </fieldset>
+                          </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- Javascript -->
+        <script src="{% static 'js/jquery-1.11.1.min.js' %}"></script>
+        <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'js/jquery.backstretch.min.js' %}"></script>
+        <script src="{% static 'js/retina-1.1.0.min.js' %}"></script>
+        <script src="{% static 'js/scripts.js' %}"></script>
+
+<script>
+    /*
+        Fullscreen background
+    */
+
+    $.backstretch("{% static 'img/backgrounds/tedx.jpg' %}");
+</script>
+    </body>
+
+</html>

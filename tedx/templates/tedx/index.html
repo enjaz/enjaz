@@ -1,148 +1,7 @@
-{% load static %}{% load bootstrap3 %}
-<!DOCTYPE html>
-<html lang="ar" dir="rtl" >
-
-    <head>
-
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>TEDxKSAUHS لو أن</title>
-
-        <!-- CSS -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
-	<link rel="stylesheet" href="{% static 'tedx/bootstrap/css/bootstrap-theme-rtl.min.css' %}">
-        <link rel="stylesheet" href="{% static 'tedx/bootstrap/css/bootstrap.min.css' %}">
-        <link rel="stylesheet" href="{% static 'tedx/font-awesome/css/font-awesome.min.css' %}">
-        <link rel="stylesheet" href="{% static 'tedx/css/form-elements.css' %}">
-        <link rel="stylesheet" href="{% static 'tedx/css/style.css' %}">
-
-
-        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-        <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-        <![endif]-->
-
-    <style>
-      @font-face {
-    font-family: 'GE Dinar One';
-    font-weight: normal;
-    src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
-}
-
-html, body{
-  height: 100%;
-}
-
-      body {
-  font-family: 'GE Dinar One'
-}
-
-.f1 fieldset {
-    text-align: right;
-}
-
-.intro{
-  padding: 15px;
-  background: white;
-  color: black;
-  border-radius: 5px;
-}
-
-.top-content .description p.intro a{
-  color: red;
-}
-
-body{
-background-image: linear-gradient( rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7) ), url('{% static 'tedx/img/backgrounds/1@2x.jpg' %}');
-background-size: cover;
-background-attachment: fixed;
-}
-
-input[type="text"], textarea{
-  color: black;
-}
-
-.f1-step{
-float: right;
-}
-
-.f1-progress-line{
-right: 0;
-}
-
-footer{
-  margin-top: 40px;
-}
-
-.checkbox input[type="checkbox"]{
-  margin-right: -20px;
-  margin-left: 0;
-}
-
-.checkbox label{
-  padding-right: 20px;
-  padding-left: 0;
-}
-    </style>
-    </head>
-    <body>
-  {% bootstrap_form_errors form %}
-		<!-- Top menu -->
-		<nav class="navbar navbar-inverse navbar-no-bg" role="navigation">
-			<div class="container">
-				<div class="navbar-header">
-					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#top-navbar-1">
-						<span class="sr-only">Toggle navigation</span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-					</button>
-					<a class="navbar-brand" href="index.html">TEDxKSAUHS</a>
-				</div>
-				<!-- Collect the navstatic filesstatic files links, forms, and other content for toggling -->
-				<div class="collapse navbar-collapse" id="top-navbar-1">
-					<ul class="nav navbar-nav navbar-right">
-						<li>
-							<span class="li-text">
-								لمتابعة مستجدات
-							</span>
-							<a href="#"><strong>TEDxKSAUSH</strong></a>
-
-							<span class="li-social">
-
-		<a href="https://twitter.com/TEDxKSAUHS" target="_blank"><i class="fa fa-twitter"></i></a>
-		<a href="https://tedxksauhs.com/" target="_blank"><i class="fa fa-dribbble"></i></a>
-		<a href="https://t.me/StudentsofKSAUH" target="_blank"><i class="fa fa-paper-plane"></i></a>
-
-		<a href="https://www.snapchat.com/add/studentsofksauh" target="_blank"><i class="fa fa-snapchat-ghost"></i></a>
-							</span>
-						</li>
-					</ul>
-				</div>
-			</div>
-		</nav>
-
-        <!-- Top content -->
-        <div class="top-content">
-            <div class="container">
-
-                <div class="row">
-                    <div class="col-sm-8 col-sm-offset-2 text">
-                        <h1>تسجيل حضور<br>  <span style="color: #ff2b06;">TED<sup>x</sup></span></b> KSAUHS.</h1>
-                        <div class="description">
-                       	  <p class="intro">
-			 ينظّم نادي الطلاب في جامعة الملك سعود بن عبد العزيز للعلوم الصحية" <a href="https://tedxksauhs.com/"><b><strong>تدكس "لو أن"</strong></b></a> في يوم السبت 15 أبريل في مركز المؤتمرات في جامعةالملك سعود بن عبدالعزيز للعلوم الصحية!
-
-			    </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
+{% extends 'tedx/base.html' %}{% load bootstrap3 %}
+{% block content %}
                     <div class="col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3 form-box">
+                        {% bootstrap_form_errors form %}
                     	<form role="form" method="post" class="f1">
                         {% csrf_token %}
                     		<h3>سجّل في تدكس "لو أن"</h3>
@@ -243,26 +102,6 @@ footer{
                                     <label class="sr-only" for="id_referral">كيف سمعت عن TEDxKSAUSH?</label>
 					    {% bootstrap_field form.referral show_label=False %}
                                 </div>
-{% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
-	<!-- Piwik -->
-	<script type="text/javascript">
-	  var _paq = _paq || [];
-      {% if user.is_authenticated %}
-      _paq.push(['setUserId', '{{ user.username }}']);
-      {% endif %}
-	  _paq.push(['trackPageView']);
-	  _paq.push(['enableLinkTracking']);
-	  (function() {
-	    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://enjazportal.com/stats/";
-	    _paq.push(['setTrackerUrl', u+'piwik.php']);
-	    _paq.push(['setSiteId', 1]);
-	    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
-	    g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-	  })();
-	</script>
-	<noscript><p><img src="//enjazportal.com/stats/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
-        <!-- End Piwik Code -->
-{% endif %}
                                 <div class="form-group">
                                       <label class="sr-only" for="id_expectations">ماذا تتوقع من TEDxKSAUSH?</label>
 					    {% bootstrap_field form.expectations show_label=False %}
@@ -307,19 +146,8 @@ footer{
 
                     	</form>
                     </div>
-                </div>
-<footer>
-  <p class="text-center">بُني بأيدٍ طلابية. حقّك في النسخ مكفول.</p>
-</footer
-            </div>
-        </div>
-
-
-        <!-- Javascript -->
-        <script src="{% static 'tedx/js/jquery-1.11.1.min.js' %}"></script>
-        <script src="{% static 'tedx/bootstrap/js/bootstrap.min.js' %}"></script>
-        <script src="{% static 'tedx/js/retina-1.1.0.min.js' %}"></script>
-        <script src="{% static 'tedx/js/scripts.js' %}"></script>
+{% endblock %}
+{% block customscript %}
 {%  if user.is_authenticated and not user.is_superuser and not user.common_profile.canceled_twitter_connection and not user.social_auth.exists %}
 <!---Twitter Modal -->>
 <div class="modal fade" id="connect-twitter">
@@ -419,6 +247,4 @@ $(function(){
 	<noscript><p><img src="//enjazportal.com/stats/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
         <!-- End Piwik Code -->
 {% endif %}
-    </body>
-
-</html>
+{% endblock %}

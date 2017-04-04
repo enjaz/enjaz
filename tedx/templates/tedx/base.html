@@ -127,32 +127,12 @@ footer{
         <!-- Top content -->
         <div class="top-content">
             <div class="container">
-
-                <div class="row">
-                    <div class="col-sm-8 col-sm-offset-2 text">
-                        <h1>تسجيل حضور<br>  <span style="color: #ff2b06;">TED<sup>x</sup></span></b> KSAUHS.</h1>
-                        <div class="description">
-                       	  <p class="intro">
-			 ينظّم نادي الطلاب في جامعة الملك سعود بن عبد العزيز للعلوم الصحية" <a href="https://tedxksauhs.com/"><b><strong>تدكس "لو أن"</strong></b></a> في يوم السبت 15 أبريل في مركز المؤتمرات في جامعةالملك سعود بن عبدالعزيز للعلوم الصحية!
-       {% if not user.is_authenticated %}
-       <br>
-       <span style="background: yellow; padding: 4px;">
-       هل لديك حساب على إنجاز؟ <a href="{% url 'userena_signin' %}?next={{ request.path }}">نأمل الحرص على تسجيل الدخول لتسهيل التواصل معك</a>!
-     </span>
-       {% endif %}
-
-			    </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
                     {% block content %}{% endblock %}
 
-                </div>
+
 <footer>
   <p class="text-center">بُني بأيدٍ طلابية. حقّك في النسخ مكفول.</p>
-</footer
+</footer>
             </div>
         </div>
 

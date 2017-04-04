@@ -9,13 +9,12 @@ def handle_registration(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            form.save()
+            registration = form.save(commit=False)
             # If user is logged-in, let's try sending a tweet!
             if request.user.is_authenticated():
-                relative_url = reverse('tedx:handle_registration')
-                full_url = request.build_absolute_uri(relative_url)
-                utils.create_tweet(request.user, full_url)
-
+                registration.user = request.user
+                utils.create_tweet(request.user)
+            registration.save()
             return HttpResponseRedirect(reverse('tedx:thanks'))
     else:
         form = RegistrationForm()

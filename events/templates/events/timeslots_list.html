@@ -17,8 +17,8 @@
         <h2 class="mentor-section-header">{{ timeslot.name }}</h2>
         <a style="float: left;" class="btn btn-Success" href="{% url 'events:list_sessions' timeslot.event.code_name timeslot.pk %}">المزيد </a>
     </div>
+    {% endfor %}
 </div>
-        {% endfor %}
 {% endblock %}
 
 {% block customscript %}

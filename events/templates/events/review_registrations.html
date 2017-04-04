@@ -50,7 +50,7 @@
                             <tr>
                                 <td><input type="checkbox" value="1" name="pk_{{ registration.pk }}"></td>
                                 <td>{{ registration.user.common_profile.get_en_full_name }}</td>
-                                <td>{{ registration.user.get_university_or_affiliation }}</td>
+                                <td>{{ registration.user.common_profile.get_university_or_affiliation }}</td>
                                 <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted|date:"Y-m-d" }}</td>
                             </tr>
                         {% endfor %}
@@ -94,7 +94,7 @@
                             <tr>
                                 <td><input type="checkbox" value="1" name="pk_{{ registration.pk }}"></td>
                                 <td>{{ registration.user.common_profile.get_en_full_name }}</td>
-                                <td>{{ registration.user.get_university_or_affiliation }}</td>
+                                <td>{{ registration.user.common_profile.get_university_or_affiliation }}</td>
                                 <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted|date:"Y-m-d" }}</td>
                             </tr>
                         {% endfor %}
@@ -138,7 +138,7 @@
                             <tr>
                                 <td><input type="checkbox" value="1" name="pk_{{ registration.pk }}"></td>
                                 <td>{{ registration.user.common_profile.get_en_full_name }}</td>
-                                <td>{{ registration.user.get_university_or_affiliation }}</td>
+                                <td>{{ registration.user.common_profile.get_university_or_affiliation }}</td>
                                 <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted|date:"Y-m-d" }}</td>
                             </tr>
                         {% endfor %}

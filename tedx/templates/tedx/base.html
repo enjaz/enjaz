@@ -101,6 +101,10 @@ footer a{
   padding-right: 20px;
   padding-left: 0;
 }
+
+.english-field input {
+    font-family: 'Roboto', "GE Dinar One", sans-serif;
+}
     </style>
 {% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
 	<!-- Piwik -->
@@ -164,8 +168,6 @@ footer a{
         <div class="top-content">
             <div class="container">
                     {% block content %}{% endblock %}
-
-
 <footer>
   <p class="text-center">بُني بأيدٍ طلابية. <a target="_blank" href="https://github.com/osamak/student-portal">حقّك في النسخ مكفول</a>.</p>
 </footer>
@@ -178,6 +180,7 @@ footer a{
         <script src="{% static 'tedx/bootstrap/js/bootstrap.min.js' %}"></script>
         <script src="{% static 'tedx/js/retina-1.1.0.min.js' %}"></script>
         <script src="{% static 'tedx/js/scripts.js' %}"></script>
+	<script src="{% static 'neon/assets/js/custom.js' %}"></script>
         {% block customscript %}{% endblock %}
     </body>
 

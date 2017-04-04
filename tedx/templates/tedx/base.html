@@ -1,13 +1,25 @@
 <!DOCTYPE html>{% load static %}
 <html lang="ar" dir="rtl" >
+<!--
+  ______         _               _   _                  _       __     __            _
+ |  ____|       (_)             | \ | |                | |      \ \   / /           | |
+ | |__    _ __   _   __ _  ____ |  \| |  ___   ___   __| | ___   \ \_/ /___   _   _ | |
+ |  __|  | '_ \ | | / _` ||_  / | . ` | / _ \ / _ \ / _` |/ __|   \   // _ \ | | | || |
+ | |____ | | | || || (_| | / /  | |\  ||  __/|  __/| (_| |\__ \    | || (_) || |_| ||_|
+ |______||_| |_|| | \__,_|/___| |_| \_| \___| \___| \__,_||___/    |_| \___/  \__,_|(_)
+               _/ |
+              |__/
 
+You must be so cool if you are reading this! Our Studnets' Club can
+totally use your help! Drop us a line at hello@enjazportal.com, will
+you?
+-->
     <head>
-
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>TEDxKSAUHS لو أن</title>
-
+        <link rel="icon" href="{% static 'logo/favicon.png' %}">
         <!-- CSS -->
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
 	<link rel="stylesheet" href="{% static 'tedx/bootstrap/css/bootstrap-theme-rtl.min.css' %}">
@@ -76,6 +88,10 @@ footer{
   margin-top: 40px;
 }
 
+footer a{
+ color: inherit;
+}
+
 .checkbox input[type="checkbox"]{
   margin-right: -20px;
   margin-left: 0;
@@ -86,6 +102,26 @@ footer{
   padding-left: 0;
 }
     </style>
+{% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
+	<!-- Piwik -->
+	<script type="text/javascript">
+	  var _paq = _paq || [];
+      {% if user.is_authenticated %}
+      _paq.push(['setUserId', '{{ user.username }}']);
+      {% endif %}
+	  _paq.push(['trackPageView']);
+	  _paq.push(['enableLinkTracking']);
+	  (function() {
+	    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://enjazportal.com/stats/";
+	    _paq.push(['setTrackerUrl', u+'piwik.php']);
+	    _paq.push(['setSiteId', 1]);
+	    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+	    g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+	  })();
+	</script>
+	<noscript><p><img src="//enjazportal.com/stats/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+        <!-- End Piwik Code -->
+{% endif %}
     </head>
     <body>
 
@@ -127,32 +163,12 @@ footer{
         <!-- Top content -->
         <div class="top-content">
             <div class="container">
-
-                <div class="row">
-                    <div class="col-sm-8 col-sm-offset-2 text">
-                        <h1>تسجيل حضور<br>  <span style="color: #ff2b06;">TED<sup>x</sup></span></b> KSAUHS.</h1>
-                        <div class="description">
-                       	  <p class="intro">
-			 ينظّم نادي الطلاب في جامعة الملك سعود بن عبد العزيز للعلوم الصحية" <a href="https://tedxksauhs.com/"><b><strong>تدكس "لو أن"</strong></b></a> في يوم السبت 15 أبريل في مركز المؤتمرات في جامعةالملك سعود بن عبدالعزيز للعلوم الصحية!
-       {% if not user.is_authenticated %}
-       <br>
-       <span style="background: yellow; padding: 4px;">
-       هل لديك حساب على إنجاز؟ <a href="{% url 'userena_signin' %}?next={{ request.path }}">نأمل الحرص على تسجيل الدخول لتسهيل التواصل معك</a>!
-     </span>
-       {% endif %}
-
-			    </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
                     {% block content %}{% endblock %}
 
-                </div>
+
 <footer>
-  <p class="text-center">بُني بأيدٍ طلابية. حقّك في النسخ مكفول.</p>
-</footer
+  <p class="text-center">بُني بأيدٍ طلابية. <a target="_blank" href="https://github.com/osamak/student-portal">حقّك في النسخ مكفول</a>.</p>
+</footer>
             </div>
         </div>
 

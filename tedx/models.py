@@ -1,5 +1,6 @@
 # -*- coding: utf-8  -*-
 from __future__ import unicode_literals
+from django.contrib.auth.models import User
 from django.db import models
 
 gender_choices = (
@@ -9,6 +10,8 @@ gender_choices = (
 
 
 class Registration(models.Model):
+    user = models.ForeignKey(User, null=True, blank=True,
+                             related_name='tedx_registrations')
     name = models.CharField(max_length=200, verbose_name=u"اسمك")
     gender = models.CharField(max_length=1, choices=gender_choices,
                               verbose_name=u"الجندر")
@@ -17,7 +20,7 @@ class Registration(models.Model):
     emial = models.EmailField(max_length=100, verbose_name=u"البريد الإلكتروني")
     city = models.CharField(max_length=10,
                             verbose_name=u"المدينة")
-    fromNGH = models.BooleanField(verbose_name="هل أنت منسوبي ومنسوبات الحرس؟")
+    fromNGH = models.BooleanField(verbose_name="هل أنت من منسوبي ومنسوبات الحرس؟")
     job_title = models.CharField(max_length=100, verbose_name=u"المسمى الوظيفي")
     yourself = models.TextField(verbose_name=u"تحدث عن نفسك")
     about_tedx = models.TextField(verbose_name=u"تحدث عن تدكس")
@@ -25,7 +28,7 @@ class Registration(models.Model):
     past_experience = models.TextField(verbose_name=u"تحدث عن تجربتك السابقة مع تدكس")
     referral = models.CharField(max_length=20, verbose_name=u"كيف سمعت عن TEDxKSAUHS?")
     expectations = models.TextField(verbose_name=u"ما الذي تتوقعه من TEDxKSAUHS?")
-    meaning = models.TextField(verbose_name=u"ما الذي تعنيه لك لو أن؟")
+    meaning = models.TextField(verbose_name=u"ما الذي تعنيه لك عبارة لو أن؟")
     interview = models.BooleanField(u"هل تقبل بعمل مقابلات معك قبل و بعد الحدث؟")
     take_pic = models.BooleanField(u"هل تقبل بالتصوير أثناء الحدث؟")
     interests_choices = (

@@ -68,7 +68,7 @@
 				    {% bootstrap_field form.mobile show_label=False %}
 
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group english-field">
                                     <label class="sr-only" for="id_email">البريد الإلكتروني</label>
 				     {% bootstrap_field form.emial show_label=False  %}
 
@@ -218,8 +218,10 @@ $(function(){
     function makeGenderless() {
         if ($("#id_gender").val() == 'F') {
             reverse_replacement = false;
+            $("fieldset h4:first").html($("fieldset h4:first").html().replace("أخبرنا", "أخبرينا"));
         } else {
             reverse_replacement = true;
+            $("fieldset h4:first").html($("fieldset h4:first").html().replace("أخبرينا", "أخبرنا"));
         }
         replaceLabel("id_interview", "تقبل", "تقبلين", reverse_replacement);
         replaceLabel("id_take_pic", "تقبل", "تقبلين", reverse_replacement);

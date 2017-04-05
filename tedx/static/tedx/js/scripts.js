@@ -1,3 +1,17 @@
+function turn_to_arabic(element){
+                arabic_numbers = $(element).val().replace(/١/g, '1')
+                                                 .replace(/٢/g, '2')
+                                                 .replace(/٣/g, '3')
+                                                 .replace(/٤/g, '4')
+                                                 .replace(/٥/g, '5')
+                                                 .replace(/٦/g, '6')
+                                                 .replace(/٧/g, '7')
+                                                 .replace(/٨/g, '8')
+                                                 .replace(/٩/g, '9')
+                                                 .replace(/۰/g, '0');
+                $(element).val(arabic_numbers);
+}
+
 function scroll_to_class(element_class, removed_height) {
 	var scroll_to = $(element_class).offset().top - removed_height;
 	if($(window).scrollTop() != scroll_to) {
@@ -52,6 +66,7 @@ jQuery(document).ready(function() {
     		}
     		else {
     			$(this).removeClass('input-error');
+                        turn_to_arabic(this);
     		}
     	});
     	// fields validation
@@ -94,12 +109,14 @@ jQuery(document).ready(function() {
 
     	// fields validation
     	$(this).find('input[type="text"], input[type="password"], textarea').each(function() {
+
     		if( $(this).val() == "" ) {
     			e.preventDefault();
     			$(this).addClass('input-error');
     		}
     		else {
     			$(this).removeClass('input-error');
+                        turn_to_arabic(this);
     		}
     	});
     	// fields validation

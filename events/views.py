@@ -188,7 +188,7 @@ def upload_abstract_image(request):
                     "message": u"لم أستطع رفع الملف"}
                 }
 
-def list_sessions(request, event_code_name):
+def list_timeslots(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
     timeslots = TimeSlot.objects.filter(event=event)
     context = {'timeslots': timeslots,
@@ -200,7 +200,21 @@ def list_sessions(request, event_code_name):
         return HttpResponseRedirect(reverse('events:registration_closed',
                                                 args=(event.code_name,)))
 
-    return render(request, 'events/session_list.html', context)
+    return render(request, 'events/timeslots_list.html', context)
+
+def list_sessions(request, event_code_name, pk):
+    event = get_object_or_404(Event, code_name=event_code_name)
+    timeslots = TimeSlot.objects.filter(event=event, pk=pk)
+    context = {'timeslots': timeslots,
+               'event': event}
+
+    if event.registration_opening_date and timezone.now() < event.registration_opening_date:
+        raise Http404
+    elif event.registration_closing_date and timezone.now() > event.registration_closing_date:
+        return HttpResponseRedirect(reverse('events:registration_closed',
+                                                args=(event.code_name,)))
+
+    return render(request, 'events/sessions_list.html', context)
 
 def show_session(request, event_code_name, pk):
     event = get_object_or_404(Event, code_name=event_code_name)
@@ -636,7 +650,7 @@ def evaluators_homepage(request,event_code_name):
                                             .filter(is_deleted=False,
                                                     event=event,
                                                     evaluation_count__lt=event.evaluators_per_abstract)
-                                                    
+
     else:
         user_evaluations = Evaluation.objects.filter(evaluator=request.user,
                                                      abstract__event=event,

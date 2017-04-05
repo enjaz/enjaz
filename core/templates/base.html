@@ -186,7 +186,7 @@ you?
                     </a>
                     <ul>{% if user|is_organizing_team_member:event or user.is_superuser %}
                         <li>
-                            <a href="{% url 'events:list_sessions' event.code_name %}">
+                            <a href="{% url 'events:list_timeslots' event.code_name %}">
                                 <i class="entypo-chart-pie"></i>
                                 <span>المسجلون والمسجلات</span>
                             </a>

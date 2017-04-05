@@ -21,3 +21,8 @@ def handle_registration(request):
     context = {'form': form}
 
     return render(request, 'tedx/index.html', context)
+
+def list_registration(request):
+    list_registration = Registration.objects.all()
+    context = {'list_registration' : list_registration}
+    return render(request, 'tedx/list_registration.html', context)

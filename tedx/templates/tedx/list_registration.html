@@ -1,0 +1,84 @@
+{% extends 'tedx/base.html' %} {% load staticfiles%}
+{% block content %}
+<div class="panel minimal minimal-gray">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<h2>المسجلات والمسجلين في تدكس "لو أن"</h2>
+		</div>
+	</div>
+
+	<table id="participants-table" class="display datatable compact dt-responsive">
+		<thead>
+			<tr>
+				<th>الاسم</th>
+				<th>الجوال</th>
+				<th>الإيميل</th>
+				<th class="none">الجندر</th>
+				<th class="none">العمر</th>
+				<th class="none">المدينة</th>
+				<th class="none">من الخرس</th>
+				<th class="none">االوظيفة</th>
+				<th class="none">عن نفسك</th>
+				<th class="none">عن تدكس</th>
+				<th class="none">هل حضرت</th>
+				<th class="none">التجربة السابقة</th>
+				<th class="none">من وين عرفتنا</th>
+				<th class="none">المعني</th>
+				<th class="none">التوقع</th>
+				<th class="none">االصور</th>
+				<th class="none">المقابلة</th>
+				<th class="none">الاهتمامات</th>
+
+			</tr>
+		</thead>
+		<tbody>
+			{% for registration in list_registration %}
+			<tr>
+				<td>{{ registration.name }}</td>
+				<td> {{ registration.mobile }} </td>
+				<td> {{ registration.emial }} </td>
+				<td> {{ registration.gender }} </td>
+				<td> {{ registration.age }} </td>
+				<td> {{ registration.city }} </td>
+				<td> {{ registration.fromNGH }} </td>
+				<td> {{ registration.job_title }} </td>
+				<td> {{ registration.yourself }} </td>
+				<td> {{ registration.about_tedx }} </td>
+				<td> {{ registration.attend_tedx }} </td>
+				<td> {{ registration.past_experience }} </td>
+				<td> {{ registration.referral }} </td>
+				<td> {{ registration.meaning }} </td>
+				<td> {{ registration.expectations }} </td>
+				<td> {{ registration.interview }} </td>
+				<td> {{ registration.take_pic }} </td>
+				<td> {{ registration.your_interest }} </td>
+
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}
+
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/buttons/buttons.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/jszip.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/buttons.html5.min.js' %}"></script>
+<script>
+	$(function(){
+    $("#participants-table").DataTable({
+			dom: 'Bfrtip',
+			buttons: [
+					'copyHtml5',
+					'excelHtml5',
+					'csvHtml5',
+			],
+			language: {% include 'js/dataTables-arabic.json' %}
+		});
+	});
+</script>
+{% endblock %}

@@ -87,7 +87,6 @@ AbstractFigureFormset = inlineformset_factory(Abstract,
                                               validate_max=True)
 
 
-
 class AbstractFigureForm(forms.ModelForm):
     class Meta:
         model = AbstractFigure
@@ -97,6 +96,12 @@ class AbstractPosterForm(forms.ModelForm):
     class Meta:
         model = AbstractPoster
         fields = ['poster','poster_powerpoint']
+
+
+class AbstractPresentationForm(AbstractPosterForm):
+    class Meta:
+        model= AbstractPoster
+        fields =['presentation_file']
 
 class CaseReportForm(forms.ModelForm):
     class Meta:

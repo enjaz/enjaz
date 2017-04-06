@@ -13,7 +13,7 @@ import os.path
 
 from core import decorators
 from clubs.models import Team, college_choices
-from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm, InitiativeForm, InitiativeFigureFormset,CaseReportForm,AbstractPosterForm
+from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm, InitiativeForm, InitiativeFigureFormset,CaseReportForm,AbstractPosterForm,AbstractPresentationForm
 from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation, TimeSlot, SessionRegistration, Initiative, SessionGroup,CaseReport
 from events import utils
 import core.utils
@@ -161,6 +161,7 @@ def list_my_abstracts(request):
 def show_abstract(request, event_code_name, pk):
     abstract = get_object_or_404(Abstract, is_deleted=False, pk=pk)
     event = abstract.event
+    context = {'event': event, 'abstract': abstract}
 
     if not abstract.user == request.user and \
             not request.user.is_superuser and \
@@ -169,17 +170,44 @@ def show_abstract(request, event_code_name, pk):
         raise PermissionDenied
 
     if request.method == 'POST':
-         form = AbstractPosterForm(request.POST, request.FILES)
-         if form.is_valid():
-             new_form=form.save()
-             new_form.abstract = Abstract.objects.get(pk=pk)
-             new_form.save()
+         poster_form = AbstractPosterForm(request.POST, request.FILES)
+         if poster_form.is_valid() :
+             new_poster_form=poster_form.save()
+             new_poster_form.abstract = Abstract.objects.get(pk=pk)
+             new_poster_form.save()
 
              return HttpResponseRedirect(reverse('events:show_abstract',
                                              args=(event.code_name,abstract.pk)))
     elif request.method == 'GET':
-         form = AbstractPosterForm()
-    context = {'event': event, 'abstract': abstract,'form':form}
+        poster_form = AbstractPosterForm()
+    context['form'] = poster_form
+
+    return render(request, "events/abstracts/show_abstract.html", context)
+
+@login_required
+def presntation_upload (request, event_code_name, pk):
+    abstract = get_object_or_404(Abstract, is_deleted=False, pk=pk)
+    event = abstract.event
+    context = {'event': event, 'abstract': abstract}
+
+    if not abstract.user == request.user and \
+            not request.user.is_superuser and \
+            not utils.can_evaluate_abstracts(request.user, event) and \
+            not utils.is_organizing_team_member(request.user, event):
+        raise PermissionDenied
+
+    if request.method == 'POST':
+         presentation_form = AbstractPresentationForm(request.POST, request.FILES)
+         if presentation_form.is_valid():
+             presentation=presentation_form.save()
+             presentation.abstract = Abstract.objects.get(pk=pk)
+             presentation.save()
+
+             return HttpResponseRedirect(reverse('events:show_abstract',
+                                             args=(event.code_name,abstract.pk)))
+    elif request.method == 'GET':
+        presentation_form=AbstractPresentationForm()
+    context['presentation_form'] = presentation_form
 
     return render(request, "events/abstracts/show_abstract.html", context)
 

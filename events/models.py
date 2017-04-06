@@ -430,6 +430,7 @@ class Abstract(models.Model):
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
     status=models.CharField(verbose_name="acceptance status", max_length=1, choices=status_choices, default='P')
+    accepted_presentaion_preference = models.CharField(verbose_name="Accepted presentation preference", max_length=1, choices=presentation_preference_choices)
 
     def get_average_score(self):
         evaluation_number = self.evaluation_set.count()
@@ -446,6 +447,8 @@ class AbstractPoster (models.Model):
     poster= models.FileField(verbose_name=u"Attach the poster", upload_to="events/posters/")
     poster_powerpoint= models.FileField(verbose_name=u"Attach the poster powerpoint", upload_to="events/poster_powerpoints/")
     date_submitted = models.DateTimeField(auto_now_add=True)
+    presentation_file = models.FileField(verbose_name=u"Attach the presentation", upload_to="events/presentations/")
+
 
 
 class AbstractFigure(models.Model):

@@ -412,6 +412,11 @@ class Abstract(models.Model):
         ('O', 'Oral'),
         ('P', 'Poster')
         )
+    status_choices = (
+        ('A', 'Accepted'),
+        ('P', 'Pending'),
+        ('R','Rejected'),
+        )
     presentation_preference = models.CharField(verbose_name="Presentation preference", max_length=1, choices=presentation_preference_choices)
     introduction = models.TextField(u"Introduction", default="" )
     methodology = models.TextField(u"Methodology", default="")
@@ -424,6 +429,8 @@ class Abstract(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
+    status=models.CharField(verbose_name="acceptance status", max_length=1, choices=status_choices, default='P')
+    accepted_presentaion_preference = models.CharField(verbose_name="Accepted presentation preference", max_length=1, choices=presentation_preference_choices)
 
     def get_average_score(self):
         evaluation_number = self.evaluation_set.count()
@@ -434,6 +441,15 @@ class Abstract(models.Model):
 
     def __unicode__(self):
         return self.title
+
+class AbstractPoster (models.Model):
+    abstract = models.ForeignKey(Abstract, related_name='posters', null=True)
+    poster= models.FileField(verbose_name=u"Attach the poster", upload_to="events/posters/")
+    poster_powerpoint= models.FileField(verbose_name=u"Attach the poster powerpoint", upload_to="events/poster_powerpoints/")
+    date_submitted = models.DateTimeField(auto_now_add=True)
+    presentation_file = models.FileField(verbose_name=u"Attach the presentation", upload_to="events/presentations/")
+
+
 
 class AbstractFigure(models.Model):
     abstract = models.ForeignKey(Abstract, related_name='figures', null=True)

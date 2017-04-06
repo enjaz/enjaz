@@ -5,6 +5,7 @@ from events import views
 
 urlpatterns = patterns('',
     url(r'^my_abstract_list/$', views.list_my_abstracts, name="list_my_abstracts"),
+    url(r'^my_registration_list/$', views.list_my_registration, name="list_my_registration"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/$', views.redirect_home, name="redirect_home"),
     #URL already puplished (to be changed after the end of hpc2)
     url(r'^(?P<event_code_name>[\d\w_\-]+)/sessions/$', views.list_timeslots, name="list_timeslots"),

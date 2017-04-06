@@ -669,3 +669,9 @@ def evaluators_homepage(request,event_code_name):
                'pending_abstracts':pending_abstracts,
                'event': event}
     return render(request, 'events/abstracts/evaluator_homepage.html', context)
+
+@login_required
+def list_my_registration(request):
+    registrations = SessionRegistration.objects.filter(is_deleted=False, user=request.user)
+    context = {'registrations': registrations}
+    return render(request, 'events/list_my_registration.html', context)

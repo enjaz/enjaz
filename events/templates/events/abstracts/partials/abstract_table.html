@@ -39,6 +39,12 @@
             <th class="text-center">Level</th>
             <td>{{ abstract.get_level_display }}</td>
         </tr>
+        {%  if abstract.status == 'A' %}
+        <tr>
+            <th class="text-center">Accepted Presentation </th>
+            <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
+        </tr>
+        {% endif %}
         {% if abstract.figures.exists  %}
         <tr>
             <th class="text-center">Attachment</th>
@@ -56,6 +62,7 @@
         </tr>
 
         {% endif %}
+        {% if abstract.accepted_presentaion_preference == 'P' %}
         {% if abstract.posters.exists %}
         <tr>
             <th class="text-center">Poster Image</th>
@@ -71,8 +78,7 @@
               </ul>
             </td>
         </tr>
-        {% endif %}
-        {% if abstract.posters.exists %}
+
         <tr>
             <th class="text-center">Poster Powerpoint</th>
             <td>
@@ -87,6 +93,25 @@
               </ul>
             </td>
         </tr>
+        {% endif %}
+        {% endif %}
+        {% if abstract.accepted_presentaion_preference == 'O' %}
+        {% if abstract.posters.exists %}
+        <tr>
+            <th class="text-center">Presentation</th>
+            <td>
+              <ul>
+                {% for presentation in abstract.posters.all %}
+                <li>
+                <a href="{{  presentation.presentation_file.url }}" class="english-field">
+                    <i class="entypo-documents"></i> {{ presentation.presentation_file.name }}
+                </a>
+              </li>
+              {% endfor %}
+              </ul>
+            </td>
+        </tr>
+        {% endif %}
         {% endif %}
     </tbody>
 </table>

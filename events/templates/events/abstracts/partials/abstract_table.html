@@ -39,7 +39,13 @@
             <th class="text-center">Level</th>
             <td>{{ abstract.get_level_display }}</td>
         </tr>
-        {% if abstract.figures.exists %}
+        {%  if abstract.status == 'A' %}
+        <tr>
+            <th class="text-center">Accepted Presentation </th>
+            <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
+        </tr>
+        {% endif %}
+        {% if abstract.figures.exists  %}
         <tr>
             <th class="text-center">Attachment</th>
             <td>
@@ -54,6 +60,58 @@
               </ul>
             </td>
         </tr>
+
+        {% endif %}
+        {% if abstract.accepted_presentaion_preference == 'P' %}
+        {% if abstract.posters.exists %}
+        <tr>
+            <th class="text-center">Poster Image</th>
+            <td>
+              <ul>
+                {% for poster in abstract.posters.all %}
+                <li>
+                <a href="{{ poster.poster.url }}" class="english-field">
+                    <i class="entypo-documents"></i> {{ poster.poster.name }}
+                </a>
+              </li>
+              {% endfor %}
+              </ul>
+            </td>
+        </tr>
+
+        <tr>
+            <th class="text-center">Poster Powerpoint</th>
+            <td>
+              <ul>
+                {% for poster_powerpoint in abstract.posters.all %}
+                <li>
+                <a href="{{  poster_powerpoint.poster_powerpoint.url }}" class="english-field">
+                    <i class="entypo-documents"></i> {{ poster_powerpoint.poster_powerpoint.name }}
+                </a>
+              </li>
+              {% endfor %}
+              </ul>
+            </td>
+        </tr>
+        {% endif %}
+        {% endif %}
+        {% if abstract.accepted_presentaion_preference == 'O' %}
+        {% if abstract.posters.exists %}
+        <tr>
+            <th class="text-center">Presentation</th>
+            <td>
+              <ul>
+                {% for presentation in abstract.posters.all %}
+                <li>
+                <a href="{{  presentation.presentation_file.url }}" class="english-field">
+                    <i class="entypo-documents"></i> {{ presentation.presentation_file.name }}
+                </a>
+              </li>
+              {% endfor %}
+              </ul>
+            </td>
+        </tr>
+        {% endif %}
         {% endif %}
     </tbody>
 </table>

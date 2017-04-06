@@ -5,7 +5,7 @@ from ckeditor.widgets import CKEditorWidget
 from django import forms
 
 
-from events.models import Event, Session, Registration, NonUser, Abstract, AbstractFigure, TimeSlot, SessionRegistration, Initiative, InitiativeFigure, SessionGroup,CaseReport,Criterion,Evaluation
+from events.models import Event, Session, Registration, NonUser, Abstract, AbstractFigure, TimeSlot, SessionRegistration, Initiative, InitiativeFigure, SessionGroup,CaseReport,Criterion,Evaluation,AbstractPoster
 
 BASIC_SEARCH_FIELDS = ['user__username', 'user__email',
                        'user__common_profile__en_first_name',
@@ -110,10 +110,14 @@ class NonUserAdmin(admin.ModelAdmin):
 
     inlines = [RegistrationInline]
 
+class AbstractPosterInline(admin.TabularInline):
+     model= AbstractPoster
+     extra=0
+
 class AbstractAdmin(admin.ModelAdmin):
     search_fields = BASIC_SEARCH_FIELDS + ["title"]
     list_filter = ["event"]
-    inlines = [AbstractFigureInline]
+    inlines = [AbstractFigureInline,AbstractPosterInline]
     filter_horizontal = ('evaluators',)
     introduction = forms.CharField(widget=CKEditorWidget())
 
@@ -123,6 +127,9 @@ class InitiativeAdmin(admin.ModelAdmin):
 class SessionGroupAdmin(admin.ModelAdmin):
     list_filter = ['event']
     list_display = ['title', 'event']
+
+
+
     
 admin.site.register(Event)
 admin.site.register(Session)

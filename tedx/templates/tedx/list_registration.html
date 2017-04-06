@@ -16,16 +16,16 @@
 				<th class="none">الجندر</th>
 				<th class="none">العمر</th>
 				<th class="none">المدينة</th>
-				<th class="none">من الخرس</th>
+				<th class="none">من الحرس</th>
 				<th class="none">االوظيفة</th>
 				<th class="none">عن نفسك</th>
 				<th class="none">عن تدكس</th>
 				<th class="none">هل حضرت</th>
 				<th class="none">التجربة السابقة</th>
 				<th class="none">من وين عرفتنا</th>
-				<th class="none">المعني</th>
+				<th class="none">المعنى</th>
 				<th class="none">التوقع</th>
-				<th class="none">االصور</th>
+				<th class="none">التصوير</th>
 				<th class="none">المقابلة</th>
 				<th class="none">الاهتمامات</th>
 
@@ -37,7 +37,7 @@
 				<td>{{ registration.name }}</td>
 				<td> {{ registration.mobile }} </td>
 				<td> {{ registration.emial }} </td>
-				<td> {{ registration.gender }} </td>
+				<td> {{ registration.get_gender_display() }} </td>
 				<td> {{ registration.age }} </td>
 				<td> {{ registration.city }} </td>
 				<td> {{ registration.fromNGH }} </td>
@@ -51,7 +51,7 @@
 				<td> {{ registration.expectations }} </td>
 				<td> {{ registration.interview }} </td>
 				<td> {{ registration.take_pic }} </td>
-				<td> {{ registration.your_interest }} </td>
+				<td> {{ registration.get_your_interest_display() }} </td>
 
 			</tr>
 			{% endfor %}

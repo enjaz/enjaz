@@ -5,8 +5,11 @@ from events import views
 
 urlpatterns = patterns('',
     url(r'^my_abstract_list/$', views.list_my_abstracts, name="list_my_abstracts"),
+    url(r'^my_registration_list/$', views.list_my_registration, name="list_my_registration"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/$', views.redirect_home, name="redirect_home"),
-    url(r'^(?P<event_code_name>[\d\w_\-]+)/sessions/$', views.list_sessions, name="list_sessions"),
+    #URL already puplished (to be changed after the end of hpc2)
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/sessions/$', views.list_timeslots, name="list_timeslots"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/timeslots/(?P<pk>\d+)/$', views.list_sessions, name="list_sessions"),
     url(r'^sessions/ajax/group$', views.handle_ajax, name="handle_ajax"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/sessions/(?P<pk>\d+)/$', views.show_session, name="show_session"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/sessions/(?P<pk>\d+)/review/$', views.review_registrations, name="review_registrations"),
@@ -38,4 +41,3 @@ urlpatterns = patterns('',
     url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/(?P<pk>\d+)/evaluate/(?P<evaluation_id>[\d\w\-]+)/$', views.edit_evaluation,name="edit_evaluation"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/evaluators/$', views.evaluators_homepage,name="evaluators_homepage"),
                        )
-

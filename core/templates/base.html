@@ -144,6 +144,12 @@ you?
                     </li>
                     {% endif %}
                     <li>
+                        <a href="{% url 'events:list_my_registration' %}">
+                            <i class="entypo-pencil"></i>
+                            <span>تسجيلاتي</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="{% url 'userena_password_change' user.username %}">
                             <i class="entypo-pencil"></i>
                             <span>غيّر كلمة السر</span>

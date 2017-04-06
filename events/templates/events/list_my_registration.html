@@ -1,0 +1,55 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}
+
+{% block title %}My registration{% endblock %}
+
+{% block content %}
+<div class="english-field">
+<h1 class="english-field">My registrations</h1>
+            <div class="panel-body">
+                <div class="row">
+                    <table id="registrations" class="display datatable dt-responsive">
+                        <thead>
+                            <tr>
+                                <th class="all">Session</th>
+                                <th class="not-mobile">Time slot</th>
+                                <th class="not-mobile">Status</th>
+                                <th class="not-mobile">Registration date</th>
+                                <th class="not-mobile">ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for registration in registrations %}
+                            <tr>
+                                <td>{{ registration.session }}</td>
+                                <td>{{ registration.session.time_slot }}</td>
+                                <td>{{ registration.get_status }}</td>
+                                <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted|date:"Y-m-d" }}</td>
+                                <td>{{ registration.pk }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block customscript %}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<style type="text/css">
+    th, td{
+        text-align: left;
+    }
+</style>
+	<script>
+    $(function(){
+        $("#registrations").dataTable({
+            "order": [[ 3, "asc" ]]
+        });
+
+    });
+    </script>
+{% endblock %}

@@ -95,7 +95,7 @@ class AbstractFigureForm(forms.ModelForm):
 class AbstractPosterForm(forms.ModelForm):
     class Meta:
         model = AbstractPoster
-        fields = ['poster','poster_powerpoint']
+        fields = ['first_image','second_image','poster_powerpoint']
 
 
 class AbstractPresentationForm(AbstractPosterForm):

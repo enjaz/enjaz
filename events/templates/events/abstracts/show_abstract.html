@@ -12,6 +12,10 @@ h2{
   padding: 10px;
   text-align: center;
 }
+h4{
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 15px;
+}
 </style>
 <div class="english-field">
 <p class="alert alert-warning"><i class="fa fa-hourglass-half" aria-hidden="true"></i> This abstract is currently pending revision.</p>
@@ -31,20 +35,43 @@ h2{
         {% if  abstract.posters.exists %}
         {% else %}
             <h2>Accepted</h2>
-            <h3><b>Congratulations!</b><br> Your abstract has been accepted.  We require all accepted abstract submitters to upload their poser image and powerpoint,make sure you have followed the poster template : </h3>
+            <h3><b>Congratulations!</b><br> Your abstract has been accepted.  We require all accepted abstract submitters to upload their poser image and powerpoint,make sure you have follow the guidlines : </h3>
+
+
+            <h4><li>Each poster can have maximally two slides (dont crowd everything in one slide, you have enough space with two slides).</li>
+
+                <li>Size and dimensions of the slide are already set in <a href="https://enjazportal.com/media/files/events/presentations/HPC_2017_Poster_Template.pptx"> the template</a>, so PLEASE, don't make any changes of size and dimensions of the slides.AND PLEASE do not add any additonal logos.</li>
+
+                <li>The least acceptable font size in the body texts is 40.</li>
+
+                <li>No sounds or videos can be uploaded with the eposter, only pictures and graphs (make sure, that you use big enough graphs).</li>
+
+                <li>When you paste a picture or a graph on the slide, choose <a href="https://enjazportal.com/media/files/events/posters/Note_for_E-Poster__How_to_Paste_.png"> "keep source formatting"</a>. (mandatory)</li>
+
+                <li>Each eposter should be saved into two formats PPT and JPEG (make sure that the picture in  JPEG format is not distorted after you export the file).</li>
+
+                <li>Both the PPT and JPEG should be uploaded to the enjaz system. (each file should be named with the presenter name and the reference number of the abstract).</li>
+
+                <li>Please upload your poster before the 13th of April as we will not accept any posters after that date.</li></h4>
             <div class="submit" style="margin-left: 9%; margin-bottom: 10px; margin-right: 9%;">
             <form method="post" action="{% url 'events:show_abstract' event.code_name abstract.pk %}" enctype="multipart/form-data">
                 {% csrf_token %}
                     <p>{{ form.non_field_errors }}</p>
-                        <p>
-                            Poster:
-                            {{ form.poster.errors }}
-                            {{ form.poster }}
-                        </p>
+
                         <p>
                             Powerpoint:
                             {{ form.poster_powerpoint.errors }}
                             {{ form.poster_powerpoint }}
+                        </p>
+                        <p>
+                            1st slide in JPEG format :
+                            {{ form.first_image.errors }}
+                            {{ form.first_image }}
+                        </p>
+                        <p>
+                            2nd slide in JPEG format :
+                            {{ form.second_image.errors }}
+                            {{ form.second_image }}
                         </p>
                 <input type="submit" class="btn btn-success" value="submit">
             </form>

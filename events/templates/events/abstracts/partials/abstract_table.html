@@ -70,8 +70,17 @@
               <ul>
                 {% for poster in abstract.posters.all %}
                 <li>
-                <a href="{{ poster.poster.url }}" class="english-field">
-                    <i class="entypo-documents"></i> {{ poster.poster.name }}
+                <a href="{{ poster.first_image.url }}" class="english-field">
+                    <i class="entypo-documents"></i> {{ poster.first_image.name }}
+                </a>
+              </li>
+              {% endfor %}
+              </ul>
+              <ul>
+                {% for poster in abstract.posters.all %}
+                <li>
+                <a href="{{ poster.second_image.url }}" class="english-field">
+                    <i class="entypo-documents"></i> {{ poster.second_image.name }}
                 </a>
               </li>
               {% endfor %}

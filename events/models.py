@@ -444,7 +444,8 @@ class Abstract(models.Model):
 
 class AbstractPoster (models.Model):
     abstract = models.ForeignKey(Abstract, related_name='posters', null=True)
-    poster= models.FileField(verbose_name=u"Attach the poster", upload_to="events/posters/")
+    first_image= models.FileField(verbose_name=u"Attach the first image", upload_to="events/posters/")
+    second_image= models.FileField(verbose_name=u"Attach the second image", upload_to="events/second_image/",null=True)
     poster_powerpoint= models.FileField(verbose_name=u"Attach the poster powerpoint", upload_to="events/poster_powerpoints/")
     date_submitted = models.DateTimeField(auto_now_add=True)
     presentation_file = models.FileField(verbose_name=u"Attach the presentation", upload_to="events/presentations/")

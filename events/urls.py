@@ -5,6 +5,7 @@ from events import views
 
 urlpatterns = patterns('',
     url(r'^my_abstract_list/$', views.list_my_abstracts, name="list_my_abstracts"),
+    url(r'^my_registration_list/$', views.list_my_registration, name="list_my_registration"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/$', views.redirect_home, name="redirect_home"),
     #URL already puplished (to be changed after the end of hpc2)
     url(r'^(?P<event_code_name>[\d\w_\-]+)/sessions/$', views.list_timeslots, name="list_timeslots"),
@@ -23,6 +24,7 @@ urlpatterns = patterns('',
     url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/$', views.submit_abstract, name="submit_abstract"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/list/$', views.list_abstracts, name="list_abstracts"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/(?P<pk>\d+)/$', views.show_abstract, name="show_abstract"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/(?P<pk>\d+)/upload/$', views.presntation_upload,name="presntation_upload"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/thanks/$', TemplateView.as_view(template_name='events/abstracts/abstract_submission_completed.html'), name="abstract_submision_completed"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/(?P<pk>\d+)/edit/$', views.edit_abstract, name="edit_abstract"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/(?P<pk>\d+)/delete/$', views.delete_abstract, name="delete_abstract"),

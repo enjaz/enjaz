@@ -2,7 +2,7 @@
 from django import forms
 
 from accounts.utils import get_user_gender
-from events.models import NonUser, Session, Registration, Abstract, AbstractFigure, Initiative, InitiativeFigure,Criterion,CriterionValue,Evaluation,CaseReport
+from events.models import NonUser, Session, Registration, Abstract, AbstractFigure, Initiative, InitiativeFigure,Criterion,CriterionValue,Evaluation,CaseReport,AbstractPoster
 from django.forms.models import inlineformset_factory
 
 class NonUserForm(forms.ModelForm):
@@ -78,7 +78,7 @@ class AbstractForm(forms.ModelForm):
                   'introduction','methodology', 'results',
                   'discussion', 'conclusion', 'was_published',
                   'was_presented_at_others',
-                  'was_presented_previously']
+                  'was_presented_previously',]
 
 AbstractFigureFormset = inlineformset_factory(Abstract,
                                               AbstractFigure,
@@ -86,10 +86,22 @@ AbstractFigureFormset = inlineformset_factory(Abstract,
                                               max_num=1,
                                               validate_max=True)
 
+
 class AbstractFigureForm(forms.ModelForm):
     class Meta:
         model = AbstractFigure
         fields = ['figure']
+
+class AbstractPosterForm(forms.ModelForm):
+    class Meta:
+        model = AbstractPoster
+        fields = ['first_image','second_image','poster_powerpoint']
+
+
+class AbstractPresentationForm(AbstractPosterForm):
+    class Meta:
+        model= AbstractPoster
+        fields =['presentation_file']
 
 class CaseReportForm(forms.ModelForm):
     class Meta:

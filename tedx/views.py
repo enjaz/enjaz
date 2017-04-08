@@ -22,7 +22,7 @@ def handle_registration(request):
         form = RegistrationForm()
     context = {'form': form}
 
-    return render(request, 'tedx/index.html', context)
+    return render(request, 'tedx/the_end.html', context)
 
 @login_required
 def list_registration(request):

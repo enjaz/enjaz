@@ -13,9 +13,10 @@
 <div class="row" style="margin-bottom: 40px; margin-top: 20px;">
 <p id="welcome">أهلا، <span id="name"></span>!</p>
 {% include "media/polls/ajax-loader.html" %}
-<div class="col-sm-4 col-sm-offset-4">
+<div class="col-sm-4 col-sm-offset-4 text-center">
 <input id="barcode" type="text" class="form-control">
 {% bootstrap_field form.category %}
+<button class="btn btn-danger btn-sm" id="cancel-last"></button>
 </div>
 </div>
 {% endblock %}
@@ -24,7 +25,7 @@
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
 <style>
 
-#welcome, #loading-image{
+#welcome, #loading-image, #cancel-last{
   visibility: hidden;
 }
 
@@ -58,21 +59,23 @@
 
 <script>
 $(function(){
+  url = "{% url 'events:process_barcode' session.event.code_name session.pk %}";
   $("#barcode").on('keyup keydown change', function(){
     user_pk = $("#barcode").val()
     if (user_pk.length == {{ BARCODE_LENGTH }}){
         $('#loading-image').css('visibility', 'visible');
         $('#welcome').css('visibility', 'invisible');
         $.ajax({
-            data: {user_pk: user_pk},
-            url: "{% url 'events:process_barcode' session.event.code_name session.pk %}",
+            data: {user_pk: user_pk, action: 'attend'},
+            url: url,
             type: 'POST',
             cache: false,
             success: function(data){
                 if (data['success'] == 1){
                     $("#barcode").val("");
                     $("#name").html(data.full_name);
-                    $("#welcome").css('visibility', 'visible');
+                    $("#welcome, #cancel-last").css('visibility', 'visible');
+                    $("#cancel-last").data("last-attendance-pk", data.last_pk).html("ألغِ " + data.full_name);
                 } else if (data['success'] == 0){
                     toastr.error(data['message']);
                 }
@@ -84,6 +87,28 @@ $(function(){
     } else {
         $('#welcome').css('visibility', 'invisible');
     }
+  });
+
+  $("#cancel-last").click(function(){
+     $('#loading-image').css('visibility', 'visible');
+     var last_pk = $(this).data("last-attendance-pk");
+     $.ajax({
+            data: {last_pk: last_pk, action: 'cancel'},
+            url: url,
+            type: 'POST',
+            cache: false,
+            success: function(data){
+                if (data['success'] == 1){
+                    toastr.success("أزيل " + data.full_name);
+                    $('#cancel-last').css('visibility', 'invisible');
+                } else if (data['success'] == 0){
+                    toastr.error(data['message']);
+                }
+            },
+            complete: function(data){
+                $('#loading-image').css('visibility', 'invisible');
+            }
+     });
   });
 });
 </script>

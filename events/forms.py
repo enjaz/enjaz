@@ -2,7 +2,10 @@
 from django import forms
 
 from accounts.utils import get_user_gender
-from events.models import NonUser, Session, Registration, Abstract, AbstractFigure, Initiative, InitiativeFigure,Criterion,CriterionValue,Evaluation,CaseReport,AbstractPoster
+from events.models import NonUser, Session, Registration, Abstract, \
+                          AbstractFigure, Initiative, InitiativeFigure, \
+                          Criterion, CriterionValue, Evaluation,CaseReport, \
+                          AbstractPoster, Attendance
 from django.forms.models import inlineformset_factory
 
 class NonUserForm(forms.ModelForm):
@@ -182,3 +185,8 @@ class InitiativeForm(forms.ModelForm):
 InitiativeFigureFormset = inlineformset_factory(Initiative,
                                               InitiativeFigure,
                                               fields=['figure'])
+
+class AttendanceForm(forms.ModelForm):
+    class Meta:
+        model = Attendance
+        fields = ['category']

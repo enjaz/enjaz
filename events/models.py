@@ -540,3 +540,21 @@ class CaseReport(models.Model):
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
 
+
+class Attendance(models.Model):
+    user = models.ForeignKey(User)
+    session = models.ForeignKey(Session)
+    category_choices = [
+        ('I', u'الدخول'),
+        ('M', u'المنتصف'),
+        ('O', u'الخروج'),
+    ]
+    category = models.CharField(u"نوع التحضير", max_length=1, blank=True,
+                                choices=category_choices)
+    date_submitted = models.DateTimeField(u"تاريخ الإرسال",
+                                          auto_now_add=True)
+    is_deleted = models.BooleanField(u"محذوف؟", default=False)
+
+    def __unicode__(self):
+        return u"{} for {}".format(self.user.username, self.session.name)
+

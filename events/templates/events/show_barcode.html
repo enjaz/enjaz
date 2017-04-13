@@ -1,0 +1,14 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}
+{% block title %}بطاقتي{% endblock %}
+
+{% block content %}
+
+
+<div class="row text-center">
+<div class="col-sm-6 col-sm-offset-3">
+{{ image|safe }}
+<p style="text-align: center" class="english-field">{{ barcode_user.common_profile.get_en_short_name|default:barcode_user.username }}</p>
+</div>
+</div>
+{% endblock %}
+

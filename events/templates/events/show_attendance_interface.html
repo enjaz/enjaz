@@ -1,0 +1,91 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}{% load bootstrap3 %}
+
+{% block title %}التحضير ل{{ session.name }}{% endblock %}
+
+
+{% block content %}
+
+<div class="text-center">
+   <img src="https://hpc.enjazportal.com/wp-content/uploads/2016/12/hpc.png" style="max-width: 120px;">
+</div>
+
+<h1 class="text-center">التحضير ل{{ session.name }}</h1>
+<div class="row" style="margin-bottom: 40px; margin-top: 20px;">
+<p id="welcome">أهلا، <span id="name"></span>!</p>
+{% include "media/polls/ajax-loader.html" %}
+<div class="col-sm-4 col-sm-offset-4">
+<input id="barcode" type="text" class="form-control">
+{% bootstrap_field form.category %}
+</div>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<style>
+
+#welcome, #loading-image{
+  visibility: hidden;
+}
+
+#barcode{
+  text-align: center;
+  font-size: 18px;
+}
+
+#welcome{
+  text-align: center;
+  font-size: 24px;
+  color: #606060;
+}
+
+.form-group{
+  margin-top: 20px;
+  text-align: center;
+}
+
+.form-group .form-control, .form-group label{
+  font-size: 0.7em;
+}
+
+#id_category{
+  width: auto;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+</style>
+
+<script>
+$(function(){
+  $("#barcode").on('keyup keydown change', function(){
+    user_pk = $("#barcode").val()
+    if (user_pk.length == {{ BARCODE_LENGTH }}){
+        $('#loading-image').css('visibility', 'visible');
+        $('#welcome').css('visibility', 'invisible');
+        $.ajax({
+            data: {user_pk: user_pk},
+            url: "{% url 'events:process_barcode' session.event.code_name session.pk %}",
+            type: 'POST',
+            cache: false,
+            success: function(data){
+                if (data['success'] == 1){
+                    $("#barcode").val("");
+                    $("#name").html(data.full_name);
+                    $("#welcome").css('visibility', 'visible');
+                } else if (data['success'] == 0){
+                    toastr.error(data['message']);
+                }
+            },
+            complete: function(data){
+                $('#loading-image').css('visibility', 'invisible');
+            }
+        });
+    } else {
+        $('#welcome').css('visibility', 'invisible');
+    }
+  });
+});
+</script>
+
+{% endblock %}

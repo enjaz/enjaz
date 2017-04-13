@@ -10,10 +10,11 @@ from django.views.decorators import csrf
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from post_office import mail
+import StringIO
+import barcode
 import os.path
 import qrcode
 import qrcode.image.svg
-import StringIO
 
 from core import decorators
 from clubs.models import Team, college_choices
@@ -735,11 +736,16 @@ def show_barcode(request, event_code_name):
 
     pk = ("{:0%s}" % BARCODE_LENGTH).format(barcode_user.pk)
 
-    output = StringIO.StringIO()
-    qrcode.make(pk, image_factory=qrcode.image.svg.SvgImage, version=3).save(output)
-    value = "".join(output.getvalue().split('\n')[1:])
+    qrcode_output = StringIO.StringIO()
+    qrcode.make(pk, image_factory=qrcode.image.svg.SvgImage, version=3).save(qrcode_output)
+    qrcode_value = "".join(qrcode_output.getvalue().split('\n')[1:])
+    CODE128 = barcode.get_barcode_class('code128')
+    one_dimensional_output = CODE128(pk)
+    one_dimensional_value = "".join([line.strip() for line in one_dimensional_output.render({'module_width': 0.4}).split('\n')[4:]])
 
-    context = {'image' : value, 'barcode_user': barcode_user, 'event': event}
+    context = {'qrcode_value' : qrcode_value,
+               'one_dimensional_value': one_dimensional_value,
+               'barcode_user': barcode_user, 'event': event}
     return render(request, 'events/show_barcode.html', context)
 
 @login_required
@@ -754,22 +760,41 @@ def process_barcode(request, event_code_name, pk):
        not utils.is_organizing_team_member(request.user, session.event):
         raise PermissionDenied
 
-    user_pk = request.POST.get("user_pk")
-    category = request.POST.get("category", "")
-    try:
-        user = User.objects.get(pk=user_pk)
-    except User.DoesNotExist:
-        raise Exception(u"رقم خاطئ!")
+    response = {}
+    action = request.POST.get("action")
+    if action == 'attend':
+        category = request.POST.get("category", "")
+        user_pk = request.POST.get("user_pk")
+
+        try:
+            user = User.objects.get(pk=user_pk)
+        except User.DoesNotExist:
+            raise Exception(u"رقم خاطئ!")
+
+        attendance = Attendance.objects.create(user=user,
+                                               session=session,
+                                               category=category)
+        last_pk = attendance.pk
+        response['last_pk'] = last_pk
+
+    elif action == 'cancel':
+        last_pk = request.POST.get("last_pk")
+        try:
+            attendance = Attendance.objects.get(pk=last_pk)
+        except Attendance.DoesNotExist:
+            raise Exception("هذا التحضير غير موجود")
+        user = attendance.user
+        attendance.delete()
+
     try:
         full_name = user.common_profile.get_ar_short_name()
     except ObjectDoesNotExist:
         # If user has no CommonProfile
         full_name = user.username
 
-    Attendance.objects.create(user=user, session=session,
-                              category=category)
+    response['full_name'] = full_name
 
-    return {'full_name': full_name}
+    return response
 
 def show_attendance_interface(request, event_code_name, pk):
     session = get_object_or_404(Session,

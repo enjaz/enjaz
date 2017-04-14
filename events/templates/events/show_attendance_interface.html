@@ -16,6 +16,11 @@
 <div class="col-sm-4 col-sm-offset-4 text-center">
 <input id="barcode" type="text" class="form-control">
 {% bootstrap_field form.category %}
+
+<input id="id_only_registered" type="checkbox">
+<label for="id_only_registered"> حضّر المُسجّلين والمُسجّلات فقط</label>
+<br>
+
 <button class="btn btn-danger btn-sm" id="cancel-last"></button>
 </div>
 </div>
@@ -55,18 +60,34 @@
   margin-left: auto;
 }
 
+
+.checkbox label{
+  margin-left: -90px;
+}
 </style>
 
 <script>
 $(function(){
   url = "{% url 'events:process_barcode' session.event.code_name session.pk %}";
-  $("#barcode").on('keyup keydown change', function(){
+  $("#barcode").keydown(function(e){
+
+   // get keycode of current keydown event
+    var code = (e.keyCode || e.which);
+
+    // do nothing if it's an arrow key
+    if(code == 37 || code == 38 || code == 39 || code == 40) {
+        return;
+    }
+
     user_pk = $("#barcode").val()
-    if (user_pk.length == {{ BARCODE_LENGTH }}){
+    // If length reaches our target, or enter (code 13) is pressed on a filled input.
+    if (user_pk.length == {{ BARCODE_LENGTH }} || code == 13 && user_pk.length){
         $('#loading-image').css('visibility', 'visible');
         $('#welcome').css('visibility', 'invisible');
         $.ajax({
-            data: {user_pk: user_pk, action: 'attend'},
+            data: {user_pk: user_pk, action: 'attend',
+                   category: $("#id_category").val(),
+                   only_registered: $("#id_only_registered:checked").length},
             url: url,
             type: 'POST',
             cache: false,
@@ -78,6 +99,7 @@ $(function(){
                     $("#cancel-last").data("last-attendance-pk", data.last_pk).html("ألغِ " + data.full_name);
                 } else if (data['success'] == 0){
                     toastr.error(data['message']);
+                    $("#cancel-last").css('visibility', 'invisible');
                 }
             },
             complete: function(data){
@@ -100,7 +122,7 @@ $(function(){
             success: function(data){
                 if (data['success'] == 1){
                     toastr.success("أزيل " + data.full_name);
-                    $('#cancel-last').css('visibility', 'invisible');
+                    $('#cancel-last, #welcome').css('visibility', 'invisible');
                 } else if (data['success'] == 0){
                     toastr.error(data['message']);
                 }

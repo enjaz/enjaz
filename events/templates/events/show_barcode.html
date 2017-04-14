@@ -9,11 +9,12 @@
 {{ qrcode_value|safe }}
 </div>
 </div>
-<div class="row text-center">
-<div class="col-sm-6 col-sm-offset-3">
-
+<div class="row ">
+<div class="col-sm-6 col-sm-offset-3 english-field">
+<div class="text-center">
 {{ one_dimensional_value|safe }}
-<p style="text-align: center" class="english-field">{{ barcode_user.common_profile.get_en_short_name|default:barcode_user.username }}</p>
+</div>
+<p style="text-align: center; color: black;">{{ barcode_user.common_profile.get_en_short_name|default:barcode_user.username }}</p>
 </div>
 </div>
 {% endblock %}

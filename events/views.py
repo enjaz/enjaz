@@ -764,12 +764,26 @@ def process_barcode(request, event_code_name, pk):
     action = request.POST.get("action")
     if action == 'attend':
         category = request.POST.get("category", "")
+        only_registered = int(request.POST.get("only_registered"))
         user_pk = request.POST.get("user_pk")
 
         try:
             user = User.objects.get(pk=user_pk)
         except User.DoesNotExist:
             raise Exception(u"رقم خاطئ!")
+
+        try:
+            full_name = user.common_profile.get_ar_short_name()
+        except ObjectDoesNotExist:
+            # If user has no CommonProfile
+            full_name = user.username
+
+        if only_registered and not SessionRegistration.objects\
+                                                      .filter(user=user,
+                                                              session=session,
+                                                              is_deleted=False)\
+                                                      .exists():
+            raise Exception(u"لا تسجيل ل{}".format(full_name))
 
         attendance = Attendance.objects.create(user=user,
                                                session=session,
@@ -783,19 +797,20 @@ def process_barcode(request, event_code_name, pk):
             attendance = Attendance.objects.get(pk=last_pk)
         except Attendance.DoesNotExist:
             raise Exception("هذا التحضير غير موجود")
-        user = attendance.user
+
         attendance.delete()
 
-    try:
-        full_name = user.common_profile.get_ar_short_name()
-    except ObjectDoesNotExist:
-        # If user has no CommonProfile
-        full_name = user.username
+        try:
+            full_name = attendance.user.common_profile.get_ar_short_name()
+        except ObjectDoesNotExist:
+            # If user has no CommonProfile
+            full_name = attendance.user.username
 
     response['full_name'] = full_name
 
     return response
 
+@login_required
 def show_attendance_interface(request, event_code_name, pk):
     session = get_object_or_404(Session,
                                 event__code_name=event_code_name,

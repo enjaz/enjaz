@@ -1,0 +1,206 @@
+<!DOCTYPE html>{% load staticfiles %}
+
+<html class="detail" lang="ar">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@TEDxKSAUHS" />
+    <meta name="twitter:title" content="TEDxKSAUHS" />
+    <meta name="twitter:description" content="لعبة ياسين في TEDxKSAUHS" />
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'logo/cultural_program.png' %}" />
+    <title>TEDx | لعبة ياسين</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.4.0/animate.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        @font-face {
+            font-family: 'GE Dinar One';
+            font-weight: lighter;
+            src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
+        }
+
+        @font-face {
+            font-family: 'GE Dinar One';
+            font-weight: normal;
+            src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
+        }
+
+        html, body{
+          min-height: 100%;
+        }
+
+        label {
+            display: block;
+            text-align: right;
+            margin-left: 40%;
+        }
+
+        body {
+            font-family: 'GE Dinar One', serif;
+            color: white;
+            direction: rtl;
+        }
+
+        html.detail {
+            background: linear-gradient( rgba(0, 0, 0, 0.57), rgba(0, 0, 0, 0.53) ), url("{% static 'tedxgame/image/background1.jpg' %}") no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+        }
+
+        html.detail body,
+        h1 {
+            background-color: transparent;
+            color: white;
+        }
+
+        .detail a {
+            color: #85C7FF;
+        }
+
+        footer {
+            padding: 60px 0;
+        }
+
+        .container {
+            width: 90%;
+            float: none;
+            margin-top: 30px;
+        }
+
+        .checkbox label {
+            margin-right: 10px;
+        }
+
+        #third-phase,
+        #promotion-step {
+            display: none;
+        }
+
+        #sad-child {
+            border-radius: 10px;
+            max-width: 100%;
+        }
+
+        .text-center {
+            font-size: 20px;
+        }
+
+        #delete-button input[type='submit']:disabled {
+            background-color: black;
+        }
+
+        p.instructions {
+            text-align: justify;
+        }
+
+        p.intro {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 18px;
+            width: 90%;
+            margin-right: auto;
+            margin-left: auto;
+            margin-bottom: 20px;
+            color: white;
+            font-size: 15px;
+        }
+
+        p.explaination {
+            border-radius: 10px;
+            padding: 10px;
+            margin-right: auto;
+            margin-left: auto;
+            margin-bottom: 0px;
+            font-size: 14px;
+            color: #e8ff74;
+        }
+
+        .large-text {
+            font-size: 36px;
+            color: black
+        }
+
+        hr {
+            margin-bottom: 5px;
+            max-width: 100px;
+        }
+
+        .form-group .checkbox {
+            margin-right: 15px;
+        }
+
+        button {
+            margin: 20px;
+            position: relative;
+            padding: 15px;
+            top: 50%;
+            color: black;
+        }
+
+        .col-xs-6 col-md-6 {
+            max-height: 100%;
+            max-width: 100%;
+        }
+
+        body {
+            font-size : 26px;
+            background-color : #F0FFFF;
+        }
+        #start{
+            text-align: center;
+        }
+        #question{
+            display : none;
+            text-align:center;
+            margin-top : 100px
+        }
+
+        .choice {
+            display: none;
+            text-align:center;
+            text-font: 26px;
+        }
+        #welcomeimg {
+            max-height: 300px;
+        }
+        #questionimg{
+            max-height: 100px;
+            margin-top: 80px
+        }
+
+    </style>
+</head>
+
+<body class="container">
+      <div class="row text-center">
+        <div class="col-sm-6 col-sm-offset-3">
+{% block content %}{% endblock %}
+            </div>
+          </div>
+{% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
+	<!-- Piwik -->
+	<script type="text/javascript">
+	  var _paq = _paq || [];
+      {% if user.is_authenticated %}
+      _paq.push(['setUserId', '{{ user.username }}']);
+      {% endif %}
+	  _paq.push(['trackPageView']);
+	  _paq.push(['enableLinkTracking']);
+	  (function() {
+	    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://enjazportal.com/stats/";
+	    _paq.push(['setTrackerUrl', u+'piwik.php']);
+	    _paq.push(['setSiteId', 1]);
+	    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+	    g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+	  })();
+	</script>
+	<noscript><p><img src="//enjazportal.com/stats/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+        <!-- End Piwik Code -->
+    {% endif %}
+</body>
+</html>

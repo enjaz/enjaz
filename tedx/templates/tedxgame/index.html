@@ -1,0 +1,152 @@
+{% extends 'tedxgame/game_base.html' %}{% load staticfiles %}
+{% block content %}
+
+    <div id="start">
+
+        <img id="welcomeimg" src="{% static 'tedxgame/image/yaseen.png' %}" >
+        <p id="welcome" style="">                          أهلاً بك في لعبة يا..س
+            <br>
+هذه اللعبة مستوحاة من نظريّة "تأثير الفراشة" توصف هذه النظرية تلك الظواهر ذات الترابط والتأثير المتبادل والمتواتر الذي يكون نتيجة حدث أول، قد يكون بسيطاً، لكنه يولّد سلسلة متتابعة من النتائج والتطورات التي يفوق حجمها بمراحل حدث البداية، وبشكل قد لا يتوقعه أحد، وفى أماكن أبعد ما تكون عن التصوّر.<br>
+<br>
+تتيح لك اللعبة تجربة أن تكون المتحكّم في هذه الأحداث الأولية .
+كن حذراً في اختيارك، فرفرفة جناح فراشة قد تسببت بإعصار !</p>
+        <button id="start-btn" > اضغط هنا لبدء اللعبة ! </button>
+
+    </div>
+
+    <div id="question">
+        <p id="question-text"> {{ first_question.question_text }}</p>
+        <button id="choice1" class="choice" data-choice-pk="{{ first_question.choices.first.pk }}" type="button" icon="{{ first_question.choices.first.icon }}" class="btn fa fa-bath">{{ first_question.choices.first.choice_text }}</button>
+        <button id="choice2" class="choice" data-choice-pk="{{ first_question.choices.last.pk }}" type="button" icon="{{ first_question.choices.last.icon }}" class="btn fa fa-bath">{{ first_question.choices.last.choice_text }}</button>
+        <p id="playagain"></p>
+        <br> <img src="{% static 'tedxgame/image/yaseen.png' %}" id="questionimg">
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+            $(document).ready(function() {
+                $.fn.extend({
+                    animateCss: function (animationName) {
+                    var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+                    this.addClass('animated ' + animationName).one(animationEnd, function() {
+                    $(this).removeClass('animated ' + animationName);
+                            });
+                        }
+                });
+                var startBtn = $("#start-btn")
+                var question = $("#question")
+                var preGame = $("#start")
+                var choiceBtn = $(".choice");
+                preGame.animateCss('fadeInDown')
+
+                startBtn.click(function() {
+                    preGame.hide()
+                    if ("stay with the sheep" == "{{ first_question.choices.first.title }}"){
+                        $("html.detail").css({"background": "url('{% static 'tedxgame/image/desert.jpg' %}')",
+                        "-webkit-background-size": "cover",
+                        "-moz-background-size": "cover",
+                        "-o-background-size": "cover",
+                        "background-size": "cover"})
+                    }
+                    else {
+                    $("html.detail").css({"background": "url('{% static 'tedxgame/image/umbrella.jpg' %}')",
+                        "-webkit-background-size": "cover",
+                        "-moz-background-size": "cover",
+                        "-o-background-size": "cover",
+                        "background-size": "cover"})}
+
+                    setTimeout(function () {
+                        question.show().animateCss('zoomIn');
+                        choiceBtn.show().animateCss('zoomIn');}, 200
+                    );
+                })
+
+                choiceBtn.click(function(){
+
+                    choice_pk = $(this).data('choice-pk');
+                    $.ajax({
+                        type: 'POST',
+                        data: {choice_pk: choice_pk},
+                        url: "{% url 'tedx:handle_game_ajax' %}" ,
+                        success: function(data){
+                            $("#question-text").html(data.next_question_text).animateCss('zoomIn');
+                            if (!data.choice1_text){
+                                $("#choice1, #choice2").hide()
+                                $("#playagain").html(" <p> <br><br><a href='{% url 'tedx:handle_game_index' %}'>اضغط هنا</a>  للعب مجددََا. &thinsp;  </p> ")
+                            } else {
+                                $("#choice1").html(data.choice1_text).data("choice-pk", data.choice1_pk).animateCss('zoomIn')
+                                $("#choice2").html(data.choice2_text).data("choice-pk", data.choice2_pk).animateCss('zoomIn')
+                            }
+
+                            if (data.flag){
+                                if (data.flag == "rain"){
+                                 $("html.detail").css({"background": "url('{% static 'tedxgame/image/rain.jpg' %}')",
+                                         "-webkit-background-size": "cover",
+                                         "-moz-background-size": "cover",
+                                         "-o-background-size": "cover",
+                                         "background-size": "cover",
+
+                                    });
+                                }
+                                else if (data.flag == "umbrella") {
+                                    $("html.detail").css({"background": "url('{% static 'tedxgame/image/umbrella.jpg' %}')",
+                                         "-webkit-background-size": "cover",
+                                         "-moz-background-size": "cover",
+                                         "-o-background-size": "cover",
+                                         "background-size": "cover",
+
+                                    });
+                                }
+                                else if (data.flag == "football") {
+                                    $("html.detail").css({"background": "url('{% static 'tedxgame/image/football.jpg' %}')",
+                                         "-webkit-background-size": "cover",
+                                         "-moz-background-size": "cover",
+                                         "-o-background-size": "cover",
+                                         "background-size": "cover",
+
+                                    });
+                                }
+                                else if (data.flag == "sheep") {
+                                    $("html.detail").css({"background": "url('{% static 'tedxgame/image/sheep.jpg' %}')",
+                                         "-webkit-background-size": "cover",
+                                         "-moz-background-size": "cover",
+                                         "-o-background-size": "cover",
+                                         "background-size": "cover",
+
+                                    });
+                                }
+                                else if (data.flag == "study") {
+                                    $("html.detail").css({"background": "url('{% static 'tedxgame/image/study.jpg' %}')",
+                                         "-webkit-background-size": "cover",
+                                         "-moz-background-size": "cover",
+                                         "-o-background-size": "cover",
+                                         "background-size": "cover",
+
+                                    });
+                                }
+                                else if (data.flag == "library") {
+                                    $("html.detail").css({"background": "url('{% static 'tedxgame/image/library.jpg' %}')",
+                                         "-webkit-background-size": "cover",
+                                         "-moz-background-size": "cover",
+                                         "-o-background-size": "cover",
+                                         "background-size": "cover",
+
+                                    });
+                                }
+                                else {
+                                    $("html.detail").css({"background": "url('{% static 'tedxgame/image/background.jpg' %}')",
+                                         "-webkit-background-size": "cover",
+                                         "-moz-background-size": "cover",
+                                         "-o-background-size": "cover",
+                                         "background-size": "cover",
+
+                                    });
+                                }
+                            }
+                        }
+                    })
+                })
+
+        })
+        </script>
+{% endblock %}

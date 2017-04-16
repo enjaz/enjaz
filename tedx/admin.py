@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin.forms import AdminAuthenticationForm
 from clubs.models import Team
-from .models import Registration
+from .models import Registration, Question, Choice, Game
 
 class TEDxAuthenticationForm(AdminAuthenticationForm):
     def confirm_login_allowed(self, user):
@@ -27,6 +27,15 @@ class TEDxAdmin(admin.sites.AdminSite):
         return is_tedx_team_member or \
                request.user.is_superuser
 
+class QuestionAdmin(admin.ModelAdmin):
+    fields = ['title','question_text']
+
+class ChoiceAdmin(admin.ModelAdmin):
+    fields = ['title','choice_text','question','next_question','flag']
+
 tedx_admin = TEDxAdmin("TEDx Admin")
+admin.site.register(Question, QuestionAdmin)
+admin.site.register(Choice, ChoiceAdmin)
+admin.site.register(Game)
 tedx_admin.register(Registration)
 admin.site.register(Registration)

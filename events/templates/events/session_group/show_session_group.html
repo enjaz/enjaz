@@ -269,6 +269,7 @@ margin-bottom: 5px;
                         {% endif %}
                         $(button).data('action', 'signup');
                         $(button).removeClass('btn-danger');
+                        $(button).addClass('btn-success');
                         status_button.hide();
                       } else if (action == 'signup'){
                         toastr.success("تمّ تسجيلك!");

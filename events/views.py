@@ -1,7 +1,8 @@
 # -*- coding: utf-8  -*-
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
+from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db.models import Count
 from django.http import HttpResponseRedirect, Http404
@@ -9,16 +10,23 @@ from django.views.decorators import csrf
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from post_office import mail
+import StringIO
+import barcode
 import os.path
+import qrcode
+import qrcode.image.svg
 
 from core import decorators
 from clubs.models import Team, college_choices
-from events.forms import NonUserForm, RegistrationForm, AbstractForm, AbstractFigureFormset, EvaluationForm,AbstractFigureForm, InitiativeForm, InitiativeFigureFormset,CaseReportForm,AbstractPosterForm,AbstractPresentationForm
-from events.models import Event, Registration, Session, Abstract, AbstractFigure,Evaluation, TimeSlot, SessionRegistration, Initiative, SessionGroup,CaseReport
-from events import utils
+from .models import Event, Registration, Session, Abstract, \
+                          AbstractFigure,Evaluation, TimeSlot, \
+                          SessionRegistration, Initiative, \
+                          SessionGroup,CaseReport, Attendance
+from . import utils, forms
 import core.utils
 import clubs.utils
 
+BARCODE_LENGTH = 8
 
 def redirect_home(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
@@ -46,9 +54,9 @@ def submit_abstract(request, event_code_name):
 
     if request.method == 'POST':
         instance = Abstract(event=event,user=request.user)
-        form = AbstractForm(request.POST, request.FILES,
+        form = forms.AbstractForm(request.POST, request.FILES,
                             instance=instance)
-        figure_formset = AbstractFigureFormset(request.POST, request.FILES)
+        figure_formset = forms.AbstractFigureFormset(request.POST, request.FILES)
         if form.is_valid() and figure_formset.is_valid():
             abstract = form.save()
             figure_formset.instance = abstract
@@ -56,8 +64,8 @@ def submit_abstract(request, event_code_name):
             return HttpResponseRedirect(reverse('events:show_abstract',
                                                 args=(event.code_name, abstract.pk)))
     elif request.method == 'GET':
-        form = AbstractForm()
-        figure_formset = AbstractFigureFormset()
+        form = forms.AbstractForm()
+        figure_formset = forms.AbstractFigureFormset()
     context['form'] = form
     context['figure_formset'] = figure_formset
 
@@ -82,9 +90,9 @@ def edit_abstract(request, event_code_name, pk):
 
     if request.method == 'POST':
         instance = Abstract(event=abstract.event,user=request.user)
-        form = AbstractForm(request.POST, request.FILES,
+        form = forms.AbstractForm(request.POST, request.FILES,
                             instance=instance)
-        figure_formset = AbstractFigureFormset(request.POST, request.FILES)
+        figure_formset = forms.AbstractFigureFormset(request.POST, request.FILES)
         if form.is_valid() and figure_formset.is_valid():
             abstract = form.save()
             figure_formset.instance = abstract
@@ -94,8 +102,8 @@ def edit_abstract(request, event_code_name, pk):
 
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
-        form = AbstractForm(instance=abstract)
-        figure_formset = AbstractFigureFormset(instance=abstract)
+        form = forms.AbstractForm(instance=abstract)
+        figure_formset = forms.AbstractFigureFormset(instance=abstract)
     context['form'] = form
     context['figure_formset'] = figure_formset
 
@@ -170,7 +178,7 @@ def show_abstract(request, event_code_name, pk):
         raise PermissionDenied
 
     if request.method == 'POST':
-         poster_form = AbstractPosterForm(request.POST, request.FILES)
+         poster_form = forms.AbstractPosterForm(request.POST, request.FILES)
          if poster_form.is_valid() :
              new_poster_form=poster_form.save()
              new_poster_form.abstract = Abstract.objects.get(pk=pk)
@@ -179,7 +187,7 @@ def show_abstract(request, event_code_name, pk):
              return HttpResponseRedirect(reverse('events:show_abstract',
                                              args=(event.code_name,abstract.pk)))
     elif request.method == 'GET':
-        poster_form = AbstractPosterForm()
+        poster_form = forms.AbstractPosterForm()
     context['form'] = poster_form
 
     return render(request, "events/abstracts/show_abstract.html", context)
@@ -197,7 +205,7 @@ def presntation_upload (request, event_code_name, pk):
         raise PermissionDenied
 
     if request.method == 'POST':
-         presentation_form = AbstractPresentationForm(request.POST, request.FILES)
+         presentation_form = forms.AbstractPresentationForm(request.POST, request.FILES)
          if presentation_form.is_valid():
              presentation=presentation_form.save()
              presentation.abstract = Abstract.objects.get(pk=pk)
@@ -206,7 +214,7 @@ def presntation_upload (request, event_code_name, pk):
              return HttpResponseRedirect(reverse('events:show_abstract',
                                              args=(event.code_name,abstract.pk)))
     elif request.method == 'GET':
-        presentation_form=AbstractPresentationForm()
+        presentation_form = forms.AbstractPresentationForm()
     context['presentation_form'] = presentation_form
 
     return render(request, "events/abstracts/show_abstract.html", context)
@@ -216,7 +224,7 @@ def presntation_upload (request, event_code_name, pk):
 @csrf.csrf_exempt
 @login_required
 def upload_abstract_image(request):
-    form = AbstractFigureForm(request.POST, request.FILES)
+    form = forms.AbstractFigureForm(request.POST, request.FILES)
     if form.is_valid():
         abstract_figure = form.save()
         return {"uploaded": 1,
@@ -350,8 +358,8 @@ def nonuser_registration(request, event_code_name):
         return HttpResponseRedirect(reverse('events:user_registration',
                                             args=(event.code_name,)))
     if request.method == 'POST':
-        registration_form = RegistrationForm(request.POST, event=event)
-        nonuser_form = NonUserForm(request.POST)
+        registration_form = forms.RegistrationForm(request.POST, event=event)
+        nonuser_form = forms.NonUserForm(request.POST)
         if registration_form.is_valid() and nonuser_form.is_valid():
             nonuser = nonuser_form.save()
             registration = registration_form.save(nonuser=nonuser)
@@ -368,8 +376,8 @@ def nonuser_registration(request, event_code_name):
             return HttpResponseRedirect(reverse('events:registration_completed',
                                                 args=(event.code_name,)))
     elif request.method == 'GET':
-        registration_form = RegistrationForm(event=event)
-        nonuser_form = NonUserForm()
+        registration_form = forms.RegistrationForm(event=event)
+        nonuser_form = forms.NonUserForm()
 
     session_choices = Session.objects.filter(event=event,
                                              time_slot=1)\
@@ -398,7 +406,7 @@ def user_registration(request, event_code_name):
                                             args=(event.code_name,)))
 
     if request.method == 'POST':
-        registration_form = RegistrationForm(request.POST, user=request.user, event=event)
+        registration_form = forms.RegistrationForm(request.POST, user=request.user, event=event)
         if registration_form.is_valid():
             registration = registration_form.save()
             print registration
@@ -415,7 +423,7 @@ def user_registration(request, event_code_name):
             return HttpResponseRedirect(reverse('events:registration_completed',
                                                 args=(event.code_name,)))
     elif request.method == 'GET':
-        registration_form = RegistrationForm(user=request.user, event=event)
+        registration_form = forms.RegistrationForm(user=request.user, event=event)
 
     context = {'registration_form': registration_form, 'event': event}
     return render(request, "events/register_user.html", context)
@@ -470,9 +478,9 @@ def submit_initiative(request, event_code_name):
 
     if request.method == 'POST':
         instance = Initiative(event=event,user=request.user)
-        form = InitiativeForm(request.POST, request.FILES,
+        form = forms.InitiativeForm(request.POST, request.FILES,
                             instance=instance)
-        figure_formset = InitiativeFigureFormset(request.POST, request.FILES)
+        figure_formset = forms.InitiativeFigureFormset(request.POST, request.FILES)
         if form.is_valid() and figure_formset.is_valid():
             initiative = form.save()
             figure_formset.instance = initiative
@@ -480,8 +488,8 @@ def submit_initiative(request, event_code_name):
             return HttpResponseRedirect(reverse('events:initiative_submission_completed',
                                                 args=(event.code_name,)))
     elif request.method == 'GET':
-        form = InitiativeForm()
-        figure_formset = InitiativeFigureFormset()
+        form = forms.InitiativeForm()
+        figure_formset = forms.InitiativeFigureFormset()
     context['form'] = form
     context['figure_formset'] = figure_formset
 
@@ -573,14 +581,14 @@ def submit_case_report(request, event_code_name):
 
     if request.method == 'POST':
         instance = CaseReport(event=event,user=request.user)
-        form = CaseReportForm(request.POST, request.FILES,
+        form = forms.CaseReportForm(request.POST, request.FILES,
                              instance=instance)
         if form.is_valid():
             abstract = form.save()
             return HttpResponseRedirect(reverse('events:show_casereport',
                                                 args=(event.code_name, abstract.pk)))
     elif request.method == 'GET':
-        form = CaseReportForm()
+        form = forms.CaseReportForm()
     context['form'] = form
 
     return render(request, 'events/abstracts/casereports/casereport_submission.html', context)
@@ -633,13 +641,13 @@ def evaluate(request, event_code_name, pk):
     evaluation = Evaluation(evaluator=request.user,
                             abstract=abstract)
     if request.method == 'POST':
-        form = EvaluationForm(request.POST, instance=evaluation, evaluator=request.user)
+        form = forms.EvaluationForm(request.POST, instance=evaluation, evaluator=request.user)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse('events:evaluators_homepage',
                                                 args=(event.code_name,)))
     elif request.method == 'GET':
-        form = EvaluationForm(instance=evaluation,
+        form = forms.EvaluationForm(instance=evaluation,
                               evaluator=request.user)
     context = {'event': event, 'abstract': abstract, 'form': form}
 
@@ -660,7 +668,7 @@ def edit_evaluation(request,event_code_name,evaluation_id, pk):
     context = {'event': event, 'abstract': abstract, 'evaluation': evaluation,'edit':True}
 
     if request.method == 'POST':
-        form = EvaluationForm(request.POST, instance=evaluation,evaluator=evaluator)
+        form = forms.EvaluationForm(request.POST, instance=evaluation,evaluator=evaluator)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse('events:evaluators_homepage',
@@ -668,7 +676,7 @@ def edit_evaluation(request,event_code_name,evaluation_id, pk):
         else:
             context['form'] = form
     elif request.method == 'GET':
-        form = EvaluationForm(instance=evaluation, evaluator=evaluator)
+        form = forms.EvaluationForm(instance=evaluation, evaluator=evaluator)
         context['form'] = form
 
     return render(request, "events/abstracts/abstracts_evaluation_form.html", context)
@@ -715,3 +723,107 @@ def list_my_registration(request):
     registrations = SessionRegistration.objects.filter(is_deleted=False, user=request.user)
     context = {'registrations': registrations}
     return render(request, 'events/list_my_registration.html', context)
+
+@login_required
+def show_barcode(request, event_code_name):
+    event = get_object_or_404(Event,
+                              code_name=event_code_name)
+    username = request.GET.get('username')
+    if username:
+        barcode_user = get_object_or_404(User, username=username)
+    else:
+        barcode_user = request.user
+
+    pk = ("{:0%s}" % BARCODE_LENGTH).format(barcode_user.pk)
+
+    qrcode_output = StringIO.StringIO()
+    qrcode.make(pk, image_factory=qrcode.image.svg.SvgImage, version=3).save(qrcode_output)
+    qrcode_value = "".join(qrcode_output.getvalue().split('\n')[1:])
+    CODE128 = barcode.get_barcode_class('code128')
+    one_dimensional_output = CODE128(pk)
+    one_dimensional_value = "".join([line.strip() for line in one_dimensional_output.render({'module_width': 0.4}).split('\n')[4:]])
+
+    context = {'qrcode_value' : qrcode_value,
+               'one_dimensional_value': one_dimensional_value,
+               'barcode_user': barcode_user, 'event': event}
+    return render(request, 'events/show_barcode.html', context)
+
+@login_required
+@decorators.ajax_only
+@decorators.post_only
+@csrf.csrf_exempt
+def process_barcode(request, event_code_name, pk):
+    session = get_object_or_404(Session,
+                                event__code_name=event_code_name,
+                                pk=pk)
+    if not request.user.is_superuser and \
+       not utils.is_organizing_team_member(request.user, session.event):
+        raise PermissionDenied
+
+    response = {}
+    action = request.POST.get("action")
+    if action == 'attend':
+        category = request.POST.get("category", "")
+        only_registered = int(request.POST.get("only_registered"))
+        user_pk = request.POST.get("user_pk")
+
+        try:
+            user = User.objects.get(pk=user_pk)
+        except User.DoesNotExist:
+            raise Exception(u"رقم خاطئ!")
+
+        try:
+            full_name = user.common_profile.get_ar_short_name()
+        except ObjectDoesNotExist:
+            # If user has no CommonProfile
+            full_name = user.username
+
+        if only_registered and not SessionRegistration.objects\
+                                                      .filter(user=user,
+                                                              session=session,
+                                                              is_deleted=False)\
+                                                      .exists():
+            raise Exception(u"لا تسجيل ل{}".format(full_name))
+
+        attendance = Attendance.objects.create(user=user,
+                                               session=session,
+                                               category=category)
+        last_pk = attendance.pk
+        response['last_pk'] = last_pk
+
+    elif action == 'cancel':
+        last_pk = request.POST.get("last_pk")
+        try:
+            attendance = Attendance.objects.get(pk=last_pk)
+        except Attendance.DoesNotExist:
+            raise Exception("هذا التحضير غير موجود")
+
+        attendance.delete()
+
+        try:
+            full_name = attendance.user.common_profile.get_ar_short_name()
+        except ObjectDoesNotExist:
+            # If user has no CommonProfile
+            full_name = attendance.user.username
+
+    response['full_name'] = full_name
+
+    return response
+
+@login_required
+def show_attendance_interface(request, event_code_name, pk):
+    session = get_object_or_404(Session,
+                                event__code_name=event_code_name,
+                                pk=pk)
+
+    if not request.user.is_superuser and \
+       not utils.is_organizing_team_member(request.user, session.event):
+        raise PermissionDenied
+
+    form = forms.AttendanceForm()
+
+    context = {'session': session, 'event': session.event,
+               'BARCODE_LENGTH': BARCODE_LENGTH,
+               'form': form}
+
+    return render(request, 'events/show_attendance_interface.html', context)

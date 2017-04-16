@@ -5,7 +5,7 @@ from ckeditor.widgets import CKEditorWidget
 from django import forms
 
 
-from events.models import Event, Session, Registration, NonUser, Abstract, AbstractFigure, TimeSlot, SessionRegistration, Initiative, InitiativeFigure, SessionGroup,CaseReport,Criterion,Evaluation,AbstractPoster
+from . import models
 
 BASIC_SEARCH_FIELDS = ['user__username', 'user__email',
                        'user__common_profile__en_first_name',
@@ -25,11 +25,11 @@ BASIC_SEARCH_FIELDS = ['user__username', 'user__email',
                        'user__common_profile__ar_last_name']
 
 class AbstractFigureInline(admin.TabularInline):
-    model = AbstractFigure
+    model = models.AbstractFigure
     extra = 0
 
 class InitiativeFigureInline(admin.TabularInline):
-    model = InitiativeFigure
+    model = models.InitiativeFigure
     extra = 0
 
 
@@ -52,7 +52,7 @@ class EventFilter(admin.SimpleListFilter):
     title = "Event"
     parameter_name = 'event'
     def lookups(self, request, model_admin):
-        return Event.objects.values_list('pk', 'name') 
+        return models.Event.objects.values_list('pk', 'name') 
 
     def queryset(self, request, queryset):
         if self.value():
@@ -62,33 +62,17 @@ class RegistrationAdmin(admin.ModelAdmin):
     list_display = ['pk', '__unicode__', 'get_university', 'get_college',
                     'date_submitted']
     list_filter = [RegistrationUniversityFilter, EventFilter]
-    search_fields= ('user__username', 'user__email',
-                    'user__common_profile__en_first_name',
-                    'user__common_profile__en_middle_name',
-                    'user__common_profile__en_last_name',
-                    'user__common_profile__ar_first_name',
-                    'user__common_profile__ar_middle_name',
-                    'user__common_profile__ar_last_name',
-                    'user__common_profile__student_id',
-                    'user__common_profile__badge_number',
-                    'user__common_profile__mobile_number',
-                    'user__common_profile__en_first_name',
-                    'user__common_profile__en_middle_name',
-                    'user__common_profile__en_last_name',
-                    'user__common_profile__ar_first_name',
-                    'user__common_profile__ar_middle_name',
-                    'user__common_profile__ar_last_name',
-                    'nonuser__email',
-                    'nonuser__mobile_number',
-                    'nonuser__en_first_name',
-                    'nonuser__en_middle_name',
-                    'nonuser__en_last_name',
-                    'nonuser__ar_first_name',
-                    'nonuser__ar_middle_name',
-                    'nonuser__ar_last_name')
+    search_fields = BASIC_SEARCH_FIELDS + ['nonuser__email',
+                                           'nonuser__mobile_number',
+                                           'nonuser__en_first_name',
+                                           'nonuser__en_middle_name',
+                                           'nonuser__en_last_name',
+                                           'nonuser__ar_first_name',
+                                           'nonuser__ar_middle_name',
+                                           'nonuser__ar_last_name']
 
 class RegistrationInline(admin.StackedInline):
-    model = Registration
+    model = models.Registration
     extra = 1
     max_num = 1
     fields = ['sessions']
@@ -111,7 +95,7 @@ class NonUserAdmin(admin.ModelAdmin):
     inlines = [RegistrationInline]
 
 class AbstractPosterInline(admin.TabularInline):
-     model= AbstractPoster
+     model= models.AbstractPoster
      extra=0
 
 class AbstractAdmin(admin.ModelAdmin):
@@ -128,21 +112,25 @@ class SessionGroupAdmin(admin.ModelAdmin):
     list_filter = ['event']
     list_display = ['title', 'event']
 
-
+class AttendanceAdmin(admin.ModelAdmin):
+    list_filter = ['session__event', 'category', 'is_deleted']
+    list_display = ['__unicode__', 'category', 'date_submitted', 'is_deleted']
+    search_fields = BASIC_SEARCH_FIELDS
 
     
-admin.site.register(Event)
-admin.site.register(Session)
-admin.site.register(CaseReport)
-admin.site.register(Registration, RegistrationAdmin)
-admin.site.register(NonUser, NonUserAdmin)
-admin.site.register(Abstract, AbstractAdmin)
-admin.site.register(TimeSlot)
-admin.site.register(SessionGroup, SessionGroupAdmin)
-admin.site.register(SessionRegistration)
-admin.site.register(Initiative, InitiativeAdmin)
-admin.site.register(Criterion)
-admin.site.register(Evaluation)
+admin.site.register(models.Event)
+admin.site.register(models.Session)
+admin.site.register(models.CaseReport)
+admin.site.register(models.Registration, RegistrationAdmin)
+admin.site.register(models.NonUser, NonUserAdmin)
+admin.site.register(models.Abstract, AbstractAdmin)
+admin.site.register(models.TimeSlot)
+admin.site.register(models.SessionGroup, SessionGroupAdmin)
+admin.site.register(models.SessionRegistration)
+admin.site.register(models.Initiative, InitiativeAdmin)
+admin.site.register(models.Criterion)
+admin.site.register(models.Evaluation)
+admin.site.register(models.Attendance, AttendanceAdmin)
 
 
 

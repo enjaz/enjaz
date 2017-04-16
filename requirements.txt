@@ -15,9 +15,12 @@ djangorestframework>=3.1,<3.1.99
 future>=0.14,<0.14.99
 Unidecode>=0.4,<0.4.99
 python-twitter>=3.1,<3.1.99
+qrcode>=5.3,<5.3.99
+unicodecsv>=0.14.1,<0.14.99
+viivakoodi>=0.8,<0.8.99
 django-picklefield
 oauth2
 Pillow
 openpyxl
 requests
-unicodecsv
+

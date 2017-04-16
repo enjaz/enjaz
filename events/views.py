@@ -250,6 +250,18 @@ def list_timeslots(request, event_code_name):
 
     return render(request, 'events/timeslots_list.html', context)
 
+def list_sessions_privileged(request, event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name)
+
+    if not utils.is_organizing_team_member(request.user, event) and\
+       not request.user.is_superuser:
+        raise PermissionDenied
+
+    sessions = Session.objects.filter(event=event)
+
+    return render(request,  'events/session_list_privileged.html',
+                  {'event': event})
+
 def list_sessions(request, event_code_name, pk):
     event = get_object_or_404(Event, code_name=event_code_name)
     timeslots = TimeSlot.objects.filter(event=event, pk=pk)
@@ -262,7 +274,7 @@ def list_sessions(request, event_code_name, pk):
         return HttpResponseRedirect(reverse('events:registration_closed',
                                                 args=(event.code_name,)))
 
-    return render(request, 'events/sessions_list.html', context)
+    return render(request,  'events/sessions_list.html', context)
 
 def show_session(request, event_code_name, pk):
     event = get_object_or_404(Event, code_name=event_code_name)

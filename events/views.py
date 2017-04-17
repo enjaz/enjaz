@@ -250,6 +250,18 @@ def list_timeslots(request, event_code_name):
 
     return render(request, 'events/timeslots_list.html', context)
 
+def list_sessions_privileged(request, event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name)
+
+    if not utils.is_organizing_team_member(request.user, event) and\
+       not request.user.is_superuser:
+        raise PermissionDenied
+
+    sessions = Session.objects.filter(event=event)
+
+    return render(request,  'events/session_list_privileged.html',
+                  {'event': event})
+
 def list_sessions(request, event_code_name, pk):
     event = get_object_or_404(Event, code_name=event_code_name)
     timeslots = TimeSlot.objects.filter(event=event, pk=pk)
@@ -262,7 +274,7 @@ def list_sessions(request, event_code_name, pk):
         return HttpResponseRedirect(reverse('events:registration_closed',
                                                 args=(event.code_name,)))
 
-    return render(request, 'events/sessions_list.html', context)
+    return render(request,  'events/sessions_list.html', context)
 
 def show_session(request, event_code_name, pk):
     event = get_object_or_404(Event, code_name=event_code_name)
@@ -725,12 +737,32 @@ def list_my_registration(request):
     return render(request, 'events/list_my_registration.html', context)
 
 @login_required
-def show_barcode(request, event_code_name):
-    event = get_object_or_404(Event,
-                              code_name=event_code_name)
-    username = request.GET.get('username')
-    if username:
-        barcode_user = get_object_or_404(User, username=username)
+def list_barcodes(request, event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name,
+                              has_attendance=True)
+
+    if not utils.is_attendance_team_member(request.user, event) and \
+       not utils.is_organizing_team_member(request.user, event) and \
+       not request.user.is_superuser:
+        raise PermissionDenied
+
+    barcode_users = User.objects.filter(session_registrations__session__event=event,
+                                        session_registrations__is_deleted=False).distinct()
+
+    context = {"barcode_users": barcode_users, 'event': event}
+    return render(request, 'events/list_barcodes.html', context)
+
+@login_required
+def show_barcode(request, event_code_name=None, user_pk=None):
+    if user_pk and event_code_name:
+        event = get_object_or_404(Event, code_name=event_code_name,
+                                  has_attendance=True)
+        if not utils.is_attendance_team_member(request.user, event) and \
+           not utils.is_organizing_team_member(request.user, event) and \
+           not request.user.is_superuser:
+            raise PermissionDenied
+        else:
+            barcode_user = get_object_or_404(User, pk=user_pk)
     else:
         barcode_user = request.user
 
@@ -745,7 +777,7 @@ def show_barcode(request, event_code_name):
 
     context = {'qrcode_value' : qrcode_value,
                'one_dimensional_value': one_dimensional_value,
-               'barcode_user': barcode_user, 'event': event}
+               'barcode_user': barcode_user}
     return render(request, 'events/show_barcode.html', context)
 
 @login_required
@@ -755,9 +787,11 @@ def show_barcode(request, event_code_name):
 def process_barcode(request, event_code_name, pk):
     session = get_object_or_404(Session,
                                 event__code_name=event_code_name,
+                                event__has_attendance=True,
                                 pk=pk)
     if not request.user.is_superuser and \
-       not utils.is_organizing_team_member(request.user, session.event):
+       not utils.is_organizing_team_member(request.user, session.event) and\
+       not utils.is_attendance_team_member(request.user, session.event):
         raise PermissionDenied
 
     response = {}
@@ -817,7 +851,8 @@ def show_attendance_interface(request, event_code_name, pk):
                                 pk=pk)
 
     if not request.user.is_superuser and \
-       not utils.is_organizing_team_member(request.user, session.event):
+       not utils.is_organizing_team_member(request.user, session.event) and \
+       not utils.is_attendance_team_member(request.user, session.event):
         raise PermissionDenied
 
     form = forms.AttendanceForm()

@@ -57,7 +57,7 @@ def get_user_attendance_events(user):
 def get_user_admistrative_events(user):
     user_events = get_user_abstract_revision_events(user) | \
                   get_user_organizing_events(user) | \
-                  get_user_abstract_revision_events(user)
+                  get_user_attendance_events(user)
     return user_events
 
 def is_organizing_team_member(user, event):

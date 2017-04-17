@@ -6,9 +6,12 @@ from events import views
 urlpatterns = patterns('',
     url(r'^my_abstract_list/$', views.list_my_abstracts, name="list_my_abstracts"),
     url(r'^my_registration_list/$', views.list_my_registration, name="list_my_registration"),
-    url(r'^^(?P<event_code_name>[\d\w_\-]+)/barcode/$', views.show_barcode, name="show_barcode"),
+    url(r'^barcode/$', views.show_barcode, name="show_my_barcode"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/barcode/(?P<user_pk>\d+)/$', views.show_barcode, name="show_barcode_privileged"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/barcode_list/$', views.list_barcodes, name="list_barcodes"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/$', views.redirect_home, name="redirect_home"),
     #URL already puplished (to be changed after the end of hpc2)
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/sessions/list/$', views.list_sessions_privileged, name="list_sessions_privileged"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/sessions/$', views.list_timeslots, name="list_timeslots"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/timeslots/(?P<pk>\d+)/$', views.list_sessions, name="list_sessions"),
     url(r'^sessions/ajax/group$', views.handle_ajax, name="handle_ajax"),

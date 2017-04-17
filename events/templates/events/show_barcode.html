@@ -1,9 +1,8 @@
-{% extends 'events_evaluation_base.html' %}{% load staticfiles %}
+{% extends 'events_evaluation_base.html' %}
 {% block title %}بطاقتي{% endblock %}
-
+{% block pageheader %}بطاقتي{% endblock %}
+{% block pageheaderurl %}{% url 'events:show_my_barcode' %}{% endblock %}
 {% block content %}
-
-
 <div class="row text-center">
 <div class="col-sm-6 col-sm-offset-3">
 {{ qrcode_value|safe }}

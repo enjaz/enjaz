@@ -190,14 +190,23 @@ you?
                         <i class="entypo-calendar"></i>
                         <span class="english-field">{{ event.official_name }}</span>
                     </a>
-                    <ul>{% if user|is_organizing_team_member:event or user.is_superuser %}
+                    <ul>{% if user|is_organizing_team_member:event or user|is_attendance_team_member:event or user.is_superuser %}
                         <li>
-                            <a href="{% url 'events:list_timeslots' event.code_name %}">
+                            <a href="{% url 'events:list_sessions_privileged' event.code_name %}">
                                 <i class="entypo-chart-pie"></i>
-                                <span>المسجلون والمسجلات</span>
+                                <span>الجلسات</span>
                             </a>
-                        </li>{% endif %}
-                        {% if event.receives_abstract_submission %}
+                        </li>
+                        {% if event.has_attendance %}
+                        <li>
+                            <a href="{% url 'events:list_barcodes' event.code_name %}">
+                                <i class="fa fa-id-badge"></i>
+                                <span>البطاقات</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% endif %}
+                        {% if event.receives_abstract_submission and user|is_organizing_team_member:event or event.receives_abstract_submission and user.is_superuser %}
                         <li>
                             <a href="{% url 'events:list_abstracts' event.code_name %}">
                                 <i class="entypo-pencil"></i>
@@ -213,7 +222,7 @@ you?
                             </a>
                         </li>
                         {% endif %}
-												{% if user|can_evaluate_abstracts:event %}
+												{% if event.receives_abstract_submission and user|can_evaluate_abstracts:event %}
 						            <li class="english-field">
 						                <a href="{% url 'events:evaluators_homepage' event.code_name %}">
 															<i class="entypo-flow-tree"></i>

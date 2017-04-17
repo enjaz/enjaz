@@ -99,8 +99,8 @@ class AbstractPosterInline(admin.TabularInline):
      extra=0
 
 class AbstractAdmin(admin.ModelAdmin):
-    search_fields = BASIC_SEARCH_FIELDS + ["title"]
-    list_filter = ["event"]
+    search_fields = BASIC_SEARCH_FIELDS + ["email", "title"]
+    list_filter = ["event", "is_deleted"]
     inlines = [AbstractFigureInline,AbstractPosterInline]
     filter_horizontal = ('evaluators',)
     introduction = forms.CharField(widget=CKEditorWidget())
@@ -117,9 +117,19 @@ class AttendanceAdmin(admin.ModelAdmin):
     list_display = ['__unicode__', 'category', 'date_submitted', 'is_deleted']
     search_fields = BASIC_SEARCH_FIELDS
 
-    
-admin.site.register(models.Event)
-admin.site.register(models.Session)
+class EventAdmin(admin.ModelAdmin):
+    list_display = search_fields = ['official_name', 'english_name',
+                                    'code_name']
+
+class SessionAdmin(admin.ModelAdmin):
+    list_filter = ['event']
+    list_display = ['name', 'event', 'date', 'start_time', 'end_time',
+                    'limit', 'get_registration_count']
+    search_fields = ['name', 'event__official_name',
+                     'event__english_name']
+
+admin.site.register(models.Event, EventAdmin)
+admin.site.register(models.Session, SessionAdmin)
 admin.site.register(models.CaseReport)
 admin.site.register(models.Registration, RegistrationAdmin)
 admin.site.register(models.NonUser, NonUserAdmin)

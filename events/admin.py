@@ -101,6 +101,7 @@ class AbstractPosterInline(admin.TabularInline):
 class AbstractAdmin(admin.ModelAdmin):
     search_fields = BASIC_SEARCH_FIELDS + ["email", "title"]
     list_filter = ["event", "is_deleted"]
+    readonly_fields = ['user']
     inlines = [AbstractFigureInline,AbstractPosterInline]
     filter_horizontal = ('evaluators',)
     introduction = forms.CharField(widget=CKEditorWidget())
@@ -113,9 +114,11 @@ class SessionGroupAdmin(admin.ModelAdmin):
     list_display = ['title', 'event']
 
 class AttendanceAdmin(admin.ModelAdmin):
-    list_filter = ['session__event', 'category', 'is_deleted']
+    list_filter = ['session_registration__session__event', 'category', 'is_deleted']
     list_display = ['__unicode__', 'category', 'date_submitted', 'is_deleted']
-    search_fields = BASIC_SEARCH_FIELDS
+    readonly_fields = ['session_registration', 'submitter']
+    search_fields = ['session_registration__' + field
+                     for field in  BASIC_SEARCH_FIELDS]
 
 class EventAdmin(admin.ModelAdmin):
     list_display = search_fields = ['official_name', 'english_name',
@@ -128,6 +131,13 @@ class SessionAdmin(admin.ModelAdmin):
     search_fields = ['name', 'event__official_name',
                      'event__english_name']
 
+class SessionRegistrationAdmin(admin.ModelAdmin):
+    readonly_fields = ['user']
+    list_display = ['__unicode__',  'is_approved', 'is_deleted',
+                    'date_submitted']
+    search_fields = BASIC_SEARCH_FIELDS + ['session__name']
+    list_filter = ['session__event', 'is_deleted', 'is_approved']
+
 admin.site.register(models.Event, EventAdmin)
 admin.site.register(models.Session, SessionAdmin)
 admin.site.register(models.CaseReport)
@@ -136,7 +146,7 @@ admin.site.register(models.NonUser, NonUserAdmin)
 admin.site.register(models.Abstract, AbstractAdmin)
 admin.site.register(models.TimeSlot)
 admin.site.register(models.SessionGroup, SessionGroupAdmin)
-admin.site.register(models.SessionRegistration)
+admin.site.register(models.SessionRegistration, SessionRegistrationAdmin)
 admin.site.register(models.Initiative, InitiativeAdmin)
 admin.site.register(models.Criterion)
 admin.site.register(models.Evaluation)

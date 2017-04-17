@@ -99,8 +99,8 @@ class AbstractPosterInline(admin.TabularInline):
      extra=0
 
 class AbstractAdmin(admin.ModelAdmin):
-    search_fields = BASIC_SEARCH_FIELDS + ["title"]
-    list_filter = ["event"]
+    search_fields = BASIC_SEARCH_FIELDS + ["email", "title"]
+    list_filter = ["event", "is_deleted"]
     inlines = [AbstractFigureInline,AbstractPosterInline]
     filter_horizontal = ('evaluators',)
     introduction = forms.CharField(widget=CKEditorWidget())

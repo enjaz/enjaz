@@ -813,15 +813,27 @@ def process_barcode(request, event_code_name, pk):
             # If user has no CommonProfile
             full_name = user.username
 
-        if only_registered and not SessionRegistration.objects\
-                                                      .filter(user=user,
-                                                              session=session,
-                                                              is_deleted=False)\
-                                                      .exists():
-            raise Exception(u"لا تسجيل ل{}".format(full_name))
+        previous_registrations = SessionRegistration.objects.filter(user=user, session=session)
 
-        attendance = Attendance.objects.create(user=user,
-                                               session=session,
+        if previous_registrations.filter(is_deleted=False,
+                                         is_approved=True).exists():
+            registration = previous_registrations.first()
+        else: # If no approved registrations
+            if only_registered:
+                raise Exception(u"لا تسجيل ل{}".format(full_name))
+            elif previous_registrations.filter(is_deleted=True).exists() or \
+                 previous_registrations.exclude(is_approved=True).exists():
+                registration = previous_registrations.first()
+                registration.is_deleted = False
+                registration.is_approved = True
+                registration.save()
+            else: # If no registration, create one
+                registration = SessionRegistration.objects.create(user=user,
+                                                                  session=session,
+                                                                  is_approved=True)
+
+        attendance = Attendance.objects.create(submitter=request.user,
+                                               session_registration=registration,
                                                category=category)
         last_pk = attendance.pk
         response['last_pk'] = last_pk
@@ -849,6 +861,7 @@ def process_barcode(request, event_code_name, pk):
 def show_attendance_interface(request, event_code_name, pk):
     session = get_object_or_404(Session,
                                 event__code_name=event_code_name,
+                                event__has_attendance=True,
                                 pk=pk)
 
     if not request.user.is_superuser and \

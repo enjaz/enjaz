@@ -288,7 +288,7 @@ class SessionRegistration(models.Model):
             return self.get_is_approved_display()
 
     def __unicode__(self):
-        return unicode(self.user)
+        return u"{} for {}".format(self.user.username, self.session.name)
 
 class Registration(models.Model):
     user = models.ForeignKey(User, null=True, blank=True,
@@ -548,8 +548,11 @@ class CaseReport(models.Model):
 
 
 class Attendance(models.Model):
-    user = models.ForeignKey(User)
-    session = models.ForeignKey(Session)
+    submitter = models.ForeignKey(User, related_name="submitted_attendance",
+                                  blank=True, null=True,
+                                  verbose_name=u"المُدخلـ/ـة")
+    session_registration = models.ForeignKey(SessionRegistration, null=True,
+                                             verbose_name=u"التسجيل")
     category_choices = [
         ('I', u'الدخول'),
         ('M', u'المنتصف'),

@@ -10,6 +10,10 @@ def is_organizing_team_member(user, event):
     return utils.is_organizing_team_member(user, event)
 
 @register.filter
+def is_attendance_team_member(user, event):
+    return utils.is_attendance_team_member(user, event)
+
+@register.filter
 def has_user_organizing_events(user):
     return utils.get_user_organizing_events(user).exists()
 

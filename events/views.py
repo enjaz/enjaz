@@ -848,10 +848,10 @@ def process_barcode(request, event_code_name, pk):
         attendance.delete()
 
         try:
-            full_name = attendance.user.common_profile.get_ar_short_name()
+            full_name = attendance.session_registration.user.common_profile.get_ar_short_name()
         except ObjectDoesNotExist:
             # If user has no CommonProfile
-            full_name = attendance.user.username
+            full_name = attendance.session_registration.user.username
 
     response['full_name'] = full_name
 

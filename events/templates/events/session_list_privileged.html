@@ -10,7 +10,7 @@
         <tr>
             <th>الجلسة</th>
             <th>المسجلون والمسجلات</th>
-            <th>التحضير</th>
+            {% if event.has_attendance %}<th>التحضير</th>{% endif %}
         </tr>
     </thead>
     <tbody>
@@ -18,7 +18,7 @@
         <tr>
             <td>{{ session }}</td>
             <td><a href="{% url 'events:review_registrations' event.code_name session.pk %}">{{ session.get_registration_count }}</a></td>
-            <td><a href="{% url 'events:show_attendance_interface' event.code_name session.pk %}">التحضير</a></td>
+            {% if event.has_attendance %}<td><a href="{% url 'events:show_attendance_interface' event.code_name session.pk %}">التحضير</a></td>{% endif %}
         </tr>
 {% endfor %}
     </tbody>

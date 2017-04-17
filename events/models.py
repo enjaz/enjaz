@@ -52,16 +52,19 @@ class Event(models.Model):
     abstract_submission_opening_date = models.DateTimeField(u"تاريخ فتح استقبال الملخصات البحثية", null=True, blank=True)
     abstract_submission_closing_date = models.DateTimeField(u"تاريخ انتهاء إغلاق استقبال الملخصات البحثية", null=True, blank=True)
     abstract_submission_instruction_url = models.URLField(u"رابط تعليمات إرسال الأبحاث", max_length=255, blank=True, default="")
-    abstract_revision_club = models.ForeignKey(Club, null=True, blank=True,
-                                               related_name="abstract_revision_events")
     abstract_revision_team = models.ForeignKey(Team, null=True, blank=True,
                                                related_name="abstract_revision_events")
     evaluators_per_abstract = models.PositiveSmallIntegerField(u"عدد المقيمين والمقيمات لكل ملخص بحثي",
                                                               null=True, blank=True, default=2)
+    has_attendance = models.BooleanField(u"هل يستخدم الحدث نظام التحضير؟",
+                                         default=False)
+    attendance_team = models.ForeignKey(Team, null=True, blank=True,
+                                        verbose_name=u"فريق التحضير",
+                                        related_name="attendance_team_events")
     is_on_telegram = models.BooleanField(default=True,
                                          verbose_name=u"على تلغرام؟")
-    organizing_club = models.ForeignKey(Club , null=True, blank=True)
-    organizing_team = models.ForeignKey(Team, null=True, blank=True)
+    organizing_team = models.ForeignKey(Team, null=True, blank=True,
+                                        verbose_name=u"فريق التنظيم")
     priorities = models.PositiveSmallIntegerField(default=1)
     notification_email = models.EmailField(u'البريد الإلكتروني للتنبيهات', blank=True)
     #city = models.CharField(max_length=20, choices=city_choices, verbose_name=u"المدينة")

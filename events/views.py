@@ -254,8 +254,8 @@ def list_sessions_privileged(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
 
     if not request.user.is_superuser and \
-       not utils.is_organizing_team_member(request.user, session.event) and \
-       not utils.is_attendance_team_member(request.user, session.event):
+       not utils.is_organizing_team_member(request.user, event) and \
+       not utils.is_attendance_team_member(request.user, event):
         raise PermissionDenied
 
     sessions = Session.objects.filter(event=event)

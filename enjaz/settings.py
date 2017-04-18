@@ -68,7 +68,6 @@ INSTALLED_APPS = (
     'researchhub',
     'wkhtmltopdf',
     'events',
-    'certificates',
     'social.apps.django_app.default',
     'tedx',
 )

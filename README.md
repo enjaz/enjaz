@@ -8,7 +8,12 @@ students can submit activities for approval, join clubs, enter their
 
 # Licensing
 
-Copyright (C) 2014-2016 Muhammad Saeed Arabi and [Osama Khalid](https://osamakhalid.com).
+* Copyright (C) 2014-2017 [Osama Khalid](https://osamakhalid.com)
+* Copyright (C) 2014-2015 Muhammad Saeed Arabi
+* Copyright (C) 2016-2017 Abdulrahman Abdullah Alsalim
+* Copyright (C) 2016-2017 Amjaad Abdullah
+* Copyright (C) 2016-2017 Zaha al-Jamaan
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
@@ -38,6 +43,8 @@ Licensed under the General Public License version 3 of the License, or
 
 Enjaz Portal works with Python 2.7 and Django 1.8.
 
+## Get it!
+
 Get the code using git:
 
 ```
@@ -49,15 +56,13 @@ Then install all the dependencies using:
 
 ```pip install --user -r requirements.txt```
 
-# Settings
+## Set it up!
 
 Copy `enjaz/secrets.template.py`  to `enjaz/secrets.py`.
 
 The only required setting is `SECRET_KEY` which can be generated using [this tool](http://www.miniwebtool.com/django-secret-key-generator/).
 
-### Step three: Get the database sorted out
-
-After everything is set, migrate!
+Then get the database sorted out, by migrating:
 
 ```python manage.py migrate```
 
@@ -68,3 +73,5 @@ Then import sites, categories and email templates:
 Finally, create userena permissions using:
 
 ```python manage.py check_permissions```
+
+## Then enjoy!

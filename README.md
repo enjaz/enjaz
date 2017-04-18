@@ -49,7 +49,7 @@ Get the code using git:
 
 ```
 git clone https://github.com/osamak/student-portal.git enjaz
-git pull origin master
+cd enjaz
 ```
 
 Then install all the dependencies using:

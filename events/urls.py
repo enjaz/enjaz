@@ -8,6 +8,18 @@ urlpatterns = patterns('',
     url(r'^my_registration_list/$', views.list_my_registration, name="list_my_registration"),
     url(r'^barcode/$', views.show_barcode, name="show_my_barcode"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/barcode/(?P<user_pk>\d+)/$', views.show_barcode, name="show_barcode_privileged"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/barcode/(?P<user_pk>\d+)/pdf$', views.BarcodePDFView.as_view(cmd_options = {
+                'margin-top': 20,
+                'margin-right': 20,
+                'margin-left': 20,
+                'page-size': 'A7',
+            }, template_name='events/partials/badge.html', filename='Badge.pdf'), name="show_badge_pdf_privileged"),
+    url(r'^barcode/pdf$', views.BarcodePDFView.as_view(cmd_options = {
+                'margin-top': 20,
+                'margin-right': 20,
+                'margin-left': 20,
+                'page-size': 'A7',
+            }, template_name='events/partials/badge.html', filename='Badge.pdf'), name="show_badge_pdf"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/barcode_list/$', views.list_barcodes, name="list_barcodes"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/$', views.redirect_home, name="redirect_home"),
     #URL already puplished (to be changed after the end of hpc2)

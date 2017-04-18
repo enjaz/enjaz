@@ -79,6 +79,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-       migrations.RunPython(migrate_profiles,
-                            reverse_code=remove_new_profiles)
+       # This was commented out since this is the only thing that
+       # requires the deprecated arshidni app.
+
+       # migrations.RunPython(migrate_profiles,
+       #                      reverse_code=remove_new_profiles)
     ]

@@ -69,8 +69,7 @@
 <script>
 $(function(){
   url = "{% url 'events:process_barcode' session.event.code_name session.pk %}";
-  $("#barcode").keydown(function(e){
-
+  $("#barcode").keyup(function(e){
    // get keycode of current keydown event
     var code = (e.keyCode || e.which);
 
@@ -80,6 +79,7 @@ $(function(){
     }
 
     user_pk = $("#barcode").val()
+
     // If length reaches our target, or enter (code 13) is pressed on a filled input.
     if (user_pk.length == {{ BARCODE_LENGTH }} || code == 13 && user_pk.length){
         $('#loading-image').css('visibility', 'visible');

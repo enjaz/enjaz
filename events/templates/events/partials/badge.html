@@ -5,12 +5,14 @@
 	<meta charset="utf-8">
 
 <style type="text/css">
-p, h1{
-	font-family: 'Roboto', sans-serif;
+html, body{
+  height: 100%;
+  width: 90%;
 }
 
 body{
-  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
   padding: 20px;
   border-radius: 5px;
   -webkit-border-radius: 5px;
@@ -25,7 +27,7 @@ body{
 <div style="width: 100%; text-align: center;">
 {{ qrcode_value|safe }}
 </div>
-<p style="text-align: center; margin-top: -10px; color: black;"><span style="font-family: monospace;">{{ pk }}</span><br>{{ barcode_user.common_profile.get_en_short_name|default:barcode_user.username }}</p>
+<p style="text-align: center; margin-top: -10px; margin-bottom: 40px; color: black;"><span style="font-family: monospace;">{{ pk }}</span><br>{{ barcode_user.common_profile.get_en_short_name|default:barcode_user.username }}</p>
 
 </body>
 </html>

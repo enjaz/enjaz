@@ -1,15 +1,28 @@
 # -*- coding: utf-8  -*-
+import barcode
 import urllib2
 import json
-from post_office import mail
-
+import StringIO
+import qrcode
+import qrcode.image.svg
 
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 
 from core.utils import hindi_to_arabic
 from events.models import Event, SessionRegistration
+from post_office import mail
 import clubs.utils
+
+
+def can_see_all_barcodes(user, barcode_user=None, event=None):
+    if barcode_user == user or\
+       event and is_attendance_team_member(user, event) or \
+       event and is_organizing_team_member(user, event) or \
+       user.is_superuser:
+        return True
+    else:
+        return False
 
 def can_evaluate_abstracts(user, event):
     if user.is_superuser:
@@ -133,3 +146,13 @@ def get_status(user, session):
         return False
     else:
         return session_registration.is_approved
+
+def get_barcode(text):
+    qrcode_output = StringIO.StringIO()
+    qrcode.make(text, image_factory=qrcode.image.svg.SvgImage, version=3).save(qrcode_output)
+    qrcode_value = "".join(qrcode_output.getvalue().split('\n')[1:])
+    CODE128 = barcode.get_barcode_class('code128')
+    one_dimensional_output = CODE128(text)
+    one_dimensional_value = "".join([line.strip() for line in one_dimensional_output.render({'module_width': 0.4}).split('\n')[4:]])
+
+    return qrcode_value, one_dimensional_value

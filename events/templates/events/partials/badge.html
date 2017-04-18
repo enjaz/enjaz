@@ -1,0 +1,31 @@
+<!DOCTYPE html>{% load staticfiles %}
+<html lang="en" dir="ltr">
+<head>
+	<title>Event Badge</title>
+	<meta charset="utf-8">
+
+<style type="text/css">
+p, h1{
+	font-family: 'Roboto', sans-serif;
+}
+
+body{
+  height: 100%;
+  padding: 20px;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border: 4px solid #B08D2E;
+}
+</style>
+</head>
+<body>
+<div style="width: 100%; text-align: center;">
+<img style="max-width: 50%; margin-top: 20px; margin-bottom: 10px; margin-right: auto; marign-left: auto;" src="{{ image_url }}">
+</div>
+<div style="width: 100%; text-align: center;">
+{{ qrcode_value|safe }}
+</div>
+<p style="text-align: center; margin-top: -10px; color: black;"><span style="font-family: monospace;">{{ pk }}</span><br>{{ barcode_user.common_profile.get_en_short_name|default:barcode_user.username }}</p>
+
+</body>
+</html>

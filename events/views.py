@@ -2,6 +2,7 @@
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db.models import Count
@@ -10,11 +11,8 @@ from django.views.decorators import csrf
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from post_office import mail
-import StringIO
-import barcode
+from wkhtmltopdf.views import PDFTemplateView
 import os.path
-import qrcode
-import qrcode.image.svg
 
 from core import decorators
 from clubs.models import Team, college_choices
@@ -758,25 +756,20 @@ def show_barcode(request, event_code_name=None, user_pk=None):
     if user_pk and event_code_name:
         event = get_object_or_404(Event, code_name=event_code_name,
                                   has_attendance=True)
-        if not utils.is_attendance_team_member(request.user, event) and \
-           not utils.is_organizing_team_member(request.user, event) and \
-           not request.user.is_superuser:
-            raise PermissionDenied
-        else:
-            barcode_user = get_object_or_404(User, pk=user_pk)
+        barcode_user = get_object_or_404(User, pk=user_pk)
     else:
+        event = None
         barcode_user = request.user
 
-    pk = ("{:0%s}" % BARCODE_LENGTH).format(barcode_user.pk)
+    if not utils.can_see_all_barcodes(request.user, barcode_user, event):
+        raise PermissionDenied
 
-    qrcode_output = StringIO.StringIO()
-    qrcode.make(pk, image_factory=qrcode.image.svg.SvgImage, version=3).save(qrcode_output)
-    qrcode_value = "".join(qrcode_output.getvalue().split('\n')[1:])
-    CODE128 = barcode.get_barcode_class('code128')
-    one_dimensional_output = CODE128(pk)
-    one_dimensional_value = "".join([line.strip() for line in one_dimensional_output.render({'module_width': 0.4}).split('\n')[4:]])
+    pk = ("{:0%s}" % BARCODE_LENGTH).format(barcode_user.pk)
+    qrcode_value, one_dimensional_value = utils.get_barcode(pk)
 
     context = {'qrcode_value' : qrcode_value,
+               'pk': pk,
+               'event': event,
                'one_dimensional_value': one_dimensional_value,
                'barcode_user': barcode_user}
     return render(request, 'events/show_barcode.html', context)
@@ -876,3 +869,34 @@ def show_attendance_interface(request, event_code_name, pk):
                'form': form}
 
     return render(request, 'events/show_attendance_interface.html', context)
+
+class BarcodePDFView(PDFTemplateView):
+    def get_context_data(self, **kwargs):
+        context = super(BarcodePDFView, self).get_context_data(**kwargs)
+
+        event_code_name = self.kwargs.get('event_code_name')
+        user_pk = self.kwargs.get('user_pk')
+
+        if user_pk and event_code_name:
+            event = get_object_or_404(Event, code_name=event_code_name,
+                                          has_attendance=True)
+            barcode_user = get_object_or_404(User, pk=user_pk)
+        else:
+            event = None
+            barcode_user = self.request.user
+
+        if not utils.can_see_all_barcodes(self.request.user, barcode_user, event):
+            raise PermissionDenied
+
+        pk = ("{:0%s}" % BARCODE_LENGTH).format(barcode_user.pk)
+        qrcode_value, one_dimensional_value = utils.get_barcode(pk)
+        image_url = static('img/hpc.png')
+        image_url = self.request.build_absolute_uri(image_url)
+
+        new_context = {'qrcode_value' : qrcode_value, 'pk': pk,
+                       'event': event, 'image_url': image_url,
+                       'one_dimensional_value': one_dimensional_value,
+                       'barcode_user': barcode_user}
+        context.update(new_context)
+        print context
+        return context

@@ -115,29 +115,14 @@ DEFAULT_DATABASES = {
             'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
     }
-
 DATABASES = getattr(secrets, 'DATABASES', DEFAULT_DATABASES)
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.8/topics/i18n/
-
 LANGUAGE_CODE = 'ar-SA'
-
 TIME_ZONE = 'Asia/Riyadh'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ= True
-
-AUTHENTICATION_BACKENDS = (
-    'userena.backends.UserenaAuthenticationBackend',
-    'guardian.backends.ObjectPermissionBackend',
-    'social.backends.twitter.TwitterOAuth',
-    'django.contrib.auth.backends.ModelBackend',
-)
-
 
 STATIC_URL = getattr(secrets, 'STATIC_URL', '/static/')
 DEFAULT_STATIC_ROOT = os.path.join(BASE_DIR, 'static_files/')
@@ -146,6 +131,25 @@ MEDIA_URL = getattr(secrets, 'MEDIA_URL', '/media/')
 DEFAULT_MEDIA_ROOT = os.path.join(BASE_DIR, 'media_files/')
 MEDIA_ROOT = getattr(secrets, 'MEDIA_ROOT', DEFAULT_MEDIA_ROOT)
 
+# Email settings
+EMAIL_USE_TLS = getattr(secrets, 'EMAIL_USE_TLS', None)
+EMAIL_HOST = getattr(secrets, 'EMAIL_HOST', None)
+EMAIL_PORT = getattr(secrets, 'EMAIL_PORT', None)
+EMAIL_HOST_USER = getattr(secrets, 'EMAIL_HOST_USER', None)
+EMAIL_HOST_PASSWORD = getattr(secrets, 'EMAIL_HOST_PASSWORD', None)
+DEFAULT_FROM_EMAIL = 'noreply@enjazportal.com'
+SERVER_EMAIL = 'errors@enjazportal.com'
+EMAIL_BACKEND = getattr(secrets, "EMAIL_BACKEND", "django.core.mail.backends.dummy.EmailBackend")
+ADMINS = [('Errors', 'errors@enjazportal.com')]
+
+
+# Userena settings
+AUTHENTICATION_BACKENDS = (
+    'userena.backends.UserenaAuthenticationBackend',
+    'guardian.backends.ObjectPermissionBackend',
+    'social.backends.twitter.TwitterOAuth',
+    'django.contrib.auth.backends.ModelBackend',
+)
 SITE_ID = 1
 ANONYMOUS_USER_ID = -1
 AUTH_PROFILE_MODULE = 'accounts.EnjazProfile'
@@ -158,13 +162,18 @@ USERENA_SIGNOUT_REDIRECT_URL = '/'
 USERENA_WITHOUT_USERNAMES = True
 USERENA_ACTIVATION_RETRY = True
 USERENA_ACTIVATION_DAYS = 30
+
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+}
+
+
+# Form app settings
+
 FORMS_BUILDER_USE_SLUGS = False
 FORMS_BUILDER_USE_SITES = False
 FORMS_BUILDER_CHOICES_SEPARATOR = '/'
-SESSION_ENGINE = 'django.contrib.sessions.backends.file'
-EMAIL_BACKEND = getattr(secrets, "EMAIL_BACKEND", "django.core.mail.backends.dummy.EmailBackend")
-SOCIAL_AUTH_TWITTER_KEY = getattr(secrets, "SOCIAL_AUTH_TWITTER_KEY", "")
-SOCIAL_AUTH_TWITTER_SECRET = getattr(secrets, "SOCIAL_AUTH_TWITTER_SECRET", "")
+
 SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.social_auth.social_details',
     'social.pipeline.social_auth.social_uid',
@@ -174,6 +183,26 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.social_auth.load_extra_data',
     'social.pipeline.user.user_details',
 )
+
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+CONSTANCE_CONFIG = {
+    'STUDENTVOICE_THRESHOLD': (30, 'What is the point threshold on which voices should be sent to their recipients?'),
+    'DEBATE_URL': ('',''),
+}
+
+
+# External API keys
+SOCIAL_AUTH_TWITTER_KEY = getattr(secrets, "SOCIAL_AUTH_TWITTER_KEY", "")
+SOCIAL_AUTH_TWITTER_SECRET = getattr(secrets, "SOCIAL_AUTH_TWITTER_SECRET", "")
 ENJAZACCOUNTS_TWITTER_KEY = getattr(secrets, "ENJAZACCOUNTS_TWITTER_KEY", "")
 ENJAZACCOUNTS_TWITTER_SECRET = getattr(secrets, "ENJAZACCOUNTS_TWITTER_SECRET", "")
+BITLY_KEY = getattr(secrets, "BITLY_KEY", None)
+
+
 WKHTMLTOPDF_CMD =  getattr(secrets, "WKHTMLTOPDF_CMD", None)
+
+# Security settings
+CORS_ORIGIN_ALLOW_ALL = True
+SESSION_COOKIE_DOMAIN = getattr(secrets, "SESSION_COOKIE_DOMAIN", None)
+CSRF_COOKIE_DOMAIN = getattr(secrets, "CSRF_COOKIE_DOMAIN", None)
+SECURE_HSTS_SECONDS = getattr(secrets, "SECURE_HSTS_SECONDS", None)

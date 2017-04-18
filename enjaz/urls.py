@@ -25,7 +25,6 @@ urlpatterns = [
     activity_forms_urls,
     url(r'^activities/admin/', include(invitation_admin.urls)),
     url(r'^activities/', include('activities.urls', namespace="activities")),
-    url(r'^certificates/', include('certificates.urls', namespace="certificates")),
     club_forms_urls,
     url(r'^clubs/', include('clubs.urls', namespace="clubs")),
     url(r'^bulb/admin/', include(bulb_admin.urls)),
@@ -51,7 +50,6 @@ urlpatterns = [
     url(r'^accounts/', include('userena.urls')),
     url(r'^questions/', include('questions.urls', namespace="cultural_program_code")),
     url(r'^tagging_autocomplete/', include('tagging_autocomplete.urls')),
-    #url('', include('social.apps.django_app.urls', namespace='social')),
 ]
 
 if settings.DEBUG:

@@ -140,11 +140,11 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-STATIC_URL = '/static/'
+STATIC_URL = getattr(secrets, 'STATIC_URL', '/static/')
 DEFAULT_STATIC_ROOT = os.path.join(BASE_DIR, 'static_files/')
 STATIC_ROOT = getattr(secrets, 'STATIC_ROOT', DEFAULT_STATIC_ROOT)
-MEDIA_URL = '/media/'
-DEFAULT_MEDIA_ROOT = os.path.join(BASE_DIR, '/media_files/')
+MEDIA_URL = getattr(secrets, 'MEDIA_URL', '/media/')
+DEFAULT_MEDIA_ROOT = os.path.join(BASE_DIR, 'media_files/')
 MEDIA_ROOT = getattr(secrets, 'MEDIA_ROOT', DEFAULT_MEDIA_ROOT)
 
 SITE_ID = 1

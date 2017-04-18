@@ -1,4 +1,5 @@
 from django.conf.urls import patterns, url,include
+from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 from events import views
@@ -8,18 +9,18 @@ urlpatterns = patterns('',
     url(r'^my_registration_list/$', views.list_my_registration, name="list_my_registration"),
     url(r'^barcode/$', views.show_barcode, name="show_my_barcode"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/barcode/(?P<user_pk>\d+)/$', views.show_barcode, name="show_barcode_privileged"),
-    url(r'^(?P<event_code_name>[\d\w_\-]+)/barcode/(?P<user_pk>\d+)/pdf$', views.BarcodePDFView.as_view(cmd_options = {
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/barcode/(?P<user_pk>\d+)/pdf$', login_required(views.BarcodePDFView.as_view(cmd_options = {
                 'margin-top': 20,
                 'margin-right': 20,
                 'margin-left': 20,
                 'page-size': 'A7',
-            }, template_name='events/partials/badge.html', filename='Badge.pdf'), name="show_badge_pdf_privileged"),
-    url(r'^barcode/pdf$', views.BarcodePDFView.as_view(cmd_options = {
+            }, template_name='events/partials/badge.html', filename='Badge.pdf')), name="show_badge_pdf_privileged"),
+    url(r'^barcode/pdf$', login_required(views.BarcodePDFView.as_view(cmd_options = {
                 'margin-top': 10,
                 'margin-right': 10,
                 'margin-left': 10,
                 'page-size': 'A7',
-            }, template_name='events/partials/badge.html', filename='Badge.pdf'), name="show_badge_pdf"),
+            }, template_name='events/partials/badge.html', filename='Badge.pdf')), name="show_badge_pdf"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/barcode_list/$', views.list_barcodes, name="list_barcodes"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/$', views.redirect_home, name="redirect_home"),
     #URL already puplished (to be changed after the end of hpc2)

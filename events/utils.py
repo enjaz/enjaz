@@ -211,3 +211,18 @@ def email_badge(user, event, my_registration_url):
     except ValidationError:
         return False
     return True
+
+def get_user_regestration_events(user):
+    if not user.is_authenticated():
+        return Event.objects.none()
+    elif user.is_superuser:
+        user_events = Event.objects.all()
+    else:
+        user_events = (Event.objects.filter(registration_team__members=user) | \
+                       Event.objects.filter(registration_team__coordinator=user)).distinct()
+    return user_events
+
+def is_regestrations_team_member(user, event):
+    user_events = get_user_regestration_events(user)
+    return user_events.filter(pk=event.pk).exists()
+

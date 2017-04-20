@@ -205,7 +205,7 @@ def email_badge(user, event, my_registration_url):
     notification_email = event.get_notification_email()
     try:
         mail.send([user.email],
-                  notification_email,
+                  u"بوابة إنجاز <{}>".format(notification_email),
                   template="event_badge_notification",
                   context=email_context,
                   attachments=attachments)

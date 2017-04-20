@@ -20,8 +20,9 @@ import accounts.utils
 import clubs.utils
 
 
-WKHTMLTOPDF_OPTIONS = {'margin-top': 20, 'margin-right': 20,
-                       'margin-left': 20, 'page-size': 'A7', }
+WKHTMLTOPDF_OPTIONS = {'margin-top': 10, 'margin-right': 10,
+                       'margin-left': 10, 'margin-bottom': 5,
+                       'page-size': 'A7', }
 BARCODE_LENGTH = 8
 
 def can_see_all_barcodes(user, barcode_user=None, event=None):
@@ -211,3 +212,18 @@ def email_badge(user, event, my_registration_url):
     except ValidationError:
         return False
     return True
+
+def get_user_regestration_events(user):
+    if not user.is_authenticated():
+        return Event.objects.none()
+    elif user.is_superuser:
+        user_events = Event.objects.all()
+    else:
+        user_events = (Event.objects.filter(registration_team__members=user) | \
+                       Event.objects.filter(registration_team__coordinator=user)).distinct()
+    return user_events
+
+def is_regestrations_team_member(user, event):
+    user_events = get_user_regestration_events(user)
+    return user_events.filter(pk=event.pk).exists()
+

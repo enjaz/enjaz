@@ -12,6 +12,7 @@ from django.utils import timezone
 from core.utils import hindi_to_arabic
 from events.models import Event, SessionRegistration
 from post_office import mail
+import accounts.utils
 import clubs.utils
 
 
@@ -156,3 +157,15 @@ def get_barcode(text):
     one_dimensional_value = "".join([line.strip() for line in one_dimensional_output.render({'module_width': 0.4}).split('\n')[4:]])
 
     return qrcode_value, one_dimensional_value
+
+def get_user_sidebar_events(user):
+    user_city = accounts.utils.get_user_city(user)
+    event_pool = Event.objects.filter(end_date__gte=timezone.now().date(),
+                                      session__isnull=False)
+    if user_city:
+        events = event_pool.filter(city=user_city) | \
+                 event_pool.filter(city="")
+    else: # if superuser
+        events = event_pool
+
+    return events.distinct()

@@ -144,6 +144,12 @@ you?
                     </li>
                     {% endif %}
                     <li>
+                        <a href="{% url 'events:show_my_barcode' %}">
+                            <i class="fa fa-id-badge"></i>
+                            <span>بطاقتي</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="{% url 'events:list_my_registration' %}">
                             <i class="entypo-pencil"></i>
                             <span>تسجيلاتي</span>
@@ -177,6 +183,24 @@ you?
                 </a>
             </li>
             {% endif %}
+            {% if user|has_user_sidebar_events %}
+            <li>
+                <a>
+                    <i class="entypo-calendar"></i>
+                    <span>التسجيل في الأنشطة الكبرى</span>
+                </a>
+                <ul>
+                {% for event in user|get_user_sidebar_events %}
+                <li>
+                    <a href="{% url 'events:list_timeslots' event.code_name %}">
+                        <i class="entypo-calendar"></i>
+                        <span>{{ event.get_html_name|safe }}</span>
+                    </a>
+                </li>
+               {% endfor %}
+               </ul>
+             </li>
+            {% endif %}
             {% if user|has_user_organizing_events or user|has_user_abstract_revision_events %}
             <li>
                 <a>
@@ -188,7 +212,7 @@ you?
                 <li>
                     <a>
                         <i class="entypo-calendar"></i>
-                        <span class="english-field">{{ event.official_name }}</span>
+                        <span>{{ event.get_html_name|safe }}</span>
                     </a>
                     <ul>{% if user|is_organizing_team_member:event or user|is_attendance_team_member:event or user.is_superuser %}
                         <li>

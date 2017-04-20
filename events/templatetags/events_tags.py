@@ -1,7 +1,9 @@
 from django import template
+from django.utils import timezone
 
 from events import utils
 from events.models import SessionRegistration, TimeSlot
+
 
 register = template.Library()
 
@@ -32,6 +34,14 @@ def has_user_abstract_revision_events(user):
 @register.filter
 def get_user_abstract_revision_events(user):
     return utils.get_user_abstract_revision_events(user)
+
+@register.filter
+def get_user_sidebar_events(user):
+    return utils.get_user_sidebar_events(user)
+
+@register.filter
+def has_user_sidebar_events(user):
+    return utils.get_user_sidebar_events(user).exists()
 
 @register.filter
 def get_session_priority(registration, session):

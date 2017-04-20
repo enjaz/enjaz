@@ -67,7 +67,8 @@ class Event(models.Model):
                                         verbose_name=u"فريق التنظيم")
     priorities = models.PositiveSmallIntegerField(default=1)
     notification_email = models.EmailField(u'البريد الإلكتروني للتنبيهات', blank=True)
-    #city = models.CharField(max_length=20, choices=city_choices, verbose_name=u"المدينة")
+    city = models.CharField(u"المدينة", max_length=20,
+                            choices=city_choices, default="")
 
     def is_on_sidebar(self, user):
         if user.is_superuser or \

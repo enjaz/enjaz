@@ -61,6 +61,9 @@ class Event(models.Model):
     attendance_team = models.ForeignKey(Team, null=True, blank=True,
                                         verbose_name=u"فريق التحضير",
                                         related_name="attendance_team_events")
+    registration_team = models.ForeignKey(Team, null=True, blank=True,
+                                        verbose_name=u"فريق التسجيل",
+                                        related_name="registration_team_events")
     is_on_telegram = models.BooleanField(default=True,
                                          verbose_name=u"على تلغرام؟")
     organizing_team = models.ForeignKey(Team, null=True, blank=True,

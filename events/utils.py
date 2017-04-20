@@ -20,8 +20,9 @@ import accounts.utils
 import clubs.utils
 
 
-WKHTMLTOPDF_OPTIONS = {'margin-top': 20, 'margin-right': 20,
-                       'margin-left': 20, 'page-size': 'A7', }
+WKHTMLTOPDF_OPTIONS = {'margin-top': 10, 'margin-right': 10,
+                       'margin-left': 10, 'margin-bottom': 5,
+                       'page-size': 'A7', }
 BARCODE_LENGTH = 8
 
 def can_see_all_barcodes(user, barcode_user=None, event=None):

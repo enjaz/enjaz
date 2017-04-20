@@ -199,8 +199,9 @@ ENJAZACCOUNTS_TWITTER_KEY = getattr(secrets, "ENJAZACCOUNTS_TWITTER_KEY", "")
 ENJAZACCOUNTS_TWITTER_SECRET = getattr(secrets, "ENJAZACCOUNTS_TWITTER_SECRET", "")
 BITLY_KEY = getattr(secrets, "BITLY_KEY", None)
 
-
-WKHTMLTOPDF_CMD =  getattr(secrets, "WKHTMLTOPDF_CMD", None)
+# Only set WKHTMLTOPDF_CMD if it isn't there.
+if getattr(secrets, "WKHTMLTOPDF_CMD", False):
+    WKHTMLTOPDF_CMD =  getattr(secrets, "WKHTMLTOPDF_CMD")
 
 # Security settings
 CORS_ORIGIN_ALLOW_ALL = True

@@ -58,7 +58,7 @@ Then install all the dependencies using:
 
 ## Set it up!
 
-Copy `enjaz/enjaz/secrets.template.py`  to `enjaz/enjaz/secrets.py`.
+Copy `enjaz/secrets.template.py`  to `enjaz/secrets.py`.
 
 The only required setting in `secrets.py` is `SECRET_KEY` which can be generated using [this tool](http://www.miniwebtool.com/django-secret-key-generator/).
 

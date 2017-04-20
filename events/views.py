@@ -554,7 +554,7 @@ def review_registrations(request, event_code_name, pk):
                                 event__code_name=event_code_name,
                                 pk=pk)
     event = session.event
-    if not utils.is_organizing_team_member(request.user, event):
+    if not utils.is_organizing_team_member(request.user, event) and not utils.is_regestrations_team_member(request.user, event):
         raise PermissionDenied
 
     approved_registrations = SessionRegistration.objects.filter(session=session, is_deleted=False, is_approved=True)

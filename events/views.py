@@ -253,7 +253,8 @@ def list_sessions_privileged(request, event_code_name):
 
     if not request.user.is_superuser and \
        not utils.is_organizing_team_member(request.user, event) and \
-       not utils.is_attendance_team_member(request.user, event):
+       not utils.is_attendance_team_member(request.user, event) and\
+            not utils.is_regestrations_team_member(request.user,event):
         raise PermissionDenied
 
     sessions = Session.objects.filter(event=event)
@@ -455,7 +456,7 @@ def show_session_privileged(request, event_code_name, pk):
     event = get_object_or_404(Event, code_name=event_code_name)
     session = get_object_or_404(Session, pk=pk, event=event)
     if not utils.is_organizing_team_member(request.user, event) and \
-       not request.user.is_superuser:
+       not request.user.is_superuser and not utils.is_regestrations_team_member(request.user,event):
         raise PermissionDenied
 
     return render(request, 'events/session_show_privileged.html',

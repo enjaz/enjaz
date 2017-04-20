@@ -8,6 +8,10 @@ from events.models import SessionRegistration, TimeSlot
 register = template.Library()
 
 @register.filter
+def is_regestrations_team_member(user, event):
+    return utils.is_regestrations_team_member(user, event)
+
+@register.filter
 def is_organizing_team_member(user, event):
     return utils.is_organizing_team_member(user, event)
 

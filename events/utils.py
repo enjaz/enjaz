@@ -6,15 +6,23 @@ import StringIO
 import qrcode
 import qrcode.image.svg
 
+from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.http import HttpResponseRedirect
+from django.template.loader import get_template
 from django.utils import timezone
 
 from core.utils import hindi_to_arabic
-from events.models import Event, SessionRegistration
 from post_office import mail
+from wkhtmltopdf.utils import render_pdf_from_template
+from .models import Event, SessionRegistration
 import accounts.utils
 import clubs.utils
 
+
+WKHTMLTOPDF_OPTIONS = {'margin-top': 20, 'margin-right': 20,
+                       'margin-left': 20, 'page-size': 'A7', }
+BARCODE_LENGTH = 8
 
 def can_see_all_barcodes(user, barcode_user=None, event=None):
     if barcode_user == user or\
@@ -169,3 +177,37 @@ def get_user_sidebar_events(user):
         events = event_pool
 
     return events.distinct()
+
+def render_badge_pdf(user):
+    text = ("{:0%s}" % BARCODE_LENGTH).format(user.pk)
+    qrcode_value, one_dimensional_value = get_barcode(text)
+    image_url = "https://enjazportal.com/static/static/img/hpc.png"
+    context = {'qrcode_value': qrcode_value,
+               'image_url': image_url,
+               'barcode_user': user,
+               'one_dimensional_value': one_dimensional_value}
+    qrcode_output = StringIO.StringIO()
+    badge_template = get_template("events/partials/badge.html")
+    pdf_content = render_pdf_from_template(badge_template,
+                                        header_template=None,
+                                        footer_template=None,
+                                        context=context,
+                                        cmd_options=WKHTMLTOPDF_OPTIONS.copy())
+    return pdf_content
+
+def email_badge(user, event, my_registration_url):
+    email_context = {'event_user': user,
+                     'my_registration_url': my_registration_url,
+                     'event': event}
+    pdf_content = render_badge_pdf(user)
+    attachments = {'Badge.pdf': ContentFile(pdf_content)}
+    notification_email = event.get_notification_email()
+    try:
+        mail.send([user.email],
+                  notification_email,
+                  template="event_badge_notification",
+                  context=email_context,
+                  attachments=attachments)
+    except ValidationError:
+        return False
+    return True

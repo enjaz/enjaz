@@ -11,7 +11,6 @@ from django.contrib import messages
 from accounts.forms import EditStudentCommonProfile, ResendForm
 from clubs.models import city_choices
 from userena.models import UserenaSignup
-from userena.utils import get_datetime_now
 
 
 def resend_confirmation_key(request):
@@ -22,7 +21,6 @@ def resend_confirmation_key(request):
             email = form.cleaned_data['email']
             try:
                 user = User.objects.get(email__iexact=email)
-                userena_signup = user.userena_signup
             except User.DoesNotExist:
                 context["error"] = u"nonexistent"
                 user = None
@@ -30,6 +28,7 @@ def resend_confirmation_key(request):
                 if user.is_active:
                     context["error"] = "already_active"
                 else:
+                    userena_signup = user.userena_signup
                     new_key = UserenaSignup.objects.reissue_activation(userena_signup.activation_key)
                     if new_key:
                         return render(request, 'userena/activate_retry_success.html')

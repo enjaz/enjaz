@@ -25,8 +25,8 @@ class Command(BaseCommand):
         event = Event.objects.get(code_name=options['event_code_name'])
         event_users = User.objects.filter(session_registrations__session__event=event,
                                           session_registrations__is_deleted=False)\
+                                  .exclude(session_registrations__badge_sent=False)\
                                   .distinct()
-                                  #.exclude(session_registrations__badge_sent=False)\
         domain = Site.objects.get_current().domain
         my_registration_url = "https://{}{}".format(domain,
                                                     reverse('events:list_my_registration'))

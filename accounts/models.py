@@ -54,6 +54,8 @@ class CommonProfile(models.Model):
 
     canceled_twitter_connection = models.BooleanField(default=False,
                                                       verbose_name=u"ألغى طلب الربط بتويتر؟")
+    scfhs_number = models.CharField(max_length=255, null=True, default="", blank=True,
+                                   verbose_name=u'SCFHS Registration Number')
     # Fields specific for students
     student_id = models.IntegerField(null=True, blank=True,
                                      verbose_name=u'الرقم الجامعي')

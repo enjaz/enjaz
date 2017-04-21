@@ -1,0 +1,183 @@
+{% extends 'userena/base_userena.html' %}{% load staticfiles %}
+
+{% block title %}تحديث المعلومات على إنجاز{% endblock %}
+{% block description %}فضلًا استخدم النموذج التالي لتحديث بياناتك على بوّابة إنجاز.{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+<div class="alert alert-success">
+    {% for message in messages %}
+    <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+	<p{% if message.tags %} class="{{ message.tags }}"{% endif %}>يمكنك العودة للصفحة الرئيسية <a href="{% url "home" %}"> من هنا</a></p>
+
+    {% endfor %}
+</div>
+{% endif %}
+
+<p class="dinar-light enjaz-warning"><i class="entypo-info"></i> أدناه معلوماتكم المسجّلة على بوابة إنجاز.  تستخدم هذه المعلومات عند التسجيل في أنشطة نادي الطلاب، ولاستصدار الشهادات، وتعرض في مختلف أجزاء البوابة مثل برنامج نقاطي ومبادرة سِراج.</p>
+
+
+<form method="post" role="form" id="form_register">
+        {% csrf_token %}
+
+	<div class="dinar-light">
+            {# =%= arabic name #}
+			<div class="form-group" top>
+                                <label class="control-label">الاسم بالعربية</label>
+				<div class="input-group{% if form.ar_first_name.errors or form.ar_middle_name.errors or form.ar_last_name.errors %} validate-has-error{% endif %}" required="required">
+					<div class="input-group-addon">
+						<i class="entypo-user"></i>
+					</div>
+
+					<input {% if form.ar_first_name.value and not form.ar_first_name.errors %}value="{{ form.ar_first_name.value }}" {% endif %}type="text" class="form-control" name="ar_first_name" id="ar_first_name" placeholder="{{ form.ar_first_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" required="required"/>
+					{% if form.ar_first_name.errors %}
+					    {% for error in form.ar_first_name.errors %}
+					        <label class='error' for='ar_first_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if form.ar_middle_name.value and not form.ar_middle_name.errors %}value="{{ form.ar_middle_name.value }}" {% endif %}type="text" class="form-control" name="ar_middle_name" id="ar_middle_name" placeholder="{{ form.ar_middle_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" required="required"/>
+					{% if form.ar_middle_name.errors %}
+					    {% for error in form.ar_middle_name.errors %}
+					        <label class='error' for='ar_middle_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if form.ar_last_name.value and not form.ar_last_name.errors %}value="{{ form.ar_last_name.value }}" {% endif %}type="text" class="form-control" name="ar_last_name" id="ar_last_name" placeholder="{{ form.ar_last_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" required="required"/>
+					{% if form.ar_last_name.errors %}
+					    {% for error in form.ar_last_name.errors %}
+					        <label class='error' for='ar_last_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+            {# =%= english name #}
+			<div class="form-group">
+                                <label class="control-label">الاسم بالإنجليزية</label>
+				<div class="english-field input-group{% if form.en_first_name.errors or form.en_middle_name.errors or form.en_last_name.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-user"></i>
+					</div>
+
+					<input {% if form.en_first_name.value and not form.en_first_name.errors %}value="{{ form.en_first_name.value }}" {% endif %}type="text" class="form-control" name="en_first_name" id="en_first_name" placeholder="{{ form.en_first_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" required="required"/>
+					{% if form.en_first_name.errors %}
+					    {% for error in form.en_first_name.errors %}
+					        <label class='dinar-light error' for='en_first_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if form.en_middle_name.value and not form.en_middle_name.errors %}value="{{ form.en_middle_name.value }}" {% endif %}type="text" class="form-control" name="en_middle_name" id="en_middle_name" placeholder="{{ form.en_middle_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" required="required"/>
+					{% if form.en_middle_name.errors %}
+					    {% for error in form.en_middle_name.errors %}
+					        <label class='dinar-light error' for='en_middle_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+					<input {% if form.en_last_name.value and not form.en_last_name.errors %}value="{{ form.en_last_name.value }}" {% endif %}type="text" class="form-control" name="en_last_name" id="en_last_name" placeholder="{{ form.en_last_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" required="required"/>
+					{% if form.en_last_name.errors %}
+					    {% for error in form.en_last_name.errors %}
+					        <label class='dinar-light error' for='en_last_name' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+            {# =%= mobile number #}
+			<div class="form-group">
+				<div class="input-group{% if form.mobile_number.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-mobile"></i>
+					</div>
+					<input {% if form.mobile_number.value and not form.badge_number.errors %}value="{{ form.mobile_number.value }}" {% endif %}type="text" class="form-control" name="mobile_number" id="mobile_number" placeholder="{{ form.mobile_number.label }}" data-mask="[\d\+]+" data-is-regex="true"/>
+					{% if form.mobile_number.errors %}
+					    {% for error in form.mobile_number.errors %}
+					        <label class='error' for='mobile_number' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+            {#=%= mimmic job discription for college name #}
+			<div class="form-group">
+				<div class="input-group{% if form.affiliation.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-vcard"></i>
+					</div>
+					<input {% if form.affiliation.value and not form.affiliation.errors %}value="{{ form.affiliation.value }}" {% endif %}type="text" class="form-control" name="affiliation" id="affiliation" placeholder="{{ form.affiliation.label }}" required="required"/>
+					{% if form.affiliation.errors %}
+					    {% for error in form.affiliation.errors %}
+					        <label class='error' for='affiliation' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+            {#=%= mimmic job discription for city  #}
+			<div class="form-group">
+				<div class="input-group{% if form.city.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-vcard"></i>
+					</div>
+
+					<input {% if form.city.value and not form.city.errors %}value="{{ form.city.value }}" {% endif %}type="text" class="form-control" name="city" id="city" placeholder="{{ form.city.label }}" required="required"/>
+					{% if form.city.errors %}
+					    {% for error in form.city.errors %}
+					        <label class='error' for='city' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+
+
+			<div class="form-group">
+				<div class="input-group{% if form.gender.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-docs"></i>
+					</div>
+					<select {% if form.gender.value and not form.gender.errors %}value="{{ form.gender.value }}" {% endif %}class="form-control" id="gender" name="gender"  title="{{ form.gender.label }}" required="required">
+                                                <option value="">{{ form.gender.label }}</option>
+                                                {% for value, label in form.fields.gender.widget.choices %}
+                                                <option {% if form.gender.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
+					</select>
+					{% if form.gender.errors %}
+					    {% for error in form.gender.errors %}
+					        <label class='error' for='city' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+    
+            <div class="form-group">
+				<div class="input-group{% if form.scfhs_number.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-vcard"></i>
+					</div>
+					<input {% if form.scfhs_number.value and not form.scfhs_number.errors %}value="{{ form.scfhs_number.value }}" {% endif %}type="text" class="form-control" name="scfhs_number" id="scfhs_number" placeholder="{{ form.scfhs_number.label }}"/>
+					{% if form.scfhs_number.errors %}
+					    {% for error in form.scfhs_number.errors %}
+					        <label class='error' for='scfhs_number' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+                <p class="english-field" style="color:white">Optional</p>
+			</div>
+
+
+			<div class="form-group">
+				<button type="submit" class="btn btn-success btn-block btn-login">
+					<i class="entypo-left-open-mini"></i>
+					حدّث
+				</button>
+			</div>
+	</div>
+</form>
+
+{% endblock %}
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.css' %}" id="style-resource-3">
+<link rel="stylesheet" href="{% static 'css/tooltipster.min.css' %}">
+<script src="{% static 'neon/assets/js/selectboxit/jquery.selectBoxIt.min.js' %}" id="script-resource-11"></script>
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+<script src="{% static 'neon/assets/js/jquery.inputmask.bundle.min.js' %}"></script>
+<script src="{% static 'js/jquery.tooltipster.min.js' %}"></script>
+<script type="application/javascript">
+        $(function() {
+            $('.tooltip-jquery').tooltipster();
+        });
+</script>>
+{% include 'userena/partials/college_selection.html' %}
+{% endblock %}

@@ -1,33 +1,58 @@
 <!DOCTYPE html>{% load staticfiles %}
 <html lang="en" dir="ltr">
+
 <head>
 	<title>Event Badge</title>
 	<meta charset="utf-8">
+	<link href="https://fonts.googleapis.com/css?family=Asar|Roboto+Mono" rel="stylesheet">
+	<style type="text/css">
+		html,
+		body {
+			height: 100%;
+			width: 90%;
+		}
 
-<style type="text/css">
-html, body{
-  height: 100%;
-  width: 90%;
-}
+		body {
+			padding: 20px;
+			margin-left: auto;
+			margin-right: auto;
+			border-radius: 5px;
+			-webkit-border-radius: 5px;
+			border: 4px solid #B08D2E;
+		}
 
-body{
-  margin-left: auto;
-  margin-right: auto;
-  padding: 20px;
-  border-radius: 5px;
-  -webkit-border-radius: 5px;
-  border: 4px solid #B08D2E;
-}
-</style>
+		.wrapper {
+			width: 100%;
+			text-align: center;
+		}
+
+		#id {
+			font-family: 'Roboto Mono', monospace;
+		}
+
+		#name {
+			text-align: center;
+			margin-top: -10px;
+			margin-bottom: 40px;
+			color: black;
+			font-family: 'Asar', serif;
+		}
+
+		#logo {
+			max-width: 50%;
+			margin: 20px auto 10px;
+		}
+	</style>
 </head>
-<body>
-<div style="width: 100%; text-align: center;">
-<img style="max-width: 50%; margin-top: 20px; margin-bottom: 10px; margin-right: auto; marign-left: auto;" src="{{ image_url }}">
-</div>
-<div style="width: 100%; text-align: center;">
-{{ qrcode_value|safe }}
-</div>
-<p style="text-align: center; margin-top: -10px; margin-bottom: 40px; color: black;"><span style="font-family: monospace;">{{ pk }}</span><br>{{ barcode_user.common_profile.get_en_short_name|default:barcode_user.username }}</p>
 
+<body>
+	<div class="wrapper">
+		<img id="logo" src="{{ image_url }}">
+	</div>
+	<div class="wrapper">
+		{{ qrcode_value|safe }}
+	</div>
+	<p id="name"><span id="id">{{ text }}</span><br>{{ barcode_user.common_profile.get_en_short_name|default:barcode_user.username }}</p>
 </body>
+
 </html>

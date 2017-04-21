@@ -1,29 +1,29 @@
 {% extends 'events_evaluation_base.html' %}{% load staticfiles %}
-
-{% block title %}My registration{% endblock %}
+{% block pageheader %}الأنشطة الكبرى{% endblock %}
+{% block title %}تسجيلي في الأنشطة الكبرى{% endblock %}
 
 {% block content %}
-<div class="english-field">
-<h1 class="english-field">My registrations</h1>
+<div>
+<h1>تسجيلي في الأنشطة الكبرى</h1>
             <div class="panel-body">
                 <div class="row">
                     <table id="registrations" class="display datatable dt-responsive">
                         <thead>
                             <tr>
-                                <th class="all">Session</th>
-                                <th class="not-mobile">Time slot</th>
-                                <th class="not-mobile">Status</th>
-                                <th class="not-mobile">Registration date</th>
-                                <th class="not-mobile">ID</th>
+                                <th class="all">الجلسة</th>
+                                <th class="not-mobile">الحدث</th>
+                                <th class="all">الحالة</th>
+                                <th class="not-mobile">تاريخ التسجيل</th>
+                                <th class="not-mobile">رقم التسجيل</th>
                             </tr>
                         </thead>
                         <tbody>
                         {% for registration in registrations %}
                             <tr>
                                 <td>{{ registration.session }}</td>
-                                <td>{{ registration.session.time_slot }}</td>
+                                <td>{{ registration.session.event.get_html_name|safe }}</td>
                                 <td>{{ registration.get_status }}</td>
-                                <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted|date:"Y-m-d" }}</td>
+                                <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted }}</td>
                                 <td>{{ registration.pk }}</td>
                             </tr>
                         {% endfor %}
@@ -39,15 +39,11 @@
 	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
 	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
-<style type="text/css">
-    th, td{
-        text-align: left;
-    }
-</style>
 	<script>
     $(function(){
         $("#registrations").dataTable({
-            "order": [[ 3, "asc" ]]
+            order: [[ 3, "desc" ]],
+            language: {% include 'js/dataTables-arabic.json' %},
         });
 
     });

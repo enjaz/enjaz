@@ -56,7 +56,7 @@ def edit_common_profile(request):
             messages.success(request, 'تم تعديل بياناتك بنجاح')
             return HttpResponseRedirect(reverse('edit_common_profile'))
     elif request.method == 'GET':
-            form = edit_form(request.POST, instance=common_profile)
+            form = edit_form(instance=common_profile)
 
 
 

@@ -198,9 +198,17 @@ def email_badge(user, event, my_registration_url):
     pdf_content = render_badge_pdf(user)
     attachments = {'Badge.pdf': ContentFile(pdf_content)}
     notification_email = event.get_notification_email()
+    cc = []
+    try:
+        if user.common_profile.alternative_email:
+            cc = [user.common_profile.alternative_email]
+    except ObjectDoesNotExist:
+       pass
+   
     try:
         mail.send([user.email],
                   u"بوابة إنجاز <{}>".format(notification_email),
+                  cc=cc,
                   template="event_badge_notification",
                   context=email_context,
                   attachments=attachments)

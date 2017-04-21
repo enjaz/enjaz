@@ -58,6 +58,8 @@ class Event(models.Model):
                                                               null=True, blank=True, default=2)
     has_attendance = models.BooleanField(u"هل يستخدم الحدث نظام التحضير؟",
                                          default=False)
+    sends_badges_automatically = models.BooleanField(u"هل ترسل البطاقات بشكل آلي للمسجلين والمسجلات حديثا؟",
+                                                     default=False)
     attendance_team = models.ForeignKey(Team, null=True, blank=True,
                                         verbose_name=u"فريق التحضير",
                                         related_name="attendance_team_events")
@@ -280,8 +282,10 @@ class SessionRegistration(models.Model):
                                           choices=is_approved_choices)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
+    badge_sent = models.BooleanField(default=False,
+                                     verbose_name=u"أرسلت البطاقة؟")
     reminder_sent = models.BooleanField(default=False,
-                                            verbose_name=u"أرسلت رسالة التذكير؟")
+                                        verbose_name=u"أرسلت رسالة التذكير؟")
     certificate_sent = models.BooleanField(default=False,
                                             verbose_name=u"أرسلت الشهادة؟")
 

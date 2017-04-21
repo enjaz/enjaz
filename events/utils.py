@@ -1,20 +1,28 @@
 # -*- coding: utf-8  -*-
-import barcode
 import urllib2
 import json
 import StringIO
 import qrcode
 import qrcode.image.svg
 
+from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.http import HttpResponseRedirect
+from django.template.loader import get_template
 from django.utils import timezone
 
 from core.utils import hindi_to_arabic
-from events.models import Event, SessionRegistration
 from post_office import mail
+from wkhtmltopdf.utils import render_pdf_from_template
+from .models import Event, SessionRegistration
 import accounts.utils
 import clubs.utils
 
+
+WKHTMLTOPDF_OPTIONS = {'margin-top': 10, 'margin-right': 10,
+                       'margin-left': 10, 'margin-bottom': 5,
+                       'page-size': 'A7', }
+BARCODE_LENGTH = 8
 
 def can_see_all_barcodes(user, barcode_user=None, event=None):
     if barcode_user == user or\
@@ -152,11 +160,7 @@ def get_barcode(text):
     qrcode_output = StringIO.StringIO()
     qrcode.make(text, image_factory=qrcode.image.svg.SvgImage, version=3).save(qrcode_output)
     qrcode_value = "".join(qrcode_output.getvalue().split('\n')[1:])
-    CODE128 = barcode.get_barcode_class('code128')
-    one_dimensional_output = CODE128(text)
-    one_dimensional_value = "".join([line.strip() for line in one_dimensional_output.render({'module_width': 0.4}).split('\n')[4:]])
-
-    return qrcode_value, one_dimensional_value
+    return qrcode_value
 
 def get_user_sidebar_events(user):
     user_city = accounts.utils.get_user_city(user)
@@ -169,6 +173,40 @@ def get_user_sidebar_events(user):
         events = event_pool
 
     return events.distinct()
+
+def render_badge_pdf(user):
+    text = ("{:0%s}" % BARCODE_LENGTH).format(user.pk)
+    qrcode_value = get_barcode(text)
+    image_url = "https://enjazportal.com/static/static/img/hpc.png"
+    context = {'qrcode_value': qrcode_value,
+               'image_url': image_url,
+               'text': text,
+               'barcode_user': user}
+    qrcode_output = StringIO.StringIO()
+    badge_template = get_template("events/partials/badge.html")
+    pdf_content = render_pdf_from_template(badge_template,
+                                        header_template=None,
+                                        footer_template=None,
+                                        context=context,
+                                        cmd_options=WKHTMLTOPDF_OPTIONS.copy())
+    return pdf_content
+
+def email_badge(user, event, my_registration_url):
+    email_context = {'event_user': user,
+                     'my_registration_url': my_registration_url,
+                     'event': event}
+    pdf_content = render_badge_pdf(user)
+    attachments = {'Badge.pdf': ContentFile(pdf_content)}
+    notification_email = event.get_notification_email()
+    try:
+        mail.send([user.email],
+                  u"بوابة إنجاز <{}>".format(notification_email),
+                  template="event_badge_notification",
+                  context=email_context,
+                  attachments=attachments)
+    except ValidationError:
+        return False
+    return True
 
 def get_user_regestration_events(user):
     if not user.is_authenticated():
@@ -183,6 +221,7 @@ def get_user_regestration_events(user):
 def is_regestrations_team_member(user, event):
     user_events = get_user_regestration_events(user)
     return user_events.filter(pk=event.pk).exists()
+
 
 
 def has_user_adminstrative_events (user):

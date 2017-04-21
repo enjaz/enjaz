@@ -185,6 +185,8 @@ class NonStudentSignupForm(EnjazSignupForm):
                                        max_length=50)
     badge_number = forms.IntegerField(label=CommonProfile._meta.get_field('badge_number').verbose_name)
     alternative_email = forms.EmailField(label=CommonProfile._meta.get_field('alternative_email').verbose_name)
+    scfhs_number = forms.CharField(label=CommonProfile._meta.get_field('scfhs_number').verbose_name,
+                                        max_length=255, required=False)
 
     def __init__(self, *args, **kw):
         super(NonStudentSignupForm, self).__init__(*args, **kw)
@@ -228,12 +230,15 @@ class NonStudentSignupForm(EnjazSignupForm):
                                      gender=self.cleaned_data['gender'],
                                      mobile_number=mobile_number,
                                      job_description=self.cleaned_data['job_description'],
+                                     scfhs_number=self.cleaned_data['scfhs_number'],
                                      )
         return new_user
 
 class NonUserSignupForm  (EnjazSignupForm):
     affiliation = forms.CharField(label=CommonProfile._meta.get_field('affiliation').verbose_name,
                                   max_length=30)
+    scfhs_number = forms.CharField(label=CommonProfile._meta.get_field('scfhs_number').verbose_name,
+                                        max_length=255, required=False)
 
 
     def clean (self):
@@ -271,6 +276,7 @@ class NonUserSignupForm  (EnjazSignupForm):
                                      city=self.cleaned_data['city'],
                                      gender=self.cleaned_data['gender'],
                                      affiliation=self.cleaned_data['affiliation'],
+                                     scfhs_number=self.cleaned_data['scfhs_number'],
                                     )
         return new_user
 
@@ -358,6 +364,15 @@ class EditStudentCommonProfile(CollegeCheckMaxin, forms.ModelForm):
         common_profile = super(EditStudentCommonProfile, self).save()
         common_profile.college = self.college
         common_profile.save()
+
+class EditStudentCommonProfile_NonUser(forms.ModelForm):
+    class Meta:
+        model = CommonProfile
+        fields = ['ar_first_name', 'ar_middle_name', 'ar_last_name',
+                  'en_first_name', 'en_middle_name', 'en_last_name',
+                  'mobile_number', 'city', 'gender', 'affiliation',
+                  'scfhs_number']
+
 
 class ResendForm(forms.Form):
     email = forms.EmailField()

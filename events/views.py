@@ -15,9 +15,9 @@ import os.path
 
 from core import decorators
 from clubs.models import Team, college_choices
-from .models import Event, Registration, Session, Abstract, \
-                          AbstractFigure,Evaluation, TimeSlot, \
-                          SessionRegistration, Initiative, \
+from .models import Event, Session, Abstract, AbstractFigure,\
+                          Evaluation, TimeSlot,\
+                          SessionRegistration, Initiative,\
                           SessionGroup,CaseReport, Attendance
 from . import utils, forms
 import core.utils
@@ -28,9 +28,6 @@ def redirect_home(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
     if event.url:
         return HttpResponseRedirect(event.url)
-    elif event.is_registration_open():
-        return HttpResponseRedirect(reverse('events:registration_introduction',
-                                            args=(event.code_name,)))
     elif event.is_abstract_submission_open():
         return HttpResponseRedirect(reverse('events:submit_abstract',
                                             args=(event.code_name,)))
@@ -354,96 +351,6 @@ def handle_ajax(request):
     return {'remaining_seats': session.get_remaining_seats(),
             'status': registration.get_status()}
 
-def introduce_registration(request, event_code_name):
-    event = get_object_or_404(Event, code_name=event_code_name)
-    utils.check_if_closed(event)
-    if request.user.is_authenticated() and \
-       not utils.is_organizing_team_member(request.user, event) and \
-       not request.user.is_superuser:
-        return HttpResponseRedirect(reverse('events:user_registration',
-                                            args=(event.code_name,)))
-    else:
-        context = {'event': event}
-        return render(request, "events/registration_introduction.html",
-                      context)
-
-def nonuser_registration(request, event_code_name):
-    event = get_object_or_404(Event, code_name=event_code_name)
-    utils.check_if_closed(event)
-    if request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('events:user_registration',
-                                            args=(event.code_name,)))
-    if request.method == 'POST':
-        registration_form = forms.RegistrationForm(request.POST, event=event)
-        nonuser_form = forms.NonUserForm(request.POST)
-        if registration_form.is_valid() and nonuser_form.is_valid():
-            nonuser = nonuser_form.save()
-            registration = registration_form.save(nonuser=nonuser)
-            if event.onsite_after and timezone.now() >= event.onsite_after:
-                for session in registration.first_priority_sessions.all():
-                    utils.register_in_vma(session, registration)
-                utils.send_onsite_confirmation(registration, event)
-            else:
-                email_context = {'name': nonuser.ar_first_name,
-                                 'event': event}
-                mail.send([nonuser.email],
-                          template="event_registration_submitted",
-                          context=email_context)
-            return HttpResponseRedirect(reverse('events:registration_completed',
-                                                args=(event.code_name,)))
-    elif request.method == 'GET':
-        registration_form = forms.RegistrationForm(event=event)
-        nonuser_form = forms.NonUserForm()
-
-    session_choices = Session.objects.filter(event=event,
-                                             time_slot=1)\
-                                     .values_list('pk', 'name')
-
-    context = {'event': event,
-               'registration_form': registration_form,
-               'nonuser_form': nonuser_form,
-               'college_choices': college_choices,
-               'session_choices': session_choices}
-
-    return render(request, "events/register_nonuser.html", context)
-
-def user_registration(request, event_code_name):
-    event = get_object_or_404(Event, code_name=event_code_name)
-    utils.check_if_closed(event)
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('events:registration_introduction',
-                                            args=(event.code_name,)))
-
-    if Registration.objects.filter(user=request.user,
-                                   first_priority_sessions__event=event,
-                                   is_deleted=False):
-
-        return HttpResponseRedirect(reverse('events:registration_already',
-                                            args=(event.code_name,)))
-
-    if request.method == 'POST':
-        registration_form = forms.RegistrationForm(request.POST, user=request.user, event=event)
-        if registration_form.is_valid():
-            registration = registration_form.save()
-            print registration
-            if event.onsite_after and timezone.now() >= event.onsite_after:
-                for session in registration.first_priority_sessions.all():
-                    utils.register_in_vma(session, registration)
-                utils.send_onsite_confirmation(registration, event)
-            else:
-                context_email = {'name': request.user.common_profile.ar_first_name,
-                                 'event': event}
-                mail.send([request.user.email],
-                          template="event_registration_submitted",
-                          context=context_email)
-            return HttpResponseRedirect(reverse('events:registration_completed',
-                                                args=(event.code_name,)))
-    elif request.method == 'GET':
-        registration_form = forms.RegistrationForm(user=request.user, event=event)
-
-    context = {'registration_form': registration_form, 'event': event}
-    return render(request, "events/register_user.html", context)
-
 @login_required
 def list_registrations(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
@@ -465,16 +372,6 @@ def show_session_privileged(request, event_code_name, pk):
 
     return render(request, 'events/session_show_privileged.html',
                   {'session': session, 'event': event})
-
-def registration_completed(request, event_code_name):
-    event = get_object_or_404(Event, code_name=event_code_name)
-    return render(request, 'events/registration_completed.html',
-                  {'event': event})
-
-def registration_already(request, event_code_name):
-    event = get_object_or_404(Event, code_name=event_code_name)
-    return render(request, 'events/registration_already.html',
-                  {'event': event})
 
 def registration_closed(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)

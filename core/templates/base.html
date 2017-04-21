@@ -201,7 +201,7 @@ you?
                </ul>
              </li>
             {% endif %}
-            {% if user|has_user_organizing_events or user|has_user_abstract_revision_events %}
+            {% if user|has_user_adminstrative_events %}
             <li>
                 <a>
                     <i class="entypo-calendar"></i>
@@ -214,13 +214,15 @@ you?
                         <i class="entypo-calendar"></i>
                         <span>{{ event.get_html_name|safe }}</span>
                     </a>
-                    <ul>{% if user|is_organizing_team_member:event or user|is_attendance_team_member:event or user.is_superuser %}
+                    <ul>{% if user|is_organizing_team_member:event or user|is_attendance_team_member:event or user.is_superuser  %}
                         <li>
                             <a href="{% url 'events:list_sessions_privileged' event.code_name %}">
                                 <i class="entypo-chart-pie"></i>
                                 <span>الجلسات</span>
                             </a>
                         </li>
+                        {% endif %}
+                        {% if user|is_organizing_team_member:event or user|is_attendance_team_member:event or user.is_superuser %}
                         {% if event.has_attendance %}
                         <li>
                             <a href="{% url 'events:list_barcodes' event.code_name %}">

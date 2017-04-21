@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib import messages
 
-from accounts.forms import EditStudentCommonProfile, ResendForm
+from accounts.forms import EditStudentCommonProfile, ResendForm, EditStudentCommonProfile_NonUser
 from clubs.models import city_choices
 from userena.models import UserenaSignup
 
@@ -43,16 +43,27 @@ def edit_common_profile(request):
     except ObjectDoesNotExist:
         return HttpResponseRedirect(reverse('home'))
 
+    if not request.user.common_profile.profile_type == 'N':
+        edit_form = EditStudentCommonProfile
+    else:
+        edit_form = EditStudentCommonProfile_NonUser
+
+
     if request.method == 'POST':
-        form = EditStudentCommonProfile(request.POST, instance=common_profile)
+        form = edit_form(request.POST, instance=common_profile)
         if form.is_valid():
             form.save()
             messages.success(request, 'تم تعديل بياناتك بنجاح')
             return HttpResponseRedirect(reverse('edit_common_profile'))
     elif request.method == 'GET':
-        form = EditStudentCommonProfile(instance=common_profile)
+            form = edit_form(instance=common_profile)
 
-    return render(request, 'accounts/edit_common_profile.html', {'form': form,
+
+
+    if not request.user.common_profile.profile_type == 'N':
+        return render(request, 'accounts/edit_common_profile.html', {'form': form,
                                                                  'city_choices': city_choices,
                                                                  'common_profile': common_profile})
-
+    else:
+        return render(request, 'accounts/edit_common_profile_nonuser.html', {'form': form,
+                                                                 'common_profile': common_profile})

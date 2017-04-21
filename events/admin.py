@@ -4,7 +4,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from ckeditor.widgets import CKEditorWidget
 from django import forms
 
-
 from . import models
 
 BASIC_SEARCH_FIELDS = ['user__username', 'user__email',
@@ -23,6 +22,11 @@ BASIC_SEARCH_FIELDS = ['user__username', 'user__email',
                        'user__common_profile__ar_first_name',
                        'user__common_profile__ar_middle_name',
                        'user__common_profile__ar_last_name']
+
+def mark_deleted(modeladmin, request, queryset):
+    queryset.update(is_deleted=True)
+mark_deleted.short_description = u"علم السجلات المُحدّدة أنها محذوفة (دون إزالتها من قاعدة البيانات)"
+
 
 class AbstractFigureInline(admin.TabularInline):
     model = models.AbstractFigure
@@ -100,6 +104,7 @@ class AbstractPosterInline(admin.TabularInline):
 
 class AbstractAdmin(admin.ModelAdmin):
     search_fields = BASIC_SEARCH_FIELDS + ["email", "title"]
+    actions = [mark_deleted]
     list_filter = ["event", "is_deleted"]
     readonly_fields = ['user']
     inlines = [AbstractFigureInline,AbstractPosterInline]
@@ -108,6 +113,7 @@ class AbstractAdmin(admin.ModelAdmin):
 
 class InitiativeAdmin(admin.ModelAdmin):
     inlines = [InitiativeFigureInline]
+    actions = [mark_deleted]
 
 class SessionGroupAdmin(admin.ModelAdmin):
     list_filter = ['event']
@@ -117,8 +123,9 @@ class AttendanceAdmin(admin.ModelAdmin):
     list_filter = ['session_registration__session__event', 'category', 'is_deleted']
     list_display = ['__unicode__', 'category', 'date_submitted', 'is_deleted']
     readonly_fields = ['session_registration', 'submitter']
+    actions = [mark_deleted]
     search_fields = ['session_registration__' + field
-                     for field in  BASIC_SEARCH_FIELDS]
+                     for field in BASIC_SEARCH_FIELDS]
 
 class EventAdmin(admin.ModelAdmin):
     list_display = search_fields = ['official_name', 'english_name',
@@ -133,6 +140,7 @@ class SessionAdmin(admin.ModelAdmin):
 
 class SessionRegistrationAdmin(admin.ModelAdmin):
     readonly_fields = ['user']
+    actions = [mark_deleted]
     list_display = ['__unicode__',  'is_approved', 'is_deleted',
                     'date_submitted']
     search_fields = BASIC_SEARCH_FIELDS + ['session__name']

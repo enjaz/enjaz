@@ -11,7 +11,6 @@ from django.views.decorators import csrf
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from post_office import mail
-from wkhtmltopdf.views import PDFTemplateView
 import os.path
 
 from core import decorators
@@ -770,13 +769,12 @@ def show_barcode(request, event_code_name=None, user_pk=None):
     if not utils.can_see_all_barcodes(request.user, barcode_user, event):
         raise PermissionDenied
 
-    pk = ("{:0%s}" % utils.BARCODE_LENGTH).format(barcode_user.pk)
-    qrcode_value, one_dimensional_value = utils.get_barcode(pk)
+    text = ("{:0%s}" % utils.BARCODE_LENGTH).format(barcode_user.pk)
+    qrcode_value = utils.get_barcode(text)
 
     context = {'qrcode_value' : qrcode_value,
-               'pk': pk,
                'event': event,
-               'one_dimensional_value': one_dimensional_value,
+               'text': text,
                'barcode_user': barcode_user}
     return render(request, 'events/show_barcode.html', context)
 
@@ -875,24 +873,6 @@ def show_attendance_interface(request, event_code_name, pk):
                'form': form}
 
     return render(request, 'events/show_attendance_interface.html', context)
-
-class BarcodePDFView(PDFTemplateView):
-    def get_context_data(self, **kwargs):
-        context = super(BarcodePDFView, self).get_context_data(**kwargs)
-
-        event_code_name = self.kwargs.get('event_code_name')
-        user_pk = self.kwargs.get('user_pk')
-
-        if user_pk and event_code_name:
-            event = get_object_or_404(Event, code_name=event_code_name,
-                                          has_attendance=True)
-            barcode_user = get_object_or_404(User, pk=user_pk)
-        else:
-            event = None
-            barcode_user = self.request.user
-
-        if not utils.can_see_all_barcodes(self.request.user, barcode_user, event):
-            raise PermissionDenied        
 
 @login_required
 def download_barcode_pdf(request, event_code_name=None, user_pk=None):

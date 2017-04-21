@@ -1,5 +1,4 @@
 # -*- coding: utf-8  -*-
-import barcode
 import urllib2
 import json
 import StringIO
@@ -161,11 +160,7 @@ def get_barcode(text):
     qrcode_output = StringIO.StringIO()
     qrcode.make(text, image_factory=qrcode.image.svg.SvgImage, version=3).save(qrcode_output)
     qrcode_value = "".join(qrcode_output.getvalue().split('\n')[1:])
-    CODE128 = barcode.get_barcode_class('code128')
-    one_dimensional_output = CODE128(text)
-    one_dimensional_value = "".join([line.strip() for line in one_dimensional_output.render({'module_width': 0.4}).split('\n')[4:]])
-
-    return qrcode_value, one_dimensional_value
+    return qrcode_value
 
 def get_user_sidebar_events(user):
     user_city = accounts.utils.get_user_city(user)
@@ -181,12 +176,12 @@ def get_user_sidebar_events(user):
 
 def render_badge_pdf(user):
     text = ("{:0%s}" % BARCODE_LENGTH).format(user.pk)
-    qrcode_value, one_dimensional_value = get_barcode(text)
+    qrcode_value = get_barcode(text)
     image_url = "https://enjazportal.com/static/static/img/hpc.png"
     context = {'qrcode_value': qrcode_value,
                'image_url': image_url,
-               'barcode_user': user,
-               'one_dimensional_value': one_dimensional_value}
+               'text': text,
+               'barcode_user': user}
     qrcode_output = StringIO.StringIO()
     badge_template = get_template("events/partials/badge.html")
     pdf_content = render_pdf_from_template(badge_template,

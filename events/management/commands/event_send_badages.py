@@ -27,7 +27,7 @@ class Command(BaseCommand):
                                           session_registrations__is_deleted=False)\
                                   .exclude(session_registrations__badge_sent=True)\
                                   .distinct()
-        count = 0
+        count = 1
         self.stdout.write("We got {} users to handle!".format(event_users.count()))
         domain = Site.objects.get_current().domain
         my_registration_url = "https://{}{}".format(domain,

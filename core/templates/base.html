@@ -128,13 +128,13 @@ you?
                             تقرير نقاطي
                         </a>
                     </li>
+                    {% endif %}
                     <li>
                         <a href="{% url 'edit_common_profile' %}">
                             <i class="entypo-cw"></i>
                             <span>حدّث معلوماتي</span>
                         </a>
                     </li>
-                    {% endif %}
                     {% if user.event_abstracts.exists %}
                     <li>
                         <a href="{% url 'events:list_my_abstracts' %}">
@@ -269,13 +269,13 @@ you?
 					<span>أندية</span>
 				</a>
 			</li>
-            {% endif %}
 			<li>
 				<a href="{% url 'activities:list' %}">
 					<i class="entypo-calendar"></i>
 					<span>أنشطة</span>
 				</a>
 			</li>
+            {% endif %}
             {# Limit the access to students #}
             {% if user.common_profile.profile_type == 'S' or user.is_superuser %}
 			<li>

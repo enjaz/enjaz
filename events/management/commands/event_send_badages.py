@@ -25,8 +25,10 @@ class Command(BaseCommand):
         event = Event.objects.get(code_name=options['event_code_name'])
         event_users = User.objects.filter(session_registrations__session__event=event,
                                           session_registrations__is_deleted=False)\
-                                  .exclude(session_registrations__badge_sent=False)\
+                                  .exclude(session_registrations__badge_sent=True)\
                                   .distinct()
+        count = 0
+        self.stdout.write("We got {} users to handle!".format(event_users.count()))
         domain = Site.objects.get_current().domain
         my_registration_url = "https://{}{}".format(domain,
                                                     reverse('events:list_my_registration'))
@@ -37,7 +39,7 @@ class Command(BaseCommand):
 
             user.session_registrations.filter(is_deleted=False, session__event=event).update(badge_sent=True)
 
-            self.stdout.write("Sent to {}!".format(user.email))
-
+            self.stdout.write("{:06d}: Sent to {}!".format(count, user.email))
+            count +=1
             if options['sleep_time']:
                 time.sleep(options['sleep_time'])

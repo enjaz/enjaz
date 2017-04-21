@@ -6,12 +6,11 @@ from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db.models import Count
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.views.decorators import csrf
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from post_office import mail
-from wkhtmltopdf.views import PDFTemplateView
 import os.path
 
 from core import decorators
@@ -24,7 +23,6 @@ from . import utils, forms
 import core.utils
 import clubs.utils
 
-BARCODE_LENGTH = 8
 
 def redirect_home(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
@@ -319,20 +317,26 @@ def handle_ajax(request):
                 registration = SessionRegistration.objects.create(session=session,
                                                    user=request.user,
                                                    is_approved=is_approved)
-                if not has_previous_sessions and session.event.is_auto_tweet:
-                    if session_group_pk:
-                        relative_url = reverse("events:show_session_group", args=(session.event.code_name, session_group.code_name))
-                    else:
-                        relative_url = reverse("events:list_sessions", args=(session.event.code_name,))
-                    full_url = request.build_absolute_uri(relative_url)
-                    if session.event.twitter:
-                        twitter_text = " (@{})".format(session.event.twitter)
-                    else:
-                        twitter_text = ""
-                    text = u"سجّلت في {}{}!  يمكنك التسجيل من: {}"
-                    if session.event.hashtag:
-                        text += u"\n#" + session.event.hashtag
-                    core.utils.create_tweet(request.user, text.format(session.event.twitter_event_name or session.event.official_name, twitter_text, full_url))
+                if not has_previous_sessions:
+                    if session.event.sends_badges_automatically:
+                        relative_url = reverse("events:list_my_registration")
+                        my_registration_url = request.build_absolute_uri(relative_url)
+                        utils.email_badge(request.user, session.event, my_registration_url)
+                        registration.badge_sent = True
+                    if session.event.is_auto_tweet:
+                        if session_group_pk:
+                            relative_url = reverse("events:show_session_group", args=(session.event.code_name, session_group.code_name))
+                        else:
+                            relative_url = reverse("events:list_timeslots", args=(session.event.code_name,))
+                        full_url = request.build_absolute_uri(relative_url)
+                        if session.event.twitter:
+                            twitter_text = " (@{})".format(session.event.twitter)
+                        else:
+                            twitter_text = ""
+                        text = u"سجّلت في {}{}!  يمكنك التسجيل من: {}"
+                        if session.event.hashtag:
+                            text += u"\n#" + session.event.hashtag
+                        core.utils.create_tweet(request.user, text.format(session.event.twitter_event_name or session.event.official_name, twitter_text, full_url))
             elif registration.is_deleted:
                 registration.is_deleted = False
                 registration.is_approved = is_approved
@@ -765,13 +769,12 @@ def show_barcode(request, event_code_name=None, user_pk=None):
     if not utils.can_see_all_barcodes(request.user, barcode_user, event):
         raise PermissionDenied
 
-    pk = ("{:0%s}" % BARCODE_LENGTH).format(barcode_user.pk)
-    qrcode_value, one_dimensional_value = utils.get_barcode(pk)
+    text = ("{:0%s}" % utils.BARCODE_LENGTH).format(barcode_user.pk)
+    qrcode_value = utils.get_barcode(text)
 
     context = {'qrcode_value' : qrcode_value,
-               'pk': pk,
                'event': event,
-               'one_dimensional_value': one_dimensional_value,
+               'text': text,
                'barcode_user': barcode_user}
     return render(request, 'events/show_barcode.html', context)
 
@@ -866,38 +869,26 @@ def show_attendance_interface(request, event_code_name, pk):
     form = forms.AttendanceForm()
 
     context = {'session': session, 'event': session.event,
-               'BARCODE_LENGTH': BARCODE_LENGTH,
+               'BARCODE_LENGTH': utils.BARCODE_LENGTH,
                'form': form}
 
     return render(request, 'events/show_attendance_interface.html', context)
 
-class BarcodePDFView(PDFTemplateView):
-    def get_context_data(self, **kwargs):
-        context = super(BarcodePDFView, self).get_context_data(**kwargs)
+@login_required
+def download_barcode_pdf(request, event_code_name=None, user_pk=None):
+    if user_pk and event_code_name:
+        event = get_object_or_404(Event, code_name=event_code_name,
+                                  has_attendance=True)
+        barcode_user = get_object_or_404(User, pk=user_pk)
+    else:
+        event = None
+        barcode_user = request.user
 
-        event_code_name = self.kwargs.get('event_code_name')
-        user_pk = self.kwargs.get('user_pk')
+    if not utils.can_see_all_barcodes(request.user, barcode_user, event):
+        raise PermissionDenied
 
-        if user_pk and event_code_name:
-            event = get_object_or_404(Event, code_name=event_code_name,
-                                          has_attendance=True)
-            barcode_user = get_object_or_404(User, pk=user_pk)
-        else:
-            event = None
-            barcode_user = self.request.user
-
-        if not utils.can_see_all_barcodes(self.request.user, barcode_user, event):
-            raise PermissionDenied
-
-        pk = ("{:0%s}" % BARCODE_LENGTH).format(barcode_user.pk)
-        qrcode_value, one_dimensional_value = utils.get_barcode(pk)
-        image_url = static('img/hpc.png')
-        image_url = self.request.build_absolute_uri(image_url)
-
-        new_context = {'qrcode_value' : qrcode_value, 'pk': pk,
-                       'event': event, 'image_url': image_url,
-                       'one_dimensional_value': one_dimensional_value,
-                       'barcode_user': barcode_user}
-        context.update(new_context)
-        print context
-        return context
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="Badge.pdf"'
+    pdf_content = utils.render_badge_pdf(barcode_user)
+    response.write(pdf_content)
+    return response

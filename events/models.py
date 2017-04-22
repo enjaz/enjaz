@@ -580,3 +580,17 @@ class Attendance(models.Model):
     def __unicode__(self):
         return u"{} for {}".format(self.user.username, self.session.name)
 
+class QuestionSession(models.Model):
+    event = models.ForeignKey(Event, verbose_name="الحدث")
+    title = models.CharField(u"عنوان الجلسة", max_length=100)
+
+    def __unicode__(self):
+        return self.title
+
+class Question (models.Model):
+    question_session = models.ForeignKey(QuestionSession, verbose_name="جلسة السؤال")
+    text = models.TextField(u"نص السؤال")
+    submission_date = models.DateTimeField(u"تاريخ الإرسال", auto_now_add=True)
+
+    def __unicode__(self):
+        return self.question_text[:20]

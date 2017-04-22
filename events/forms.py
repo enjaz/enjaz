@@ -5,7 +5,7 @@ from accounts.utils import get_user_gender
 from events.models import NonUser, Session, Registration, Abstract, \
                           AbstractFigure, Initiative, InitiativeFigure, \
                           Criterion, CriterionValue, Evaluation,CaseReport, \
-                          AbstractPoster, Attendance
+                          AbstractPoster, Attendance, Question
 from django.forms.models import inlineformset_factory
 
 class NonUserForm(forms.ModelForm):
@@ -190,3 +190,8 @@ class AttendanceForm(forms.ModelForm):
     class Meta:
         model = Attendance
         fields = ['category']
+
+class QuestionForm(forms.ModelForm):
+    class Meta:
+        model = Question
+        fields = ['text']

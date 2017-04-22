@@ -18,7 +18,8 @@ from clubs.models import Team, college_choices
 from .models import Event, Session, Abstract, AbstractFigure,\
                           Evaluation, TimeSlot,\
                           SessionRegistration, Initiative,\
-                          SessionGroup,CaseReport, Attendance
+                          SessionGroup,CaseReport, Attendance,\
+                          QuestionSession, Question
 from . import utils, forms
 import core.utils
 import clubs.utils
@@ -788,4 +789,54 @@ def download_barcode_pdf(request, event_code_name=None, user_pk=None):
     response['Content-Disposition'] = 'attachment; filename="Badge.pdf"'
     pdf_content = utils.render_badge_pdf(barcode_user)
     response.write(pdf_content)
+    return response
+
+def show_question_session(request, event_code_name, pk):
+    question_session = get_object_or_404(QuestionSession, pk=pk,
+                                         event__code_name=event_code_name)
+
+    old_questions = question_session.question_set.order_by('-submission_date')
+    last_question = old_questions.first()
+    if last_question:
+        last_pk = old_questions.first().pk
+    else:
+        last_pk = 1
+
+    context = {"question_session": question_session,
+               "last_pk": last_pk,
+               "old_questions": old_questions}
+
+    if request.method == "GET":
+        form = forms.QuestionForm()
+    elif request.method == "POST":
+        instance = Question(question_session=question_session)
+        form = forms.QuestionForm(request.POST, instance=instance)
+        if form.is_valid():
+            question = form.save()
+            return HttpResponseRedirect(reverse('events:show_question_session',
+                                                args=(question_session.event.code_name, pk,)) + \
+                                        "#q"+str(question.pk))
+
+    context['form'] = form
+
+    return render(request, "events/questions/index.html", context)
+
+@csrf.csrf_exempt
+@decorators.ajax_only
+def handle_question_ajax(request, event_code_name, pk):
+    question_session = get_object_or_404(QuestionSession, pk=pk,
+                                         event__code_name=event_code_name)
+
+    old_last_pk = request.POST['last_pk']
+    new_last_pk = question_session.question_set.order_by('-submission_date').first().pk
+
+    if old_last_pk != new_last_pk:
+        new_questions = question_session.question_set.filter(pk__gt=old_last_pk)
+        new_questions = new_questions.values_list('text', flat=True)
+        new_questions = list(new_questions)
+        response = {'new_questions':new_questions,
+                   'new_last_pk':new_last_pk}
+    else:
+        response = {}
+
     return response

@@ -221,6 +221,12 @@ you?
                                 <span>الجلسات</span>
                             </a>
                         </li>
+												<li>
+                            <a href="{% url 'events:list_presenter_attendance' event.code_name %}">
+                                <i class="entypo-chart-pie"></i>
+                                <span>تحضير مقدمي الأبحاث</span>
+                            </a>
+                        </li>
                         {% endif %}
                         {% if user|is_organizing_team_member:event or user|is_attendance_team_member:event or user.is_superuser %}
                         {% if event.has_attendance %}

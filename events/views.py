@@ -153,6 +153,42 @@ def list_abstracts(request, event_code_name):
         return render(request, 'events/abstracts/list_abstracts.html', context)
 
 @login_required
+def list_presenter_attendance(request, event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name,
+                              receives_abstract_submission=True)
+
+    if not request.user.is_superuser and \
+       not utils.is_organizing_team_member(request.user, event) and \
+       not utils.is_attendance_team_member(request.user, event):
+        raise PermissionDenied
+
+    oral_present = Abstract.objects.filter(event=event, is_deleted=False, status='A', accepted_presentaion_preference='O', did_presenter_attend=True)
+    oral_absent = Abstract.objects.filter(event=event, is_deleted=False, status='A', accepted_presentaion_preference='O', did_presenter_attend=False)
+
+    poster_present = Abstract.objects.filter(event=event, is_deleted=False, status='A', accepted_presentaion_preference='P', did_presenter_attend=True)
+    poster_absent = Abstract.objects.filter(event=event, is_deleted=False, status='A', accepted_presentaion_preference='P', did_presenter_attend=False)
+
+    context = {'event': event,
+               'oral_present': oral_present,
+               'oral_absent': oral_absent,
+               'poster_present': poster_present,
+               'poster_absent': poster_absent}
+
+    if request.method == "POST":
+        action = request.POST.get('action')
+        pks = [int(field.lstrip('pk_')) for field in request.POST if field.startswith('pk_')]
+        print pks
+        if action == "attend":
+            Abstract.objects.filter(pk__in=pks).update(did_presenter_attend=True)
+        elif action == "absent":
+            Abstract.objects.filter(pk__in=pks).update(did_presenter_attend=False)
+        return HttpResponseRedirect(reverse('events:list_presenter_attendance',
+                                                args=(event.code_name,)))
+
+    elif request.method == "GET":
+        return render(request, 'events/abstracts/list_presenter_attendance.html', context)
+
+@login_required
 def list_my_abstracts(request):
     abstracts = Abstract.objects.filter(is_deleted=False, user=request.user)
     casereports = CaseReport.objects.filter(is_deleted=False, user=request.user)

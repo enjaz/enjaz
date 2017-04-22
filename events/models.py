@@ -204,7 +204,12 @@ class Session(models.Model):
 
     def get_remaining_seats(self):
         if not self.limit is None:
-            return  self.limit - self.get_registration_count()
+            # Never return negative seat numbers.
+            diff = self.limit - self.get_registration_count()
+            if diff <= 0:
+                return 0
+            else:
+                return diff
 
     def __unicode__(self):
         if self.gender:

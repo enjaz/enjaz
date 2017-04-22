@@ -32,6 +32,10 @@ class AbstractFigureInline(admin.TabularInline):
     model = models.AbstractFigure
     extra = 0
 
+class QuestionInline(admin.TabularInline):
+    model = models.Question
+    extra = 1
+    
 class InitiativeFigureInline(admin.TabularInline):
     model = models.InitiativeFigure
     extra = 0
@@ -146,6 +150,12 @@ class SessionRegistrationAdmin(admin.ModelAdmin):
     search_fields = BASIC_SEARCH_FIELDS + ['session__name']
     list_filter = ['session__event', 'is_deleted', 'is_approved']
 
+
+class QustionSessionAdmin(admin.ModelAdmin):
+    search_fields = ['title', 'question__question_text']
+    list_filter = ['event']
+    inlines = [QuestionInline]
+
 admin.site.register(models.Event, EventAdmin)
 admin.site.register(models.Session, SessionAdmin)
 admin.site.register(models.CaseReport)
@@ -159,6 +169,4 @@ admin.site.register(models.Initiative, InitiativeAdmin)
 admin.site.register(models.Criterion)
 admin.site.register(models.Evaluation)
 admin.site.register(models.Attendance, AttendanceAdmin)
-
-
-
+admin.site.register(models.QuestionSession, QustionSessionAdmin)

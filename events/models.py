@@ -280,7 +280,7 @@ class SessionRegistration(models.Model):
     date_edited = models.DateTimeField(auto_now=True)
     is_approved_choices = (
         (True, u'معتمد'),
-        (False, u'مرفوض'),
+        (False, u'لم تعد المقاعد متوفّرة'),
         (None, u'معلق'),
         )
     is_approved = models.NullBooleanField(default= None, verbose_name=u"الحالة",

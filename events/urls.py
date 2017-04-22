@@ -45,4 +45,6 @@ urlpatterns = patterns('',
     url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/(?P<pk>\d+)/evaluate/$', views.evaluate, name="evaluate"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/(?P<pk>\d+)/evaluate/(?P<evaluation_id>[\d\w\-]+)/$', views.edit_evaluation,name="edit_evaluation"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/evaluators/$', views.evaluators_homepage,name="evaluators_homepage"),
-                       )
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/questions/(?P<pk>\d+)/$', views.show_question_session, name='show_question_session'),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/questions/(?P<pk>\d+)/ajax$', views.handle_question_ajax, name="handle_question_ajax"),
+)

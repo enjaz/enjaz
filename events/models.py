@@ -375,7 +375,7 @@ class Registration(models.Model):
         elif self.nonuser:
             return self.nonuser.ar_first_name
 
-        
+
     def get_ar_full_name(self):
         if self.user:
             try:
@@ -450,6 +450,7 @@ class Abstract(models.Model):
                                      verbose_name=u"محذوف؟")
     status=models.CharField(verbose_name="acceptance status", max_length=1, choices=status_choices, default='P')
     accepted_presentaion_preference = models.CharField(verbose_name="Accepted presentation preference", max_length=1, choices=presentation_preference_choices)
+    did_presenter_attend = models.BooleanField(verbose_name=u"حضر المقدم؟", default=False)
 
     def get_average_score(self):
         evaluation_number = self.evaluation_set.count()

@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-from datetime import datetime
+from datetime import time
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.templatetags.staticfiles import static
@@ -874,5 +874,68 @@ def handle_question_ajax(request, event_code_name, pk):
                    'new_last_pk':new_last_pk}
     else:
         response = {}
+
+    return response
+
+@login_required
+def show_event_stats(request, event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name)
+
+    if not request.user.is_superuser and \
+       not utils.is_organizing_team_member(request.user, session.event) and \
+       not utils.is_attendance_team_member(request.user, session.event):
+        raise PermissionDenied
+
+    sessions = {}
+
+    sessions = event.session_set.annotate(attendance=Count("sessionregistration__attendance")).order_by("-attendance").all()
+    context = {'event': event, 'sessions': sessions}
+    return render(request, 'events/show_event_stats.html', context)
+
+def get_csv(request, event_code_name, session_pk):
+    session = get_object_or_404(Session,
+                                event__code_name=event_code_name,
+                                pk=session_pk)
+
+    if not request.user.is_superuser and \
+       not utils.is_organizing_team_member(request.user, session.event) and \
+       not utils.is_attendance_team_member(request.user, session.event):
+        raise PermissionDenied
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
+    session_attendances = Attendance.objects.filter(session_registration__session=session)
+
+    if session.event.has_attendance and session_attendances.count() >= 2:
+        start_time = time(00,00)
+        first_attendance = session_attendances.order_by("date_submitted").first().date_submitted
+        first_attendance = timezone.datetime.combine(first_attendance, start_time)
+        first_attendance = timezone.make_aware(first_attendance, timezone.get_current_timezone())
+        end_time = time(23,59,59)
+        last_attendance = session_attendances.order_by("date_submitted").last().date_submitted
+        last_attendance = timezone.datetime.combine(last_attendance, end_time)
+        last_attendance = timezone.make_aware(last_attendance, timezone.get_current_timezone())
+
+        current_datetime = first_attendance
+        last_datetime = last_attendance
+        rows = ['Date,Total,In,Mid,Out,Uncategorized']
+        while last_datetime > current_datetime:
+            current_datetime += timezone.timedelta(hours=1)
+            datetime_str = current_datetime.strftime('%Y-%m-%d %H:%M:%S')
+            attendance_count = session_attendances.filter(date_submitted__lte=current_datetime).count()
+            attendance_i_count = session_attendances.filter(date_submitted__lte=current_datetime, category="I").count()
+            attendance_m_count = session_attendances.filter(date_submitted__lte=current_datetime, category="M").count()
+            attendance_o_count = session_attendances.filter(date_submitted__lte=current_datetime, category="O").count()
+            attendance_u_count = session_attendances.filter(date_submitted__lte=current_datetime, category="").count()
+            rows.append(','.join([datetime_str] + [str(count) for count in
+                                                   attendance_count,
+                                                   attendance_i_count,
+                                                   attendance_m_count,
+                                                   attendance_o_count,
+                                                   attendance_u_count]))
+        output = "\n".join(rows)
+        response.write(output)
+    else:
+        response.write("")
 
     return response

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}{% load staticfiles %}
+{% block title %}إحصاءات {{ event.official_name }}{% endblock %}
+{% block content %}
+
+<script src="{% static 'js/dygraph.min.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/dygraph.min.css' %}">
+
+
+{% for session in sessions %}
+<h2>{{ session.name }}</h2>
+<div class="english-field" id="session-{{ session.pk }}"></div>
+<script>
+div_{{ session_pk }} = document.getElement
+new Dygraph(document.getElementById("session-{{ session.pk }}"),
+"{% url 'events:get_csv' event.code_name session.pk %}", {ylabel: 'الحضور'}
+);
+</script>
+{% endfor %}
+
+
+{% endblock %}

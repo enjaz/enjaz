@@ -579,7 +579,10 @@ class Attendance(models.Model):
     is_deleted = models.BooleanField(u"محذوف؟", default=False)
 
     def __unicode__(self):
-        return u"{} for {}".format(self.user.username, self.session.name)
+        if not self.session_registration:
+            return None
+        else:
+            return u"{} for {}".format(self.session_registration.user.username, self.session_registration.session.name)
 
 class QuestionSession(models.Model):
     event = models.ForeignKey(Event, verbose_name="الحدث")

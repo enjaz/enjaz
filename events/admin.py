@@ -6,7 +6,7 @@ from django import forms
 
 from . import models
 
-BASIC_SEARCH_FIELDS = ['user__username', 'user__email',
+BASIC_SEARCH_FIELDS = ['user__pk', 'user__username', 'user__email',
                        'user__common_profile__en_first_name',
                        'user__common_profile__en_middle_name',
                        'user__common_profile__en_last_name',

@@ -228,7 +228,7 @@ class NonStudentSignupForm(EnjazSignupForm):
                                      badge_number=self.cleaned_data['badge_number'],
                                      city=self.cleaned_data['city'],
                                      gender=self.cleaned_data['gender'],
-                                     mobile_number=mobile_number,
+                                     mobile_number=self.cleaned_data['mobile_number'],
                                      job_description=self.cleaned_data['job_description'],
                                      scfhs_number=self.cleaned_data['scfhs_number'],
                                      )

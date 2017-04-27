@@ -4,7 +4,6 @@
 {% block description %}فضلًا املأ النموذج التالي لإتمام عملية التسجيل.{% endblock %}
 
 {% block content %}
-{% comment %}
 {% if form.errors %}
 <div class="form-login-error visible dinar-light">
        <h3 class="dinar-medium">عفوًا، نرجو التأكد من الحقول التالية</h3>
@@ -13,7 +12,6 @@
        {% endfor %}
 </div>
 {% endif %}
-{% endcomment %}
 <div class="dinar-light enjaz-warning"><i class="entypo-info"></i>النموذج أدناه لتسجيل موظفات وموظفي الجامعة. اذا كُنت طالبـ/ـة أو من خارج الجامعة فينبغي اختيار النموذج المُخصص.
 
     <div style="text-align: center; margin-top: 5px; display: block;">
@@ -155,6 +153,23 @@
 					{% if form.city.errors %}
 					    {% for error in form.city.errors %}
 					        <label class='error' for='city' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="input-group{% if form.gender.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-docs"></i>
+					</div>
+					<select {% if form.gender.value and not form.gender.errors %}value="{{ form.gender.value }}" {% endif %}class="form-control" id="gender" name="gender"  title="{{ form.gender.label }}" required="required">
+                                                <option value="">{{ form.gender.label }}</option>
+                                                {% for value, label in form.fields.gender.widget.choices %}
+                                                <option {% if form.gender.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
+					</select>
+					{% if form.gender.errors %}
+					    {% for error in form.gender.errors %}
+					        <label class='error' for='gender' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
 				</div>

@@ -353,7 +353,7 @@ class EditStudentCommonProfile(CollegeCheckMaxin, forms.ModelForm):
         fields = ['ar_first_name', 'ar_middle_name', 'ar_last_name',
                   'en_first_name', 'en_middle_name', 'en_last_name',
                   'alternative_email', 'student_id', 'badge_number',
-                  'mobile_number', 'city', 'gender']
+                  'mobile_number', 'city', 'gender', 'scfhs_number']
 
     def clean(self):
         cleaned_data = super(EditStudentCommonProfile, self).clean()

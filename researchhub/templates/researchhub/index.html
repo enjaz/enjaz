@@ -13,7 +13,7 @@
 <div class="row">
     <div style="border-color: #ffd78a;" class="col-sm-6 col-sm-offset-2 mentor-section-intro">
         <h2 class="english-field mentor-section-header"><i class="fa fa-hand-o-right"></i><br>Meet our supervisors!</h2>
-        <p class="section-intro">Our super-helpful supervisors are willing to take you into a whole new level of research participation!</p>
+        <p class="section-intro">ResearchHub's list of supervisors are here to provide you with new Research opportunities!</p>
     </div>
     <div class="col-md-3">
         <div class="tile-stats tile-orange">
@@ -23,7 +23,7 @@
             <p>Supervisors enlisted on Enjaz</p>
         </div>
     </div>
-</div>    
+</div>
 <div class="row">
     <div class="panel-body">
         <div class="col-md-10 col-md-offset-1 ">
@@ -85,7 +85,7 @@
     </div>
     <div style="border-color: #2c7ea1;" class="col-sm-6 mentor-section-intro">
         <h2 class="english-field mentor-section-header"><i class="fa fa-lightbulb-o"></i><br>Explore open research projects!</h2>
-        <p class="section-intro">Open research projects for you to explore and join!  Oh, and you could post your project, too!</p>
+        <p class="section-intro">Start your own Research or explore new research opportunities to join!</p>
     </div>
 </div>
 <div class="row">
@@ -140,7 +140,7 @@
 <div class="row">
     <div class="col-sm-6 col-sm-offset-2 mentor-section-intro">
         <h2 class="english-field mentor-section-header"><i class="fa fa-magic"></i><br>Meet our skilled students!</h2>
-        <p class="section-intro">Open research projects for you to explore and join!  Oh, and you could post your project, too!</p>
+        <p class="section-intro">ResearchHub's skilled students will help you with all aspects of Research!</p>
     </div>
     <div class="col-md-3">
         <div class="tile-stats tile-mentor">
@@ -202,12 +202,17 @@
 <div class="row">
 </div>
 </div>
+
+{% include "researchhub/partials/feedback_footer.html" %}
+
+
 {% endlocalize %}
 {% endblock %}
 {% block customscript %}
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
 {% include "researchhub/partials/add_project_asset.html" %}
 {% include "researchhub/partials/add_skill_asset.html" %}
+{% include "researchhub/partials/submit_feedback_asset.html" %}
 {% endblock %}
 {% block customstyles %}
     <link href='https://fonts.googleapis.com/css?family=Candal' rel='stylesheet' type='text/css'>

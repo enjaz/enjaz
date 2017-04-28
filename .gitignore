@@ -1,10 +1,9 @@
 *.log
 *.pot
 *.pyc
-local_settings.py
-manage.py
-sc_portal/
-mediafiles/
+secrets.py
+media_files/
+static_files/
 .bashrc
 .project
 .pydevproject
@@ -12,3 +11,5 @@ mediafiles/
 *.sqlite3
 *~
 *#
+*csv
+*xlsx

@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 from django.contrib import admin
-from core.models import Announcement, Publication, StudentClubYear, Tweet
+from core.models import Announcement, Publication, StudentClubYear, Tweet, TwitterAccess
 
 
 class AnnouncementAdmin(admin.ModelAdmin):
@@ -24,3 +24,4 @@ admin.site.register(Announcement, AnnouncementAdmin)
 admin.site.register(Publication, PublicationAdmin)
 admin.site.register(Tweet)
 admin.site.register(StudentClubYear)
+admin.site.register(TwitterAccess)

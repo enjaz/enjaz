@@ -1,0 +1,18 @@
+{% with modal_id='show-recommended_book-modal' no_footer=True modal_title="تفاصيل توصية" %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}
+<script>
+$(function(){
+  $('#show-recommended_book-modal').modal({
+    keyboard: false,
+    backdrop: 'static',
+    show    : false,
+  });
+
+  $(".recommendation").click(function(){
+    $('#show-recommended_book-modal').modal('show');
+    url = $(this).data("url")
+    $("#show-recommended_book-modal .modal-body").load(url);
+  });
+})
+</script>

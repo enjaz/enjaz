@@ -20,7 +20,7 @@ from core import decorators
 from clubs.models import Club
 from activities.models import Activity, Episode
 from media.models import EmployeeReport, FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment, \
-    WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment, POLL_TYPE_CHOICES, ReportComment, Buzz
+    WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment, POLL_TYPE_CHOICES, ReportComment, Buzz, Post
 from media.forms import EmployeeReportForm, FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
     TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm, \
     FollowUpReportImageFormset, FollowUpReportAdImageFormset, ReportCommentForm, BuzzForm
@@ -1221,3 +1221,9 @@ def delete_buzz(request, buzz_id):
     buzz.is_deleted=True
     buzz.save()
     return {"message": "success"}
+
+def show_post(request, slug):
+    post = get_object_or_404(Post, slug=slug)
+    if not post.is_published():
+        raise Http404
+    return render(request, "media/show_post.html", {'post': post})

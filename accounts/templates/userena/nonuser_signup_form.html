@@ -180,12 +180,20 @@
 					{% endif %}
 				</div>
 			</div>
-
-
-
-
-
-
+    
+            <div class="form-group">
+				<div class="input-group{% if form.scfhs_number.errors %} validate-has-error{% endif %}">
+					<div class="input-group-addon">
+						<i class="entypo-vcard"></i>
+					</div>
+					<input {% if form.scfhs_number.value and not form.scfhs_number.errors %}value="{{ form.scfhs_number.value }}" {% endif %}type="text" class="english-field form-control" name="scfhs_number" id="scfhs_number" placeholder="{{ form.scfhs_number.label }} (Optional)"/>
+					{% if form.scfhs_number.errors %}
+					    {% for error in form.scfhs_number.errors %}
+					        <label class='error' for='scfhs_number' style='display: inline-block'>{{ error|escape }}</label>
+					    {% endfor %}
+					{% endif %}
+				</div>
+			</div>
 			<div class="form-group">
 				<div class="input-group{% if form.password1.errors or form.password2.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">

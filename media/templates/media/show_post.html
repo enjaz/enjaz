@@ -1,0 +1,58 @@
+{% extends 'front/front_base.html' %}{% load staticfiles %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block custommeta %}
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@StudentsofKSAUH" />
+    <meta name="twitter:title" content="{{ post.title }}" />
+    <meta name="twitter:description" content="{{ post.body|striptags|truncatewords:20 }}" />{% if post.image %}
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ post.image.url }}" />{% endif %}
+<style>
+    @font-face {
+        font-family: 'KacstOne';
+        src: url('{% static 'fonts/KacstOne.ttf' %}') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+
+      }
+
+    #statement p,
+    #statement blockquote p {
+        font-family: 'KacstOne';
+        text-align: right;
+        font-size: 16px;
+        line-height: 1.4;
+        color: rgb(48, 54, 65);
+    }
+
+    .highlight {
+        background: #ffff89;
+    }
+
+    #post-image {
+        float: left;
+        width: 40%;
+        margin: 0 15px 15px 15px;
+    }
+
+    @media only screen and (max-width: 767px) {
+        #post-image {
+            float: none;
+            width: 80%;
+            margin: 0 15px 15px 15px;
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-8 col-sm-offset-2">
+            <div id="statement" class="text-center">
+                <h1 class="text-right">{{ post.title }}</h1>
+                {% if post.image %}<img id="post-image" src="{{ post.image.url }}">{% endif %}
+                {{ post.body|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

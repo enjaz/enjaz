@@ -1,0 +1,179 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}{% load events_tags %}
+{% block title %}{{ session.event.official_name }}{% endblock %}
+{% block content %}
+
+<div class="row">
+
+    <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
+        <h2 class="mentor-section-header">{{ session.name }}</h2>
+        {% if session.acceptance_method == 'F' %}
+        <p class="text-center alert alert-warning ">This session is <strong>FIRST CAME FIRST SERVE</strong>, the acceptance is approved by default</p>
+        {% endif %}
+    </div>
+
+</div>
+
+
+<!--Panel for pending, approved and rejected-->
+
+<div class="english-field">
+
+        <div class="panel panel-success">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseThree-1" class="english-field notcollapsed">
+                    Approved Registrations ({{ approved_registrations.count }})
+                </a>
+            </h4>
+        </div>
+        <div id="collapseThree-1" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <form method="post">
+              {% csrf_token %}
+            <select name="action">
+                <option>Choose Action</option>
+                <option value="pend">Pend</option>
+                <option value="reject">Reject</option>
+            </select>
+                <div class="row">
+                    <table id="approved" class="display datatable dt-responsive">
+                        <thead>
+                            <tr>
+                                <th class="all"></th>
+                                <th class="not-mobile">Name</th>
+                                <th class="not-mobile">University</th>
+                                <th class="not-mobile">Registration date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for registration in approved_registrations %}
+                            <tr>
+                                <td><input type="checkbox" value="1" name="pk_{{ registration.pk }}"></td>
+                                <td>{{ registration.user.common_profile.get_en_full_name }}</td>
+                                <td>{{ registration.user.common_profile.get_university_or_affiliation }}</td>
+                                <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted|date:"Y-m-d" }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    </form>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseThree-2" class="english-field notcollapsed">
+                    Pending Registrations ({{ pending_registrations.count }})
+                </a>
+            </h4>
+        </div>
+        <div id="collapseThree-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <form method="post">
+              {% csrf_token %}
+            <select name="action">
+                <option>Choose Action</option>
+                <option value="approve">Approve</option>
+                <option value="reject">Reject</option>
+            </select>
+                <div class="row">
+                    <table id="pending" class="display datatable dt-responsive">
+                        <thead>
+                            <tr>
+                                <th class="all"></th>
+                                <th class="not-mobile">Name</th>
+                                <th class="not-mobile">University</th>
+                                <th class="not-mobile">Registration date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for registration in pending_registrations %}
+                            <tr>
+                                <td><input type="checkbox" value="1" name="pk_{{ registration.pk }}"></td>
+                                <td>{{ registration.user.common_profile.get_en_full_name }}</td>
+                                <td>{{ registration.user.common_profile.get_university_or_affiliation }}</td>
+                                <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted|date:"Y-m-d" }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                    <button type="submit" class="btn btn-warning">Submit</button>
+                    </form>
+            </div>
+        </div>
+    </div>
+        <div class="panel panel-danger">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseThree-3" class="english-field notcollapsed">
+                    Regected Registrations ({{ regected_registrations.count }})
+                </a>
+            </h4>
+        </div>
+        <div id="collapseThree-3" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <form method="post">
+              {% csrf_token %}
+            <select name="action">
+                <option>Choose Action</option>
+                <option value="approve">Approve</option>
+                <option value="pend">Pend</option>
+            </select>
+                <div class="row">
+                    <table id="regected" class="display datatable dt-responsive">
+                        <thead>
+                            <tr>
+                                <th class="all"></th>
+                                <th class="not-mobile">Name</th>
+                                <th class="not-mobile">University</th>
+                                <th class="not-mobile">Registration date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for registration in regected_registrations %}
+                            <tr>
+                                <td><input type="checkbox" value="1" name="pk_{{ registration.pk }}"></td>
+                                <td>{{ registration.user.common_profile.get_en_full_name }}</td>
+                                <td>{{ registration.user.common_profile.get_university_or_affiliation }}</td>
+                                <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted|date:"Y-m-d" }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                    <button type="submit" class="btn btn-danger">Submit</button>
+                    </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block customscript %}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<style type="text/css">
+    th, td{
+        text-align: left;
+    }
+</style>
+	<script>
+    $(function(){
+        $("#approved").dataTable({
+            "order": [[ 3, "desc" ]]
+        });
+        $("#pending").dataTable({
+            "order": [[ 3, "desc" ]]
+        });
+        $("#regected").dataTable({
+            "order": [[ 3, "desc" ]]
+        });
+    });
+    </script>
+{% endblock %}

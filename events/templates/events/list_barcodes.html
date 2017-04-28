@@ -1,0 +1,43 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}{% load events_tags %}
+
+{% block title %}بطاقات {{ event.official_name }}{% endblock %}
+{% block pageheaderurl %}{% url 'events:list_barcodes' event.code_name %}{% endblock %}
+
+{% block content %}
+<h1>بطاقات {{ event.get_html_name|safe }}</h1>
+<table id="users" class="display datatable db-responsive">
+    <thead>
+        <tr>
+            <th>الاسم بالعربيّة</th>
+            <th>الاسم بالإنجليزية</th>
+            <th>البريد</th>
+            <th>الجوال</th>
+            <th>البطاقة</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for barcode_user in barcode_users %}
+        <tr>
+            <td>{{ barcode_user.common_profile.get_ar_full_name|default:barcode_user.username }}</td>
+            <td class="english-field">{{ barcode_user.common_profile.get_en_full_name|default:barcode_user.username }}</td>
+            <td class="english-field">{{ barcode_user.email }}</td>
+            <td>{{ barcode_user.common_profile.mobile_number }}</td>
+            <td><a href="{% url 'events:show_barcode_privileged' event.code_name barcode_user.pk %}">البطاقة</a></td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block customscript %}
+    <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+    <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+	<script>
+    $(function(){
+        $("#users").dataTable({
+                      language: {% include 'js/dataTables-arabic.json' %}});
+     });
+</script>
+{% endblock %}

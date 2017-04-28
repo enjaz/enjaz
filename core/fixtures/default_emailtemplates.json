@@ -571,7 +571,7 @@
 },
 {
   "fields": {
-    "last_updated": "2016-09-30T08:23:13.207Z",
+    "last_updated": "2016-09-30T08:23:13Z",
     "name": "due_report_to_report_submitter",
     "language": "",
     "created": "2015-08-30T22:47:45Z",
@@ -1081,7 +1081,7 @@
 },
 {
   "fields": {
-    "last_updated": "2016-04-04T17:21:33Z",
+    "last_updated": "2017-04-10T13:06:39Z",
     "name": "event_registration_submitted",
     "language": "",
     "created": "2016-03-23T12:41:27Z",
@@ -1089,7 +1089,7 @@
     "description": "\u0644\u0644\u0645\u0633\u062c\u0644\u064a\u0646 \u0641\u064a \u0627\u0644\u0641\u0639\u0627\u0644\u064a\u0627\u062a \u0627\u0644\u0643\u0628\u0631\u0649 \u0628\u0639\u062f \u0625\u062a\u0645\u0627\u0645\u0647\u0645 \u0627\u0644\u062a\u0633\u062c\u064a\u0644",
     "content": "{{ name }}\u060c \u0637\u0627\u0628\u062a \u0623\u064a\u0627\u0645\u0643 \u0628\u0643\u0644 \u062e\u064a\u0631!\r\n\r\n\u064a\u0633\u0631\u0646\u0627 \u0623\u0646 \u0646\u0624\u0643\u062f \u0644\u0643 \u0625\u062a\u0645\u0627\u0645\u0643 \u0627\u0644\u062a\u0633\u062c\u064a\u0644 \u0641\u064a {{ event.name }} \u0648\u0627\u0644\u0630\u064a \u0633\u064a\u0639\u0642\u062f \u0641\u064a {% if event.start_date != event.end_date %}\u0627\u0644\u0641\u062a\u0631\u0629 \u0645\u0646 {{ event.start_date|date:\"j F\" }} \u0625\u0644\u0649 {{ event.end_date|date:\"j F\" }}{% else%}{{ event.start_date|date:\"j F\" }}{% endif %}{% if event.has_multiple_sessions %}\u060c \u0648\u0633\u064a\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0631\u0633\u0627\u0644\u0629 \u0623\u062e\u0631\u0649 \u0641\u064a \u062d\u0627\u0644 \u062a\u0623\u0643\u064a\u062f \u0642\u0628\u0648\u0644\u0643 \u0641\u064a \u0648\u0631\u0634 \u0627\u0644\u0639\u0645\u0644 \u0627\u0644\u0645\u0633\u062c\u0644 \u0628\u0647\u0627{% endif %}.\r\n\r\n\u0646\u0646\u0635\u062d\u0643 \u0628\u0645\u062a\u0627\u0628\u0639\u0629 \u0645\u0633\u062a\u062c\u062f\u0627\u062a \u0627\u0644\u062d\u062f\u062b \u0639\u0628\u0631 \u0627\u0644\u0648\u0633\u0627\u0626\u0644 \u0627\u0644\u062a\u0627\u0644\u064a\u0629:\r\n\r\n\u062d\u0633\u0627\u0628\u0646\u0627 \u0639\u0644\u0649 \u062a\u0648\u064a\u062a\u0631:\r\nhttps://twitter.com/{{ event.twitter }}\r\n{% if event.is_on_telegram %}\r\n\u0642\u0646\u0627\u062a\u0646\u0627 \u0639\u0644\u0649 \u062a\u0644\u063a\u0631\u0627\u0645:\r\nhttps://telegram.me/KSAUEVENTS{% endif %}\r\n\u0646\u062a\u0637\u0644\u0639 \u0644\u0631\u0624\u064a\u062a\u0643\u0645!",
     "default_template": null,
-    "subject": "\u062a\u0645 \u0628\u0646\u062c\u0627\u062d \u062a\u0633\u062c\u064a\u0644\u0643 \u0641\u064a {{ event.name }}!"
+    "subject": "\u062a\u0645 \u0628\u0646\u062c\u0627\u062d \u062a\u0633\u062c\u064a\u0644\u0643 \u0641\u064a {{ event.official_name }}!"
   },
   "model": "post_office.emailtemplate",
   "pk": 74
@@ -1186,10 +1186,10 @@
 },
 {
   "fields": {
-    "last_updated": "2016-09-14T14:59:25.784Z",
+    "last_updated": "2016-09-14T14:59:25Z",
     "name": "new_attendee_to_session_submitter",
     "language": "",
-    "created": "2016-09-14T14:59:25.784Z",
+    "created": "2016-09-14T14:59:25Z",
     "html_content": "",
     "description": "\u064a\u0631\u0633\u0644 \u0625\u0644\u0649 \u0645\u064f\u0631\u0633\u0644\u0640/\u0640\u0629 \u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0629 \u0641\u064a \u0633\u0650\u0631\u0627\u062c \u0628\u0639\u062f \u062a\u0623\u0643\u064a\u062f \u0639\u0636\u0648/\u0629 \u062c\u062f\u064a\u062f/\u0629",
     "content": "{{ session.submitter.common_profile.ar_first_name }}\u060c \u0637\u0627\u0628\u062a \u0623\u064a\u0627\u0645\u0643 \u0628\u0643\u0644 \u062e\u064a\u0631!\r\n\r\n\u0646\u0648\u062f \u0623\u0646 \u0646\u0628\u0644\u063a\u0643 \u0623\u0646 {{ attendee.common_profile.get_ar_full_name }} \u0623\u0643\u062f \u062d\u0636\u0648\u0631 \u062c\u0644\u0633\u0629 {{ session.title }}!\r\n\r\n\u064a\u0645\u0643\u0646\u0643 \u0645\u0634\u0627\u0647\u062f\u0629 \u0628\u0642\u064a\u0651\u0629 \u0627\u0644\u0645\u0624\u0643\u062f\u064a\u0646 \u0648\u0627\u0644\u0645\u0624\u0643\u062f\u0627\u062a \u0645\u0646 \u0635\u0641\u062d\u0629 \u0627\u0644\u062c\u0644\u0633\u0629:\r\n\r\n{{ full_url }}\r\n",
@@ -1201,10 +1201,10 @@
 },
 {
   "fields": {
-    "last_updated": "2016-09-30T08:16:13.587Z",
+    "last_updated": "2016-09-30T08:16:13Z",
     "name": "overdue_report_to_report_submitter",
     "language": "",
-    "created": "2016-09-30T08:16:13.587Z",
+    "created": "2016-09-30T08:16:13Z",
     "html_content": "",
     "description": "\u0625\u0644\u0649 \u0627\u0644\u0645\u0645\u062b\u0644\u0640/\u0640\u0629 \u0627\u0644\u0625\u0639\u0644\u0627\u0645\u064a\u0640/\u0640\u0629 \u0623\u0648 \u0627\u0644\u0645\u0648\u0638\u0641\u0640/\u0640\u0629 \u064a\u0648\u0645 \u0627\u0644\u0623\u062d\u062f \u0644\u0636\u0645\u0627\u0646 \u0625\u062a\u0645\u0627\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u062a\u0642\u0627\u0631\u064a\u0631 \u0642\u0628\u0644 \u064a\u0648\u0645 \u0627\u0644\u0627\u062b\u0646\u064a\u0646.",
     "content": "\u0637\u0627\u0628\u062a \u0623\u064a\u0627\u0645\u0643 \u0628\u0643\u0644 \u062e\u064a\u0631!\r\n\r\n\u064a\u0646\u0628\u063a\u064a \u0625\u062a\u0645\u0627\u0645 \u062c\u0645\u064a\u0639 \u0627\u0644\u062a\u0642\u0627\u0631\u064a\u0631 \u0627\u0644\u0625\u0639\u0644\u0627\u0645\u064a\u0629 \u0627\u0644\u0641\u0627\u0626\u062a\u0629 \u0642\u0628\u0644 \u064a\u0648\u0645 \u0627\u0644\u0627\u062b\u0646\u064a\u0646\u060c \u0648\u0627\u0644\u0646\u0634\u0627\u0637 {{ episode.activity.name }} \u0627\u0644\u0630\u064a \u0623\u0642\u0627\u0645\u0647 {{ episode.activity.primary_club.name }} \u0627\u0646\u062a\u0647\u0649 \u064a\u0648\u0645 {{ episode.end_date|date:\"l j F\" }}.\r\n\r\n\u0646\u0631\u062c\u0648 \u0645\u0646\u0643 \u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0646\u0634\u0627\u0637 \u0648\u0625\u0643\u0645\u0627\u0644 \u0627\u0644\u0625\u062c\u0631\u0627\u0621\u0627\u062a \u0645\u0646 \u062e\u0644\u0627\u0644 \u0627\u0644\u0631\u0627\u0628\u0637 \u0627\u0644\u062a\u0627\u0644\u064a:\r\n\r\n{{ full_url }}\r\n\r\n\u0623\u0632\u0643\u0649 \u0627\u0644\u062a\u062d\u064a\u0629\u060c",
@@ -1213,5 +1213,335 @@
   },
   "model": "post_office.emailtemplate",
   "pk": 82
+},
+{
+  "fields": {
+    "last_updated": "2017-02-14T19:05:50Z",
+    "name": "researchhub_feedback_submitted_to_team",
+    "language": "",
+    "created": "2017-02-14T19:05:50Z",
+    "html_content": "",
+    "description": "\u064a\u0631\u0633\u0644 \u0625\u0644\u0649 \u0641\u0631\u064a\u0642 \u0631\u064a\u0633\u064a\u0631\u062a\u0634 \u0647\u0628 \u0628\u0639\u062f \u062a\u0642\u062f\u064a\u0645 \u0627\u0644\u062a\u063a\u0630\u064a\u0629 \u0627\u0644\u0631\u0627\u062c\u0639\u0629",
+    "content": "Dear ResearchHub Team,\r\n\r\n{{ user.common_profile.get_en_full_name }} just sent the following feedback:\r\n\r\nDid you get benefit from ResearchHub?\r\n{{ data.get_benefit }}\r\n\r\nWhy?\r\n{{ data.why}}\r\n\r\nYou can answer them by replying to this email.\r\n\r\nBest,",
+    "default_template": null,
+    "subject": "A new feedback from {{ user.common_profile.get_en_full_name }}"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 83
+},
+{
+  "fields": {
+    "last_updated": "2017-02-14T19:06:29Z",
+    "name": "researchhub_feedback_submitted_to_user",
+    "language": "",
+    "created": "2017-02-14T19:06:29Z",
+    "html_content": "",
+    "description": "\u064a\u0631\u0633\u0644 \u0625\u0644\u0649 \u0645\u0642\u062f\u0645 \u0627\u0644\u062a\u063a\u0630\u064a\u0629 \u0627\u0644\u0631\u0627\u062c\u0639\u0629",
+    "content": "Dear {{ user.common_profile.ar_first_name }},\r\n\r\nWe just received the following feedback:\r\n\r\nDid you get benefit from ResearchHub?\r\n{{ data.get_benefit }}\r\n\r\nWhy?\r\n{{ data.why}}\r\n\r\nIf you have any inquires do not hesitate to contact us on Researchhub@enjazportal.com.\r\n\r\nBest,",
+    "default_template": null,
+    "subject": "We received your feedback! "
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 84
+},
+{
+  "fields": {
+    "last_updated": "2017-02-26T10:16:20Z",
+    "name": "event_session_reminder",
+    "language": "",
+    "created": "2017-02-26T10:10:57Z",
+    "html_content": "",
+    "description": "\u064a\u064f\u0631\u0633\u0644 \u0625\u0644\u0649 \u0627\u0644\u0645\u0633\u062c\u0644\u0627\u062a \u0648\u0627\u0644\u0645\u0633\u062c\u0644\u064a\u0646 \u0641\u064a \u062c\u0644\u0633\u0627\u062a \u0627\u0644\u0623\u0646\u0634\u0637\u0629 \u0627\u0644\u0643\u0628\u0631\u0649 \u0642\u0628\u0644 \u064a\u0648\u0645 \u0645\u0646 \u0639\u0642\u062f\u0647\u0627",
+    "content": "{{ first_name }}\u060c \u0637\u0627\u0628\u062a \u0623\u064a\u0627\u0645\u0643 \u0628\u0643\u0644 \u062e\u064a\u0631!\r\n\r\n\u0646\u0648\u062f \u062a\u0630\u0643\u064a\u0631\u0643\u0645 \u0628\u0627\u0644\u062c\u0644\u0633\u0627\u062a \u0627\u0644\u062a\u064a \u0633\u062c\u0651\u0644\u062a\u0645 \u0628\u0647\u0627 \u0641\u064a {{ event.official_name }} \u0648\u0627\u0644\u062a\u064a \u0633\u062a\u0639\u0642\u062f \u063a\u062f\u064b\u0627 {{ tomorrow_date|date:\"l\" }}!\r\n\r\n\u0627\u0644\u062c\u0644\u0633\u0627\u062a \u0647\u064a:\r\n{% for registration in tomorrow_registrations %}\r\n* {{ registration.session.name }}{% if registration.session.location %} \u0648\u0627\u0644\u062a\u064a \u0633\u062a\u0642\u0627\u0645 \u0641\u064a {{ registration.session.location }}{% endif %}{% if registration.session.start_time and registration.session.end_time %} \u0645\u0646 {{ registration.session.start_time }}-{{ registration.session.end_time }}{% endif %}.{% endfor %}\r\n\r\n\u0646\u062a\u0637\u0644\u0639 \u0644\u0631\u0624\u064a\u062a\u0643\u0645 \u063a\u062f\u064b\u0627!",
+    "default_template": null,
+    "subject": "\u062a\u0630\u0643\u064a\u0631 \u0628\u062a\u0633\u062c\u064a\u0644\u0643 \u0641\u064a {{ event.official_name }}"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 85
+},
+{
+  "fields": {
+    "last_updated": "2017-02-26T10:21:26Z",
+    "name": "researchhub_feedback_submitted_to_team",
+    "language": "",
+    "created": "2017-02-26T10:21:26Z",
+    "html_content": "",
+    "description": "\u064a\u0631\u0633\u0644 \u0625\u0644\u0649 \u0641\u0631\u064a\u0642 \u0631\u064a\u0633\u064a\u0631\u062a\u0634 \u0647\u0628 \u0628\u0639\u062f \u062a\u0642\u062f\u064a\u0645 \u0627\u0644\u062a\u063a\u0630\u064a\u0629 \u0627\u0644\u0631\u0627\u062c\u0639\u0629",
+    "content": "Dear ResearchHub Team,\r\n\r\n{{ user.common_profile.get_en_full_name }} just sent the following feedback:\r\n\r\nDid you get benefit from ResearchHub?\r\n{{ data.get_benefit }}\r\n\r\nWhy?\r\n{{ data.why}}\r\n\r\nYou can answer them by replying to this email.\r\n\r\nBest,",
+    "default_template": null,
+    "subject": "A new feedback from {{ user.common_profile.get_en_full_name }}"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 86
+},
+{
+  "fields": {
+    "last_updated": "2017-02-26T10:21:57Z",
+    "name": "researchhub_feedback_submitted_to_user",
+    "language": "",
+    "created": "2017-02-26T10:21:57Z",
+    "html_content": "",
+    "description": "\u064a\u0631\u0633\u0644 \u0625\u0644\u0649 \u0645\u0642\u062f\u0645 \u0627\u0644\u062a\u063a\u0630\u064a\u0629 \u0627\u0644\u0631\u0627\u062c\u0639\u0629",
+    "content": "Dear {{ user.common_profile.ar_first_name }},\r\n\r\nWe just received the following feedback:\r\n\r\nDid you get benefit from ResearchHub?\r\n{{ data.get_benefit }}\r\n\r\nWhy?\r\n{{ data.why}}\r\n\r\nIf you have any inquires do not hesitate to contact us on Researchhub@enjazportal.com.\r\n\r\nBest,",
+    "default_template": null,
+    "subject": "We received your feedback!"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 87
+},
+{
+  "fields": {
+    "last_updated": "2017-02-27T18:29:12Z",
+    "name": "culture_program_confirm_attendance",
+    "language": "",
+    "created": "2017-02-27T18:29:12Z",
+    "html_content": "",
+    "description": "",
+    "content": "{{ first_name }}\u060c \u0637\u0627\u0628\u062a \u0623\u064a\u0627\u0645\u0643 \u0628\u0643\u0644 \u062e\u064a\u0631!\r\n\r\n\u0643\u0646\u062a\u0645 \u0633\u062c\u0644\u062a\u0645 \u0641\u064a \u0648\u0631\u0634 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0627\u0644\u062b\u0642\u0627\u0641\u064a\u060c \u0648\u0648\u0635\u0644\u062a\u0643\u0645 \u0627\u0644\u064a\u0648\u0645 \u0631\u0633\u0627\u0644\u0629 \u0628\u0630\u0644\u0643 \u0627\u0644\u062a\u0633\u062c\u064a\u0644\u060c \u0644\u0643\u0646\u0646\u0627 \u0646\u0648\u062f \u0625\u062d\u0627\u0637\u062a\u0643\u0645 \u0623\u0646 \u0639\u062f\u062f \u0645\u0642\u0627\u0639\u062f \u0627\u0644\u0648\u0631\u0634 \u0645\u062d\u062f\u0648\u062f \u0628\u062d\u0643\u0645 \u062b\u0631\u0627\u0621 \u0645\u062d\u062a\u0648\u064a\u0627\u062a\u0647\u0627\u060c \u0648\u0628\u0627\u0644\u062a\u0627\u0644\u064a \u0644\u0646 \u064a\u062a\u064a\u0633\u0631 \u0644\u0646\u0627 \u0642\u0628\u0648\u0644 \u0643\u0644 \u0645\u0646 \u0633\u062c\u0651\u0644\u060c \u0648\u0633\u062a\u0635\u0644\u0643\u0645 \u0631\u0633\u0627\u0626\u0644 \u0639\u0644\u0649 \u0627\u0644\u062c\u0648\u0651\u0627\u0644 \u0644\u062a\u0623\u0643\u064a\u062f \u0627\u0644\u0642\u0628\u0648\u0644\u060c \u0648\u0633\u0646\u0633\u0639\u0649 \u062c\u0627\u0647\u062f\u064a\u0646 \u0644\u0642\u0628\u0648\u0644 \u0623\u0643\u0628\u0631 \u0639\u062f\u062f \u0645\u0645\u0643\u0646.\r\n\r\n\u0646\u062a\u0637\u0644\u0639 \u0644\u0623\u0646 \u064a\u0643\u0648\u0646 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0627\u0644\u062b\u0642\u0627\u0641\u064a \u0648\u0639\u0644\u0649 \u0627\u0645\u062a\u062f\u0627\u062f \u0627\u0644\u0623\u064a\u0627\u0645 \u0627\u0644\u062b\u0644\u0627\u062b\u0629 \u0627\u0644\u0642\u0627\u062f\u0645\u0629: \u0628\u0645\u0639\u0631\u0636\u0647 \u0648\u0645\u062d\u0627\u0636\u0631\u0627\u062a\u0647 \u0648\u0648\u0631\u0634\u0647 \u062a\u062c\u0631\u0628\u0629 \u062b\u0631\u064a\u0629 \u0644\u0644\u062c\u0645\u064a\u0639!\r\n\r\n\u0623\u0632\u0643\u0649 \u0627\u0644\u062a\u062d\u064a\u0651\u0629\u060c",
+    "default_template": null,
+    "subject": "\u062a\u0646\u0628\u064a\u0647 \u0628\u062e\u0635\u0648\u0635 \u0648\u0631\u0634 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0627\u0644\u062b\u0642\u0627\u0641\u064a!"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 88
+},
+{
+  "fields": {
+    "last_updated": "2017-03-14T09:53:52Z",
+    "name": "cp5_certificate",
+    "language": "",
+    "created": "2017-03-12T20:34:16Z",
+    "html_content": "",
+    "description": "\u0646\u0635 \u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u062a\u064a \u0623\u0631\u0641\u0642\u062a \u0645\u0639\u0647\u0627 \u0634\u0647\u0627\u062f\u0627\u062a \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0627\u0644\u062b\u0642\u0627\u0641\u064a \u0627\u0644\u062e\u0627\u0645\u0633",
+    "content": "\u0637\u0627\u0628\u062a \u0623\u064a\u0627\u0645\u0643 \u0628\u0643\u0644 \u062e\u064a\u0631\u060c\r\n\r\n\u0647\u0627 \u0642\u062f \u062e\u064f\u062a\u0645 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0627\u0644\u062b\u0642\u0627\u0641\u064a \u0627\u0644\u062e\u0627\u0645\u0633\u060c \u0627\u0644\u0630\u064a \u0623\u062b\u0627\u0631 \u0627\u0644\u0643\u062b\u064a\u0631\u060c \u0627\u0644\u0643\u062b\u064a\u0631 \u0645\u0646 \u0627\u0644\u062f\u0647\u0634\u0629!\r\n\r\n\u0643\u0627\u0646\u062a \u0623\u064a\u0627\u0645 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0627\u0644\u062b\u0642\u0627\u0641\u064a \u062d\u0627\u0641\u0644\u0629\u060c \u0648\u0633\u0639\u064a\u062f\u0629\u060c \u0648\u0646\u062d\u0646 \u0648\u0625\u0630 \u0646\u062b\u0645\u0651\u0646 \u0644\u0643\u0645 \u0635\u0646\u0627\u0639\u0629 \u0627\u0644\u0623\u062b\u0631 \u0641\u064a \u0627\u0644\u0646\u0634\u0627\u0637 \u0627\u0644\u0637\u0644\u0627\u0628\u064a \u0644\u064a\u0633\u0631\u0646\u0627 \u0623\u0646 \u0646\u0631\u0641\u0642 \u0634\u0647\u0627\u062f\u0629 \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u0629 \u0641\u064a \u0627\u0644\u062a\u0646\u0638\u064a\u0645. \u0644\u0623\u064a \u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0623\u0648 \u0627\u0633\u062a\u0641\u0633\u0627\u0631\u0627\u062a \u064a\u0645\u0643\u0646 \u0627\u0644\u062a\u0648\u0627\u0635\u0644 \u0645\u0639 \u0641\u0631\u064a\u0642 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0627\u0644\u062b\u0642\u0627\u0641\u064a \u0627\u0644\u062e\u0627\u0645\u0633:\r\n\r\ncultural.program@ksau-hs.edu.sa\r\n\r\n\u0646\u0644\u0642\u0627\u0643\u0645 \u0641\u064a \u0646\u0634\u0627\u0637 \u0637\u0644\u0627\u0628\u064a \u0642\u0627\u062f\u0645\u060c \u0645\u0639 \u0623\u0632\u0643\u0649 \u0627\u0644\u062a\u062d\u064a\u0651\u0629\u060c",
+    "default_template": null,
+    "subject": "\u0634\u0647\u0627\u062f\u0629 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0627\u0644\u062b\u0642\u0627\u0641\u064a \u0627\u0644\u062e\u0627\u0645\u0633"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 89
+},
+{
+  "fields": {
+    "last_updated": "2017-03-12T21:43:38Z",
+    "name": "cp5_certificate_resend",
+    "language": "",
+    "created": "2017-03-12T21:37:18Z",
+    "html_content": "",
+    "description": "",
+    "content": "\u0637\u0627\u0628\u062a \u0623\u064a\u0627\u0645\u0643 \u0628\u0643\u0644 \u062e\u064a\u0631\u060c\r\n\r\n\u0641\u064a \u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u0633\u0627\u0628\u0642\u0629 \u0623\u064f\u0631\u0641\u0642\u062a \u0634\u0647\u0627\u062f\u0629 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0627\u0644\u062b\u0642\u0627\u0641\u064a \u0627\u0644\u062e\u0627\u0645\u0633 \u062f\u0648\u0646 \u0623\u0646 \u0646\u064f\u0628\u064a\u0651\u0646 \u0635\u0650\u064a\u063a\u062a\u0647\u0627.\r\n\r\n\u0645\u0639 \u0647\u0630\u0647 \u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0623\u0631\u0641\u0642\u0646\u0627 \u0646\u0633\u062e\u0629 \u0645\u0646 \u0634\u0647\u0627\u062f\u062a\u0643\u0645 \u064a\u0633\u0647\u0644 \u0641\u062a\u062d\u0647\u0627.\r\n\r\n\u0623\u0632\u0643\u0649 \u0627\u0644\u062a\u062d\u064a\u0651\u0629\u060c",
+    "default_template": null,
+    "subject": "\u062a\u0635\u062d\u064a\u062d: \u0634\u0647\u0627\u062f\u0629 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0627\u0644\u062b\u0642\u0627\u0641\u064a \u0627\u0644\u062e\u0627\u0645\u0633"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 90
+},
+{
+  "fields": {
+    "last_updated": "2017-03-14T09:42:30Z",
+    "name": "cp5_workshop_certificate",
+    "language": "",
+    "created": "2017-03-14T09:35:00Z",
+    "html_content": "",
+    "description": "\u0634\u0647\u0627\u062f\u0627\u062a \u0645\u0646 \u062d\u0636\u0648\u0631\u0648\u0627 \u0648\u0631\u0634 \u0639\u0645\u0644 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0627\u0644\u062b\u0642\u0627\u0641\u064a \u0627\u0644\u062e\u0627\u0645\u0633",
+    "content": "\u0637\u0627\u0628\u062a \u0623\u064a\u0627\u0645\u0643 \u0628\u0643\u0644 \u062e\u064a\u0631\u060c\r\n\r\n\u0647\u0627 \u0642\u062f \u062e\u064f\u062a\u0645 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0627\u0644\u062b\u0642\u0627\u0641\u064a \u0627\u0644\u062e\u0627\u0645\u0633\u060c \u0627\u0644\u0630\u064a \u0623\u062b\u0627\u0631 \u0627\u0644\u0643\u062b\u064a\u0631\u060c \u0627\u0644\u0643\u062b\u064a\u0631 \u0645\u0646 \u0627\u0644\u062f\u0647\u0634\u0629!\r\n\r\n\u0633\u0639\u062f\u0646\u0627 \u0628\u0627\u0646\u0636\u0645\u0627\u0645\u0643 \u0644\u0648\u0631\u0634 \u0639\u0645\u0644 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c\u060c \u0648\u064a\u0633\u0639\u062f\u0646\u0627 \u0623\u0646 \u0646\u0631\u0641\u0642 \u0634\u0647\u0627\u062f\u0629 \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u0629 \u0641\u064a \u0627\u0644\u0648\u0631\u0634\u0629\u060c \u0648\u0644\u0623\u064a \u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0623\u0648 \u0627\u0633\u062a\u0641\u0633\u0627\u0631\u0627\u062a \u064a\u0645\u0643\u0646 \u0627\u0644\u062a\u0648\u0627\u0635\u0644 \u0645\u0639 \u0641\u0631\u064a\u0642 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0627\u0644\u062b\u0642\u0627\u0641\u064a \u0627\u0644\u062e\u0627\u0645\u0633:\r\n\r\ncultural.program@ksau-hs.edu.sa\r\n\r\n\u0646\u0644\u0642\u0627\u0643 \u0641\u064a \u0646\u0634\u0627\u0637 \u0637\u0644\u0627\u0628\u064a \u0642\u0627\u062f\u0645\u060c \u0645\u0639 \u0623\u0632\u0643\u0649 \u0627\u0644\u062a\u062d\u064a\u0651\u0629\u060c",
+    "default_template": null,
+    "subject": "\u0634\u0647\u0627\u062f\u0629 \u0648\u0631\u0634\u0629 \u0639\u0645\u0644 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0627\u0644\u062b\u0642\u0627\u0641\u064a \u0627\u0644\u062e\u0627\u0645\u0633"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 91
+},
+{
+  "fields": {
+    "last_updated": "2017-03-17T17:00:54Z",
+    "name": "hpc_off_campus_abstract",
+    "language": "",
+    "created": "2017-03-17T16:55:28Z",
+    "html_content": "",
+    "description": "",
+    "content": "Dear abstract submitter,\r\n\r\nWe are sorry to inform you that the abstract submitted by you entitled \"{{ title }}\" to the Health Profession Conference in {{ city}} was rejected.\r\n\r\nWe would like to invite you, however, to attend the conference and be part of an exciting program that targets the latest in health professions.\r\n\r\nBest,",
+    "default_template": null,
+    "subject": "HPC abstract evaluation result"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 92
+},
+{
+  "fields": {
+    "last_updated": "2017-03-22T13:00:04Z",
+    "name": "hpc2_evaluators_riyadh",
+    "language": "",
+    "created": "2017-03-22T13:00:04Z",
+    "html_content": "",
+    "description": "\u0644\u0645\u0642\u064a\u0645\u064a \u0648\u0645\u064f\u0642\u064a\u0651\u0645\u0627\u062a \u0623\u0628\u062d\u0627\u062b \u0627\u0644\u0631\u064a\u0627\u0636 \u0628\u0639\u062f \u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628\u0627\u062a \u0644\u0647\u0645.",
+    "content": "Dear evaluator!\r\n\r\nWelcome to the {{ event.english_name }}!\r\n\r\nWe would like thank you for participating in online abstract evaluation! Below are the credentials required for online evaluation of abstracts.\r\n\r\nUsername: {{ user.username }}\r\nPassword: {{ random_password }}\r\n\r\nEach abstract has two randomly-assigned evalautors.  The eventual score will be the average of both evaluators.  The top abstracts will be accepted for oral or poster presentation at the conference.\r\n\r\nBelow are the steps needed for evaluating the abstracts:\r\n\r\n1) Kindly go the following page and login:\r\nhttps://enjazportal.com/events/hpc2-r/abstracts/evaluators/\r\n2) On the Abstract Evaluation page, two tables are shown: one for abstracts pending evaluation, and the other for evaluated abstracts.\r\n3) By clicking an abstract title, the abstract will be shown with 7 evaluation criteria.\r\n4) After evaluating the abstracts, kindly press \"Submit\"\r\n\r\nPlease do not hesitate to contact us for any further assistance or clarification!\r\n\r\nBest regards,",
+    "default_template": null,
+    "subject": "HOWTO: HPC Abstract Evaluation"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 93
+},
+{
+  "fields": {
+    "last_updated": "2017-03-22T13:30:29Z",
+    "name": "hpc2_evaluators_jeddah",
+    "language": "",
+    "created": "2017-03-22T13:30:29Z",
+    "html_content": "",
+    "description": "\u0644\u0645\u0642\u064a\u0645\u064a \u0648\u0645\u064f\u0642\u064a\u0651\u0645\u0627\u062a \u0623\u0628\u062d\u0627\u062b \u062c\u062f\u0651\u0629 \u0628\u0639\u062f \u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628\u0627\u062a \u0644\u0647\u0645.",
+    "content": "Dear evaluator!\r\n\r\nWelcome to the {{ event.english_name }}!\r\n\r\nWe would like thank you for participating in online abstract evaluation! Below are the credentials required for online evaluation of abstracts.\r\n\r\nUsername: {{ user.username }}\r\nPassword: {{ random_password }}\r\n\r\nEach abstract has two randomly-assigned evalautors.  The eventual score will be the average of both evaluators.  The top abstracts will be accepted for oral or poster presentation at the conference.\r\n\r\nBelow are the steps needed for evaluating the abstracts:\r\n\r\n1) Kindly go the following page and login:\r\nhttps://enjazportal.com/events/hpc2-j/abstracts/evaluators/\r\n2) On the Abstract Evaluation page, two tables are shown: one for abstracts pending evaluation, and the other for evaluated abstracts.\r\n3) By clicking an abstract title, the abstract will be shown with 7 evaluation criteria.\r\n4) After evaluating the abstracts, kindly press \"Submit\"\r\n\r\nPlease do not hesitate to contact us for any further assistance or clarification!\r\n\r\nBest regards,",
+    "default_template": null,
+    "subject": "HOWTO: HPC Abstract Evaluation"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 94
+},
+{
+  "fields": {
+    "last_updated": "2017-03-24T16:59:38Z",
+    "name": "hpc2_evaluators_reminder",
+    "language": "",
+    "created": "2017-03-24T16:58:27Z",
+    "html_content": "",
+    "description": "\u062a\u0630\u0643\u064a\u0631 \u0644\u0645\u0642\u064a\u0645\u064a \u0648\u0645\u064f\u0642\u064a\u0651\u0645\u0627\u062a \u0627\u0644\u0623\u0628\u062d\u0627\u062b.",
+    "content": "Dear evaluator,\r\n\r\nWe would like to send all the responses to abstract submitter, abstract evaluation will end at 11:59PM of Monday March 27, 2017.\r\n\r\nWe would like to take this opportunity to thank you again for participating in abstract evaluation of the Health Professions Conference!\r\n\r\nBest regards,",
+    "default_template": null,
+    "subject": "REMINDER: HPC Abstract Evaluation"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 95
+},
+{
+  "fields": {
+    "last_updated": "2017-04-02T22:22:13Z",
+    "name": "hpc2_accepted_poster",
+    "language": "",
+    "created": "2017-04-02T21:09:26Z",
+    "html_content": "",
+    "description": "\u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u0645\u0628\u062f\u0626\u064a\u0629 \u0628\u0642\u0628\u0648\u0644 \u0627\u0644\u0645\u0644\u0635\u0642\u0627\u062a \u0627\u0644\u0628\u062d\u062b\u064a\u0629 \u0641\u064a \u0645\u0624\u062a\u0645\u0631 \u0627\u0644\u062a\u062e\u0635\u0635\u0627\u062a \u0627\u0644\u0635\u062d\u064a\u0629 \u0627\u0644\u062b\u0627\u0646\u064a \u0641\u064a \u0627\u0644\u0631\u064a\u0627\u0636.",
+    "content": "Dear {{abstract.presenting_author }},\r\n\r\nWe are excited to inform you that your abstract submission, titled \"{{ title }}\", was accepted for poster presentation in the Health Profession Conference 2017!  The conference will be held at King Saud bin Abdulaziz University for Health Sciences in Riyadh on April 23-25, 2017.\r\n\r\nPoster presentations will be on the first and second days of the conference (April 23rd and April 24th). The exact instructions on the template to be used and further requirements will be sent this Thursday, April 6th.\r\n\r\nWe are looking forward to seeing you at the conference!\r\n\r\nBest,",
+    "default_template": null,
+    "subject": "Your abstract has been accepted for poster presentation!"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 96
+},
+{
+  "fields": {
+    "last_updated": "2017-04-02T22:21:52Z",
+    "name": "hpc2_accepted_oral",
+    "language": "",
+    "created": "2017-04-02T21:16:00Z",
+    "html_content": "",
+    "description": "\u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u0645\u0628\u062f\u0626\u064a\u0629 \u0628\u0642\u0628\u0648\u0644 \u0627\u0644\u0639\u0631\u0648\u0636 \u0627\u0644\u0628\u062d\u062b\u064a\u0629 \u0627\u0644\u0634\u0641\u0647\u064a\u0629 \u0641\u064a \u0645\u0624\u062a\u0645\u0631 \u0627\u0644\u062a\u062e\u0635\u0635\u0627\u062a \u0627\u0644\u0635\u062d\u064a\u0629 \u0627\u0644\u062b\u0627\u0646\u064a \u0641\u064a \u0627\u0644\u0631\u064a\u0627\u0636.",
+    "content": "Dear {{abstract.presenting_author }},\r\n\r\nWe are excited to inform you that your abstract submission, titled \"{{title }}\", was accepted for oral presentation in the Health Profession Conference 2017!  The conference will be held at King Saud bin Abdulaziz University for Health Sciences in Riyadh on April 23-25, 2017.\r\n\r\nOral presentations will be on the second day of the conference April 24th from 8:30AM to 12:00PM. All presenters are required to be at the university's Convention Center at 8:30AM.  Each presentation will have eight minutes followed by two minutes of questions by the evaluation committee.\r\n\r\nWe are looking forward to seeing you at the conference!\r\n\r\nBest,",
+    "default_template": null,
+    "subject": "Your abstract has been accepted for oral presentation!"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 97
+},
+{
+  "fields": {
+    "last_updated": "2017-04-02T22:23:53Z",
+    "name": "hpc2_rejected_abstract",
+    "language": "",
+    "created": "2017-04-02T22:11:49Z",
+    "html_content": "",
+    "description": "\u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u0625\u062e\u0637\u0627\u0631 \u0628\u0631\u0641\u0636 \u0627\u0644\u0645\u0644\u062e\u0635\u0627\u062a \u0627\u0644\u0628\u062d\u062b\u064a\u0629 \u0641\u064a \u0645\u0624\u062a\u0645\u0631 \u0627\u0644\u062a\u062e\u0635\u0635\u0627\u062a \u0627\u0644\u0635\u062d\u064a\u0629 \u0627\u0644\u062b\u0627\u0646\u064a \u0641\u064a \u0627\u0644\u0631\u064a\u0627\u0636.",
+    "content": "Dear {{abstract.presenting_author }},\r\n\r\nWe are sorry to inform you that your abstract titled \"{{title }}\" was declined from presentation in the Health Profession Conference 2017.  It is our hope, however, to see you at the conference which will be held from April 23rd to April 25th, 2017 at King Saud bin Abdulaziz University for Health Sciences.\r\n\r\nBest,",
+    "default_template": null,
+    "subject": "Abstract submission to the Health Profession Conference declined"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 98
+},
+{
+  "fields": {
+    "last_updated": "2017-04-06T14:12:38Z",
+    "name": "osama",
+    "language": "",
+    "created": "2017-04-06T14:12:38Z",
+    "html_content": "",
+    "description": "",
+    "content": "Dear Osama,\r\n\r\nFollowing Email is for you :)\r\n\r\n\r\nAbstract ID: {{abstract.pk }}\r\nAbstract Title: {{abstract.title }}\r\nAbstract Author: {{abstract.presenting_author }}\r\n\r\nUrl: {{ full_url }}\r\n\r\n",
+    "default_template": null,
+    "subject": "Good Evening"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 100
+},
+{
+  "fields": {
+    "last_updated": "2017-04-11T13:09:59Z",
+    "name": "Posters_instructions_23April",
+    "language": "",
+    "created": "2017-04-07T17:15:41Z",
+    "html_content": "",
+    "description": "\u0631\u0633\u0627\u0644\u0629 \u062a\u062d\u062a\u0648\u064a \u0639\u0644\u0649 \u062a\u0641\u0627\u0635\u064a\u0644 \u0627\u0644\u0631\u0641\u0639 \u0644\u0645\u0642\u062f\u0645\u064a \u0627\u0644\u0645\u0644\u0635\u0642\u0627\u062a \u0627\u0644\u0628\u062d\u062b\u064a\u0629 23 \u0627\u0628\u0631\u064a\u0644",
+    "content": "Dear {{abstract.presenting_author }},\r\n\r\nThis E-Mail contains instructions for your Poster abstract: \"{{ abstract.title }}\" ID: \"{{ abstract.pk }}\"\r\n\r\n\r\nDuring the Health Profession Conference 2017, electronic posters (ePosters) will be used instead of the conventional paper based posters. \r\n\r\nePosters are displayed on big screens with similar dimensions to the conventional posters, but they are more efficient, space saving and environment friendly. \r\n\r\nYour Poster session will be on 23th of April and each presenter will have a designated time present his\\her poster. (the designated times will be announced soon) \r\n\r\nTo prepare your eposter, it is mandatory to use the template from the link bellow and to follow these guidlines:\r\n\r\n-Each poster can have maximally two slides (dont crowd everything in one slide, you have enough space with two slides).\r\n-size and dimensions of the slide are already set in the template, so PLEASE, don't make any changes of size and dimensions of the slides.AND PLEASE do not add any additonal logos \r\n-The least acceptable font size in the body texts is 40.\r\n-No sounds or videos can be uploaded with the eposter, only pictures and graphs (make sure, that you use big enough graphs). \r\n-When you paste a picture or a graph on the slide, choose \"keep source formatting. (mandatory)\r\n-Each eposter should be saved into two formats PPT and JPEG (make sure that the picture in  JPEG format is not distorted after you export the file).\r\n-Both the PPT and JPEG should be uploaded to the enjaz system. (each file should be named with the presenter name and the reference number of the abstract).\r\n-Please upload your poster before the 15th of April as we will not accept any posters after that date\r\n\r\n\r\nTemplate link: https://enjazportal.com/media/files/events/presentations/HPC_2017_Poster_Template.pptx\r\nInstructions: \r\nhttps://enjazportal.com/media/files/events/posters/Note_for_E-Poster__How_to_Paste_.png\r\nhttps://enjazportal.com/media/files/events/poster_powerpoints/Notes_for_E-Poster_Submission.png\r\n\r\nYou can upload your abstract by signing-in to your Enjaz account and opening your abstract\r\nOr by using the following link: {{ full_url }}\r\n\r\nWe are looking forward to seeing you at the conference!\r\n\r\nBest,",
+    "default_template": null,
+    "subject": "HPC: Instructions for Uplpading ePoster "
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 101
+},
+{
+  "fields": {
+    "last_updated": "2017-04-11T13:10:28Z",
+    "name": "Posters_instructions_24April",
+    "language": "",
+    "created": "2017-04-07T17:20:31Z",
+    "html_content": "",
+    "description": "\u0631\u0633\u0627\u0644\u0629 \u062a\u062d\u062a\u0648\u064a \u0639\u0644\u0649 \u062a\u0641\u0627\u0635\u064a\u0644 \u0627\u0644\u0631\u0641\u0639 \u0644\u0645\u0642\u062f\u0645\u064a \u0627\u0644\u0645\u0644\u0635\u0642\u0627\u062a \u0627\u0644\u0628\u062d\u062b\u064a\u0629 24 \u0627\u0628\u0631\u064a\u0644",
+    "content": "Dear {{abstract.presenting_author }},\r\n\r\nThis E-Mail contains instructions for your Poster abstract: \"{{ abstract.title }}\" ID: \"{{ abstract.pk }}\"\r\n\r\n\r\nDuring the Health Profession Conference 2017, electronic posters (ePosters) will be used instead of the conventional paper based posters. \r\n\r\nePosters are displayed on big screens with similar dimensions to the conventional posters, but they are more efficient, space saving and environment friendly. \r\n\r\nYour Poster session will be on 24th of April and each presenter will have a designated time present his\\her poster. (the designated times will be announced soon) \r\n\r\nTo prepare your eposter, it is mandatory to use the template from the link bellow and to follow these guidlines:\r\n\r\n-Each poster can have maximally two slides (dont crowd everything in one slide, you have enough space with two slides).\r\n-size and dimensions of the slide are already set in the template, so PLEASE, don't make any changes of size and dimensions of the slides.AND PLEASE do not add any additonal logos \r\n-The least acceptable font size in the body texts is 40.\r\n-No sounds or videos can be uploaded with the eposter, only pictures and graphs (make sure, that you use big enough graphs). \r\n-When you paste a picture or a graph on the slide, choose \"keep source formatting. (mandatory)\r\n-Each eposter should be saved into two formats PPT and JPEG (make sure that the picture in  JPEG format is not distorted after you export the file).\r\n-Both the PPT and JPEG should be uploaded to the enjaz system. (each file should be named with the presenter name and the reference number of the abstract).\r\n-Please upload your poster before the 15th of April as we will not accept any posters after that date\r\n\r\n\r\nTemplate link: https://enjazportal.com/media/files/events/presentations/HPC_2017_Poster_Template.pptx\r\nInstructions: \r\nhttps://enjazportal.com/media/files/events/posters/Note_for_E-Poster__How_to_Paste_.png\r\nhttps://enjazportal.com/media/files/events/poster_powerpoints/Notes_for_E-Poster_Submission.png\r\n\r\nYou can upload your abstract by signing-in to your Enjaz account and opening your abstract\r\nOr by using the following link: {{ full_url }}\r\n\r\nWe are looking forward to seeing you at the conference!\r\n\r\nBest,",
+    "default_template": null,
+    "subject": "HPC: Instructions for Uplpading ePoster "
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 102
+},
+{
+  "fields": {
+    "last_updated": "2017-04-17T14:30:33Z",
+    "name": "hpc2_oral_presentation_workshop",
+    "language": "",
+    "created": "2017-04-17T14:30:33Z",
+    "html_content": "",
+    "description": "\u0631\u0633\u0627\u0644\u0629 \u062a\u0631\u0633\u0644 \u0625\u0644\u0649 \u0627\u0644\u0637\u0644\u0627\u0628 \u0648\u0627\u0644\u0637\u0627\u0644\u0628\u0627\u062a \u0627\u0644\u0645\u0642\u0628\u0648\u0644\u064a\u0646 \u0644\u0644\u062a\u0642\u062f\u064a\u0645\u0627\u062a \u0627\u0644\u0634\u0641\u0647\u064a\u0629 \u0641\u064a \u0645\u0624\u062a\u0645\u0631 \u0627\u0644\u062a\u062d\u0635\u0635\u0627\u062a \u0627\u0644\u0635\u062d\u064a\u0629 \u0628\u062e\u0635\u0648\u0635 \u0648\u0631\u0634\u0629 \u0627\u0644\u0639\u0645\u0644 \u0627\u0644\u062a\u0639\u0631\u064a\u0641\u064a\u0629 \u0627\u0644\u062a\u064a \u0633\u062a\u0642\u0627\u0645 \u064a\u0648\u0645 \u0627\u0644\u0623\u0631\u0628\u0639\u0627\u0621 19 \u0623\u0628\u0631\u064a\u0644 2017.",
+    "content": "Dear {{abstract.presenting_author }},\r\n\r\nAs part of our continued effort to make the Health Profession Conference 2017 an extraordinary experience for all students, we would like to invite you, as an oral presenter, to a special, pre-conference, free-of-charge workshop that will take place this Wednesday April 19!\r\n\r\nThe work shop will be on the best practices of oral presenters, with critical tips that will help you get your presentation up to speed!  The workshop will be presented by one of the abstract elevators, Prof. Ali Hajeer, from 3:00PM to 4:30PM at the Convention Center at the KSAU-HS campus.\r\n\r\nTo confirm your attendance, you must respond to this email no later than Tuesday, April 18 2:00PM.\r\n\r\nBest regards,",
+    "default_template": null,
+    "subject": "Special invitiation: HPC pre-conference workshop for oral presenters"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 105
+},
+{
+  "fields": {
+    "last_updated": "2017-04-19T02:38:01Z",
+    "name": "hpc2_pharmacy_program_cancellation",
+    "language": "",
+    "created": "2017-04-19T02:38:01Z",
+    "html_content": "",
+    "description": "",
+    "content": "{{ first_name }} \u0637\u0627\u0628\u062a \u0623\u064a\u0627\u0645\u0643 \u0628\u0643\u0644 \u062e\u064a\u0631\u060c\r\n\r\n\u0646\u0648\u062f \u0625\u062e\u0637\u0627\u0631\u0643 \u0628\u0623\u0646 \u0628\u0631\u0646\u0627\u0645\u062c \u0643\u0644\u064a\u0629 \u0627\u0644\u0635\u064a\u062f\u0644\u0629 \u0641\u064a \u0645\u0624\u062a\u0645\u0631 \u0627\u0644\u062a\u062e\u0635\u0635\u0627\u062a \u0627\u0644\u0635\u062d\u064a\u0629 \u0648\u0627\u0644\u0630\u064a \u0643\u0627\u0646 \u0633\u064a\u0639\u0642\u062f \u0641\u064a \u0627\u0644\u064a\u0648\u0645 \u0627\u0644\u062b\u0627\u0644\u062b \u0648\u0627\u0644\u0623\u062e\u064a\u0631 \u0645\u0646 \u0627\u0644\u0645\u0624\u062a\u0645\u0631 (\u0627\u0644\u062b\u0644\u0627\u062b\u0627\u0621 25 \u0623\u0628\u0631\u064a\u0644) \u0644\u0646 \u064a\u064f\u0639\u0642\u062f \u0644\u0638\u0631\u0648\u0641 \u062e\u0627\u0631\u062c\u0629 \u0639\u0646 \u0625\u0631\u0627\u062f\u0629 \u0645\u0646\u0638\u0651\u0645\u064a \u0648\u0645\u0646\u0638\u0651\u0645\u0627\u062a \u0627\u0644\u0645\u0624\u062a\u0645\u0631.\r\n\r\n\u0646\u062b\u0645\u0651\u0646 \u0644\u0643 \u0627\u0644\u062a\u0633\u062c\u064a\u0644 \u0641\u064a \u0628\u0631\u0646\u0627\u0645\u062c \u0627\u0644\u0643\u0644\u064a\u0629\u060c \u0648\u0646\u062f\u0639\u0648\u0643 \u0644\u0644\u0627\u0646\u0636\u0645\u0627\u0645 \u0644\u0628\u0631\u0627\u0645\u062c \u0627\u0644\u0645\u0624\u062a\u0645\u0631 \u0648\u0641\u0639\u0627\u0644\u064a\u062a\u0647 \u0648\u0648\u0631\u0634 \u0639\u0645\u0644\u0647 \u0627\u0644\u0623\u062e\u0631\u0649 \u0641\u064a \u0643\u0644 \u064a\u0648\u0645 \u0645\u0646 \u0627\u0644\u0623\u064a\u0627\u0645 \u0627\u0644\u062b\u0644\u0627\u062b\u0629\u060c \u0648\u064a\u0645\u0643\u0646\u0643 \u0627\u0644\u0627\u0637\u0644\u0627\u0639 \u0639\u0644\u0649 \u062a\u0641\u0627\u0635\u064a\u0644 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0641\u064a \u0627\u0644\u0635\u0641\u062d\u0629 \u0627\u0644\u062a\u0627\u0644\u064a\u0629:\r\n\r\nhttps://enjazportal.com/events/hpc2-r/sessions/\r\n\r\n\u0623\u0632\u0643\u0649 \u0627\u0644\u062a\u062d\u064a\u0651\u0629\u060c",
+    "default_template": null,
+    "subject": "\u062a\u062d\u062f\u064a\u062b \u0628\u062e\u0635\u0648\u0635 \u0628\u0631\u0646\u0627\u0645\u062c \u0643\u0644\u064a\u0629 \u0627\u0644\u0635\u064a\u062f\u0644\u0629"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 106
+},
+{
+  "fields": {
+    "last_updated": "2017-04-20T21:05:56.266Z",
+    "name": "event_badge_notification",
+    "language": "",
+    "created": "2017-04-20T20:31:57.424Z",
+    "html_content": "",
+    "description": "\u0631\u0633\u0627\u0644\u0629 \u062a\u0631\u0633\u0644 \u0625\u0644\u0649 \u062c\u0645\u064a\u0639 \u0627\u0644\u0645\u0642\u0628\u0648\u0644\u064a\u0646 \u0648\u0627\u0644\u0645\u0642\u0628\u0648\u0644\u0627\u062a \u0641\u064a \u0627\u0644\u0646\u0634\u0627\u0637\u0627\u062a \u0627\u0644\u062a\u064a \u0641\u064a\u0647\u0627 \u062a\u062d\u0636\u064a\u0631",
+    "content": "{{ event_user.common_profile.ar_first_name }}! \u0637\u0627\u0628\u062a \u0623\u064a\u0627\u0645\u0643 \u0628\u0643\u0644 \u062e\u064a\u0631\u060c\r\n\r\n\u0646\u0648\u062f \u0625\u062e\u0637\u0627\u0631\u0643 \u0628\u0642\u0628\u0648\u0644\u0643 \u0641\u064a {{ event.official_name }} \u0648\u0627\u0644\u0630\u064a \u0633\u064a\u0642\u0627\u0645 \u0641\u064a \u0627\u0644\u0641\u062a\u0631\u0629 \u0645\u0646 {{ event.start_date|date:\"l j F Y\" }} \u0625\u0644\u0649 {{ event.end_date|date:\"l j F Y\" }}!\r\n\r\n\u064a\u0645\u0643\u0646\u0643 \u0627\u0644\u0627\u0637\u0644\u0627\u0639 \u0639\u0644\u0649 \u0627\u0644\u062c\u0644\u0633\u0627\u062a \u0627\u0644\u062a\u064a \u062a\u0645\u0651 \u0627\u0644\u0642\u0628\u0648\u0644 \u0641\u064a\u0647\u0627 \u0645\u0646 \u0627\u0644\u0635\u0641\u062d\u0629 \u0627\u0644\u062a\u0627\u0644\u064a\u0629: {{ my_registration_url }}\r\n\r\n\u0641\u064a \u0627\u0644\u0645\u0631\u0641\u0642\u0627\u062a \u062a\u0630\u0643\u0631\u062a\u0643 \u0644\u0644\u062d\u0636\u0648\u0631 \u0648\u064a\u0646\u0628\u063a\u064a \u0627\u0644\u062d\u0631\u0635 \u0639\u0644\u0649 \u0625\u062d\u0636\u0627\u0631\u0647\u0627 \u0644\u0644\u062a\u0645\u0643\u0651\u0646 \u0645\u0646 \u062f\u062e\u0648\u0644 \u0627\u0644\u062d\u062f\u062b\u060c \u0648\u0644\u0627 \u062d\u0627\u062c\u0629 \u0644\u0637\u0628\u0627\u0639\u062a\u0647\u0627\u060c \u0628\u0644 \u064a\u064f\u0643\u062a\u0641\u0649 \u0628\u062d\u0641\u0638 \u0627\u0644\u0645\u0644\u0641\u0651 \u0627\u0644\u0645\u0631\u0641\u0642 \u0639\u0644\u0649 \u0627\u0644\u062c\u0648\u0651\u0627\u0644 \u0648\u0625\u0638\u0627\u0647\u0631\u0647 \u0641\u064a \u0645\u0648\u0642\u0639 \u0627\u0644\u062d\u062f\u062b.{% if event.is_on_telegram or event.twitter %}\r\n\r\n\u0643\u0645\u0627 \u0646\u0624\u0643\u062f \u0639\u0644\u0649 \u0623\u0647\u0645\u0651\u064a\u0629 \u0645\u062a\u0627\u0628\u0639\u0629 \u0642\u0646\u0648\u0627\u062a \u0627\u0644\u062d\u062f\u062b \u0639\u0644\u0649:\r\n{% if event.twitter %}* \u062a\u0648\u064a\u062a\u0631: https://twitter.com/{{ event.twitter }}{% endif %}\r\n{% if event.is_on_telegram %}* \u062a\u0644\u063a\u0631\u0627\u0645: https://t.me/StudentsofKSAUH{% endif %}\r\n{% endif %}\r\n\u0646\u062a\u0637\u0644\u0639 \u0644\u062d\u062f\u062b \u0645\u0630\u0647\u0644\u060c \u064a\u0642\u0648\u0645 \u0628\u0623\u064a\u062f\u064d \u0637\u0644\u0627\u0628\u064a\u0651\u0629!\r\n\r\n\u0623\u0632\u0643\u0649 \u0627\u0644\u062a\u062d\u064a\u0651\u0629\u060c",
+    "default_template": null,
+    "subject": "\u062a\u0630\u0643\u0631\u062a\u0643 \u0644\u062d\u0636\u0648\u0631 {{ event.official_name }}"
+  },
+  "model": "post_office.emailtemplate",
+  "pk": 107
 }
 ]

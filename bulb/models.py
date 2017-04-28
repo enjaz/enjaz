@@ -2,8 +2,8 @@
 from datetime import timedelta
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.db.models import Count
 from django.utils import timezone
 
 from tagging.registry import register
@@ -25,6 +25,15 @@ class Category(models.Model):
                                   verbose_name=u"تصنيف علوي؟")
     description = models.TextField(blank=True, verbose_name=u"وصف التصنيف")
     image = models.ImageField(upload_to='bulb/categories/', blank=True, null=True)
+
+    def get_top_recommended_books(self):
+        return self.get_ordered_recommended_books()[:9]
+
+    def get_ordered_recommended_books(self):
+        return self.recommendedbook_set.annotate(recommendation_count=Count('bookrecommendation'))\
+                                       .filter(recommendation_count__gte=1)\
+                                       .order_by('-recommendation_count')
+
     def __unicode__(self):
         return self.name
 
@@ -103,6 +112,10 @@ class Book(models.Model):
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
     objects = managers.BookQuerySet.as_manager()
+    featured_announcement_date = models.DateField(u"تاريخ الإعلان", null=True,
+                                                    default=None)
+    is_featured = models.NullBooleanField(u"هل الكتاب مختار؟", default=False)
+    was_announced = models.NullBooleanField(u"أعلن عنه؟", default=False)
 
 
     def is_in_user_city(self, user):
@@ -576,18 +589,47 @@ class BookCommitment(models.Model):
     def __unicode__(self):
         return self.title
 
-class ReadathonProducts(models.Model):
-    user = models.ForeignKey(User,
-                             u"المستخدمـ/ـة")
-    readathon = models.ForeignKey(Readathon,
-                                u"الريديثون")
-    username = models.CharField(u"أسم المستخدمـ\ـة", max_length=200)
-    title = models.CharField(u"العنوان", max_length=200)
-    body = models.TextField(default=False)
+# class ReadathonProduct(models.Model):
+#     user = models.ForeignKey(User,
+#                              u"المستخدمـ/ـة")
+#     readathon = models.ForeignKey(Readathon,
+#                                 u"الريديثون")
+#     username = models.CharField(u"أسم المستخدمـ\ـة", max_length=200)
+#     title = models.CharField(u"العنوان", max_length=200)
+#     body = models.TextField(default=False)
+#     submission_date = models.DateTimeField(u"تاريخ الإرسال",
+#                                            auto_now_add=True)
+
+
+#     def __unicode__(self):
+#         return self.title
+
+# class ReadathonFiles(models.Model):
+#     readathon_products = models.ForeignKey(ReadathonProduct, related_name='attachment')
+#     attachment = models.FileField(u"ملف", upload_to="readathon/attachment/")
+
+class RecommendedBook(models.Model):
+    title = models.CharField("العنوان", max_length=200)
+    authors = models.CharField(u"تأليف", max_length=200)
+    cover = models.ImageField(u"الغلاف", upload_to='bulb/covers/')
+    category = models.ForeignKey(Category, verbose_name=u"التصنيف")
+    date_submitted = models.DateTimeField(u"تاريخ الإرسال",
+                                          auto_now_add=True)
 
     def __unicode__(self):
         return self.title
 
-class ReadathonFiles(models.Model):
-    readathon_products = models.ForeignKey(ReadathonProducts, related_name='attachment')
-    attachment = models.FileField(u"ملف", upload_to="readathon/attachment/")
+class BookRecommendation(models.Model):
+    comment = models.TextField(u"تعليق")
+    recommended_book = models.ForeignKey(RecommendedBook, verbose_name=u"الكتاب الموصى")
+    user = models.ForeignKey(User, verbose_name=u"المستخدمـ/ـة")
+    is_deleted = models.BooleanField(u"هل حُذف؟",
+                                     default=False)
+    date_submitted = models.DateTimeField(u"تاريخ الإرسال",
+                                          auto_now_add=True)
+    date_modified = models.DateTimeField(u"تاريخ التعديل",
+                                          auto_now=True)
+    objects = managers.BulbQuerySet.as_manager()
+
+    def __unicode__(self):
+        return self.recommended_book.title

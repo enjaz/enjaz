@@ -54,6 +54,8 @@ class CommonProfile(models.Model):
 
     canceled_twitter_connection = models.BooleanField(default=False,
                                                       verbose_name=u"ألغى طلب الربط بتويتر؟")
+    scfhs_number = models.CharField(max_length=255, null=True, default="", blank=True,
+                                   verbose_name=u'SCFHS Registration Number')
     # Fields specific for students
     student_id = models.IntegerField(null=True, blank=True,
                                      verbose_name=u'الرقم الجامعي')
@@ -97,6 +99,44 @@ class CommonProfile(models.Model):
 
         return en_fullname
 
+    def get_ar_short_name(self):
+        short_name = None
+        try:
+            # If the Arabic first name is missing, let's assume the
+            # rest is also missing.
+            if self.ar_first_name:
+                # Some of us just don't like to be addressed with
+                # their full names.  Let's respect that!
+                is_full_name_hater = self.user.groups.filter(name="Full name haters").exists()
+                if is_full_name_hater:
+                    fields = [self.ar_first_name, self.ar_middle_name]
+                else:
+                    fields = [self.ar_first_name, self.ar_last_name]
+                short_name = " ".join(fields)
+        except AttributeError: # If the user has their details missing
+            pass
+
+        return short_name
+
+    def get_en_short_name(self):
+        short_name = None
+        try:
+            # If the Arabic first name is missing, let's assume the
+            # rest is also missing.
+            if self.en_first_name:
+                # Some of us just don't like to be addressed with
+                # their full names.  Let's respect that!
+                is_full_name_hater = self.user.groups.filter(name="Full name haters").exists()
+                if is_full_name_hater:
+                    fields = [self.en_first_name, self.en_middle_name]
+                else:
+                    fields = [self.en_first_name, self.en_last_name]
+                short_name = " ".join(fields)
+        except AttributeError: # If the user has their details missing
+            pass
+
+        return short_name
+
     def get_city_code(self):
         if self.city == u'الرياض':
             return 'R'
@@ -105,6 +145,11 @@ class CommonProfile(models.Model):
         elif self.city == u'الأحساء':
             return 'A'
 
+    def get_university_or_affiliation(self):
+        if self.profile_type == 'S':
+            return "KSAU-HS"
+        else:
+            return self.affiliation
 
 class EnjazProfile(UserenaBaseProfile):
     user = models.OneToOneField(User,

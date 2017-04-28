@@ -8,9 +8,10 @@
 {% block pageheader %}<span class="english-field">ResearchHub</span>{% endblock %}
 
 {% block navbar %}
-    <li class="english-field"><a href="{% url 'researchhub:join_us' %}"><i class="fa fa-envelope"></i> Join the team</a></li>
+    <!--<li class="english-field"><a href="{% url 'researchhub:join_us' %}"><i class="fa fa-envelope"></i> Join the team</a></li> -->
     <li class="english-field"><a href="{% url 'researchhub:submit_consultation' %}"><i class="fa fa-gavel"></i> Get consultation</a></li>
     <li class="english-field"><a href="{% url 'researchhub:faq' %}"><i class="fa fa-question-circle"></i> FAQ</a></li>
+    <li class="english-field"><a id="submit-feedback"><i class="fa fa-commenting-o"></i> Submit FeedBack</a></li>
 {% endblock %}
 
 {% block content %}{% endblock %}

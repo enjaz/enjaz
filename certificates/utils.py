@@ -1,29 +1,48 @@
 from PIL import Image, ImageDraw, ImageFont
+from django.conf import settings
+from django.contrib.staticfiles.templatetags.staticfiles import static
 import cStringIO
 import clubs.utils
 import media.utils
+import random
+import os
 
 
-def generate_certificate_image(template_bytes, image_format, y_position, x_position, text, color, font_size, font_family=None):
-    font_family = '/usr/share/fonts/google-crosextra-carlito/Carlito-Regular.ttf'
+def create_temporary_certificate(request_pk):
+    if settings.DEBUG:
+        root = settings.DEFAULT_STATIC_ROOT
+    else:
+        root = settings.STATIC_ROOT
+    request_pk = str(request_pk)
+    file_path = os.path.join(root, 'certificate_tmp', request_pk)
+    relative_url = static('certificate_tmp/' + str(request_pk))
+    return file_path, relative_url
+
+def generate_certificate_image(request_pk, template, template_bytes,
+                               text):
+    if template.font_family:
+        font_family = template.font_family
+    else:
+        # By default, we are shipping a font
+        font_family = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts', 'Carlito-Regular.ttf')
+
     base = Image.open(cStringIO.StringIO(template_bytes))
     base = base.convert("RGBA")
 
-    txt = Image.new('RGBA', base.size, (255,255,255,0))
+    txt = Image.new('RGBA', base.size, (255, 255, 255, 0))
     # get a font
-    fnt = ImageFont.truetype(font_family, font_size)
+    fnt = ImageFont.truetype(font_family, template.font_size)
     # get a drawing context
     d = ImageDraw.Draw(txt)
     text_x_center = fnt.getsize(text)[0] / 2
     text_y_center = fnt.getsize(text)[1] / 2
     # draw text, full opacity
-    a = d.text((x_position - text_x_center, y_position - text_y_center), text, font=fnt, fill="#"+color)
+    a = d.text((template.x_position - text_x_center, template.y_position - text_y_center), text, font=fnt, fill="#"+template.color)
     out = Image.alpha_composite(base, txt)
-    img_response = cStringIO.StringIO()
-    out.show()
-    out.save(img_response, format=image_format)
-    return img_response
+    file_path, relative_url = create_temporary_certificate(request_pk)
 
+    out.save(file_path, format=template.image_format)
+    return file_path, relative_url
 
 def can_approve_certificates(user):
     if user.is_superuser or \

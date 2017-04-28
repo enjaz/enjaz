@@ -1,18 +1,18 @@
 # -*- coding: utf-8  -*-
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.files import File
 
-from activities.models import Episode
-from clubs.models import Club
-from colorfield.fields import ColorField
+from certificates import utils
 from niqati.utils import generate_random_string
 
 
+TEXT_PLACE_HOLDER = 'Nada Abdullah'
+
 class CertificateRequest(models.Model):
     submitter = models.ForeignKey(User, related_name="certificate_submissions")
-    submitter_club = models.ForeignKey(Club, null=True, blank=True)
-    episode = models.ForeignKey(Episode, null=True, blank=True)
+    submitter_club = models.ForeignKey('clubs.Club', null=True, blank=True)
+    episode = models.ForeignKey('activities.Episode', null=True, blank=True)
     description = models.CharField(u"وصف الشهادة", max_length=200)
     text = models.TextField(u"الصياغة")
     student_list = models.FileField(u"قائمة الطلاب والطالبات", upload_to="certificate_lists", blank=True)
@@ -30,37 +30,18 @@ class CertificateRequest(models.Model):
         return self.description
 
 class Certificate(models.Model):
-    certificate_template = models.ForeignKey('CertificateTemplate')
-    email = models.EmailField(blank=True, default="")
-    user = models.ForeignKey(User)
-    image = models.ImageField()
+    certificate_template = models.ForeignKey('CertificateTemplate',
+                                             verbose_name=u"القالب")
+    user = models.ForeignKey(User, verbose_name=u"المستخدمـ/ـة")
+    image = models.ImageField(u"الصورة")
     verification_code = models.CharField(u"رمز التحقق", max_length=6)
     submission_date = models.DateTimeField(u"تاريخ الإرسال",
                                            auto_now_add=True)
     modification_date = models.DateTimeField(u"تاريخ التعديل",
                                            auto_now=True)
 
-    def is_student_recipient(self):
-        try:
-            if self.user:
-                return True
-        except ObjectDoesNotExist:
-            if self.email:
-                return self.email.endswith("ksau-hs.edu.sa") or \
-                       User.objects.filter(common_profile__alternative_email__iexact=self.email).exists()
-
-    def get_user(self):
-        try:
-            if self.user:
-                return True
-        except ObjectDoesNotExist:
-            if self.email:
-                return (User.objects.filter(email__iexact=self.email) | \
-                        User.objects.filter(common_profile__alternative_email__iexact=self.email)).first()
-
     def __unicode__(self):
-        recipient = self.email or self.user.username
-        return u"{} ({})".format(self.certificate_template.certificate_request.description, recipient)
+        return u"{} ({})".format(self.certificate_template.certificate_request.description, self.user.username)
 
 class CertificateTemplate(models.Model):
     certificate_request = models.OneToOneField(CertificateRequest)
@@ -84,14 +65,29 @@ class CertificateTemplate(models.Model):
     modification_date = models.DateTimeField(u"تاريخ التعديل",
                                            auto_now=True)
 
-    def generate_certificates(self):
-        certificates = []
-        if self.certificate_request.students.exists():
-            for student in self.certificate_request.students.all():
-                verification_code = generate_random_string(6)
-                Certificate(certificate_template=self, user=student,
-                            verification_code=verification_code)
-        
+    def generate_certificate(self, user, text):
+        template_bytes = self.image.read()
+        while True:
+            verification_code = generate_random_string(6)
+            if not Certificate.objects.filter(verification_code=verification_code).exists():
+                break
+
+        file_path, relative_url = utils.generate_certificate_image(self.certificate_request.pk,
+                                                                   template=self,
+                                                                   template_bytes=template_bytes,
+                                                                   text=text)
+        certificate = Certificate.objects.create(certificate_template=self,
+                                                 user=user,
+                                                 verification_code=verification_code)
+        certificate_file = open(file_path)
+        certificate.image.save("{}.{}".format(certificate.pk, self.image_format), File(certificate_file))
+
+        return certificate
 
     def __unicode__(self):
-        return self.certificate_request.description
+        return self.description
+
+class TextPosition(models.Model):
+    certificate_template = models.ForeignKey('CertificateTemplate',
+                                             verbose_name=u"القالب",
+                                             related_name="text_positions")

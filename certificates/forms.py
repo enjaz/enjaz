@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 from activities.models import Episode
-from certificates.models import CertificateTemplate, CertificateRequest
+from certificates.models import Certificate, CertificateTemplate, CertificateRequest
+from certificates import utils
 from dal import autocomplete
 from django import forms
 import clubs.utils
@@ -37,12 +38,20 @@ class CertificateRequestForm(forms.ModelForm):
                                                              'data-html': 'true', })}
 
 class CertificateTemplateForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(CertificateTemplateForm, self).__init__(*args, **kwargs)
-        self.fields['image'].required=False
-
     example_text =  forms.CharField(label=u"المثال", initial="Nada Abdullah")
-    is_approved = forms.NullBooleanField(label="معتمد؟")
+    is_approved = forms.BooleanField(label=u"معتمد؟")
+
+    def save(self):
+        template = super(CertificateTemplateForm, self).save()
+        if self.cleaned_data['is_approved']:
+            certificate_request = template.certificate_request
+            certificate_request.is_approved = True
+            certificate_request.save()
+            for user in template.certificate_request.students.all():
+                certificate = template.generate_certificate(user, user.common_profile.get_en_full_name())
+
+        return template
+
     class Meta:
         model = CertificateTemplate
         fields = ['example_text', 'description', 'color', 'font_size',

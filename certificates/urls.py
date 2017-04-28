@@ -14,8 +14,6 @@ urlpatterns = patterns('',
     url(r'^requests/(?P<pk>\d+)/$', views.show_certificate_request, name="show_certificate_request"),
     url(r'^requests/(?P<pk>\d+)/edit/$', views.edit_certificate_request, name="edit_certificate_request"),
     url(r'^requests/(?P<pk>\d+)/approve/$', views.approve_request, name="approve_certificate_request"),
-    url(r'^requests/(?P<pk>\d+)/approve/delete/$', views.delete_template, name='delete_template'),
-    url(r'^requests/(?P<pk>\d+)/approve/save$', views.save_image, name='save_image'),
     url(r'^requests/(?P<pk>\d+)/approve/upload$', views.upload_image, name='upload_image'),
     url(r'^requests/(?P<pk>\d+)/approve/update$', views.update_image, name='update_image'),
 )

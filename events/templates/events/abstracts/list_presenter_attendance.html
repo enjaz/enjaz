@@ -1,0 +1,240 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %} {%  load events_tags %}
+
+{% block title %}{{ event.official_name }}: Abstract presenter attendance{% endblock %}
+
+{% block content %}
+<div class="text-center">
+   <img src="https://hpc.enjazportal.com/wp-content/uploads/2016/12/hpc.png" style="max-width: 120px;">
+    <h1 class="text-center">تحضير مقدمي الأبحاث في {{ event.official_name }}</h1>
+</div>
+<br>
+
+
+<div class="english-field">
+    <div class="row">
+
+    <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
+        <h2 class="mentor-section-header">Oral Presenter</h2>
+    </div>
+
+    </div>
+        <div class="panel panel-success">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseThree-1" class="english-field notcollapsed">
+                    Present ({{ oral_present.count }})
+                </a>
+            </h4>
+        </div>
+        <div id="collapseThree-1" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <form method="post">
+              {% csrf_token %}
+            <select name="action">
+                <option>Choose Action</option>
+                <option value="absent">Absent</option>
+            </select>
+                <div class="row">
+                    <table id="oral_present" class="display datatable dt-responsive">
+                        <thead>
+                            <tr>
+                                <th class="all"></th>
+                                <th class="not-mobile">ID</th>
+                                <th class="all">Title</th>
+                                <th class="not-mobile">Presenting author</th>
+                                <th class="not-mobile">Presentation status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for presenter in oral_present %}
+                            <tr>
+                                <td><input type="checkbox" value="1" name="pk_{{ presenter.pk }}"></td>
+                                <td>{{ presenter.pk }}</td>
+                                <td>{{ presenter.title }}</td>
+                                <td>{{ presenter.presenting_author }}</td>
+                                <td>{{ presenter.status }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    </form>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseThree-2" class="english-field notcollapsed">
+                    Absent ({{ oral_absent.count }})
+                </a>
+            </h4>
+        </div>
+        <div id="collapseThree-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <form method="post">
+              {% csrf_token %}
+            <select name="action">
+                <option>Choose Action</option>
+                <option value="attend">Attend</option>
+            </select>
+                <div class="row">
+                    <table id="oral_absent" class="display datatable dt-responsive">
+                        <thead>
+                            <tr>
+                                <th class="all"></th>
+                                <th class="not-mobile">ID</th>
+                                <th class="all">Title</th>
+                                <th class="not-mobile">Presenting author</th>
+                                <th class="not-mobile">Presentation status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for presenter in oral_absent %}
+                            <tr>
+                                <td><input type="checkbox" value="1" name="pk_{{ presenter.pk }}"></td>
+                                <td>{{ presenter.pk }}</td>
+                                <td>{{ presenter.title }}</td>
+                                <td>{{ presenter.presenting_author }}</td>
+                                <td>{{ presenter.status }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                    <button type="submit" class="btn btn-warning">Submit</button>
+                    </form>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+<div class="english-field">
+    <div class="row">
+
+    <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
+        <h2 class="mentor-section-header">Poster Presenter</h2>
+    </div>
+
+    </div>
+        <div class="panel panel-success">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseThree-3" class="english-field notcollapsed">
+                    Present ({{ poster_present.count }})
+                </a>
+            </h4>
+        </div>
+        <div id="collapseThree-3" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <form method="post">
+              {% csrf_token %}
+            <select name="action">
+                <option>Choose Action</option>
+                <option value="absent">Absent</option>
+            </select>
+                <div class="row">
+                    <table id="poster_present" class="display datatable dt-responsive">
+                        <thead>
+                            <tr>
+                                <th class="all"></th>
+                                <th class="not-mobile">ID</th>
+                                <th class="all">Title</th>
+                                <th class="not-mobile">Presenting author</th>
+                                <th class="not-mobile">Presentation status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for presenter in poster_present %}
+                            <tr>
+                                <td><input type="checkbox" value="1" name="pk_{{ presenter.pk }}"></td>
+                                <td>{{ presenter.pk }}</td>
+                                <td>{{ presenter.title }}</td>
+                                <td>{{ presenter.presenting_author }}</td>
+                                <td>{{ presenter.status }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    </form>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseThree-4" class="english-field notcollapsed">
+                    Absent ({{ poster_absent.count }})
+                </a>
+            </h4>
+        </div>
+        <div id="collapseThree-4" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <form method="post">
+              {% csrf_token %}
+            <select name="action">
+                <option>Choose Action</option>
+                <option value="attend">Attend</option>
+            </select>
+                <div class="row">
+                    <table id="poster_absent" class="display datatable dt-responsive">
+                        <thead>
+                            <tr>
+                                <th class="all"></th>
+                                <th class="not-mobile">ID</th>
+                                <th class="all">Title</th>
+                                <th class="not-mobile">Presenting author</th>
+                                <th class="not-mobile">Presentation status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for presenter in poster_absent %}
+                            <tr>
+                                <td><input type="checkbox" value="1" name="pk_{{ presenter.pk }}"></td>
+                                <td>{{ presenter.pk }}</td>
+                                <td>{{ presenter.title }}</td>
+                                <td>{{ presenter.presenting_author }}</td>
+                                <td>{{ presenter.status }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                    <button type="submit" class="btn btn-warning">Submit</button>
+                    </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block customscript %}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<style type="text/css">
+    th, td{
+        text-align: left;
+    }
+</style>
+	<script>
+    $(function(){
+        $("#oral_present").dataTable({
+            "order": [[ 1, "desc" ]]
+        });
+        $("#oral_absent").dataTable({
+            "order": [[ 1, "desc" ]]
+        });
+        $("#poster_present").dataTable({
+            "order": [[ 1, "desc" ]]
+        });
+        $("#poster_absent").dataTable({
+            "order": [[ 1, "desc" ]]
+        });
+    });
+    </script>
+{% endblock %}

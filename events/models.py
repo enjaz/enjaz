@@ -1,11 +1,12 @@
 # -*- coding: utf-8  -*-
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
 
-from clubs.models import Club, Team
+from clubs.models import Club, Team, city_choices
 from events.managers import RegistrationQuerySet, SessionQuerySet
 from ckeditor.fields import RichTextField
 
@@ -23,7 +24,7 @@ session_gender_choices = (
 class Event(models.Model):
     official_name = models.CharField(u"الاسم الرسمي", max_length=255)
     english_name = models.CharField(u"الاسم الإنجليزي", max_length=255, default="", blank=True)
-
+    twitter_event_name = models.CharField(u"الاسم في تغريدة تويتر", default="", max_length=50, blank=True)
     is_official_name_english = models.BooleanField(u"هل اسم الحدث الرسمي إنجليزي", default=False)
     code_name = models.CharField(max_length=50, default="",
                                  blank=True,
@@ -36,9 +37,12 @@ class Event(models.Model):
     onsite_after = models.DateTimeField(u"التسجيل في الموقع يبدأ من", null=True, blank=True)
     url = models.URLField(max_length=255, blank=True, default="")
     location_url = models.URLField(max_length=255, blank=True, default="")
+    hashtag = models.CharField(u"هاشتاغ", default="", max_length=30,
+                               blank=True, help_text="بدون #")
     twitter = models.CharField(max_length=255,
                                blank=True,
                                default="KSAU_Events")
+    is_auto_tweet = models.BooleanField(default=True, verbose_name=u"تغريد تلقائي؟")
     receives_initiative_submission = models.BooleanField(default=False,
                                                          verbose_name=u"يستقبل مبادرات؟")
     initiative_submission_opening_date = models.DateTimeField(u"تاريخ فتح استقبال المبادرات", null=True, blank=True)
@@ -48,15 +52,36 @@ class Event(models.Model):
     abstract_submission_opening_date = models.DateTimeField(u"تاريخ فتح استقبال الملخصات البحثية", null=True, blank=True)
     abstract_submission_closing_date = models.DateTimeField(u"تاريخ انتهاء إغلاق استقبال الملخصات البحثية", null=True, blank=True)
     abstract_submission_instruction_url = models.URLField(u"رابط تعليمات إرسال الأبحاث", max_length=255, blank=True, default="")
-    abstract_revision_club = models.ForeignKey(Club, null=True, blank=True,
-                                               related_name="abstract_revision_events")
     abstract_revision_team = models.ForeignKey(Team, null=True, blank=True,
                                                related_name="abstract_revision_events")
+    evaluators_per_abstract = models.PositiveSmallIntegerField(u"عدد المقيمين والمقيمات لكل ملخص بحثي",
+                                                              null=True, blank=True, default=2)
+    has_attendance = models.BooleanField(u"هل يستخدم الحدث نظام التحضير؟",
+                                         default=False)
+    sends_badges_automatically = models.BooleanField(u"هل ترسل البطاقات بشكل آلي للمسجلين والمسجلات حديثا؟",
+                                                     default=False)
+    attendance_team = models.ForeignKey(Team, null=True, blank=True,
+                                        verbose_name=u"فريق التحضير",
+                                        related_name="attendance_team_events")
+    registration_team = models.ForeignKey(Team, null=True, blank=True,
+                                        verbose_name=u"فريق التسجيل",
+                                        related_name="registration_team_events")
     is_on_telegram = models.BooleanField(default=True,
                                          verbose_name=u"على تلغرام؟")
-    organizing_club = models.ForeignKey(Club , null=True)
-    organizing_team = models.ForeignKey(Team, null=True)
+    organizing_team = models.ForeignKey(Team, null=True, blank=True,
+                                        verbose_name=u"فريق التنظيم")
     priorities = models.PositiveSmallIntegerField(default=1)
+    notification_email = models.EmailField(u'البريد الإلكتروني للتنبيهات', blank=True)
+    city = models.CharField(u"المدينة", max_length=20,
+                            choices=city_choices, default="")
+
+    def is_on_sidebar(self, user):
+        if user.is_superuser or \
+           (user.common_profile.city == self.city and \
+            end_date > timezone.now().date()):
+            return True
+        else:
+            return False
 
     def is_abstract_submission_open(self):
         #If we have abstract_submission_opening_date and/or
@@ -94,6 +119,9 @@ class Event(models.Model):
         else:
             return False
 
+    def get_notification_email(self):
+        return self.notification_email or settings.DEFAULT_FROM_EMAIL
+
     def __unicode__(self):
         return self.official_name
 
@@ -103,12 +131,39 @@ class TimeSlot(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True)
     date_edited = models.DateTimeField(auto_now=True)
 
+    def is_user_already_on(self, user):
+        return SessionRegistration.objects.filter(session__time_slot=self,
+                                                  is_deleted=False,
+                                                  user=user).exists()
+
     def __unicode__(self):
         return self.name
 
+class SessionGroup(models.Model):
+    event = models.ForeignKey(Event, null=True, blank=True)
+    sessions = models.ManyToManyField('Session', blank=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, default="")
+    background = models.ImageField(upload_to='session_group/backgrounds/',
+                                   blank=True, null=True)
+    code_name = models.CharField(max_length=50, default="",
+                                 blank=True,
+                                 verbose_name=u"الاسم البرمجي",
+                                 help_text=u"حروف لاتينية صغيرة وأرقام")
+    is_limited_to_one = models.BooleanField(default=False,
+                                            verbose_name=u"هل التسجيل مقتصر على جلسة واحدة؟")
+
+    def is_user_already_on(self, user):
+        return SessionRegistration.objects.filter(session__sessiongroup=self,
+                                                  is_deleted=False,
+                                                  user=user).exists()
+
+    def __unicode__(self):
+        return self.title
+
 class Session(models.Model):
     event = models.ForeignKey(Event, null=True, blank=True)
-    time_slot = models.ForeignKey(TimeSlot, default="", null=True)
+    time_slot = models.ForeignKey(TimeSlot, blank=True, null=True)
     name = models.CharField(max_length=255)
     limit = models.PositiveSmallIntegerField(null=True, blank=True,
                                              default=None)
@@ -143,6 +198,18 @@ class Session(models.Model):
     def get_all_registrations(self):
         return (self.first_priority_registrations.all() | \
                 self.second_priority_registrations.all()).distinct()
+
+    def get_registration_count(self):
+        return SessionRegistration.objects.filter(session=self, is_deleted=False).count()
+
+    def get_remaining_seats(self):
+        if not self.limit is None:
+            # Never return negative seat numbers.
+            diff = self.limit - self.get_registration_count()
+            if diff <= 0:
+                return 0
+            else:
+                return diff
 
     def __unicode__(self):
         if self.gender:
@@ -213,20 +280,28 @@ class SessionRegistration(models.Model):
     date_edited = models.DateTimeField(auto_now=True)
     is_approved_choices = (
         (True, u'معتمد'),
-        (False, u'مرفوض'),
+        (False, u'لم تعد المقاعد متوفّرة'),
         (None, u'معلق'),
         )
     is_approved = models.NullBooleanField(default= None, verbose_name=u"الحالة",
                                           choices=is_approved_choices)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
+    badge_sent = models.BooleanField(default=False,
+                                     verbose_name=u"أرسلت البطاقة؟")
     reminder_sent = models.BooleanField(default=False,
-                                            verbose_name=u"أرسلت رسالة التذكير؟")
+                                        verbose_name=u"أرسلت رسالة التذكير؟")
     certificate_sent = models.BooleanField(default=False,
                                             verbose_name=u"أرسلت الشهادة؟")
 
+    def get_status(self):
+        if self.is_deleted == True:
+            return "غير مسجل"
+        else:
+            return self.get_is_approved_display()
+
     def __unicode__(self):
-        return unicode(self.user)
+        return u"{} for {}".format(self.user.username, self.session.name)
 
 class Registration(models.Model):
     user = models.ForeignKey(User, null=True, blank=True,
@@ -300,7 +375,7 @@ class Registration(models.Model):
         elif self.nonuser:
             return self.nonuser.ar_first_name
 
-        
+
     def get_ar_full_name(self):
         if self.user:
             try:
@@ -329,14 +404,15 @@ class Registration(models.Model):
             return self.nonuser.gender
         except AttributeError:
             return ''
-        
+
     def __unicode__(self):
         return self.get_en_full_name()
 
 class Abstract(models.Model):
     user = models.ForeignKey(User, null=True, blank=True,
                              related_name='event_abstracts')
-    event = models.ForeignKey(Event, verbose_name=u"الحدث")    
+    event = models.ForeignKey(Event, verbose_name=u"الحدث")
+    evaluators = models.ManyToManyField(User, blank=True, verbose_name=u"المقيمين")
     title = models.CharField(verbose_name="Title", max_length=255)
     authors = models.TextField(verbose_name=u"Name of authors")
     study_field = models.CharField(verbose_name="Field", max_length=255, default="")
@@ -355,6 +431,11 @@ class Abstract(models.Model):
         ('O', 'Oral'),
         ('P', 'Poster')
         )
+    status_choices = (
+        ('A', 'Accepted'),
+        ('P', 'Pending'),
+        ('R','Rejected'),
+        )
     presentation_preference = models.CharField(verbose_name="Presentation preference", max_length=1, choices=presentation_preference_choices)
     introduction = models.TextField(u"Introduction", default="" )
     methodology = models.TextField(u"Methodology", default="")
@@ -367,17 +448,30 @@ class Abstract(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
+    status=models.CharField(verbose_name="acceptance status", max_length=1, choices=status_choices, default='P')
+    accepted_presentaion_preference = models.CharField(verbose_name="Accepted presentation preference", max_length=1, choices=presentation_preference_choices)
+    did_presenter_attend = models.BooleanField(verbose_name=u"حضر المقدم؟", default=False)
 
     def get_average_score(self):
         evaluation_number = self.evaluation_set.count()
         if not evaluation_number:
             return 0
-        total_score = CriterionValue.objects.filter(evaluation__in=self.evaluation_set).aggregate(Sum('value'))['value__sum']
+        total_score = CriterionValue.objects.filter(evaluation__in=self.evaluation_set.all()).aggregate(Sum('value'))['value__sum']
         return total_score / evaluation_number
 
     def __unicode__(self):
         return self.title
-    
+
+class AbstractPoster (models.Model):
+    abstract = models.ForeignKey(Abstract, related_name='posters', null=True)
+    first_image= models.FileField(verbose_name=u"Attach the first image", upload_to="events/posters/")
+    second_image= models.FileField(verbose_name=u"Attach the second image", upload_to="events/second_image/",null=True)
+    poster_powerpoint= models.FileField(verbose_name=u"Attach the poster powerpoint", upload_to="events/poster_powerpoints/")
+    date_submitted = models.DateTimeField(auto_now_add=True)
+    presentation_file = models.FileField(verbose_name=u"Attach the presentation", upload_to="events/presentations/")
+
+
+
 class AbstractFigure(models.Model):
     abstract = models.ForeignKey(Abstract, related_name='figures', null=True)
     figure = models.FileField(verbose_name=u"Attach the figure", upload_to="events/figures/")
@@ -392,12 +486,12 @@ class Evaluation(models.Model):
         return self.criterion_values.aggregate(Sum('value'))['value__sum'] or 0
 
 class Criterion(models.Model):
-    event = models.ForeignKey(Event, verbose_name=u"الحدث")
+    events = models.ManyToManyField(Event, verbose_name=u"الحدث")
     human_name = models.CharField(max_length=200,
                                verbose_name=u"اسم المعيار الذي سيظهر")
     code_name = models.CharField(max_length=200,
                                  verbose_name=u"اسم المعيار البرمجي")
-    instructions = models.TextField(verbose_name=u"تعليمات")
+    instructions = models.TextField(u"تعليمات", default="")
 
     def __unicode__(self):
         return self.code_name
@@ -439,3 +533,68 @@ class Initiative(models.Model):
 class InitiativeFigure(models.Model):
     initiative = models.ForeignKey(Initiative, related_name='figures', null=True)
     figure = models.FileField(verbose_name=u"Attach the figure", upload_to="events/figures/initiatives/")
+
+class CaseReport(models.Model):
+    user = models.ForeignKey(User, null=True, blank=True,
+                             related_name='event_casereport')
+    event = models.ForeignKey(Event, verbose_name=u"الحدث")
+    title = models.CharField(verbose_name="Title", max_length=255)
+    authors = models.TextField(verbose_name=u"Name of authors")
+    study_field = models.CharField(verbose_name="Field", max_length=255, default="")
+    university = models.CharField(verbose_name="University", max_length=255)
+    college = models.CharField(verbose_name="College", max_length=255)
+    email = models.EmailField(verbose_name="Email")
+    phone = models.CharField(verbose_name="Phone number", max_length=20)
+    introduction = models.TextField(u"Introduction", default="")
+    patient_info = models.TextField(u"Patient info", default="")
+    clinical_presentation = models.TextField(u"clinical presentation", default="")
+    diagnosis = models.TextField(u"Diagnosis", default="")
+    treatment = models.TextField(u"Treatment", default="")
+    outcome = models.TextField(u"Outcome", default="")
+    discussion = models.TextField(u"Discussion", default="")
+    conclusion = models.TextField(u"Conclusion", default="")
+    was_published = models.BooleanField(u"Have you published this research?", default=False)
+    was_presented_at_others = models.BooleanField(u"Have you presented this research in any other conference before?", default=False)
+    was_presented_previously = models.BooleanField(u"Have you presented this research in a previous year of this conference?", default=False)
+    date_submitted = models.DateTimeField(auto_now_add=True)
+    is_deleted = models.BooleanField(default=False,
+                                     verbose_name=u"محذوف؟")
+
+
+class Attendance(models.Model):
+    submitter = models.ForeignKey(User, related_name="submitted_attendance",
+                                  blank=True, null=True,
+                                  verbose_name=u"المُدخلـ/ـة")
+    session_registration = models.ForeignKey(SessionRegistration, null=True,
+                                             verbose_name=u"التسجيل")
+    category_choices = [
+        ('I', u'الدخول'),
+        ('M', u'المنتصف'),
+        ('O', u'الخروج'),
+    ]
+    category = models.CharField(u"نوع التحضير", max_length=1, blank=True,
+                                choices=category_choices)
+    date_submitted = models.DateTimeField(u"تاريخ الإرسال",
+                                          auto_now_add=True)
+    is_deleted = models.BooleanField(u"محذوف؟", default=False)
+
+    def __unicode__(self):
+        if not self.session_registration:
+            return None
+        else:
+            return u"{} for {}".format(self.session_registration.user.username, self.session_registration.session.name)
+
+class QuestionSession(models.Model):
+    event = models.ForeignKey(Event, verbose_name="الحدث")
+    title = models.CharField(u"عنوان الجلسة", max_length=100)
+
+    def __unicode__(self):
+        return self.title
+
+class Question (models.Model):
+    question_session = models.ForeignKey(QuestionSession, verbose_name="جلسة السؤال")
+    text = models.TextField(u"نص السؤال")
+    submission_date = models.DateTimeField(u"تاريخ الإرسال", auto_now_add=True)
+
+    def __unicode__(self):
+        return self.question_text[:20]

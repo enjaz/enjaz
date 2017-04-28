@@ -1,15 +1,15 @@
-{% load staticfiles %}{% load studentguide_tags %}{% load events_tags %}{% load clubs_utils %}
+{% load staticfiles %}{% load studentguide_tags %}{% load events_tags %}  {% load clubs_utils %}
 <!DOCTYPE html>
 <html lang="en" dir="rtl">
 <!--
-  ______         _               _   _                  _       __     __            _ 
+  ______         _               _   _                  _       __     __            _
  |  ____|       (_)             | \ | |                | |      \ \   / /           | |
  | |__    _ __   _   __ _  ____ |  \| |  ___   ___   __| | ___   \ \_/ /___   _   _ | |
  |  __|  | '_ \ | | / _` ||_  / | . ` | / _ \ / _ \ / _` |/ __|   \   // _ \ | | | || |
  | |____ | | | || || (_| | / /  | |\  ||  __/|  __/| (_| |\__ \    | || (_) || |_| ||_|
  |______||_| |_|| | \__,_|/___| |_| \_| \___| \___| \__,_||___/    |_| \___/  \__,_|(_)
-               _/ |                                                                    
-              |__/                                                                     
+               _/ |
+              |__/
 
 You must be so cool if you are reading this! Our Studnets' Club can
 totally use your help! Drop us a line at hello@enjazportal.com, will
@@ -18,11 +18,9 @@ you?
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	
+
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta name="description" content="بوابة إنجاز للنشاطات الطلابية" />
-	<meta name="apple-itunes-app" content="app-id=1042764760">
-    <meta name="google-play-app" content="app-id=com.enjazportal.enjazapp">
 
 	<title>إنجاز | {% block title %}{% endblock %}</title>
 	<link rel="icon" href="{% static 'logo/favicon.png' %}">
@@ -50,48 +48,48 @@ you?
 		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
 		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 	<![endif]-->
-	
-	
+
+
 </head>
 <body class="page-body skin-green" data-url="http://neon.dev">
-<div class="page-container right-sidebar"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->	
-	
+<div class="page-container right-sidebar"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+
 		<div class="sidebar-menu">
-		
-			
+
+
 		<header class="logo-env">
-			
+
 			<!-- logo -->
 			<div class="logo">
 				<a href="{% url 'home' %}">
 					<img src="{% static 'logo/enjaz_portal_logo_white.png' %}" width="170" alt="" />
 				</a>
 			</div>
-			
+
 						<!-- logo collapse icon -->
-						
+
 			<div class="sidebar-collapse">
 				<a href="#" class="sidebar-collapse-icon with-animation"><!-- add class "with-animation" if you want sidebar to have animation during expanding/collapsing transition -->
 					<i class="entypo-menu"></i>
 				</a>
 			</div>
-			
-									
-			
+
+
+
 			<!-- open/close menu icon (do not remove if you want to enable menu on mobile devices) -->
 			<div class="sidebar-mobile-menu visible-xs">
 				<a href="#" class="with-animation"><!-- add class "with-animation" to support animation -->
 					<i class="entypo-menu"></i>
 				</a>
 			</div>
-			
+
 		</header>
-				
-		
-		
-				
-		
-				
+
+
+
+
+
+
 		<ul id="main-menu" class="">
 			<!-- add class "multiple-expanded" to allow multiple submenus to open -->
 			<!-- class "auto-inherit-active-class" will automatically add "active" class for parent elements who are marked already with class "active" -->
@@ -130,13 +128,13 @@ you?
                             تقرير نقاطي
                         </a>
                     </li>
+                    {% endif %}
                     <li>
                         <a href="{% url 'edit_common_profile' %}">
                             <i class="entypo-cw"></i>
                             <span>حدّث معلوماتي</span>
                         </a>
                     </li>
-                    {% endif %}
                     {% if user.event_abstracts.exists %}
                     <li>
                         <a href="{% url 'events:list_my_abstracts' %}">
@@ -145,6 +143,18 @@ you?
                         </a>
                     </li>
                     {% endif %}
+                    <li>
+                        <a href="{% url 'events:show_my_barcode' %}">
+                            <i class="fa fa-id-badge"></i>
+                            <span>بطاقتي</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'events:list_my_registration' %}">
+                            <i class="entypo-pencil"></i>
+                            <span>تسجيلاتي</span>
+                        </a>
+                    </li>
                     <li>
                         <a href="{% url 'userena_password_change' user.username %}">
                             <i class="entypo-pencil"></i>
@@ -173,27 +183,62 @@ you?
                 </a>
             </li>
             {% endif %}
-            {% if user|has_user_organizing_events %}
+            {% if user|has_user_sidebar_events %}
+            <li>
+                <a>
+                    <i class="entypo-calendar"></i>
+                    <span>التسجيل في الأنشطة الكبرى</span>
+                </a>
+                <ul>
+                {% for event in user|get_user_sidebar_events %}
+                <li>
+                    <a href="{% url 'events:list_timeslots' event.code_name %}">
+                        <i class="entypo-calendar"></i>
+                        <span>{{ event.get_html_name|safe }}</span>
+                    </a>
+                </li>
+               {% endfor %}
+               </ul>
+             </li>
+            {% endif %}
+            {% if user|has_user_adminstrative_events %}
             <li>
                 <a>
                     <i class="entypo-calendar"></i>
                     <span>إدارة الأنشطة الكبرى</span>
                 </a>
                 <ul>
-                {% for event in user|get_user_organizing_events %}
+                {% for event in user|get_user_admistrative_events %}
                 <li>
                     <a>
                         <i class="entypo-calendar"></i>
-                        <span class="english-field">{{ event.official_name }}</span>
+                        <span>{{ event.get_html_name|safe }}</span>
                     </a>
-                    <ul>
+                    <ul>{% if user|is_organizing_team_member:event or user|is_attendance_team_member:event or user.is_superuser  %}
                         <li>
-                            <a href="{% url 'events:list_registrations' event.code_name %}">
+                            <a href="{% url 'events:list_sessions_privileged' event.code_name %}">
                                 <i class="entypo-chart-pie"></i>
-                                <span>المسجلون والمسجلات</span>
+                                <span>الجلسات</span>
                             </a>
                         </li>
-                        {% if event.receives_abstract_submission %}
+												<li>
+                            <a href="{% url 'events:list_presenter_attendance' event.code_name %}">
+                                <i class="entypo-chart-pie"></i>
+                                <span>تحضير مقدمي الأبحاث</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% if user|is_organizing_team_member:event or user|is_attendance_team_member:event or user.is_superuser %}
+                        {% if event.has_attendance %}
+                        <li>
+                            <a href="{% url 'events:list_barcodes' event.code_name %}">
+                                <i class="fa fa-id-badge"></i>
+                                <span>البطاقات</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% endif %}
+                        {% if event.receives_abstract_submission and user|is_organizing_team_member:event or event.receives_abstract_submission and user.is_superuser %}
                         <li>
                             <a href="{% url 'events:list_abstracts' event.code_name %}">
                                 <i class="entypo-pencil"></i>
@@ -201,14 +246,22 @@ you?
                             </a>
                         </li>
                         {% endif %}
-                        {% if event.receives_initiative_submission %}
+                        {% if event.receives_initiative_submission and user|is_organizing_team_member:event or event.receives_initiative_submission and user.is_superuser %}
                         <li>
                             <a href="{% url 'events:list_initiatives' event.code_name %}">
-                                <i class="entypo-pencil"></i>
+                                <i class="entypo-network"></i>
                                 <span>المبادرات</span>
                             </a>
                         </li>
                         {% endif %}
+												{% if event.receives_abstract_submission and user|can_evaluate_abstracts:event %}
+						            <li class="english-field">
+						                <a href="{% url 'events:evaluators_homepage' event.code_name %}">
+															<i class="entypo-flow-tree"></i>
+															<span>Evaluate abstracts</span>
+														</a>
+						            </li>
+						            {% endif %}
                     </ul>
                 </li>
                 {% endfor %}
@@ -222,13 +275,13 @@ you?
 					<span>أندية</span>
 				</a>
 			</li>
-            {% endif %}
 			<li>
 				<a href="{% url 'activities:list' %}">
 					<i class="entypo-calendar"></i>
 					<span>أنشطة</span>
 				</a>
 			</li>
+            {% endif %}
             {# Limit the access to students #}
             {% if user.common_profile.profile_type == 'S' or user.is_superuser %}
 			<li>
@@ -315,10 +368,10 @@ you?
 			</li>
             {% endcomment %}
 		</ul>
-				
-	</div>	
+
+	</div>
 	<div class="main-content">
-	
+
 	<nav class="navbar navbar-default" role="navigation">
 	<!-- Brand and toggle get grouped for better mobile display -->
 	<div class="navbar-header">
@@ -336,7 +389,7 @@ you?
 	</div>
 	<!-- /.navbar-collapse -->
 </nav>
-	
+
 	<div class="col-xs-12 clearfix">
 {% block content %}
 
@@ -379,9 +432,9 @@ you?
 	<script src="{% static 'neon/assets/js/neon-api.js' %}"></script>
 	<script src="{% static 'neon/assets/js/neon-custom.js' %}"></script>
 	<script src="{% static 'neon/assets/js/neon-demo.js' %}"></script>
-	
+
 	{% block customscript %}
-	
+
 	{% endblock %}
 {% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
 	<!-- Piwik -->

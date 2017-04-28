@@ -1,0 +1,51 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}
+{% block pageheader %}الأنشطة الكبرى{% endblock %}
+{% block title %}تسجيلي في الأنشطة الكبرى{% endblock %}
+
+{% block content %}
+<div>
+<h1>تسجيلي في الأنشطة الكبرى</h1>
+            <div class="panel-body">
+                <div class="row">
+                    <table id="registrations" class="display datatable dt-responsive">
+                        <thead>
+                            <tr>
+                                <th class="all">الجلسة</th>
+                                <th class="not-mobile">الحدث</th>
+                                <th class="all">الحالة</th>
+                                <th class="not-mobile">تاريخ التسجيل</th>
+                                <th class="not-mobile">رقم التسجيل</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for registration in registrations %}
+                            <tr>
+                                <td>{{ registration.session }}</td>
+                                <td>{{ registration.session.event.get_html_name|safe }}</td>
+                                <td>{{ registration.get_status }}</td>
+                                <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted }}</td>
+                                <td>{{ registration.pk }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block customscript %}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+	<script>
+    $(function(){
+        $("#registrations").dataTable({
+            order: [[ 3, "desc" ]],
+            language: {% include 'js/dataTables-arabic.json' %},
+        });
+
+    });
+    </script>
+{% endblock %}

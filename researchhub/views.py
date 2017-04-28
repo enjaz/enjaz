@@ -10,7 +10,7 @@ from core import decorators
 from core.models import StudentClubYear
 from post_office import mail
 from researchhub.models import Supervisor, Project, SkilledStudent, Domain, Skill
-from researchhub.forms import ProjectForm, MemberProjectForm, AddSupervisorForm, EditSupervisorForm, SkilledStudentForm, ConsultationForm
+from researchhub.forms import ProjectForm, MemberProjectForm, AddSupervisorForm, EditSupervisorForm, SkilledStudentForm, ConsultationForm, FeedbackForm
 from researchhub import utils
 from wkhtmltopdf.views import PDFTemplateView
 
@@ -72,6 +72,29 @@ def submit_consultation(request):
         form = ConsultationForm()
     return render(request, 'researchhub/submit_consultation.html',
                   {'form': form})
+
+@decorators.ajax_only
+@login_required
+def submit_feedback(request):
+    if request.method == 'POST':
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            email_context = {'user': request.user,
+                             'data': form.cleaned_data}
+            mail.send([request.user.email],
+                       template="researchhub_feedback_submitted_to_user",
+                       context=email_context)
+            mail.send(["researchhub@enjazportal.com"],
+                       template="researchhub_feedback_submitted_to_team",
+                       context=email_context,
+                       headers={'Reply-to': request.user.email})
+            return {"message": "success"}
+    elif request.method == 'GET':
+        form = FeedbackForm()
+
+    context = {'form': form}
+    return render(request, 'researchhub/submit_feedback_form.html', context)
+
 
 @login_required
 @csrf.csrf_exempt

@@ -1,0 +1,18 @@
+{% extends 'events_evaluation_base.html' %}
+{% block title %}بطاقتي{% endblock %}
+{% block pageheader %}بطاقتي{% endblock %}
+{% block pageheaderurl %}{% url 'events:show_my_barcode' %}{% endblock %}
+{% block content %}
+<div class="row text-center">
+<div class="col-sm-6 col-sm-offset-3">
+{{ qrcode_value|safe }}
+</div>
+</div>
+<div class="row ">
+<p style="text-align: center; color: black;"><span style="font-family: monospace;">{{ text }}</span><br>{{ barcode_user.common_profile.get_en_short_name|default:barcode_user.username }}</p>
+
+<p style="text-align: center;"><a href="{% if user == barcode_user%}{% url 'events:download_barcode_pdf' %}{% else %}{% url 'events:download_barcode_pdf_privileged' event.code_name barcode_user.pk %}{% endif %}" class="btn btn-success">تنزيل</a></p>
+</div>
+</div>
+{% endblock %}
+

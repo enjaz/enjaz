@@ -1,15 +1,37 @@
 # -*- coding: utf-8  -*-
 import urllib2
 import json
-from post_office import mail
+import StringIO
+import qrcode
+import qrcode.image.svg
 
-
+from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.http import HttpResponseRedirect
+from django.template.loader import get_template
 from django.utils import timezone
 
 from core.utils import hindi_to_arabic
-from events.models import Event, SessionRegistration
+from post_office import mail
+from wkhtmltopdf.utils import render_pdf_from_template
+from .models import Event, SessionRegistration
+import accounts.utils
 import clubs.utils
+
+
+WKHTMLTOPDF_OPTIONS = {'margin-top': 10, 'margin-right': 10,
+                       'margin-left': 10, 'margin-bottom': 5,
+                       'page-size': 'A7', }
+BARCODE_LENGTH = 8
+
+def can_see_all_barcodes(user, barcode_user=None, event=None):
+    if barcode_user == user or\
+       event and is_attendance_team_member(user, event) or \
+       event and is_organizing_team_member(user, event) or \
+       user.is_superuser:
+        return True
+    else:
+        return False
 
 def can_evaluate_abstracts(user, event):
     if user.is_superuser:
@@ -34,8 +56,38 @@ def get_user_organizing_events(user):
                        Event.objects.filter(organizing_team__coordinator=user)).distinct()
     return user_events
 
+def get_user_abstract_revision_events(user):
+    if not user.is_authenticated():
+        return Event.objects.none()
+    elif user.is_superuser:
+        user_events = Event.objects.all()
+    else:
+        user_events = (Event.objects.filter(abstract_revision_team__members=user) | \
+                       Event.objects.filter(abstract_revision_team__coordinator=user)).distinct()
+    return user_events
+
+def get_user_attendance_events(user):
+    if not user.is_authenticated():
+        return Event.objects.none()
+    elif user.is_superuser:
+        user_events = Event.objects.all()
+    else:
+        user_events = (Event.objects.filter(attendance_team__members=user) | \
+                       Event.objects.filter(attendance_team__coordinator=user)).distinct()
+    return user_events
+
+def get_user_admistrative_events(user):
+    user_events = get_user_abstract_revision_events(user) | \
+                  get_user_organizing_events(user) | \
+                  get_user_attendance_events(user)
+    return user_events
+
 def is_organizing_team_member(user, event):
     user_events = get_user_organizing_events(user)
+    return user_events.filter(pk=event.pk).exists()
+
+def is_attendance_team_member(user, event):
+    user_events = get_user_attendance_events(user)
     return user_events.filter(pk=event.pk).exists()
 
 def register_in_vma(session, registration):
@@ -95,4 +147,91 @@ def send_onsite_confirmation(registration, event):
 
 def is_registered(user, session):
     if SessionRegistration.objects.filter(session=session, user=user, is_deleted = False).exists():
+        return True
+
+def get_status(user, session):
+    session_registration = SessionRegistration.objects.get(session=session, user=user)
+    if session_registration.is_deleted:
+        return False
+    else:
+        return session_registration.is_approved
+
+def get_barcode(text):
+    qrcode_output = StringIO.StringIO()
+    qrcode.make(text, image_factory=qrcode.image.svg.SvgImage, version=3).save(qrcode_output)
+    qrcode_value = "".join(qrcode_output.getvalue().split('\n')[1:])
+    return qrcode_value
+
+def get_user_sidebar_events(user):
+    user_city = accounts.utils.get_user_city(user)
+    event_pool = Event.objects.filter(end_date__gte=timezone.now().date(),
+                                      session__isnull=False)
+    if user_city:
+        events = event_pool.filter(city=user_city) | \
+                 event_pool.filter(city="")
+    else: # if superuser
+        events = event_pool
+
+    return events.distinct()
+
+def render_badge_pdf(user):
+    text = ("{:0%s}" % BARCODE_LENGTH).format(user.pk)
+    qrcode_value = get_barcode(text)
+    image_url = "https://enjazportal.com/static/static/img/hpc.png"
+    context = {'qrcode_value': qrcode_value,
+               'image_url': image_url,
+               'text': text,
+               'barcode_user': user}
+    qrcode_output = StringIO.StringIO()
+    badge_template = get_template("events/partials/badge.html")
+    pdf_content = render_pdf_from_template(badge_template,
+                                        header_template=None,
+                                        footer_template=None,
+                                        context=context,
+                                        cmd_options=WKHTMLTOPDF_OPTIONS.copy())
+    return pdf_content
+
+def email_badge(user, event, my_registration_url):
+    email_context = {'event_user': user,
+                     'my_registration_url': my_registration_url,
+                     'event': event}
+    pdf_content = render_badge_pdf(user)
+    attachments = {'Badge.pdf': ContentFile(pdf_content)}
+    notification_email = event.get_notification_email()
+    cc = []
+    try:
+        if user.common_profile.alternative_email:
+            cc = [user.common_profile.alternative_email]
+    except ObjectDoesNotExist:
+       pass
+   
+    try:
+        mail.send([user.email],
+                  u"بوابة إنجاز <{}>".format(notification_email),
+                  cc=cc,
+                  template="event_badge_notification",
+                  context=email_context,
+                  attachments=attachments)
+    except ValidationError:
+        return False
+    return True
+
+def get_user_regestration_events(user):
+    if not user.is_authenticated():
+        return Event.objects.none()
+    elif user.is_superuser:
+        user_events = Event.objects.all()
+    else:
+        user_events = (Event.objects.filter(registration_team__members=user) | \
+                       Event.objects.filter(registration_team__coordinator=user)).distinct()
+    return user_events
+
+def is_regestrations_team_member(user, event):
+    user_events = get_user_regestration_events(user)
+    return user_events.filter(pk=event.pk).exists()
+
+
+
+def has_user_adminstrative_events (user):
+    if get_user_abstract_revision_events(user).exists() or get_user_organizing_events(user).exists() or get_user_attendance_events(user).exists:
         return True

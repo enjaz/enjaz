@@ -495,3 +495,22 @@ class BuzzView(models.Model):
     viewer = models.ForeignKey(User)
     on_date = models.DateTimeField(auto_now_add=True, verbose_name=u"البداية")
     off_date = models.DateTimeField(null=True, blank=True, verbose_name=u"النهاية")
+
+class Post(models.Model):
+    title = models.CharField(max_length=128, verbose_name=u"العنوان")
+    slug = models.SlugField(max_length=50, verbose_name=u"الرابط")
+    body = models.TextField(u"النص")
+    announcement_date = models.DateTimeField(u"وقت الإعلان",
+                                             null=True, blank=True)
+    submitter = models.ForeignKey(User)
+    image = models.ImageField(upload_to="media/post/", blank=True,
+                              verbose_name=u"الصورة")
+
+    def is_published(self):
+        if not self.announcement_date:
+            return True
+        else:
+            return self.announcement_date <= timezone.now()
+
+    def __unicode__(self):
+        return self.title

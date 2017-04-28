@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from media.models import FollowUpReport, Story, StoryReview, StoryTask, Article, ArticleReview, Poll, PollChoice
+from media.models import FollowUpReport, Story, StoryReview, StoryTask, Article, ArticleReview, Poll, PollChoice, Post
 
 admin.site.register(FollowUpReport)
 
@@ -19,4 +19,12 @@ class PollChoiceAdmin(admin.TabularInline):
 class PollAdmin(admin.ModelAdmin):
     inlines = (PollChoiceAdmin, )
 
+class PostAdmin(admin.ModelAdmin):
+    readonly_fields = ['submitter']
+    def save_model(self, request, obj, form, change):
+        if not obj.id:
+            obj.submitter = request.user
+        super(PostAdmin, self).save_model(request, obj, form, change)
+    
 admin.site.register(Poll, PollAdmin)
+admin.site.register(Post, PostAdmin)

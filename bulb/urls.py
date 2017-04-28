@@ -10,10 +10,15 @@ urlpatterns = patterns('',
     url(r'^join_us/$', views.handle_recruitment, name="handle_recruitment"),
     url(r'^join_us/thanks/$', TemplateView.as_view(template_name='bulb/recruitment_thanks.html'), name="recruitment_thanks"),
     url(r'^bulb-user-autocomplete/$', views.BulbUserAutocomplete.as_view(), name='bulb-user-autocomplete'),
+    url(r'^bulb-book-autocomplete/$', views.BulbBookAutocomplete.as_view(), name='bulb-book-autocomplete'),
+    url(r'^bulb-recommended-book-autocomplete/$', views.BulbRecommendedBookAutocomplete.as_view(), name='bulb-recommended-book-autocomplete'),
     url(r'^newspaper/$', views.handle_newspaper_signup, name='handle_newspaper_signup'),
     url(r'^newspaper/update$', views.update_newspaper_count, name='update_newspaper_count'),
     url(r'^suggest_friend/$', views.handle_dewanya_suggestions, name="handle_dewanya_suggestions"),
-    url(r'^suggest_friend/autocomplete$', views.autocomplete_users, name="autocomplete_users"),
+    url(r'^suggest_friend/autocomplete/$', views.autocomplete_users, name="autocomplete_users"),
+    url(r'^cultural_program/$', views.handle_cultural_program, name='handle_cultural_program'),
+    url(r'^cultural_program/ajax/$', views.handle_cultural_program_ajax, name='handle_cultural_program_ajax'),
+
 
     # Books exchange
     url(r'^exchange/$', views.list_book_categories, name="list_book_categories"),
@@ -82,7 +87,7 @@ urlpatterns = patterns('',
     url(r'^groups/sessions/(?P<session_pk>\d+)/$', views.show_session, name='show_session'),
     url(r'^groups/ajax/group$', views.control_group, name="control_group"),
     url(r'^groups/ajax/session$', views.toggle_session_confirmation, name="toggle_session_confirmation"),
-    
+
     # Readers
     url(r'^readers/$', views.list_reader_profiles, name="list_reader_profiles"),
     url(r'^readers/search/$', views.search_readers, name="search_readers"),
@@ -100,4 +105,14 @@ urlpatterns = patterns('',
     url(r'^readathon/(?P<readathon_pk>\d+)/(?P<pk>\d+)/edit/$', views.edit_book_commitment, name="edit_book_commitment"),
     url(r'^readathon/(?P<readathon_pk>\d+)/(?P<pk>\d+)/update/$', views.update_book_commitment, name="update_book_commitment"),
     url(r'^readathon/(?P<readathon_pk>\d+)/(?P<pk>\d+)/delete/$', views.delete_book_commitment, name="delete_book_commitment"),
-)
+
+    # Recommendations
+    url(r'^recommendations/$', views.show_recommendation_index, name="show_recommendation_index"),
+    url(r'^recommendations/users/(?P<pk>\d+)/$', views.show_user_recommendations, name="show_user_recommendations"),
+    url(r'^recommendations/books/add/$', views.add_book_recommendation, name="add_book_recommendation"),
+    url(r'^recommendations/books/(?P<pk>\d+)/$', views.show_recommended_book, name="show_recommended_book"),
+    url(r'^recommendations/books/(?P<pk>\d+)/edit/$', views.edit_book_recommendation, name="edit_book_recommendation"),
+    url(r'^recommendations/books/(?P<pk>\d+)/duplicate/$', views.duplicate_book_recommendation, name="duplicate_book_recommendation"),
+    url(r'^recommendations/books/(?P<pk>\d+)/delete/$', views.delete_book_recommendation, name="delete_book_recommendation"),
+    url(r'^recommendations/categories/(?P<code_name>[\w\d_]+)/$', views.show_recommendation_category, name="show_recommendation_category"),
+    )

@@ -71,6 +71,7 @@ INSTALLED_APPS = (
     'events',
     'social.apps.django_app.default',
     'tedx',
+    'certificates',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -127,7 +128,11 @@ USE_TZ= True
 
 STATIC_URL = getattr(secrets, 'STATIC_URL', '/static/')
 DEFAULT_STATIC_ROOT = os.path.join(BASE_DIR, 'static_files/')
-STATIC_ROOT = getattr(secrets, 'STATIC_ROOT', DEFAULT_STATIC_ROOT)
+if DEBUG:
+    STATICFILES_DIRS = (DEFAULT_STATIC_ROOT,)
+else:
+    STATIC_ROOT = getattr(secrets, 'STATIC_ROOT', DEFAULT_STATIC_ROOT)
+
 MEDIA_URL = getattr(secrets, 'MEDIA_URL', '/media/')
 DEFAULT_MEDIA_ROOT = os.path.join(BASE_DIR, 'media_files/')
 MEDIA_ROOT = getattr(secrets, 'MEDIA_ROOT', DEFAULT_MEDIA_ROOT)

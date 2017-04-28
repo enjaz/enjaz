@@ -12,7 +12,7 @@ import base64
 
 from core import decorators
 from certificates.forms import CertificateTemplateForm, CertificateRequestForm, VerifyCertificateForm
-from certificates.models import CertificateTemplate, CertificateRequest, Certificate
+from certificates.models import TEXT_PLACE_HOLDER, CertificateTemplate, CertificateRequest, Certificate
 from certificates import utils
 from clubs.models import Club
 from niqati.utils import generate_random_string
@@ -125,70 +125,34 @@ def approve_request(request, pk):
         raise PermissionDenied
 
     certificate_request = get_object_or_404(CertificateRequest, pk=pk)
+    context = {'certificate_request': certificate_request}
+
     try:
         instance = certificate_request.certificatetemplate
+        template_bytes = instance.image.read()
+        file_path, relative_url = utils.generate_certificate_image(pk,
+                                                                   template=instance,
+                                                                   template_bytes=template_bytes,
+                                                                   text=TEXT_PLACE_HOLDER)
+        context['tmp_image'] = relative_url
     except ObjectDoesNotExist:
         instance = CertificateTemplate(certificate_request=certificate_request,
                                        description=certificate_request.description)
 
-    context = {'certificate_request': certificate_request,
-               'certificate_template': instance}
+
 
     if request.method == 'POST':
-        form = CertificateTemplateForm(request.POST, instance=instance)
-        if form.is_valid() and 'template_image' in request.session:
+        form = CertificateTemplateForm(request.POST, request.FILES, instance=instance)
+        if form.is_valid():
             certificate_template = form.save()
-            if form.cleaned_data['is_approved']:
-                certificate_request.is_approved = True
-                template_bytes = base64.b64decode(request.session['template_image'])
-                filename = u"{}.{}".format(certificate_template.description, certificate_template.image_format)
-                template_file = ContentFile(template_bytes)
-                certificate_template.image.save(filename, template_file)
-                for student in certificate_request.students.all():
-                    print student
-                    template_file = ContentFile(template_bytes)
-
-                    while True:
-                        verification_code = generate_random_string(6)
-                        if not Certificate.objects.filter(verification_code=verification_code).exists():
-                            break
-
-                    img_response = utils.generate_certificate_image(template_bytes,
-                                                              certificate_template.image_format,
-                                                              certificate_template.y_position,
-                                                              certificate_template.x_position,
-                                                              student.common_profile.get_en_full_name(),
-                                                              certificate_template.color,
-                                                              certificate_template.font_size)
-                    certificate = Certificate.objects.create(certificate_template=certificate_template,
-                                                             user=student,
-                                                             verification_code=verification_code)
-                    certificate_file = ContentFile(img_response)
-                    certificate.image.save("{}.{}".format(certificate.pk, certificate_template.image_format), certificate_file)
-
-        elif not 'template_image' in request.session:
-            context['error'] = 'no_image'
+            return HttpResponseRedirect(reverse('certificates:approve_certificate_request', args=(pk,)))
         else:
             print form.errors
     elif request.method == 'GET':
         form = CertificateTemplateForm(instance=instance)
 
     context['form'] = form
-    print form.errors
     return render(request, 'certificates/approve_request.html', context)
-
-def delete_template(request, pk):
-    certificate_request = get_object_or_404(CertificateRequest, pk=pk)
-
-    if not utils.can_approve_certificates(request.user):
-        raise PermissionDenied
-
-    if 'template_image' in request.session:
-        del request.session['template_image']
-
-    CertificateTemplate.objects.filter(certificate_request=certificate_request).delete()
-    show_url = reverse('certificates:show_certificate_request', args=(certificate_request.pk,))
-    return HttpResponseRedirect(show_url)
 
 @csrf_exempt
 @decorators.post_only
@@ -196,36 +160,15 @@ def delete_template(request, pk):
 def upload_image(request, pk):
     if not utils.can_approve_certificates(request.user):
         raise PermissionDenied
-    #certificate_request = get_object_or_404(CertificateRequest, pk=pk)
+
     template_bytes = request.FILES['image'].read()
     img = Image.open(ContentFile(template_bytes))
     width, height = img.size
-    img_str = base64.b64encode(template_bytes)
-    request.session['template_image'] = img_str
-    request.session['width'] = width
-    request.session['height'] = height
+    file_path, relative_url = utils.create_temporary_certificate(pk)
+    with open(file_path, 'w') as f:
+        f.write(template_bytes)
 
-    return {'img_str': img_str, 'width': width, 'height': height}
-
-@csrf_exempt
-@decorators.post_only
-@decorators.ajax_only
-def save_image(request, pk):
-    if not utils.can_approve_certificates(request.user):
-        raise PermissionDenied
-
-    certificate_request = get_object_or_404(CertificateRequest, pk=pk)
-    template_bytes = base64.b64decode(request.session['template_image'])
-    img_file = ContentFile(template_bytes)
-    instance = CertificateTemplate(certificate_request=certificate_request)
-    form = CertificateTemplateForm(request.POST, instance=CertificateTemplate)
-    if form.is_valid():
-        certificate_template = form.save()
-        print "it works!"
-        certificate_template.image.save(request.POST['title']+certificate_template.image_format, img_file)
-    else:
-        print form.errors
-    return {}
+    return {'img_url': relative_url, 'width': width, 'height': height}
 
 @csrf_exempt
 @decorators.post_only
@@ -233,29 +176,34 @@ def save_image(request, pk):
 def update_image(request, pk):
     if not utils.can_approve_certificates(request.user):
         raise PermissionDenied
+
     certificate_request = get_object_or_404(CertificateRequest, pk=pk)
 
-    if 'template_image' in  request.session:
-        template_bytes = base64.b64decode(request.session['template_image'])
-    else:
-        # FIXME: Handle when no certificate template was saved.
-        template_bytes = certificate_request.certificatetemplate.image.read()
-
-    y_position = float(request.POST['y'])
-    x_position = float(request.POST['x'])
-    example_text = request.POST.get('example_text', 'Nada Abdullah')
-    image_format = request.POST.get('image_format', 'PNG')
-    color = request.POST['color']
     try:
         font_size = int(request.POST['font_size'])
     except ValueError:
         raise Exception(u"لم تدخل حجما صالحا للخط")
-    img_response = utils.generate_certificate_image(template_bytes,
-                                              image_format,
-                                              y_position,
-                                              x_position,
-                                              example_text,
-                                              color,
-                                              font_size)
-    img_str = base64.b64encode(img_response.getvalue())
-    return {'img_str': img_str}
+
+    if 'image' in request.FILES:
+        template_bytes = request.FILES['image'].read()
+    else:
+        template = certificate_request.certificatetemplate
+        template_bytes = template.image.read()
+
+    y_position = float(request.POST['y'])
+    x_position = float(request.POST['x'])
+    example_text = request.POST.get('example_text', TEXT_PLACE_HOLDER)
+    image_format = request.POST.get('image_format', 'PNG')
+    color = request.POST['color']
+
+    template = CertificateTemplate(y_position=y_position,
+                                   x_position=x_position,
+                                   font_size=font_size,
+                                   image_format=image_format,
+                                   color=color)
+
+    file_path, img_url = utils.generate_certificate_image(certificate_request.pk,
+                                                          template=template,
+                                                          template_bytes=template_bytes,
+                                                          text=example_text)
+    return {'img_url': img_url}

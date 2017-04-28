@@ -49,9 +49,9 @@ urlpatterns = [
     url(r'^accounts/edit/$', 'accounts.views.edit_common_profile', name='edit_common_profile'),
     url(r'^accounts/', include('userena.urls')),
     url(r'^questions/', include('questions.urls', namespace="cultural_program_code")),
+    url(r'^certificates/', include('certificates.urls', namespace="certificates")),
     url(r'^tagging_autocomplete/', include('tagging_autocomplete.urls')),
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + \
-                   static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

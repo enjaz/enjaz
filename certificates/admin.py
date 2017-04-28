@@ -1,6 +1,12 @@
 from django.contrib import admin
-from certificates.models import CertificateTemplate, CertificateRequest, Certificate
+from certificates import models
 
-admin.site.register(Certificate)
-admin.site.register(CertificateRequest)
-admin.site.register(CertificateTemplate)
+class TextPositionInline(admin.TabularInline):
+    model = models.TextPosition
+
+class TemplateAdmin(admin.ModelAdmin):
+    inlines = [TextPositionInline]
+
+admin.site.register(models.Certificate)
+admin.site.register(models.CertificateRequest)
+admin.site.register(models.CertificateTemplate, TemplateAdmin)

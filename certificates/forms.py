@@ -1,9 +1,10 @@
 # -*- coding: utf-8  -*-
 from activities.models import Episode
-from certificates.models import Certificate, CertificateTemplate, CertificateRequest
+from certificates.models import Certificate, CertificateTemplate, CertificateRequest, TextPosition
 from certificates import utils
 from dal import autocomplete
 from django import forms
+from django.forms import  inlineformset_factory
 import clubs.utils
 
 
@@ -54,13 +55,13 @@ class CertificateTemplateForm(forms.ModelForm):
 
     class Meta:
         model = CertificateTemplate
-        fields = ['example_text', 'description', 'color', 'font_size',
-                  'x_position', 'y_position', 'image', 'image_format']
-        widgets = {'color': forms.TextInput(attrs={'class': 'jscolor english-field'}),
-                   'x_position': forms.HiddenInput(),
-                   'y_position': forms.HiddenInput()}
-
+        fields = ['example_text', 'description', 'image',
+                  'image_format']
 
 class VerifyCertificateForm(forms.Form):
     verification_code = forms.CharField(max_length=6, min_length=6,
                                         label=u"رمز التحقق")
+
+PositionFormset =  inlineformset_factory(CertificateTemplate, TextPosition,
+                                         fields=('y_position', 'x_position', 'size', 'color'),
+                                         widgets={'color': forms.TextInput(attrs={'class': 'jscolor english-field'})})

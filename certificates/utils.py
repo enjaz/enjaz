@@ -19,7 +19,7 @@ def create_temporary_certificate(request_pk):
     return file_path, relative_url
 
 def generate_certificate_image(request_pk, template, template_bytes,
-                               text):
+                               positions, texts):
     if template.font_family:
         font_family = template.font_family
     else:
@@ -28,16 +28,19 @@ def generate_certificate_image(request_pk, template, template_bytes,
 
     base = Image.open(cStringIO.StringIO(template_bytes))
     base = base.convert("RGBA")
-
     txt = Image.new('RGBA', base.size, (255, 255, 255, 0))
-    # get a font
-    fnt = ImageFont.truetype(font_family, template.font_size)
-    # get a drawing context
-    d = ImageDraw.Draw(txt)
-    text_x_center = fnt.getsize(text)[0] / 2
-    text_y_center = fnt.getsize(text)[1] / 2
-    # draw text, full opacity
-    a = d.text((template.x_position - text_x_center, template.y_position - text_y_center), text, font=fnt, fill="#"+template.color)
+    count = 0
+    for position in positions:
+        text = texts[count]
+        # get a font
+        fnt = ImageFont.truetype(font_family, position.size)
+        # get a drawing context
+        d = ImageDraw.Draw(txt)
+        text_x_center = fnt.getsize(text)[0] / 2
+        text_y_center = fnt.getsize(text)[1] / 2
+        # draw text, full opacity
+        d.text((position.x_position - text_x_center, position.y_position - text_y_center), text, font=fnt, fill="#"+position.color)
+        count += 1
     out = Image.alpha_composite(base, txt)
     file_path, relative_url = create_temporary_certificate(request_pk)
 

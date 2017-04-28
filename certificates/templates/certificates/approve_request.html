@@ -13,15 +13,43 @@
         cursor: pointer;
     }
 </style>
+
+
 <h1>مراجعة شهادة {{ certificate_request.description }}</h1>
 <div id="wrapper">
 <div id="live-div" {% if tmp_image %}style="background-image:url({{ tmp_image }}); width: {{ certificate_request.certificatetemplate.image.width }}px; height: {{ certificate_request.certificatetemplate.image.height }}px;"{% endif %}></div>
 </div>
 <div class="row">
     <div class="col-md-4 col-md-offset-4">
-        <form method="post" class="form" enctype="multipart/form-data">
+        <form  id="template-form" method="post" class="form" enctype="multipart/form-data">
+<table class="table table-hover">
+
+   <thead>
+      <th>الاختيار</th>
+      <th>الموضع السيني</th>
+      <th>الموضع الصادي</th>
+      <th>اللون</th>
+      <th>حجم الخط</th>
+      <th>احذف</th>
+   </thead>
+   <tbody>
+   {% for form in formset %}
+     <tr>
+       <td>{{ form.id }}<input {% if forloop.counter == 1 %}checked{% endif %} name="text-position" class="text-position" type="radio"></td>
+       <td>{{ form.x_position }}</td>
+       <td>{{ form.y_position }}</td>
+       <td>{{ form.color }}</td>
+       <td>{{ form.size }}</td>
+       <td>{{ form.DELETE }}</td>
+     </tr>
+   {% endfor %}
+   </tbody>
+</table>
+
+
+{{ formset.management_form }}
             {% csrf_token %}
-            {% bootstrap_form form %}
+            {% bootstrap_form template_form %}
             <input id="save" type="submit" value="اعتمد وأرسل" class="btn btn-success">
         </form>
     </div>
@@ -35,15 +63,17 @@
 <script type="text/javascript">
     
 $(function(){
+    function define_targetted_position(){
+       row = $('input.text-position:checked').closest('tr');
+       y_input = row.find("input[name$=-y_position]");
+       x_input = row.find("input[name$=-x_position]");
+       console.log(row);
+       console.log(y_input);
+       console.log(x_input);
+    }
+    define_targetted_position();
     function update_image(){
-        var formData = new FormData(); 
-        formData.append("image", $("#id_image").prop('files')[0]);
-        formData.append("image_format", $("#id_image_format").val());
-        formData.append("color", $("#id_color").val());
-        formData.append("font_size", $("#id_font_size").val());
-        formData.append("example_text", $("#id_example_text").val());
-        formData.append("y", posY);
-        formData.append("x", posX);
+        var formData = new FormData($('#template-form')[0]); 
         $.ajax({method: 'POST',
                 url: "{% url 'certificates:update_image' certificate_request.pk %}",
                 data: formData,
@@ -58,32 +88,26 @@ $(function(){
                 }
         });
     }
-    
+    $("input.text-position").change(define_targetted_position);
     $("#live-div").click(function(event){
         img = this;
         var offset = $(this).offset();
         posX = event.offsetX?(event.offsetX):event.pageX-document.getElementById("live-div").offsetLeft;
         posY = event.offsetY?(event.offsetY):event.pageY-document.getElementById("live-div").offsetTop;
-        $("#id_x_position").val(posX);
-        $("#id_y_position").val(posY);
+        x_input.val(posX);
+        y_input.val(posY);
         console.log(posX);
         console.log(posY);
         update_image();
     });
 
-    $("#id_color, #id_text, #id_font_size, #id_image_format").change(function(){
-        color = $("#id_color").val();
-        font_size = $("#id_font_size").val();
-        example_text = $("#id_example_text").val();
-        image_format = $("#id_image_format").val();
+    $("input[type=text], input[type=number]").change(function(){
         update_image();
     });
     
     $("#id_image").change(function () {
         /* get some values from elements on the page: */
-        var formData = new FormData(); 
-        formData.append("image", $("#id_image").prop('files')[0]);
-        formData.append("image_format", $("#id_image_format").val());
+        var formData = new FormData($('#template-form')[0]); 
         $.ajax({
             url: "{% url 'certificates:upload_image' certificate_request.pk %}",
             type: 'POST',

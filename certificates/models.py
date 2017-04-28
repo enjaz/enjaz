@@ -46,11 +46,7 @@ class Certificate(models.Model):
 class CertificateTemplate(models.Model):
     certificate_request = models.OneToOneField(CertificateRequest)
     description = models.CharField(u"وصف الشهادة", max_length=200)
-    font_family = models.CharField(u"نوع الخط", max_length=200)
-    font_size = models.PositiveIntegerField(u"حجم الخط", default=34)
-    color = models.CharField(u"لون الخط", max_length=10, default="000000")
-    y_position = models.PositiveIntegerField(u"الموضع على المحور السيني")
-    x_position = models.PositiveIntegerField(u"الموضع على المحور الصادي")
+    font_family = models.CharField(u"نوع الخط", max_length=200, blank=True)
     image = models.ImageField(u"صورة القالب", upload_to="certificate_templates")
     image_format_choices = (
         ('PNG', 'PNG'),
@@ -65,7 +61,7 @@ class CertificateTemplate(models.Model):
     modification_date = models.DateTimeField(u"تاريخ التعديل",
                                            auto_now=True)
 
-    def generate_certificate(self, user, text):
+    def generate_certificate(self, user, texts):
         template_bytes = self.image.read()
         while True:
             verification_code = generate_random_string(6)
@@ -75,7 +71,7 @@ class CertificateTemplate(models.Model):
         file_path, relative_url = utils.generate_certificate_image(self.certificate_request.pk,
                                                                    template=self,
                                                                    template_bytes=template_bytes,
-                                                                   text=text)
+                                                                   texts=texts)
         certificate = Certificate.objects.create(certificate_template=self,
                                                  user=user,
                                                  verification_code=verification_code)
@@ -91,3 +87,8 @@ class TextPosition(models.Model):
     certificate_template = models.ForeignKey('CertificateTemplate',
                                              verbose_name=u"القالب",
                                              related_name="text_positions")
+    y_position = models.PositiveIntegerField(u"الموضع على المحور السيني")
+    x_position = models.PositiveIntegerField(u"الموضع على المحور الصادي")
+    size = models.PositiveIntegerField(u"حجم الخط", default=34)
+    color = models.CharField(u"لون الخط", max_length=10, default="000000")
+

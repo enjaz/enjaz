@@ -11,7 +11,7 @@ import cStringIO
 import base64
 
 from core import decorators
-from certificates.forms import CertificateTemplateForm, CertificateRequestForm, VerifyCertificateForm
+from certificates.forms import CertificateTemplateForm, CertificateRequestForm, VerifyCertificateForm, PositionFormset
 from certificates.models import TEXT_PLACE_HOLDER, CertificateTemplate, CertificateRequest, Certificate
 from certificates import utils
 from clubs.models import Club
@@ -129,29 +129,37 @@ def approve_request(request, pk):
 
     try:
         instance = certificate_request.certificatetemplate
-        template_bytes = instance.image.read()
-        file_path, relative_url = utils.generate_certificate_image(pk,
-                                                                   template=instance,
-                                                                   template_bytes=template_bytes,
-                                                                   text=TEXT_PLACE_HOLDER)
-        context['tmp_image'] = relative_url
     except ObjectDoesNotExist:
         instance = CertificateTemplate(certificate_request=certificate_request,
                                        description=certificate_request.description)
-
-
+    else:
+        template_bytes = instance.image.read()
+        texts = [TEXT_PLACE_HOLDER] * instance.text_positions.count()
+        file_path, relative_url = utils.generate_certificate_image(pk,
+                                                                   template=instance,
+                                                                   template_bytes=template_bytes,
+                                                                   positions=instance.text_positions.all(),
+                                                                   texts=texts)
+        context['tmp_image'] = relative_url
 
     if request.method == 'POST':
-        form = CertificateTemplateForm(request.POST, request.FILES, instance=instance)
-        if form.is_valid():
-            certificate_template = form.save()
+        template_form = CertificateTemplateForm(request.POST, request.FILES, instance=instance)
+        formset = PositionFormset(request.POST, instance=instance)
+        if template_form.is_valid() and formset.is_valid():
+            template = template_form.save()
+            formset.instance = template
+            formset.save()
             return HttpResponseRedirect(reverse('certificates:approve_certificate_request', args=(pk,)))
         else:
-            print form.errors
+            print template_form.errors
+            print formset.errors
     elif request.method == 'GET':
-        form = CertificateTemplateForm(instance=instance)
+        template_form = CertificateTemplateForm(instance=instance)
+        formset = PositionFormset(instance=instance)
 
-    context['form'] = form
+    context['template_form'] = template_form
+    context['formset'] = formset
+
     return render(request, 'certificates/approve_request.html', context)
 
 @csrf_exempt
@@ -180,30 +188,28 @@ def update_image(request, pk):
     certificate_request = get_object_or_404(CertificateRequest, pk=pk)
 
     try:
-        font_size = int(request.POST['font_size'])
-    except ValueError:
-        raise Exception(u"لم تدخل حجما صالحا للخط")
-
+        instance = certificate_request.certificatetemplate
+    except ObjectDoesNotExist:
+        instance = None
+    
     if 'image' in request.FILES:
         template_bytes = request.FILES['image'].read()
     else:
-        template = certificate_request.certificatetemplate
-        template_bytes = template.image.read()
+        template_bytes = instance.image.read()
 
-    y_position = float(request.POST['y'])
-    x_position = float(request.POST['x'])
+    position_formset = PositionFormset(request.POST, instance=instance)
+    if position_formset.is_valid():
+        positions = position_formset.save(commit=False)
+    else:
+        raise Exception(u"خطأ في تحديد مواضع النصوص")
+
     example_text = request.POST.get('example_text', TEXT_PLACE_HOLDER)
     image_format = request.POST.get('image_format', 'PNG')
-    color = request.POST['color']
-
-    template = CertificateTemplate(y_position=y_position,
-                                   x_position=x_position,
-                                   font_size=font_size,
-                                   image_format=image_format,
-                                   color=color)
-
+    template = CertificateTemplate(image_format=image_format)
+    texts = [example_text] * len(positions)
     file_path, img_url = utils.generate_certificate_image(certificate_request.pk,
                                                           template=template,
                                                           template_bytes=template_bytes,
-                                                          text=example_text)
+                                                          positions=positions,
+                                                          texts=texts)
     return {'img_url': img_url}

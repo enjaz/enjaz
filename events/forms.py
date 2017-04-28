@@ -1,11 +1,13 @@
 0# -*- coding: utf-8  -*-
 from django import forms
+from django.forms.widgets import TextInput
 
 from accounts.utils import get_user_gender
 from events.models import NonUser, Session, Registration, Abstract, \
                           AbstractFigure, Initiative, InitiativeFigure, \
                           Criterion, CriterionValue, Evaluation,CaseReport, \
-                          AbstractPoster, Attendance, Question
+                          AbstractPoster, Attendance, Question, SurveyQuestion, \
+                          SurveyAnswer
 from django.forms.models import inlineformset_factory
 
 class NonUserForm(forms.ModelForm):
@@ -195,3 +197,33 @@ class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
         fields = ['text']
+
+class SurveyForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.session = kwargs.pop("session")
+        self.survey = self.session.survey
+        super(SurveyForm, self).__init__(*args, **kwargs)
+        for question in self.survey.survery_questions.all():
+            filed_name = 'question_' + str(question.pk)
+            if question.category == "O":
+                self.fields[filed_name] = forms.CharField(label=question.text,
+                                                          widget=forms.Textarea)
+            elif question.category == "S":
+                choices = [(i, i) for i in range(11)]
+                self.fields[field_name] = forms.IntegerField(label=question.text
+                                                             widget=forms.RadioSelect(choices=choices))
+
+    def save(self, user):
+        field_names = [field_name for field_name in self.cleaned_data
+                       if field_name.startswith("question_")]
+        for field_name in field_names:
+            question_pk = field_name.lstrip("question_")
+            question = SurveyQuestion.objects.get(pk=question_pk)
+            arguments = {'question': question,
+                         'session': self.session,
+                         'user':user}
+            if question.category == 'O':
+                arguments['text_value'] = self.cleaned_data[field_name]
+            elif question.category == 'S':
+                arguments['numerical_value'] = self.cleaned_data[field_name]
+            SurveyAnswer.objects.create(**arguments)

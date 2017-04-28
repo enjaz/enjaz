@@ -472,7 +472,6 @@ def show_initiative(request, event_code_name, pk):
     return render(request, "events/initiatives/show_initiative.html", context)
 
 def show_session_group(request, event_code_name, code_name):
-    event = SessionGroup.event
     session_group = get_object_or_404(SessionGroup,
                                       event__code_name=event_code_name,
                                       code_name=code_name)
@@ -481,7 +480,7 @@ def show_session_group(request, event_code_name, code_name):
         raise Http404
     elif session_group.event.registration_closing_date and timezone.now() > session_group.event.registration_closing_date:
         return HttpResponseRedirect(reverse('events:registration_closed',
-                                                args=(event.code_name,)))
+                                                args=(session_group.event.code_name,)))
     if request.user.is_authenticated() and session_group.is_limited_to_one:
         context['already_on'] = session_group.is_user_already_on(request.user)
 
@@ -939,3 +938,19 @@ def get_csv(request, event_code_name, session_pk):
         response.write("")
 
     return response
+
+@decorators.ajax_only
+@login_required
+def handle_survey(request, session_pk):
+    session = get_object_or_404(Survey, pk=session_pk)
+
+    if request.method == 'POST':
+        form = SurveyForm(request.POST, session=session)
+        if form.is_valid():
+            form.save(user=request.user)
+            return {"message": "success"}
+    elif request.method == 'GET':
+        form = SurveyForm(request.POST, session=session)
+
+    context = {'form': form}
+    return render(request, 'bulb/groups/edit_group_form.html', context)

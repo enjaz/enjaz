@@ -71,6 +71,7 @@ class CertificateTemplate(models.Model):
         file_path, relative_url = utils.generate_certificate_image(self.certificate_request.pk,
                                                                    template=self,
                                                                    template_bytes=template_bytes,
+                                                                   positions=self.text_positions.all(),
                                                                    texts=texts)
         certificate = Certificate.objects.create(certificate_template=self,
                                                  user=user,

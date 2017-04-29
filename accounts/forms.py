@@ -228,7 +228,7 @@ class NonStudentSignupForm(EnjazSignupForm):
                                      badge_number=self.cleaned_data['badge_number'],
                                      city=self.cleaned_data['city'],
                                      gender=self.cleaned_data['gender'],
-                                     mobile_number=mobile_number,
+                                     mobile_number=self.cleaned_data['mobile_number'],
                                      job_description=self.cleaned_data['job_description'],
                                      scfhs_number=self.cleaned_data['scfhs_number'],
                                      )
@@ -353,7 +353,7 @@ class EditStudentCommonProfile(CollegeCheckMaxin, forms.ModelForm):
         fields = ['ar_first_name', 'ar_middle_name', 'ar_last_name',
                   'en_first_name', 'en_middle_name', 'en_last_name',
                   'alternative_email', 'student_id', 'badge_number',
-                  'mobile_number', 'city', 'gender']
+                  'mobile_number', 'city', 'gender', 'scfhs_number']
 
     def clean(self):
         cleaned_data = super(EditStudentCommonProfile, self).clean()

@@ -29,7 +29,7 @@
 
 <br>
 
-<form method="post" role="form" id="form_register">	
+<form method="post" role="form" id="form_register">
         {% csrf_token %}
 	<div class="dinar-light">
 			<div class="form-group">
@@ -38,20 +38,20 @@
 					<div class="input-group-addon">
 						<i class="entypo-user"></i>
 					</div>
-					
-					<input {% if form.ar_first_name.value and not form.ar_first_name.errors %}value="{{ form.ar_first_name.value }}" {% endif %}type="text" class="form-control" name="ar_first_name" id="ar_first_name" placeholder="{{ form.ar_first_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" required="required"/>
+
+					<input {% if form.ar_first_name.value and not form.ar_first_name.errors %}value="{{ form.ar_first_name.value }}" {% endif %}type="text" class="form-control" name="ar_first_name" id="ar_first_name" placeholder="{{ form.ar_first_name.label }}" data-mask="[أ-ي , ء , آ]+" data-is-regex="true" required="required"/>
 					{% if form.ar_first_name.errors %}
 					    {% for error in form.ar_first_name.errors %}
 					        <label class='error' for='ar_first_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
-					<input {% if form.ar_middle_name.value and not form.ar_middle_name.errors %}value="{{ form.ar_middle_name.value }}" {% endif %}type="text" class="form-control" name="ar_middle_name" id="ar_middle_name" placeholder="{{ form.ar_middle_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" required="required"/>
+					<input {% if form.ar_middle_name.value and not form.ar_middle_name.errors %}value="{{ form.ar_middle_name.value }}" {% endif %}type="text" class="form-control" name="ar_middle_name" id="ar_middle_name" placeholder="{{ form.ar_middle_name.label }}" data-mask="[أ-ي , ء , آ]+" data-is-regex="true" required="required"/>
 					{% if form.ar_middle_name.errors %}
 					    {% for error in form.ar_middle_name.errors %}
 					        <label class='error' for='ar_middle_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
-					<input {% if form.ar_last_name.value and not form.ar_last_name.errors %}value="{{ form.ar_last_name.value }}" {% endif %}type="text" class="form-control" name="ar_last_name" id="ar_last_name" placeholder="{{ form.ar_last_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" required="required"/>
+					<input {% if form.ar_last_name.value and not form.ar_last_name.errors %}value="{{ form.ar_last_name.value }}" {% endif %}type="text" class="form-control" name="ar_last_name" id="ar_last_name" placeholder="{{ form.ar_last_name.label }}" data-mask="[أ-ي , ء , آ]+" data-is-regex="true" required="required"/>
 					{% if form.ar_last_name.errors %}
 					    {% for error in form.ar_last_name.errors %}
 					        <label class='error' for='ar_last_name' style='display: inline-block'>{{ error|escape }}</label>
@@ -66,7 +66,7 @@
 					<div class="input-group-addon">
 						<i class="entypo-user"></i>
 					</div>
-					
+
 					<input {% if form.en_first_name.value and not form.en_first_name.errors %}value="{{ form.en_first_name.value }}" {% endif %}type="text" class="form-control" name="en_first_name" id="en_first_name" placeholder="{{ form.en_first_name.label }}" data-mask="[A-Za-z']+" data-is-regex="true" required="required"/>
 					{% if form.en_first_name.errors %}
 					    {% for error in form.en_first_name.errors %}
@@ -87,13 +87,13 @@
 					{% endif %}
 				</div>
 			</div>
-			
+
 			<div class="form-group">
 				<div class="english-field input-group{% if form.email.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-mail"></i>
 					</div>
-					
+
 					<input {% if form.email.value and not form.email.errors %}value="{{ form.email.value }}" {% endif %}type="text" class="form-control" name="email" id="email" {% if not form.email.errors %}placeholder="البريد الإلكتروني الجامعي"{% endif %} data-mask="[a-zA-Z0-9]+@(ksau-hs\.edu|ngha\.med)\.sa" data-is-regex="true" required="required"/>
 					{% if form.email.errors %}
 					    {% for error in form.email.errors %}
@@ -105,7 +105,7 @@
 					<div class="input-group-addon">
 						<i class="entypo-mail"></i>
 					</div>
-					
+
 					<input {% if form.alternative_email.value and not form.alternative_email.errors %}value="{{ form.alternative_email.value }}" {% endif %}type="text" class="tooltip-jquery form-control" name="alternative_email" id="alternative_email" {% if not form.alternative_email.errors %}placeholder="{{ form.alternative_email.label }}"{% endif %} title="البريد الشخصي، مثلا بريدك على Gmail أو Hotmail" required="required"/>
 					{% if form.alternative_email.errors %}
 					    {% for error in form.alternative_email.errors %}
@@ -133,7 +133,7 @@
 					<div class="input-group-addon">
 						<i class="entypo-vcard"></i>
 					</div>
-					
+
 					<input {% if form.badge_number.value and not form.badge_number.errors %}value="{{ form.badge_number.value }}" {% endif %}type="text" class="form-control" name="badge_number" id="badge_number" placeholder="{{ form.badge_number.label }}" data-mask="\d+" data-is-regex="true" required="required"/>
 					{% if form.badge_number.errors %}
 					    {% for error in form.badge_number.errors %}
@@ -164,7 +164,7 @@
 					<div class="input-group-addon">
 						<i class="entypo-vcard"></i>
 					</div>
-					
+
 					<input {% if form.job_description.value and not form.job_description.errors %}value="{{ form.job_description.value }}" {% endif %}type="text" class="form-control" name="job_description" id="job_description" placeholder="{{ form.job_description.label }}" required="required"/>
 					{% if form.job_description.errors %}
 					    {% for error in form.job_description.errors %}
@@ -178,12 +178,12 @@
 					<div class="input-group-addon">
 						<i class="entypo-key"></i>
 					</div>
-					
+
 					<input type="password" class="form-control" name="password1" id="password1" placeholder="اختر كلمة سر" autocomplete="off" required="required"/>
 					<input type="password" class="form-control" name="password2" id="password2" placeholder="أكّد كلمة السر" autocomplete="off" required="required"/>
 				</div>
 			</div>
-			
+
 			<div class="form-group">
 				<button type="submit" class="btn btn-success btn-block btn-login">
 					<i class="entypo-left-open-mini"></i>

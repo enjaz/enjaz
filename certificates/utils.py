@@ -1,6 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
+import textwrap
 import cStringIO
 import clubs.utils
 import media.utils
@@ -36,10 +37,22 @@ def generate_certificate_image(request_pk, template, template_bytes,
         fnt = ImageFont.truetype(font_family, position.size)
         # get a drawing context
         d = ImageDraw.Draw(txt)
-        text_x_center = fnt.getsize(text)[0] / 2
-        text_y_center = fnt.getsize(text)[1] / 2
-        # draw text, full opacity
-        d.text((position.x_position - text_x_center, position.y_position - text_y_center), text, font=fnt, fill="#"+position.color)
+        lines = textwrap.wrap(text, width=60)
+        if len(lines) > 1:
+            initial_y = position.y_position
+        else:
+            line = lines[0]
+            height = fnt.getsize(line)[1]
+            text_y_center = (height / 2)
+            initial_y = position.y_position - text_y_center
+
+        for line in lines:
+            width, height = fnt.getsize(line)
+            text_x_center = width / 2
+            # draw text, full opacity
+            d.text((position.x_position - text_x_center, initial_y), line, font=fnt, fill="#"+position.color)
+            line_space = height * 0.2
+            initial_y += height + line_space
         count += 1
     out = Image.alpha_composite(base, txt)
     file_path, relative_url = create_temporary_certificate(request_pk)

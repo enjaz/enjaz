@@ -163,7 +163,8 @@ class SessionGroup(models.Model):
 
 class Session(models.Model):
     event = models.ForeignKey(Event, null=True, blank=True)
-    survey = models.ForeignKey(Survey, verbose_name=u"الاستبيان", related_name="survey_sessions",
+    survey = models.ForeignKey('Survey', verbose_name=u"الاستبيان",
+                               related_name="survey_sessions",
                                null=True, blank=True)
     time_slot = models.ForeignKey(TimeSlot, blank=True, null=True)
     name = models.CharField(max_length=255)
@@ -451,7 +452,8 @@ class Abstract(models.Model):
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
     status=models.CharField(verbose_name="acceptance status", max_length=1, choices=status_choices, default='P')
-    accepted_presentaion_preference = models.CharField(verbose_name="Accepted presentation preference", max_length=1, choices=presentation_preference_choices)
+    accepted_presentaion_preference = models.CharField(verbose_name="Accepted presentation preference",
+                                                       max_length=1, choices=presentation_preference_choices)
     did_presenter_attend = models.BooleanField(verbose_name=u"حضر المقدم؟", default=False)
 
     def get_average_score(self):
@@ -625,7 +627,7 @@ class SurveyQuestion(models.Model):
 class SurveyAnswer(models.Model):
     question = models.ForeignKey(SurveyQuestion, verbose_name=u"السؤال")
     numerical_value = models.IntegerField(u"القيمة الرقمية",
-                                          max_length=100, blank=True)
+                                          blank=True, null=True)
     text_value = models.TextField(u"القيمة النصية")
     user = models.ForeignKey(User, verbose_name=u"المستخدمـ/ـة",
                              blank=True, null=True)

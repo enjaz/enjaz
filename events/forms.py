@@ -210,7 +210,7 @@ class SurveyForm(forms.Form):
                                                           widget=forms.Textarea)
             elif question.category == "S":
                 choices = [(i, i) for i in range(11)]
-                self.fields[field_name] = forms.IntegerField(label=question.text
+                self.fields[field_name] = forms.IntegerField(label=question.text,
                                                              widget=forms.RadioSelect(choices=choices))
 
     def save(self, user):

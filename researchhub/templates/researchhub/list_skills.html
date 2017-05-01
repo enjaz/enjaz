@@ -38,7 +38,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for skilledstudent in skill.skilledstudent_set.all %}
+            {% for skilledstudent in skilledstudents %}
             <tr>
                 <td><a href="{% url 'researchhub:show_skill' skilledstudent.pk %}">{{ skilledstudent.user.common_profile.get_en_full_name }}</a></td>
                 <td>{{ skilledstudent.description|truncatechars:100 }}</td>

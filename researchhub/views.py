@@ -55,7 +55,7 @@ class InvitationView(PDFTemplateView):
 
 @login_required
 def submit_consultation(request):
-    if request.method == 'POST':    
+    if request.method == 'POST':
         form = ConsultationForm(request.POST)
         if form.is_valid():
             email_context = {'user': request.user,
@@ -124,7 +124,7 @@ def control_projects(request):
             project.is_hidden = False
 
     project.save()
-    
+
 @decorators.ajax_only
 @login_required
 def add_project(request):
@@ -316,7 +316,7 @@ def delete_supervisor(request, pk):
     return {"message": "success", "list_url": full_url}
 
 def list_skills(request):
-    skilledstudents = SkilledStudent.objects.available().order_by("-submission_date")
+    skilledstudents = SkilledStudent.objects.filter(is_deleted=False).order_by("-submission_date")
     skills = Skill.objects.all()
     context = {'skilledstudents': skilledstudents, 'skills': skills}
     return render(request, "researchhub/list_skills.html", context)

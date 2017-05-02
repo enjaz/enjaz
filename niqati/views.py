@@ -314,9 +314,9 @@ def general_report(request, city_code=""):
 
     if city_code:
         city_codes = [city_pair[0] for city_pair in city_code_choices]
-        if not city in city_codes:
+        if not city_code in city_codes:
             raise Http404
-        city = accounts.utils.get_city_from_code(city)
+        city = accounts.utils.get_city_from_code(city_code)
         current_year = StudentClubYear.objects.get_current()
         users = User.objects.filter(common_profile__city=city,
                                     code__year=current_year).annotate(point_sum=Sum('code__points')).filter(point_sum__gt=0).order_by('-point_sum')

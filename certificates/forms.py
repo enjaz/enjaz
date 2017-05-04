@@ -31,9 +31,9 @@ class CertificateRequestForm(forms.ModelForm):
 
     class Meta:
         model = CertificateRequest
-        fields = ['episode', 'description', 'text', 'student_list',
-                  'students']
-        widgets = {'students':
+        fields = ['episode', 'description', 'text', 'user_list',
+                  'users']
+        widgets = {'users':
                    autocomplete.ModelSelect2Multiple(url='bulb:bulb-user-autocomplete',
                                                      attrs={ 'data-placeholder': 'أَضف اسمًا',
                                                              'data-html': 'true', })}
@@ -48,7 +48,7 @@ class CertificateTemplateForm(forms.ModelForm):
             certificate_request = template.certificate_request
             certificate_request.is_approved = True
             certificate_request.save()
-            for user in template.certificate_request.students.all():
+            for user in template.certificate_request.users.all():
                 certificate = template.generate_certificate(user, user.common_profile.get_en_full_name())
 
         return template
@@ -63,5 +63,8 @@ class VerifyCertificateForm(forms.Form):
                                         label=u"رمز التحقق")
 
 PositionFormset =  inlineformset_factory(CertificateTemplate, TextPosition,
-                                         fields=('y_position', 'x_position', 'size', 'color'),
+                                         fields=('y_position', 'y_center',
+                                                 'x_position','x_center',
+                                                 'font_family',
+                                                 'size', 'color'),
                                          widgets={'color': forms.TextInput(attrs={'class': 'jscolor english-field'})})

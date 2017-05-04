@@ -1,45 +1,62 @@
 # -*- coding: utf-8  -*-
 from PIL import Image
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
+from django.views.static import serve
 from django.shortcuts import render, get_object_or_404
 import cStringIO
 import base64
 
 from core import decorators
 from certificates.forms import CertificateTemplateForm, CertificateRequestForm, VerifyCertificateForm, PositionFormset
-from certificates.models import TEXT_PLACE_HOLDER, CertificateTemplate, CertificateRequest, Certificate
+from certificates.models import TEXT_PLACE_HOLDER, CertificateTemplate, CertificateRequest, Certificate, TextPosition
 from certificates import utils
 from clubs.models import Club
+from events.models import Abstract, Session
 from niqati.utils import generate_random_string
 
 def index(request):
     return render(request, 'certificates/index.html')
-    
 
 # Certificate views
 
-def list_certificates(request, username=None):
-    if username:
+def list_certificates_per_user(request, pk=None):
+    if pk:
         if not utils.can_view_all_certificates(request.user):
             raise PermissionDenied
         else:
-            user = get_object_or_404(User, username=username)
+            user = get_object_or_404(User, pk=pk)
     else:
         user = request.user
 
     certificates = Certificate.objects.filter(user=user)
     return render(request, 'certificates/list_certificates.html',
-                  {'certificates': certificate})
+                  {'certificates': certificates})
 
 def show_certificate(request, verification_code):
     certificate = get_object_or_404(Certificate, verification_code=verification_code)
     return render(request, 'certificates/show_certificate.html',
                   {'certificate': certificate})
+
+@login_required
+def download_certificate(request, verification_code):
+    certificate = get_object_or_404(Certificate,
+                                    verification_code=verification_code)
+
+    if not certificate.user and certificate.user == request.user and \
+       not utils.can_view_all_certificates(request.user) and \
+       not (certificate.content_object and type(certificate.content_object) is Session or \
+            certificate.content_object and type(certificate.content_object) is Abstract and\
+            is_organizing_team_member(request.user, certificate.content_object.event)):
+        raise PermissionDenied       
+    
+    return serve(request, certificate.image.name, settings.MEDIA_ROOT, show_indexes=False)
 
 def verify_certificate(request):
     context = {}
@@ -127,20 +144,15 @@ def approve_request(request, pk):
     certificate_request = get_object_or_404(CertificateRequest, pk=pk)
     context = {'certificate_request': certificate_request}
 
-    try:
-        instance = certificate_request.certificatetemplate
-    except ObjectDoesNotExist:
-        instance = CertificateTemplate(certificate_request=certificate_request,
-                                       description=certificate_request.description)
-    else:
-        template_bytes = instance.image.read()
+    instance = certificate_request.get_template()
+    if instance:
         texts = [TEXT_PLACE_HOLDER] * instance.text_positions.count()
         file_path, relative_url = utils.generate_certificate_image(pk,
                                                                    template=instance,
-                                                                   template_bytes=template_bytes,
-                                                                   positions=instance.text_positions.all(),
                                                                    texts=texts)
         context['tmp_image'] = relative_url
+    else:
+        instance = CertificateTemplate(certificate_request=certificate_request)
 
     if request.method == 'POST':
         template_form = CertificateTemplateForm(request.POST, request.FILES, instance=instance)
@@ -150,9 +162,6 @@ def approve_request(request, pk):
             formset.instance = template
             formset.save()
             return HttpResponseRedirect(reverse('certificates:approve_certificate_request', args=(pk,)))
-        else:
-            print template_form.errors
-            print formset.errors
     elif request.method == 'GET':
         template_form = CertificateTemplateForm(instance=instance)
         formset = PositionFormset(instance=instance)
@@ -172,7 +181,7 @@ def upload_image(request, pk):
     template_bytes = request.FILES['image'].read()
     img = Image.open(ContentFile(template_bytes))
     width, height = img.size
-    file_path, relative_url = utils.create_temporary_certificate(pk)
+    file_path, relative_url = utils.get_temporary_paths(pk)
     with open(file_path, 'w') as f:
         f.write(template_bytes)
 
@@ -187,20 +196,28 @@ def update_image(request, pk):
 
     certificate_request = get_object_or_404(CertificateRequest, pk=pk)
 
-    try:
-        instance = certificate_request.certificatetemplate
-    except ObjectDoesNotExist:
-        instance = None
+    instance = certificate_request.get_template()
     
     if 'image' in request.FILES:
         template_bytes = request.FILES['image'].read()
     else:
         template_bytes = instance.image.read()
 
+    if instance:
+        existing_positions = instance.text_positions.all()
+    else:
+        existing_positions = TextPosition.objects.none()
+
     position_formset = PositionFormset(request.POST, instance=instance)
     if position_formset.is_valid():
-        positions = position_formset.save(commit=False)
+        # Formsets only return changed objects.
+        changed_positions = position_formset.save(commit=False)
+        previous_pks = [position.pk for position in changed_positions
+                        if position.pk]
+        existing_positions = existing_positions.exclude(pk__in=previous_pks)
+        positions = changed_positions + list(existing_positions)
     else:
+        print position_formset.errors
         raise Exception(u"خطأ في تحديد مواضع النصوص")
 
     example_text = request.POST.get('example_text', TEXT_PLACE_HOLDER)

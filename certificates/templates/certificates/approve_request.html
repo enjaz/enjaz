@@ -1,0 +1,141 @@
+{% extends 'certificates/certificate_base.html' %}{% load bootstrap3 %}{% load staticfiles %}
+{% block title %}نظام استصدار الشهادات: اعتماد شهادة {{ certificate_request.description }}{% endblock %}
+{% block content %}
+<style>
+    #wrapper{
+        height: 100vh;
+        overflow: scroll;
+{% if not tmp_image %}
+        display: none;
+{% endif %}
+    }
+    #live-div{
+        cursor: pointer;
+    }
+</style>
+
+
+<h1>مراجعة شهادة {{ certificate_request.description }}</h1>
+<div id="wrapper">
+<div id="live-div" {% if tmp_image %}style="background-image:url({{ tmp_image }}); width: {{ certificate_request.certificatetemplate.image.width }}px; height: {{ certificate_request.certificatetemplate.image.height }}px;"{% endif %}></div>
+</div>
+<div class="row">
+    <div class="col-md-4 col-md-offset-4">
+        <form  id="template-form" method="post" class="form" enctype="multipart/form-data">
+<table class="table table-hover">
+
+   <thead>
+      <th>الاختيار</th>
+      <th>الموضع السيني</th>
+      <th>انتصاف سيني</th>
+      <th>الموضع الصادي</th>
+      <th>انتصاف صادي</th>
+      <th>اللون</th>
+      <th>حجم الخط</th>
+      <th>نوع الخط</th>
+      <th>احذف</th>
+   </thead>
+   <tbody>
+   {% for form in formset %}
+     <tr>
+       <td>{{ form.id }}<input {% if forloop.counter == 1 %}checked{% endif %} name="text-position" class="text-position" type="radio"></td>
+       <td>{{ form.x_position }}</td>
+       <td>{{ form.x_center }}</td>
+       <td>{{ form.y_position }}</td>
+       <td>{{ form.y_center }}</td>
+       <td>{{ form.color }}</td>
+       <td>{{ form.size }}</td>
+       <td>{{ form.font_family }}</td>
+       <td>{{ form.DELETE }}</td>
+     </tr>
+   {% endfor %}
+   </tbody>
+</table>
+
+
+{{ formset.management_form }}
+            {% csrf_token %}
+            {% bootstrap_form template_form %}
+            <input id="save" type="submit" value="اعتمد وأرسل" class="btn btn-success">
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="{% static 'js/jscolor.min.js' %}"></script>
+
+<script type="text/javascript">
+    
+$(function(){
+    function define_targetted_position(){
+       row = $('input.text-position:checked').closest('tr');
+       y_input = row.find("input[name$=-y_position]");
+       x_input = row.find("input[name$=-x_position]");
+       console.log(row);
+       console.log(y_input);
+       console.log(x_input);
+    }
+    define_targetted_position();
+    function update_image(){
+        var formData = new FormData($('#template-form')[0]); 
+        $.ajax({method: 'POST',
+                url: "{% url 'certificates:update_image' certificate_request.pk %}",
+                data: formData,
+                cache: false,
+                contentType: false,
+                enctype: 'multipart/form-data',
+                processData: false,
+                success: function(data){
+                    var url = data['img_url'];
+                    $("#live-div").css("background-image", "url(" + url + "?" + new Date().getTime() + ")")
+                    $("#wrapper").show();
+                }
+        });
+    }
+    $("input.text-position").change(define_targetted_position);
+    $("#live-div").click(function(event){
+        img = this;
+        var offset = $(this).offset();
+        posX = event.offsetX?(event.offsetX):event.pageX-document.getElementById("live-div").offsetLeft;
+        posY = event.offsetY?(event.offsetY):event.pageY-document.getElementById("live-div").offsetTop;
+        x_input.val(posX);
+        y_input.val(posY);
+        console.log(posX);
+        console.log(posY);
+        update_image();
+    });
+
+    $("input[type=text], input[type=number], select").change(function(){
+        update_image();
+    });
+    
+    $("#id_image").change(function () {
+        /* get some values from elements on the page: */
+        var formData = new FormData($('#template-form')[0]); 
+        $.ajax({
+            url: "{% url 'certificates:upload_image' certificate_request.pk %}",
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function(data){
+                var base64 = data['img_str'];
+                var url = data['img_url'];
+                var width = data['width'];
+                var height = data['height'];
+                $("#wrapper, #save").show();
+                //$("#live-certificate").attr("src", "data:image/png;base64," + base64);
+                $("#live-div").css("background-image", "url(" + url + "?" + new Date().getTime() + ")")
+                $("#live-div").css('width', width + "px");
+                $("#live-div").css('height', height + "px");
+            }
+        });
+    });
+});
+    
+</script>
+{% endblock %}

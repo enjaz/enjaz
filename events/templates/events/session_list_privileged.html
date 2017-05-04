@@ -11,6 +11,7 @@
             <th>الجلسة</th>
             <th>المسجلون والمسجلات</th>
             {% if event.has_attendance %}<th>التحضير</th>{% endif %}
+            {% if user|is_organizing_team_member:event or user.is_superuser %}<th>الشهادات</th>{% endif %}
         </tr>
     </thead>
     <tbody>
@@ -19,6 +20,7 @@
             <td>{{ session }}</td>
             <td><a href="{% url 'events:review_registrations' event.code_name session.pk %}">{{ session.get_registration_count }}</a></td>
             {% if event.has_attendance %}<td><a href="{% url 'events:show_attendance_interface' event.code_name session.pk %}">التحضير</a></td>{% endif %}
+            {% if user|is_organizing_team_member:event or user.is_superuser %}<td><a href="{% url 'events:list_session_certificates' event.code_name session.pk %}">الشهادات</a></td>{% endif %}
         </tr>
 {% endfor %}
     </tbody>

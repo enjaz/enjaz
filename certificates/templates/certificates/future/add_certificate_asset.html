@@ -1,0 +1,34 @@
+{% load staticfiles %}
+<script type="text/javascript">
+    $(function () {
+        // initialize request edit modal
+        $('#edit-request-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        });
+        $("#add-request").click(function () {
+
+            $("#edit-request-modal").modal('show');
+            $("#edit-request-modal .modal-title").html("أضف طلب شهادة جديد");
+            $("#edit-request-modal .modal-body").load("{% url 'certificates:add_request_introduction' %}", function(){
+                $('.end-introduction').click(function() {
+                    $("#edit-request-modal .modal-body").load("{% url 'certificates:add_certificate_request' %}");
+            });
+        });
+        var $submitButton = $("#edit-request-modal button.submit-button");
+        // Unbind any handlers previously attached to the submit button
+        // This is necessary to avoid multiple submissions of the form
+        $submitButton.off('click');
+        $submitButton.click(function () {
+            $("form#edit-request-form").submit();
+        });
+    });
+    {% include 'bulb/adjust_modal_size.js' %}
+    });
+</script>
+
+
+{% with modal_id='edit-request-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}

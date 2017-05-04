@@ -1,0 +1,164 @@
+{% extends 'certificates/certificate_base.html' %}
+
+{% block content %}
+<style>
+    #live-certificate{
+        cursor: pointer;
+    }
+</style>
+<h1>نظام استصدار الشهادات</h1>
+    <!--<img class="img-responsive" id="live-certificate" {% if not request.session.certificate %}style="display: none;"{% endif %} src="data:image/png;base64,{{ request.session.certificate }}">-->
+<div id="live-div" {% if not request.session.certificate %}style="display: none;"{% else %}style="background-image:url(data:image/png;base64,{{ request.session.certificate }}); width: {{ request.session.width }}px; height: {{ request.session.height }}px; "{% endif %}></div>
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label for="text">اسم الشهادة</label>
+                <input class="form-control" type="text" value="منظمو ومنظمات البرنامج الثقافي الخامس" id="description">
+            </div>
+            <div class="form-group">
+                <label for="text">النص التجريبي</label>
+                <input class="form-control" type="text" value="Nada Abdullah" id="text">
+            </div>
+            <div class="form-group">
+                <label for="font-size">حجم الخط</label>
+                <input class="form-control" type="number" value="36" id="font-size">
+            </div>
+            <div class="form-group">
+                <label for="color">اللون</label>
+                <input  type="color" id="color">
+            </div>
+            <div class="form-group">
+                <label for="file">قالب الشهادة</label>
+                <input class="form-control" type="file" id="file">
+            </div>
+            <select id="image_format" name="image_format">
+                <option value="PNG">PNG</option>
+                <option value="JPEG">JPG</option>
+                <option value="GIF">GIF</option>
+            </select>
+            <button type="button" {% if not request.session.certificate %}style="display: none;"{% endif %} class="btn btn-danger" id="delete">Delete</button>
+            <button type="button" {% if not request.session.certificate %}style="display: none;"{% endif %} class="btn btn-success" id="save">Save</button>
+
+            <button type="button">aa</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script type="text/javascript">
+$(function(){
+
+    var posX;
+    var posY;
+    var font_size = $("#font-size").val();
+    var color = $("#color").val();
+    var text = $("#text").val();
+    var image_format = $("#image_format").val();
+
+    function update_image(){
+        $.ajax({method: 'POST',
+                url: "{% url 'certificates:update_image' %}",
+                data: {text: text,
+                       image_format: image_format,
+                       font_size: font_size,
+                       color: color,
+                       x: posX,
+                       y: posY},
+                success: function(data){
+                    var base64 = data['img_str'];
+                    $("#live-certificate, #live-div").show();
+                    $("#live-certificate").attr("src", "data:image/png;base64," + base64);
+                    $("#live-div").show();
+                    $("#live-div").css("background-image", "url(data:image/png;base64," + base64 + ")")
+                }
+        });
+    }
+    
+    $("#live-certificate, #live-div").click(function(event){
+        img = this;
+        var offset = $(this).offset();
+        //posX = event.pageX - offset.left;
+        //posY = event.pageY - offset.top;
+        posX = event.offsetX?(event.offsetX):event.pageX-document.getElementById("live-div").offsetLeft;
+        posY = event.offsetY?(event.offsetY):event.pageY-document.getElementById("live-div").offsetTop;
+        
+        console.log(posX);
+        console.log(posY);
+        //console.log(event.offsetX, event.pageX);
+        //posX = event.offsetX?(event.offsetX):event.pageX-img.offsetLeft;
+        //posY = event.offsetY?(event.offsetY):event.pageY-img.offsetTop;
+        update_image();
+    });
+
+    $("#delete").click(function(){
+        //event.preventDefault();
+        $.ajax({method: 'POST',
+                url: "{% url 'certificates:delete_image' %}",
+                success: function(){
+                    $("#live-certificate, #live-div, #delete, #save").hide();
+                    $("#live-certificate").attr("src", false);
+                    $("#live-div").css("background-image", "none");
+                }
+        });
+    });
+    
+    $("#save").click(function(){
+        //event.preventDefault();
+        $.ajax({method: 'POST',
+                url: "{% url 'certificates:save_image' %}",
+                data: {description: $("#description").val(),
+                       image_format: image_format,
+                       x_position: posX,
+                       y_position: posY,
+                       font_size: font_size,
+                       color: color
+                       },
+                success: function(){
+                    $("#live-certificate").hide();
+                    $("#delete, #save").hide();
+                    $("#live-certificate").attr("src", false);
+                    $("#live-div").css("background-image", "none");
+                }
+        });
+    });
+    
+    $("#color, #text, #font-size, #image_format").change(function(){
+        color = $("#color").val();
+        font_size = $("#font-size").val();
+        text = $("#text").val();
+        image_format = $("#image_format").val();
+        update_image();
+    });
+    
+    $("#file").change(function () {
+        /* get some values from elements on the page: */
+        var formData = new FormData(); 
+        formData.append("certificate", $("#file").prop('files')[0]);
+        formData.append("image_format", $("#id_image_format").val());
+        $.ajax({
+            url: "{% url 'certificates:upload_image' %}",
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function(data){
+                var base64 = data['img_str'];
+                var width = data['width'];
+                var height = data['height'];
+                $("#live-certificate, #live-div, #delete, #save").show();
+                //$("#live-certificate").attr("src", "data:image/png;base64," + base64);
+                $("#live-div").css("background-image", "url(data:image/png;base64," + base64 + ")")
+                $("#live-div").css('width', width + "px");
+                $("#live-div").css('height', height + "px");
+            }
+        });
+    });
+});
+    
+</script>
+{% endblock %}

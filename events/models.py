@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import Sum
@@ -196,6 +197,8 @@ class Session(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True)
     for_onsite_registration = models.BooleanField(default=False,
                                                   verbose_name=u"متاح التسجيل في يوم الحدث؟")
+    certificates = GenericRelation('certificates.Certificate')
+
     objects = SessionQuerySet.as_manager()
 
     def get_all_registrations(self):
@@ -455,6 +458,7 @@ class Abstract(models.Model):
     accepted_presentaion_preference = models.CharField(verbose_name="Accepted presentation preference",
                                                        max_length=1, choices=presentation_preference_choices)
     did_presenter_attend = models.BooleanField(verbose_name=u"حضر المقدم؟", default=False)
+    certificates = GenericRelation('certificates.Certificate', related_query_name="abstracts")
 
     def get_average_score(self):
         evaluation_number = self.evaluation_set.count()

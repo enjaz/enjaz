@@ -15,6 +15,7 @@ import os.path
 
 from core import decorators
 from clubs.models import Team, college_choices
+from certificates.models import Certificate
 from .models import Event, Session, Abstract, AbstractFigure,\
                           Evaluation, TimeSlot,\
                           SessionRegistration, Initiative,\
@@ -954,3 +955,35 @@ def handle_survey(request, session_pk):
 
     context = {'form': form}
     return render(request, 'bulb/groups/edit_group_form.html', context)
+
+@login_required
+def list_session_certificates(request, event_code_name, pk):
+    session = get_object_or_404(Session,
+                                event__code_name=event_code_name,
+                                pk=pk)
+
+    if not request.user.is_superuser and \
+       not utils.is_organizing_team_member(request.user, session.event):
+        raise PermissionDenied
+
+    context = {'session': session}
+    return render(request, 'events/list_session_certificates.html', context)
+
+@login_required
+def list_abstract_certificates(request, event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name,
+                              receives_abstract_submission=True)
+
+    if not request.user.is_superuser and \
+       not utils.is_organizing_team_member(request.user, event):
+        raise PermissionDenied
+
+    approved_pks = Abstract.objects.filter(event=event)\
+                                   .exclude(accepted_presentaion_preference="")\
+                                   .values_list('pk', flat=True)
+
+    certificates = Certificate.objects.filter(abstracts__pk__in=approved_pks)
+
+    context = {'certificates': certificates,
+               'event': event}
+    return render(request, 'events/list_abstract_certificates.html', context)

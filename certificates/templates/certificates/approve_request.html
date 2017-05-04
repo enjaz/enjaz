@@ -27,9 +27,12 @@
    <thead>
       <th>الاختيار</th>
       <th>الموضع السيني</th>
+      <th>انتصاف سيني</th>
       <th>الموضع الصادي</th>
+      <th>انتصاف صادي</th>
       <th>اللون</th>
       <th>حجم الخط</th>
+      <th>نوع الخط</th>
       <th>احذف</th>
    </thead>
    <tbody>
@@ -37,9 +40,12 @@
      <tr>
        <td>{{ form.id }}<input {% if forloop.counter == 1 %}checked{% endif %} name="text-position" class="text-position" type="radio"></td>
        <td>{{ form.x_position }}</td>
+       <td>{{ form.x_center }}</td>
        <td>{{ form.y_position }}</td>
+       <td>{{ form.y_center }}</td>
        <td>{{ form.color }}</td>
        <td>{{ form.size }}</td>
+       <td>{{ form.font_family }}</td>
        <td>{{ form.DELETE }}</td>
      </tr>
    {% endfor %}
@@ -101,7 +107,7 @@ $(function(){
         update_image();
     });
 
-    $("input[type=text], input[type=number]").change(function(){
+    $("input[type=text], input[type=number], select").change(function(){
         update_image();
     });
     

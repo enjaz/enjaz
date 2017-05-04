@@ -1,4 +1,4 @@
-{% extends 'certificates/certificate_base.html' %}
+{% extends 'certificates/certificate_base.html' %}{% load staticfiles %}
 
 {% block content %}
 <h1>نظام الشهادات</h1>
@@ -10,9 +10,9 @@
         <th class="not-mobile">التاريخ</th>
     </thead>
     <tbody>
-        {% for certificate in certificate %}
+        {% for certificate in certificates %}
         <tr>
-            <td><a href="{% url 'certifiactes:show_certifiacte' certifiacte.verification_code %}">{{ certificate.certificate_request.certificate_template.describtion }}</a></td>
+            <td><a href="{% url 'certificates:download_certificate' certificate.verification_code %}">{{ certificate }}</a></td>
             <td class="english-field">{{ certifiacte.verification_code }}</td>
             <td data-order="{{ certificate.submission_date|date:'U' }}">{{ certificate.submission_date|date:"j F Y" }}</td>
         </tr>
@@ -30,7 +30,7 @@
 <script type="text/javascript">
     $(function(){
         $('.datatable').DataTable({
-            order: [[ 2, "asc" ]],
+            order: [[ 2, "desc" ]],
             language: {% include 'js/dataTables-arabic.json' %}
         });
     });

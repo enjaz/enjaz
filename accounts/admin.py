@@ -8,6 +8,7 @@ from django.contrib.auth.models import User, Permission, Group
 from django.core.exceptions import ObjectDoesNotExist
 from userena.admin import UserenaAdmin
 
+from . import utils
 from clubs.models import Club, college_choices, section_choices
 from accounts.models import CommonProfile
 from core.models import StudentClubYear
@@ -99,10 +100,10 @@ class SectionFilter(admin.SimpleListFilter):
 class ModifiedUserAdmin(UserenaAdmin):
     """This changes the way the admin websites (both the main and deanship
 ones) deal with the User model."""
-    list_display = ('username', 'full_ar_name', 'full_en_name', 'college',
-                    'student_id', 'badge_number', 'email',
-                    'mobile_number', 'is_active', 'is_coordinator',
-                    'date_joined')
+    list_display = ('username', 'get_ar_full_name',
+                    'get_en_full_name', 'get_college', 'student_id',
+                    'badge_number', 'email', 'mobile_number',
+                    'is_active', 'is_coordinator', 'date_joined')
 
     list_filter = (EmployeeFilter, CoordinatorFilter, CollegeFilter,
                    SectionFilter)
@@ -140,22 +141,20 @@ ones) deal with the User model."""
 
     def is_coordinator(self, obj):
         return obj.coordination.current_year().exists()
-
     is_coordinator.boolean = True
     is_coordinator.short_description = u"منسق؟"
 
-    def full_en_name(self, obj):
-        try:
-            return obj.common_profile.get_en_full_name()
-        except ObjectDoesNotExist:
-            return
+    def get_en_full_name(self, obj):
+        return utils.get_user_en_full_name(obj)
+    get_en_full_name.short_description = u"الاسم الإنجليزي الكامل"
 
-    def full_ar_name(self, obj):
-        try:
-            return obj.common_profile.get_ar_full_name()
-        except ObjectDoesNotExist:
-            return
-    
+    def get_ar_full_name(self, obj):
+        return utils.get_user_en_full_name(obj)
+    get_ar_full_name.short_description = u"الاسم العربي الكامل"
+
+    def get_college(self, obj):
+        return utils.get_user_college(obj)
+
     def student_id(self, obj):
         try:
             return obj.common_profile.student_id
@@ -173,15 +172,6 @@ ones) deal with the User model."""
             return obj.common_profile.mobile_number
         except ObjectDoesNotExist:
             return
-
-    def college(self, obj):
-        try:
-            return obj.common_profile.college
-        except ObjectDoesNotExist:
-            return
-
-    full_en_name.short_description = u"الاسم الإنجليزي الكامل"
-    full_ar_name.short_description = u"الاسم العربي الكامل"
 
 user_list_admin = UserListAdmin("User List Admin")
 admin.site.unregister(User)

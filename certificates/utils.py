@@ -9,7 +9,7 @@ import random
 import os
 
 
-def create_temporary_certificate(request_pk):
+def get_temporary_paths(request_pk):
     if settings.DEBUG:
         root = settings.DEFAULT_STATIC_ROOT
     else:
@@ -19,13 +19,22 @@ def create_temporary_certificate(request_pk):
     relative_url = static('certificate_tmp/' + str(request_pk))
     return file_path, relative_url
 
-def generate_certificate_image(request_pk, template, template_bytes,
-                               positions, texts):
-    if template.font_family:
-        font_family = template.font_family
-    else:
-        # By default, we are shipping a font
-        font_family = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts', 'Carlito-Regular.ttf')
+def generate_certificate_image(request_pk, template, texts,
+                               template_bytes=None, positions=None):
+    # if template.font_family:
+    #     font_family = template.font_family
+    # else:
+    #     # By default, we are shipping a font
+    #     font_name = 'Unique.ttf'
+    #     #font_name = 'Carlito-Regular.ttf'
+        
+
+    # If the template is saved, we don't really need to pass
+    # positions, and template_byes
+    if not positions:
+        positions = template.text_positions.all()
+    if not template_bytes:
+        template_bytes = template.image.read()
 
     base = Image.open(cStringIO.StringIO(template_bytes))
     base = base.convert("RGBA")
@@ -34,28 +43,39 @@ def generate_certificate_image(request_pk, template, template_bytes,
     for position in positions:
         text = texts[count]
         # get a font
+        if position.font_family:
+            font_name = position.font_family.name
+        else:
+            font_name = 'Unique.ttf'
+        font_family = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts', font_name)
         fnt = ImageFont.truetype(font_family, position.size)
         # get a drawing context
         d = ImageDraw.Draw(txt)
         lines = textwrap.wrap(text, width=60)
-        if len(lines) > 1:
-            initial_y = position.y_position
-        else:
+        if position.y_center:
             line = lines[0]
-            height = fnt.getsize(line)[1]
-            text_y_center = (height / 2)
+            height_per_line = fnt.getsize(line)[1]
+            total_height = height_per_line * len(lines)
+            text_y_center = (total_height / 2)
             initial_y = position.y_position - text_y_center
+        else:
+            initial_y = position.y_position
 
         for line in lines:
             width, height = fnt.getsize(line)
-            text_x_center = width / 2
+            if position.x_center:
+                text_x_center = width / 2
+                initial_x = position.x_position - text_x_center
+            else:
+                initial_x = position.x_position
+
             # draw text, full opacity
-            d.text((position.x_position - text_x_center, initial_y), line, font=fnt, fill="#"+position.color)
+            d.text((initial_x, initial_y), line, font=fnt, fill="#"+position.color)
             line_space = height * 0.2
             initial_y += height + line_space
         count += 1
     out = Image.alpha_composite(base, txt)
-    file_path, relative_url = create_temporary_certificate(request_pk)
+    file_path, relative_url = get_temporary_paths(request_pk)
 
     out.save(file_path, format=template.image_format)
     return file_path, relative_url

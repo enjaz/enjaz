@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import Sum
@@ -163,6 +164,9 @@ class SessionGroup(models.Model):
 
 class Session(models.Model):
     event = models.ForeignKey(Event, null=True, blank=True)
+    survey = models.ForeignKey('Survey', verbose_name=u"الاستبيان",
+                               related_name="survey_sessions",
+                               null=True, blank=True)
     time_slot = models.ForeignKey(TimeSlot, blank=True, null=True)
     name = models.CharField(max_length=255)
     limit = models.PositiveSmallIntegerField(null=True, blank=True,
@@ -193,6 +197,8 @@ class Session(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True)
     for_onsite_registration = models.BooleanField(default=False,
                                                   verbose_name=u"متاح التسجيل في يوم الحدث؟")
+    certificates = GenericRelation('certificates.Certificate')
+
     objects = SessionQuerySet.as_manager()
 
     def get_all_registrations(self):
@@ -453,6 +459,7 @@ class Abstract(models.Model):
                                                        max_length=1, choices=presentation_preference_choices,
                                                        blank=True)
     did_presenter_attend = models.BooleanField(verbose_name=u"حضر المقدم؟", default=False)
+    certificates = GenericRelation('certificates.Certificate', related_query_name="abstracts")
 
     def get_average_score(self):
         evaluation_number = self.evaluation_set.count()
@@ -593,10 +600,46 @@ class QuestionSession(models.Model):
     def __unicode__(self):
         return self.title
 
-class Question (models.Model):
+class Question(models.Model):
     question_session = models.ForeignKey(QuestionSession, verbose_name="جلسة السؤال")
     text = models.TextField(u"نص السؤال")
     submission_date = models.DateTimeField(u"تاريخ الإرسال", auto_now_add=True)
 
     def __unicode__(self):
         return self.question_text[:20]
+
+class Survey(models.Model):
+    name = models.CharField(u"اسم السؤال", max_length=100)
+    date_submitted = models.DateTimeField(u"تاريخ الإرسال",
+                                          auto_now_add=True)
+
+    def __unicode__(self):
+        return self.name
+
+class SurveyQuestion(models.Model):
+    survey = models.ForeignKey(Survey, verbose_name=u"الاستبيان", related_name="survey_questions")
+    category_choices = (
+        ('O', u'سؤال مفتوح'),
+        ('S', u'مقياس')
+        )
+    category = models.CharField(u"نوع السؤال", max_length=1,
+                                choices=category_choices)
+    text = models.CharField(u"نص السؤال", max_length=100)
+
+    def __unicode__(self):
+        return self.text
+
+class SurveyAnswer(models.Model):
+    question = models.ForeignKey(SurveyQuestion, verbose_name=u"السؤال")
+    numerical_value = models.IntegerField(u"القيمة الرقمية",
+                                          blank=True, null=True)
+    text_value = models.TextField(u"القيمة النصية")
+    user = models.ForeignKey(User, verbose_name=u"المستخدمـ/ـة",
+                             blank=True, null=True)
+    session = models.ForeignKey(Session, verbose_name=u"الجلسة",
+                                blank=True, null=True)
+    date_submitted = models.DateTimeField(u"تاريخ الإرسال",
+                                          auto_now_add=True)
+
+    def __unicode__(self):
+        return u"{}'s answer to {}".format(user.username, question.text)

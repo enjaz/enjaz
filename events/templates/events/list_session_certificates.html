@@ -1,0 +1,43 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}{% load events_tags %}
+
+{% block title %}شهادات {{ session.name }}{% endblock %}
+{% block pageheaderurl %}{% url 'events:list_barcodes' event.code_name %}{% endblock %}
+
+{% block content %}
+<h1>شهادات {{ session.name }}</h1>
+<table id="users" class="display datatable db-responsive">
+    <thead>
+        <tr>
+            <th>الاسم بالعربيّة</th>
+            <th>الاسم بالإنجليزية</th>
+            <th>البريد</th>
+            <th>الجوال</th>
+            <th>الشهادة</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for certificate in session.certificates %}
+        <tr>
+            <td>{{ certificate.user.common_profile.get_ar_full_name|default:certificate.user.username }}</td>
+            <td class="english-field">{{ certificate.user.common_profile.get_en_full_name|default:certificate.user.username }}</td>
+            <td class="english-field">{{ certificate.user.email }}</td>
+            <td>{{ certificate.user.common_profile.mobile_number }}</td>
+            <td><a href="{% url 'events:download_certificate' certificate.verification_code %}">الشهادة</a></td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block customscript %}
+    <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+    <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+	<script>
+    $(function(){
+        $("#users").dataTable({
+                      language: {% include 'js/dataTables-arabic.json' %}});
+     });
+</script>
+{% endblock %}

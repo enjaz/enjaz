@@ -150,6 +150,12 @@ you?
                         </a>
                     </li>
                     <li>
+                        <a href="{% url 'certificates:list_certificates_per_user' %}">
+                            <i class="fa fa-trophy"></i>
+                            <span>شهاداتي</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="{% url 'events:list_my_registration' %}">
                             <i class="entypo-pencil"></i>
                             <span>تسجيلاتي</span>
@@ -227,8 +233,6 @@ you?
                                 <span>تحضير مقدمي الأبحاث</span>
                             </a>
                         </li>
-                        {% endif %}
-                        {% if user|is_organizing_team_member:event or user|is_attendance_team_member:event or user.is_superuser %}
                         {% if event.has_attendance %}
                         <li>
                             <a href="{% url 'events:list_barcodes' event.code_name %}">
@@ -243,6 +247,12 @@ you?
                             <a href="{% url 'events:list_abstracts' event.code_name %}">
                                 <i class="entypo-pencil"></i>
                                 <span>الملخصات</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'events:list_abstract_certificates' event.code_name %}">
+                                <i class="fa fa-trophy"></i>
+                                <span>شهادات الأبحاث</span>
                             </a>
                         </li>
                         {% endif %}

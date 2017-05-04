@@ -1,0 +1,14 @@
+{% extends 'certificates/certificate_base.html' %}{% load bootstrap3 %}
+
+{% block content %}
+<h1>التحقق من الشهادات المُصدرة</h1>
+{% if submitted and certificate_exists %}
+<p class="alert alert-success">هذا الرمز مرتبط ب<a href="{% url 'certificates:show_certificate' form.verification_code.value %}">شهادة صالحة</a>.</p>
+{% elif submitted and not certificate_exists %}
+<p class="alert alert-danger">هذا الرمز ليس مرتبطًا بشهادة صالحة</p>
+{% endif %}
+<form method="post">
+{% bootstrap_form form %}
+<input class="btn btn-success" type="submit" value="تحقّق">
+</form>
+{% endblock %}

@@ -30,19 +30,19 @@
 						<i class="entypo-user"></i>
 					</div>
 
-					<input {% if form.ar_first_name.value and not form.ar_first_name.errors %}value="{{ form.ar_first_name.value }}" {% endif %}type="text" class="form-control" name="ar_first_name" id="ar_first_name" placeholder="{{ form.ar_first_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" required="required"/>
+					<input {% if form.ar_first_name.value and not form.ar_first_name.errors %}value="{{ form.ar_first_name.value }}" {% endif %}type="text" class="form-control" name="ar_first_name" id="ar_first_name" placeholder="{{ form.ar_first_name.label }}" data-mask="[أ-ي , ء , آ]+" data-is-regex="true" required="required"/>
 					{% if form.ar_first_name.errors %}
 					    {% for error in form.ar_first_name.errors %}
 					        <label class='error' for='ar_first_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
-					<input {% if form.ar_middle_name.value and not form.ar_middle_name.errors %}value="{{ form.ar_middle_name.value }}" {% endif %}type="text" class="form-control" name="ar_middle_name" id="ar_middle_name" placeholder="{{ form.ar_middle_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" required="required"/>
+					<input {% if form.ar_middle_name.value and not form.ar_middle_name.errors %}value="{{ form.ar_middle_name.value }}" {% endif %}type="text" class="form-control" name="ar_middle_name" id="ar_middle_name" placeholder="{{ form.ar_middle_name.label }}" data-mask="[أ-ي , ء , آ]+" data-is-regex="true" required="required"/>
 					{% if form.ar_middle_name.errors %}
 					    {% for error in form.ar_middle_name.errors %}
 					        <label class='error' for='ar_middle_name' style='display: inline-block'>{{ error|escape }}</label>
 					    {% endfor %}
 					{% endif %}
-					<input {% if form.ar_last_name.value and not form.ar_last_name.errors %}value="{{ form.ar_last_name.value }}" {% endif %}type="text" class="form-control" name="ar_last_name" id="ar_last_name" placeholder="{{ form.ar_last_name.label }}" data-mask="[أ-ي ]+" data-is-regex="true" required="required"/>
+					<input {% if form.ar_last_name.value and not form.ar_last_name.errors %}value="{{ form.ar_last_name.value }}" {% endif %}type="text" class="form-control" name="ar_last_name" id="ar_last_name" placeholder="{{ form.ar_last_name.label }}" data-mask="[أ-ي , ء , آ]+" data-is-regex="true" required="required"/>
 					{% if form.ar_last_name.errors %}
 					    {% for error in form.ar_last_name.errors %}
 					        <label class='error' for='ar_last_name' style='display: inline-block'>{{ error|escape }}</label>
@@ -140,7 +140,7 @@
 					{% endif %}
 				</div>
 			</div>
-    
+
             <div class="form-group">
 				<div class="input-group{% if form.scfhs_number.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">

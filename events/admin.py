@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.core.exceptions import ObjectDoesNotExist
 from ckeditor.widgets import CKEditorWidget
 from django import forms
-
+from core.forms import OptionalForm
 from . import models
 
 BASIC_SEARCH_FIELDS = ['user__pk', 'user__username', 'user__email',
@@ -30,6 +30,7 @@ mark_deleted.short_description = u"علم السجلات المُحدّدة أن
 
 class AbstractFigureInline(admin.TabularInline):
     model = models.AbstractFigure
+    form = OptionalForm
     extra = 0
 
 class QuestionInline(admin.TabularInline):
@@ -104,6 +105,7 @@ class NonUserAdmin(admin.ModelAdmin):
 
 class AbstractPosterInline(admin.TabularInline):
      model= models.AbstractPoster
+     form = OptionalForm
      extra=0
 
 class AbstractAdmin(admin.ModelAdmin):

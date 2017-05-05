@@ -104,3 +104,9 @@ def get_user_en_short_name(user):
         return user.common_profile.get_en_short_name()
     except (ObjectDoesNotExist, AttributeError):
         return
+
+def get_user_scfhs_number(user):
+    try:
+        return user.common_profile.scfhs_number
+    except (ObjectDoesNotExist, AttributeError):
+        return ""

@@ -77,7 +77,8 @@ class Certificate(models.Model):
             text_values = [text.text for text in self.texts.all()]
         file_path, relative_url = utils.generate_certificate_image(self.pk,
                                                                    template=self.certificate_template,
-                                                                   texts=text_values)
+                                                                   texts=text_values,
+                                                                   verification_code=self.verification_code)
         certificate_file = open(file_path)
         self.image.save("{}.{}".format(self.verification_code, self.image_format), File(certificate_file))
 
@@ -138,7 +139,8 @@ class CertificateTemplate(models.Model):
 
         file_path, relative_url = utils.generate_certificate_image(self.certificate_request.pk,
                                                                    template=self,
-                                                                   texts=texts)
+                                                                   texts=texts,
+                                                                   verification_code=verification_code)
         certificate = Certificate.objects.create(certificate_template=self,
                                                  user=user,
                                                  description=description,

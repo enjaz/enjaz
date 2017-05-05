@@ -21,7 +21,7 @@
             <td class="english-field">{{ certificate.user.common_profile.get_en_full_name|default:certificate.user.username }}</td>
             <td class="english-field">{{ certificate.user.email }}</td>
             <td>{{ certificate.user.common_profile.mobile_number }}</td>
-            <td><a href="{% url 'events:download_certificate' certificate.verification_code %}">الشهادة</a></td>
+            <td><a href="{% url 'certificates:download_certificate' certificate.verification_code %}">الشهادة</a></td>
         </tr>
 {% endfor %}
     </tbody>

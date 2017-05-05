@@ -217,7 +217,8 @@ class Session(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True)
     for_onsite_registration = models.BooleanField(default=False,
                                                   verbose_name=u"متاح التسجيل في يوم الحدث؟")
-    certificates = GenericRelation('certificates.Certificate')
+    certificates = GenericRelation('certificates.Certificate',
+                                   related_query_name="sessions")
 
     objects = SessionQuerySet.as_manager()
 

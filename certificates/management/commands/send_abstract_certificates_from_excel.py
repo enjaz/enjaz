@@ -6,7 +6,7 @@ from django.contrib.sites.models import Site
 from django.utils import translation
 from openpyxl import load_workbook
 
-from certificates.models import Certificate, CertificateTemplate
+from certificates.models import Certificate
 from events.models import Abstract
 from post_office import mail
 
@@ -14,10 +14,6 @@ from post_office import mail
 class Command(BaseCommand):
     help = "Send badges emails."
     def add_arguments(self, parser):
-        parser.add_argument('--oral-template-pk', dest='oral_template_pk',
-                            type=int)
-        parser.add_argument('--poster-template-pk', dest='poster_template_pk',
-                            type=int)
         parser.add_argument('--excel-file', dest='excel_file',
                             type=str)
         parser.add_argument('--send-emails', dest='send_emails',
@@ -58,17 +54,21 @@ class Command(BaseCommand):
                 # certificate
                 if abstract.accepted_presentaion_preference in ['O', 'P'] and \
                    abstract.did_presenter_attend:
+                    if abstract.accepted_presentaion_preference == 'O':
+                        template = abstract.event.oral_certificate_template
+                    elif abstract.accepted_presentaion_preference == 'P':
+                        template = abstract.event.poster_certificate_template
+
                     for author in authors:
-                        if abstract.accepted_presentaion_preference == 'O':
-                            template = CertificateTemplate.objects.get(pk=options['oral_template_pk'])
-                        elif abstract.accepted_presentaion_preference == 'P':
-                            template = CertificateTemplate.objects.get(pk=options['poster_template_pk'])
                         description = "شهادة {} لتقديم {}".format(author, abstract.title)
                         print 'Generating {}\'s "{}"'.format(author, abstract.title)
                         template.generate_certificate(user=abstract.user,
                                                       texts=[author, abstract.title],
                                                       description=description,
                                                       content_object=abstract)
+                        # Other than the first author, we are going to
+                        # use the co_author certificate template
+                        template = abstract.event.coauthor_certificate_template
                     if options['send_emails']:
                         contxt = {'title': abstract.title,
                                   'user': abstract.user,

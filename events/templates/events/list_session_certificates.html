@@ -1,8 +1,7 @@
 {% extends 'events_evaluation_base.html' %}{% load staticfiles %}{% load events_tags %}
 
 {% block title %}شهادات {{ session.name }}{% endblock %}
-{% block pageheaderurl %}{% url 'events:list_barcodes' event.code_name %}{% endblock %}
-
+{% block pageheader %}شهادات {{ session.event.get_html_name|safe }}{% endblock %}
 {% block content %}
 <h1>شهادات {{ session.name }}</h1>
 <table id="users" class="display datatable db-responsive">
@@ -16,7 +15,7 @@
         </tr>
     </thead>
     <tbody>
-{% for certificate in session.certificates %}
+{% for certificate in session.certificates.all %}
         <tr>
             <td>{{ certificate.user.common_profile.get_ar_full_name|default:certificate.user.username }}</td>
             <td class="english-field">{{ certificate.user.common_profile.get_en_full_name|default:certificate.user.username }}</td>

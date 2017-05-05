@@ -10,8 +10,6 @@ from django.http import HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.static import serve
 from django.shortcuts import render, get_object_or_404
-import cStringIO
-import base64
 
 from core import decorators
 from certificates.forms import CertificateTemplateForm, CertificateRequestForm, VerifyCertificateForm, PositionFormset

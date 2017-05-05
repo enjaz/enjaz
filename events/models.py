@@ -52,15 +52,15 @@ class Event(models.Model):
     oral_certificate_template = models.ForeignKey('certificates.CertificateTemplate', null=True,
                                                   blank=True,
                                                   related_name="oral_events",
-                                                  verbose_name=u"قالب شهادة الملصق البحث")
+                                                  verbose_name=u"قالب شهادة التقديم الشفهي")
     coauthor_certificate_template = models.ForeignKey('certificates.CertificateTemplate', null=True,
                                                       blank=True,
                                                       related_name="coauthor_events",
-                                                      verbose_name=u"قالب شهادة الملصق البحث")
+                                                      verbose_name=u"قالب شهادة المشاركة في التأليف")
     event_certificate_template =  models.ForeignKey('certificates.CertificateTemplate', null=True,
                                                     blank=True,
                                                     related_name="events",
-                                                    verbose_name=u"قالب شهادة الملصق البحث")
+                                                    verbose_name=u"قالب شهادة الحدث")
     receives_initiative_submission = models.BooleanField(default=False,
                                                          verbose_name=u"يستقبل مبادرات؟")
     initiative_submission_opening_date = models.DateTimeField(u"تاريخ فتح استقبال المبادرات", null=True, blank=True)

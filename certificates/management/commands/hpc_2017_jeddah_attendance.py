@@ -7,7 +7,7 @@ from django.utils import translation
 import re
 
 from certificates.models import Certificate
-from events.models import Attendance, Session, SessionRegistration
+from events.models import Attendance, Event, Session, SessionRegistration
 from post_office import mail
 import accounts.utils
 
@@ -36,7 +36,10 @@ no_mid_categories = ["I", "O", ""]
 
 sessions = {}
 for pk in workshops + colleges + [GENERAL_PROGRAM_PK]:
-    sessions[pk] = Session.objects.get(pk=pk)
+    try:
+        sessions[pk] = Session.objects.get(pk=pk)
+    except Session.DoesNotExist:
+        continue
 
 def generate_session_certificate(user, session_pk):
     session = sessions[session_pk]
@@ -44,7 +47,7 @@ def generate_session_certificate(user, session_pk):
     if not name:
         name = user.username
 
-    session_name = re.sub("[ -]*(:?fe)?male$", "", session.name, flags=re.I)
+    session_name = re.sub("[ -]*(:?fe)?male$", "", session.name, flags=re.I).strip()
 
     if Certificate.objects.filter(sessions__pk=session_pk, user=user).exists():
         print u"Skipping {} for {} as previously generated.".format(session_name, name)
@@ -61,8 +64,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         translation.activate(settings.LANGUAGE_CODE)
+        event = Event.objects.get(code_name="hpc2-j")
         from_email = event.get_notification_email()
-                                    .exclude(pk__in=generated_pks)
         domain = Site.objects.get_current().domain
         url = "https://{}{}".format(domain,
                                     reverse('certificates:list_certificates_per_user'))
@@ -114,6 +117,10 @@ class Command(BaseCommand):
                     name = user.username
                 texts = [name]
                 session = sessions[GENERAL_PROGRAM_PK]
-                
-                continue
-                session.event_certificate_template.generate_certificate(hpc_user, texts, content_object=session)
+                if Certificate.objects.filter(sessions__pk=GENERAL_PROGRAM_PK, user=hpc_user).exists():
+                    print u"Skipping {} for {} as previously generated.".format(session.name, name)
+                    continue
+                else:
+                    print u"Preparing {} for {}.".format(session.name, name)
+
+                session.event.event_certificate_template.generate_certificate(hpc_user, texts, content_object=session)

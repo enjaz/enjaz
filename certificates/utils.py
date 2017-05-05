@@ -20,25 +20,32 @@ def get_temporary_paths(request_pk):
     return file_path, relative_url
 
 def generate_certificate_image(request_pk, template, texts,
-                               template_bytes=None, positions=None):
-    # if template.font_family:
-    #     font_family = template.font_family
-    # else:
-    #     # By default, we are shipping a font
-    #     font_name = 'Unique.ttf'
-    #     #font_name = 'Carlito-Regular.ttf'
-        
+                               template_bytes=None, positions=None,
+                               verification_code="XXX123"):
 
     # If the template is saved, we don't really need to pass
     # positions, and template_byes
     if not positions:
         positions = template.text_positions.all()
     if not template_bytes:
-        template_bytes = template.image.read()
+        template_file = open(template.image.path)
+        template_bytes = template_file.read()
 
     base = Image.open(cStringIO.StringIO(template_bytes))
+    image_width, image_height = base.size
     base = base.convert("RGBA")
     txt = Image.new('RGBA', base.size, (255, 255, 255, 0))
+
+
+    # Verification code:
+    font_family = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts', 'Unique.ttf')
+    fnt = ImageFont.truetype(font_family, 30)
+    code_width, code_height = fnt.getsize(verification_code)
+    code_x = image_width - code_width
+    code_y = image_height - code_height
+    d = ImageDraw.Draw(txt)
+    d.text((code_x, code_y), verification_code, font=fnt, fill="#000000")
+
     count = 0
     for position in positions:
         text = texts[count]

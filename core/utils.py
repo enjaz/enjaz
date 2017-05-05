@@ -3,6 +3,22 @@ from core.models import Tweet, TwitterAccess
 from django.db import models
 import operator
 
+BASIC_SEARCH_FIELDS = ['user__pk', 'user__username', 'user__email',
+                       'user__common_profile__en_first_name',
+                       'user__common_profile__en_middle_name',
+                       'user__common_profile__en_last_name',
+                       'user__common_profile__ar_first_name',
+                       'user__common_profile__ar_middle_name',
+                       'user__common_profile__ar_last_name',
+                       'user__common_profile__student_id',
+                       'user__common_profile__badge_number',
+                       'user__common_profile__mobile_number',
+                       'user__common_profile__en_first_name',
+                       'user__common_profile__en_middle_name',
+                       'user__common_profile__en_last_name',
+                       'user__common_profile__ar_first_name',
+                       'user__common_profile__ar_middle_name',
+                       'user__common_profile__ar_last_name']
 
 def create_tweet(user, text):
     if not user.social_auth.exists():

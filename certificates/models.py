@@ -46,7 +46,7 @@ class Certificate(models.Model):
                                              null=True, blank=True,
                                              verbose_name=u"القالب")
     user = models.ForeignKey(User, verbose_name=u"المستخدمـ/ـة")
-    image = models.ImageField(u"الصورة")
+    image = models.ImageField(u"الصورة", upload_to="certificates")
     verification_code = models.CharField(u"رمز التحقق", max_length=6)
 
     description = models.CharField(u"وصف الشهادة", max_length=200,

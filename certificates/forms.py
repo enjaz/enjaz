@@ -14,7 +14,7 @@ class CertificateRequestForm(forms.ModelForm):
         super(CertificateRequestForm, self).__init__(*args, **kwargs)
 
         if clubs.utils.is_coordinator_or_deputy_of_any_club(self.user):
-            user_clubs = get_user_coordination_and_deputyships(self.user)
+            user_clubs = clubs.utils.get_user_coordination_and_deputyships(self.user)
             self.club = user_clubs.first()
             episodes = Episode.objects.filter(activity__primary_club__in=user_clubs)
             self.fields['episode'] = forms.ModelChoiceField(episodes,

@@ -1,5 +1,3 @@
-import time
-
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.urlresolvers import reverse
@@ -7,7 +5,6 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.utils import translation
 
-from certificates.models import Certificate, CertificateTemplate
 from events.models import Event, Abstract
 from post_office import mail
 
@@ -17,10 +14,6 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--event-code-name', dest='event_code_name',
                             type=str)
-        parser.add_argument('--oral-template-pk', dest='oral_template_pk',
-                            type=int)
-        parser.add_argument('--poster-template-pk', dest='poster_template_pk',
-                            type=int)
         parser.add_argument('--send-emails', dest='send_emails',
                             action='store_true', default=False)
 
@@ -35,12 +28,16 @@ class Command(BaseCommand):
                                             did_presenter_attend=True,
                                             accepted_presentaion_preference__in=["O", "P"])\
                                     .exclude(pk__in=generated_pks)
-        template = CertificateTemplate.objects.get(pk=options['certificate_template'])
         domain = Site.objects.get_current().domain
         url = "https://{}{}".format(domain,
                                     reverse('certificates:list_certificates_per_user'))
         for abstract in abstracts:
-            template.generate_certificate(abstract.user, [abstract.user.get_en_full_name(), abstract.title])
+            if abstract.accepted_presentaion_preference == 'O':
+                template = abstract.event.oral_certificate_template
+            elif abstract.accepted_presentaion_preference == 'P':
+                template = abstract.event.poster_certificate_template
+
+            template.generate_certificate(abstract.user, [abstract.presenting_author, abstract.title])
             if options['send_emails']:
                 contxt = {'title': abstract.title,
                           'user': abstract.user,

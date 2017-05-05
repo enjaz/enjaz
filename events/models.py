@@ -44,6 +44,23 @@ class Event(models.Model):
                                blank=True,
                                default="KSAU_Events")
     is_auto_tweet = models.BooleanField(default=True, verbose_name=u"تغريد تلقائي؟")
+    # Certificates
+    poster_certificate_template = models.ForeignKey('certificates.CertificateTemplate', null=True,
+                                                    blank=True,
+                                                    related_name="poster_events",
+                                                    verbose_name=u"قالب شهادة الملصق البحث")
+    oral_certificate_template = models.ForeignKey('certificates.CertificateTemplate', null=True,
+                                                  blank=True,
+                                                  related_name="oral_events",
+                                                  verbose_name=u"قالب شهادة الملصق البحث")
+    coauthor_certificate_template = models.ForeignKey('certificates.CertificateTemplate', null=True,
+                                                      blank=True,
+                                                      related_name="coauthor_events",
+                                                      verbose_name=u"قالب شهادة الملصق البحث")
+    event_certificate_template =  models.ForeignKey('certificates.CertificateTemplate', null=True,
+                                                    blank=True,
+                                                    related_name="events",
+                                                    verbose_name=u"قالب شهادة الملصق البحث")
     receives_initiative_submission = models.BooleanField(default=False,
                                                          verbose_name=u"يستقبل مبادرات؟")
     initiative_submission_opening_date = models.DateTimeField(u"تاريخ فتح استقبال المبادرات", null=True, blank=True)
@@ -164,6 +181,9 @@ class SessionGroup(models.Model):
 
 class Session(models.Model):
     event = models.ForeignKey(Event, null=True, blank=True)
+    certificate_template = models.ForeignKey('certificates.CertificateTemplate', null=True,
+                                             blank=True,
+                                             verbose_name=u"قالب شهادة الجلسة")
     survey = models.ForeignKey('Survey', verbose_name=u"الاستبيان",
                                related_name="survey_sessions",
                                null=True, blank=True)
@@ -289,16 +309,11 @@ class SessionRegistration(models.Model):
         (False, u'لم تعد المقاعد متوفّرة'),
         (None, u'معلق'),
         )
-    is_approved = models.NullBooleanField(default= None, verbose_name=u"الحالة",
+    is_approved = models.NullBooleanField(u"الحالة", default=None,
                                           choices=is_approved_choices)
-    is_deleted = models.BooleanField(default=False,
-                                     verbose_name=u"محذوف؟")
-    badge_sent = models.BooleanField(default=False,
-                                     verbose_name=u"أرسلت البطاقة؟")
-    reminder_sent = models.BooleanField(default=False,
-                                        verbose_name=u"أرسلت رسالة التذكير؟")
-    certificate_sent = models.BooleanField(default=False,
-                                            verbose_name=u"أرسلت الشهادة؟")
+    is_deleted = models.BooleanField(u"محذوف؟", default=False)
+    badge_sent = models.BooleanField(u"أرسلت البطاقة؟", default=False)
+    reminder_sent = models.BooleanField(u"أرسلت رسالة التذكير؟", default=False)
 
     def get_status(self):
         if self.is_deleted == True:

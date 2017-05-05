@@ -4,10 +4,12 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.utils import translation
+import re
 
 from certificates.models import Certificate
 from events.models import Attendance, Session, SessionRegistration
 from post_office import mail
+import accounts.utils
 
 # Attendance rules:
 #
@@ -36,17 +38,23 @@ sessions = {}
 for pk in workshops + colleges + [GENERAL_PROGRAM_PK]:
     sessions[pk] = Session.objects.get(pk=pk)
 
-def generate_session_sertificate(user, session_pk):
+def generate_session_certificate(user, session_pk):
     session = sessions[session_pk]
     name = accounts.utils.get_user_en_full_name(user)
     if not name:
         name = user.username
 
+    session_name = re.sub("[ -]*(:?fe)?male$", "", session.name, flags=re.I)
+
     if Certificate.objects.filter(sessions__pk=session_pk, user=user).exists():
-        print "Skipping {} for {} as previously generated.".format(session.name, name)
+        print u"Skipping {} for {} as previously generated.".format(session_name, name)
         return
-    texts = [name, session.title]
-    session.certificate_template.generate_certificate(hpc_user, texts, content_object=session)
+    else:
+        print u"Preparing {} for {}.".format(session_name, name)
+    scfhs_number = accounts.utils.get_user_scfhs_number(user)
+    texts = [name, session_name, scfhs_number]
+    return
+    session.certificate_template.generate_certificate(user, texts, content_object=session)
 
 class Command(BaseCommand):
     help = "Generate HPC 2017 Certificates."
@@ -101,5 +109,11 @@ class Command(BaseCommand):
                         break
 
             if user_total >= 5:
-                texts = [hpc_user.common_profile.get_en_full_name()]
+                name = accounts.utils.get_user_en_full_name(hpc_user)
+                if not name:
+                    name = user.username
+                texts = [name]
+                session = sessions[GENERAL_PROGRAM_PK]
+                
+                continue
                 session.event_certificate_template.generate_certificate(hpc_user, texts, content_object=session)

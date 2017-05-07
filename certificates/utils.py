@@ -7,6 +7,8 @@ import clubs.utils
 import media.utils
 import random
 import os
+from events.models import Session
+
 
 
 def get_temporary_paths(request_pk):
@@ -114,3 +116,11 @@ def can_view_all_certificates(user):
         return True
     else:
         return False
+
+def certificate_has_surveys(user):
+
+    for certificate in user.certificate_set.all():
+        if type(certificate.content_object) is Session:
+            session= certificate.content_object
+            if session.mandotary_survey or session.optional_survey:
+                return True

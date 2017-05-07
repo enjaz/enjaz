@@ -179,6 +179,15 @@ class SessionGroup(models.Model):
     def __unicode__(self):
         return self.title
 
+class Survey(models.Model):
+    name = models.CharField(u"اسم السؤال", max_length=100)
+    date_submitted = models.DateTimeField(u"تاريخ الإرسال",
+                                          auto_now_add=True)
+
+    def __unicode__(self):
+        return self.name
+
+
 class Session(models.Model):
     event = models.ForeignKey(Event, null=True, blank=True)
     certificate_template = models.ForeignKey('certificates.CertificateTemplate', null=True,
@@ -221,6 +230,8 @@ class Session(models.Model):
                                    related_query_name="sessions")
 
     objects = SessionQuerySet.as_manager()
+    mandotary_survey = models.ForeignKey(Survey, related_name="mandotary_surveys",null=True)
+    optional_survey = models.ForeignKey(Survey, related_name="optional_surveys",null=True)
 
     def get_all_registrations(self):
         return (self.first_priority_registrations.all() | \
@@ -624,13 +635,6 @@ class Question(models.Model):
     def __unicode__(self):
         return self.question_text[:20]
 
-class Survey(models.Model):
-    name = models.CharField(u"اسم السؤال", max_length=100)
-    date_submitted = models.DateTimeField(u"تاريخ الإرسال",
-                                          auto_now_add=True)
-
-    def __unicode__(self):
-        return self.name
 
 class SurveyQuestion(models.Model):
     survey = models.ForeignKey(Survey, verbose_name=u"الاستبيان", related_name="survey_questions")

@@ -17,6 +17,7 @@ from certificates.models import TEXT_PLACE_HOLDER, CertificateTemplate, Certific
 from certificates import utils
 from clubs.models import Club
 from events.models import Abstract, Session
+from events.utils import is_organizing_team_member
 from niqati.utils import generate_random_string
 
 def index(request):
@@ -46,12 +47,13 @@ def show_certificate(request, verification_code):
 def download_certificate(request, verification_code):
     certificate = get_object_or_404(Certificate,
                                     verification_code=verification_code)
-
+    if utils.certificate_has_surveys(request.user):
+        if not certificate.content_object.mandotary_survey.question_set.exists():
+            raise PermissionDenied
     if not certificate.user and certificate.user == request.user and \
        not utils.can_view_all_certificates(request.user) and \
        not (certificate.content_object and type(certificate.content_object) is Session or \
-            certificate.content_object and type(certificate.content_object) is Abstract and\
-            is_organizing_team_member(request.user, certificate.content_object.event)):
+            certificate.content_object and type(certificate.content_object) is Abstract and is_organizing_team_member(request.user, certificate.content_object.event)):
         raise PermissionDenied       
     
     return serve(request, certificate.image.name, settings.MEDIA_ROOT, show_indexes=False)

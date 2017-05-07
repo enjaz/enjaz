@@ -1,7 +1,17 @@
-{% extends 'certificates/certificate_base.html' %}{% load staticfiles %}
+{% extends 'certificates/certificate_base.html' %}{% load staticfiles %}{% load certificates_utils %}
 
 {% block content %}
 <h1>نظام الشهادات</h1>
+    {% if  user|certificate_has_surveys %}
+        {% for certificate in certificates %}
+            <div style="float: right;">
+                <button id="survey" data-session="{{ certificate.content_object }}" data-session-pk="{{ certificate.content_object.pk }}" data-survey-pk="{{ certificate.content_object.mandotary_survey.pk }}" class='btn btn-icon btn-success'>
+                    <i class="entypo-pencil"></i>
+                   استبيان
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
 
 <table class="display datatable compact dt-responsive">
     <thead>
@@ -35,4 +45,37 @@
         });
     });
 </script>
+{% load staticfiles %}
+<script type="text/javascript">
+    $(function () {
+        // initialize project edit modal
+        $('#edit-survey-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        });
+        $("#survey").click(function () {
+            session_pk =  $(this).data("session-pk");
+            survey_pk = $(this).data("survey-pk");
+            session = $(this).data("session");
+
+            $("#edit-survey-modal").modal('show');
+
+            $("#edit-survey-modal .modal-title").html("تعبئة الإستبيان");
+            $("#edit-survey-modal .modal-body").load("{% url 'certificates:add_request_introduction'%}", function(){
+
+            });
+
+            var $submitButton = $("#edit-survey-modal button.submit-button");
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-group-form").submit();
+            });
+        });
+    });
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+{% with modal_id='edit-report-modal' %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}
 {% endblock %}

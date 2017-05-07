@@ -20,7 +20,7 @@ from .models import Event, Session, Abstract, AbstractFigure,\
                           Evaluation, TimeSlot,\
                           SessionRegistration, Initiative,\
                           SessionGroup,CaseReport, Attendance,\
-                          QuestionSession, Question
+                          QuestionSession, Question, Survey
 from . import utils, forms
 import core.utils
 import clubs.utils
@@ -942,16 +942,16 @@ def get_csv(request, event_code_name, session_pk):
 
 @decorators.ajax_only
 @login_required
-def handle_survey(request, session_pk):
-    session = get_object_or_404(Survey, pk=session_pk)
-
+def handle_survey(request, session_pk, survey_pk):
+    session = get_object_or_404(Session, pk=session_pk)
+    survey = get_object_or_404(Survey,pk=survey_pk)
     if request.method == 'POST':
-        form = SurveyForm(request.POST, session=session)
+        form = forms.SurveyForm(request.POST, session=session)
         if form.is_valid():
             form.save(user=request.user)
             return {"message": "success"}
     elif request.method == 'GET':
-        form = SurveyForm(request.POST, session=session)
+        form = forms.SurveyForm(request.POST, session=session)
 
     context = {'form': form}
     return render(request, 'bulb/groups/edit_group_form.html', context)
@@ -987,3 +987,5 @@ def list_abstract_certificates(request, event_code_name):
     context = {'certificates': certificates,
                'event': event}
     return render(request, 'events/list_abstract_certificates.html', context)
+
+

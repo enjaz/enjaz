@@ -1,9 +1,13 @@
 {% load bootstrap3 %}{% load staticfiles %}
+<style>
 
-<form enctype="multipart/form-data" id="edit-survey-form" action="post">
+</style>
+<div class="form-group">
+<form  enctype="multipart/form-data" id="edit-survey-form" action="post">
 {% csrf_token %}
-{% bootstrap_form form %}
+{% bootstrap_form form layout='horizontal' %}
 </form>
+</div>
 <script type="text/javascript">
 $(function () {
     // modify form submission behaviour to be ajaxy
@@ -12,7 +16,7 @@ $(function () {
         /* stop form from submitting normally */
         event.preventDefault();
         var formData = new FormData($(this)[0]);
-        var url = "{% url 'events:handle_survey' session_pk survey_pk%}";
+        var url = "{% url 'events:handle_survey' session.pk survey.pk%}";
 
         /* Send the data */
         $.ajax({

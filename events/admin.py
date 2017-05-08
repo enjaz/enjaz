@@ -157,3 +157,5 @@ admin.site.register(models.Evaluation)
 admin.site.register(models.Attendance, AttendanceAdmin)
 admin.site.register(models.QuestionSession, QustionSessionAdmin)
 admin.site.register(models.Survey)
+admin.site.register(models.SurveyQuestion)
+

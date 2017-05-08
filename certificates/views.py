@@ -48,8 +48,10 @@ def download_certificate(request, verification_code):
     certificate = get_object_or_404(Certificate,
                                     verification_code=verification_code)
     if utils.certificate_has_surveys(request.user):
-        if not certificate.content_object.mandotary_survey.question_set.exists():
-            raise PermissionDenied
+        for question in certificate.content_object.mandotary_survey.question_set.all():
+            if not question.surveyanswer_set.objects.filter(user=request.user).exists():
+                raise PermissionDenied
+
     if not certificate.user and certificate.user == request.user and \
        not utils.can_view_all_certificates(request.user) and \
        not (certificate.content_object and type(certificate.content_object) is Session or \

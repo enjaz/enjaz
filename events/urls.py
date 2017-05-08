@@ -52,6 +52,7 @@ urlpatterns = patterns('',
     url(r'^(?P<event_code_name>[\d\w_\-]+)/stats/$', views.show_event_stats, name="show_event_stats"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/stats/(?P<session_pk>\d+)/csv$', views.get_csv, name="get_csv"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<code_name>[\d\w\-]+)/$', views.show_session_group,name="show_session_group"),
-    url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<session_pk>\d+)/(?P<survey_pk>\d+)/$', views.handle_survey,name="handle_survey"),
+    url(r'^survey/(?P<session_pk>\d+)/(?P<survey_pk>\d+)/$', views.handle_survey,name="handle_survey"),
+    url(r'^survey/thanks/$', TemplateView.as_view(template_name='events/thank_you.html'),name="survey_submission_completed"),
 
 )

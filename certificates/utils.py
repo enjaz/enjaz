@@ -124,3 +124,9 @@ def certificate_has_surveys(user):
             session= certificate.content_object
             if session.mandotary_survey or session.optional_survey:
                 return True
+
+def filled_certifcate_survey(user,certificate):
+    if certificate_has_surveys(user):
+        for question in certificate.content_object.mandotary_survey.survey_questions.all():
+            if question.surveyanswer_set.filter(user=user).exists():
+                return True

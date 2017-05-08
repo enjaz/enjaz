@@ -5,6 +5,7 @@
     {% if  user|certificate_has_surveys %}
         <h3> الجلسات التي تتطلب تعبئة الإستبيان</h3>
         {% for certificate in certificates %}
+           {% if not user|filled_certifcate_survey:certificate %}
             <div style="float: right;">
                 <li style="margin-bottom:5%">{{ certificate.content_object.name }}</li>
                 <button id="survey" data-session="{{ certificate.content_object.name }}" data-session-pk="{{ certificate.content_object.pk }}" data-survey-pk="{{ certificate.content_object.mandotary_survey.pk }}" data-url="{% url 'events:handle_survey' certificate.content_object.pk certificate.content_object.mandotary_survey.pk%}" class='btn btn-icon btn-success'>
@@ -12,6 +13,7 @@
                    تعبئة الإستبيان
                 </button>
             </div>
+           {% endif %}
         {% endfor %}
     {% endif %}
 

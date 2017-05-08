@@ -944,9 +944,9 @@ def get_csv(request, event_code_name, session_pk):
 @login_required
 def handle_survey(request, session_pk, survey_pk):
     session = get_object_or_404(Session, pk=session_pk)
-    survey = get_object_or_404(Survey,pk=survey_pk)
+    survey = get_object_or_404(Survey,mandotary_surveys__pk=session_pk,pk=survey_pk)
 
-    context = {'survey': survey,'session':session}
+    context = {'survey':survey,'session':session}
 
     if request.method == 'POST':
         form = forms.SurveyForm(request.POST, session=session)

@@ -203,10 +203,10 @@ class SurveyForm(forms.Form):
         self.session = kwargs.pop("session")
         self.survey = self.session.survey
         super(SurveyForm, self).__init__(*args, **kwargs)
-        for question in self.survey.survery_questions.all():
-            filed_name = 'question_' + str(question.pk)
+        for question in self.survey.survey_questions.all():
+            field_name = 'question_' + str(question.pk)
             if question.category == "O":
-                self.fields[filed_name] = forms.CharField(label=question.text,
+                self.fields[field_name] = forms.CharField(label=question.text,
                                                           widget=forms.Textarea)
             elif question.category == "S":
                 choices = [(i, i) for i in range(11)]

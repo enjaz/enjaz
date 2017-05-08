@@ -952,7 +952,7 @@ def handle_survey(request, session_pk, survey_pk):
         form = forms.SurveyForm(request.POST, session=session)
         if form.is_valid():
             form.save(user=request.user)
-            show_group_url = reverse('events:survey_submission_completed')
+            show_group_url = reverse('certificates:list_certificates_per_user')
             full_url = request.build_absolute_uri(show_group_url)
             return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':

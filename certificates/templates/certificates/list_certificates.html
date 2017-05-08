@@ -5,7 +5,7 @@
     {% if  user|certificate_has_surveys %}
         {% for certificate in certificates %}
             <div style="float: right;">
-                <button id="survey" data-session="{{ certificate.content_object }}" data-session-pk="{{ certificate.content_object.pk }}" data-survey-pk="{{ certificate.content_object.mandotary_survey.pk }}" class='btn btn-icon btn-success'>
+                <button id="survey" data-session="{{ certificate.content_object.name }}" data-session-pk="{{ certificate.content_object.pk }}" data-survey-pk="{{ certificate.content_object.mandotary_survey.pk }}" class='btn btn-icon btn-success'>
                     <i class="entypo-pencil"></i>
                    استبيان
                 </button>
@@ -57,12 +57,12 @@
         $("#survey").click(function () {
             session_pk =  $(this).data("session-pk");
             survey_pk = $(this).data("survey-pk");
-            session = $(this).data("session");
+            session_title = $(this).data("session");
 
             $("#edit-survey-modal").modal('show');
 
-            $("#edit-survey-modal .modal-title").html("تعبئة الإستبيان");
-            $("#edit-survey-modal .modal-body").load("{% url 'certificates:add_request_introduction'%}", function(){
+            $("#edit-survey-modal .modal-title").html("تعبئة استبيان"+session_title);
+            $("#edit-survey-modal .modal-body").load("{% url 'events:handle_survey' session_pk survey_pk%}", function(){
 
             });
 
@@ -75,7 +75,7 @@
     });
 {% include 'bulb/adjust_modal_size.js' %}
 </script>
-{% with modal_id='edit-report-modal' %}
+{% with modal_id='edit-survey-modal' %}
     {% include "bulb/groups/common_edit_modal.html" %}
 {% endwith %}
 {% endblock %}

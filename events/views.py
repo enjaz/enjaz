@@ -945,16 +945,21 @@ def get_csv(request, event_code_name, session_pk):
 def handle_survey(request, session_pk, survey_pk):
     session = get_object_or_404(Session, pk=session_pk)
     survey = get_object_or_404(Survey,pk=survey_pk)
+
+    context = {'survey': survey,'session':session}
+
     if request.method == 'POST':
         form = forms.SurveyForm(request.POST, session=session)
         if form.is_valid():
             form.save(user=request.user)
-            return {"message": "success"}
+            show_group_url = reverse('events:survey_submission_completed')
+            full_url = request.build_absolute_uri(show_group_url)
+            return {"message": "success", "show_url": full_url}
     elif request.method == 'GET':
         form = forms.SurveyForm(request.POST, session=session)
 
-    context = {'form': form}
-    return render(request, 'bulb/groups/edit_group_form.html', context)
+    context['form'] = form
+    return render(request, 'events/partials/submit_survey.html', context)
 
 @login_required
 def list_session_certificates(request, event_code_name, pk):

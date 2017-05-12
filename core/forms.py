@@ -1,6 +1,5 @@
 # -*- coding: utf-8  -*-
 from django import forms
-from django.forms.utils import flatatt
 from django.utils.html import format_html
 
 from constance import config
@@ -21,4 +20,4 @@ class DebateForm(forms.Form):
 
 class HeaderWidget(forms.widgets.Widget):
     def render(self, name, value, attrs=None):
-        return format_html(u'<p{0}>{1}</p>', flatatt(attrs), self.attrs['text'])
+        return format_html(u'<p class="header-field">{}</p>', self.attrs['text'])

@@ -110,3 +110,14 @@ def get_user_scfhs_number(user):
         return user.common_profile.scfhs_number
     except (ObjectDoesNotExist, AttributeError):
         return ""
+
+def get_user_cc(user):
+    cc = []
+    try:
+        if user.common_profile.alternative_email:
+            cc = [user.common_profile.alternative_email]
+    except (ObjectDoesNotExist, AttributeError):
+        pass
+
+    return cc
+   

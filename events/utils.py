@@ -225,8 +225,8 @@ def is_regestrations_team_member(user, event):
     user_events = get_user_regestration_events(user)
     return user_events.filter(pk=event.pk).exists()
 
-
-
 def has_user_adminstrative_events (user):
-    if get_user_abstract_revision_events(user).exists() or get_user_organizing_events(user).exists() or get_user_attendance_events(user).exists:
+    if get_user_abstract_revision_events(user).exists() or \
+       get_user_organizing_events(user).exists() or \
+       get_user_attendance_events(user).exists():
         return True

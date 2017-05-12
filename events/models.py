@@ -645,7 +645,7 @@ class SurveyQuestion(models.Model):
                                 choices=category_choices)
     is_english = models.BooleanField(default=False,
                                      verbose_name=u"هل السؤال إنجليزي")
-    text = models.CharField(u"نص السؤال", max_length=100)
+    text = models.TextField(u"نص السؤال")
 
     def __unicode__(self):
         return self.text

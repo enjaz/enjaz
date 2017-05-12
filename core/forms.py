@@ -21,5 +21,4 @@ class DebateForm(forms.Form):
 
 class HeaderWidget(forms.widgets.Widget):
     def render(self, name, value, attrs=None):
-        attrs.update(self.attrs)
-        return format_html(u'<p{0}>{1}</p>', flatatt(attrs), value)
+        return format_html(u'<p{0}>{1}</p>', flatatt(attrs), self.attrs['text'])

@@ -229,8 +229,7 @@ class SurveyForm(forms.Form):
                                                              widget=forms.RadioSelect(choices=choices))
             elif question.category == 'H':
                 self.fields[field_name] =  forms.CharField(
-                                                    widget=HeaderWidget(attrs={'class': 'header-field'}),
-                                                    initial=label,
+                                                    widget=HeaderWidget(attrs={'text': label}),
                                                     required=False,
                                                     label='')
             if question.is_optional or \

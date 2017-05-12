@@ -1,8 +1,6 @@
 import string
-import random
-
 from django.utils import timezone
-
+from django.utils.crypto import get_random_string
 from core.models import StudentClubYear
 import accounts.utils
 import clubs.utils
@@ -13,9 +11,10 @@ STRING_LENGTH = 6
 def generate_random_string(length=STRING_LENGTH):
     look_alike = "O0I1"
     all_chars = string.ascii_uppercase + string.digits
-    chars = "".join([char for char in all_chars
+    allowed_chars = "".join([char for char in all_chars
                      if not char in look_alike])
-    return ''.join(random.choice(chars) for i in range(STRING_LENGTH))
+    return get_random_string(length=length,
+                             allowed_chars=allowed_chars)
 
 def get_free_random_strings(number):
     # To avoid ImportError

@@ -8,12 +8,22 @@
 {% bootstrap_form form %}
 </form>
 </div>
+<style>
+.header-field{
+  border-top: 1px solid #a4a4a4;
+  padding-top: 7px;
+  font-size: 1.2em;
+  color: black;
+}
+</style>
+
 <script type="text/javascript">
 $(function () {
     // modify form submission behaviour to be ajaxy
     $(".radio label").addClass("radio-inline");
+    $(".header-field").removeClass("form-control");
     $("div.radio").removeClass("radio").css("display", "inline");
-    $("label:has(span.english)").addClass("english-field");
+    $("label:has(span.english), p:has(span.english)").addClass("english-field");
 
     $("form#edit-survey-form").submit(function (event) {
 

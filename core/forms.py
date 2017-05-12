@@ -1,5 +1,7 @@
 # -*- coding: utf-8  -*-
 from django import forms
+from django.forms.utils import flatatt
+from django.utils.html import format_html
 
 from constance import config
 
@@ -16,3 +18,8 @@ class DebateForm(forms.Form):
 
     def save(self):
         config.DEBATE_URL = self.cleaned_data['url']
+
+class HeaderWidget(forms.widgets.Widget):
+    def render(self, name, value, attrs=None):
+        attrs.update(self.attrs)
+        return format_html(u'<p{0}>{1}</p>', flatatt(attrs), value)

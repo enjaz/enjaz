@@ -639,12 +639,15 @@ class SurveyQuestion(models.Model):
     survey = models.ForeignKey(Survey, verbose_name=u"الاستبيان", related_name="survey_questions")
     category_choices = (
         ('O', u'سؤال مفتوح'),
-        ('S', u'مقياس')
+        ('S', u'مقياس'),
+        ('H', u'ترويسة')
         )
     category = models.CharField(u"نوع السؤال", max_length=1,
                                 choices=category_choices)
     is_english = models.BooleanField(default=False,
-                                     verbose_name=u"هل السؤال إنجليزي")
+                                     verbose_name=u"هل السؤال إنجليزي؟")
+    is_optional = models.BooleanField(default=False,
+                                      verbose_name=u"هل السؤال اختياري؟")
     text = models.TextField(u"نص السؤال")
 
     def __unicode__(self):

@@ -179,7 +179,11 @@ class CertificateTemplate(models.Model):
 
         # Let's save the certificate image
         certificate_file = open(file_path)
-        certificate.image.save("{}.{}".format(verification_code, self.image_format), File(certificate_file))
+        # Let's make accessing certificates from the public media URL
+        # unfeasible by adding a random string.
+        random_string = generate_random_string(4)
+        filename = "{}-{}.{}".format(verification_code, random_string, self.image_format)
+        certificate.image.save(filename, File(certificate_file))
 
         return certificate
 

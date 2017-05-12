@@ -144,7 +144,6 @@ def list_abstracts(request, event_code_name):
     if request.method == "POST":
         action = request.POST.get('action')
         pks = [int(field.lstrip('pk_')) for field in request.POST if field.startswith('pk_')]
-        print pks
         if action == "delete":
             Abstract.objects.filter(pk__in=pks).update(is_deleted=True)
         return HttpResponseRedirect(reverse('events:list_abstracts',
@@ -178,7 +177,6 @@ def list_presenter_attendance(request, event_code_name):
     if request.method == "POST":
         action = request.POST.get('action')
         pks = [int(field.lstrip('pk_')) for field in request.POST if field.startswith('pk_')]
-        print pks
         if action == "attend":
             Abstract.objects.filter(pk__in=pks).update(did_presenter_attend=True)
         elif action == "absent":
@@ -503,7 +501,6 @@ def review_registrations(request, event_code_name, pk):
     if request.method == "POST":
         action = request.POST.get('action')
         pks = [int(field.lstrip('pk_')) for field in request.POST if field.startswith('pk_')]
-        print pks
         if action == "approve":
             SessionRegistration.objects.filter(pk__in=pks).update(is_approved=True)
         elif action == "reject":
@@ -893,6 +890,7 @@ def show_event_stats(request, event_code_name):
     return render(request, 'events/show_event_stats.html', context)
 
 def get_csv(request, event_code_name, session_pk):
+    # TODO: This should probably be changed into a commandline 
     session = get_object_or_404(Session,
                                 event__code_name=event_code_name,
                                 pk=session_pk)
@@ -942,21 +940,19 @@ def get_csv(request, event_code_name, session_pk):
 
 @decorators.ajax_only
 @login_required
-def handle_survey(request, session_pk, survey_pk):
+def handle_survey(request, session_pk):
     session = get_object_or_404(Session, pk=session_pk)
-    survey = get_object_or_404(Survey,mandotary_surveys__pk=session_pk,pk=survey_pk)
 
-    context = {'survey':survey,'session':session}
+    context = {'session': session}
 
     if request.method == 'POST':
         form = forms.SurveyForm(request.POST, session=session)
         if form.is_valid():
             form.save(user=request.user)
-            show_group_url = reverse('certificates:list_certificates_per_user')
-            full_url = request.build_absolute_uri(show_group_url)
-            return {"message": "success", "show_url": full_url}
+            show_url = reverse('certificates:list_certificates_per_user')
+            return {"message": "success", "show_url": show_url}
     elif request.method == 'GET':
-        form = forms.SurveyForm(request.POST, session=session)
+        form = forms.SurveyForm(session=session)
 
     context['form'] = form
     return render(request, 'events/partials/submit_survey.html', context)

@@ -7,7 +7,7 @@ from events.models import NonUser, Session, Registration, Abstract, \
                           AbstractFigure, Initiative, InitiativeFigure, \
                           Criterion, CriterionValue, Evaluation,CaseReport, \
                           AbstractPoster, Attendance, Question, SurveyQuestion, \
-                          SurveyAnswer
+                          SurveyResponse, SurveyAnswer
 from django.forms.models import inlineformset_factory
 
 class NonUserForm(forms.ModelForm):
@@ -39,7 +39,6 @@ class RegistrationForm(forms.Form):
         untimed_sessions = Session.objects.filter(event=self.event, time_slot__isnull=True)
 
         for untimed_session in untimed_sessions:
-            print 'session_%s' % untimed_session.code_name
             self.fields['session_%s' % untimed_session.code_name] = forms.BooleanField(label=untimed_session.name,
                                                                                        required=False)
 
@@ -52,7 +51,6 @@ class RegistrationForm(forms.Form):
         # If no sessions were selected, do not register.
         if not untimed_session_code_names and \
            not timed_session_fields:
-            print "fuck!"
             return
 
         if self.user:
@@ -201,27 +199,58 @@ class QuestionForm(forms.ModelForm):
 class SurveyForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.session = kwargs.pop("session")
-        self.survey = self.session.survey
+        self.optional_questions = self.mandatory_questions = SurveyQuestion.objects.none()
+        if self.session.mandatory_survey:
+            self.mandatory_questions = self.session.mandatory_survey.survey_questions.all()
+        if self.session.optional_survey:
+            self.optional_questions = self.session.optional_survey.survey_questions.all()
         super(SurveyForm, self).__init__(*args, **kwargs)
-        for question in self.survey.survey_questions.all():
+        for question in (self.mandatory_questions | self.optional_questions):
             field_name = 'question_' + str(question.pk)
             if question.category == "O":
                 self.fields[field_name] = forms.CharField(label=question.text,
                                                           widget=forms.Textarea)
             elif question.category == "S":
+                from django.utils.html import format_html
                 choices = [(i, i) for i in range(11)]
-                self.fields[field_name] = forms.IntegerField(label=question.text,
+                if question.is_english:
+                    # This is used in the template to add
+                    # 'english-field' to the label tag by JavaScript.
+                    label = format_html(u"<span class='english'>{}</span>", question.text)
+                else:
+                    label = question.text
+                self.fields[field_name] = forms.IntegerField(label=label,
                                                              widget=forms.RadioSelect(choices=choices))
+            if question in self.optional_questions:
+                self.fields[field_name].required = False
 
     def save(self, user):
         field_names = [field_name for field_name in self.cleaned_data
                        if field_name.startswith("question_")]
+        mandatory_response = None
+        optional_response = None 
+
         for field_name in field_names:
             question_pk = field_name.lstrip("question_")
             question = SurveyQuestion.objects.get(pk=question_pk)
+            if question in self.optional_questions:
+                survey = self.session.optional_survey
+                if not optional_response:
+                    optional_response = SurveyResponse.objects\
+                                                      .create(survey=survey,
+                                                              session=self.session,
+                                                              user=user)
+                response = optional_response
+            if question in self.mandatory_questions:
+                survey = self.session.mandatory_survey
+                if not mandatory_response:
+                    mandatory_response = SurveyResponse.objects\
+                                                       .create(survey=survey,
+                                                               session=self.session,
+                                                               user=user)
+                response = mandatory_response
             arguments = {'question': question,
-                         'session': self.session,
-                         'user':user}
+                         'survey_response': response}
             if question.category == 'O':
                 arguments['text_value'] = self.cleaned_data[field_name]
             elif question.category == 'S':

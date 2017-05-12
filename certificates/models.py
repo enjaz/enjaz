@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.files import File
 
 from certificates import utils
-from events.models import Abstract, Session
+from events.models import Abstract, Session, SurveyResponse
 from niqati.utils import generate_random_string
 import accounts.utils
 
@@ -62,6 +62,28 @@ class Certificate(models.Model):
     modification_date = models.DateTimeField(u"تاريخ التعديل",
                                             auto_now=True)
 
+    def is_related_to_session(self):
+        if type(self.content_object) is Session:
+            return True
+        else:
+            return False
+
+    def has_pending_optional_survey(self):
+        if self.is_related_to_session() and\
+           self.content_object.optional_survey:
+            return not SurveyResponse.objects.filter(survey=self.content_object.optional_survey,
+                                                     user=self.user).exists()
+        else:
+            return False
+
+    def has_pending_mandatory_survey(self):
+        if self.is_related_to_session() and\
+           self.content_object.mandatory_survey:
+            return not SurveyResponse.objects.filter(survey=self.content_object.mandatory_survey,
+                                                     user=self.user).exists()
+        else:
+            return False
+
     def regenerate_certificate(self, texts=None):
         if texts:
             self.texts.delete()
@@ -80,7 +102,7 @@ class Certificate(models.Model):
                                                                    texts=text_values,
                                                                    verification_code=self.verification_code)
         certificate_file = open(file_path)
-        self.image.save("{}.{}".format(self.verification_code, self.image_format), File(certificate_file))
+        self.image.save("{}.{}".format(self.verification_code, self.certificate_template.image_format), File(certificate_file))
 
     def __unicode__(self):
         if self.description:

@@ -6,6 +6,10 @@ from core.utils import BASIC_SEARCH_FIELDS
 class TextPositionInline(admin.TabularInline):
     model = models.TextPosition
 
+class CertificateTextInline(admin.TabularInline):
+    model = models.CertificateText
+    extra = 0
+
 class TemplateAdmin(admin.ModelAdmin):
     inlines = [TextPositionInline]
 
@@ -19,6 +23,7 @@ class CertificateAdmin(admin.ModelAdmin):
     search_fields = BASIC_SEARCH_FIELDS + ['verification_code']
     list_filter = ['sessions__event', 'sessions']
     actions = [regenerate_certificate]
+    inlines = [CertificateTextInline]
 
 admin.site.register(models.Certificate, CertificateAdmin)
 admin.site.register(models.CertificateRequest)

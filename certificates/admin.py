@@ -49,7 +49,7 @@ regenerate_certificate.short_description = u"أعد توليد الشهادات 
 
 class CertificateAdmin(admin.ModelAdmin):
     list_display = ['__unicode__', 'verification_code']
-    search_fields = BASIC_SEARCH_FIELDS + ['verification_code']
+    search_fields = BASIC_SEARCH_FIELDS + ['verification_code', 'texts__text']
     list_filter = ['sessions__event', 'sessions']
     actions = [regenerate_certificate]
     inlines = [CertificateTextInline]

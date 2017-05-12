@@ -5,7 +5,6 @@ from certificates import views
 urlpatterns = patterns('',
     url(r'^$', views.index, name="index"),
     url(r'^certificates/(?:(?P<pk>\d+)/)?$', views.list_certificates_per_user, name="list_certificates_per_user"),
-    url(r'^certificates/(?P<verification_code>[\w\d]+)/$', views.show_certificate, name="show_certificate"),
     url(r'^certificates/(?P<verification_code>[\w\d]+)/download$', views.download_certificate, name="download_certificate"),
     url(r'^certificates/verify/$', views.verify_certificate, name="verify_certificate"),
 

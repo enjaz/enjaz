@@ -184,9 +184,6 @@ class Session(models.Model):
     certificate_template = models.ForeignKey('certificates.CertificateTemplate', null=True,
                                              blank=True,
                                              verbose_name=u"قالب شهادة الجلسة")
-    survey = models.ForeignKey('Survey', verbose_name=u"الاستبيان",
-                               related_name="survey_sessions",
-                               null=True, blank=True)
     time_slot = models.ForeignKey(TimeSlot, blank=True, null=True)
     name = models.CharField(max_length=255)
     limit = models.PositiveSmallIntegerField(null=True, blank=True,
@@ -221,6 +218,12 @@ class Session(models.Model):
                                    related_query_name="sessions")
 
     objects = SessionQuerySet.as_manager()
+    mandatory_survey = models.ForeignKey('Survey', verbose_name=u"استبيان إجباري",
+                                         related_name="mandatory_sessions",
+                                         null=True, blank=True)
+    optional_survey = models.ForeignKey('Survey', verbose_name=u"استبيان اختياري",
+                                        related_name="optional_sessions",
+                                        null=True, blank=True)
 
     def get_all_registrations(self):
         return (self.first_priority_registrations.all() | \
@@ -625,7 +628,7 @@ class Question(models.Model):
         return self.question_text[:20]
 
 class Survey(models.Model):
-    name = models.CharField(u"اسم السؤال", max_length=100)
+    name = models.CharField(u"الاسم", max_length=100)
     date_submitted = models.DateTimeField(u"تاريخ الإرسال",
                                           auto_now_add=True)
 
@@ -640,22 +643,34 @@ class SurveyQuestion(models.Model):
         )
     category = models.CharField(u"نوع السؤال", max_length=1,
                                 choices=category_choices)
+    is_english = models.BooleanField(default=False,
+                                     verbose_name=u"هل السؤال إنجليزي")
     text = models.CharField(u"نص السؤال", max_length=100)
 
     def __unicode__(self):
         return self.text
 
-class SurveyAnswer(models.Model):
-    question = models.ForeignKey(SurveyQuestion, verbose_name=u"السؤال")
-    numerical_value = models.IntegerField(u"القيمة الرقمية",
-                                          blank=True, null=True)
-    text_value = models.TextField(u"القيمة النصية")
+class SurveyResponse(models.Model):
     user = models.ForeignKey(User, verbose_name=u"المستخدمـ/ـة",
                              blank=True, null=True)
     session = models.ForeignKey(Session, verbose_name=u"الجلسة",
                                 blank=True, null=True)
+    survey = models.ForeignKey(Survey, verbose_name=u"الاستبيان",
+                               related_name="responses",
+                               blank=True, null=True)
     date_submitted = models.DateTimeField(u"تاريخ الإرسال",
                                           auto_now_add=True)
 
     def __unicode__(self):
-        return u"{}'s answer to {}".format(user.username, question.text)
+        return u"{}'s response to {}".format(self.user.username, self.survey.name)
+
+class SurveyAnswer(models.Model):
+    question = models.ForeignKey(SurveyQuestion, verbose_name=u"السؤال")
+    survey_response = models.ForeignKey(SurveyResponse, related_name="answers",
+                                        verbose_name=u"استبيان معبأ", null=True)
+    numerical_value = models.IntegerField(u"القيمة الرقمية",
+                                          blank=True, null=True)
+    text_value = models.TextField(u"القيمة النصية")
+
+    def __unicode__(self):
+        return u"{}'s answer to {}".format(self.survey_response.user.username, self.question.text)

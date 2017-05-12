@@ -20,7 +20,7 @@ from .models import Event, Session, Abstract, AbstractFigure,\
                           Evaluation, TimeSlot,\
                           SessionRegistration, Initiative,\
                           SessionGroup,CaseReport, Attendance,\
-                          QuestionSession, Question
+                          QuestionSession, Question, Survey
 from . import utils, forms
 import core.utils
 import clubs.utils
@@ -144,7 +144,6 @@ def list_abstracts(request, event_code_name):
     if request.method == "POST":
         action = request.POST.get('action')
         pks = [int(field.lstrip('pk_')) for field in request.POST if field.startswith('pk_')]
-        print pks
         if action == "delete":
             Abstract.objects.filter(pk__in=pks).update(is_deleted=True)
         return HttpResponseRedirect(reverse('events:list_abstracts',
@@ -178,7 +177,6 @@ def list_presenter_attendance(request, event_code_name):
     if request.method == "POST":
         action = request.POST.get('action')
         pks = [int(field.lstrip('pk_')) for field in request.POST if field.startswith('pk_')]
-        print pks
         if action == "attend":
             Abstract.objects.filter(pk__in=pks).update(did_presenter_attend=True)
         elif action == "absent":
@@ -503,7 +501,6 @@ def review_registrations(request, event_code_name, pk):
     if request.method == "POST":
         action = request.POST.get('action')
         pks = [int(field.lstrip('pk_')) for field in request.POST if field.startswith('pk_')]
-        print pks
         if action == "approve":
             SessionRegistration.objects.filter(pk__in=pks).update(is_approved=True)
         elif action == "reject":
@@ -893,6 +890,7 @@ def show_event_stats(request, event_code_name):
     return render(request, 'events/show_event_stats.html', context)
 
 def get_csv(request, event_code_name, session_pk):
+    # TODO: This should probably be changed into a commandline 
     session = get_object_or_404(Session,
                                 event__code_name=event_code_name,
                                 pk=session_pk)
@@ -943,18 +941,21 @@ def get_csv(request, event_code_name, session_pk):
 @decorators.ajax_only
 @login_required
 def handle_survey(request, session_pk):
-    session = get_object_or_404(Survey, pk=session_pk)
+    session = get_object_or_404(Session, pk=session_pk)
+
+    context = {'session': session}
 
     if request.method == 'POST':
-        form = SurveyForm(request.POST, session=session)
+        form = forms.SurveyForm(request.POST, session=session)
         if form.is_valid():
             form.save(user=request.user)
-            return {"message": "success"}
+            show_url = reverse('certificates:list_certificates_per_user')
+            return {"message": "success", "show_url": show_url}
     elif request.method == 'GET':
-        form = SurveyForm(request.POST, session=session)
+        form = forms.SurveyForm(session=session)
 
-    context = {'form': form}
-    return render(request, 'bulb/groups/edit_group_form.html', context)
+    context['form'] = form
+    return render(request, 'events/partials/submit_survey.html', context)
 
 @login_required
 def list_session_certificates(request, event_code_name, pk):
@@ -987,3 +988,5 @@ def list_abstract_certificates(request, event_code_name):
     context = {'certificates': certificates,
                'event': event}
     return render(request, 'events/list_abstract_certificates.html', context)
+
+

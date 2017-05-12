@@ -1,0 +1,47 @@
+{% load bootstrap3 %}{% load staticfiles %}
+<style>
+
+</style>
+<div class="form-group">
+<form class="text-center" id="edit-survey-form" action="post">
+{% csrf_token %}
+{% bootstrap_form form %}
+</form>
+</div>
+<script type="text/javascript">
+$(function () {
+    // modify form submission behaviour to be ajaxy
+    $(".radio label").addClass("radio-inline");
+    $("div.radio").removeClass("radio").css("display", "inline");
+    $("label:has(span.english)").addClass("english-field");
+
+    $("form#edit-survey-form").submit(function (event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+        var formData = new FormData($(this)[0]);
+
+        /* Send the data */
+        $.ajax({
+            url: "{% url 'events:handle_survey' session.pk %}",
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (data) {
+                if (data.message == "success") {
+                    // show success message (using toastr)
+                    toastr.options.positionClass = "toast-top-left";
+                    toastr.success("تم تعبئة استبيان {{ session.name }} بنجاح.");
+                    window.location.href= data.show_url;
+
+                } else {
+                    $("#edit-survey-modal .modal-body").html(data);
+                }}
+        });
+    });
+});
+            
+</script>

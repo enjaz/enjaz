@@ -7,6 +7,8 @@ import clubs.utils
 import media.utils
 import random
 import os
+from events.models import Session
+
 
 
 def get_temporary_paths(request_pk):
@@ -58,7 +60,7 @@ def generate_certificate_image(request_pk, template, texts,
         fnt = ImageFont.truetype(font_family, position.size)
         # get a drawing context
         d = ImageDraw.Draw(txt)
-        lines = textwrap.wrap(text, width=60)
+        lines = textwrap.wrap(text, width=70)
         if position.y_center:
             line = lines[0]
             height_per_line = fnt.getsize(line)[1]

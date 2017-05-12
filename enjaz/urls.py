@@ -10,6 +10,7 @@ from accounts.forms import StudentSignupForm, NonStudentSignupForm, NonUserSignu
 from activities.admin import invitation_admin
 from activities.urls import activity_forms_urls
 from bulb.admin import bulb_admin
+from certificates.admin import certificate_admin
 from clubs.urls import club_forms_urls
 from core.views import visit_announcement
 from researchhub.forms import ResearchHubSignupForm
@@ -49,6 +50,7 @@ urlpatterns = [
     url(r'^accounts/edit/$', 'accounts.views.edit_common_profile', name='edit_common_profile'),
     url(r'^accounts/', include('userena.urls')),
     url(r'^questions/', include('questions.urls', namespace="cultural_program_code")),
+    url(r'^certificates/admin/', include(certificate_admin.urls)),
     url(r'^certificates/', include('certificates.urls', namespace="certificates")),
     url(r'^tagging_autocomplete/', include('tagging_autocomplete.urls')),
 ]

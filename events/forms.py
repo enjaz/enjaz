@@ -1,8 +1,11 @@
-0# -*- coding: utf-8  -*-
+# -*- coding: utf-8  -*-
+from __future__ import unicode_literals
 from django import forms
 from django.forms.widgets import TextInput
+from django.utils.html import format_html
 
 from accounts.utils import get_user_gender
+from core.forms import HeaderWidget
 from events.models import NonUser, Session, Registration, Abstract, \
                           AbstractFigure, Initiative, InitiativeFigure, \
                           Criterion, CriterionValue, Evaluation,CaseReport, \
@@ -196,6 +199,7 @@ class QuestionForm(forms.ModelForm):
         model = Question
         fields = ['text']
 
+
 class SurveyForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.session = kwargs.pop("session")
@@ -205,23 +209,32 @@ class SurveyForm(forms.Form):
         if self.session.optional_survey:
             self.optional_questions = self.session.optional_survey.survey_questions.all()
         super(SurveyForm, self).__init__(*args, **kwargs)
+
         for question in (self.mandatory_questions | self.optional_questions):
+            if question.is_english:
+                # This is used in the template to add
+                # 'english-field' to the label tag by JavaScript.
+                label = format_html(u"<span class='english'>{}</span>", question.text)
+            else:
+                label = question.text
+
             field_name = 'question_' + str(question.pk)
             if question.category == "O":
-                self.fields[field_name] = forms.CharField(label=question.text,
+                self.fields[field_name] = forms.CharField(label=label,
                                                           widget=forms.Textarea)
             elif question.category == "S":
-                from django.utils.html import format_html
+
                 choices = [(i, i) for i in range(11)]
-                if question.is_english:
-                    # This is used in the template to add
-                    # 'english-field' to the label tag by JavaScript.
-                    label = format_html(u"<span class='english'>{}</span>", question.text)
-                else:
-                    label = question.text
                 self.fields[field_name] = forms.IntegerField(label=label,
                                                              widget=forms.RadioSelect(choices=choices))
-            if question in self.optional_questions:
+            elif question.category == 'H':
+                self.fields[field_name] =  forms.CharField(
+                                                    widget=HeaderWidget(attrs={'class': 'header-field'}),
+                                                    initial=label,
+                                                    required=False,
+                                                    label='')
+            if question.is_optional or \
+               question in self.optional_questions:
                 self.fields[field_name].required = False
 
     def save(self, user):

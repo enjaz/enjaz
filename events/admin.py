@@ -1,11 +1,11 @@
 # -*- coding: utf-8  -*-
+from django import forms
 from django.contrib import admin
 from django.core.exceptions import ObjectDoesNotExist
 from ckeditor.widgets import CKEditorWidget
-from django import forms
 from core.forms import OptionalForm
-from . import models
 from core.utils import BASIC_SEARCH_FIELDS
+from . import models
 
 def mark_deleted(modeladmin, request, queryset):
     queryset.update(is_deleted=True)
@@ -90,7 +90,13 @@ class NonUserAdmin(admin.ModelAdmin):
 class AbstractPosterInline(admin.TabularInline):
      model= models.AbstractPoster
      form = OptionalForm
-     extra=0
+     extra = 0
+
+class SurveyQuestionInline(admin.TabularInline):
+    model= models.SurveyQuestion
+
+class SurveyAnswerInline(admin.TabularInline):
+    model= models.SurveyAnswer
 
 class AbstractAdmin(admin.ModelAdmin):
     search_fields = BASIC_SEARCH_FIELDS + ["email", "title"]
@@ -136,11 +142,26 @@ class SessionRegistrationAdmin(admin.ModelAdmin):
     search_fields = BASIC_SEARCH_FIELDS + ['session__name']
     list_filter = ['session__event', 'is_deleted', 'is_approved']
 
-
 class QustionSessionAdmin(admin.ModelAdmin):
     search_fields = ['title', 'question__question_text']
     list_filter = ['event']
     inlines = [QuestionInline]
+
+class SurveyAdmin(admin.ModelAdmin):
+    search_fields = ['name', 'mandatory_sessions__event__official_name',
+                     'optional_sessions__event__official_name']
+    list_filter = ['mandatory_sessions__event',
+                   'optional_sessions__event']
+    list_display = ['__unicode__', 'get_response_count']
+    inlines = [SurveyQuestionInline]
+
+    def get_response_count(self, obj):
+        return obj.responses.count()
+
+class SurveyResponseAdmin(admin.ModelAdmin):
+    search_fields = ['survey__name'] + BASIC_SEARCH_FIELDS
+    list_filter = ['survey', 'session__event']
+    inlines = [SurveyAnswerInline]
 
 admin.site.register(models.Event, EventAdmin)
 admin.site.register(models.Session, SessionAdmin)
@@ -156,6 +177,5 @@ admin.site.register(models.Criterion)
 admin.site.register(models.Evaluation)
 admin.site.register(models.Attendance, AttendanceAdmin)
 admin.site.register(models.QuestionSession, QustionSessionAdmin)
-admin.site.register(models.Survey)
-admin.site.register(models.SurveyQuestion)
-
+admin.site.register(models.Survey, SurveyAdmin)
+admin.site.register(models.SurveyResponse, SurveyResponseAdmin)

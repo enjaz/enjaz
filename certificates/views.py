@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.static import serve
 from django.shortcuts import render, get_object_or_404
+import os.path
 
 from core import decorators
 from certificates.forms import CertificateTemplateForm, CertificateRequestForm, VerifyCertificateForm, PositionFormset
@@ -17,14 +18,15 @@ from certificates.models import TEXT_PLACE_HOLDER, CertificateTemplate, Certific
 from certificates import utils
 from clubs.models import Club
 from events.models import Abstract, Session
-from events.utils import is_organizing_team_member
 from niqati.utils import generate_random_string
+import events.utils
+
 
 def index(request):
     return render(request, 'certificates/index.html')
 
 # Certificate views
-
+@login_required
 def list_certificates_per_user(request, pk=None):
     if pk:
         if not utils.can_view_all_certificates(request.user):
@@ -38,27 +40,29 @@ def list_certificates_per_user(request, pk=None):
     return render(request, 'certificates/list_certificates.html',
                   {'certificates': certificates})
 
-def show_certificate(request, verification_code):
-    certificate = get_object_or_404(Certificate, verification_code=verification_code)
-    return render(request, 'certificates/show_certificate.html',
-                  {'certificate': certificate})
-
 @login_required
 def download_certificate(request, verification_code):
     certificate = get_object_or_404(Certificate,
                                     verification_code=verification_code)
-    if utils.certificate_has_surveys(request.user):
-        for question in certificate.content_object.mandotary_survey.survey_questions.all():
-            if not question.surveyanswer_set.filter(user=request.user).exists():
-                raise PermissionDenied
+
+    is_event_organizer = certificate.content_object and\
+                         type(certificate.content_object) in [Session, Abstract] and\
+                         events.utils.is_organizing_team_member(request.user, certificate.content_object.event)
 
     if not certificate.user and certificate.user == request.user and \
        not utils.can_view_all_certificates(request.user) and \
-       not (certificate.content_object and type(certificate.content_object) is Session or \
-            certificate.content_object and type(certificate.content_object) is Abstract and is_organizing_team_member(request.user, certificate.content_object.event)):
-        raise PermissionDenied       
-    
-    return serve(request, certificate.image.name, settings.MEDIA_ROOT, show_indexes=False)
+       not is_event_organizer:
+        raise PermissionDenied
+
+    if certificate.user and certificate.user == request.user and \
+       certificate.has_pending_mandatory_survey():
+        raise PermissionDenied
+
+    certificate_name = os.path.split(certificate.image.path)[-1]
+    certificate_response = serve(request, certificate.image.name, settings.MEDIA_ROOT, show_indexes=False)
+    certificate_response['Content-Disposition'] = u'attachment; filename="{}"'.format(certificate_name)
+
+    return certificate_response
 
 def verify_certificate(request):
     context = {}
@@ -219,7 +223,6 @@ def update_image(request, pk):
         existing_positions = existing_positions.exclude(pk__in=previous_pks)
         positions = changed_positions + list(existing_positions)
     else:
-        print position_formset.errors
         raise Exception(u"خطأ في تحديد مواضع النصوص")
 
     example_text = request.POST.get('example_text', TEXT_PLACE_HOLDER)

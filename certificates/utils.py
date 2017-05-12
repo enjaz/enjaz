@@ -60,7 +60,7 @@ def generate_certificate_image(request_pk, template, texts,
         fnt = ImageFont.truetype(font_family, position.size)
         # get a drawing context
         d = ImageDraw.Draw(txt)
-        lines = textwrap.wrap(text, width=60)
+        lines = textwrap.wrap(text, width=70)
         if position.y_center:
             line = lines[0]
             height_per_line = fnt.getsize(line)[1]
@@ -116,17 +116,3 @@ def can_view_all_certificates(user):
         return True
     else:
         return False
-
-def certificate_has_surveys(user):
-
-    for certificate in user.certificate_set.all():
-        if type(certificate.content_object) is Session:
-            session= certificate.content_object
-            if session.mandotary_survey or session.optional_survey:
-                return True
-
-def filled_certifcate_survey(user,certificate):
-    if certificate_has_surveys(user):
-        for question in certificate.content_object.mandotary_survey.survey_questions.all():
-            if question.surveyanswer_set.filter(user=user).exists():
-                return True

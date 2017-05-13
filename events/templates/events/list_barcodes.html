@@ -24,7 +24,7 @@
             <td class="english-field">{{ barcode_user.email }}</td>
             <td>{{ barcode_user.common_profile.mobile_number }}</td>
             <td><a href="{% url 'events:show_barcode_privileged' event.code_name barcode_user.pk %}">البطاقة</a></td>
-            <td><a href="{% url 'events:list_attendance' event.code_name barcode_user.pk %}">{{ barcode_user.session_registrations.count }}</a></td>
+            <td><a href="{% url 'events:list_attendance' event.code_name barcode_user.pk %}">الحضور</a></td>
         </tr>
 {% endfor %}
     </tbody>

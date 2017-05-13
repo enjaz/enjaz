@@ -20,7 +20,7 @@
             <td>{{ attendance.session_registration.session.name }}</td>
             <td>{{ attendance.get_category_display }}</td>
             <td>{{ attendance.date_submitted }}</td>
-            <td>{{ attendance.submitter.common_profile.get_en_full_name|default:attendance.submitter.username  }}</td>
+            <td>{{ attendance.submitter.common_profile.get_ar_short_name|default:attendance.submitter.username }}</td>
         </tr>
     {% endfor %}
     </tbody>

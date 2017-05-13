@@ -55,4 +55,6 @@ urlpatterns = patterns('',
     url(r'^survey/thanks/$', TemplateView.as_view(template_name='events/thank_you.html'),name="survey_submission_completed"),
     # Has to be the last URL so it doesn't catch unintended patterns.
     url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<code_name>[\d\w\-]+)/$', views.show_session_group,name="show_session_group"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<user_pk>\d+)/$', views.list_attendance,name="list_attendance"),
+
 )

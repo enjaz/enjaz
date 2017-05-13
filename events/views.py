@@ -990,3 +990,18 @@ def list_abstract_certificates(request, event_code_name):
     return render(request, 'events/list_abstract_certificates.html', context)
 
 
+@login_required
+def list_attendance(request, event_code_name,user_pk=None):
+
+    event = get_object_or_404(Event, code_name=event_code_name,
+                                  has_attendance = True)
+    user = get_object_or_404(User, pk=user_pk)
+
+    if not request.user.is_superuser and not utils.is_organizing_team_member(request.user,event):
+        raise PermissionDenied
+
+    attendances = Attendance.objects.filter(session_registration__user=user)
+
+    context ={'event':event,'user':user,'attendances':attendances}
+
+    return render(request, 'events/list_attendance.html', context)

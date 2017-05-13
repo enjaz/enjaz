@@ -1,0 +1,41 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}{% load events_tags %}
+
+{% block title %}حضور {{ event.official_name }}{% endblock %}
+{% block pageheaderurl %}{% url 'events:list_barcodes' event.code_name %}{% endblock %}
+
+{% block content %}
+<h1>حضور {{ event.get_html_name|safe }}</h1>
+<table id="users" class="display datatable db-responsive">
+    <thead>
+        <tr>
+            <th>اسم الجلسة</th>
+            <th>نوع التحضير</th>
+            <th>وقت التحضير</th>
+            <th>الشخص الذي حضر</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for attendance in attendances %}
+        <tr>
+            <td>{{ attendance.session_registrations.session.name }}</td>
+            <td>{{ attendance.get_category_display }}</td>
+            <td>{{ attendance.date_submitted }}</td>
+            <td>{{ attendance.submitter }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block customscript %}
+    <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+    <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+	<script>
+    $(function(){
+        $("#users").dataTable({
+                      language: {% include 'js/dataTables-arabic.json' %}});
+     });
+</script>
+{% endblock %}

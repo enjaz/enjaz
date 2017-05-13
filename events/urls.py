@@ -12,6 +12,7 @@ urlpatterns = patterns('',
     url(r'^barcode/download$', views.download_barcode_pdf, name="download_barcode_pdf"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/barcode/(?P<user_pk>\d+)/download$', views.download_barcode_pdf, name="download_barcode_pdf_privileged"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/barcode/(?P<user_pk>\d+)/$', views.show_barcode, name="show_barcode_privileged"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/attendance/(?P<user_pk>\d+)/$', views.list_attendance,name="list_attendance"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/barcode_list/$', views.list_barcodes, name="list_barcodes"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/$', views.redirect_home, name="redirect_home"),
     #URL already puplished (to be changed after the end of hpc2)
@@ -53,7 +54,6 @@ urlpatterns = patterns('',
     url(r'^(?P<event_code_name>[\d\w_\-]+)/stats/(?P<session_pk>\d+)/csv$', views.get_csv, name="get_csv"),
     url(r'^survey/(?P<session_pk>\d+)/$', views.handle_survey, name="handle_survey"),
     url(r'^survey/thanks/$', TemplateView.as_view(template_name='events/thank_you.html'),name="survey_submission_completed"),
-    url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<user_pk>\d+)/$', views.list_attendance,name="list_attendance"),
     # Has to be the last URL so it doesn't catch unintended patterns.
     url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<code_name>[\d\w\-]+)/$', views.show_session_group,name="show_session_group"),
 

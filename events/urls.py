@@ -53,8 +53,8 @@ urlpatterns = patterns('',
     url(r'^(?P<event_code_name>[\d\w_\-]+)/stats/(?P<session_pk>\d+)/csv$', views.get_csv, name="get_csv"),
     url(r'^survey/(?P<session_pk>\d+)/$', views.handle_survey, name="handle_survey"),
     url(r'^survey/thanks/$', TemplateView.as_view(template_name='events/thank_you.html'),name="survey_submission_completed"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<user_pk>\d+)/$', views.list_attendance,name="list_attendance"),
     # Has to be the last URL so it doesn't catch unintended patterns.
     url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<code_name>[\d\w\-]+)/$', views.show_session_group,name="show_session_group"),
-    url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<user_pk>\d+)/$', views.list_attendance,name="list_attendance"),
 
-)
+                       )

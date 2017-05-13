@@ -17,7 +17,7 @@
     <tbody>
     {% for attendance in attendances %}
         <tr>
-            <td>{{ attendance.session_registrations.session.name }}</td>
+            <td>{{ attendance.session_registration.session.name }}</td>
             <td>{{ attendance.get_category_display }}</td>
             <td>{{ attendance.date_submitted }}</td>
             <td>{{ attendance.submitter }}</td>

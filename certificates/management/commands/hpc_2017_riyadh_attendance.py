@@ -154,7 +154,7 @@ class Command(BaseCommand):
             if user_total >= 5 or long_workshop_positive:
                 name = accounts.utils.get_user_en_full_name(hpc_user)
                 if not name:
-                    name = user.username
+                    name = hpc_user.username
                 scfhs_number = accounts.utils.get_user_scfhs_number(hpc_user)
                 texts = [name, scfhs_number]
                 session = sessions[GENERAL_PROGRAM_PK]

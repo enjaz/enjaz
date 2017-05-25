@@ -56,7 +56,6 @@ def generate_session_certificate(user, session_pk):
         print u"Preparing {} for {}.".format(session_name, name)
     scfhs_number = accounts.utils.get_user_scfhs_number(user)
     texts = [name, session_name, scfhs_number]
-    return
     session.certificate_template.generate_certificate(user, texts, content_object=session)
 
 class Command(BaseCommand):
@@ -114,13 +113,13 @@ class Command(BaseCommand):
             if user_total >= 5:
                 name = accounts.utils.get_user_en_full_name(hpc_user)
                 if not name:
-                    name = user.username
-                texts = [name]
+                    name = hpc_user.username
+                scfhs_number = accounts.utils.get_user_scfhs_number(hpc_user)
+                texts = [name, scfhs_number]
                 session = sessions[GENERAL_PROGRAM_PK]
                 if Certificate.objects.filter(sessions__pk=GENERAL_PROGRAM_PK, user=hpc_user).exists():
                     print u"Skipping {} for {} as previously generated.".format(session.name, name)
                     continue
                 else:
                     print u"Preparing {} for {}.".format(session.name, name)
-
                 session.event.event_certificate_template.generate_certificate(hpc_user, texts, content_object=session)

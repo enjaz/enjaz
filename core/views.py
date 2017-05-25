@@ -1,6 +1,5 @@
 # -*- coding: utf-8  -*-
 from datetime import datetime, timedelta, date
-
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404
 from django.db.models import Sum, Count
@@ -10,8 +9,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from dal import autocomplete
+import re
 
-from core import decorators
+from . import decorators, utils
 from .models import Announcement, Publication, StudentClubYear
 from .forms import DebateForm
 from activities.models import Activity, Episode
@@ -268,3 +269,21 @@ def debate(request):
             form = DebateForm(initial={'url': url})
         context['form'] = form
     return render(request, 'debate.html', context)
+
+class UserAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated():
+            return User.objects.none()
+
+        qs = User.objects.filter(is_active=True)
+
+        if self.q:
+            search_fields = [re.sub('^user__', '', field) for field in utils.BASIC_SEARCH_FIELDS]
+            print search_fields
+            qs = utils.get_search_queryset(qs, search_fields, self.q)
+
+        return qs
+
+    def get_result_label(self, item):
+        full_name = accounts.utils.get_user_ar_full_name(item) or item.username
+        return"%s <bdi style='font-family: monospace;'>(%s)</bdi>" % (full_name, item.username)

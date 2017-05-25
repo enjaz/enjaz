@@ -4,22 +4,14 @@ from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth import authenticate
-from certificates import models
+from certificates import forms, models, utils
 from core.utils import BASIC_SEARCH_FIELDS
-import clubs.utils
-import events.utils
-import media.utils
 
-def has_access(user):
-    return media.utils.is_media_coordinator_or_deputy(user) or \
-        clubs.utils.is_presidency_coordinator_or_deputy(user) or \
-        events.utils.get_user_organizing_events(user).exists()  or \
-        user.is_superuser
 
 class CertificateListAuthenticationForm(AdminAuthenticationForm):
     def confirm_login_allowed(self, user):
         if not user.is_active and \
-           not has_access(user):
+           not utils.can_access_certificate_admin(user):
             raise forms.ValidationError(
                 self.error_messages['invalid_login'],
                 code='invalid_login',
@@ -30,7 +22,7 @@ class CertificateListAdmin(admin.sites.AdminSite):
     login_form = CertificateListAuthenticationForm
 
     def has_permission(self, request):
-        return has_access(request.user)
+        return utils.can_access_certificate_admin(request.user)
 
 class TextPositionInline(admin.TabularInline):
     model = models.TextPosition
@@ -48,17 +40,38 @@ def regenerate_certificate(modeladmin, request, queryset):
 regenerate_certificate.short_description = u"أعد توليد الشهادات المُحدّدة"
 
 class CertificateAdmin(admin.ModelAdmin):
+    form = forms.CertificateForm
     list_display = ['__unicode__', 'verification_code']
+    readonly_fields = ['object_id', 'content_type', 'image',
+                       'verification_code']
     search_fields = BASIC_SEARCH_FIELDS + ['verification_code', 'texts__text']
     list_filter = ['sessions__event', 'sessions']
     actions = [regenerate_certificate]
     inlines = [CertificateTextInline]
 
     def has_module_permission(self, request, obj=None):
-        return has_access(request.user)
+        return utils.can_access_certificate_admin(request.user)
 
     def has_change_permission(self, request, obj=None):
-        return has_access(request.user)
+        return utils.can_access_certificate_admin(request.user)
+
+    def save_formset(self, request, form, formset, change):
+        certificate = formset.instance
+        if not change:
+            if certificate.certificate_template:
+                targetted_count = certificate.certificate_template.text_positions.count()
+                instances = formset.save()
+                current_count = len(instances)
+                remaining_count = targetted_count - current_count
+                if remaining_count > 0:
+                    for i in range(remaining_count):
+                        models.CertificateText.objects.create(certificate=certificate,
+                                                              text="")
+        else:
+            super(CertificateAdmin, self).save_formset(request, form, formset, change)
+
+        if certificate.certificate_template:
+            certificate.regenerate_certificate()
 
 certificate_admin = CertificateListAdmin("Certificate Admin")
 

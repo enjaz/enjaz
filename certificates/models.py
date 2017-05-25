@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+import os
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -6,7 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files import File
 
-from certificates import utils
+from . import utils, managers
 from events.models import Abstract, Session, SurveyResponse
 from niqati.utils import generate_random_string
 import accounts.utils
@@ -62,6 +63,8 @@ class Certificate(models.Model):
     modification_date = models.DateTimeField(u"تاريخ التعديل",
                                             auto_now=True)
 
+    objects = managers.CertificateQuerySet.as_manager()
+
     def is_related_to_session(self):
         if type(self.content_object) is Session:
             return True
@@ -84,7 +87,18 @@ class Certificate(models.Model):
         else:
             return False
 
+    def get_filename(self):
+        random_string = generate_random_string(4)
+        filename = "{}-{}.{}".format(self.verification_code, random_string, self.certificate_template.image_format)
+        return filename
+
     def regenerate_certificate(self, texts=None):
+        # If verification_code hasn't been generate, generate it!
+        if not self.verification_code:
+            self.verification_code = self.__class__.objects.get_vacant_code()
+            self.save()
+
+        # If alternative texts are provided, use them!
         if texts:
             self.texts.delete()
             # Let's save the text for further regeneration
@@ -102,7 +116,12 @@ class Certificate(models.Model):
                                                                    texts=text_values,
                                                                    verification_code=self.verification_code)
         certificate_file = open(file_path)
-        self.image.save("{}.{}".format(self.verification_code, self.certificate_template.image_format), File(certificate_file))
+        # Remove old photo
+        if self.image:
+            os.remove(self.image.path)
+        # Save the newer photo
+        filename = self.get_filename()
+        self.image.save(filename, File(certificate_file))
 
     def __unicode__(self):
         if self.description:
@@ -154,11 +173,7 @@ class CertificateTemplate(models.Model):
                                            auto_now=True)
 
     def generate_certificate(self, user, texts, description="", content_object=None):
-        while True:
-            verification_code = generate_random_string(6)
-            if not Certificate.objects.filter(verification_code=verification_code).exists():
-                break
-
+        verification_code = Certificate.objects.objects.get_vacant_code()
         file_path, relative_url = utils.generate_certificate_image(self.certificate_request.pk,
                                                                    template=self,
                                                                    texts=texts,
@@ -181,8 +196,7 @@ class CertificateTemplate(models.Model):
         certificate_file = open(file_path)
         # Let's make accessing certificates from the public media URL
         # unfeasible by adding a random string.
-        random_string = generate_random_string(4)
-        filename = "{}-{}.{}".format(verification_code, random_string, self.image_format)
+        filename = certificate.get_filename()
         certificate.image.save(filename, File(certificate_file))
 
         return certificate

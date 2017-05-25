@@ -10,7 +10,6 @@ import os
 from events.models import Session
 
 
-
 def get_temporary_paths(request_pk):
     if settings.DEBUG:
         root = settings.DEFAULT_STATIC_ROOT
@@ -61,6 +60,9 @@ def generate_certificate_image(request_pk, template, texts,
         # get a drawing context
         d = ImageDraw.Draw(txt)
         lines = textwrap.wrap(text, width=70)
+        # If no text to draw, skip!
+        if not lines:
+            continue
         if position.y_center:
             line = lines[0]
             height_per_line = fnt.getsize(line)[1]

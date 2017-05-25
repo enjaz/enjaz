@@ -49,6 +49,7 @@ regenerate_certificate.short_description = u"أعد توليد الشهادات 
 
 class CertificateAdmin(admin.ModelAdmin):
     list_display = ['__unicode__', 'verification_code']
+    readonly_fields = ['verification_code']
     search_fields = BASIC_SEARCH_FIELDS + ['verification_code', 'texts__text']
     list_filter = ['sessions__event', 'sessions']
     actions = [regenerate_certificate]
@@ -59,6 +60,24 @@ class CertificateAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return has_access(request.user)
+
+    def save_formset(self, request, form, formset, change):
+        certificate = formset.instance
+        if not change:
+            if certificate.certificate_template:
+                targetted_count = certificate.certificate_template.text_positions.count()
+                instances = formset.save()
+                current_count = len(instances)
+                remaining_count = targetted_count - current_count
+                if remaining_count > 0:
+                    for i in range(remaining_count):
+                        models.CertificateText.objects.create(certificate=certificate,
+                                                              text="")
+        else:
+            super(CertificateAdmin, self).save_formset(request, form, formset, change)
+
+        if certificate.certificate_template:
+            certificate.regenerate_certificate()
 
 certificate_admin = CertificateListAdmin("Certificate Admin")
 

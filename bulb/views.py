@@ -1,5 +1,6 @@
 # -*- coding: utf-8  -*-
 import json
+import re
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
@@ -21,6 +22,8 @@ from bulb.forms import BookGiveForm, BookLendForm, BookEditForm, NeededBookForm,
 from bulb import utils
 import accounts.utils
 import clubs.utils
+import core.utils
+
 
 def index(request):
     groups = Group.objects.current_year().for_user_city(request.user).unarchived().undeleted().order_by("?")[:6]
@@ -1543,12 +1546,7 @@ class BulbUserAutocomplete(autocomplete.Select2QuerySetView):
         qs = User.objects.filter(common_profile__profile_type='S', is_active=True)
 
         if self.q:
-            search_fields=['email', 'common_profile__ar_first_name',
-                           'common_profile__ar_last_name',
-                           'common_profile__en_first_name',
-                           'common_profile__en_last_name',
-                           'common_profile__student_id',
-                           'common_profile__mobile_number']
+            search_fields = [re.sub('^user__', '', field) for field in core.utils.BASIC_SEARCH_FIELDS]
             qs = get_search_queryset(qs, search_fields, self.q)
 
         return qs

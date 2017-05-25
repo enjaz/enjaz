@@ -65,6 +65,9 @@ def download_certificate(request, verification_code):
     return certificate_response
 
 def verify_certificate(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     context = {}
     if request.method == "POST":
         form = VerifyCertificateForm(request.POST)
@@ -80,13 +83,8 @@ def verify_certificate(request):
 
 # Request views
 def list_certificate_requests(request, club_pk=None):
-    if club_pk:
-        if not utils.can_view_all_certificates(request.user):
-            raise PermissionDenied
-        else:
-            club = get_object_or_404(Club, pk=club_pk)
-    else:
-        club
+    if not request.user.is_superuser:
+        raise PermissionDenied
 
     certificate_requests = CertificateRequest.objects.filter(submitter_club=club)
     return render(request, 'certificate_requests/list_certificate_requests.html',
@@ -94,6 +92,8 @@ def list_certificate_requests(request, club_pk=None):
 
 @login_required
 def show_certificate_request(request, pk):
+    if not request.user.is_superuser:
+        raise PermissionDenied
     certificate_request = get_object_or_404(CertificateRequest, pk=pk)
     return render(request, 'certificates/show_certificate_request.html',
                   {'certificate_request': certificate_request})
@@ -101,6 +101,9 @@ def show_certificate_request(request, pk):
 #@decorators.ajax_only
 @login_required
 def add_certificate_request(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     if request.method == 'POST':
         instance = CertificateRequest(submitter=request.user)
         form = CertificateRequestForm(request.POST, instance=instance, user=request.user)
@@ -120,6 +123,9 @@ def add_certificate_request(request):
 #@decorators.ajax_only
 @login_required
 def edit_certificate_request(request, pk):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     certificate_request = get_object_or_404(CertificateRequest, pk=pk)
 
     if not utils.can_edit_certificate_request(request.user, certificate_request):

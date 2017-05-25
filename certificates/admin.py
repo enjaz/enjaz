@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth import authenticate
+from django.utils.html import format_html
 from certificates import forms, models, utils
 from core.utils import BASIC_SEARCH_FIELDS
 
@@ -41,7 +42,7 @@ regenerate_certificate.short_description = u"أعد توليد الشهادات 
 
 class CertificateAdmin(admin.ModelAdmin):
     form = forms.CertificateForm
-    list_display = ['__unicode__', 'verification_code']
+    list_display = ['__unicode__', 'verification_code', 'get_link']
     readonly_fields = ['object_id', 'content_type', 'image',
                        'verification_code']
     search_fields = BASIC_SEARCH_FIELDS + ['verification_code', 'texts__text']
@@ -54,6 +55,11 @@ class CertificateAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return utils.can_access_certificate_admin(request.user)
+
+    def get_link(self, obj):
+        if obj.image:
+            return format_html(u"<a href='{}'>الشهادة</span>", obj.image.url)
+    get_link.short_description = "رابط الشهادة"
 
     def save_formset(self, request, form, formset, change):
         certificate = formset.instance

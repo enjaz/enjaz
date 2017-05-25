@@ -4,6 +4,7 @@ from django.contrib.staticfiles.templatetags.staticfiles import static
 import textwrap
 import cStringIO
 import clubs.utils
+import events.utils
 import media.utils
 import random
 import os
@@ -118,3 +119,9 @@ def can_view_all_certificates(user):
         return True
     else:
         return False
+
+def can_access_certificate_admin(user):
+    return media.utils.is_media_coordinator_or_deputy(user) or \
+        clubs.utils.is_presidency_coordinator_or_deputy(user) or \
+        events.utils.get_user_organizing_events(user).exists()  or \
+        user.is_superuser

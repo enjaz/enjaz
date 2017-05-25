@@ -117,7 +117,8 @@ class Certificate(models.Model):
                                                                    verification_code=self.verification_code)
         certificate_file = open(file_path)
         # Remove old photo
-        os.remove(self.image.path)
+        if self.image:
+            os.remove(self.image.path)
         # Save the newer photo
         filename = self.get_filename()
         self.image.save(filename, File(certificate_file))

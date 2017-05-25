@@ -34,7 +34,7 @@ class CertificateRequestForm(forms.ModelForm):
         fields = ['episode', 'description', 'text', 'user_list',
                   'users']
         widgets = {'users':
-                   autocomplete.ModelSelect2Multiple(url='bulb:bulb-user-autocomplete',
+                   autocomplete.ModelSelect2Multiple(url='user-autocomplete',
                                                      attrs={ 'data-placeholder': 'أَضف اسمًا',
                                                              'data-html': 'true', })}
 
@@ -68,3 +68,14 @@ PositionFormset =  inlineformset_factory(CertificateTemplate, TextPosition,
                                                  'font_family',
                                                  'size', 'color'),
                                          widgets={'color': forms.TextInput(attrs={'class': 'jscolor english-field'})})
+
+
+
+
+class CertificateForm(forms.ModelForm):
+    class Meta:
+        model = Certificate
+        fields = ('__all__')
+        widgets = {
+            'user': autocomplete.ModelSelect2(url='user-autocomplete', attrs={'data-html': 'true'})
+        }

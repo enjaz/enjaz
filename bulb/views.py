@@ -197,8 +197,14 @@ def confirm_book_order(request, pk):
     book_exchange_coordinator = clubs.utils.get_team_for_user("book_exchange", book.submitter).coordinator
     current_year = StudentClubYear.objects.get_current()
     instance = Request(requester=request.user, book=book)
+    studentclubyear = get_object_or_404(StudentClubYear, pk=pk, is_deleted=False)
+
+    if studentclubyear.bookexchange_close_date and timezone.now() > studentclubyear.bookexchange_close_date:
+        return render(request, 'bulb/exchange/book_section_is_closed.html', {'studentclubyear':studentclubyear})
+
     if request.method == 'POST':
         form = RequestForm(request.POST, instance=instance)
+
         # TODO: In case the user lost thier balance after this form
         # was shown, no error message will be shown.  Show it?
         if book.contribution == 'G':
@@ -248,6 +254,7 @@ def confirm_book_order(request, pk):
 
     elif request.method == 'GET':
         form = RequestForm(instance=instance)
+
 
     return render(request, "bulb/exchange/components/confirm_book_order.html",
                   {'book': book, 'form': form})
@@ -1862,6 +1869,6 @@ def show_recommendation_category(request, code_name):
     return render(request, "bulb/recommendations/show_category.html", context)
 
 def show_recommended_book(request, pk):
-    recommended_book = get_object_or_404(RecommendedBook, pk=pk)    
+    recommended_book = get_object_or_404(RecommendedBook, pk=pk)
     context = {'recommended_book': recommended_book}
     return render(request, "bulb/recommendations/show_recommended_book.html", context)

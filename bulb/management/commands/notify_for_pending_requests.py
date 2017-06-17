@@ -10,11 +10,11 @@ from media.utils import get_club_media_center
 
 
 class Command(BaseCommand):
-    help = "Notify users on pending requests after 7 days."
+    help = "Notify users on pending requests after 3 days."
 
     def handle(self, *args, **options):
         domain = Site.objects.get_current().domain
-        date = timezone.now().date() - datetime.timedelta(7)
+        date = timezone.now().date() - datetime.timedelta(3)
         date_min = datetime.datetime.combine(date, datetime.time.min)
         date_max = datetime.datetime.combine(date, datetime.time.max)
         for book_request in Request.objects.filter(delivery='D')\

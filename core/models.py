@@ -81,6 +81,8 @@ class StudentClubYear(models.Model):
                                                     null=True, blank=True)
     alahsa_closing_ceremony_date = models.DateField(u"الحفل الختامي في الأحساء",
                                                     null=True, blank=True)
+    bookexchange_closure_date = models.DateField(u"تاريخ إغلاق تبادل الكتب",
+                                               null=True, blank=True)
 
     objects = YearManager()
     def __unicode__(self):

@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
@@ -240,6 +241,22 @@ class Session(models.Model):
                 return 0
             else:
                 return diff
+
+    def has_mandatory_survey_to_fill(self, user):
+        if not self.mandatory_survey or \
+           SurveyResponse.objects.filter(survey=self.mandatory_survey,
+                                         user=user).exists():
+            return False
+        else:
+            return True
+
+    def has_optional_survey_to_fill(self, user):
+        if not self.optional_survey or \
+           SurveyResponse.objects.filter(survey=self.optional_survey,
+                                         user=user).exists():
+            return False
+        else:
+            return True
 
     def __unicode__(self):
         if self.gender:

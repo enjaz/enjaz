@@ -7,9 +7,10 @@ from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db.models import Count
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.views.decorators import csrf
 from django.shortcuts import render, get_object_or_404, redirect
+from django.template.loader import get_template
 from django.utils import timezone
+from django.views.decorators import csrf
 from post_office import mail
 import os.path
 
@@ -940,22 +941,50 @@ def get_csv(request, event_code_name, session_pk):
 
 @decorators.ajax_only
 @login_required
-def handle_survey(request, session_pk):
+def handle_survey(request, session_pk, optional=False):
     session = get_object_or_404(Session, pk=session_pk)
 
-    context = {'session': session}
+    is_optional = bool(optional)
+    optional_survey = session.optional_survey
+
+    context = {'session': session, 'is_optional': is_optional}
 
     if request.method == 'POST':
-        form = forms.SurveyForm(request.POST, session=session)
+        form = forms.SurveyForm(request.POST, session=session,
+                                is_optional=is_optional)
         if form.is_valid():
             form.save(user=request.user)
-            show_url = reverse('certificates:list_certificates_per_user')
-            return {"message": "success", "show_url": show_url}
+            if not is_optional and optional_survey:
+                form = forms.SurveyForm(session=session,
+                                        is_optional=True)
+                context['form'] = form
+                template = get_template('events/partials/submit_survey.html')
+                html = template.render(context)
+                submit_url = reverse('events:handle_survey', args=(sessions.pk, 'optional'))
+                return {"message": "success", 'html': html,
+                        'submit_url': submit_url}
+            else:
+                show_url = reverse('certificates:list_certificates_per_user')
+                return {"message": "success", "show_url": show_url}
     elif request.method == 'GET':
-        form = forms.SurveyForm(session=session)
+        form = forms.SurveyForm(session=session,
+                                is_optional=is_optional)
 
     context['form'] = form
     return render(request, 'events/partials/submit_survey.html', context)
+
+@decorators.ajax_only
+@login_required
+def delete_survey_response(reuqest, session_pk):
+    session = get_object_or_404(Session, pk=session_pk,
+                                optional_survey__isnull=False)
+
+    SurveyResponse.objects.filter(user=request.user,
+                                  survey=session.optional_survey,
+                                  session=session).delete()
+
+    return {'message': 'success'}
+
 
 @login_required
 def list_session_certificates(request, event_code_name, pk):

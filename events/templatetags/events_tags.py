@@ -8,6 +8,14 @@ from events.models import SessionRegistration, TimeSlot
 register = template.Library()
 
 @register.filter
+def has_mandatory_survey_to_fill(session, user):
+    return session.has_mandatory_survey_to_fill(user)
+
+@register.filter
+def has_optional_survey_to_fill(session, user):
+    return session.has_optional_survey_to_fill(user)
+
+@register.filter
 def is_regestrations_team_member(user, event):
     return utils.is_regestrations_team_member(user, event)
 

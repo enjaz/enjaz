@@ -211,8 +211,6 @@ class SurveyForm(forms.Form):
         else:
             self.survey = self.session.mandatory_survey
 
-        print(self.survey)
-
         questions = self.survey.survey_questions.all()
 
         for question in questions:
@@ -228,6 +226,9 @@ class SurveyForm(forms.Form):
             if question.category == "O":
                 self.fields[field_name] = forms.CharField(label=label,
                                                           widget=forms.Textarea,
+                                                          required=required)
+            elif question.category == "I":
+                self.fields[field_name] = forms.CharField(label=label,
                                                           required=required)
             elif question.category == "S":
                 choices = [(i, i) for i in range(11)]

@@ -656,6 +656,7 @@ class SurveyQuestion(models.Model):
     survey = models.ForeignKey(Survey, verbose_name=u"الاستبيان", related_name="survey_questions")
     category_choices = (
         ('O', u'سؤال مفتوح'),
+        ('I', u'جواب قصير'),
         ('S', u'مقياس'),
         ('H', u'ترويسة')
         )

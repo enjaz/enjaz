@@ -223,15 +223,17 @@ class SurveyForm(forms.Form):
             else:
                 label = question.text
 
+            required = not question.is_optional
             field_name = 'question_' + str(question.pk)
             if question.category == "O":
                 self.fields[field_name] = forms.CharField(label=label,
-                                                          widget=forms.Textarea)
+                                                          widget=forms.Textarea,
+                                                          required=required)
             elif question.category == "S":
-
                 choices = [(i, i) for i in range(11)]
                 self.fields[field_name] = forms.IntegerField(label=label,
-                                                             widget=forms.RadioSelect(choices=choices))
+                                                             widget=forms.RadioSelect(choices=choices),
+                                                             required=required)
             elif question.category == 'H':
                 self.fields[field_name] =  forms.CharField(
                                                     widget=HeaderWidget(attrs={'text': label}),

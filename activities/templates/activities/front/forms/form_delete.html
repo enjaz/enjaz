@@ -1,0 +1,21 @@
+{% extends 'activities/show.html' %}{% load i18n %}
+{% block title %}{% trans "Delete form" %}{% endblock %}
+{% block review_content %}
+    <style>
+        .errorlist {color:#f00;}
+    </style>
+<div class="panel panel-default panel-shadow" data-collapsed="0">
+    <div class="panel-heading">
+        <div class="panel-title">{% trans "Delete form" %} {{ form.title }}{% trans "?" %}</div>
+    </div>
+	<!-- panel body -->
+	<div class="panel-body">
+    <p>{% trans "Are you sure you want to <strong>delete</strong> the form" %} {{ form.title }}{% trans "?" %}</p>
+    <form method="post">
+        {% csrf_token %}
+        <button class="btn btn-danger" type="submit" name="action" value="delete">{% trans "Yes" %}</button>
+        <button class="btn btn-default" type="submit" name="action" value="keep">{% trans "No" %}</button>
+    </form>
+    </div>
+</div>
+{% endblock %}

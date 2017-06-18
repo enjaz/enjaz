@@ -1,0 +1,15 @@
+{% extends "bulb_base.html" %}{% load staticfiles %}
+{% block title %} توقف طلبات الكتب {% endblock %}
+{% block navbar %}
+    {% include "bulb/exchange/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+
+<div class="col-sm-6 col-sm-offset-3 mentor-section-intro text-center">
+  <h3>نعتذر توقفت طلبات الكتب</h3>
+  {% csrf_token %}
+  <p>
+    شكرًا لتفاعلك مع مكتبة سِراج التعاونية لكن نعتذر منك تم ايقاف طلبات الكتب من المكتبة طول فترة الصيف
+    يمكنك العودة في تاريخ 5/9/2017 وطلب الكتاب مرة أخرى!
+  </p>
+  {% endblock %}

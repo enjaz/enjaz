@@ -307,13 +307,20 @@ you?
 				</a>
 			</li>
             {% endif %}
-            {% if not user.common_profile.profile_type == 'N' %}
+
+				  {% if not user.common_profile.profile_type == 'N' %}
+				<li>
+					<li class="highlighted-section">
+					<a href="https://enjazportal.com/menhaj/">
+						<i class="entypo-book"></i>
+						<span>مِنهاج</span>
+					</a>
+				</li>
 			<li>
 				<a href="{% url 'studentguide:index' %}">
 					<i class="entypo-graduation-cap"></i>
 					<span>الإرشاد الطلابي</span>
 				</a>
-			</li>
 
             {% if user.common_profile.get_city_code == "R" or user.is_superuser %}
 			<li class="highlighted-section">

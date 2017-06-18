@@ -31,6 +31,14 @@ class TextPositionInline(admin.TabularInline):
 class CertificateTextInline(admin.TabularInline):
     model = models.CertificateText
     extra = 0
+    def has_module_permission(self, request, obj=None):
+        return utils.can_access_certificate_admin(request.user)
+
+    def has_add_permission(self, request, obj=None):
+        return utils.can_access_certificate_admin(request.user)
+
+    def has_change_permission(self, request, obj=None):
+        return utils.can_access_certificate_admin(request.user)
 
 class TemplateAdmin(admin.ModelAdmin):
     inlines = [TextPositionInline]
@@ -45,12 +53,17 @@ class CertificateAdmin(admin.ModelAdmin):
     list_display = ['__unicode__', 'verification_code', 'get_link']
     readonly_fields = ['object_id', 'content_type', 'image',
                        'verification_code']
-    search_fields = BASIC_SEARCH_FIELDS + ['verification_code', 'texts__text']
-    list_filter = ['sessions__event', 'sessions']
+    search_fields = BASIC_SEARCH_FIELDS + ['verification_code',
+                                           'texts__text', 'certificate_template__description',
+                                           'certificate_template__certificate_request__description']
+    list_filter = ['sessions__event', 'sessions', 'certificate_template']
     actions = [regenerate_certificate]
     inlines = [CertificateTextInline]
 
     def has_module_permission(self, request, obj=None):
+        return utils.can_access_certificate_admin(request.user)
+
+    def has_add_permission(self, request, obj=None):
         return utils.can_access_certificate_admin(request.user)
 
     def has_change_permission(self, request, obj=None):
@@ -63,20 +76,16 @@ class CertificateAdmin(admin.ModelAdmin):
 
     def save_formset(self, request, form, formset, change):
         certificate = formset.instance
-        if not change:
-            if certificate.certificate_template:
-                targetted_count = certificate.certificate_template.text_positions.count()
-                instances = formset.save()
-                current_count = len(instances)
-                remaining_count = targetted_count - current_count
-                if remaining_count > 0:
-                    for i in range(remaining_count):
-                        models.CertificateText.objects.create(certificate=certificate,
-                                                              text="")
-        else:
-            super(CertificateAdmin, self).save_formset(request, form, formset, change)
+        instances = formset.save()
 
-        if certificate.certificate_template:
+        if certificate.certificate_template: 
+            targetted_count = certificate.certificate_template.text_positions.count()
+            current_count = len(instances)
+            remaining_count = targetted_count - current_count
+            if remaining_count > 0:
+                for i in range(remaining_count):
+                    models.CertificateText.objects.create(certificate=certificate,
+                                                          text="")
             certificate.regenerate_certificate()
 
 certificate_admin = CertificateListAdmin("Certificate Admin")

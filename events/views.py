@@ -960,7 +960,7 @@ def handle_survey(request, session_pk, optional=False):
                 context['form'] = form
                 template = get_template('events/partials/submit_survey.html')
                 html = template.render(context)
-                submit_url = reverse('events:handle_survey', args=(sessions.pk, 'optional'))
+                submit_url = reverse('events:handle_survey', args=(session.pk, 'optional'))
                 return {"message": "success", 'html': html,
                         'submit_url': submit_url}
             else:

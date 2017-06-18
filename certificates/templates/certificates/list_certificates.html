@@ -1,4 +1,4 @@
-{% extends 'certificates/certificate_base.html' %}{% load staticfiles %}
+{% extends 'certificates/certificate_base.html' %}{% load staticfiles events_tags %}
 
 {% block content %}
 <h1 style="text-align: center">الشهادات</h1>
@@ -7,16 +7,16 @@
         <th>الشهادة</th>
         <th class="not-mobile">الرمز</th>
         <th class="not-mobile">التاريخ</th>
-        <th class="not-mobile">تنزيل</th>
+        <th class="always">تنزيل</th>
     </thead>
     <tbody>
         {% for certificate in certificates %}
         <tr>
             <td>{{ certificate }}</td>
-            <td class="english-field">{{ certifiacte.verification_code }}</td>
+            <td class="english-field">{{ certificate.verification_code }}</td>
             <td data-order="{{ certificate.submission_date|date:'U' }}">{{ certificate.submission_date|date:"j F Y" }}</td>
             <td>
-                {% if certificate.has_pending_mandatory_survey %}
+                {% if certificate.is_related_to_session and certificate.content_object|has_mandatory_survey_to_fill:user %}
                 <button data-session-title="{{ certificate.content_object.name }}" data-session-pk="{{ certificate.content_object.pk }}" data-url="{% url 'events:handle_survey' certificate.content_object.pk %}" class="survey btn btn-icon btn-success">
                     <i class="entypo-pencil"></i>
                    تعبئة الاستبيان
@@ -24,8 +24,8 @@
                 {% else %}
                 <a class="btn btn-success" href="{% url 'certificates:download_certificate' certificate.verification_code %}"><i class="fa fa-download" aria-hidden="true"></i> تنزيل</a>
                 {% endif %}
-                {% if not certificate.has_pending_mandatory_survey and certificate.has_pending_optional_survey %}
-                <button data-session-title="{{ certificate.content_object.name }}" data-session-pk="{{ certificate.content_object.pk }}" data-url="{% url 'events:handle_survey' certificate.content_object.pk %}" class="survey btn-sm btn-icon btn-success">
+                {% if certificate.is_related_to_session and certificate.content_object|has_optional_survey_to_fill:user and not certificate.content_object|has_mandatory_survey_to_fill:user %}
+                <button data-session-title="{{ certificate.content_object.name }}" data-session-pk="{{ certificate.content_object.pk }}" data-url="{% url 'events:handle_survey' certificate.content_object.pk 'optional' %}" class="survey btn btn-icon btn-warning">
                     <i class="entypo-pencil"></i>
                    ساعدنا عبر تعبئة الاستبيان!
                 </button>

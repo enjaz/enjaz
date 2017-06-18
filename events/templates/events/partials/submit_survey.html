@@ -1,13 +1,22 @@
-{% load bootstrap3 %}{% load staticfiles %}
-<style>
-
-</style>
+{% load bootstrap3 %}{% load staticfiles events_tags %}
 <div class="form-group">
-<form class="text-center" id="edit-survey-form" action="post">
+<p class="alert alert-warning english-field" id="mandatory-alert">To get your certificate, you will need to fill the following survey, so we can make the next event even better!</p>
+<p class="alert alert-warning english-field" id="optional-alert">Please help us by filling the <em>"{{ session.optional_survey.name }}"</em> survey!</p>
+
+<form action="{% url 'events:handle_survey' session.pk %}" class="text-center" id="edit-survey-form" action="post">
 {% csrf_token %}
 {% bootstrap_form form %}
 </form>
 </div>
+
+<div class="english-field" id="confirm-message">
+<p>By submitting your response in the study on <em>"{{ session.optional_survey.name }}"</em>.  Your acceptance supports student research!</p>
+
+<button class="btn btn-success" id="agree">Agree</button>
+<button class="btn btn-danger" id="disagree">Disgree</button>
+
+</div>
+
 <style>
 .header-field{
   border-top: 1px solid #a4a4a4;
@@ -15,25 +24,56 @@
   font-size: 1.2em;
   color: black;
 }
+
+#confirm-message, #optional-alert, #mandatory-alert{
+  display: none;
+}
 </style>
 
 <script type="text/javascript">
 $(function () {
+    formData = null;
+{% if session|has_mandatory_survey_to_fill:user %}
+    is_optional = false;
+    $("#mandatory-alert").show()
+    $("form#edit-survey-form").attr('action', "{% url 'events:handle_survey' session.pk %}");
+{% else %}
+    is_optional = true;
+    $("#optional-alert").show()
+    $("form#edit-survey-form").attr('action', "{% url 'events:handle_survey' session.pk 'optional' %}");
+{% endif %}
     // modify form submission behaviour to be ajaxy
     $(".radio label").addClass("radio-inline");
     $(".header-field").removeClass("form-control");
     $("div.radio").removeClass("radio").css("display", "inline");
-    $("label:has(span.english), p:has(span.english)").addClass("english-field");
+    $("div:has(> label > span.english), p:has(span.english)").addClass("english-field text-center");
+    $("div.english-field textarea").attr("placeholder", "")
 
+    $("#agree").click(function(){
+        $("#edit-survey-modal").modal('hide');
+    });
+    $("#disagree").click(function(){
+        $.ajax({
+            url: "{% url 'events:delete_survey_response' session.pk %}",
+            type: 'POST',
+            success: function (data) {
+                if (data.message == "success") {
+                    $("#edit-survey-modal").modal('hide');
+                } else {
+                    toastr.error(data.message);
+                }
+            }
+        });
+    });
     $("form#edit-survey-form").submit(function (event) {
 
         /* stop form from submitting normally */
         event.preventDefault();
-        var formData = new FormData($(this)[0]);
 
+        formData = new FormData($(this)[0]);
         /* Send the data */
         $.ajax({
-            url: "{% url 'events:handle_survey' session.pk %}",
+            url: $(this).attr('action'),
             type: 'POST',
             data: formData,
             cache: false,
@@ -45,8 +85,14 @@ $(function () {
                     // show success message (using toastr)
                     toastr.options.positionClass = "toast-top-left";
                     toastr.success("تم تعبئة استبيان {{ session.name }} بنجاح.");
-                    window.location.href= data.show_url;
-
+                    if (data.html){
+                       $("#edit-survey-modal .modal-body").html(data.html);
+                       $("form#edit-survey-form").attr('action', data.submit_url);
+                       is_optional = true;
+                    } else if (is_optional){
+                       $("#edit-survey-form").hide();
+                       $("#confirm-message").show();
+                    }
                 } else {
                     $("#edit-survey-modal .modal-body").html(data);
                 }}

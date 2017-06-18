@@ -203,14 +203,19 @@ class QuestionForm(forms.ModelForm):
 class SurveyForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.session = kwargs.pop("session")
-        self.optional_questions = self.mandatory_questions = SurveyQuestion.objects.none()
-        if self.session.mandatory_survey:
-            self.mandatory_questions = self.session.mandatory_survey.survey_questions.all()
-        if self.session.optional_survey:
-            self.optional_questions = self.session.optional_survey.survey_questions.all()
+        self.is_optional = kwargs.pop("is_optional")
         super(SurveyForm, self).__init__(*args, **kwargs)
 
-        for question in (self.mandatory_questions | self.optional_questions):
+        if self.is_optional:
+            self.survey = self.session.optional_survey
+        else:
+            self.survey = self.session.mandatory_survey
+
+        print(self.survey)
+
+        questions = self.survey.survey_questions.all()
+
+        for question in questions:
             if question.is_english:
                 # This is used in the template to add
                 # 'english-field' to the label tag by JavaScript.
@@ -232,39 +237,29 @@ class SurveyForm(forms.Form):
                                                     widget=HeaderWidget(attrs={'text': label}),
                                                     required=False,
                                                     label='')
-            if question.is_optional or \
-               question in self.optional_questions:
-                self.fields[field_name].required = False
 
     def save(self, user):
         field_names = [field_name for field_name in self.cleaned_data
                        if field_name.startswith("question_")]
-        mandatory_response = None
-        optional_response = None 
+
+        response = SurveyResponse.objects.create(survey=self.survey,
+                                                 session=self.session,
+                                                 user=user)
 
         for field_name in field_names:
             question_pk = field_name.lstrip("question_")
             question = SurveyQuestion.objects.get(pk=question_pk)
-            if question in self.optional_questions:
-                survey = self.session.optional_survey
-                if not optional_response:
-                    optional_response = SurveyResponse.objects\
-                                                      .create(survey=survey,
-                                                              session=self.session,
-                                                              user=user)
-                response = optional_response
-            if question in self.mandatory_questions:
-                survey = self.session.mandatory_survey
-                if not mandatory_response:
-                    mandatory_response = SurveyResponse.objects\
-                                                       .create(survey=survey,
-                                                               session=self.session,
-                                                               user=user)
-                response = mandatory_response
             arguments = {'question': question,
                          'survey_response': response}
             if question.category == 'O':
+                if self.cleaned_data[field_name].strip() == "":
+                    continue
                 arguments['text_value'] = self.cleaned_data[field_name]
             elif question.category == 'S':
+                if self.cleaned_data[field_name] is None:
+                    continue
                 arguments['numerical_value'] = self.cleaned_data[field_name]
             SurveyAnswer.objects.create(**arguments)
+
+        if not response.answers.exists():
+            response.delete()

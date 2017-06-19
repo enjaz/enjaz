@@ -77,6 +77,9 @@
                 $("form#edit-survey-form").submit();
             });
         });
+        if (window.location.hash == '#fill_survey'){
+            $(".survey").first().trigger('click')
+        }
     });
 {% include 'bulb/adjust_modal_size.js' %}
 </script>

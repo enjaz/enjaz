@@ -230,6 +230,15 @@ class SurveyForm(forms.Form):
             elif question.category == "I":
                 self.fields[field_name] = forms.CharField(label=label,
                                                           required=required)
+            elif question.category == "C":
+                if not question.choices.strip():
+                    raise Exception
+                choices = [('', '-----')]
+                
+                choices += [(choice.strip(), choice.strip()) for choice in question.choices.split('\n') if choice]
+                self.fields[field_name] = forms.ChoiceField(label=label,
+                                                            choices=choices,
+                                                            required=required)
             elif question.category == "S":
                 choices = [(i, i) for i in range(11)]
                 self.fields[field_name] = forms.IntegerField(label=label,

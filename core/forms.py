@@ -3,6 +3,7 @@ from django import forms
 from django.utils.html import format_html
 
 from constance import config
+from dal import autocomplete
 
 # This form is used in the admin interface to make all fields
 # optional.  Check out events/admin.py.
@@ -21,3 +22,9 @@ class DebateForm(forms.Form):
 class HeaderWidget(forms.widgets.Widget):
     def render(self, name, value, attrs=None):
         return format_html(u'<p class="header-field">{}</p>', self.attrs['text'])
+
+class UserAutocompleteFormMeta:
+    fields = ('__all__')
+    widgets = {
+        'user': autocomplete.ModelSelect2(url='user-autocomplete', attrs={'data-html': 'true'})
+    }

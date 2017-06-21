@@ -9,6 +9,16 @@ from certificates import forms, models, utils
 from core.utils import BASIC_SEARCH_FIELDS
 
 
+class CertificateAdminPermission:
+    def has_module_permission(self, request, obj=None):
+        return utils.can_access_certificate_admin(request.user)
+
+    def has_add_permission(self, request, obj=None):
+        return utils.can_access_certificate_admin(request.user)
+
+    def has_change_permission(self, request, obj=None):
+        return utils.can_access_certificate_admin(request.user)
+
 class CertificateListAuthenticationForm(AdminAuthenticationForm):
     def confirm_login_allowed(self, user):
         if not user.is_active and \
@@ -28,17 +38,9 @@ class CertificateListAdmin(admin.sites.AdminSite):
 class TextPositionInline(admin.TabularInline):
     model = models.TextPosition
 
-class CertificateTextInline(admin.TabularInline):
+class CertificateTextInline(CertificateAdminPermission, admin.TabularInline):
     model = models.CertificateText
     extra = 0
-    def has_module_permission(self, request, obj=None):
-        return utils.can_access_certificate_admin(request.user)
-
-    def has_add_permission(self, request, obj=None):
-        return utils.can_access_certificate_admin(request.user)
-
-    def has_change_permission(self, request, obj=None):
-        return utils.can_access_certificate_admin(request.user)
 
 class TemplateAdmin(admin.ModelAdmin):
     inlines = [TextPositionInline]
@@ -48,7 +50,7 @@ def regenerate_certificate(modeladmin, request, queryset):
         certificate.regenerate_certificate()
 regenerate_certificate.short_description = u"أعد توليد الشهادات المُحدّدة"
 
-class CertificateAdmin(admin.ModelAdmin):
+class CertificateAdmin(CertificateAdminPermission, admin.ModelAdmin):
     form = forms.CertificateForm
     list_display = ['__unicode__', 'verification_code', 'get_link']
     readonly_fields = ['object_id', 'content_type', 'image',
@@ -59,15 +61,6 @@ class CertificateAdmin(admin.ModelAdmin):
     list_filter = ['sessions__event', 'sessions', 'certificate_template']
     actions = [regenerate_certificate]
     inlines = [CertificateTextInline]
-
-    def has_module_permission(self, request, obj=None):
-        return utils.can_access_certificate_admin(request.user)
-
-    def has_add_permission(self, request, obj=None):
-        return utils.can_access_certificate_admin(request.user)
-
-    def has_change_permission(self, request, obj=None):
-        return utils.can_access_certificate_admin(request.user)
 
     def get_link(self, obj):
         if obj.image:

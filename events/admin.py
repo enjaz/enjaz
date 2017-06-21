@@ -2,7 +2,7 @@
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ObjectDoesNotExist
-from certificates.admin import certificate_admin
+from certificates.admin import certificate_admin, CertificateAdminPermission
 from ckeditor.widgets import CKEditorWidget
 from core.admin import ModelAdminReadOnly
 from core.forms import OptionalForm
@@ -98,7 +98,7 @@ class AbstractPosterInline(admin.TabularInline):
 class SurveyQuestionInline(admin.TabularInline):
     model= models.SurveyQuestion
 
-class SurveyAnswerInline(admin.TabularInline):
+class SurveyAnswerInline(CertificateAdminPermission, admin.TabularInline):
     model= models.SurveyAnswer
     exclude = ['text_value', 'numerical_value']
     readonly_fields = ['question', 'get_value']
@@ -153,7 +153,7 @@ class QustionSessionAdmin(admin.ModelAdmin):
     list_filter = ['event']
     inlines = [QuestionInline]
 
-class SurveyAdmin(admin.ModelAdmin):
+class SurveyAdmin(CertificateAdminPermission, admin.ModelAdmin):
     search_fields = ['name', 'mandatory_sessions__event__official_name',
                      'optional_sessions__event__official_name']
     list_filter = ['mandatory_sessions__event',
@@ -161,7 +161,7 @@ class SurveyAdmin(admin.ModelAdmin):
     list_display = ['__unicode__', 'get_response_count']
     inlines = [SurveyQuestionInline]
 
-class SurveyResponseAdmin(ModelAdminReadOnly, admin.ModelAdmin):
+class SurveyResponseAdmin(CertificateAdminPermission, ModelAdminReadOnly, admin.ModelAdmin):
     search_fields = ['survey__name'] + BASIC_SEARCH_FIELDS
     list_filter = ['survey', 'session__event']
     fields = []

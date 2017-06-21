@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^tedx/admin/', include(tedx_admin.urls)),
     url(r'^tedx/', include('tedx.urls', namespace="tedx")),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^admin/', include('loginas.urls')),
     url(r'^admin/', include(admin.site.urls)),
     activity_forms_urls,
     url(r'^activities/admin/', include(invitation_admin.urls)),

@@ -104,7 +104,7 @@ ones) deal with the User model."""
                     'get_en_full_name', 'get_college', 'student_id',
                     'badge_number', 'email', 'mobile_number',
                     'is_active', 'is_coordinator', 'date_joined')
-
+    change_form_template = 'loginas/change_form.html'
     list_filter = (EmployeeFilter, CoordinatorFilter, CollegeFilter,
                    SectionFilter)
     actions = [make_active]

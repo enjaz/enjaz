@@ -649,6 +649,9 @@ class Survey(models.Model):
     date_submitted = models.DateTimeField(u"تاريخ الإرسال",
                                           auto_now_add=True)
 
+    def get_response_count(self):
+        return self.responses.count()
+
     def __unicode__(self):
         return self.name
 
@@ -694,6 +697,9 @@ class SurveyAnswer(models.Model):
     numerical_value = models.IntegerField(u"القيمة الرقمية",
                                           blank=True, null=True)
     text_value = models.TextField(u"القيمة النصية")
+
+    def get_value(self):
+        return self.text_value or self.numerical_value
 
     def __unicode__(self):
         return u"{}'s answer to {}".format(self.survey_response.user.username, self.question.text)

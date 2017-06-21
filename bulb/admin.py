@@ -5,7 +5,8 @@ from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.html import format_html
 
-from bulb import models, utils
+from core.admin import ModelAdminReadOnly
+from . import models, utils
 
 class BulbAuthenticationForm(AdminAuthenticationForm):
     def confirm_login_allowed(self, user):
@@ -104,10 +105,6 @@ class BulbModelAdmin(admin.ModelAdmin):
         return utils.is_bulb_coordinator_or_deputy(request.user) or \
                utils.is_bulb_member(request.user) or \
                request.user.is_superuser
-
-class ModelAdminReadOnly:
-    def get_readonly_fields(self, request, obj=None):
-        return [field.name for field in self.model._meta.fields]
 
 class RecruitmentAdmin(BulbModelAdmin):
     list_display = ['get_full_ar_name', 'get_email',

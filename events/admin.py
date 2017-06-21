@@ -2,15 +2,17 @@
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ObjectDoesNotExist
+from certificates.admin import certificate_admin
 from ckeditor.widgets import CKEditorWidget
+from core.admin import ModelAdminReadOnly
 from core.forms import OptionalForm
 from core.utils import BASIC_SEARCH_FIELDS
 from . import models
 
+
 def mark_deleted(modeladmin, request, queryset):
     queryset.update(is_deleted=True)
 mark_deleted.short_description = u"علم السجلات المُحدّدة أنها محذوفة (دون إزالتها من قاعدة البيانات)"
-
 
 class AbstractFigureInline(admin.TabularInline):
     model = models.AbstractFigure
@@ -97,6 +99,8 @@ class SurveyQuestionInline(admin.TabularInline):
 
 class SurveyAnswerInline(admin.TabularInline):
     model= models.SurveyAnswer
+    exclude = ['text_value', 'numerical_value']
+    readonly_fields = ['question', 'get_value']
 
 class AbstractAdmin(admin.ModelAdmin):
     search_fields = BASIC_SEARCH_FIELDS + ["email", "title"]
@@ -155,12 +159,10 @@ class SurveyAdmin(admin.ModelAdmin):
     list_display = ['__unicode__', 'get_response_count']
     inlines = [SurveyQuestionInline]
 
-    def get_response_count(self, obj):
-        return obj.responses.count()
-
-class SurveyResponseAdmin(admin.ModelAdmin):
+class SurveyResponseAdmin(ModelAdminReadOnly, admin.ModelAdmin):
     search_fields = ['survey__name'] + BASIC_SEARCH_FIELDS
     list_filter = ['survey', 'session__event']
+    fields = []
     inlines = [SurveyAnswerInline]
 
 admin.site.register(models.Event, EventAdmin)
@@ -179,3 +181,5 @@ admin.site.register(models.Attendance, AttendanceAdmin)
 admin.site.register(models.QuestionSession, QustionSessionAdmin)
 admin.site.register(models.Survey, SurveyAdmin)
 admin.site.register(models.SurveyResponse, SurveyResponseAdmin)
+certificate_admin.register(models.Survey, SurveyAdmin)
+certificate_admin.register(models.SurveyResponse, SurveyResponseAdmin)

@@ -8,6 +8,7 @@ from core.admin import ModelAdminReadOnly
 from core.forms import OptionalForm
 from core.utils import BASIC_SEARCH_FIELDS
 from . import models
+import events.forms
 
 
 def mark_deleted(modeladmin, request, queryset):
@@ -106,7 +107,7 @@ class AbstractAdmin(admin.ModelAdmin):
     search_fields = BASIC_SEARCH_FIELDS + ["email", "title"]
     actions = [mark_deleted]
     list_filter = ["event", "is_deleted"]
-    readonly_fields = ['user']
+    form = events.forms.AbstractForm
     inlines = [AbstractFigureInline,AbstractPosterInline]
     filter_horizontal = ('evaluators',)
     introduction = forms.CharField(widget=CKEditorWidget())
@@ -120,9 +121,10 @@ class SessionGroupAdmin(admin.ModelAdmin):
     list_display = ['title', 'event']
 
 class AttendanceAdmin(admin.ModelAdmin):
+    form = events.forms.AttendanceAdminForm
     list_filter = ['session_registration__session__event', 'category', 'is_deleted']
     list_display = ['__unicode__', 'category', 'date_submitted', 'is_deleted']
-    readonly_fields = ['session_registration', 'submitter']
+    readonly_fields = ['session_registration']
     actions = [mark_deleted]
     search_fields = ['session_registration__' + field
                      for field in BASIC_SEARCH_FIELDS]
@@ -139,7 +141,7 @@ class SessionAdmin(admin.ModelAdmin):
                      'event__english_name']
 
 class SessionRegistrationAdmin(admin.ModelAdmin):
-    readonly_fields = ['user']
+    form = events.forms.SessionRegistrationAdminForm
     actions = [mark_deleted]
     list_display = ['__unicode__',  'is_approved', 'is_deleted',
                     'date_submitted']

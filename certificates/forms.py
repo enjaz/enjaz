@@ -1,7 +1,8 @@
 # -*- coding: utf-8  -*-
 from activities.models import Episode
-from certificates.models import Certificate, CertificateTemplate, CertificateRequest, TextPosition
-from certificates import utils
+from core.forms import UserAutocompleteFormMeta
+from .models import Certificate, CertificateTemplate, CertificateRequest, TextPosition
+from . import utils
 from dal import autocomplete
 from django import forms
 from django.forms import  inlineformset_factory
@@ -69,13 +70,6 @@ PositionFormset =  inlineformset_factory(CertificateTemplate, TextPosition,
                                                  'size', 'color'),
                                          widgets={'color': forms.TextInput(attrs={'class': 'jscolor english-field'})})
 
-
-
-
 class CertificateForm(forms.ModelForm):
-    class Meta:
+    class Meta(UserAutocompleteFormMeta):
         model = Certificate
-        fields = ('__all__')
-        widgets = {
-            'user': autocomplete.ModelSelect2(url='user-autocomplete', attrs={'data-html': 'true'})
-        }

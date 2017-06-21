@@ -5,12 +5,12 @@ from django.forms.widgets import TextInput
 from django.utils.html import format_html
 
 from accounts.utils import get_user_gender
-from core.forms import HeaderWidget
-from events.models import NonUser, Session, Registration, Abstract, \
-                          AbstractFigure, Initiative, InitiativeFigure, \
-                          Criterion, CriterionValue, Evaluation,CaseReport, \
-                          AbstractPoster, Attendance, Question, SurveyQuestion, \
-                          SurveyResponse, SurveyAnswer
+from core.forms import UserAutocompleteFormMeta, HeaderWidget
+from .models import NonUser, Session, Registration, Abstract, \
+    AbstractFigure, Initiative, InitiativeFigure, \
+    Criterion, CriterionValue, Evaluation,CaseReport, \
+    AbstractPoster, Attendance, Question, SurveyQuestion, \
+    SurveyResponse, SurveyAnswer, SessionRegistration
 from django.forms.models import inlineformset_factory
 
 class NonUserForm(forms.ModelForm):
@@ -275,3 +275,15 @@ class SurveyForm(forms.Form):
 
         if not response.answers.exists():
             response.delete()
+
+class AbstractAdminForm(forms.ModelForm):
+    class Meta(UserAutocompleteFormMeta):
+        model = Abstract
+
+class AttendanceAdminForm(forms.ModelForm):
+    class Meta(UserAutocompleteFormMeta):
+        model = Attendance
+
+class SessionRegistrationAdminForm(forms.ModelForm):
+    class Meta(UserAutocompleteFormMeta):
+        model = SessionRegistration

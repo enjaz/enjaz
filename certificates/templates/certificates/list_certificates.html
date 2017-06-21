@@ -23,6 +23,13 @@
                 </button>
                 {% else %}
                 <a class="btn btn-success" href="{% url 'certificates:download_certificate' certificate.verification_code %}"><i class="fa fa-download" aria-hidden="true"></i> تنزيل</a>
+{% if certificate.is_related_to_session and not certificate.content_object|has_optional_survey_to_fill:user and not certificate.content_object|has_mandatory_survey_to_fill:user %}
+                <button style="display: none;" data-session-title="{{ certificate.content_object.name }}" data-session-pk="{{ certificate.content_object.pk }}" data-url="{% url 'events:handle_survey' certificate.content_object.pk 'optional' %}" class="survey btn btn-icon btn-warning">
+
+                    <i class="entypo-pencil"></i>
+                   ساعدنا عبر تعبئة الاستبيان!
+                </button>
+{% endif %}
                 {% endif %}
                 {% if certificate.is_related_to_session and certificate.content_object|has_optional_survey_to_fill:user and not certificate.content_object|has_mandatory_survey_to_fill:user %}
                 <button data-session-title="{{ certificate.content_object.name }}" data-session-pk="{{ certificate.content_object.pk }}" data-url="{% url 'events:handle_survey' certificate.content_object.pk 'optional' %}" class="survey btn btn-icon btn-warning">

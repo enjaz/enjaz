@@ -1,0 +1,46 @@
+# -*- coding: utf-8  -*-
+from django.db import models
+from django.contrib.auth.models import User
+from core.models import StudentClubYear
+from clubs.models import city_choices, gender_choices, Club, College
+
+#'S' in Teams for no clashing with Team in clubs.models
+class Teams(models.Model):
+    ar_name = models.CharField(max_length=200, verbose_name=u"الاسم")
+    en_name = models.CharField(max_length=200, verbose_name=u"الاسم الإنجليزي")
+    code_name = models.CharField(max_length=200, verbose_name=u"الاسم البرمجي")
+    email = models.EmailField(max_length=254, verbose_name=u"البريد الإلكتروني")
+    year = models.ForeignKey(StudentClubYear, null=True, blank=True,
+                             on_delete=models.SET_NULL, default=None,
+                             verbose_name=u"السنة",
+                             related_name='teams_of_year')#TODO: find better name =P
+    city = models.CharField(max_length=20, choices=city_choices, verbose_name=u"المدينة")
+    gender = models.CharField(max_length=1, choices=gender_choices,
+                              verbose_name=u"الجنس", blank=True,
+                              default="")
+    club = models.ForeignKey(Club, null=True, blank=True,
+                             verbose_name=u"النادي المتصل",
+                             related_name='club_teams') #TODO: find better name =P
+    coordinator = models.ForeignKey(User, null=True,
+                                    blank=True,
+                                    verbose_name=u"المنسق",
+                                    related_name="teams_coordination",
+                                    on_delete=models.SET_NULL)
+    members = models.ManyToManyField(User, verbose_name=u"الأعضاء",
+                                     blank=True,
+                                     related_name="teams_memberships")
+    #TODO: category needs options
+    category= models.CharField(max_length=1)
+    is_visible= models.BooleanField(default=True, verbose_name=u"مرئي؟")
+    logo = models.ImageField(upload_to='clubs/logos/',
+                              blank=True, null=True)
+    parent = models.ForeignKey('self', null=True, blank=True,
+                               related_name="children",
+                               on_delete=models.SET_NULL,
+                               default=None, verbose_name=u"النادي الأب")
+                                                           #نادي أم فريق؟
+    college = models.ForeignKey(College, null=True, blank=True,
+                                 on_delete=models.SET_NULL,
+                                 default=None,
+                                 verbose_name=u"الكلية",)
+    description = models.TextField(verbose_name=u"الوصف", blank=True)

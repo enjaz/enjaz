@@ -54,6 +54,8 @@ urlpatterns = [
     url(r'^certificates/admin/', include(certificate_admin.urls)),
     url(r'^certificates/', include('certificates.urls', namespace="certificates")),
     url(r'^tagging_autocomplete/', include('tagging_autocomplete.urls')),
+
+    url(r'^teams/', include('teams.urls', namespace="teams")),
 ]
 
 if settings.DEBUG:

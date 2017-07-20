@@ -1,0 +1,20 @@
+{% extends "teams_base.html" %}
+{% block title %}قائمة الفرق{% endblock %}
+
+{% block content %}
+
+    {% for team_city, teams in per_city %}
+        <h3>فِرق {{team_city}}</h3>
+        {% for team in teams %}
+            <a href="{% url 'teams:show_info' team.pk %}">{{ team.ar_name }}</a>
+        {% endfor %}
+    {% endfor %}
+
+    <!--let's think about javascript later-->
+    <div id="info-card"></div>
+
+{% endblock %}
+
+{% block customscript %}
+
+{% endblock %}

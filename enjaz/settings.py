@@ -70,6 +70,7 @@ INSTALLED_APPS = (
     'studentvoice',
     'tagging',
     'tagging_autocomplete',
+    'teams',
     'tedx',
     'userena',
     'wkhtmltopdf',

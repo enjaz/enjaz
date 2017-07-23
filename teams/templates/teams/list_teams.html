@@ -11,17 +11,19 @@
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
                 <div class="panel panel-bd">
                     <div class="panel panel-default">
-                    <div class="panel-body">
-                        <!--I'm not sure how the teams' logos will be saved-->
-                        <!-- <img src="-logo.png"><br>  -->
-                        <a href="{% url 'teams:show_info' team.pk %}">{{ team.ar_name }}</a><br>
-                        {{team.description|truncatewords:20}}
+                    <div class="panel-body text-center">
+                      {% if team.logo %}
+                        <img src="{{ team.logo.url }}" style="max-width: 120px;"><br>
+                      {% endif %}
+                        <a href="{% url 'teams:show' team.pk %}">{{ team.ar_name }}</a><br>
+                        <p style="word-wrap:break-word;">{{team.description|truncatewords:20}} </p>
                     </div>
                     </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+
     {% endfor %}
 
     <!--let's think about javascript later-->

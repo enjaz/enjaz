@@ -1,8 +1,13 @@
 {% extends 'base.html' %}
 {% block title %}{% endblock %}
-{% block pageheaderurl %}{% endblock %}
-{% block pageheader %}{% endblock %}
-{% block navbar %}{% endblock %}
+{% block pageheaderurl %}{% url 'teams:list_teams' %}{% endblock %}
+{% block pageheader %}الفِرق{% endblock %}
+
+{% block navbar %}
+	{% if perms.teams.add_teams %}
+		<li><a href="{% url 'teams:create' %}"><span class="glyphicon glyphicon-plus"></span>أضف فريقًا</a></li>
+	{% endif %}
+{% endblock %}
 
 {% block content %}{% endblock %}
 

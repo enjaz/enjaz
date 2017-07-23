@@ -1,0 +1,63 @@
+{% extends "teams_base.html" %}{% load staticfiles %}{% load l10n %}
+{% block title %}بيانات الفريق{% endblock %}
+
+{% block content %}
+
+<div class="text-center">
+  <h2>{{ team.ar_name }}</h2>
+   <img src="{{ team.logo.url }}" style="max-width: 120px;">
+</div>
+
+<div class="row">
+<div class="col-md-8">
+<table class="tg table-hover table">
+  <colgroup>
+    <col class="col-xs-2">
+    <col class="col-xs-6">
+  </colgroup>
+  <tr>
+    <th>الاسم الإنجليزي</th>
+    <td class="english-field">{{ team.en_name }}</td>
+  </tr>{% if team.description %}
+  <tr>
+    <th>الوصف</th>
+    <td>{{ team.description }}</td>
+  </tr>
+{% endif %}  <tr>
+    <th>البريد الإلكتروني</th>
+    <td class="english-field">{{ team.email }}</td>
+  </tr>
+  <tr>
+    <th>المنسق</th>
+    <td>{% if team.coordinator %} {{ team.coordinator.common_profile.get_ar_full_name|default:team.coordinator.username }} {% else %} لا يوجد {% endif %}</td>
+  </tr>
+</table>
+</div>
+<div class="col-md-4">
+	<div class="panel panel-primary" data-collapsed="0">
+		<!-- panel head -->
+		<div class="panel-heading">
+			<div class="panel-title">خيارات</div>
+		</div>
+
+		<!-- panel body -->
+		<div class="panel-body">
+			<p style="font-size:1em;"><ul class="list-unstyled">
+        {% if can_edit %}<li><a href="{% url 'teams:edit' team.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>{% endif %}
+
+      <!--
+			<li><a href=""><span class="glyphicon glyphicon-gift"></span> تقييمات الأنشطة</a></li>
+			<li><a href=""><span class="entypo-users"></span> استعرض أعضاء النادي</a></li>
+			<li><a href=""><span class="entypo-users"></span> صلاحيات الأعضاء</a></li>
+			<li><a href=""><span class="glyphicon glyphicon-list-alt"></span> راجع طلبات الانضمام</a></li>
+			<li><a href=""><span class="glyphicon glyphicon-star"></span> انضم للنادي</a></li>
+      <li><a href=""><span class="entypo-docs"></span> النماذج</a></li>
+      -->
+
+			</ul></p>
+		</div>
+	</div>
+</div>
+</div>
+
+{% endblock %}

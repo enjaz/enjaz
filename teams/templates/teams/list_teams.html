@@ -1,12 +1,26 @@
-{% extends "teams_base.html" %}
+{% extends "teams_base.html" %}{% load staticfiles %}
 {% block title %}قائمة الفرق{% endblock %}
 
 {% block content %}
 
-    {% for team_city, teams in per_city %}
+    {% for team_city, team_cat, teams in per_city %}
         <h3>فِرق {{team_city}}</h3>
-        {% for team in teams %}
-            <a href="{% url 'teams:show_info' team.pk %}">{{ team.ar_name }}</a>
+        <h4>{{team_cat}}</h4>
+        <div class="row">
+            {% for team in teams %}
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+                <div class="panel panel-bd">
+                    <div class="panel panel-default">
+                    <div class="panel-body">
+                        <!--I'm not sure how the teams' logos will be saved-->
+                        <!-- <img src="-logo.png"><br>  -->
+                        <a href="{% url 'teams:show_info' team.pk %}">{{ team.ar_name }}</a><br>
+                        {{team.description|truncatewords:20}}
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endfor %}
     {% endfor %}
 

@@ -1,11 +1,13 @@
-{% extends "teams_base.html" %}{% load staticfiles %}{% load l10n %}
+{% extends "teams_base.html" %}{% load staticfiles %}{% load l10n %}{% load bootstrap3 %}
 {% block title %}بيانات الفريق{% endblock %}
 
 {% block content %}
 
 <div class="text-center">
   <h2>{{ team.ar_name }}</h2>
+    {% if teams.logo %}
    <img src="{{ team.logo.url }}" style="max-width: 120px;">
+{% endif %}
 </div>
 
 <div class="row">
@@ -43,7 +45,24 @@
 		<!-- panel body -->
 		<div class="panel-body">
 			<p style="font-size:1em;"><ul class="list-unstyled">
-        {% if can_edit %}<li><a href="{% url 'teams:edit' team.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>{% endif %}
+        {% if can_edit %}<li><a href="{% url 'teams:edit' team.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
+          <br>
+            <form method="post" data-team_pk='{{ team.pk }}' enctype="multipart/form-data" id="add-members-form" action="post">
+
+            {% bootstrap_form_errors form %}
+            {% csrf_token %}
+           <div class="form-group has-feedback has-feedback-left">
+            <label class="control-label">أضف أعضاء:</label>
+			{% bootstrap_field form.members show_label=False %}
+			<div class="form-control-feedback">
+				<i class=""></i>
+			</div>
+            <button id='add_members' type="submit" class="btn btn-primary">
+                    أضف
+           </button>
+		</div>
+          </form>
+        {% endif %}
 
       <!--
 			<li><a href=""><span class="glyphicon glyphicon-gift"></span> تقييمات الأنشطة</a></li>
@@ -61,3 +80,39 @@
 </div>
 
 {% endblock %}
+{% block customscript %}
+
+    <script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
+    <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+    <script type="text/javascript">
+    $(function() {
+        $("form#add-members-form").submit(function (event) {
+        /* stop form from submitting normally */
+            event.preventDefault();
+            /* get some values from elements on the page: */
+            var formData = new FormData($(this)[0]);
+            /* Send the data */
+            $.ajax({
+                url: "{% url 'teams:add_members' team.pk %}",
+                type: 'POST',
+                data: formData,
+                cache: false,
+                contentType: false,
+                enctype: 'multipart/form-data',
+                processData: false,
+                success: function (data) {
+                    if (data.message == "success") {
+                        // show success message (using toastr)
+                        toastr.options.positionClass = "toast-top-left";
+                        toastr.success("لقدت تمت إضافة الاعضاء للفريق" );
+                    } else {
+                        toastr.warning("There was an issue! " + data.message);
+                    }
+                }
+            });
+        });
+    });
+        </script>
+ {% endblock %}

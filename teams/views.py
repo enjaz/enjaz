@@ -1,3 +1,5 @@
+from lib2to3.pgen2.driver import load_grammar
+
 from django.db.utils import OperationalError
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
@@ -12,6 +14,8 @@ from .models import Teams, category_choices
 from clubs.models import city_choices
 from .utils import is_coordinator
 from .forms import DisabledTeamForm, TeamForm
+from core import decorators
+from . import forms
 
 
 def list_teams(request):
@@ -30,19 +34,24 @@ def list_teams(request):
     context = {'per_city': per_city}
     return render(request, 'teams/list_teams.html', context)
 
+
 def show_info(request, team_id):
     team = get_object_or_404(Teams, pk=team_id)
     context = {'team': team}
     return render(request, 'teams/infocard.html', context)
 
+
+@decorators.get_only
 def show(request, team_id):
     team = get_object_or_404(Teams, pk=team_id)
+    form = forms.AddTeamMembersForm(instance=team)
 
     can_edit = is_coordinator(team, request.user) or \
                 request.user.is_superuser
 
     context = {'team': team,
-                'can_edit': can_edit}
+               'can_edit': can_edit,
+               'form':form}
     return render(request, 'teams/show.html', context)
 
 @login_required
@@ -54,7 +63,7 @@ def create(request):
         if form.is_valid():
             print form.cleaned_data
             form.save()
-            return HttpResponseRedirect(reverse('teams:list'))
+            return HttpResponseRedirect(reverse('teams:list_teams'))
         else:
             context = {'form': form}
             return render(request, 'teams/new.html', context)
@@ -91,3 +100,31 @@ def edit(request, team_id):
             form = TeamForm(instance=exisiting_team)
         context = {'form': form, 'team_id': team_id}
         return render(request, 'teams/new.html', context)
+
+
+@decorators.ajax_only
+@csrf.csrf_exempt
+@decorators.post_only
+@login_required
+def add_members(request,team_id):
+
+    team = get_object_or_404(Teams, pk=team_id)
+    ar_name=team.ar_name
+
+    if not request.user == team.coordinator and \
+       not request.user.is_superuser:
+       raise PermissionDenied
+
+    context={}
+
+    if request.method == 'POST':
+        form = forms.AddTeamMembersForm(request.POST,instance=team)
+        if form.is_valid():
+            form.save()
+            return {"message": "success"}
+    context['form'] = form
+
+    return render(request, 'teams/show.html', context)
+
+
+

@@ -43,3 +43,8 @@ class DisabledTeamForm(TeamForm):
                     cleaned_data[field] = getattr(self.instance, field)
 
         return cleaned_data
+
+class AddTeamMembersForm(ModelForm):
+    class Meta:
+        model = Teams
+        fields = ['members']

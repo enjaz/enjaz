@@ -233,7 +233,11 @@ class SurveyAdmin(CertificateAdminPermission, admin.ModelAdmin):
         ws.append([ugettext(u"التاريخ و الوقت"), ugettext(u"المستخدم")] + [question.text for question in survey.survey_questions.all()])
 
         for response in survey.responses.all():
-            ws.append([response.date_submitted.strftime("%c"), response.user.username] + [answer.text_value for answer in response.answers.all()])
+            ws.append(
+                [response.date_submitted.strftime("%c"), response.user.username] + [
+                    answer.text_value if answer.question.category != 'S' else answer.numerical_value for answer in response.answers.all()
+                ]
+            )
 
         wb.save(output)
 

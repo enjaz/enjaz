@@ -6,6 +6,7 @@ from django import forms
 from django.conf.urls import url
 from django.contrib import admin
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -191,8 +192,16 @@ class SurveyAdmin(CertificateAdminPermission, admin.ModelAdmin):
                      'optional_sessions__event__official_name']
     list_filter = ['mandatory_sessions__event',
                    'optional_sessions__event']
-    list_display = ['__unicode__', 'get_response_count']
+    list_display = ['__unicode__', 'get_response_count', 'link_to_excel_results']
     inlines = [SurveyQuestionInline]
+
+    def link_to_excel_results(self, obj):
+        return '<a href="{}">{}</a>'.format(
+            reverse("admin:events_survey_results", args=(obj.id,)),
+            _(u"حمّل النتائج كملف إكسل")
+        )
+    link_to_excel_results.allow_tags = True
+    link_to_excel_results.short_description = _(u"النتائج")
 
     def get_urls(self):
         urlpatterns = super(SurveyAdmin, self).get_urls()

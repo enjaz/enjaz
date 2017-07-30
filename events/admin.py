@@ -230,13 +230,21 @@ class SurveyAdmin(CertificateAdminPermission, admin.ModelAdmin):
         ws = wb.active
 
         # TODO: Headers should probably be excluded
-        ws.append([ugettext(u"التاريخ و الوقت"), ugettext(u"المستخدم")] + [question.text for question in survey.survey_questions.all()])
+        questions = survey.survey_questions.all()
+        ws.append([ugettext(u"التاريخ و الوقت"), ugettext(u"المستخدم")] + [question.text for question in questions])
 
         for response in survey.responses.all():
+            values = []
+            for question in questions:
+                try:
+                    answer = response.answers.filter(question=question).get()
+                    value = answer.numerical_value if question.category == 'S' else answer.text_value
+                    values.append(value)
+                except ObjectDoesNotExist:
+                    values.append("")
+
             ws.append(
-                [response.date_submitted.strftime("%c"), response.user.username] + [
-                    answer.text_value if answer.question.category != 'S' else answer.numerical_value for answer in response.answers.all()
-                ]
+                [response.date_submitted.strftime("%c"), response.user.username] + values
             )
 
         wb.save(output)

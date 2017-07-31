@@ -9,6 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.utils.http import urlquote
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 from certificates.admin import certificate_admin, CertificateAdminPermission
@@ -223,24 +224,31 @@ class SurveyAdmin(CertificateAdminPermission, admin.ModelAdmin):
         output = HttpResponse(
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=utf-8'
         )
-        file_name = u"{} - {}".format(survey.name, _(u"النتائج"))
-        output['Content-Disposition'] = 'attachment; filename={}'.format("Survey Results.xlsx")
+        file_name = "{} - {}.xlsx".format(survey.name, _(u"النتائج"))
+        # `urlquote` encodes Arabic (Unicode) characters into the appropriate %XX codes
+        output['Content-Disposition'] = "attachment; filename={}".format(urlquote(file_name))
 
         wb = openpyxl.Workbook()
         ws = wb.active
 
-        # TODO: Headers should probably be excluded
         questions = survey.survey_questions.all()
         ws.append([ugettext(u"التاريخ و الوقت"), ugettext(u"المستخدم")] + [question.text for question in questions])
 
-        for response in survey.responses.all():
+        responses = survey.responses.all().prefetch_related('answers__question')
+
+        for response in responses:
             values = []
             for question in questions:
                 try:
-                    answer = response.answers.filter(question=question).get()
+                    # `next` returns the next item in a sequence
+                    # In this configuration, it's going to return the first element that matches the `if` condition
+                    # This has a big performance advantage
+                    # Check: https://stackoverflow.com/a/9868665
+                    # and: https://stackoverflow.com/a/2364277
+                    answer = next(answer for answer in response.answers.all() if answer.question == question)
                     value = answer.numerical_value if question.category == 'S' else answer.text_value
                     values.append(value)
-                except ObjectDoesNotExist:
+                except StopIteration:
                     values.append("")
 
             ws.append(

@@ -224,7 +224,7 @@ class SurveyAdmin(CertificateAdminPermission, admin.ModelAdmin):
         output = HttpResponse(
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=utf-8'
         )
-        file_name = "{} - {}.xlsx".format(survey.name, _(u"النتائج"))
+        file_name = "{} - {}.xlsx".format(survey.name.encode('utf-8'), _(u"النتائج"))
         # `urlquote` encodes Arabic (Unicode) characters into the appropriate %XX codes
         output['Content-Disposition'] = "attachment; filename={}".format(urlquote(file_name))
 
@@ -232,7 +232,7 @@ class SurveyAdmin(CertificateAdminPermission, admin.ModelAdmin):
         ws = wb.active
 
         questions = survey.survey_questions.all()
-        ws.append([ugettext(u"التاريخ و الوقت"), ugettext(u"المستخدم")] + [question.text for question in questions])
+        ws.append([ugettext(u"التاريخ"), ugettext(u"الوقت"), ugettext(u"المستخدم")] + [question.text for question in questions])
 
         responses = survey.responses.all().prefetch_related('answers__question')
 
@@ -252,7 +252,7 @@ class SurveyAdmin(CertificateAdminPermission, admin.ModelAdmin):
                     values.append("")
 
             ws.append(
-                [response.date_submitted.strftime("%c"), response.user.username] + values
+                [response.date_submitted.strftime("%m/%d/%Y"), response.date_submitted.strftime("%H:%M:%S"), response.user.username] + values
             )
 
         wb.save(output)

@@ -6,7 +6,7 @@ from approvals.models import ActivityRequest
 
 
 class SubmitActivityCreateRequest(generic.detail.SingleObjectTemplateResponseMixin, generic.base.ContextMixin, generic.edit.ProcessFormView):
-    template_name = "approvals/submit_activity_create_request.html"
+    template_name = "approvals/submit-activity-create-request.html"
 
     def get_context_data(self, **kwargs):
         context = super(SubmitActivityCreateRequest, self).get_context_data(**kwargs)
@@ -19,7 +19,7 @@ class SubmitActivityCreateRequest(generic.detail.SingleObjectTemplateResponseMix
     def get(self, request, *args, **kwargs):
         return self.render_to_response(self.get_context_data())
 
-    def post(self, **kwargs):
+    def post(self, request, *args, **kwargs):
         activity_request_form = ActivityCreateRequestForm(self.request.POST, instance=ActivityRequest())
         event_request_formset = EventRequestFormSet(self.request.POST, instance=activity_request_form.instance)
 
@@ -28,7 +28,7 @@ class SubmitActivityCreateRequest(generic.detail.SingleObjectTemplateResponseMix
             event_request_formset.save()
             return redirect("/")
 
-        return render(self.request, self.template_name, self.get_context_data().update({
+        return self.render_to_response(self.get_context_data().update({
             'activity_request_form': activity_request_form,
             'event_request_formset': event_request_formset,
         }))

@@ -25,8 +25,7 @@ class ActivityRequest(AbstractRequest):
         null=True, blank=True,
     )
 
-    name = models.CharField(_(u"اسم النشاط"), max_length=200)
-    description = ckeditor.fields.RichTextField(_(u"وصف النشاط"))
+    name = models.CharField(_(u"العنوان"), max_length=200)
 
     # This is a flag to distinguish update from creation requests
     is_update_request = models.BooleanField(
@@ -75,12 +74,12 @@ class DescriptionField(AbstractRequestAttachment):
 
 
 class EventRequest(AbstractRequestAttachment):
-    label = models.CharField(max_length=50)
-    description = models.CharField(max_length=200)
-    date = models.DateField()
-    start_time = models.TimeField()
-    end_time = models.TimeField()
-    location = models.CharField(max_length=50)
+    label = models.CharField(_(u"العنوان"), max_length=50)
+    description = models.CharField(_(u"الوصف"), max_length=200)
+    date = models.DateField(_(u"التاريخ"))
+    start_time = models.TimeField(_(u"وقت البداية"))
+    end_time = models.TimeField(_(u"وقت النهاية"))
+    location = models.CharField(_(u"المكان"), max_length=50)
 
     class Meta:
         verbose_name = _(u"طلب فعالية")

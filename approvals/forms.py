@@ -8,7 +8,7 @@ class ActivityCreateRequestForm(forms.ModelForm):
 
     class Meta:
         model = ActivityRequest
-        fields = '__all__'
+        fields = ['name']
 
 
 class ActivityUpdateRequestForm(forms.ModelForm):

@@ -1,11 +1,11 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.views import generic
 
 from approvals.forms import ActivityCreateRequestForm, EventRequestFormSet
 from approvals.models import ActivityRequest
 
 
-class SubmitActivityCreateRequest(generic.detail.SingleObjectTemplateResponseMixin, generic.base.ContextMixin, generic.edit.ProcessFormView):
+class SubmitActivityCreateRequest(generic.TemplateView):
     template_name = "approvals/submit-activity-create-request.html"
 
     def get_context_data(self, **kwargs):

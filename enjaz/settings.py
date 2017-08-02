@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'accounts',
     'activities',
+    'activities2',
     'api',
     'bootstrap3',
     'bulb',

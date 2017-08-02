@@ -11,6 +11,6 @@ static_files/
 *.sqlite3
 *~
 *#
-*csv
 *xlsx
 .idea/
+venv/

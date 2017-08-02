@@ -18,6 +18,7 @@ from tedx.admin import tedx_admin
 
 urlpatterns = [
     url(r'^', include('core.urls')),
+    url(r'^approvals/', include('approvals.urls')),
     url(r'^api/', include('api.urls')),
     url(r'^tedx/admin/', include(tedx_admin.urls)),
     url(r'^tedx/', include('tedx.urls', namespace="tedx")),

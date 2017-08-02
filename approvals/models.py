@@ -20,8 +20,8 @@ class ActivityRequest(AbstractRequest):
     # field. For activity update requests, it should be set to the activity that is going to be
     # updated.
     activity = models.ForeignKey(
-        _(u"النشاط"),
-        to='activities2.Activity',
+        'activities2.Activity',
+        verbose_name=_(u"النشاط"),
         null=True, blank=True,
     )
 
@@ -45,8 +45,8 @@ class ActivityRequest(AbstractRequest):
 
 class ActivityCancelRequest(AbstractRequest):
     activity = models.ForeignKey(
-        _(u"النشاط"),
-        to='activities2.Activity',
+        'activities2.Activity',
+        verbose_name=_(u"النشاط"),
     )
 
     class Meta:
@@ -56,8 +56,8 @@ class ActivityCancelRequest(AbstractRequest):
 
 class AbstractRequestAttachment(models.Model):
     activity_request = models.ForeignKey(
-        _(u"طلب النشاط"),
-        to='approvals.ActivityRequest',
+        'approvals.ActivityRequest',
+        verbose_name=_(u"طلب النشاط"),
         related_name='%(class)ss'
     )
 
@@ -74,7 +74,7 @@ class DescriptionField(AbstractRequestAttachment):
         verbose_name_plural = _(u"حقول وصفية")
 
 
-class EventSubRequest(AbstractRequestAttachment):
+class EventRequest(AbstractRequestAttachment):
     label = models.CharField(max_length=50)
     description = models.CharField(max_length=200)
     date = models.DateField()

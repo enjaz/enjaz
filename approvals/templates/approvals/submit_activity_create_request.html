@@ -1,0 +1,20 @@
+{% extends "activities_base.html" %}{% load bootstrap3 %}
+{% block title %}ارفع طلب نشاط{% endblock %}
+
+{% block content %}
+<form action="" method="post" class="form" enctype="multipart/form-data">
+  {% csrf_token %}
+
+	{% bootstrap_form activity_request_form %}
+
+  {% bootstrap_formset event_request_formset %}
+
+  {% buttons %}
+    <button type="submit" class="btn btn-primary btn-block">
+      {% bootstrap_icon "ok-sign" %} أرسل
+    </button>
+  {% endbuttons %}
+
+</form>
+
+{% endblock %}

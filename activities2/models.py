@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from forms_builder.forms.models import Form
 
-<<<<<<< HEAD
 
 class Events(models.Model):
     activity= models.ForeignKey('Activity')
@@ -17,8 +16,6 @@ class Events(models.Model):
     short_description= models.CharField(max_length=128, verbose_name= "Short description of the event")
  
 
-    
-=======
 class Activity(models.Model):
     primary_club = models.ForeignKey('clubs.Club', null=True,
                                      on_delete=models.SET_NULL,
@@ -79,5 +76,3 @@ class Activity(models.Model):
         )
     is_approved = models.NullBooleanField(verbose_name=u"الحالة",
                                           choices=is_approved_choices)
->>>>>>> 84e3c29aef90cedb79c3a78aa1d06742ed035b2c
-# Create your models here.

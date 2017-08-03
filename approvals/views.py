@@ -16,9 +16,6 @@ class SubmitActivityCreateRequest(generic.TemplateView):
         })
         return context
 
-    def get(self, request, *args, **kwargs):
-        return self.render_to_response(self.get_context_data())
-
     def post(self, request, *args, **kwargs):
         activity_request_form = ActivityCreateRequestForm(self.request.POST, instance=ActivityRequest())
         event_request_formset = EventRequestFormSet(self.request.POST, instance=activity_request_form.instance)

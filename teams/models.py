@@ -4,14 +4,14 @@ from django.contrib.auth.models import User
 from core.models import StudentClubYear
 from clubs.models import city_choices, gender_choices, Club, College
 
-category_choices = (
+CATEGORY_CHOICES = (
     ('CC', 'نادي كلية'),
     ('SC', 'نادي متخصص'),
     ('I', 'مبادرة'),
     ('P', 'برنامج عام'),
     ('CD', 'عمادة كلية'),
     ('SA', 'عمادة شؤون الطلاب'),
-    ('P', 'رئاسة')
+    ('P', 'رئاسة نادي الطلاب')
     )
 
 #'S' in Teams for no clashing with Team in clubs.models
@@ -28,18 +28,18 @@ class Teams(models.Model):
     gender = models.CharField(max_length=1, choices=gender_choices,
                               verbose_name=u"الجنس", blank=True,
                               default="")
-    coordinator = models.ForeignKey(User, null=True,
+    leader = models.ForeignKey(User, null=True,
                                     blank=True,
                                     verbose_name=u"المنسق",
-                                    related_name="teams_coordination",
+                                    related_name="teams_leader",
                                     on_delete=models.SET_NULL)
     members = models.ManyToManyField(User, verbose_name=u"الأعضاء",
                                      blank=True,
-                                     related_name="teams_memberships")
-    category = models.CharField(max_length=2, choices=category_choices,
+                                     related_name="teams")
+    category = models.CharField(max_length=2, choices=CATEGORY_CHOICES,
                                verbose_name=u"نوع الفريق")
     is_visible= models.BooleanField(default=True, verbose_name=u"مرئي؟")
-    logo = models.ImageField(upload_to='clubs/logos/',
+    logo = models.ImageField(upload_to='teams/logos/',
                               blank=True, null=True)
     parent = models.ForeignKey('self', null=True, blank=True,
                                related_name="children",

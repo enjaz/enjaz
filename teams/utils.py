@@ -7,4 +7,4 @@ import accounts.utils
 
 def is_coordinator(teams, user):
     """Return whether the user is the coordinator of a given club or team."""
-    return teams.coordinator == user
+    return teams.leader == user

@@ -111,7 +111,7 @@ def add_members(request,team_id):
     team = get_object_or_404(Teams, pk=team_id)
     ar_name=team.ar_name
 
-    if not request.user == team.coordinator and \
+    if not request.user == team.leader and \
        not request.user.is_superuser:
        raise PermissionDenied
 

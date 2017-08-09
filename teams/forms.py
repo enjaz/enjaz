@@ -6,7 +6,7 @@ class TeamForm(ModelForm):
     class Meta:
         model = Teams
         fields = ['ar_name','en_name','description', 'email',
-                  'parent', 'coordinator', 'city', 'gender',
+                  'parent', 'leader', 'city', 'gender',
                   'category', 'logo', 'is_visible']
     def clean(self):
         # Remove spaces at the start and end of all text fields.

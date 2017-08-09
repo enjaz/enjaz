@@ -10,19 +10,19 @@ from django.core.exceptions import PermissionDenied
 from django.views.decorators import csrf
 
 from core.models import StudentClubYear
-from .models import Teams, category_choices
+from teams.models import Teams, CATEGORY_CHOICES
 from clubs.models import city_choices
-from .utils import is_coordinator
-from .forms import DisabledTeamForm, TeamForm
+from teams.utils import is_coordinator
+from teams.forms import DisabledTeamForm, TeamForm
 from core import decorators
-from . import forms
+from teams import forms
 
 
 def list_teams(request):
     current_year = StudentClubYear.objects.get_current()
     per_city = []
     for city_code, city_name in city_choices:
-        for cat_code, cat_name in category_choices:
+        for cat_code, cat_name in CATEGORY_CHOICES:
             try:
                 teams = Teams.objects.filter(year=current_year,
                                              city=city_code,

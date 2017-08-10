@@ -1,10 +1,10 @@
 from django.forms import ModelForm
-from .models import Teams
+from .models import Team
 
 
 class TeamForm(ModelForm):
     class Meta:
-        model = Teams
+        model = Team
         fields = ['ar_name','en_name','description', 'email',
                   'parent', 'leader', 'city', 'gender',
                   'category', 'logo', 'is_visible']
@@ -46,5 +46,5 @@ class DisabledTeamForm(TeamForm):
 
 class AddTeamMembersForm(ModelForm):
     class Meta:
-        model = Teams
+        model = Team
         fields = ['members']

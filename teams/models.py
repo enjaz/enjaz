@@ -14,8 +14,7 @@ CATEGORY_CHOICES = (
     ('P', 'رئاسة نادي الطلاب')
     )
 
-#'S' in Teams for no clashing with Team in clubs.models
-class Teams(models.Model):
+class Team(models.Model):
     ar_name = models.CharField(max_length=200, verbose_name=u"الاسم")
     en_name = models.CharField(max_length=200, verbose_name=u"الاسم الإنجليزي")
     code_name = models.CharField(max_length=200, verbose_name=u"الاسم البرمجي")

@@ -3,9 +3,10 @@
 
 {% block content %}
 
-    {% for team_city, team_cat, teams in per_city %}
-        <h3>فِرق {{team_city}}</h3>
-        <h4>{{team_cat}}</h4>
+    {% for team_city, team_cat, team in per_city %}
+        <h3>فِرق {{team_city}}</h3><br>
+        <h4>{{team_cat}}</h4><br>
+        {{team.ar_name}}<br>
         <div class="row">
             {% for team in teams %}
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">

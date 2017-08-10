@@ -8,4 +8,4 @@ class TeamAdmin(admin.ModelAdmin):
     list_display = ['ar_name', 'leader', 'city']
     search_fields = ['ar_name', 'en_name', 'year', 'city']
 
-admin.site.register(models.Teams, TeamAdmin)
+admin.site.register(models.Team, TeamAdmin)

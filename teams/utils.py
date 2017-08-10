@@ -1,10 +1,10 @@
 # -*- coding: utf-8  -*-
 """Utility functions related to the clubs app."""
-from .models import Teams
+from .models import Team
 from core.models import StudentClubYear
 import accounts.utils
 
 
-def is_coordinator(teams, user):
+def is_coordinator(team, user):
     """Return whether the user is the coordinator of a given club or team."""
-    return teams.leader == user
+    return team.leader == user

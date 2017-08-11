@@ -44,15 +44,17 @@ class ListView(generic.ListView):
         current_year = StudentClubYear.objects.get_current()
         per_city = []
         for city_code, city_name in city_choices:
+            per_category = []
             for cat_code, cat_name in CATEGORY_CHOICES:
                 try:
                     teams = Team.objects.filter(year=current_year,
                                                 city=city_code,
                                                 category=cat_code)
                     if teams.exists():
-                        per_city.append((city_name, cat_name, teams))
+                        per_category.append((cat_name, teams))
                 except ObjectDoesNotExist:
                     raise Http404
+            per_city.append((city_name, per_category))
         context['per_city'] = per_city
         return context
 

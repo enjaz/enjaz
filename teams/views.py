@@ -82,6 +82,8 @@ class CreateView(generic.CreateView):
     template_name = 'teams/new.html'
     success_url = 'teams:list_teams'
 
+    #TODO: set year automatically
+
     # can't decorate the class in django 1.8 like this:
     # @method_decorator(<decorator>, name='dispatch')
     # class CreateView(...): etc
@@ -93,18 +95,12 @@ class CreateView(generic.CreateView):
 
     def form_valid(self, form):
         """
-        If the form is valid...
+        If the form is valid,...
         """
         print form.cleaned_data
         self.object = form.save()
         return HttpResponseRedirect(reverse('teams:list_teams'))
 
-    def form_invalid(self, form):
-        """
-        If the form is invalid, re-render the context data with the
-        data-filled form and errors.
-        """
-        return self.render_to_response(self.get_context_data(form=form))
 
 @login_required
 def edit(request, team_id):

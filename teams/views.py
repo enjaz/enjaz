@@ -44,15 +44,17 @@ class ListView(generic.ListView):
         current_year = StudentClubYear.objects.get_current()
         per_city = []
         for city_code, city_name in city_choices:
+            per_category = []
             for cat_code, cat_name in CATEGORY_CHOICES:
                 try:
                     teams = Team.objects.filter(year=current_year,
                                                 city=city_code,
                                                 category=cat_code)
                     if teams.exists():
-                        per_city.append((city_name, cat_name, teams))
+                        per_category.append((cat_name, teams))
                 except ObjectDoesNotExist:
                     raise Http404
+            per_city.append((city_name, per_category))
         context['per_city'] = per_city
         return context
 
@@ -80,6 +82,8 @@ class CreateView(generic.CreateView):
     template_name = 'teams/new.html'
     success_url = 'teams:list_teams'
 
+    #TODO: set year automatically
+
     # can't decorate the class in django 1.8 like this:
     # @method_decorator(<decorator>, name='dispatch')
     # class CreateView(...): etc
@@ -91,18 +95,12 @@ class CreateView(generic.CreateView):
 
     def form_valid(self, form):
         """
-        If the form is valid...
+        If the form is valid,...
         """
         print form.cleaned_data
         self.object = form.save()
         return HttpResponseRedirect(reverse('teams:list_teams'))
 
-    def form_invalid(self, form):
-        """
-        If the form is invalid, re-render the context data with the
-        data-filled form and errors.
-        """
-        return self.render_to_response(self.get_context_data(form=form))
 
 @login_required
 def edit(request, team_id):

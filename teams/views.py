@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from lib2to3.pgen2.driver import load_grammar
 
 from django.db.utils import OperationalError
@@ -12,6 +13,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.views.decorators import csrf
 from django.views import generic
+from rules.contrib.views import PermissionRequiredMixin
 
 from core.models import StudentClubYear
 from teams.models import Team, CATEGORY_CHOICES
@@ -63,19 +65,36 @@ def show_info(request, team_id):
     context = {'team': team}
     return render(request, 'teams/infocard.html', context)
 
+class DetailView(generic.DetailView):
+    model = Team
+    template_name= "teams/show.html"
+    pk_url_kwarg = 'team_id'
+    permission_required = 'teams.change_team_display_details'
 
-@decorators.get_only
-def show(request, team_id):
-    team = get_object_or_404(Team, pk=team_id)
-    form = forms.AddTeamMembersForm(instance=team)
+    def get_context_data(self, **kwargs):
+        context = super(DetailView, self).get_context_data(**kwargs)
+        return context
 
-    can_edit = is_coordinator(team, request.user) or \
-                request.user.is_superuser
+    def form_valid(self, form):
+        """
+        If the form is valid,...
+        """
+        print form.cleaned_data
+        self.object = form.save()
+        return HttpResponseRedirect(reverse('teams:list_teams'))
 
-    context = {'team': team,
-               'can_edit': can_edit,
-               'form':form}
-    return render(request, 'teams/show.html', context)
+#@decorators.get_only
+#def show(request, team_id):
+#    team = get_object_or_404(Team, pk=team_id)
+#    form = forms.AddTeamMembersForm(instance=team)
+#
+#    can_edit = is_coordinator(team, request.user) or \
+#                request.user.is_superuser
+#
+#    context = {'team': team,
+#               'can_edit': can_edit,
+#               'form':form}
+#    return render(request, 'teams/show.html', context)
 
 class CreateView(generic.CreateView):
     form_class = TeamForm
@@ -101,36 +120,21 @@ class CreateView(generic.CreateView):
         self.object = form.save()
         return HttpResponseRedirect(reverse('teams:list_teams'))
 
+class UpdateView(PermissionRequiredMixin, generic.UpdateView):
+    model = Team
+    form_class = TeamForm
+    template_name = 'teams/new.html'
+    success_url = 'teams:list_teams'
+    pk_url_kwarg = 'team_id'
+    permission_required = 'teams.change_team_display_details'
 
-@login_required
-def edit(request, team_id):
-    exisiting_team = get_object_or_404(Team, pk=team_id)
-
-    # If the user is neither the coordinator, nor has the permission
-    # to change activities (i.e. not part of the head of the Student
-    # Club), raise a PermissionDenied error.
-    if not request.user == exisiting_team.coordinator and \
-       not request.user.has_perm('teams.change_team'):
-       raise PermissionDenied
-
-    if request.method == 'POST':
-        if request.user == exisiting_team.coordinator:
-            modified_team = DisabledTeamForm(request.POST,
-                                             instance=exisiting_team)
-        else:
-            modified_team = TeamForm(request.POST, instance=exisiting_team)
-        modified_team.save()
-        return HttpResponseRedirect(reverse('teams:show',
-                                            args=(team_id,)))
-    else:
-        exisiting_team = get_object_or_404(Team, pk=team_id)
-        if request.user == exisiting_team.coordinator:
-            form = DisabledTeamForm(instance=exisiting_team)
-        else:
-            form = TeamForm(instance=exisiting_team)
-        context = {'form': form, 'team_id': team_id}
-        return render(request, 'teams/new.html', context)
-
+    def form_valid(self, form):
+        """
+        If the form is valid,...
+        """
+        print form.cleaned_data
+        self.object = form.save()
+        return HttpResponseRedirect(reverse('teams:list_teams'))
 
 @decorators.ajax_only
 @csrf.csrf_exempt
@@ -155,6 +159,3 @@ def add_members(request,team_id):
     context['form'] = form
 
     return render(request, 'teams/show.html', context)
-
-
-

@@ -1,5 +1,6 @@
 from django.forms import ModelForm
 from .models import Team
+from dal import autocomplete
 
 
 class TeamForm(ModelForm):
@@ -45,6 +46,8 @@ class DisabledTeamForm(TeamForm):
         return cleaned_data
 
 class AddTeamMembersForm(ModelForm):
+
     class Meta:
         model = Team
         fields = ['members']
+

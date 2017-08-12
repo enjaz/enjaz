@@ -29,45 +29,20 @@ class ListView(generic.ListView):
     context_object_name = 'all_teams'
 
     def get_queryset(self, **kwargs):
-        current_year = StudentClubYear.objects.get_current()
-        for city_code, city_name in city_choices:
-            for cat_code, cat_name in CATEGORY_CHOICES:
-                try:
-                    teams = Team.objects.filter(year=current_year,
-                                                city=city_code,
-                                                category=cat_code)
-                    return teams
-                except ObjectDoesNotExist:
-                    raise Http404
+        # FIXME: The year filter returns no teams at all. Maybe the year is not being set on the team instances?
+        # current_year = StudentClubYear.objects.get_current()
+        return Team.objects.all()  # filter(year=current_year)
 
-    #TODO: Find out how to avoid this repetition > ~ <
-    def get_context_data(self, **kwargs):
-        context = super(ListView, self).get_context_data(**kwargs)
-        current_year = StudentClubYear.objects.get_current()
-        per_city = []
-        for city_code, city_name in city_choices:
-            per_category = []
-            for cat_code, cat_name in CATEGORY_CHOICES:
-                try:
-                    teams = Team.objects.filter(year=current_year,
-                                                city=city_code,
-                                                category=cat_code)
-                    if teams.exists():
-                        per_category.append((cat_name, teams))
-                except ObjectDoesNotExist:
-                    raise Http404
-            per_city.append((city_name, per_category))
-        context['per_city'] = per_city
-        return context
 
 def show_info(request, team_id):
     team = get_object_or_404(Team, pk=team_id)
     context = {'team': team}
     return render(request, 'teams/infocard.html', context)
 
+
 class DetailView(generic.DetailView):
     model = Team
-    template_name= "teams/show.html"
+    template_name = "teams/show.html"
     pk_url_kwarg = 'team_id'
     permission_required = 'teams.change_team_display_details'
 
@@ -78,13 +53,12 @@ class DetailView(generic.DetailView):
         return context
 
 
-
 class CreateView(generic.CreateView):
     form_class = TeamForm
     template_name = 'teams/new.html'
     success_url = 'teams:list_teams'
 
-    #TODO: set year automatically
+    # TODO: set year automatically
 
     # can't decorate the class in django 1.8 like this:
     # @method_decorator(<decorator>, name='dispatch')
@@ -103,6 +77,7 @@ class CreateView(generic.CreateView):
         self.object = form.save()
         return HttpResponseRedirect(reverse('teams:list_teams'))
 
+
 class UpdateView(PermissionRequiredMixin, generic.UpdateView):
     model = Team
     form_class = TeamForm
@@ -119,23 +94,23 @@ class UpdateView(PermissionRequiredMixin, generic.UpdateView):
         self.object = form.save()
         return HttpResponseRedirect(reverse('teams:list_teams'))
 
+
 @decorators.ajax_only
 @csrf.csrf_exempt
 @decorators.post_only
 @login_required
-def add_members(request,team_id):
-
+def add_members(request, team_id):
     team = get_object_or_404(Team, pk=team_id)
-    ar_name=team.ar_name
+    ar_name = team.ar_name
 
     if not request.user == team.leader and \
-       not request.user.is_superuser:
-       raise PermissionDenied
+            not request.user.is_superuser:
+        raise PermissionDenied
 
-    context={}
+    context = {}
 
     if request.method == 'POST':
-        form = forms.AddTeamMembersForm(request.POST,instance=team)
+        form = forms.AddTeamMembersForm(request.POST, instance=team)
         if form.is_valid():
             form.save()
             return {"message": "success"}

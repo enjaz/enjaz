@@ -75,8 +75,7 @@ class CreateView(generic.CreateView):
         """
         print form.cleaned_data
         self.object = form.save()
-        return HttpResponseRedirect(reverse('teams:list_teams'))
-
+        return HttpResponseRedirect(reverse('teams:show', kwargs={"team_id": self.object.pk}))
 
 class UpdateView(PermissionRequiredMixin, generic.UpdateView):
     model = Team
@@ -92,8 +91,7 @@ class UpdateView(PermissionRequiredMixin, generic.UpdateView):
         """
         print form.cleaned_data
         self.object = form.save()
-        return HttpResponseRedirect(reverse('teams:list_teams'))
-
+        return HttpResponseRedirect(reverse('teams:show', kwargs={"team_id": self.object.pk}))
 
 @decorators.ajax_only
 @csrf.csrf_exempt

@@ -73,28 +73,11 @@ class DetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(DetailView, self).get_context_data(**kwargs)
+        context['form'] = forms.AddTeamMembersForm(instance=self.object)
+
         return context
 
-    def form_valid(self, form):
-        """
-        If the form is valid,...
-        """
-        print form.cleaned_data
-        self.object = form.save()
-        return HttpResponseRedirect(reverse('teams:list_teams'))
 
-#@decorators.get_only
-#def show(request, team_id):
-#    team = get_object_or_404(Team, pk=team_id)
-#    form = forms.AddTeamMembersForm(instance=team)
-#
-#    can_edit = is_coordinator(team, request.user) or \
-#                request.user.is_superuser
-#
-#    context = {'team': team,
-#               'can_edit': can_edit,
-#               'form':form}
-#    return render(request, 'teams/show.html', context)
 
 class CreateView(generic.CreateView):
     form_class = TeamForm

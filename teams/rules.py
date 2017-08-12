@@ -23,6 +23,7 @@ rules.add_perm('teams.add_team', is_supervisor)
 rules.add_perm('teams.change_team_main_details', is_supervisor)
 rules.add_perm('teams.change_team_display_details', is_supervisor | is_team_leader)
 rules.add_perm('teams.delete_team', is_supervisor)
+rules.add_perm('teams.change_team_members', is_supervisor)
 
 rules.add_perm('teams.change_team_members', is_team_leader)
 rules.add_perm('teams.change_team_registration', is_team_leader | is_team_member)

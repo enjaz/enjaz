@@ -40,6 +40,10 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
+<<<<<<< HEAD
+=======
+    'approvals',
+>>>>>>> f062ad443ce68e15372fd3484ad3b2cf375ad22b
     'activities',
     'activities2',
     'api',

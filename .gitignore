@@ -11,5 +11,11 @@ static_files/
 *.sqlite3
 *~
 *#
+<<<<<<< HEAD
 *csv
 *xlsx
+=======
+*xlsx
+.idea/
+venv/
+>>>>>>> f062ad443ce68e15372fd3484ad3b2cf375ad22b

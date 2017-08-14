@@ -70,7 +70,11 @@
 		<!-- panel body -->
 		<div class="panel-body">
 			<p style="font-size:1em;"><ul class="list-unstyled">
+<<<<<<< HEAD
         {% has_perm 'teams.change_team_display_details' request.user as can_edit %}
+=======
+        {% has_perm 'teams.change_team_display_details' team leader as can_edit %}
+>>>>>>> 46035834538b2a279edabf7df5a9a49a0e8340da
         {% if can_edit %}<li><a href="{% url 'teams:edit' team.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
           <br>
             <form method="post" data-team_pk='{{ team.pk }}' enctype="multipart/form-data" id="add-members-form" action="post">

@@ -19,7 +19,15 @@ class SubmissionForm(ModelForm):
                   'inside_collaborators','outside_collaborators','participants','category','organizers',
                   'assignee','gender','is_approved']
 
+def activities_list_for_reviwer(request):
+    context={
+        "active":Activity.objects.all().filter(is_approved=None).current_year(),
+        "inactive": Activities.objects.all().filter(is_approved=False, is_approved=True).current_year(),
+        }
+    if request.user.is_authenticated():
+        template = "activities2/"
 
+    return render(requests, template, context)
 
     
 # Create your views here.

@@ -44,10 +44,6 @@ class DetailView(generic.DetailView):
     model = Team
     template_name = "teams/show.html"
     pk_url_kwarg = 'team_id'
-<<<<<<< HEAD
-=======
-    permission_required = 'teams.change_team_display_details'
->>>>>>> 46035834538b2a279edabf7df5a9a49a0e8340da
 
     def get_context_data(self, **kwargs):
         context = super(DetailView, self).get_context_data(**kwargs)
@@ -56,7 +52,6 @@ class DetailView(generic.DetailView):
         return context
 
 
-<<<<<<< HEAD
 class CreateView(PermissionRequiredMixin, generic.CreateView):
     model = Team
     form_class = TeamForm
@@ -71,47 +66,6 @@ class UpdateView(PermissionRequiredMixin, generic.UpdateView):
     template_name = 'teams/new.html'
     pk_url_kwarg = 'team_id'
     permission_required = 'teams.change_team_display_details'
-=======
-class CreateView(generic.CreateView):
-    form_class = TeamForm
-    template_name = 'teams/new.html'
-    success_url = 'teams:list_teams'
-
-    # TODO: set year automatically
-
-    # can't decorate the class in django 1.8 like this:
-    # @method_decorator(<decorator>, name='dispatch')
-    # class CreateView(...): etc
-
-    @method_decorator(permission_required('teams.add_club', raise_exception=True))
-    # I did login_required as URLconf decorator; see teams/urls
-    def dispatch(self, *args, **kwargs):
-        return super(CreateView, self).dispatch(*args, **kwargs)
-
-    def form_valid(self, form):
-        """
-        If the form is valid,...
-        """
-        print form.cleaned_data
-        self.object = form.save()
-        return HttpResponseRedirect(reverse('teams:show', kwargs={"team_id": self.object.pk}))
-
-class UpdateView(PermissionRequiredMixin, generic.UpdateView):
-    model = Team
-    form_class = TeamForm
-    template_name = 'teams/new.html'
-    success_url = 'teams:list_teams'
-    pk_url_kwarg = 'team_id'
-    permission_required = 'teams.change_team_display_details'
-
-    def form_valid(self, form):
-        """
-        If the form is valid,...
-        """
-        print form.cleaned_data
-        self.object = form.save()
-        return HttpResponseRedirect(reverse('teams:show', kwargs={"team_id": self.object.pk}))
->>>>>>> 46035834538b2a279edabf7df5a9a49a0e8340da
 
 @decorators.ajax_only
 @csrf.csrf_exempt
@@ -120,19 +74,11 @@ class UpdateView(PermissionRequiredMixin, generic.UpdateView):
 def add_members(request, team_id):
     team = get_object_or_404(Team, pk=team_id)
     ar_name = team.ar_name
-<<<<<<< HEAD
 
     if not request.user == team.leader and \
             not request.user.is_superuser:
         raise PermissionDenied
 
-=======
-
-    if not request.user == team.leader and \
-            not request.user.is_superuser:
-        raise PermissionDenied
-
->>>>>>> 46035834538b2a279edabf7df5a9a49a0e8340da
     context = {}
 
     if request.method == 'POST':

@@ -56,3 +56,6 @@ class Team(models.Model):
     class Meta:
         verbose_name = 'الفريق'
         verbose_name_plural = 'الفِرق'
+
+    def get_absolute_url(self):
+        return "/teams/%i/" % self.id

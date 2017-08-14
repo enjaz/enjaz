@@ -44,7 +44,6 @@ class DetailView(generic.DetailView):
     model = Team
     template_name = "teams/show.html"
     pk_url_kwarg = 'team_id'
-    permission_required = 'teams.change_team_display_details'
 
     def get_context_data(self, **kwargs):
         context = super(DetailView, self).get_context_data(**kwargs)
@@ -53,45 +52,20 @@ class DetailView(generic.DetailView):
         return context
 
 
-class CreateView(generic.CreateView):
+class CreateView(PermissionRequiredMixin, generic.CreateView):
+    model = Team
     form_class = TeamForm
     template_name = 'teams/new.html'
-    success_url = 'teams:list_teams'
+    permission_required = 'teams.add_team'
 
     # TODO: set year automatically
-
-    # can't decorate the class in django 1.8 like this:
-    # @method_decorator(<decorator>, name='dispatch')
-    # class CreateView(...): etc
-
-    @method_decorator(permission_required('teams.add_club', raise_exception=True))
-    # I did login_required as URLconf decorator; see teams/urls
-    def dispatch(self, *args, **kwargs):
-        return super(CreateView, self).dispatch(*args, **kwargs)
-
-    def form_valid(self, form):
-        """
-        If the form is valid,...
-        """
-        print form.cleaned_data
-        self.object = form.save()
-        return HttpResponseRedirect(reverse('teams:show', kwargs={"team_id": self.object.pk}))
 
 class UpdateView(PermissionRequiredMixin, generic.UpdateView):
     model = Team
     form_class = TeamForm
     template_name = 'teams/new.html'
-    success_url = 'teams:list_teams'
     pk_url_kwarg = 'team_id'
     permission_required = 'teams.change_team_display_details'
-
-    def form_valid(self, form):
-        """
-        If the form is valid,...
-        """
-        print form.cleaned_data
-        self.object = form.save()
-        return HttpResponseRedirect(reverse('teams:show', kwargs={"team_id": self.object.pk}))
 
 @decorators.ajax_only
 @csrf.csrf_exempt

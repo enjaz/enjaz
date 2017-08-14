@@ -57,7 +57,7 @@
   </tr>
   <tr>
     <th>المنسق</th>
-    <td>{% if team.coordinator %} {{ team.coordinator.common_profile.get_ar_full_name|default:team.coordinator.username }} {% else %} لا يوجد {% endif %}</td>
+    <td>{% if team.leader %} {{ team.leader.common_profile.get_ar_full_name|default:team.leader.username }} {% else %} لا يوجد {% endif %}</td>
   </tr>
 </table>
 </div>
@@ -70,7 +70,7 @@
 		<!-- panel body -->
 		<div class="panel-body">
 			<p style="font-size:1em;"><ul class="list-unstyled">
-        {% has_perm 'teams.change_team_display_details' team leader as can_edit %}
+        {% has_perm 'teams.change_team_display_details' request.user as can_edit %}
         {% if can_edit %}<li><a href="{% url 'teams:edit' team.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
           <br>
             <form method="post" data-team_pk='{{ team.pk }}' enctype="multipart/form-data" id="add-members-form" action="post">

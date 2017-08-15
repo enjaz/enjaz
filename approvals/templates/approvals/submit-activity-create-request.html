@@ -1,0 +1,44 @@
+{% extends "activities_base.html" %}{% load bootstrap3 %}{% load staticfiles %}{% load i18n %}
+{% block title %}ارفع طلب نشاط{% endblock %}
+
+{% block content %}
+  <h2>طلب نشاط جديد</h2>
+  <form action="" method="post" class="form" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% bootstrap_form activity_request_form layout='horizontal' %}
+
+    <h3>الفعاليات</h3>
+    {% with formset=event_request_formset %}
+      {% include "approvals/components/formset.html" %}
+    {% endwith %}
+
+    <hr>
+
+    {% buttons %}
+      <button type="submit" class="btn btn-primary btn-block">
+        {% bootstrap_icon "ok-sign" %} أرسل
+      </button>
+    {% endbuttons %}
+
+  </form>
+
+{% endblock %}
+
+{% block scripts %}
+
+  {{ block.super }}
+
+  <script src="{% static 'js/jquery.formset.js' %}"></script>
+  <script type="text/javascript">
+    $("form").find(".form-container").formset({
+        prefix: '{{ event_request_formset.prefix }}',
+        addText: "{% trans "أضف فعالية" %}",
+        deleteText: "{% trans "احذف" %}",
+        addCssClass: 'add-row btn btn-xs btn-primary',
+        deleteCssClass: 'delete-row btn btn-xs btn-default',
+        formCssClass: 'event-request-formset'
+    });
+  </script>
+
+{% endblock %}

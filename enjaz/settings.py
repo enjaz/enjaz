@@ -14,7 +14,6 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 import os
 from django.contrib.messages import constants as messages
 import secrets
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
@@ -41,7 +40,12 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
+<<<<<<< HEAD
+=======
+    'approvals',
+>>>>>>> f062ad443ce68e15372fd3484ad3b2cf375ad22b
     'activities',
+    'activities2',
     'api',
     'bootstrap3',
     'bulb',

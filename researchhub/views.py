@@ -10,7 +10,7 @@ from core import decorators
 from core.models import StudentClubYear
 from post_office import mail
 from researchhub.models import Supervisor, Project, SkilledStudent, Domain, Skill
-from researchhub.forms import ProjectForm, MemberProjectForm, AddSupervisorForm, EditSupervisorForm, SkilledStudentForm, ConsultationForm, FeedbackForm
+from researchhub.forms import ProjectForm, MemberProjectForm, AddSupervisorForm, EditSupervisorForm, SkilledStudentForm, ConsultationForm, FeedbackForm, EmailForm
 from researchhub import utils
 from wkhtmltopdf.views import PDFTemplateView
 
@@ -72,6 +72,33 @@ def submit_consultation(request):
         form = ConsultationForm()
     return render(request, 'researchhub/submit_consultation.html',
                   {'form': form})
+
+@decorators.ajax_only
+@login_required
+def send_email(request, pk):
+    supervisor = get_object_or_404(Supervisor, pk=pk)
+
+    if request.method == 'POST':
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            email_context = {'user': request.user,
+                             'supervisor': supervisor,
+                             'data': form.cleaned_data}
+            mail.send([request.user.email],
+                       template="researchhub_send_email_to_student",
+                       context=email_context)
+            mail.send([supervisor.user.email],
+                       "researchhub@enjazportal.com",
+                       template="researchhub_send_email_to_supervisor",
+                       context=email_context,
+                       headers={'Reply-to': request.user.email})
+            return {"message": "success"}
+    elif request.method == 'GET':
+        form = EmailForm()
+
+    context = {'form': form,
+                'supervisor': supervisor}
+    return render(request, 'researchhub/send_email_form.html', context)
 
 @decorators.ajax_only
 @login_required

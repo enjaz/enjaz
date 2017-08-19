@@ -50,7 +50,7 @@
                 </tr>
                 <tr>
                     <th>Email</th>
-                    <td><a href="mailto:{{ supervisor.user.email }}">{{ supervisor.user.email }}</a></td>
+                    <td><a id="send-email"><i class="fa fa-envelope"></i> Send Email</a></td>
                 </tr>
                 {% if supervisor.available_from %}
                 <tr>
@@ -114,5 +114,6 @@ p{
 {% with model='supervisor' %}
     {% include "researchhub/partials/delete_asset.html" %}
 {% endwith %}
+{% include "researchhub/partials/submit_feedback_asset.html" %}
+{% include "researchhub/partials/send_email_asset.html" %}
 {% endblock %}
-

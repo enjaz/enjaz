@@ -85,10 +85,12 @@ def send_email(request, pk):
                              'supervisor': supervisor,
                              'data': form.cleaned_data}
             mail.send([request.user.email],
+                       "researchhub@enjazportal.com",
                        template="researchhub_send_email_to_student",
                        context=email_context)
             mail.send([supervisor.user.email],
                        "researchhub@enjazportal.com",
+                       bcc="researchhub@enjazportal.com",
                        template="researchhub_send_email_to_supervisor",
                        context=email_context,
                        headers={'Reply-to': request.user.email})

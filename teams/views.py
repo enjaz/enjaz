@@ -14,12 +14,13 @@ from django.core.exceptions import PermissionDenied
 from django.views.decorators import csrf
 from django.views import generic
 from rules.contrib.views import PermissionRequiredMixin
+from post_office import mail
 
 from core.models import StudentClubYear
 from teams.models import Team, CATEGORY_CHOICES
 from clubs.models import city_choices
 from teams.utils import is_coordinator
-from teams.forms import DisabledTeamForm, TeamForm
+from teams.forms import DisabledTeamForm, TeamForm, EmailForm
 from core import decorators
 from teams import forms
 
@@ -89,3 +90,30 @@ def add_members(request, team_id):
     context['form'] = form
 
     return render(request, 'teams/show.html', context)
+
+@decorators.ajax_only
+@login_required
+def send_email(request, team_id):
+    team = get_object_or_404(Team, pk=team_id)
+
+    if request.method == 'POST':
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            email_context = {'user': request.user,
+                             'team': team,
+                             'data': form.cleaned_data}
+            mail.send([request.user.email],
+                       template="teams_send_email_to_student",
+                       context=email_context)
+            mail.send([team.email],
+                       [request.user.email],
+                       template="teams_send_email_to_team",
+                       context=email_context,
+                       headers={'Reply-to': request.user.email})
+            return {"message": "success"}
+    elif request.method == 'GET':
+        form = EmailForm()
+
+    context = {'form': form,
+                'team': team}
+    return render(request, 'teams/send_email_form.html', context)

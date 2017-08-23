@@ -5,20 +5,18 @@ from approvals.models import ActivityRequest, EventRequest, ActivityRequsetRespo
 
 
 class ActivityCreateRequestForm(forms.ModelForm):
-
     class Meta:
         model = ActivityRequest
         fields = ['name']
 
 
 class ActivityUpdateRequestForm(forms.ModelForm):
-
     class Meta:
         model = ActivityRequest
         fields = '__all__'
 
-class ActivityRequsetResponseForm(form.ModelForm):
 
+class ActivityRequestResponseForm(forms.ModelForm):
     class Meta:
         model = ActivityRequsetResponse
         fields = '__all__'

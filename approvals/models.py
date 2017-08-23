@@ -89,10 +89,10 @@ class EventRequest(AbstractRequestAttachment):
         verbose_name = _(u"طلب فعالية")
         verbose_name_plural = _(u"طلبات فعاليات")
 
+
 class ActivityRequsetResponse(AbstractRequestAttachment):
     request = models.ForeignKey(ActivityRequest)
     is_approved = models.BooleanField()
-
 
 
 class RequestThread(object):

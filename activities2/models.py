@@ -6,22 +6,6 @@ from django.contrib.contenttypes.fields import GenericRelation
 from forms_builder.forms.models import Form
 
 
-
-class Activity(models.Model):
-    primary_club = models.ForeignKey('clubs.Club', null=True,
-                                     on_delete=models.SET_NULL,
-                                     related_name='primary_activity',
-                                     verbose_name=u"النادي المنظم")
-    secondary_clubs = models.ManyToManyField('clubs.Club', blank=True,
-                                            related_name="secondary_activity",
-                                            verbose_name=u"الأندية المتعاونة")
-    chosen_reviewer_club = models.ForeignKey('clubs.Club', null=True,
-                                             blank=True,
-                                             on_delete=models.SET_NULL,
-                                             related_name='chosen_reviewer_activities',
-                                             verbose_name=u"الكلية المراجعة")
-
-
 class Activity(models.Model):
     # primary_club = models.ForeignKey(
     #     'clubs.Club', null=True,

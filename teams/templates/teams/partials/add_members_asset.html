@@ -11,7 +11,7 @@ $(function() {
         var formData = new FormData($(this)[0]);
         /* Send the data */
         $.ajax({
-            url: "{% url 'teams:add_members' team.pk %}",
+            url: "{% url 'teams:add_members' team.code_name %}",
             type: 'POST',
             data: formData,
             cache: false,

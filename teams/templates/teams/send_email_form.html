@@ -16,7 +16,7 @@ $(function () {
 
         /* get some values from elements on the page: */
         var formData = new FormData($(this)[0]);
-        var url = "{% url 'teams:send_email' team.pk %}";
+        var url = "{% url 'teams:send_email' team.code_name %}";
 
         /* Send the data */
         $.ajax({

@@ -13,3 +13,5 @@ static_files/
 *#
 *csv
 *xlsx
+.idea/
+venv/

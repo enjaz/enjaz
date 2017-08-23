@@ -322,7 +322,7 @@ you?
 					<span>الإرشاد الطلابي</span>
 				</a>
 
-            {% if user.common_profile.get_city_code == "R" or user.is_superuser %}
+            {% if not user.common_profile.get_city_code == "A" or user.is_superuser %}
 			<li class="highlighted-section">
 				<a href="{% url 'researchhub:index' %}">
 					<i class="fa fa-search"></i>

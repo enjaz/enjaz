@@ -36,6 +36,7 @@ urlpatterns = patterns('',
     url(r'^supervisors/(?P<pk>\d+)/rate/$', views.rate_supervisor, name="rate_supervisor"),
     url(r'^supervisors/(?P<pk>\d+)/edit/$', views.edit_supervisor, name="edit_supervisor"),
     url(r'^supervisors/(?P<pk>\d+)/delete/$', views.delete_supervisor, name="delete_supervisor"),
+    url(r'^supervisors/(?P<pk>\d+)/send_email/$', views.send_email, name="send_email"),
 
     # Skills
     url(r'^skills/$', views.list_skills, name="list_skills"),

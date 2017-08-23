@@ -178,7 +178,7 @@
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Date added</th>
+                            <th>City</th>
                         </tr>
                     </thead>
 
@@ -186,7 +186,7 @@
                         {% for skill in latest_skills %}
                         <tr>
                             <td><a href="{% url 'researchhub:show_skill' skill.pk %}">{{ skill.user.common_profile.get_en_full_name|default:skill.user.username }}</a></td>
-                            <td>{{ skill.submission_date|date:"Y-n-j" }}</td>
+                            <td>{{ skill.user.common_profile.city }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

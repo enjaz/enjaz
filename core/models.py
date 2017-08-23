@@ -132,3 +132,8 @@ class TwitterAccess(models.Model):
 
     def __unicode__(self):
         return self.code_name
+
+class CarouselSlider(models.Model):
+    image = models.ImageField(u"الصورة")
+    alt = models.CharField(u"النص البديل" ,
+                           max_length=30 , blank=True) #Should blank=True?

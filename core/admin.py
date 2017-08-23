@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 from django.contrib import admin
-from core.models import Announcement, Publication, StudentClubYear, Tweet, TwitterAccess
+from core.models import Announcement, Publication, StudentClubYear,\
+                        Tweet, TwitterAccess, CarouselSlider
 
 # Used in bulb/admin.py and events/admin.py
 class ModelAdminReadOnly:
@@ -23,9 +24,10 @@ class AnnouncementAdmin(admin.ModelAdmin):
 class PublicationAdmin(admin.ModelAdmin):
     readonly_fields = ('date_added', )
     list_display = ('label', 'file', 'date_added')
-    
+
 admin.site.register(Announcement, AnnouncementAdmin)
 admin.site.register(Publication, PublicationAdmin)
 admin.site.register(Tweet)
 admin.site.register(StudentClubYear)
 admin.site.register(TwitterAccess)
+admin.site.register(CarouselSlider)

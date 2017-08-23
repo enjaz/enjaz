@@ -13,7 +13,7 @@ from dal import autocomplete
 import re
 
 from . import decorators, utils
-from .models import Announcement, Publication, StudentClubYear
+from .models import Announcement, Publication, StudentClubYear, CarouselSlider
 from .forms import DebateForm
 from activities.models import Activity, Episode
 from bulb.models import Book
@@ -65,7 +65,9 @@ def portal_home(request):
         
         return render(request, 'home.html', context) # the dashboard
     else:
-        return render(request, 'front/home_front.html')
+        sliders = CarouselSlider.objects.all()
+        context = {'sliders': sliders}
+        return render(request, 'front/new_home_front.html', context)
 
 
 def visit_announcement(request, pk):

@@ -102,6 +102,8 @@ urlpatterns = [
 
 >>>>>>> f062ad443ce68e15372fd3484ad3b2cf375ad22b
     url(r'^tagging_autocomplete/', include('tagging_autocomplete.urls')),
+
+    url(r'^teams/', include('teams.urls', namespace="teams")),
 ]
 
 if settings.DEBUG:

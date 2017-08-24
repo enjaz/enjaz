@@ -1,0 +1,59 @@
+{% extends "base_teams.html" %}{% load staticfiles %}
+{% block title %}قائمة الفرق{% endblock %}
+
+{% block content %}
+
+  {# Group the teams list by city in order to show each city's teams separately #}
+  {% regroup all_teams by city as all_teams_by_city %}
+
+  {# Loop over each city's teams #}
+  {% for city_teams in all_teams_by_city %}
+
+    <h3>فِرق {{ city_teams.grouper }}</h3>
+
+    {# In order to show teams separated by category, we also regroup each city's teams, this time by category #}
+    {% regroup city_teams.list by get_category_display as city_teams_by_category %}
+    {% comment %}
+      Note:
+        We use `get_category_display` because we want to display the category name (which is returned by
+        `team.get_category_display()`), rather than the category code (which we'll be getting if we use
+        `team.category` #}
+      You may want to check out `get_FOO_display` here:
+      https://docs.djangoproject.com/en/1.9/ref/models/instances/#django.db.models.Model.get_FOO_display #}
+    {% endcomment %}
+
+    {# We loop over each category to show its teams #}
+    {% for category_teams in city_teams_by_category %}
+
+      <h4>{{ category_teams.grouper }}</h4>
+
+      <div class="row">
+
+        {# Finally we loop over the teams within each category in order to display them #}
+        {% for team in category_teams.list %}
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+          <div class="panel panel-bd">
+            <div class="panel panel-default">
+              <div class="panel-body text-center">
+                {% if team.logo %}
+                  <img src="{{ team.logo.url }}" style="max-width: 120px;"><br>
+                {% endif %}
+                  <a href="{% url 'teams:show' team.pk %}">{{ team.ar_name }}</a><br>
+                  <p style="word-wrap:break-word;">{{team.description|truncatewords:20}} </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  {% endfor %}
+
+  <!--let's think about javascript later-->
+  <div id="info-card"></div>
+
+{% endblock %}
+
+{% block customscript %}
+
+{% endblock %}

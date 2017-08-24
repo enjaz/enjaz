@@ -1,0 +1,17 @@
+{% extends "base_teams.html" %}{% load bootstrap3 %}{% load rules %}
+{% block title %}{% if form.has_changed %} تعديل {{ form.name.value }}{% else %} نادٍ جديد {% endif %}{% endblock %}
+
+{% block content %}
+<h2>{% if form.has_changed %} تعديل {{ form.name.value }} {% else %} نادٍ جديد {% endif %}</h2>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% if form.has_changed %}{% else %}{% url 'teams:create' %}{% endif %}" method="post">
+{% csrf_token %}
+    {% bootstrap_form form %}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "star" %} أرسل
+        </button>
+    {% endbuttons %}
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base_teams.html" %}
+{% block title %}بيانات الفريق{% endblock %}
+
+{% block content %}
+    <img src="" alt="">
+    <p>اسم الفريق:{{team.ar_name}} | {{team.en_name}} <br>
+    البريد الإلكتروني: {{team.email}}<br>
+    المدينة: {{team.city}}<br>
+            الكلية: {{team.college}}<br>
+    المنسقـ/ـة: {{team.coordinator}}<br>
+    الأعضاء: {{team.members}}<br>
+    {{team.category}}<br>
+    {{team.parent}}<br>
+    وصف الفريق: {{team.description|linebreaksbr}}
+    </p>
+{% endblock %}

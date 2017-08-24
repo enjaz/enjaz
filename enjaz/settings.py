@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rules',
     'accounts',
 <<<<<<< HEAD
 =======
@@ -74,6 +75,7 @@ INSTALLED_APPS = (
     'studentvoice',
     'tagging',
     'tagging_autocomplete',
+    'teams',
     'tedx',
     'userena',
     'wkhtmltopdf',
@@ -156,6 +158,7 @@ ADMINS = [('Errors', 'errors@enjazportal.com')]
 
 # Userena settings
 AUTHENTICATION_BACKENDS = (
+    'rules.permissions.ObjectPermissionBackend',
     'userena.backends.UserenaAuthenticationBackend',
     'guardian.backends.ObjectPermissionBackend',
     'social.backends.twitter.TwitterOAuth',

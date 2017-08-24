@@ -1,0 +1,153 @@
+{% extends "base_teams.html" %}{% load staticfiles %}{% load l10n %}{% load bootstrap3 %}{% load rules %}
+{% block title %}بيانات الفريق{% endblock %}
+
+{% block content %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+<style>
+
+.select2-selection--single{
+    padding: 0;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__rendered{
+    width: 100% !important;
+}
+.add-members select{
+    width: 80%;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #00a651;
+    color: #fff;
+    border-radius: 3px;
+    cursor: default;
+    float: left;
+    margin-right: 2px;
+    margin-top: 2px;
+    padding: 7px 12px;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove{
+    color: white;
+}
+</style>
+
+<div class="text-center">
+  <h2>{{ team.ar_name }}</h2>
+    {% if team.logo %}
+   <img src="{{ team.logo.url }}" style="max-width: 120px;">
+{% endif %}
+</div>
+<div class="row">
+<div class="col-md-8">
+<table class="tg table-hover table">
+  <colgroup>
+    <col class="col-xs-2">
+    <col class="col-xs-6">
+  </colgroup>
+  <tr>
+    <th>الاسم الإنجليزي</th>
+    <td class="english-field">{{ team.en_name }}</td>
+  </tr>{% if team.description %}
+  <tr>
+    <th>الوصف</th>
+    <td>{{ team.description }}</td>
+  </tr>
+{% endif %}  <tr>
+    <th>البريد الإلكتروني</th>
+    <td class="english-field">{{ team.email }}</td>
+  </tr>
+  <tr>
+    <th>المنسق</th>
+    <td>{% if team.leader %} {{ team.leader.common_profile.get_ar_full_name|default:team.leader.username }} {% else %} لا يوجد {% endif %}</td>
+  </tr>
+</table>
+</div>
+<div class="col-md-4">
+	<div class="panel panel-primary" data-collapsed="0">
+		<!-- panel head -->
+		<div class="panel-heading">
+			<div class="panel-title">خيارات</div>
+		</div>
+		<!-- panel body -->
+		<div class="panel-body">
+			<p style="font-size:1em;"><ul class="list-unstyled">
+        {% has_perm 'teams.change_team_display_details' request.user as can_edit %}
+        {% if can_edit %}<li><a href="{% url 'teams:edit' team.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
+          <br>
+            <form method="post" data-team_pk='{{ team.pk }}' enctype="multipart/form-data" id="add-members-form" action="post">
+            {% bootstrap_form_errors form %}
+            {% csrf_token %}
+            أضف أعضاء:
+			<div class="add-members" id="add-members">
+               {{ form.members }}
+            </div>
+			<div class="form-control-feedback">
+				<i class=""></i>
+			</div>
+            <button style="float:left;margin-top: 3px" id='add_members' type="submit" class="btn btn-primary">
+                    أضف
+           </button>
+
+          </form>
+        {% endif %}
+
+      <!--
+			<li><a href=""><span class="glyphicon glyphicon-gift"></span> تقييمات الأنشطة</a></li>
+			<li><a href=""><span class="entypo-users"></span> استعرض أعضاء النادي</a></li>
+			<li><a href=""><span class="entypo-users"></span> صلاحيات الأعضاء</a></li>
+			<li><a href=""><span class="glyphicon glyphicon-list-alt"></span> راجع طلبات الانضمام</a></li>
+			<li><a href=""><span class="glyphicon glyphicon-star"></span> انضم للنادي</a></li>
+      <li><a href=""><span class="entypo-docs"></span> النماذج</a></li>
+      -->
+
+			</ul></p>
+		</div>
+	</div>
+</div>
+</div>
+
+{% endblock %}
+{% block customscript %}
+
+    <script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
+    <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+
+
+    <script type="text/javascript">
+    $(function() {
+
+        $("#add-members select").select2();
+
+
+        $("form#add-members-form").submit(function (event) {
+        /* stop form from submitting normally */
+            event.preventDefault();
+            /* get some values from elements on the page: */
+            var formData = new FormData($(this)[0]);
+            /* Send the data */
+            $.ajax({
+                url: "{% url 'teams:add_members' team.pk %}",
+                type: 'POST',
+                data: formData,
+                cache: false,
+                contentType: false,
+                enctype: 'multipart/form-data',
+                processData: false,
+                success: function (data) {
+                    if (data.message == "success") {
+                        // show success message (using toastr)
+                        toastr.options.positionClass = "toast-top-left";
+                        toastr.success("لقدت تمت إضافة الاعضاء للفريق" );
+                    } else {
+                        toastr.warning("There was an issue! " + data.message);
+                    }
+                }
+            });
+        });
+
+    });
+
+        </script>
+    {% include 'bulb/groups/components/autocomplete_asset.html' %}
+ {% endblock %}

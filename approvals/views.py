@@ -1,8 +1,9 @@
 from django.shortcuts import redirect
 from django.views import generic
-
-from approvals.forms import ActivityCreateRequestForm, EventRequestFormSet
-from approvals.models import ActivityRequest
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView
+from approvals.forms import ActivityCreateRequestForm, EventRequestFormSet, ActivityRequestResponseForm
+from approvals.models import ActivityRequest, ActivityRequsetResponse
 
 
 class SubmitActivityCreateRequest(generic.TemplateView):
@@ -29,3 +30,13 @@ class SubmitActivityCreateRequest(generic.TemplateView):
             'activity_request_form': activity_request_form,
             'event_request_formset': event_request_formset,
         }))
+
+
+class RequestDetail(DetailView):
+    model = ActivityRequest
+    queryset = ActivityRequest.objects.all()
+
+
+class ActivityApproval(CreateView):
+    model = ActivityRequsetResponse
+    form_class = ActivityRequestResponseForm

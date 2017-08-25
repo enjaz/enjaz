@@ -23,6 +23,8 @@ class ActivityRequest(AbstractRequest):
         'activities2.Activity',
         verbose_name=_(u"النشاط"),
         null=True, blank=True,
+        related_name="requests_created",
+
     )
 
     name = models.CharField(_(u"العنوان"), max_length=200)
@@ -46,6 +48,8 @@ class ActivityCancelRequest(AbstractRequest):
     activity = models.ForeignKey(
         'activities2.Activity',
         verbose_name=_(u"النشاط"),
+        related_name="requests_canceld",
+
     )
 
     class Meta:
@@ -84,6 +88,11 @@ class EventRequest(AbstractRequestAttachment):
     class Meta:
         verbose_name = _(u"طلب فعالية")
         verbose_name_plural = _(u"طلبات فعاليات")
+
+
+class ActivityRequsetResponse(AbstractRequestAttachment):
+    request = models.ForeignKey(ActivityRequest)
+    is_approved = models.BooleanField()
 
 
 class RequestThread(object):

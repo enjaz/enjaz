@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-=======
+
 # coding=utf-8
 >>>>>>> f062ad443ce68e15372fd3484ad3b2cf375ad22b
 from django.db import models
@@ -7,8 +6,6 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from forms_builder.forms.models import Form
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 
 class Events(models.Model):
     activity= models.ForeignKey('Activity')
@@ -23,7 +20,6 @@ class Events(models.Model):
  
 
     
-=======
 class Activity(models.Model):
     primary_club = models.ForeignKey('clubs.Club', null=True,
                                      on_delete=models.SET_NULL,
@@ -37,7 +33,6 @@ class Activity(models.Model):
                                              on_delete=models.SET_NULL,
                                              related_name='chosen_reviewer_activities',
                                              verbose_name=u"الكلية المراجعة")
-=======
 
 class Event(models.Model):
     activity = models.ForeignKey('Activity')

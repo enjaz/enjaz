@@ -89,9 +89,9 @@
 			<p style="font-size:1em;"><ul class="list-unstyled">
         <li><a id="send-email"><i class="fa fa-envelope"></i> أرسل بريد إلكتروني للفريق </a></li>
         {% has_perm 'teams.change_team_display_details' request.user as can_edit %}
-        {% if can_edit %}<li><a href="{% url 'teams:edit' team.pk %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
+        {% if can_edit %}<li><a href="{% url 'teams:edit' team.code_name %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
           <br>
-            <form method="post" data-team_pk='{{ team.pk }}' enctype="multipart/form-data" id="add-members-form" action="post">
+            <form method="post" data-team_pk='{{ team.code_name }}' enctype="multipart/form-data" id="add-members-form" action="post">
             {% bootstrap_form_errors form %}
             {% csrf_token %}
             أضف أعضاء:
@@ -102,7 +102,7 @@
 				<i class=""></i>
 			</div>
             <button style="float:left;margin-top: 3px" id='add_members' type="submit" class="btn btn-primary">
-                    أضف
+                    احفظ
            </button>
 
           </form>

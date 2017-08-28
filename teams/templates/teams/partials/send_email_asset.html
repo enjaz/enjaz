@@ -11,7 +11,7 @@
             $("#send-email-modal").modal('show');
 
             $("#send-email-modal .modal-title").html("إرسال بريد إلكتروني");
-            $("#send-email-modal .modal-body").load("{% url 'teams:send_email' team.pk %}", function(){
+            $("#send-email-modal .modal-body").load("{% url 'teams:send_email' team.code_name %}", function(){
 
             });
 

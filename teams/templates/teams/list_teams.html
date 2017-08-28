@@ -37,7 +37,7 @@
                 {% if team.logo %}
                   <img src="{{ team.logo.url }}" style="max-width: 120px;"><br>
                 {% endif %}
-                  <a href="{% url 'teams:show' team.pk %}">{{ team.ar_name }}</a><br>
+                  <a href="{% url 'teams:show' team.code_name %}">{{ team.ar_name }}</a><br>
                   <p style="word-wrap:break-word;">{{team.description|truncatewords:20}} </p>
               </div>
             </div>

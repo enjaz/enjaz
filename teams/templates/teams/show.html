@@ -5,7 +5,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
 <style>
-
+#send-email{
+    cursor: pointer;
+}
+.panel-body li{
+    margin-bottom: 3%;
+}
 .select2-selection--single{
     padding: 0;
 }
@@ -61,8 +66,8 @@
   </tr>
   <tr>
     <th>المنصب</th>
-    <td>{% if user.position %} {{ user.position.profile.get_full_name|default:# }}{% else %} لا يوجد {% endif %}
-        {% if user.position == 'L' %}
+    <td>{% if user.position %} {{ user.position.profile.get_full_name|default:user.username }}{% else %} لا يوجد {% endif %}
+
             <div class="dropdown">
                 <button style="float:left;margin-top: 3px" id='add_position' type="submit" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">عيّن المنصب
                 <span class="caret"></span></button>
@@ -73,7 +78,6 @@
                   <li><a href="#">عضو/ة</a></li>
                 </ul>
             </div>
-        {% endif %}
     </td>
   </tr>
 </table>
@@ -119,7 +123,7 @@
 
 			</ul></p>
             <div>
-            <a href="https://twitter.com/share" class="twitter-share-button" data-text="أنا عضو/ة في فريق" data-url="{% url &#39;teams:show&#39; team.pk %}" data-via="StudentsofKSAUH" data-lang="ar" data-show-count="false">غرّد</a>
+            <a href="https://twitter.com/share" class="twitter-share-button" data-text="أنا عضو/ة في فريق" data-url="{% url 'teams:show' team.pk %}" data-via="StudentsofKSAUH" data-lang="ar" data-show-count="false">غرّد</a>
             </div>
 		</div>
 	</div>

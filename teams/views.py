@@ -14,12 +14,13 @@ from django.core.exceptions import PermissionDenied
 from django.views.decorators import csrf
 from django.views import generic
 from rules.contrib.views import PermissionRequiredMixin
+from post_office import mail
 
 from core.models import StudentClubYear
 from teams.models import Team, CATEGORY_CHOICES
 from clubs.models import city_choices
 from teams.utils import is_coordinator
-from teams.forms import DisabledTeamForm, TeamForm
+from teams.forms import DisabledTeamForm, TeamForm, EmailForm
 from core import decorators
 from teams import forms
 
@@ -29,34 +30,56 @@ class ListView(generic.ListView):
     context_object_name = 'all_teams'
 
     def get_queryset(self, **kwargs):
-        # FIXME: The year filter returns no teams at all. Maybe the year is not being set on the team instances?
-        # current_year = StudentClubYear.objects.get_current()
-        return Team.objects.all()  # filter(year=current_year)
+        current_year = StudentClubYear.objects.get_current()
+        return Team.objects.filter(year=current_year)
 
-
-def show_info(request, team_id):
-    team = get_object_or_404(Team, pk=team_id)
+def show_info(request, code_name):
+    team = get_object_or_404(Team, pk=code_name)
     context = {'team': team}
     return render(request, 'teams/infocard.html', context)
-
 
 class DetailView(generic.DetailView):
     model = Team
     template_name = "teams/show.html"
-    pk_url_kwarg = 'team_id'
+    slug_field = 'code_name'
+    slug_url_kwarg = 'code_name'
+
+    def get_object(self):
+        current_year = StudentClubYear.objects.get_current()
+        team = get_object_or_404(
+            self.model,
+            code_name=self.kwargs['code_name'],
+            year=current_year)
+        return team
 
     def get_context_data(self, **kwargs):
         context = super(DetailView, self).get_context_data(**kwargs)
         context['form'] = forms.AddTeamMembersForm(instance=self.object)
-
         return context
 
+class ArchiveDetailView(generic.DetailView):
+    model = Team
+    template_name = "teams/show.html"
+    slug_field = 'code_name'
+    slug_url_kwarg = 'code_name'
+
+    def get_object(self):
+        team = get_object_or_404(
+            self.model,
+            code_name=self.kwargs['code_name'],
+            year__start_date__year=self.kwargs['year'])
+        return team
+
+    def get_context_data(self, **kwargs):
+        context = super(ArchiveDetailView, self).get_context_data(**kwargs)
+        context['form'] = forms.AddTeamMembersForm(instance=self.object)
+        return context
 
 class CreateView(PermissionRequiredMixin, generic.CreateView):
     model = Team
     form_class = TeamForm
     template_name = 'teams/new.html'
-    permission_required = 'teams.add_team'
+    success_url = 'teams:list_teams'
 
     # TODO: set year automatically
 
@@ -64,15 +87,25 @@ class UpdateView(PermissionRequiredMixin, generic.UpdateView):
     model = Team
     form_class = TeamForm
     template_name = 'teams/new.html'
-    pk_url_kwarg = 'team_id'
+    slug_field = 'code_name'
+    slug_url_kwarg = 'code_name'
     permission_required = 'teams.change_team_display_details'
+
+    def get_object(self):
+        current_year = StudentClubYear.objects.get_current()
+        team = get_object_or_404(
+            self.model,
+            code_name=self.kwargs['code_name'],
+            year=current_year)
+        return team
 
 @decorators.ajax_only
 @csrf.csrf_exempt
 @decorators.post_only
 @login_required
-def add_members(request, team_id):
-    team = get_object_or_404(Team, pk=team_id)
+def add_members(request, code_name):
+    current_year = StudentClubYear.objects.get_current()
+    team = get_object_or_404(Team, code_name=code_name, year=current_year)
     ar_name = team.ar_name
 
     if not request.user == team.leader and \
@@ -89,3 +122,31 @@ def add_members(request, team_id):
     context['form'] = form
 
     return render(request, 'teams/show.html', context)
+
+@decorators.ajax_only
+@login_required
+def send_email(request, code_name):
+    current_year = StudentClubYear.objects.get_current()
+    team = get_object_or_404(Team, code_name=code_name, year=current_year)
+
+    if request.method == 'POST':
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            email_context = {'user': request.user,
+                             'team': team,
+                             'data': form.cleaned_data}
+            mail.send([request.user.email],
+                       template="teams_send_email_to_student",
+                       context=email_context)
+            mail.send([team.email],
+                       [request.user.email],
+                       template="teams_send_email_to_team",
+                       context=email_context,
+                       headers={'Reply-to': request.user.email})
+            return {"message": "success"}
+    elif request.method == 'GET':
+        form = EmailForm()
+
+    context = {'form': form,
+                'team': team}
+    return render(request, 'teams/send_email_form.html', context)

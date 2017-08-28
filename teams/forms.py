@@ -1,9 +1,11 @@
-from django.forms import ModelForm
-from .models import Team
+# -*- coding: utf-8 -*-
+from django import forms
 from dal import autocomplete
 
+from .models import Team
 
-class TeamForm(ModelForm):
+
+class TeamForm(forms.ModelForm):
     class Meta:
         model = Team
         fields = ['ar_name','en_name','description', 'email',
@@ -45,9 +47,12 @@ class DisabledTeamForm(TeamForm):
 
         return cleaned_data
 
-class AddTeamMembersForm(ModelForm):
+class AddTeamMembersForm(forms.ModelForm):
 
     class Meta:
         model = Team
         fields = ['members']
 
+class EmailForm(forms.Form):
+    subject = forms.CharField(label=u"العنوان")
+    text = forms.CharField(label=u"اكتب نص رسالتك هنا", widget=forms.Textarea)

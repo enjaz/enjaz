@@ -1,0 +1,30 @@
+{% load staticfiles %}
+<script type="text/javascript">
+    $(function () {
+        // initialize email modal
+        $('#submit-email-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        });
+        $("a#send-email").click(function () {
+            $("#send-email-modal").modal('show');
+
+            $("#send-email-modal .modal-title").html("إرسال بريد إلكتروني");
+            $("#send-email-modal .modal-body").load("{% url 'teams:send_email' team.code_name %}", function(){
+
+            });
+
+            var $submitButton = $("#send-email-modal button.submit-button");
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#send-email-form").submit();
+            });
+        });
+    });
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+
+{% with modal_id='send-email-modal' %}
+    {% include "teams/partials/common_modal.html" %}
+{% endwith %}

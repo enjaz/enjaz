@@ -59,6 +59,23 @@
     <th>المنسق</th>
     <td>{% if team.leader %} {{ team.leader.common_profile.get_ar_full_name|default:team.leader.username }} {% else %} لا يوجد {% endif %}</td>
   </tr>
+  <tr>
+    <th>المنصب</th>
+    <td>{% if user.position %} {{ user.position.profile.get_full_name|default:# }}{% else %} لا يوجد {% endif %}
+        {% if user.position == 'L' %}
+            <div class="dropdown">
+                <button style="float:left;margin-top: 3px" id='add_position' type="submit" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">عيّن المنصب
+                <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                  <li><a href="#">نائب ممثلـ/ـة الفريق</a></li>
+                  <li><a href="#">الممثلـ/ـة الإعلاميـ/ـة للفريق</a></li>
+                  <li><a href="#">عضو/ة فعالـ/ـة</a></li>
+                  <li><a href="#">عضو/ة</a></li>
+                </ul>
+            </div>
+        {% endif %}
+    </td>
+  </tr>
 </table>
 </div>
 <div class="col-md-4">
@@ -101,6 +118,9 @@
       -->
 
 			</ul></p>
+            <div>
+            <a href="https://twitter.com/share" class="twitter-share-button" data-text="أنا عضو/ة في فريق" data-url="{% url &#39;teams:show&#39; team.pk %}" data-via="StudentsofKSAUH" data-lang="ar" data-show-count="false">غرّد</a>
+            </div>
 		</div>
 	</div>
 </div>
@@ -108,7 +128,7 @@
 
 {% endblock %}
 {% block customscript %}
-
+    <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
     <script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
     <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>

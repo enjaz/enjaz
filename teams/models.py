@@ -34,9 +34,10 @@ class Team(models.Model):
                                     verbose_name=_(u"المنسق"),
                                     related_name="teams_leader",
                                     on_delete=models.SET_NULL)
-    members = models.ManyToManyField(User, verbose_name=_(u"الأعضاء"),
-                                     blank=True,
-                                     related_name="teams")
+    members = models.ManyToManyField(User, through="Membership",
+                                     verbose_name=_(u"الأعضاء"),
+                                     blank=True)
+    is_open = models.BooleanField(default=True, verbose_name=_(u"مفتوح للتسجيل؟"))
     category = models.CharField(max_length=2, choices=CATEGORY_CHOICES,
                                verbose_name=_(u"نوع الفريق"))
     is_visible= models.BooleanField(default=True, verbose_name=_(u"مرئي؟"))
@@ -59,3 +60,14 @@ class Team(models.Model):
 
     def get_absolute_url(self):
         return "/teams/%s/" % self.code_name
+
+class Membership(models.Model):
+    member = models.ForeignKey(User, verbose_name=_(u"العضو"))
+    team = models.ForeignKey(Team, verbose_name=_(u"الفريق"))
+    accepted = models.BooleanField(default=False)
+    registration_date = models.DateTimeField(_(u"تاريخ التسجيل"), auto_now_add=True)
+    modification_date = models.DateTimeField(_(u"تاريخ التعديل"), auto_now=True, null=True)
+
+    class Meta:
+        verbose_name = 'العضوية'
+        verbose_name_plural = 'العضويات'

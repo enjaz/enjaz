@@ -17,7 +17,7 @@ from rules.contrib.views import PermissionRequiredMixin
 from post_office import mail
 
 from core.models import StudentClubYear
-from teams.models import Team, CATEGORY_CHOICES
+from teams.models import Team, CATEGORY_CHOICES, Membership
 from clubs.models import city_choices
 from teams.utils import is_coordinator
 from teams.forms import DisabledTeamForm, TeamForm, EmailForm
@@ -109,7 +109,8 @@ def add_members(request, code_name):
     ar_name = team.ar_name
 
     if not request.user == team.leader and \
-            not request.user.is_superuser:
+            not request.user.is_superuser and \
+            team.is_open is False:
         raise PermissionDenied
 
     context = {}
@@ -117,7 +118,10 @@ def add_members(request, code_name):
     if request.method == 'POST':
         form = forms.AddTeamMembersForm(request.POST, instance=team)
         if form.is_valid():
-            form.save()
+            form.save(commit=False)
+            membership = Membership(member=request.user, team=team)
+            #TODO: check how to specify memeber ^
+            membership.save()
             return {"message": "success"}
     context['form'] = form
 
@@ -150,3 +154,27 @@ def send_email(request, code_name):
     context = {'form': form,
                 'team': team}
     return render(request, 'teams/send_email_form.html', context)
+
+@login_required
+@decorators.ajax_only
+@csrf.csrf_exempt
+def control_registration(request, code_name):
+    current_year = StudentClubYear.objects.get_current()
+    team = get_object_or_404(Team, code_name=code_name)
+
+    if not request.user == team.leader and \
+            not request.user.is_superuser:
+        raise PermissionDenied
+
+    #if team.year is not current_year:
+    #    team.is_open = False
+    #else:
+    if team.is_open == True:
+        team.is_open = False
+    elif team.is_open == False:
+        team.is_open = True
+    team.save()
+    return {'team_isopen': team.is_open}
+
+
+

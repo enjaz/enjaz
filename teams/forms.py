@@ -10,7 +10,7 @@ class TeamForm(forms.ModelForm):
         model = Team
         fields = ['ar_name','en_name','description', 'email',
                   'parent', 'leader', 'city', 'gender',
-                  'category', 'logo', 'is_visible']
+                  'category', 'logo', 'is_visible', 'is_open']
     def clean(self):
         # Remove spaces at the start and end of all text fields.
         cleaned_data = super(TeamForm, self).clean()

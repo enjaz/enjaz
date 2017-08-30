@@ -33,6 +33,7 @@
 .select2-container--default .select2-selection--multiple .select2-selection__choice__remove{
     color: white;
 }
+
 </style>
 
 <div class="text-center">
@@ -98,16 +99,26 @@
             <form method="post" data-team_pk='{{ team.code_name }}' enctype="multipart/form-data" id="add-members-form" action="post">
             {% bootstrap_form_errors form %}
             {% csrf_token %}
-            أضف أعضاء:
+            <div id="mem-list-header">{% if team.is_open %}أضف الأعضاء:{% else %}قائمة الأعضاء:{% endif %}</div>
 			<div class="add-members" id="add-members">
                {{ form.members }}
             </div>
 			<div class="form-control-feedback">
 				<i class=""></i>
 			</div>
-            <button style="float:left;margin-top: 3px" id='add_members' type="submit" class="btn btn-primary">
+
+<br>
+<li>حالة التسجيل:</li>
+
+
+            <a class="openclose-btn" href="{% url 'teams:control_registration' team.code_name %}">
+                <div id="status">{% if team.is_open %}مفتوح{% else %}مغلق{% endif %} </div></a>
+
+
+            <button style="float:left" id='add_members' type="submit" class="btn btn-primary">
                     احفظ
-           </button>
+            </button>
+
 
           </form>
         {% endif %}
@@ -140,4 +151,8 @@
 {% include 'bulb/groups/components/autocomplete_asset.html' %}
 {% include "teams/partials/send_email_asset.html" %}
 {% include "teams/partials/add_members_asset.html" %}
+
+{% include "teams/partials/control_registration.html" %}
+
+
 {% endblock %}

@@ -1,0 +1,28 @@
+<script type="text/javascript">
+$(function() {
+
+    function toggleStatus(data){
+        if (data.team_isopen == true){
+            $("#mem-list-header").html("أضف الأعضاء:");
+            $("#add-members").show();
+            $("#status").html("مفتوح");
+        }else if (data.team_isopen == false){
+            $("#mem-list-header").html("قائمة الأعضاء:");
+            $("#add-members").hide();
+            $("#status").html("مغلق");
+        }
+    }
+
+    $(".openclose-btn").click(function(e){
+        e.preventDefault()
+        $.ajax({
+                url: "{% url 'teams:control_registration' team.code_name %}",
+                method: "POST",
+                success: function(data){
+                    toggleStatus(data);
+                }
+            });
+    });
+});
+
+</script>

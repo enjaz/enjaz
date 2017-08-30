@@ -5,7 +5,6 @@
 
   {# Group the teams list by city in order to show each city's teams separately #}
   {% regroup all_teams by city as all_teams_by_city %}
-
   {# Loop over each city's teams #}
   {% for city_teams in all_teams_by_city %}
 

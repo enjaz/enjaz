@@ -8,9 +8,12 @@ from .models import Team
 class TeamForm(forms.ModelForm):
     class Meta:
         model = Team
-        fields = ['ar_name','en_name','description', 'email',
+        fields = ['ar_name','en_name','code_name','description', 'email',
                   'parent', 'leader', 'city', 'gender',
-                  'category', 'logo', 'is_visible']
+                  'category', 'logo', 'is_visible','year']
+        widgets = {
+            'year': forms.HiddenInput(),
+        }
     def clean(self):
         # Remove spaces at the start and end of all text fields.
         cleaned_data = super(TeamForm, self).clean()

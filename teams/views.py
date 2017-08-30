@@ -38,6 +38,7 @@ def show_info(request, code_name):
     context = {'team': team}
     return render(request, 'teams/infocard.html', context)
 
+
 class DetailView(generic.DetailView):
     model = Team
     template_name = "teams/show.html"
@@ -55,6 +56,7 @@ class DetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(DetailView, self).get_context_data(**kwargs)
         context['form'] = forms.AddTeamMembersForm(instance=self.object)
+
         return context
 
 class ArchiveDetailView(generic.DetailView):
@@ -79,9 +81,12 @@ class CreateView(PermissionRequiredMixin, generic.CreateView):
     model = Team
     form_class = TeamForm
     template_name = 'teams/new.html'
-    permission_required = 'teams.add_team'
-
+    success_url = 'teams:list_teams'
+    permission_required = 'teams.add_teams'
+    current_year = StudentClubYear.objects.get_current()
     # TODO: set year automatically
+    def get_initial(self):
+        return {'year': self.current_year}
 
 class UpdateView(PermissionRequiredMixin, generic.UpdateView):
     model = Team

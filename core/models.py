@@ -3,6 +3,8 @@ from django.db import models
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext_lazy as _
+
 
 import accounts.utils
 
@@ -129,6 +131,32 @@ class TwitterAccess(models.Model):
     access_token = models.CharField(max_length=200)
     access_token_secret = models.CharField(max_length=200)
     code_name = models.CharField(max_length=20)
+
+    def __unicode__(self):
+        return self.code_name
+
+class Campus(models.Model):
+    ar_name = models.CharField(max_length=200, verbose_name=_(u"الاسم"))
+    en_name = models.CharField(max_length=200, verbose_name=_(u"الاسم الإنجليزي"))
+    code_name = models.CharField(max_length=200, verbose_name=_(u"الاسم البرمجي"))
+
+    def __unicode__(self):
+        return self.code_name
+
+class College(models.Model):
+    ar_name = models.CharField(max_length=200, verbose_name=_(u"الاسم"))
+    en_name = models.CharField(max_length=200, verbose_name=_(u"الاسم الإنجليزي"))
+    code_name = models.CharField(max_length=200, verbose_name=_(u"الاسم البرمجي"))
+    campus = models.ForeignKey(Campus)
+
+    def __unicode__(self):
+        return self.code_name
+
+class Section(models.Model):
+    ar_name = models.CharField(max_length=200, verbose_name=_(u"الاسم"))
+    en_name = models.CharField(max_length=200, verbose_name=_(u"الاسم الإنجليزي"))
+    code_name = models.CharField(max_length=200, verbose_name=_(u"الاسم البرمجي"))
+    college = models.ForeignKey(College)
 
     def __unicode__(self):
         return self.code_name

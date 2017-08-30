@@ -15,6 +15,13 @@ CATEGORY_CHOICES = (
     ('SA', _(u'عمادة شؤون الطلاب')),
     ('P', _(u'رئاسة نادي الطلاب'))
     )
+POSITION_CHOICES = (
+    ('L', _(u'ممثلـ/ـة الفريق')),
+    ('VL', _(u'نائب ممثلـ/ـة الفريق')),
+    ('SR', _(u'الممثلـ/ـة الإعلاميـ/ـة للفريق')),
+    ('AM', _(u'عضو/ة فعالـ/ـة')),
+    ('M', _(u'عضو/ة')),
+    )
 
 class Team(models.Model):
     ar_name = models.CharField(max_length=200, verbose_name=_(u"الاسم"))
@@ -59,3 +66,9 @@ class Team(models.Model):
 
     def get_absolute_url(self):
         return "/teams/%s/" % self.code_name
+
+class Position(models.Model):
+    team= models.ForeignKey(Team)
+    user = models.ForeignKey(User, verbose_name=_(u"المستخدم"))
+    position = models.CharField(max_length=2, choices=POSITION_CHOICES,
+                               verbose_name=_(u"لمنصب"))

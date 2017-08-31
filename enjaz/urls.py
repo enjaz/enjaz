@@ -18,7 +18,6 @@ from tedx.admin import tedx_admin
 
 urlpatterns = [
     url(r'^', include('core.urls')),
-<<<<<<< HEAD
     url(r'^api/', include('api.urls')),
     url(r'^tedx/admin/', include(tedx_admin.urls)),
     url(r'^tedx/', include('tedx.urls', namespace="tedx")),
@@ -43,7 +42,6 @@ urlpatterns = [
     url(r'^user_list/', include(user_list_admin.urls)),
     url(r'^arshidni/', RedirectView.as_view(pattern_name='studentguide:index', permanent=True)),
     url(r'^mediacenter/', include('media.urls', namespace="media")),
-=======
 
     url(r'^tedx/admin/', include(tedx_admin.urls)),
     url(r'^tedx/', include('tedx.urls', namespace="tedx")),
@@ -82,7 +80,6 @@ urlpatterns = [
     url(r'^admin/', include('loginas.urls')),
     url(r'^admin/', include(admin.site.urls)),
 
->>>>>>> f062ad443ce68e15372fd3484ad3b2cf375ad22b
     url(r'^accounts/profile_type/$', TemplateView.as_view(template_name='profile_type.html'), name='profile_type'),
     url(r'^accounts/signup/$', 'userena.views.signup', {'signup_form': StudentSignupForm, 'template_name': 'userena/student_signup_form.html'}),
     url(r'^accounts/resend/$', 'accounts.views.resend_confirmation_key', name='resend_confirmation_key'),
@@ -91,16 +88,15 @@ urlpatterns = [
     url(r'^accounts/signin/$', 'userena.views.signin', {'auth_form': ModifiedAuthenticationForm}),
     url(r'^accounts/edit/$', 'accounts.views.edit_common_profile', name='edit_common_profile'),
     url(r'^accounts/', include('userena.urls')),
-<<<<<<< HEAD
+
     url(r'^questions/', include('questions.urls', namespace="cultural_program_code")),
     url(r'^certificates/admin/', include(certificate_admin.urls)),
     url(r'^certificates/', include('certificates.urls', namespace="certificates")),
-=======
+
 
     url(r'^api/', include('api.urls')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
->>>>>>> f062ad443ce68e15372fd3484ad3b2cf375ad22b
     url(r'^tagging_autocomplete/', include('tagging_autocomplete.urls')),
 
     url(r'^teams/', include('teams.urls', namespace="teams")),

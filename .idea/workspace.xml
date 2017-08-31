@@ -1,21 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="931492bf-531f-436a-be01-5af3087a331b" name="Default" comment="Models and views for submission form 26 July.">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/approvals/templates/approvals/request-detail.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/clubs/migrations/0053_add_2017_2018_clubs.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0013_add_2017_2018_year.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/activities2/models.py" afterPath="$PROJECT_DIR$/activities2/models.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/activities2/views.py" afterPath="$PROJECT_DIR$/activities2/views.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/approvals/forms.py" afterPath="$PROJECT_DIR$/approvals/forms.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/approvals/models.py" afterPath="$PROJECT_DIR$/approvals/models.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/approvals/urls.py" afterPath="$PROJECT_DIR$/approvals/urls.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/approvals/views.py" afterPath="$PROJECT_DIR$/approvals/views.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/events/admin.py" afterPath="$PROJECT_DIR$/events/admin.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/events/tests.py" afterPath="$PROJECT_DIR$/events/tests.py" />
-    </list>
+    <list default="true" id="931492bf-531f-436a-be01-5af3087a331b" name="Default" comment="Models and views for submission form 26 July." />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -391,6 +377,9 @@
     </configuration>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="931492bf-531f-436a-be01-5af3087a331b" name="Default" comment="" />
@@ -461,6 +450,14 @@
           </value>
         </entry>
       </map>
+    </option>
+  </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+    <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+      <collection />
     </option>
   </component>
   <component name="VcsContentAnnotationSettings">

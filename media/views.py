@@ -94,7 +94,7 @@ def list_reports(request):
         clubs_for_user = employee_clubs
     else:
         clubs_for_user = get_clubs_for_assessment_by_user(request.user)
-    reports = FollowUpReport.objects.current_year().filter(episode__activity__primary_club__in=clubs_for_user)
+    reports = FollowUpReport.objects.current_year().filter(episode__activity__primary_club__in=clubs_for_user, is_draft=False)
     return render(request, 'media/list_reports.html', {'reports': reports})
 
 @login_required
@@ -196,7 +196,8 @@ def submit_report(request, episode_pk):
                                   instance=FollowUpReport(pk=episode.pk, # make pk equal to episode pk
                                                                          # to keep things synchronized
                                                           episode=episode,
-                                                          submitter=request.user)
+                                                          submitter=request.user,
+                                                          is_draft=request.POST['draft'])
                                   )
         image_formset = FollowUpReportImageFormset(request.POST, request.FILES)
         ad_formset = FollowUpReportAdImageFormset(request.POST, request.FILES)

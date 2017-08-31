@@ -116,6 +116,7 @@ class FollowUpReport(models.Model):
     announcement_sites = models.TextField(verbose_name=u"أماكن النشر و الإعلان")
     notes = models.TextField(verbose_name=u"ملاحظات", blank=True, default="")
 
+    is_draft = models.BooleanField(verbose_name=u"حفظ كمسودة", default=False)
     def __unicode__(self):
         "Return the name of the parent activity followed by the number of the episode"
         return self.episode.activity.name + " #" + str(self.episode.get_index())

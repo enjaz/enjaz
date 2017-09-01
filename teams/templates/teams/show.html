@@ -70,11 +70,10 @@
     {% if user.position %} {{ user.position.profile.get_full_name}}
     {% elif can_edit_position %}
         <div class="dropdown">
-            <form action="" method="post">
+            <form action="{% url 'teams:show' team.pk %}" method="post">
                 {% csrf_token %}
                     {% bootstrap_form positionform %}
                     {% buttons %}
-
                         <button style="float:left;margin-top: 3px" id='add_position' type="submit" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
                         عيّن
                         </button>

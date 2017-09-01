@@ -63,4 +63,4 @@ class EmailForm(forms.Form):
 class AddPositionForm(forms.ModelForm):
     class Meta:
         model = Position
-        fields = ['position']
+        fields = ['user','position']

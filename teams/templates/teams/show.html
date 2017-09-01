@@ -95,6 +95,7 @@
         {% has_perm 'teams.change_team_display_details' request.user as can_edit %}
         {% if can_edit %}<li><a href="{% url 'teams:edit' team.code_name %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
           <br>
+            <a href="{% url 'forms:form_list' team.pk %}">النماذج </a>
             <form method="post" data-team_pk='{{ team.code_name }}' enctype="multipart/form-data" id="add-members-form" action="post">
             {% bootstrap_form_errors form %}
             {% csrf_token %}

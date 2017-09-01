@@ -84,7 +84,7 @@ class CreateView(PermissionRequiredMixin, generic.CreateView):
     success_url = 'teams:list_teams'
     permission_required = 'teams.add_teams'
     current_year = StudentClubYear.objects.get_current()
-    # TODO: set year automatically
+
     def get_initial(self):
         return {'year': self.current_year}
 

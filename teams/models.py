@@ -70,5 +70,4 @@ class Team(models.Model):
 class Position(models.Model):
     team= models.ForeignKey(Team)
     user = models.ForeignKey(User, verbose_name=_(u"المستخدم"))
-    position = models.CharField(max_length=2, choices=POSITION_CHOICES,
-                               verbose_name=_(u"لمنصب"))
+    position = models.CharField(max_length=2, choices=POSITION_CHOICES, default='M', verbose_name=_(u"لمنصب"))

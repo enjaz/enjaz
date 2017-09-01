@@ -29,3 +29,4 @@ rules.add_perm('teams.change_team_members', is_team_leader)
 rules.add_perm('teams.change_team_registration', is_team_leader | is_team_member)
 
 rules.add_perm('teams.view_team_evaluation_summary', is_supervisor)
+rules.add_perm('teams.change_members_position', is_team_leader)

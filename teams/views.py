@@ -15,12 +15,12 @@ from django.views.decorators import csrf
 from django.views import generic
 from rules.contrib.views import PermissionRequiredMixin
 from post_office import mail
-
+from django.core.urlresolvers import reverse_lazy
 from core.models import StudentClubYear
-from teams.models import Team, CATEGORY_CHOICES
+from teams.models import Team, CATEGORY_CHOICES, Position
 from clubs.models import city_choices
 from teams.utils import is_coordinator
-from teams.forms import DisabledTeamForm, TeamForm, EmailForm
+from teams.forms import DisabledTeamForm, TeamForm, EmailForm, AddPositionForm
 from core import decorators
 from teams import forms
 
@@ -153,3 +153,11 @@ def send_email(request, code_name):
     context = {'form': form,
                 'team': team}
     return render(request, 'teams/send_email_form.html', context)
+
+class CreatePositionView(CreateView):
+    model = Position
+    form_class = AddPositionForm
+    template_name = 'teams/position.html'
+    success_url = reverse_lazy('show')
+    permission_required = 'teams.change_members_position'
+

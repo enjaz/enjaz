@@ -2,7 +2,7 @@
 from django import forms
 from dal import autocomplete
 
-from .models import Team
+from .models import Team, Position
 
 
 class TeamForm(forms.ModelForm):
@@ -56,3 +56,8 @@ class AddTeamMembersForm(forms.ModelForm):
 class EmailForm(forms.Form):
     subject = forms.CharField(label=u"العنوان")
     text = forms.CharField(label=u"اكتب نص رسالتك هنا", widget=forms.Textarea)
+
+class AddPositionForm(forms.ModelForm):
+    class Meta:
+        model = Position
+        fields = ['position']

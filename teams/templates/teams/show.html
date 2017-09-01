@@ -59,23 +59,27 @@
     <th>المنسق</th>
     <td>{% if team.leader %} {{ team.leader.common_profile.get_ar_full_name|default:team.leader.username }} {% else %} لا يوجد {% endif %}</td>
   </tr>
-  <tr>
+ <!-- <tr>
     <th>المنصب</th>
-    <td>{% if user.position %} {{ user.position.profile.get_full_name|default:# }}{% else %} لا يوجد {% endif %}
-        {% if user.position == 'L' %}
-            <div class="dropdown">
-                <button style="float:left;margin-top: 3px" id='add_position' type="submit" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">عيّن المنصب
-                <span class="caret"></span></button>
-                <ul class="dropdown-menu">
-                  <li><a href="#">نائب ممثلـ/ـة الفريق</a></li>
-                  <li><a href="#">الممثلـ/ـة الإعلاميـ/ـة للفريق</a></li>
-                  <li><a href="#">عضو/ة فعالـ/ـة</a></li>
-                  <li><a href="#">عضو/ة</a></li>
-                </ul>
-            </div>
-        {% endif %}
+    <td>{% has_perm 'teams.change_members_position' request.user as can_edit_position %}
+    {% if user.position %} {{ user.position.profile.get_full_name}}
+    {% elif can_edit_position %}
+        <div class="dropdown">
+            <form action="" method="post">
+                {% csrf_token %}
+                    {% bootstrap_form form %}
+                    {% buttons %}
+                        <button style="float:left;margin-top: 3px" id='add_position' type="submit" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        عيّن
+                        </button>
+                    {% endbuttons %}
+            </form>
+        </div>
+    {% else %} لا يوجد
+    {% endif %}
+
     </td>
-  </tr>
+  </tr> -->
 </table>
 </div>
 <div class="col-md-4">

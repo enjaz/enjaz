@@ -60,6 +60,7 @@ class DetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(DetailView, self).get_context_data(**kwargs)
         context['form'] = forms.AddTeamMembersForm(instance=self.object)
+        context['positionform'] = forms.AddPositionForm(instance=self.object)
 
         return context
 

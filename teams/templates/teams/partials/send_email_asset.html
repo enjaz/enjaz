@@ -19,7 +19,9 @@
             $submitButton.off('click');
             $submitButton.click(function () {
                 $("form#send-email-form").submit();
+                    $("#send-email-modal").modal('hide');
             });
+
         });
     });
 {% include 'bulb/adjust_modal_size.js' %}

@@ -1,0 +1,46 @@
+{% extends 'teams_base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Forms" %}{% endblock %}
+{% block content %}
+    <style>
+        .errorlist {color:#f00;}
+    </style>
+
+    <div class="row">
+    <div class="panel panel-default panel-shadow" data-collapsed="0">
+
+    <div class="panel-heading">
+        <div class="panel-title">
+            {% include 'teams/forms/breadcrumb.html' %}
+        </div>
+    </div>
+	<!-- panel body -->
+	<div class="panel-body">
+
+    {% for form in forms %}
+        {# Use `cycle` to help with arrangement of forms into 3 per row. #}
+        {# It's in an HTML comment so that its output isn't printed on the page. #}
+        <!-- {% cycle 'start' '' 'end' as row_pos %} -->
+            {% if row_pos == 'start' or forloop.first %}
+            <div class="row">
+            {% endif %}
+              <div class="col-sm-6 col-md-4">
+                <div class="thumbnail">
+                  <div class="caption">
+                    <h3>{{ form.title }}</h3>
+                    <p>{{ form.intro|linebreaksbr }}</p>
+                    <p><a href="{% url 'forms:form_detail' object_id form.get_url_attr %}"
+                          class="btn btn-block btn-primary" role="button"><i class="entypo-left-bold"></i> </a></p>
+                  </div>
+                </div>
+              </div>
+            {% if row_pos == 'end' or forloop.last %}
+            </div>
+            {% endif %}
+    {% empty %}
+    <p>{% trans "No forms to display." %}</p>
+    {% endfor %}
+    </div>
+    </div>
+    </div>
+{% endblock %}

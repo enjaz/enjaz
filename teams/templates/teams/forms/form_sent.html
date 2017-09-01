@@ -1,0 +1,21 @@
+{% extends 'teams_base.html' %}
+{% block title %}{{ form.title }}{% endblock %}
+{% block content %}
+    <style>
+        .errorlist {color:#f00;}
+    </style>
+<div class="row">
+<div class="panel panel-default panel-shadow" data-collapsed="0">
+    <div class="panel-heading">
+        <div class="panel-title">{% include "teams/forms/breadcrumb.html" %}</div>
+    </div>
+	<!-- panel body -->
+	<div class="panel-body">
+    <h3>{{ form.title }}</h3>
+    {% if form.response %}
+    <p class="alert alert-success">{{ form.response|linebreaksbr }}</p>
+    {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

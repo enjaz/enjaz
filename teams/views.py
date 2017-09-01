@@ -18,11 +18,14 @@ from post_office import mail
 from django.core.urlresolvers import reverse_lazy
 from core.models import StudentClubYear
 from teams.models import Team, CATEGORY_CHOICES, Position
+from teams.models import Team, CATEGORY_CHOICES, Membership
 from clubs.models import city_choices
 from teams.utils import is_coordinator
 from teams.forms import DisabledTeamForm, TeamForm, EmailForm, AddPositionForm
 from core import decorators
 from teams import forms
+
+FORMS_CURRENT_APP = "team_forms"
 
 
 class ListView(generic.ListView):
@@ -44,6 +47,7 @@ class DetailView(generic.DetailView):
     template_name = "teams/show.html"
     slug_field = 'code_name'
     slug_url_kwarg = 'code_name'
+    current_app = FORMS_CURRENT_APP
 
     def get_object(self):
         current_year = StudentClubYear.objects.get_current()
@@ -83,8 +87,10 @@ class CreateView(PermissionRequiredMixin, generic.CreateView):
     template_name = 'teams/new.html'
     success_url = 'teams:list_teams'
     permission_required = 'teams.add_teams'
+    current_year = StudentClubYear.objects.get_current()
 
-    # TODO: set year automatically
+    def get_initial(self):
+        return {'year': self.current_year}
 
 class UpdateView(PermissionRequiredMixin, generic.UpdateView):
     model = Team
@@ -112,7 +118,8 @@ def add_members(request, code_name):
     ar_name = team.ar_name
 
     if not request.user == team.leader and \
-            not request.user.is_superuser:
+            not request.user.is_superuser and \
+            team.is_open is False:
         raise PermissionDenied
 
     context = {}
@@ -120,7 +127,10 @@ def add_members(request, code_name):
     if request.method == 'POST':
         form = forms.AddTeamMembersForm(request.POST, instance=team)
         if form.is_valid():
-            form.save()
+            form.save(commit=False)
+            membership = Membership(member=request.user, team=team)
+            #TODO: check how to specify memeber ^
+            membership.save()
             return {"message": "success"}
     context['form'] = form
 
@@ -153,6 +163,30 @@ def send_email(request, code_name):
     context = {'form': form,
                 'team': team}
     return render(request, 'teams/send_email_form.html', context)
+
+@login_required
+@decorators.ajax_only
+@csrf.csrf_exempt
+def control_registration(request, code_name):
+    current_year = StudentClubYear.objects.get_current()
+    team = get_object_or_404(Team, code_name=code_name)
+
+    if not request.user == team.leader and \
+            not request.user.is_superuser:
+        raise PermissionDenied
+
+    #if team.year is not current_year:
+    #    team.is_open = False
+    #else:
+    if team.is_open == True:
+        team.is_open = False
+    elif team.is_open == False:
+        team.is_open = True
+    team.save()
+    return {'team_isopen': team.is_open}
+
+
+
 
 class CreatePositionView(CreateView):
     model = Position

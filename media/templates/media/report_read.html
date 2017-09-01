@@ -162,14 +162,11 @@
                 <h4>صور إعلانات النشاط</h4>
 
                 {% for image in report.ad_images.all %}
-                    {% if forloop.first %}<ul>{% endif %}
-                        <li>
+                    
                         <a href="{{ image.image.url }}" class="english-field">
-                            <i class="entypo-picture"></i>
-                            {{ image.image.name }}
+                            <img style="height: 100px; margin:0px 10px; border-radius: 10%" src="{{ image.image.url }}">
                         </a>
-                        </li>
-                    {% if forloop.last %}</ul>{% endif %}
+                        
                 {% empty %}
                     <p>لا يوجد.</p>
                 {% endfor %}
@@ -178,14 +175,11 @@
                 <h4>صور النشاط</h4>
 
                 {% for image in report.images.all %}
-                    {% if forloop.first %}<ul>{% endif %}
-                        <li>
+                    
                         <a href="{{ image.image.url }}" class="english-field">
-                            <i class="entypo-picture"></i>
-                            {{ image.image.name }}
+                            <img style="height: 100px; margin: 0px 10px; border-radius: 10%" src="{{ image.image.url }}">
                         </a>
-                        </li>
-                    {% if forloop.last %}</ul>{% endif %}
+                        
                 {% empty %}
                     <p>لا يوجد.</p>
                 {% endfor %}

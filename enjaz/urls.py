@@ -15,6 +15,7 @@ from clubs.urls import club_forms_urls
 from core.views import visit_announcement
 from researchhub.forms import ResearchHubSignupForm
 from tedx.admin import tedx_admin
+from teams.urls import team_forms_urls
 
 urlpatterns = [
     url(r'^', include('core.urls')),
@@ -54,7 +55,7 @@ urlpatterns = [
     url(r'^certificates/admin/', include(certificate_admin.urls)),
     url(r'^certificates/', include('certificates.urls', namespace="certificates")),
     url(r'^tagging_autocomplete/', include('tagging_autocomplete.urls')),
-
+    team_forms_urls,
     url(r'^teams/', include('teams.urls', namespace="teams")),
 ]
 

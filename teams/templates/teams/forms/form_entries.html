@@ -1,6 +1,6 @@
-{% extends 'clubs_base.html' %}{% load i18n %}
+{% extends 'teams/show.html' %}{% load i18n %}
 {% block title %}{{ title }}{% endblock %}
-{% block content %}
+{% block review_content %}
     <style>
     #content-main table {margin:10px 0 20px 0;}
     #content-main ul, #content-main li {display:inline; padding:0;}
@@ -64,7 +64,6 @@
         });
     });
     </script>
-<div class="row">
 <div class="panel panel-default panel-shadow" data-collapsed="0">
     <div class="panel-heading">
         <div class="panel-title">{% trans "Entries" %}
@@ -78,8 +77,6 @@
     </div>
 	<!-- panel body -->
 	<div class="panel-body">
-
-    <h3>{% trans "Entries" %}</h3>
 
     <div id="content-main">
         <form method="post">
@@ -157,10 +154,6 @@
         {% if can_delete_entries %}
         <input type="submit" name="back" class="button btn btn-xs btn-default" value="{% trans "Back to form" %}">
         <input type="submit" name="delete" class="button btn btn-xs btn-danger" value="{% trans "Delete selected" %}">
-        {% if original.is_primary %}
-        <input type="submit" name="approve_and_delete" class="button btn btn-xs btn-gold" value="اقبل و احذف المحدد">
-        <input type="submit" name="approve" class="button btn btn-xs btn-success" value="اقبل المحدد">
-        {% endif %}
         {% endif %}
         {% endif %}
         {% empty %}
@@ -171,19 +164,4 @@
     </div>
 </div>
 </div>
-</div>
 {% endblock %}
-{% if original.is_primary %}
-{% block customscript %}
-<script>
-$(document).ready(function () {
-    // A little hack to make approve buttons post to a different url
-    $("input[name=approve], input[name=approve_and_delete]").click(function () {
-        $("form").attr("action", "{% url 'clubs:approve_application' club.id %}");
-        return true;
-    });
-
-});
-</script>
-{% endblock %}
-{% endif %}

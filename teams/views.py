@@ -24,6 +24,8 @@ from teams.forms import DisabledTeamForm, TeamForm, EmailForm
 from core import decorators
 from teams import forms
 
+FORMS_CURRENT_APP = "team_forms"
+
 
 class ListView(generic.ListView):
     template_name = 'teams/list_teams.html'
@@ -44,6 +46,7 @@ class DetailView(generic.DetailView):
     template_name = "teams/show.html"
     slug_field = 'code_name'
     slug_url_kwarg = 'code_name'
+    current_app = FORMS_CURRENT_APP
 
     def get_object(self):
         current_year = StudentClubYear.objects.get_current()

@@ -95,30 +95,27 @@
         <li><a id="send-email"><i class="fa fa-envelope"></i> أرسل بريد إلكتروني للفريق </a></li>
         {% has_perm 'teams.change_team_display_details' request.user as can_edit %}
         {% if can_edit %}<li><a href="{% url 'teams:edit' team.code_name %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
-          <br>
-            <a href="{% url 'forms:form_list' team.pk %}">النماذج </a>
+         <li>            <a href="{% url 'forms:form_list' team.pk %}"><i class="entypo-docs"></i>النماذج </a></li>
+
             <form method="post" data-team_pk='{{ team.code_name }}' enctype="multipart/form-data" id="add-members-form" action="post">
             {% bootstrap_form_errors form %}
             {% csrf_token %}
-            <div id="mem-list-header">{% if team.is_open %}أضف الأعضاء:{% else %}قائمة الأعضاء:{% endif %}</div>
+
+<li>حالة التسجيل:</li>
+            
+            <a class="openclose-btn" href="{% url 'teams:control_registration' team.code_name %}">
+                <div id="status">{% if team.is_open %}مفتوح{% else %}مغلق{% endif %} </div></a>
+<div id="mem-list-header">{% if team.is_open %}أضف الأعضاء:{% else %}قائمة الأعضاء:{% endif %}</div>
 			<div class="add-members" id="add-members">
                {{ form.members }}
-            </div>
+
 			<div class="form-control-feedback">
 				<i class=""></i>
 			</div>
-
-<br>
-<li>حالة التسجيل:</li>
-
-
-            <a class="openclose-btn" href="{% url 'teams:control_registration' team.code_name %}">
-                <div id="status">{% if team.is_open %}مفتوح{% else %}مغلق{% endif %} </div></a>
-
-
-            <button style="float:left" id='add_members' type="submit" class="btn btn-primary">
+                        <button style="float:left" id='add_members' type="submit" class="btn btn-primary">
                     احفظ
             </button>
+</div>
 
 
           </form>
@@ -140,6 +137,7 @@
 		</div>
 	</div>
 </div>
+
 </div>
 
 {% endblock %}
@@ -154,6 +152,12 @@
 {% include "teams/partials/add_members_asset.html" %}
 
 {% include "teams/partials/control_registration.html" %}
-
+<script type="text/javascript">
+$(function() {
+    {% if not team.is_open %}
+    $("#mem-list-header,#add-members").hide();
+    {% endif %}
+    });
+</script>
 
 {% endblock %}

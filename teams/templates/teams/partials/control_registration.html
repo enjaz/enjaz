@@ -3,11 +3,11 @@ $(function() {
 
     function toggleStatus(data){
         if (data.team_isopen == true){
-            $("#mem-list-header").html("أضف الأعضاء:");
+            $("#mem-list-header").show();
             $("#add-members").show();
             $("#status").html("مفتوح");
         }else if (data.team_isopen == false){
-            $("#mem-list-header").html("قائمة الأعضاء:");
+            $("#mem-list-header").hide();
             $("#add-members").hide();
             $("#status").html("مغلق");
         }

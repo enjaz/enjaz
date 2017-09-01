@@ -1,4 +1,4 @@
-{% extends 'clubs_base.html' %}{% load i18n %}{% load staticfiles %}
+{% extends 'teams_base.html' %}{% load i18n %}{% load staticfiles %}
 {% block title %}{% if builder_form.instance.pk %}{% trans "Edit Form" %}{% else %}{% trans "Add Form" %}{% endif %}{% endblock %}
 {% block content %}
     <style>
@@ -11,7 +11,7 @@
     <div class="panel-heading">
 
         <div class="panel-title">
-            {% include 'clubs/forms/breadcrumb.html' %}
+            {% include 'teams/forms/breadcrumb.html' %}
         </div>
         {% if builder_form.instance.pk %}
         <div class="panel-options">

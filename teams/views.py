@@ -168,6 +168,23 @@ def send_email(request, code_name):
 @login_required
 @decorators.ajax_only
 @csrf.csrf_exempt
+def add_position(request, code_name):
+    team = get_object_or_404(Team, code_name=code_name, year=current_year)
+    ar_name = team.ar_name
+
+    if not request.user == team.leader and \
+            not request.user.is_superuser:
+        raise PermissionDenied
+    context = {}
+    if request.method == 'POST':
+        form = forms.AddPositionForm(request.POST, instance=team)
+        if form.is_valid():
+            form.save(commit=False)
+            return {"message": "success"}
+    context['form'] = form
+    return render(request, 'teams/show.html', context)
+@login_required
+@decorators.ajax_only
 def control_registration(request, code_name):
     current_year = StudentClubYear.objects.get_current()
     team = get_object_or_404(Team, code_name=code_name)
@@ -188,11 +205,4 @@ def control_registration(request, code_name):
 
 
 
-
-class CreatePositionView(CreateView):
-    model = Position
-    form_class = AddPositionForm
-    template_name = 'teams/position.html'
-    success_url = reverse_lazy('show')
-    permission_required = 'teams.change_members_position'
 

@@ -70,7 +70,7 @@
     {% if user.position %} {{ user.position.profile.get_full_name}}
     {% elif can_edit_position %}
         <div class="dropdown">
-            <form action="{% url 'teams:show' team.pk %}" method="post">
+            <form action="{% url 'teams:add_position' team.pk %}" id="add-position-form" method="post">
                 {% csrf_token %}
                     {% bootstrap_form positionform %}
                     {% buttons %}
@@ -153,6 +153,7 @@
 {% include 'bulb/groups/components/autocomplete_asset.html' %}
 {% include "teams/partials/send_email_asset.html" %}
 {% include "teams/partials/add_members_asset.html" %}
+{% include "teams/partials/add_position_asset.html" %}
 
 {% include "teams/partials/control_registration.html" %}
 <script type="text/javascript">

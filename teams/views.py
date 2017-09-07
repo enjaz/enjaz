@@ -86,7 +86,6 @@ class CreateView(PermissionRequiredMixin, generic.CreateView):
     model = Team
     form_class = TeamForm
     template_name = 'teams/new.html'
-    success_url = 'teams:list_teams'
     permission_required = 'teams.add_teams'
     current_year = StudentClubYear.objects.get_current()
 
@@ -202,7 +201,3 @@ def control_registration(request, code_name):
         team.is_open = True
     team.save()
     return {'team_isopen': team.is_open}
-
-
-
-

@@ -48,61 +48,23 @@ class Campus(models.Model):
         verbose_name_plural = _(u"مدن جامعية")
 
 
-class Section(models.Model):
+class Specialty(models.Model):
     """
-    Each campus has 2 sections, one 'male' and one 'female'.
+    A specialty like Medicine or Nursing.
     """
-    campus = models.ForeignKey(
-        'core.Campus',
-        related_name='sections',
-        verbose_name=_(u"المدينة الجامعية")
-    )
-    gender = models.CharField(
-        _(u"الجنس"),
-        max_length=1,
-        choices=PLURAL_STUDENT_GENDER_CHOICES
-    )
-
-    def __unicode__(self):
-        return u"{} - {}".format(self.campus.city, self.get_gender_display())
-
-    class Meta:
-        verbose_name = _(u"قِسم")
-        verbose_name_plural = _(u"أقسام")
-
-
-class College(models.Model):
-    """
-    `College` objects are gender-specific; so an actual college may be represented by more than 1 `College` object for
-    a particular campus.
-       For example, the College of Medicine in Riyadh is represented by 2 `College` objects: (1) College of
-       Medicine (Male), and (2) College of Medicine (Female).
-    """
-    campus = models.ForeignKey(
-        'core.Campus',
-        related_name='colleges',
-        verbose_name=_(u"المدينة الجامعية")
-    )
-    section = models.ForeignKey(
-        'core.Section',
-        related_name='colleges',
-        verbose_name=_(u"القِسم")
-    )
     name = models.CharField(_(u"الاسم"), max_length=50)
 
-    # We're going to be gradually moving data from the old `clubs.College` model to here. This field is
-    # for maintaining a link between the old and new data. It's a temporary measure.
-    old_college_object = models.OneToOneField(
-        'clubs.College',
-        related_name='new_college_object',
-    )
-
     def __unicode__(self):
-        return u"{} ({} - {})".format(self.name, self.campus.city, self.section.get_gender_display())
+        return self.name
 
     class Meta:
-        verbose_name = _(u"كلية")
-        verbose_name_plural = _(u"كليات")
+        verbose_name = _(u"تخصص")
+        verbose_name_plural = _(u"تخصصات")
+
+
+# May be implemented in the future
+# class Level(models.Model):
+#     pass
 
 
 class StudentClubYear(models.Model):
@@ -143,38 +105,6 @@ class StudentClubYear(models.Model):
     class Meta:
         verbose_name = u"سنة نادي"
         verbose_name_plural = u"سنوات النادي"
-
-
-class Announcement(models.Model):
-    """
-    An announcement.
-    """
-    TYPE_CHOICES = (
-        ('R', u'إعلان بحث'),
-        ('E', u'إعلان جهة خارجية'),
-        ('M', u'إعلان برنامج عام لنادي الطلاب'),
-    )
-    type = models.CharField(max_length=1,
-                            choices=TYPE_CHOICES,
-                            verbose_name=u"النوع")
-    title = models.CharField(max_length=128,
-                             verbose_name=u"العنوان")
-    description = models.TextField(verbose_name=u"الوصف")
-    image = models.ImageField(upload_to='announcement_images', blank=True, null=True)
-    url = models.URLField(verbose_name=u"الرابط")
-    visits = models.PositiveIntegerField(default=0,
-                                         verbose_name=u"عدد الزيارات")
-    date_created = models.DateTimeField(auto_now_add=True,
-                                        verbose_name=u"تاريخ الإنشاء")
-
-    # Note: announcements should be flexible as to who can see them (eg, different announcements for different campuses)
-
-    def __unicode__(self):
-        return self.title
-
-    class Meta:
-        verbose_name = u"إعلان"
-        verbose_name_plural = u"الإعلانات"
 
 
 class Publication(models.Model):

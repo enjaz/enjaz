@@ -11,7 +11,6 @@ urlpatterns = [
     url(r'^indicators/$', views.indicators, name='indicators'),
     url(r'^indicators/(?P<city_code>\w)/$', views.indicators, name='indicators_for_city'),
     url(r'^aboutsc/(deanship_cp4)/$', RedirectView.as_view(pattern_name='media:show_post'), name='cp4_bader'),
-    url(r'^visit/(?P<pk>\d+)/$', views.visit_announcement, name='visit_announcement'),
     url(r'^cancel_twitter_connection$', views.cancel_twitter_connection, name='cancel_twitter_connection'),
     url('', include('social.apps.django_app.urls', namespace='social')),
     url(r'^user_count/$', TemplateView.as_view(template_name='user_count.html'), name='user_count'),

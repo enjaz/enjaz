@@ -21,7 +21,7 @@ urlpatterns = [
     url(r'^tedx/admin/', include(tedx_admin.urls)),
     url(r'^tedx/', include('tedx.urls', namespace="tedx")),
 
-    url(r'^approvals/', include('approvals.urls')),
+    url(r'^approvals/', include('approvals.urls', namespace='approvals')),
     activity_forms_urls,
     url(r'^activities/admin/', include(invitation_admin.urls)),
     url(r'^activities/', include('activities.urls', namespace="activities")),

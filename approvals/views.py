@@ -32,9 +32,11 @@ class SubmitActivityCreateRequest(generic.TemplateView):
         }))
 
 
-class RequestDetail(DetailView):
+class ActivityRequestDetail(DetailView):
     model = ActivityRequest
     queryset = ActivityRequest.objects.all()
+    template_name = "approvals/activity-request-detail.html"
+    context_object_name = 'activity_request'
 
 
 class ActivityApproval(CreateView):

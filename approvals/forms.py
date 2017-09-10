@@ -1,7 +1,7 @@
 from django import forms
 from django.forms.models import inlineformset_factory
 
-from approvals.models import ActivityRequest, EventRequest, ActivityRequsetResponse
+from approvals.models import ActivityRequest, EventRequest, ActivityRequestReview
 
 
 class ActivityCreateRequestForm(forms.ModelForm):
@@ -18,7 +18,7 @@ class ActivityUpdateRequestForm(forms.ModelForm):
 
 class ActivityRequestResponseForm(forms.ModelForm):
     class Meta:
-        model = ActivityRequsetResponse
+        model = ActivityRequestReview
         fields = '__all__'
 
 

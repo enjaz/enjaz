@@ -1,7 +1,7 @@
 from django.shortcuts import redirect
 from django.views import generic
 from approvals.forms import ActivityCreateRequestForm, EventRequestFormSet, ActivityRequestResponseForm
-from approvals.models import ActivityRequest, ActivityRequsetResponse
+from approvals.models import ActivityRequest, ActivityRequestReview
 
 
 class SubmitActivityCreateRequest(generic.TemplateView):
@@ -48,5 +48,5 @@ class ActivityRequestDetail(generic.DetailView):
 
 
 class ActivityApproval(generic.CreateView):
-    model = ActivityRequsetResponse
+    model = ActivityRequestReview
     form_class = ActivityRequestResponseForm

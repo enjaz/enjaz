@@ -7,48 +7,51 @@
 {% endblock %}
 
 {% block content %}
-  <ul class="cbp_tmtimeline">
-{#    <li>#}
-{#      <time class="cbp_tmtime" datetime="2017-09-10T18:30">#}
-{#        <span class="hidden">10/09/2017</span>#}
-{#        <span class="large">Now</span>#}
-{#      </time>#}
-{#      <div class="cbp_tmicon">#}
-{#        <i class="entypo-user"></i>#}
-{#      </div>#}
-{#      <div class="cbp_tmlabel empty">#}
-{#        <span>No Activity</span>#}
-{#      </div>#}
-{#    </li>#}
+  <div class="well">
+    <ul class="cbp_tmtimeline">
+  {#    <li>#}
+  {#      <time class="cbp_tmtime" datetime="2017-09-10T18:30">#}
+  {#        <span class="hidden">10/09/2017</span>#}
+  {#        <span class="large">Now</span>#}
+  {#      </time>#}
+  {#      <div class="cbp_tmicon">#}
+  {#        <i class="entypo-user"></i>#}
+  {#      </div>#}
+  {#      <div class="cbp_tmlabel empty">#}
+  {#        <span>No Activity</span>#}
+  {#      </div>#}
+  {#    </li>#}
 
-    <li>
-      <time class="cbp_tmtime" datetime="{{ activity_request.submission_datetime|date:"c" }}">
-        <span>{{ activity_request.submission_datetime|date:"h:i A" }}</span>
-        <span>{{ activity_request.submission_datetime|naturalday }}</span>
-      </time>
-      <div class="cbp_tmicon bg-success"> <i class="entypo-feather"></i> </div>
-      <div class="cbp_tmlabel">
-        <h2>{% trans "تم رفع نشاط جديد باسم:" %} {{ activity_request.name }}</h2>
-{#        <p>#}
-{#          Tolerably earnestly middleton extremely distrusts she boy now not.#}
-{#          Add and offered prepare how cordial two promise.#}
-{#          Greatly who affixed suppose but enquire compact prepare all put.#}
-{#          Added forth chief trees but rooms think may.#}
-{#        </p>#}
-      </div>
-    </li>
+      <li>
+        <time class="cbp_tmtime" datetime="{{ activity_request.submission_datetime|date:"c" }}">
+          <span>{{ activity_request.submission_datetime|date:"h:i A" }}</span>
+          <span>{{ activity_request.submission_datetime|naturalday }}</span>
+        </time>
+        <div class="cbp_tmicon bg-success"> <i class="entypo-feather"></i> </div>
+        <div class="cbp_tmlabel">
+          <h2>{% trans "تم رفع نشاط جديد باسم:" %} {{ activity_request.name }}</h2>
+  {#        <p>#}
+  {#          Tolerably earnestly middleton extremely distrusts she boy now not.#}
+  {#          Add and offered prepare how cordial two promise.#}
+  {#          Greatly who affixed suppose but enquire compact prepare all put.#}
+  {#          Added forth chief trees but rooms think may.#}
+  {#        </p>#}
+        </div>
+      </li>
 
-    <li>
-      <time class="cbp_tmtime" datetime="2017-09-10T18:30">
-{#        <span class="hidden">10/09/2017</span>#}
-{#        <span class="large">Now</span>#}
-      </time>
-      <div class="cbp_tmicon">
-        <i class="entypo-flag"></i>
-      </div>
-      <div class="cbp_tmlabel empty">
-{#        <span>No Activity</span>#}
-      </div>
-    </li>
-  </ul>
+      <li>
+        <time class="cbp_tmtime" datetime="2017-09-10T18:30">
+  {#        <span class="hidden">10/09/2017</span>#}
+  {#        <span class="large">Now</span>#}
+        </time>
+        <div class="cbp_tmicon">
+          <i class="entypo-flag"></i>
+        </div>
+        <div class="cbp_tmlabel empty">
+  {#        <span>No Activity</span>#}
+        </div>
+      </li>
+    </ul>
+  </div>
+
 {% endblock %}

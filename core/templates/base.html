@@ -38,7 +38,7 @@ you?
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.min.css' %}">
     {% endblock %}
 	<link rel="stylesheet" href="{% static 'neon/assets/css/skins/green.css' %}">
-	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}?v=0001">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}?v=0002">
     {% block customstyles %}{% endblock %}
   {% endblock %}
 
@@ -410,8 +410,10 @@ you?
       <!-- /.navbar-collapse -->
     </nav>
 
-    <div class="col-xs-12 clearfix">
-      {% block content %}{% endblock %}
+    <div class="row">
+      <div class="col-xs-12 clearfix">
+        {% block content %}{% endblock %}
+      </div>
     </div>
 
     <div class="clearfix"></div>

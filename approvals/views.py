@@ -30,14 +30,11 @@ class SubmitActivityCreateRequest(generic.TemplateView):
         }))
 
 
-class ActivityRequestList(generic.TemplateView):
+class ActivityRequestList(generic.ListView):
+    module = ActivityRequest
+    queryset = ActivityRequest.objects.all()
     template_name = "approvals/activityrequest_list.html"
-
-    def get_context_data(self, **kwargs):
-        return super(ActivityRequestList, self).get_context_data(**kwargs).update({
-            'active_requests': ActivityRequest.objects.all(),
-            'inactive_requests': ActivityRequest.objects.all(),
-        })
+    context_object_name = "activity_requests"
 
 
 class ActivityRequestDetail(generic.DetailView):

@@ -49,12 +49,12 @@ body, p, .form-control, .page-container .sidebar-menu #main-menu li, .login-page
 }
 
 .sidebar-menu #main-menu li, .main-content .user-info li a, .frontend .site-header .site-nav .main-menu li a, body, .dinar-light {
-	font-family: "GE Dinar One", Arial;
+	font-family: "GE Dinar One", Arial !important;
 	font-weight: lighter;
 }
 
 h1, h2, h3, h4, h5, h6, h7, .site-header .site-nav .main-menu > li.active > a, .dinar-medium {
-    font-family: "GE Dinar One", Arial;
+    font-family: "GE Dinar One", Arial !important;
     font-weight: normal;
 }
 

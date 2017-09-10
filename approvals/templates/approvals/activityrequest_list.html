@@ -1,9 +1,35 @@
-{% extends 'base_approvals.html' %}
+{% extends 'base_approvals.html' %}{% load i18n %}
+
+{% block title %}طلبات الأنشطة{% endblock %}
 
 {% block content %}
-  <ul>
-    {% for request in active_requests %}
-      <li>{{ request.name }}</li>
-    {% endfor %}
-  </ul>
+  <div class="panel panel-default panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+    <!-- panel head -->
+    <div class="panel-heading">
+      <div class="panel-title">{% trans "طلبات الأنشطة" %}</div>
+    </div>
+
+    <!-- panel body -->
+{#    <div class="panel-body">#}
+{#      <p>#}
+{#        Article evident arrived express highest men did boy.#}
+{#        Mistress sensible entirely am so.#}
+{#        Quick can manor smart money hopes worth too.#}
+{#        Comfort produce husband boy her had hearing.#}
+{#        Law others theirs passed but wishes.#}
+{#        You day real less till dear read.#}
+{#        Considered use dispatched melancholy sympathize discretion led. Oh feel if up to till like.#}
+{#      </p>#}
+{#    </div>#}
+
+    <table class="table">
+      <tbody>
+        {% for request in activity_requests %}
+          <tr>
+            <td><a href="{% url 'approvals:request-detail' request.pk %}">{{ request.name }}</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 {% endblock %}

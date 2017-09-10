@@ -1,0 +1,9 @@
+{% extends 'base_approvals.html' %}
+
+{% block content %}
+  <ul>
+    {% for request in active_requests %}
+      <li>{{ request.name }}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

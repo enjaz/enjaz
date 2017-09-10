@@ -1,13 +1,11 @@
 from django.shortcuts import redirect
 from django.views import generic
-from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView
 from approvals.forms import ActivityCreateRequestForm, EventRequestFormSet, ActivityRequestResponseForm
 from approvals.models import ActivityRequest, ActivityRequsetResponse
 
 
 class SubmitActivityCreateRequest(generic.TemplateView):
-    template_name = "approvals/submit-activity-create-request.html"
+    template_name = "approvals/submit_activity_creation_request.html"
 
     def get_context_data(self, **kwargs):
         context = super(SubmitActivityCreateRequest, self).get_context_data(**kwargs)
@@ -32,13 +30,23 @@ class SubmitActivityCreateRequest(generic.TemplateView):
         }))
 
 
-class ActivityRequestDetail(DetailView):
+class ActivityRequestList(generic.TemplateView):
+    template_name = "approvals/activityrequest_list.html"
+
+    def get_context_data(self, **kwargs):
+        return super(ActivityRequestList, self).get_context_data(**kwargs).update({
+            'active_requests': ActivityRequest.objects.all(),
+            'inactive_requests': ActivityRequest.objects.all(),
+        })
+
+
+class ActivityRequestDetail(generic.DetailView):
     model = ActivityRequest
     queryset = ActivityRequest.objects.all()
-    template_name = "approvals/activity-request-detail.html"
-    context_object_name = 'activity_request'
+    template_name = "approvals/activityrequest_detail.html"
+    context_object_name = "activity_request"
 
 
-class ActivityApproval(CreateView):
+class ActivityApproval(generic.CreateView):
     model = ActivityRequsetResponse
     form_class = ActivityRequestResponseForm

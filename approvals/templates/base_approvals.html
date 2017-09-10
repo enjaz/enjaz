@@ -1,12 +1,12 @@
 {% extends 'base.html' %}{% load clubs_utils %}
 {% block navbutton %}
-    {% if perms.activities.add_activity or user.coordination.current_year.exists or user.deputyships.current_year.exists or user|can_assess_any_club %}
-        {% include 'includes/nav-button.html' %}
-    {% endif %}
+  {% if perms.activities.add_activity or user.coordination.current_year.exists or user.deputyships.current_year.exists or user|can_assess_any_club %}
+    {% include 'includes/nav-button.html' %}
+  {% endif %}
 {% endblock %}
 {% block title %}{% endblock %}
-{% block pageheaderurl %}#{% endblock %}
+{% block pageheaderurl %}{% url 'approvals:request-list' %}{% endblock %}
 {% block pageheader %}الموافقات{% endblock %}
 {% block navbar %}
-		<li><a href="{% url 'approvals:submit-activity-create-request' %}"><span class="glyphicon glyphicon-plus"></span> طلب نشاط جديد</a></li>
+  <li><a href="{% url 'approvals:submit-activity-create-request' %}"><span class="glyphicon glyphicon-plus"></span> طلب نشاط جديد</a></li>
 {% endblock %}

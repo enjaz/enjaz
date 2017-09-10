@@ -90,9 +90,28 @@ class EventRequest(AbstractRequestAttachment):
         verbose_name_plural = _(u"طلبات فعاليات")
 
 
-class ActivityRequsetResponse(AbstractRequestAttachment):
-    request = models.ForeignKey(ActivityRequest)
-    is_approved = models.BooleanField()
+class ActivityRequestReview(models.Model):
+    """
+    In order for an `ActivityRequest` to be approved, it has to be reviewed and approved
+    by each team in the workflow to which the team requesting the activity refers.
+    """
+    # reviewer_team = models.ForeignKey('teams.Team')
+    request = models.ForeignKey(
+        'approvals.ActivityRequest',
+        related_name='reviews',
+        verbose_name=_(u"طلب النشاط"),
+    )
+    is_approved = models.BooleanField(
+        _(u"تم الاعتماد؟"),
+        choices=(
+            (True, _(u"نعم")),
+            (False, _(u"لا")),
+        )
+    )
+    review_datetime = models.DateTimeField(
+        _(u"تاريخ و وقت المراجعة"),
+        auto_now_add=True,
+    )
 
 
 class RequestThread(object):

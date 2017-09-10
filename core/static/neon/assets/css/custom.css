@@ -831,3 +831,15 @@ a.btn-signup{
 a.btn-signup:hover{
     background-color: #acd547;
 }
+
+/* Properly style site footer */
+.page-container .main-content {
+    padding-bottom: 100px;
+}
+
+.site-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    margin-right: -20px;
+}

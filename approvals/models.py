@@ -15,6 +15,13 @@ class AbstractRequest(models.Model):
 
 
 class ActivityRequest(AbstractRequest):
+    # The thread id is used to group requests into "threads." (See `RequestThread` class below.)
+    # The first request in a thread gets an automatically assigned id, and the same id is then applied to all
+    # requests sharing that same thread.
+    # def increment_thread_id():
+    #     return ActivityRequest.objects.order_by('thread_id').last().thread_id + 1
+    thread_id = models.PositiveIntegerField()
+
     # When the activity creation request is first created, this field should initially be blank. Once
     # the request is approved, an `Activity` object is created and linked to the request via this
     # field. For activity update requests, it should be set to the activity that is going to be
@@ -115,4 +122,19 @@ class ActivityRequestReview(models.Model):
 
 
 class RequestThread(object):
-    pass
+    """
+    A request thread is a sequence of `ActivityRequest`'s related to the same activity.
+    """
+    def __init__(self, id=None, activity_request=None, activity=None):
+        """
+        A `RequestThread` can be initiated using one of three options.
+        :param id: The thread_id is used to initiate the thread.
+        :param activity_request: Any activity request that's part of the thread can be used to initiate it.
+        :param activity: Activities can also initiate `RequestThread`s
+        """
+        assert any([id, activity_request, activity]), "One of the three should be specified"
+        assert len(filter(lambda param: param is None, [id, activity_request, activity])) == 2,\
+            "Only 1 should be specified"
+
+        # Lets focus now on initiating the thread by ID; we can work out the other 2 options later
+        self.requests = ActivityRequest.objects.filter(thread_id=id)

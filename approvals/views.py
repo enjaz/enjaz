@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.views import generic
 from approvals.forms import ActivityCreateRequestForm, EventRequestFormSet, ActivityRequestResponseForm
@@ -22,7 +23,7 @@ class SubmitActivityCreateRequest(generic.TemplateView):
         if activity_request_form.is_valid() and event_request_formset.is_valid():
             activity_request_form.save()
             event_request_formset.save()
-            return redirect("/")
+            return redirect(reverse("approvals:request-list"))
 
         return self.render_to_response(self.get_context_data().update({
             'activity_request_form': activity_request_form,

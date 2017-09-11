@@ -7,7 +7,7 @@ from approvals.models import ActivityRequest, EventRequest, ActivityRequestRevie
 class ActivityCreateRequestForm(forms.ModelForm):
     class Meta:
         model = ActivityRequest
-        fields = ['name']
+        fields = ['thread_id', 'name']
 
 
 class ActivityUpdateRequestForm(forms.ModelForm):

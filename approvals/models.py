@@ -143,7 +143,7 @@ class RequestThread(object):
 
     @property
     def name(self):
-        return self.requests.first().name
+        return self.requests.first().name  # performance? (esp. in long lists)
 
     def __repr__(self):
         return "<RequestThread: {}>".format(self.id)

@@ -4,7 +4,7 @@ from django.http.response import Http404
 from django.shortcuts import redirect
 from django.views import generic
 from approvals.forms import ActivityCreateRequestForm, EventRequestFormSet, ActivityRequestResponseForm
-from approvals.models import ActivityRequest, ActivityRequestReview, RequestThread, RequestThreadManager
+from approvals.models import ActivityRequest, ActivityRequestReview, RequestThreadManager
 
 
 class SubmitActivityCreateRequest(generic.TemplateView):
@@ -25,7 +25,7 @@ class SubmitActivityCreateRequest(generic.TemplateView):
         if activity_request_form.is_valid() and event_request_formset.is_valid():
             activity_request_form.save()
             event_request_formset.save()
-            return redirect(reverse("approvals:request-list"))
+            return redirect(reverse("approvals:requestthread-list"))
 
         return self.render_to_response(self.get_context_data().update({
             'activity_request_form': activity_request_form,
@@ -33,10 +33,12 @@ class SubmitActivityCreateRequest(generic.TemplateView):
         }))
 
 
-class ActivityRequestList(generic.ListView):
-    queryset = ActivityRequest.objects.all()
-    template_name = "approvals/activityrequest_list.html"
-    context_object_name = "activity_requests"
+class RequestThreadList(generic.ListView):
+    template_name = "approvals/requestthread_list.html"
+    context_object_name = "request_threads"
+
+    def get_queryset(self):
+        return RequestThreadManager.all()
 
 
 class RequestThreadDetail(generic.DetailView):

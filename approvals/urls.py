@@ -5,6 +5,6 @@ app_name = 'approvals'
 
 urlpatterns = [
     url(r'^activities/new/$', views.SubmitActivityCreateRequest.as_view(), name='submit-activity-create-request'),
-    url(r'^activities/$', views.ActivityRequestList.as_view(), name='request-list'),
+    url(r'^activities/$', views.RequestThreadList.as_view(), name='requestthread-list'),
     url(r'^activities/(?P<pk>\d+)/$', views.RequestThreadDetail.as_view(), name='requestthread-detail'),
 ]

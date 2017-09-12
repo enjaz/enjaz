@@ -2,27 +2,32 @@
 {% block title %}ارفع طلب نشاط{% endblock %}
 
 {% block content %}
-  <h2>طلب نشاط جديد</h2>
-  <form action="" method="post" class="form" enctype="multipart/form-data">
-    {% csrf_token %}
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">طلب نشاط جديد</h4>
+    </div>
+    <div class="panel-body">
+      <form action="" method="post" class="form" enctype="multipart/form-data">
+        {% csrf_token %}
 
-    {% bootstrap_form activity_request_form layout='horizontal' %}
+        {% bootstrap_form activity_request_form layout='horizontal' %}
 
-    <h3>الفعاليات</h3>
-    {% with formset=event_request_formset %}
-      {% include "approvals/components/formset.html" %}
-    {% endwith %}
+        <h3>الفعاليات</h3>
+        {% with formset=event_request_formset %}
+          {% include "approvals/components/formset.html" %}
+        {% endwith %}
 
-    <hr>
+        <hr>
 
-    {% buttons %}
-      <button type="submit" class="btn btn-primary btn-block">
-        {% bootstrap_icon "ok-sign" %} أرسل
-      </button>
-    {% endbuttons %}
+        {% buttons %}
+          <button type="submit" class="btn btn-primary btn-block">
+            {% bootstrap_icon "ok-sign" %} أرسل
+          </button>
+        {% endbuttons %}
 
-  </form>
-
+      </form>
+    </div>
+  </div>
 {% endblock %}
 
 {% block scripts %}

@@ -1,0 +1,48 @@
+{% load bootstrap3 %}
+<form enctype="multipart/form-data" id="send-email-form" action="post">
+{% csrf_token %}
+<div class="english-field">
+{% bootstrap_form form %}
+</div>
+</form>
+<script type="text/javascript">
+$(function () {
+
+    // modify form submission behaviour to be ajaxy
+    $("form#send-email-form").submit(function (event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get some values from elements on the page: */
+        var formData = new FormData($(this)[0]);
+        var url = "{% url 'teams:send_email' team.code_name %}";
+
+        /* Send the data */
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (data) {
+            console.log(data)
+                if (data.message == "success") {
+
+                    // show success message (using toastr)
+                    toastr.options.positionClass = "toast-top-left";
+                    toastr.success("تم إرسال البريد الإلكتروني بنجاح.");
+
+                    // hide modal
+                    $("#send-email-modal").modal('hide');
+
+                } else {
+                    $("#send-email-modal .modal-body").html(data);
+                }}
+        });
+
+    });
+});
+</script>

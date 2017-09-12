@@ -1,0 +1,35 @@
+<script type="text/javascript">
+$(function() {
+
+    $("#add-members select").select2();
+
+
+    $("form#add-members-form").submit(function (event) {
+    /* stop form from submitting normally */
+        event.preventDefault();
+        /* get some values from elements on the page: */
+        var formData = new FormData($(this)[0]);
+        /* Send the data */
+        $.ajax({
+            url: "{% url 'teams:add_members' team.code_name %}",
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (data) {
+                if (data.message == "success") {
+                    // show success message (using toastr)
+                    toastr.options.positionClass = "toast-top-left";
+                    toastr.success("لقدت تمت إضافة الاعضاء للفريق" );
+                } else {
+                    toastr.warning("There was an issue! " + data.message);
+                }
+            }
+        });
+    });
+
+});
+
+    </script>

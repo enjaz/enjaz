@@ -1,0 +1,9 @@
+<ol class="breadcrumb bc-3" style="padding: 0px;">{% load i18n %}
+    <li>
+        <a href="{% url 'teams:show' team.pk %}">
+            <i class="entypo-users"></i>
+            {{ team.ar_name }}
+        </a>
+    </li>
+    <li><a href="{% url 'forms:form_list' team.pk %}">{% trans "Forms" %}</a></li>
+</ol>

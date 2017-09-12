@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 import os
 from django.contrib.messages import constants as messages
 import secrets
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
@@ -40,6 +41,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'rules',
     'accounts',
     'approvals',
     'activities',
@@ -72,6 +74,7 @@ INSTALLED_APPS = (
     'studentvoice',
     'tagging',
     'tagging_autocomplete',
+    'teams',
     'tedx',
     'userena',
     'wkhtmltopdf',
@@ -154,6 +157,7 @@ ADMINS = [('Errors', 'errors@enjazportal.com')]
 
 # Userena settings
 AUTHENTICATION_BACKENDS = (
+    'rules.permissions.ObjectPermissionBackend',
     'userena.backends.UserenaAuthenticationBackend',
     'guardian.backends.ObjectPermissionBackend',
     'social.backends.twitter.TwitterOAuth',

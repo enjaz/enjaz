@@ -14,6 +14,7 @@ from certificates.admin import certificate_admin
 from clubs.urls import club_forms_urls
 from researchhub.forms import ResearchHubSignupForm
 from tedx.admin import tedx_admin
+from teams.urls import team_forms_urls
 
 urlpatterns = [
     url(r'^', include('core.urls')),
@@ -68,6 +69,8 @@ urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
     url(r'^tagging_autocomplete/', include('tagging_autocomplete.urls')),
+    team_forms_urls,
+    url(r'^teams/', include('teams.urls', namespace="teams")),
 ]
 
 if settings.DEBUG:

@@ -26,7 +26,7 @@
       <tbody>
         {% for request in activity_requests %}
           <tr>
-            <td><a href="{% url 'approvals:request-detail' request.pk %}">{{ request.name }}</a></td>
+            <td><a href="{% url 'approvals:requestthread-detail' request.pk %}">{{ request.name }}</a></td>
           </tr>
         {% endfor %}
       </tbody>

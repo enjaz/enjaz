@@ -1,0 +1,62 @@
+{% extends 'base_approvals.html' %}{% load staticfiles %}{% load i18n %}{% load humanize %}
+
+{% block title %}{{ request_thread.requests.first.name }}{% endblock %}
+
+{% block styles %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'neon/assets/js/vertical-timeline/css/default.css' %}">
+  <link rel="stylesheet" href="{% static 'neon/assets/js/vertical-timeline/css/component.css' %}">
+{% endblock %}
+
+{% block content %}
+  <div class="panel panel-success">
+    <div class="panel-heading">
+      <h4 class="panel-title">{{ request_thread.requests.first.name }}</h4>
+    </div>
+    <div class="panel-body">
+      <ul class="cbp_tmtimeline">
+        <li>
+          <time class="cbp_tmtime" datetime="2017-09-10T18:30">
+            <span class="hidden">10/09/2017</span>
+            <span class="large">Now</span>
+          </time>
+          <div class="cbp_tmicon">
+            <i class="entypo-flag"></i>
+          </div>
+          <div class="cbp_tmlabel empty">
+            <span>No Activity</span>
+          </div>
+        </li>
+
+        {% for activity_request in request_thread.requests.all %}
+
+        <li>
+          <time class="cbp_tmtime" datetime="{{ activity_request.submission_datetime|date:"c" }}">
+            <span>{{ activity_request.submission_datetime|date:"h:i A" }}</span>
+            <span>{{ activity_request.submission_datetime|naturalday }}</span>
+          </time>
+          <div class="cbp_tmicon bg-success"> <i class="entypo-plus"></i> </div>
+          <div class="cbp_tmlabel">
+            <h2>{% trans "تم رفع نشاط جديد باسم:" %} {{ activity_request.name }}</h2>
+          </div>
+        </li>
+
+        {% endfor %}
+
+{#        <li>#}
+{#          <time class="cbp_tmtime" datetime="2017-09-10T18:30">#}
+    {#        <span class="hidden">10/09/2017</span>#}
+    {#        <span class="large">Now</span>#}
+{#          </time>#}
+{#          <div class="cbp_tmicon">#}
+{#            <i class="entypo-clock"></i>#}
+{#          </div>#}
+{#          <div class="cbp_tmlabel empty">#}
+    {#        <span>No Activity</span>#}
+{#          </div>#}
+{#        </li>#}
+      </ul>
+    </div>
+  </div>
+
+{% endblock %}

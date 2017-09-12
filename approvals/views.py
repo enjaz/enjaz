@@ -1,8 +1,10 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.http.response import Http404
 from django.shortcuts import redirect
 from django.views import generic
 from approvals.forms import ActivityCreateRequestForm, EventRequestFormSet, ActivityRequestResponseForm
-from approvals.models import ActivityRequest, ActivityRequestReview
+from approvals.models import ActivityRequest, ActivityRequestReview, RequestThread, RequestThreadManager
 
 
 class SubmitActivityCreateRequest(generic.TemplateView):
@@ -32,17 +34,20 @@ class SubmitActivityCreateRequest(generic.TemplateView):
 
 
 class ActivityRequestList(generic.ListView):
-    module = ActivityRequest
     queryset = ActivityRequest.objects.all()
     template_name = "approvals/activityrequest_list.html"
     context_object_name = "activity_requests"
 
 
-class ActivityRequestDetail(generic.DetailView):
-    model = ActivityRequest
-    queryset = ActivityRequest.objects.all()
-    template_name = "approvals/activityrequest_detail.html"
-    context_object_name = "activity_request"
+class RequestThreadDetail(generic.DetailView):
+    template_name = "approvals/requestthread_detail.html"
+    context_object_name = "request_thread"
+
+    def get_object(self, queryset=None):
+        try:
+            return RequestThreadManager.get(id=self.kwargs.get(self.pk_url_kwarg))
+        except ObjectDoesNotExist:
+            raise Http404
 
 
 class ActivityApproval(generic.CreateView):

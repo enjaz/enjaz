@@ -1,5 +1,6 @@
 # coding=utf-8
 import ckeditor.fields
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -137,4 +138,51 @@ class RequestThread(object):
             "Only 1 should be specified"
 
         # Lets focus now on initiating the thread by ID; we can work out the other 2 options later
+        self.id = id
         self.requests = ActivityRequest.objects.filter(thread_id=id)
+
+    @property
+    def name(self):
+        return self.requests.first().name
+
+    def __repr__(self):
+        return "<RequestThread: {}>".format(self.id)
+
+
+class RequestThreadManager(object):
+    """
+    This serves as an interface through which request threads are retrieved and used anywhere in the project.
+    """
+    @classmethod
+    def get(cls, **kwargs):
+        filtered = cls.filter(**kwargs)
+        if not filtered:
+            raise ObjectDoesNotExist
+        return next(iter(filtered))
+
+    @classmethod
+    def filter(cls, **kwargs):
+        """
+        Return a list of `RequestThread`s based on the passed lookups (currently only `id` is supported)
+        """
+        thread_id = kwargs.get('id')
+        if thread_id:
+            return filter(lambda thread: thread.id == int(thread_id), cls._get_all_threads())
+        return cls._get_all_threads()
+
+    @classmethod
+    def all(cls):
+        """
+        Return all request threads in a python list
+        """
+        return cls._get_all_threads()
+
+    @classmethod
+    def _get_all_threads(cls):
+        thread_ids = cls._get_all_thread_ids()
+        return [RequestThread(id=thread_id) for thread_id in thread_ids]
+
+    @classmethod
+    def _get_all_thread_ids(cls):
+        return list(set(ActivityRequest.objects.values_list('thread_id', flat=True)))
+

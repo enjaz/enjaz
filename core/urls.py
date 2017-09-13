@@ -17,4 +17,5 @@ urlpatterns = [
     url(r'^user_count/$', TemplateView.as_view(template_name='user_count.html'), name='user_count'),
     url(r'^user_count/update$', views.update_user_count, name='update_user_count'),
     url(r'^user-autocomplete/$', views.UserAutocomplete.as_view(), name='user-autocomplete'),
+    url(r'^bedayatkhair/$', TemplateView.as_view(template_name='bedayatkhair.html'), name='bedayatkhair'),
 ]

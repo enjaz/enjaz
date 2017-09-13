@@ -1,0 +1,273 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>بداية خير</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="بداية خير" />
+    <meta name="author" content="فريق بوابة انجاز" />
+
+
+    <!-- Facebook and Twitter integration -->
+    <meta property="og:title" content="" />
+    <meta property="og:image" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:site_name" content="" />
+    <meta property="og:description" content="" />
+    <meta name="twitter:title" content="" />
+    <meta name="twitter:image" content="" />
+    <meta name="twitter:url" content="" />
+    <meta name="twitter:card" content="" />
+
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="icon" href="{% static 'logo/favicon.png' %}">
+
+
+    <link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/entypo/css/entypo.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:400,700,400italic">
+
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="{% static 'ranger/css/animate.css' %}">
+    <!-- Icomoon Icon Fonts-->
+    <link rel="stylesheet" href="{% static 'ranger/css/icomoon.css' %}">
+    <!-- Simple Line Icons -->
+    <link rel="stylesheet" href="{% static 'ranger/css/simple-line-icons.css' %}">
+    <!-- Owl Carousel -->
+    <link rel="stylesheet" href="{% static 'ranger/css/owl.carousel.min.css' %}">
+    <link rel="stylesheet" href="{% static 'ranger/css/owl.theme.default.min.css' %}">
+    <!-- Bootstrap  -->
+    <link rel="stylesheet" href="{% static 'ranger/css/bootstrap.css' %}">
+
+
+    <link rel="stylesheet" href="{% static 'ranger/css/style.css' %}">
+
+    <link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.min.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
+
+    <!-- Modernizr JS -->
+    <script src="{% static 'ranger/js/modernizr-2.6.2.min.js' %}"></script>
+    <!-- FOR IE9 below -->
+    <!--[if lt IE 9]>
+	<script src="js/respond.min.js"></script>
+	<![endif]-->
+</head>
+
+<body>
+    <header role="banner" id="fh5co-header">
+        <div class="container">
+            <!-- <div class="row"> -->
+            <nav class="navbar navbar-default">
+                <div class="navbar-header ">
+                    <!-- Mobile Toggle Menu Button -->
+                    <a href="#" class="js-fh5co-nav-toggle fh5co-nav-toggle" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar"><i></i></a>
+                    <a class="navbar-brand" href="www.enjazportal.com">بوابة انجاز</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-left">
+                        <li class="active"><a href="#" data-nav-section="home"><span>عن إنجاز</span></a></li>
+                        <li><a href="#" data-nav-section="services"><span>المميزات</span></a></li>
+                        <li><a href="#" data-nav-section="screenshots"><span>التطبيقات المفيدة</span></a></li>
+                        <li><a href="#" data-nav-section="tour"><span>الإحصائيات</span></a></li>
+                        <li><a href="#" data-nav-section="features"><span>فريق إنجاز</span></a></li>
+                        <li><a href="#" data-nav-section="testimonials"><span>الأكاديمية</span></a></li>
+                    </ul>
+                </div>
+            </nav>
+            <!-- </div> -->
+        </div>
+    </header>
+
+    <div class="fh5co-cta" data-section="home" style="background: #2E64FE;">
+        <div class="overlay"></div>
+        <div class="container">
+            <div class="row row-bottom-padded-sm animate-box">
+                <div class="col-md-8 col-md-offset-2 text-center">
+                    <h3>بوابة إنجاز الإلكترونية هي بوابة المستقبل للأنشطة الطلابية في نادي الطلاب. من خلال تعزيز الإستفادة من الجانب الإلكتروني والتقني, يدخل نادي الطلاب مرحلة جديدة من عمره بقوة أكبر وأدوات أكثر!</h3>
+                    <p><a href="#" class="btn btn-primary btn-outline btn-lg" data-nav-section="services">المزيد</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fh5co-our-services" data-section="services">
+        <div class="container">
+            <div class="row row-bottom-padded-sm animate-box">
+                <div class="col-md-12 section-heading text-center">
+                    <h1>المميزات</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="box animate-box">
+                        <div class="icon colored-1"><span><i class="icon-mustache"></i></span></div>
+                        <h3>سراج</h3>
+                        <div></div>
+                        <p>مبادرة لخلق بيئة للتبادل المعرفي والثقافي والفكري! أبرز مبادراتها هي: </p>
+                        <li>جلسات النقاش والقراءة: وهي فرصة مهيئة لإشباع شفغك المعرفي بعيدًا عن المجال الأكاديمي</li>
+                        <li>المكتبة التعاونية الطلابية: ههدفها هو أن يعرض كلا طلاب الجامعة وطالباتها ماعندهم من كتب ثقافية ومعرفية قيمة, ووتبنى مكتبة تعاونية عامرة</li>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="box animate-box">
+                        <div class="icon colored-4"><span><i class="icon-heart"></i></span></div>
+                        <h3>ResearchHub</h3>
+                        <p>وهي فرصة تتيح لمحبي البحث الوصول لأهدافهم وبدء أبحاثهم بطريقة سهلة</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="box animate-box">
+                        <img src="https://enjazportal.com/menhaj/wp-content/uploads/2017/05/cropped-1-1.png" class="custom-logo" alt="" itemprop="logo" srcset="https://enjazportal.com/menhaj/wp-content/uploads/2017/05/cropped-1-1.png 248w, https://enjazportal.com/menhaj/wp-content/uploads/2017/05/cropped-1-1-150x150.png 150w" sizes="(max-width: 248px) 100vw, 248px" width="100" height="100" style="margin-top: -100px;">
+                        <h3>منهاج</h3>
+                        <p>هي منصة إلكترونية طلابية تعاونية, تقوم بعرض التجارب الأكاديمية واللاصفية في جامعة الملك سعود بن عبدالعزيز للغلوم الصحية, والإجابة على حساب الآسك الذين يعين على طرح الأسئلة بهوية مجهولة, حتى يجيب عليها فريق من عشرات الطلاب والطالبات من مختلف التخصصات والخبرات</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fh5co-product-screenshots" data-section="screenshots">
+
+        <div class="row row-bottom-padded-sm animate-box" data-animate-effect="fadeIn">
+            <div class="col-md-12 section-heading text-center">
+                <h2>App Screenshots</h2>
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3">
+                        <h3>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="owl-carousel-center">
+            <div class="animate-box" data-animate-effect="fadeIn"><img src="{% static 'ranger/images/screen-1-1-login.jpg' %}" alt="Free HTML5 Bootstrap Template by FreeHTML5.co"></div>
+            <div class="animate-box" data-animate-effect="fadeIn"><img src="{% static 'ranger/images/screen-1-8-list.jpg' %}" alt="Free HTML5 Bootstrap Template by FreeHTML5.co"></div>
+            <div class="animate-box" data-animate-effect="fadeIn"><img src="{% static 'ranger/images/screen-2-1-login.jpg' %}" alt="Free HTML5 Bootstrap Template by FreeHTML5.co"></div>
+            <div class="animate-box" data-animate-effect="fadeIn"><img src="{% static 'ranger/images/screen-2-6-overview.jpg' %}" alt="Free HTML5 Bootstrap Template by FreeHTML5.co"></div>
+            <div class="animate-box" data-animate-effect="fadeIn"><img src="{% static 'ranger/images/screen-3-7-groups.jpg' %}" alt="Free HTML5 Bootstrap Template by FreeHTML5.co"></div>
+            <div class="animate-box" data-animate-effect="fadeIn"><img src="{% static 'ranger/images/screen-4-7-groups.jpg' %}" alt="Free HTML5 Bootstrap Template by FreeHTML5.co"></div>
+            <div class="animate-box" data-animate-effect="fadeIn"><img src="{% static 'ranger/images/screen-5-6-overview.jpg' %}" alt="Free HTML5 Bootstrap Template by FreeHTML5.co"></div>
+        </div>
+    </div>
+
+    <div id="fh5co-tour" data-section="tour" style="background: #A4A4A4;">
+        <div class="fh5co-tour">
+            <div class="row row-bottom-padded-sm animate-box">
+                <div class="col-md-12 section-heading text-center">
+                    <h1>إحصائيات بوابة إنجاز</h1>
+                </div>
+            </div>
+            <div>
+            </div>
+            <div class="fh5co-narrow-content animate-box">
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <h3>‫‪1248‬‬</h3>
+                        <h3>عدد كتب سراج</h3>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <h3>‫‪2511‬‬</h3>
+                        <h3>عدد الأنشطة</h3>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <h3>‫‪13211‬‬</h3>
+                        <h3>عدد المسجلين في إنجاز</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fh5co-features" data-section="features">
+        <div class="container">
+            <div class="row row-bottom-padded-sm animate-box">
+                <div class="col-md-12 section-heading text-center">
+                    <h1>فريق بوابة إنجاز</h1>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-6 col-xxs-12 fh5co-service animate-box" data-animate-effect="fadeIn">
+                <div class="fh5co-icon"><i class="fa fa-male"></i></div>
+                <div class="fh5co-desc">
+                    <h3>الطلاب</h3>
+                    <li>سعيد عرابي</li>
+                    <li>عبدالرحمن السالم</li>
+                    <li>عبدالرحمن القميزي</li>
+                    <li>فهد الغانم</li>
+                    <li>مفلح الشهراني</li>
+                </div>
+            </div>
+            <div class="row row-bottom-padded-sm">
+                <div class="col-md-6 col-sm-6 col-xs-6 col-xxs-12 fh5co-service animate-box" data-animate-effect="fadeIn">
+                    <div class="fh5co-icon"><i class="fa fa-female"></i></div>
+                    <div class="fh5co-desc">
+                        <h3>الطالبات</h3>
+                        <li>زها الجمعان</li>
+                        <li>أمجاد المدشل</li>
+                        <li>صالحة الخيري</li>
+                        <li>نوف الهملان</li>
+                        <br>
+                        <h3>جدة</h3>
+                        <li>عبير نفادي</li>
+                        <br>
+                        <h3>الأحساء</h3>
+                        <li>سجا اللاحم</li>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fh5co-testimonials" data-section="testimonials" style="background: #04B431;">
+        <div class="container">
+
+            <div class="row row-bottom-padded-sm animate-box">
+                <div class="col-md-12 section-heading text-center">
+                    <h1>الأكاديمية</h1>
+                </div>
+                <div class="row animate-box" data-animate-effect="fadeIn">
+                    <div class="col-md-8 col-md-offset-2 text-center">
+                        <h3>في حال أردت الإنضمام إلى فريقنا, وليس لديك الخبرة الكافية في البرمجة, فبإمكانك التسجيل في الأكاديمية التي تقام كل سمة. فثمانية مكن التسعة أعضاء وعضوات الفريق هم من خريجيها.</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer id="footer" role="contentinfo">
+        <div class="container">
+            <div class="row row-bottom-padded-sm">
+                <div class="col-lg-10 col-lg-offset-1 text-center">
+                    <p class="text-muted">بُني بأيدٍ طلابيّة</p>
+                    <p class="text-muted">حقك في النسخ مكفول.</p>
+                    <a target="_blank" rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.ar"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" /></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="{% static 'ranger/js/jquery.min.js' %}"></script>
+    <!-- jQuery Easing -->
+    <script src="{% static 'ranger/js/jquery.easing.1.3.js' %}"></script>
+    <!-- Bootstrap -->
+    <script src="{% static 'ranger/js/bootstrap.min.js' %}"></script>
+    <!-- Waypoints -->
+    <script src="{% static 'ranger/js/jquery.waypoints.min.js' %}"></script>
+    <!-- Owl Carousel -->
+    <script src="{% static 'ranger/js/owl.carousel.min.js' %}"></script>
+    <!-- Main JS (Do not remove) -->
+    <script src="{% static 'ranger/js/main.js' %}"></script>
+
+    <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+    <link href='https://fonts.googleapis.com/css?family=Candal' rel='stylesheet' type='text/css'>
+</body>
+
+</html>

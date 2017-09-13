@@ -23,6 +23,7 @@ from niqati.models import Order, Code
 from media.models import FollowUpReport, Story
 import accounts.utils
 import clubs.utils
+#from teams.models import Team
 
 
 def portal_home(request):
@@ -289,3 +290,53 @@ class UserAutocomplete(autocomplete.Select2QuerySetView):
     def get_result_label(self, item):
         full_name = accounts.utils.get_user_ar_full_name(item) or item.username
         return"%s <bdi style='font-family: monospace;'>(%s)</bdi>" % (full_name, item.username)
+
+def portal_home_new (request):
+    context = {}
+    if request.user.is_authenticated():
+        context['logged_in'] = True
+
+        # ----Greeting----
+        current_hour = datetime.now().time().hour
+        #TODO: Refine the phrases used
+        if current_hour in range(3, 12, 1): #so upto 11:59 should be included
+            context['greeting'] = 'صباح الخير'
+        else:
+            context['greeting'] = 'مساء الخير'
+
+        # ----Teams----
+        #commented-out because Team model doesn't exist on this branch
+        #club_teams = Team.objects.filter(category='CC') | Team.objects.filter(category='SC')
+        #context['teams'] = teams
+
+        # --- niqati ------- as before
+        niqati_sum = request.user.code_set.current_year().aggregate(niqati_sum=Sum('points'))['niqati_sum']
+        context['niqati_sum'] = niqati_sum
+        context['niqati_count'] = request.user.code_set.current_year().count()
+        context['latest_entries'] = request.user.code_set.current_year().order_by('-redeem_date')[:5]
+
+        # --- books -------- as before
+        context['book_sample'] = Book.objects.current_year().for_user_city(request.user).available().order_by("?")[:6]
+        context['book_count'] = Book.objects.current_year().undeleted().count()
+        context['my_book_count'] = request.user.book_giveaways.current_year().undeleted().count()
+
+        # --- announcements
+        context['student_researches'] = Announcement.objects.filter(type='R')[::-1] # show last first
+        context['external_announcements'] = Announcement.objects.filter(type='E')[::-1]
+        context['major_program_announcement'] = None
+        if Announcement.objects.filter(type='M').count() > 0:
+            context['major_program_announcement'] = Announcement.objects.filter(type='M')[0]
+
+        # ----Memories----
+        current_date = datetime.now().date()
+        # if user's reg. date is today's date without checking year
+
+    else:
+        context['logged_in'] = False
+
+        sliders = CarouselSlider.objects.all()
+        context['sliders'] = sliders
+        # ---- Books ----
+        context['book_sample'] = Book.objects.current_year().for_user_city(request.user).available().order_by("?")[:6]
+
+    return render(request, 'front/new_test.html', context)

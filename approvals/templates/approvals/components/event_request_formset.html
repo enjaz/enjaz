@@ -1,0 +1,48 @@
+{% load bootstrap3 %}{% load i18n %}
+
+{{ formset.management_form }}
+{{ formset.non_form_errors.as_ul }}
+<div class="panel-group" id="id_{{ formset.prefix }}_formset" role="tablist" aria-multiselectable="true">
+  {% for form in formset.forms %}
+    <div class="panel panel-success panel-shadow form-container animated fadeInDown">
+      <div class="panel-heading" role="tab" id="headingOne">
+        <div class="panel-title">
+          <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            {% trans "فعالية جديدة" %}
+          </a>
+        </div>
+        <div class="panel-options">
+          {{ form.DELETE }}
+        </div>
+      </div>
+      <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+        <div class="panel-body">
+          {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+          {% endfor %}
+
+          <div class="row">
+            <div class="col-md-6">
+              {% bootstrap_field form.label %}
+              {% bootstrap_field form.description %}
+            </div>
+            <div class="col-md-6">
+              <div class="well">
+                {% bootstrap_field form.date %}
+                <div class="row">
+                  <div class="col-md-6">
+                    {% bootstrap_field form.start_time %}
+                  </div>
+                  <div class="col-md-6">
+                    {% bootstrap_field form.end_time %}
+                  </div>
+                </div>
+                {% bootstrap_field form.location %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>

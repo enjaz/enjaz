@@ -7,7 +7,7 @@ from approvals.models import ActivityRequest, EventRequest, ActivityRequestRevie
 class ActivityCreateRequestForm(forms.ModelForm):
     class Meta:
         model = ActivityRequest
-        exclude = ['activity', 'submission_datetime', 'submitter', 'submitter_team', 'is_update_request']
+        exclude = ['activity', 'submission_datetime', 'submitter', 'is_update_request']
 
 
 class ActivityUpdateRequestForm(forms.ModelForm):

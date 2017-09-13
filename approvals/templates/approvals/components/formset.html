@@ -2,7 +2,7 @@
 {% load bootstrap3 %}
 {{ formset.management_form }}
 {{ formset.non_form_errors.as_ul }}
-<table id="images-formset" class="form" style="width: 100%;">
+<table id="id_{{ formset.prefix }}_formset" class="form" style="width: 100%;">
 {% for form in formset.forms %}
   {% if forloop.first %}
     <colgroup>

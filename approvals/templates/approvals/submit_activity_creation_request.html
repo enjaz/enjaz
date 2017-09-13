@@ -2,50 +2,159 @@
 {% block title %}ارفع طلب نشاط{% endblock %}
 
 {% block content %}
+  <h2>طلب نشاط جديد</h2>
+  <form action="" method="post" class="form" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <h4 class="panel-title">{% trans "مؤقت" %}</h4>
+      </div>
+      <div class="panel-body">
+        {% bootstrap_field activity_request_form.thread_id %}
+        {% bootstrap_field activity_request_form.submitter_team %}
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title">{% trans "البيانات الأساسية" %}</h4>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-6">
+            {% bootstrap_field activity_request_form.name %}
+          </div>
+          <div class="col-md-6">
+            {% bootstrap_field activity_request_form.category %}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            {% bootstrap_field activity_request_form.description %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title">{% trans "البيانات الأساسية ٢" %}</h4>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-12">
+            {% bootstrap_field activity_request_form.goals %}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            {% bootstrap_field activity_request_form.organizer_count %}
+          </div>
+          <div class="col-md-6">
+            {% bootstrap_field activity_request_form.participant_count %}
+          </div>
+        </div>
+        {% bootstrap_field activity_request_form.inside_collaborators %}
+        {% bootstrap_field activity_request_form.outside_collaborators %}
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title">{% trans "التعاون" %}</h4>
+      </div>
+      <div class="panel-body">
+        {% bootstrap_field activity_request_form.collaborating_teams %}
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title">{% trans "الفئة المستهدفة" %}</h4>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-4">
+            {% bootstrap_field activity_request_form.campus %}
+          </div>
+          <div class="col-md-4">
+            {% bootstrap_field activity_request_form.specialty %}
+          </div>
+          <div class="col-md-4">
+            {% bootstrap_field activity_request_form.gender %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title">{% trans "التاريخ" %}</h4>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-4">
+            {% bootstrap_field activity_request_form.start_date %}
+          </div>
+          <div class="col-md-4">
+            {% bootstrap_field activity_request_form.end_date %}
+          </div>
+          <div class="col-md-4">
+            {% bootstrap_field activity_request_form.location %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h4 class="panel-title">طلب نشاط جديد</h4>
+      <h4 class="panel-title">الفعاليات</h4>
     </div>
     <div class="panel-body">
-      <form action="" method="post" class="form" enctype="multipart/form-data">
-        {% csrf_token %}
-
-        {% bootstrap_form activity_request_form layout='horizontal' %}
-
-        <h3>الفعاليات</h3>
-        {% with formset=event_request_formset %}
-          {% include "approvals/components/formset.html" %}
-        {% endwith %}
-
-        <hr>
-
-        <h3>المتطلّبات</h3>
-        {% with formset=requirement_request_formset %}
-          {% include "approvals/components/formset.html" %}
-        {% endwith %}
-
-        <hr>
-
-        {% buttons %}
-          <button type="submit" class="btn btn-primary btn-block">
-            {% bootstrap_icon "ok-sign" %} أرسل
-          </button>
-        {% endbuttons %}
-
-      </form>
+      {% with formset=event_request_formset %}
+        {% include "approvals/components/formset.html" %}
+      {% endwith %}
     </div>
   </div>
-{% endblock %}
 
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">المتطلّبات</h4>
+    </div>
+    <div class="panel-body">
+      {% with formset=requirement_request_formset %}
+        {% include "approvals/components/formset.html" %}
+      {% endwith %}
+    </div>
+  </div>
+
+
+
+  {% buttons %}
+    <button type="submit" class="btn btn-primary btn-block">
+      {% bootstrap_icon "ok-sign" %} أرسل
+    </button>
+  {% endbuttons %}
+{% endblock %}
+x
 {% block scripts %}
 
   {{ block.super }}
 
   <script src="{% static 'js/jquery.formset.js' %}"></script>
   <script type="text/javascript">
-    $("form").find(".form-container").formset({
+    $("#id_{{ event_request_formset.prefix }}_formset").find(".form-container").formset({
         prefix: '{{ event_request_formset.prefix }}',
         addText: "{% trans "أضف فعالية" %}",
+        deleteText: "{% trans "احذف" %}",
+        addCssClass: 'add-row btn btn-xs btn-primary',
+        deleteCssClass: 'delete-row btn btn-xs btn-default',
+        formCssClass: 'event-request-formset'
+    });
+    $("#id_{{ requirement_request_formset.prefix }}_formset").find(".form-container").formset({
+        prefix: '{{ event_request_formset.prefix }}',
+        addText: "{% trans "أضف متطلّب" %}",
         deleteText: "{% trans "احذف" %}",
         addCssClass: 'add-row btn btn-xs btn-primary',
         deleteCssClass: 'delete-row btn btn-xs btn-default',

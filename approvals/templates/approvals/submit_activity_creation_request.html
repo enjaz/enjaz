@@ -1,6 +1,19 @@
 {% extends "base_approvals.html" %}{% load bootstrap3 %}{% load staticfiles %}{% load i18n %}
 {% block title %}ارفع طلب نشاط{% endblock %}
 
+{% block styles %}
+  {{ block.super }}
+
+  <style>
+    div.datepicker {
+      right: auto;
+    }
+    div.bootstrap-timepicker-widget {
+      direction: ltr;
+    }
+  </style>
+{% endblock %}
+
 {% block content %}
   <h2>طلب نشاط جديد</h2>
   <form action="" method="post" class="form" enctype="multipart/form-data">
@@ -163,9 +176,11 @@ x
 
   {{ block.super }}
 
+  <script src="{% static 'neon/assets/js/bootstrap-datepicker.js' %}"></script>
+  <script src="{% static 'neon/assets/js/bootstrap-timepicker.min.js' %}"></script>
   <script src="{% static 'js/jquery.formset.js' %}"></script>
   <script type="text/javascript">
-  function initializeAutocomplete(context){
+  function initializeDepositoryItemAutoComplete(context){
       $(".depository-item-request-autocomplete", context || null).autocomplete({
           source: "{% url 'activities:autocomplete_items' %}",
           position: { my : "right top", at: "right bottom" },
@@ -173,7 +188,18 @@ x
       });
   }
 
+  function initializeEventDateAndTimePickers(context) {
+      // Select all fields whose id ends with '-date'
+      $("[id$='-date']", context || null).datepicker();
+      // Select fields whose id ends with '-start_time' or '-end_time'
+      $("[id$='-start_time'], [id$='-end_time']", context || null).timepicker();
+
+  }
+
   $(function() {
+      // Initiate datepickers
+      $("#id_start_date, #id_end_date").datepicker();
+
       // Initiate formsets
       $("#id_{{ event_request_formset.prefix }}_formset").find(".form-container").formset({
           prefix: '{{ event_request_formset.prefix }}',
@@ -181,7 +207,11 @@ x
           deleteText: "{% trans "احذف" %}",
           addCssClass: 'add-row btn btn-xs btn-primary',
           deleteCssClass: 'delete-row btn btn-xs btn-default',
-          formCssClass: 'event-request-formset'
+          formCssClass: 'event-request-formset',
+          added: function (row) {
+              // Initialize date and time pickers for new row
+              initializeEventDateAndTimePickers(row);
+          }
       });
       $("#id_{{ depository_item_request_formset.prefix }}_formset").find(".form-container").formset({
           prefix: '{{ depository_item_request_formset.prefix }}',
@@ -192,7 +222,7 @@ x
           formCssClass: 'event-request-formset',
           added: function (row) {
               // Initialize auto-complete for added row
-              initializeAutocomplete(row);
+              initializeDepositoryItemAutoComplete(row);
           }
 
       });
@@ -214,7 +244,9 @@ x
       });
 
       // Initialize auto-complete for depository item formset
-      initializeAutocomplete();
+      initializeDepositoryItemAutoComplete();
+      // Initialize date and time pickers for event request formset
+      initializeEventDateAndTimePickers();
   });
   </script>
 

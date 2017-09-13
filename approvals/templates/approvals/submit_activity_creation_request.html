@@ -19,6 +19,13 @@
 
         <hr>
 
+        <h3>المتطلّبات</h3>
+        {% with formset=requirement_request_formset %}
+          {% include "approvals/components/formset.html" %}
+        {% endwith %}
+
+        <hr>
+
         {% buttons %}
           <button type="submit" class="btn btn-primary btn-block">
             {% bootstrap_icon "ok-sign" %} أرسل

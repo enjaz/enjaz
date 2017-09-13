@@ -1,11 +1,25 @@
 # coding=utf-8
 import ckeditor.fields
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from core.models import DEFINITE_PLURAL_STUDENT_GENDER_CHOICES
+
 
 class AbstractRequest(models.Model):
+    submitter_team = models.ForeignKey(
+        'teams.Team',
+        related_name='%(class)ss',
+        verbose_name=_(u"الفريق المقدّم للطلب"),
+    )
+    submitter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='%(class)ss',
+        verbose_name=_(u"مقدّم الطلب"),
+        on_delete=models.SET_NULL, null=True,
+    )
     submission_datetime = models.DateTimeField(
         _(u"وقت تقديم الطلب"),
         auto_now_add=True,
@@ -36,6 +50,49 @@ class ActivityRequest(AbstractRequest):
     )
 
     name = models.CharField(_(u"العنوان"), max_length=200)
+
+    category = models.CharField(
+        _(u"التصنيف"),
+        max_length=50
+    )  # TODO: This should be a foreign key to a `Category` model
+
+    # Descriptive fields  # TODO: These should be implemented using a more generic way!
+    description = models.TextField(_(u"الوصف"))
+    goals = models.TextField(_(u"الأهداف"))
+
+    inside_collaborators = models.TextField(_(u"الجهات المتعاونة من داخل الجامعة"))
+    outside_collaborators = models.TextField(_(u"الجهات المتعاونة من خارج الجامعة"))
+
+    organizer_count = models.PositiveIntegerField(_(u"عدد المنظمين"))
+    participant_count = models.PositiveIntegerField(_(u"عدد المشاركين"))
+
+    # Collaboration fields
+    collaborating_teams = models.ManyToManyField(
+        'teams.Team',
+        related_name='collaborated_activity_requests',
+        verbose_name=_(u"الفرق المتعاونة"),
+    )
+
+    # Date and location fields
+    start_date = models.DateField(_(u"تاريخ البداية"))
+    end_date = models.DateField(_(u"تاريخ النهاية"))
+    location = models.CharField(_(u"المكان"), max_length=100)
+
+    # Targeted population fields
+    # TODO: Add an option in the form to select "all" (?)
+    campus = models.ManyToManyField(
+        "core.Campus",
+        verbose_name=_(u"المدينة الجامعية"),
+    )
+    specialty = models.ManyToManyField(
+        "core.Specialty",
+        verbose_name=_(u"التخصص"),
+    )
+    gender = models.CharField(
+        _(u"القسم"),
+        max_length=1,
+        choices=DEFINITE_PLURAL_STUDENT_GENDER_CHOICES
+    )
 
     # This is a flag to distinguish update from creation requests
     is_update_request = models.BooleanField(
@@ -96,6 +153,14 @@ class EventRequest(AbstractRequestAttachment):
     class Meta:
         verbose_name = _(u"طلب فعالية")
         verbose_name_plural = _(u"طلبات فعاليات")
+
+
+class RequirementRequest(AbstractRequestAttachment):
+    description = models.CharField(_(u"الوصف"), max_length=50)
+
+    class Meta:
+        verbose_name = _(u"متطلّب")
+        verbose_name_plural = _(u"متطلّبات")
 
 
 class ActivityRequestReview(models.Model):

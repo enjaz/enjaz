@@ -61,6 +61,9 @@ class Team(models.Model):
                                  verbose_name=_(u"الكلية"))
     description = models.TextField(verbose_name=_(u"الوصف"), blank=True)
 
+    def __unicode__(self):
+        return self.ar_name
+
     class Meta:
         verbose_name = 'الفريق'
         verbose_name_plural = 'الفِرق'

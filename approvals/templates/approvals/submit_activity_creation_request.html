@@ -55,8 +55,6 @@
             {% bootstrap_field activity_request_form.participant_count %}
           </div>
         </div>
-        {% bootstrap_field activity_request_form.inside_collaborators %}
-        {% bootstrap_field activity_request_form.outside_collaborators %}
       </div>
     </div>
 
@@ -66,6 +64,8 @@
       </div>
       <div class="panel-body">
         {% bootstrap_field activity_request_form.collaborating_teams %}
+        {% bootstrap_field activity_request_form.inside_collaborators %}
+        {% bootstrap_field activity_request_form.outside_collaborators %}
       </div>
     </div>
 
@@ -106,36 +106,57 @@
         </div>
       </div>
     </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title">الفعاليات</h4>
+      </div>
+      <div class="panel-body">
+        {% with formset=event_request_formset %}
+          {% include "approvals/components/formset.html" %}
+        {% endwith %}
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title">متطلّبات مخازن العمادة</h4>
+      </div>
+      <div class="panel-body">
+        {% with formset=depository_item_request_formset %}
+          {% include "approvals/components/formset.html" %}
+        {% endwith %}
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title">المتطلّبات</h4>
+      </div>
+      <div class="panel-body">
+        {% with formset=requirement_request_formset %}
+          {% include "approvals/components/formset.html" %}
+        {% endwith %}
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title">الملفات المرفقة</h4>
+      </div>
+      <div class="panel-body">
+        {% with formset=file_attachment_formset %}
+          {% include "approvals/components/formset.html" %}
+        {% endwith %}
+      </div>
+    </div>
+
+    {% buttons %}
+      <button type="submit" class="btn btn-primary btn-block">
+        {% bootstrap_icon "ok-sign" %} أرسل
+      </button>
+    {% endbuttons %}
   </form>
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title">الفعاليات</h4>
-    </div>
-    <div class="panel-body">
-      {% with formset=event_request_formset %}
-        {% include "approvals/components/formset.html" %}
-      {% endwith %}
-    </div>
-  </div>
-
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title">المتطلّبات</h4>
-    </div>
-    <div class="panel-body">
-      {% with formset=requirement_request_formset %}
-        {% include "approvals/components/formset.html" %}
-      {% endwith %}
-    </div>
-  </div>
-
-
-
-  {% buttons %}
-    <button type="submit" class="btn btn-primary btn-block">
-      {% bootstrap_icon "ok-sign" %} أرسل
-    </button>
-  {% endbuttons %}
 {% endblock %}
 x
 {% block scripts %}
@@ -144,22 +165,57 @@ x
 
   <script src="{% static 'js/jquery.formset.js' %}"></script>
   <script type="text/javascript">
-    $("#id_{{ event_request_formset.prefix }}_formset").find(".form-container").formset({
-        prefix: '{{ event_request_formset.prefix }}',
-        addText: "{% trans "أضف فعالية" %}",
-        deleteText: "{% trans "احذف" %}",
-        addCssClass: 'add-row btn btn-xs btn-primary',
-        deleteCssClass: 'delete-row btn btn-xs btn-default',
-        formCssClass: 'event-request-formset'
-    });
-    $("#id_{{ requirement_request_formset.prefix }}_formset").find(".form-container").formset({
-        prefix: '{{ event_request_formset.prefix }}',
-        addText: "{% trans "أضف متطلّب" %}",
-        deleteText: "{% trans "احذف" %}",
-        addCssClass: 'add-row btn btn-xs btn-primary',
-        deleteCssClass: 'delete-row btn btn-xs btn-default',
-        formCssClass: 'event-request-formset'
-    });
+  function initializeAutocomplete(context){
+      $(".depository-item-request-autocomplete", context || null).autocomplete({
+          source: "{% url 'activities:autocomplete_items' %}",
+          position: { my : "right top", at: "right bottom" },
+          minLength: 2
+      });
+  }
+
+  $(function() {
+      // Initiate formsets
+      $("#id_{{ event_request_formset.prefix }}_formset").find(".form-container").formset({
+          prefix: '{{ event_request_formset.prefix }}',
+          addText: "{% trans "أضف فعالية" %}",
+          deleteText: "{% trans "احذف" %}",
+          addCssClass: 'add-row btn btn-xs btn-primary',
+          deleteCssClass: 'delete-row btn btn-xs btn-default',
+          formCssClass: 'event-request-formset'
+      });
+      $("#id_{{ depository_item_request_formset.prefix }}_formset").find(".form-container").formset({
+          prefix: '{{ depository_item_request_formset.prefix }}',
+          addText: "{% trans "أضف متطلّبًا" %}",
+          deleteText: "{% trans "احذف" %}",
+          addCssClass: 'add-row btn btn-xs btn-primary',
+          deleteCssClass: 'delete-row btn btn-xs btn-default',
+          formCssClass: 'event-request-formset',
+          added: function (row) {
+              // Initialize auto-complete for added row
+              initializeAutocomplete(row);
+          }
+
+      });
+      $("#id_{{ requirement_request_formset.prefix }}_formset").find(".form-container").formset({
+          prefix: '{{ requirement_request_formset.prefix }}',
+          addText: "{% trans "أضف متطلّبًا" %}",
+          deleteText: "{% trans "احذف" %}",
+          addCssClass: 'add-row btn btn-xs btn-primary',
+          deleteCssClass: 'delete-row btn btn-xs btn-default',
+          formCssClass: 'event-request-formset'
+      });
+      $("#id_{{ file_attachment_formset.prefix }}_formset").find(".form-container").formset({
+          prefix: '{{ file_attachment_formset.prefix }}',
+          addText: "{% trans "أضف ملفًا مرفقًا" %}",
+          deleteText: "{% trans "احذف" %}",
+          addCssClass: 'add-row btn btn-xs btn-primary',
+          deleteCssClass: 'delete-row btn btn-xs btn-default',
+          formCssClass: 'event-request-formset'
+      });
+
+      // Initialize auto-complete for depository item formset
+      initializeAutocomplete();
+  });
   </script>
 
 {% endblock %}

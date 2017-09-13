@@ -9,6 +9,10 @@ from core.models import DEFINITE_PLURAL_STUDENT_GENDER_CHOICES
 
 
 class AbstractRequest(models.Model):
+    """
+    This is a base class that includes fields common to both `ActivityRequest`
+    and `ActivityCancelRequest`
+    """
     submitter_team = models.ForeignKey(
         'teams.Team',
         related_name='%(class)ss',
@@ -30,6 +34,9 @@ class AbstractRequest(models.Model):
 
 
 class ActivityRequest(AbstractRequest):
+    """
+    A request to conduct an activity
+    """
     # The thread id is used to group requests into "threads." (See `RequestThread` class below.)
     # The first request in a thread gets an automatically assigned id, and the same id is then applied to all
     # requests sharing that same thread.
@@ -51,10 +58,13 @@ class ActivityRequest(AbstractRequest):
 
     name = models.CharField(_(u"العنوان"), max_length=200)
 
-    category = models.CharField(
-        _(u"التصنيف"),
-        max_length=50
-    )  # TODO: This should be a foreign key to a `Category` model
+    category = models.ForeignKey(
+        'activities.Category',
+        related_name='activity_requests',
+        verbose_name=_(u"التصنيف"),
+        on_delete=models.SET_NULL, null=True,
+        limit_choices_to={'category__isnull': True},  # If the category has sub-categories, don't show it.
+    )
 
     # Descriptive fields  # TODO: These should be implemented using a more generic way!
     description = models.TextField(_(u"الوصف"))
@@ -104,12 +114,18 @@ class ActivityRequest(AbstractRequest):
         default=False,
     )
 
+    def __unicode__(self):
+        return self.name
+
     class Meta:
         verbose_name = _(u"طلب نشاط")
         verbose_name_plural = _(u"طلبات أنشطة")
 
 
 class ActivityCancelRequest(AbstractRequest):
+    """
+    A request to cancel an approved activity
+    """
     activity = models.ForeignKey(
         'activities2.Activity',
         verbose_name=_(u"النشاط"),
@@ -123,6 +139,9 @@ class ActivityCancelRequest(AbstractRequest):
 
 
 class AbstractRequestAttachment(models.Model):
+    """
+    This is a base class for all kinds of 'request attachments' that accompany an activity request
+    """
     activity_request = models.ForeignKey(
         'approvals.ActivityRequest',
         verbose_name=_(u"طلب النشاط"),
@@ -143,6 +162,10 @@ class DescriptionField(AbstractRequestAttachment):
 
 
 class EventRequest(AbstractRequestAttachment):
+    """
+    An activity may contain one or more events. Each `Event` represents a single
+    continuous session on particular date, with start and end times, and a specific location.
+    """
     label = models.CharField(_(u"العنوان"), max_length=50)
     description = models.CharField(_(u"الوصف"), max_length=200)
     date = models.DateField(_(u"التاريخ"))
@@ -150,17 +173,65 @@ class EventRequest(AbstractRequestAttachment):
     end_time = models.TimeField(_(u"وقت النهاية"))
     location = models.CharField(_(u"المكان"), max_length=50)
 
+    def __unicode__(self):
+        return self.label
+
     class Meta:
         verbose_name = _(u"طلب فعالية")
         verbose_name_plural = _(u"طلبات فعاليات")
 
 
+class DepositoryItemRequest(AbstractRequestAttachment):
+    """
+    A request for an item that's found in the depository.
+    (See `activities.DepositoryItem`)
+    """
+    name = models.CharField(_(u"الاسم"), max_length=100)
+    quantity = models.PositiveIntegerField(_(u"الكمية"))
+    unit = models.CharField(_(u"الوحدة"), max_length=20)
+    category = models.CharField(_(u"التصنيف"), max_length=40)
+
+    def __unicode__(self):
+        return self.name
+
+    # class Meta:
+    #     verbose_name = _(u"")
+    #     verbose_name_plural = _(u"")
+
+
 class RequirementRequest(AbstractRequestAttachment):
+    """
+    A request for a particular requirement needed for an activity. This could be a purchase,
+     an administrative action or communication, or any requirement in general.
+    """
     description = models.CharField(_(u"الوصف"), max_length=50)
+
+    def __unicode__(self):
+        return self.description
 
     class Meta:
         verbose_name = _(u"متطلّب")
         verbose_name_plural = _(u"متطلّبات")
+
+
+class FileAttachment(AbstractRequestAttachment):
+    description = models.CharField(
+        _(u"الوصف"),
+        max_length=200,
+    )
+    file = models.FileField(
+        _(u"الملف"),
+        upload_to='approvals/file_attachments/',
+    )
+
+    def __unicode__(self):
+        if self.description:
+            return self.description
+        return self.file.name
+
+    class Meta:
+        verbose_name = _(u"ملف مرفق")
+        verbose_name_plural = _(u"ملفات مرفقة")
 
 
 class ActivityRequestReview(models.Model):

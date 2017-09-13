@@ -1,7 +1,8 @@
 from django import forms
 from django.forms.models import inlineformset_factory
 
-from approvals.models import ActivityRequest, EventRequest, ActivityRequestReview, RequirementRequest
+from approvals.models import ActivityRequest, EventRequest, ActivityRequestReview, RequirementRequest, FileAttachment, \
+    DepositoryItemRequest
 
 
 class ActivityCreateRequestForm(forms.ModelForm):
@@ -24,4 +25,11 @@ class ActivityRequestResponseForm(forms.ModelForm):
 
 EventRequestFormSet = inlineformset_factory(ActivityRequest, EventRequest, fields='__all__', extra=1)
 
-RequirementRequestFormSet = inlineformset_factory(ActivityRequest, RequirementRequest, fields='__all__', extra=3)
+DepositoryItemRequestFormSet = inlineformset_factory(
+    ActivityRequest, DepositoryItemRequest, fields=['name', 'quantity'], extra=1,
+    widgets={'name': forms.TextInput(attrs={'class': 'depository-item-request-autocomplete text-right'})},
+)
+
+RequirementRequestFormSet = inlineformset_factory(ActivityRequest, RequirementRequest, fields='__all__', extra=1)
+
+FileAttachmentFormSet = inlineformset_factory(ActivityRequest, FileAttachment, fields='__all__', extra=1)

@@ -4,7 +4,7 @@ from django.http.response import Http404
 from django.shortcuts import redirect
 from django.views import generic
 from approvals.forms import ActivityCreateRequestForm, EventRequestFormSet, ActivityRequestResponseForm, \
-    RequirementRequestFormSet
+    RequirementRequestFormSet, FileAttachmentFormSet, DepositoryItemRequestFormSet
 from approvals.models import ActivityRequest, ActivityRequestReview, RequestThreadManager
 
 
@@ -16,25 +16,35 @@ class SubmitActivityCreateRequest(generic.TemplateView):
         context.update({
             'activity_request_form': ActivityCreateRequestForm,
             'event_request_formset': EventRequestFormSet,
+            'depository_item_request_formset': DepositoryItemRequestFormSet,
             'requirement_request_formset': RequirementRequestFormSet,
+            'file_attachment_formset': FileAttachmentFormSet,
         })
         return context
 
     def post(self, request, *args, **kwargs):
         activity_request_form = ActivityCreateRequestForm(self.request.POST, instance=ActivityRequest())
         event_request_formset = EventRequestFormSet(self.request.POST, instance=activity_request_form.instance)
+        depository_item_request_formset = DepositoryItemRequestFormSet(self.request.POST, instance=activity_request_form.instance)
         requirement_request_formset = RequirementRequestFormSet(self.request.POST, instance=activity_request_form.instance)
+        file_attachment_formset = FileAttachmentFormSet(self.request.POST, self.request.FILES, instance=activity_request_form.instance)
 
-        if activity_request_form.is_valid() and event_request_formset.is_valid() and requirement_request_formset.is_valid():
+        if activity_request_form.is_valid() and event_request_formset.is_valid() \
+                and depository_item_request_formset.is_valid() and requirement_request_formset.is_valid() \
+                and file_attachment_formset.is_valid():
             activity_request_form.save()
             event_request_formset.save()
+            depository_item_request_formset.save()
             requirement_request_formset.save()
+            file_attachment_formset.save()
             return redirect(reverse("approvals:requestthread-list"))
 
         return self.render_to_response(self.get_context_data().update({
             'activity_request_form': activity_request_form,
-            'requirement_request_formset': requirement_request_formset,
             'event_request_formset': event_request_formset,
+            'depository_item_request_formset': depository_item_request_formset,
+            'requirement_request_formset': requirement_request_formset,
+            'file_attachment_formset': file_attachment_formset,
         }))
 
 

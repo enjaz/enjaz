@@ -31,23 +31,38 @@ class ActivityRequestResponseForm(forms.ModelForm):
         fields = '__all__'
 
 
-EventRequestFormSet = inlineformset_factory(
-    ActivityRequest, EventRequest, fields='__all__', extra=1,
-    widgets={
-        'label': forms.TextInput(attrs={'placeholder': _(u"صف الفعالية بعنوان قصير مناسب..."), 'class': 'input-lg'}),
-        'description': forms.Textarea(attrs={'placeholder': _(u"صف الفعالية بشيء من التفصيل..."), 'rows': '6', 'class': 'autogrow'}),
-        'date': forms.TextInput(attrs={'placeholder': _(u"اختر التاريخ من القائمة...")}),
-        'location': forms.TextInput(attrs={'placeholder': _(u"اسم المبنى؟ رقم القاعة؟ إلخ...")})
-    },
-    labels={
-        'label': _(u"ما عنوان هذه الفعاليّة؟"),
-        'description': _(u"ما طبيعة و محتوى هذه الفعاليّة؟"),
-        'date': _(u"في أي يوم ستقام هذه الفعاليّة؟"),
-        'start_time': _(u"في أي ساعة ستبدأ الفعاليّة؟"),
-        'end_time': _(u"في أي ساعة ستنتهي؟"),
-        'location': _(u"أين ستقام الفعاليّة؟"),
-    },
-)
+class EventRequestForm(forms.ModelForm):
+    label = forms.CharField(
+        label=_(u"ما عنوان هذه الفعاليّة؟"),
+        widget=forms.TextInput(attrs={'placeholder': _(u"صف الفعالية بعنوان قصير مناسب..."), 'class': 'input-lg'}),
+    )
+    description = forms.CharField(
+        label=_(u"ما طبيعة و محتوى هذه الفعاليّة؟"),
+        widget=forms.Textarea(attrs={'placeholder': _(u"صف لنا الفعالية بشيء من التفصيل..."), 'rows': '6', 'class': 'autogrow'}),
+    )
+    date = forms.DateField(
+        label=_(u"في أي يوم ستقام هذه الفعاليّة؟"),
+        widget=forms.TextInput(attrs={'placeholder': _(u"اختر التاريخ من القائمة...")}),
+    )
+    start_time = forms.TimeField(
+        label=_(u"في أي ساعة ستبدأ الفعاليّة؟"),
+        input_formats=("%I:%M %p", "%H:%M:%S", "%H:%M"),
+    )
+    end_time = forms.TimeField(
+        label=_(u"في أي ساعة ستنتهي؟"),
+        input_formats=("%I:%M %p", "%H:%M:%S", "%H:%M"),
+    )
+    location = forms.CharField(
+        label=_(u"أين ستقام الفعاليّة؟"),
+        widget=forms.TextInput(attrs={'placeholder': _(u"اسم المبنى؟ رقم القاعة؟ إلخ...")}),
+    )
+
+    class Meta:
+        model = EventRequest
+        fields = '__all__'
+
+
+EventRequestFormSet = inlineformset_factory(ActivityRequest, EventRequest, form=EventRequestForm, extra=1)
 
 DepositoryItemRequestFormSet = inlineformset_factory(
     ActivityRequest, DepositoryItemRequest, fields=['name', 'quantity'], extra=1,

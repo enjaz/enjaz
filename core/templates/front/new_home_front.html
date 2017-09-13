@@ -2,7 +2,7 @@
 
 {% block title %}الصفحة الرئيسية{% endblock %}
 {% block content %}
-	<!-- style="background-image: url({% static 'img/bg.jpg' %});"> -->
+
 <style>
   .tales {
   width: 100%;
@@ -15,6 +15,65 @@
   min-width:100%;
   max-height:400px;
   }
+
+
+
+  body {
+    padding: 1em;
+    background: #999
+}
+.scrollable {
+    width: auto;
+    margin: 0 auto;
+    padding: 0;
+    background: #000;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+img {
+    max-width: auto;
+    margin: 0;
+    float:left;
+}
+.items {
+    width: auto;
+    -webkit-animation: hscroll 12s infinite;
+    -moz-animation: hscroll 12s infinite;
+    -ms-animation: hscroll 12s infinite;
+}
+
+@-webkit-keyframes hscroll {
+  0%   { margin-left: 0; }
+27.33%  { margin-left: 0 }
+  33.33%  { margin-left: -333px; }
+60.66% { margin-left: -333px; }
+66.66% { margin-left: -666px; }
+94.99% { margin-left: -666px; }
+  100%  { margin-left: 0 }
+}
+
+@-moz-keyframes hscroll {
+  0%   { margin-left: 0; }
+27.33%  { margin-left: 0 }
+  33.33%  { margin-left: -333px; }
+60.66% { margin-left: -333px; }
+66.66% { margin-left: -666px; }
+94.99% { margin-left: -666px; }
+  100%  { margin-left: 0 }
+}
+
+@-ms-keyframes hscroll {
+  0%   { margin-left: 0; }
+27.33%  { margin-left: 0 }
+  33.33%  { margin-left: -333px; }
+60.66% { margin-left: -333px; }
+66.66% { margin-left: -666px; }
+94.99% { margin-left: -666px; }
+  100%  { margin-left: 0 }
+}
+
+
 </style>
 
 {% if logged_in %}
@@ -63,6 +122,19 @@
   <a class="twitter-timeline" data-lang="ar" data-height="400" href="https://twitter.com/StudentsofKSAUH">Tweets by StudentsofKSAUH</a>
   <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 </div>
+
+<br><br>
+<div>
+  <div class="scrollable">
+    <div class="items">
+      {% for slider in sliders %}
+        <img src="{{ slider.image.url }}" alt="{{ slider.image.alt }}">
+      {% endfor %}
+        </div>
+</div>
+</div>
+
+
 
 
 

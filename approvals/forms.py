@@ -4,7 +4,7 @@ from django.forms.models import inlineformset_factory
 from django.utils.translation import ugettext_lazy as _
 
 from approvals.models import ActivityRequest, EventRequest, ActivityRequestReview, RequirementRequest, FileAttachment, \
-    DepositoryItemRequest
+    DepositoryItemRequest, ActivityRequestComment
 
 
 class ActivityCreateRequestForm(forms.ModelForm):
@@ -72,3 +72,15 @@ DepositoryItemRequestFormSet = inlineformset_factory(
 RequirementRequestFormSet = inlineformset_factory(ActivityRequest, RequirementRequest, fields='__all__', extra=1)
 
 FileAttachmentFormSet = inlineformset_factory(ActivityRequest, FileAttachment, fields='__all__', extra=1)
+
+
+class ActivityRequestCommentForm(forms.ModelForm):
+    text = forms.CharField(
+        label=_(u"أضف تعليقًا"),
+        widget=forms.Textarea(attrs={'rows': '3', 'class': 'autogrow', 'placeholder': _(u"تعليقك...")}),
+    )
+
+    class Meta:
+        model = ActivityRequestComment
+        fields = ['text']
+

@@ -234,6 +234,31 @@ class FileAttachment(AbstractRequestAttachment):
         verbose_name_plural = _(u"ملفات مرفقة")
 
 
+class ActivityRequestComment(models.Model):
+    """
+    A comment on an activity request thread.
+    """
+    thread_id = models.PositiveIntegerField()
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='activity_request_comments',
+        verbose_name=_(u"المعلّق"),
+        on_delete=models.SET_NULL, null=True,
+    )
+    text = models.TextField(_(u"النص"))
+    submission_datetime = models.DateTimeField(
+        _(u"التاريخ و الوقت"),
+        auto_now_add=True
+    )
+
+    def __unicode__(self):
+        return self.text[:50]  # the first 50 characters of the text
+
+    class Meta:
+        verbose_name = _(u"تعليق")
+        verbose_name_plural = _(u"تعليقات")
+
+
 class ActivityRequestReview(models.Model):
     """
     In order for an `ActivityRequest` to be approved, it has to be reviewed and approved
@@ -276,6 +301,7 @@ class RequestThread(object):
         # Lets focus now on initiating the thread by ID; we can work out the other 2 options later
         self.id = id
         self.requests = ActivityRequest.objects.filter(thread_id=id)
+        self.comments = ActivityRequestComment.objects.filter(thread_id=id)
 
     @property
     def name(self):

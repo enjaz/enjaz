@@ -1,11 +1,11 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.http.response import Http404
 from django.shortcuts import redirect
 from django.views import generic
 from approvals.forms import ActivityCreateRequestForm, EventRequestFormSet, ActivityRequestResponseForm, \
-    RequirementRequestFormSet, FileAttachmentFormSet, DepositoryItemRequestFormSet
-from approvals.models import ActivityRequest, ActivityRequestReview, RequestThreadManager
+    RequirementRequestFormSet, FileAttachmentFormSet, DepositoryItemRequestFormSet, ActivityRequestCommentForm
+from approvals.models import ActivityRequest, ActivityRequestReview, RequestThreadManager, ActivityRequestComment
 
 
 class SubmitActivityCreateRequest(generic.TemplateView):
@@ -65,6 +65,32 @@ class RequestThreadDetail(generic.DetailView):
             return RequestThreadManager.get(id=self.kwargs.get(self.pk_url_kwarg))
         except ObjectDoesNotExist:
             raise Http404
+
+    def get_context_data(self, **kwargs):
+        context = super(RequestThreadDetail, self).get_context_data(**kwargs)
+        context.update({
+            'comment_form': ActivityRequestCommentForm(),
+        })
+        return context
+
+
+class HandleActivityRequestCommentForm(generic.CreateView):
+    form_class = ActivityRequestCommentForm
+    template_name = "approvals/requestthread_list.html"  # This view only handles post requests; we shouldn't need this
+    http_method_names = ['post']  # Is this the best way to specify we're only handling POST?
+
+    def get_form_kwargs(self):
+        """
+        Automatically set the author and thread_id fields.
+        """
+        kwargs = super(HandleActivityRequestCommentForm, self).get_form_kwargs()
+        kwargs.update({
+            'instance': ActivityRequestComment(author=self.request.user, thread_id=self.kwargs.get('pk')),
+        })
+        return kwargs
+
+    def get_success_url(self):
+        return reverse('approvals:requestthread-detail', args=(self.kwargs.get('pk'), ))
 
 
 class ActivityApproval(generic.CreateView):

@@ -114,6 +114,10 @@ class ActivityRequest(AbstractRequest):
         default=False,
     )
 
+    @property
+    def is_open(self):
+        return not self.reviews.exists()  # This is a temporary implementation
+
     def __unicode__(self):
         return self.name
 
@@ -264,7 +268,6 @@ class ActivityRequestReview(models.Model):
     In order for an `ActivityRequest` to be approved, it has to be reviewed and approved
     by each team in the workflow to which the team requesting the activity refers.
     """
-    # reviewer_team = models.ForeignKey('teams.Team')
     request = models.ForeignKey(
         'approvals.ActivityRequest',
         related_name='reviews',
@@ -277,35 +280,65 @@ class ActivityRequestReview(models.Model):
             (False, _(u"لا")),
         )
     )
-    review_datetime = models.DateTimeField(
-        _(u"تاريخ و وقت المراجعة"),
+    submitter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='activity_request_reviews',
+        verbose_name=_(u"المراجِع"),
+        on_delete=models.SET_NULL, null=True,
+    )
+    submitter_team = models.ForeignKey(
+        'teams.Team',
+        related_name='activity_request_reviews',
+        verbose_name=_(u"الفريق المراجِع"),
+        on_delete=models.SET_NULL, null=True,
+    )
+    submission_datetime = models.DateTimeField(
+        _(u"التاريخ و الوقت"),
         auto_now_add=True,
     )
+
+    class Meta:
+        verbose_name = _(u"مراجَعة")
+        verbose_name_plural = _(u"مراجَعات")
 
 
 class RequestThread(object):
     """
     A request thread is a sequence of `ActivityRequest`'s related to the same activity.
     """
-    def __init__(self, id=None, activity_request=None, activity=None):
+    def __init__(self, id):
         """
-        A `RequestThread` can be initiated using one of three options.
-        :param id: The thread_id is used to initiate the thread.
-        :param activity_request: Any activity request that's part of the thread can be used to initiate it.
-        :param activity: Activities can also initiate `RequestThread`s
+        A unique thread id identifies each request thread. This id is stored
+        in all instances that are contained in the thread.
         """
-        assert any([id, activity_request, activity]), "One of the three should be specified"
-        assert len(filter(lambda param: param is None, [id, activity_request, activity])) == 2,\
-            "Only 1 should be specified"
-
-        # Lets focus now on initiating the thread by ID; we can work out the other 2 options later
         self.id = id
         self.requests = ActivityRequest.objects.filter(thread_id=id)
         self.comments = ActivityRequestComment.objects.filter(thread_id=id)
+        self.reviews = ActivityRequestReview.objects.filter(request__in=self.requests)
+
+    @property
+    def items(self):
+        import itertools
+        return sorted(
+            itertools.chain(self.requests, self.comments, self.reviews),
+            key=lambda item: item.submission_datetime,
+        )
 
     @property
     def name(self):
         return self.requests.first().name  # performance? (esp. in long lists)
+
+    @property
+    def is_active(self):
+        return any([request.is_open for request in self.requests])
+
+    @property
+    def date_opened(self):
+        return self.requests.first().submission_datetime
+
+    @property
+    def last_updated(self):
+        return self.items[-1].submission_datetime
 
     def __repr__(self):
         return "<RequestThread: {}>".format(self.id)
@@ -325,12 +358,20 @@ class RequestThreadManager(object):
     @classmethod
     def filter(cls, **kwargs):
         """
-        Return a list of `RequestThread`s based on the passed lookups (currently only `id` is supported)
+        Return a list of `RequestThread`s based on the passed lookups (currently only `id` and `is_active` supported)
         """
+        filtered = cls._get_all_threads()
+
         thread_id = kwargs.get('id')
+        is_active = kwargs.get('is_active')
+
         if thread_id:
-            return filter(lambda thread: thread.id == int(thread_id), cls._get_all_threads())
-        return cls._get_all_threads()
+            filtered = filter(lambda thread: thread.id == int(thread_id), filtered)
+
+        if is_active is not None:
+            filtered = filter(lambda thread: thread.is_active == is_active, filtered)
+
+        return filtered
 
     @classmethod
     def all(cls):
@@ -347,4 +388,3 @@ class RequestThreadManager(object):
     @classmethod
     def _get_all_thread_ids(cls):
         return list(set(ActivityRequest.objects.values_list('thread_id', flat=True)))
-

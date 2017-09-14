@@ -278,10 +278,14 @@
                 {% trans "أضاف" %} <a href="">{{ comment.author }}</a> {% trans "التعليق التالي:" %}
               </div>
             </div>
-            <p class="comment-text">
-              {{ comment.text|linebreaksbr }}
-            </p>
-          </div>
+            <div class="panel panel-default panel-shadow">
+              <div class="panel-body">
+                <p class="comment-text">
+                  {{ comment.text|linebreaksbr }}
+                </p>
+              </div>
+            </div>
+          <div>
         </li>
         {% endfor %}
 
@@ -310,6 +314,35 @@
 
           </div>
         </li>
+
+        {% if request_thread.is_active %}{# FIXME: This is temporary! #}
+        <li>
+          <div class="cbp_tmicon bg-success"> <i class="entypo-check"></i> </div>
+          <div class="cbp_tmlabel">
+            <form action="{% url 'approvals:requestthread-review' request_thread.id %}" method="post">
+              {% csrf_token %}
+
+              {% bootstrap_field review_form.submitter_team %}
+
+              <div class="row">
+                <div class="col-md-6">
+                  <button class="btn btn-lg btn-block btn-success btn-icon" type="submit" name="is_approved" value="True">
+                    <i class="entypo-check"></i>
+                    {% trans "اقبل" %}
+                  </button>
+                </div>
+                <div class="col-md-6">
+                  <button class="btn btn-lg btn-block btn-danger btn-icon" type="submit" name="is_approved" value="False">
+                    <i class="entypo-cancel"></i>
+                    {% trans "ارفض" %}
+                  </button>
+                </div>
+              </div>
+            </form>
+
+          </div>
+        </li>
+        {% endif %}
 
       </ul>
     </div>

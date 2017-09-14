@@ -4,7 +4,8 @@ from django.http.response import Http404
 from django.shortcuts import redirect
 from django.views import generic
 from approvals.forms import ActivityCreateRequestForm, EventRequestFormSet, ActivityRequestResponseForm, \
-    RequirementRequestFormSet, FileAttachmentFormSet, DepositoryItemRequestFormSet, ActivityRequestCommentForm
+    RequirementRequestFormSet, FileAttachmentFormSet, DepositoryItemRequestFormSet, ActivityRequestCommentForm, \
+    ActivityRequestReviewForm
 from approvals.models import ActivityRequest, ActivityRequestReview, RequestThreadManager, ActivityRequestComment
 
 
@@ -48,12 +49,14 @@ class SubmitActivityCreateRequest(generic.TemplateView):
         }))
 
 
-class RequestThreadList(generic.ListView):
+class RequestThreadList(generic.TemplateView):
     template_name = "approvals/requestthread_list.html"
-    context_object_name = "request_threads"
 
-    def get_queryset(self):
-        return RequestThreadManager.all()
+    def get_context_data(self, **kwargs):
+        return {
+            'active_request_threads': RequestThreadManager.filter(is_active=True),
+            'inactive_request_threads': RequestThreadManager.filter(is_active=False),
+        }
 
 
 class RequestThreadDetail(generic.DetailView):
@@ -70,6 +73,7 @@ class RequestThreadDetail(generic.DetailView):
         context = super(RequestThreadDetail, self).get_context_data(**kwargs)
         context.update({
             'comment_form': ActivityRequestCommentForm(),
+            'review_form': ActivityRequestReviewForm(),
         })
         return context
 
@@ -86,6 +90,25 @@ class HandleActivityRequestCommentForm(generic.CreateView):
         kwargs = super(HandleActivityRequestCommentForm, self).get_form_kwargs()
         kwargs.update({
             'instance': ActivityRequestComment(author=self.request.user, thread_id=self.kwargs.get('pk')),
+        })
+        return kwargs
+
+    def get_success_url(self):
+        return reverse('approvals:requestthread-detail', args=(self.kwargs.get('pk'), ))
+
+
+class HandleActivityRequestReviewForm(generic.CreateView):
+    form_class = ActivityRequestReviewForm
+    template_name = "approvals/requestthread_list.html"
+    http_method_names = ['post']
+
+    def get_form_kwargs(self):
+        kwargs = super(HandleActivityRequestReviewForm, self).get_form_kwargs()
+        kwargs.update({
+            'instance': ActivityRequestReview(
+                request=RequestThreadManager.get(id=self.kwargs.get('pk')).requests.last(),
+                submitter=self.request.user
+            ),
         })
         return kwargs
 

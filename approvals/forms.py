@@ -84,3 +84,12 @@ class ActivityRequestCommentForm(forms.ModelForm):
         model = ActivityRequestComment
         fields = ['text']
 
+
+class ActivityRequestReviewForm(forms.ModelForm):
+
+    class Meta:
+        model = ActivityRequestReview
+        fields = [
+            'submitter_team',  # temporary during development
+            'is_approved',
+        ]

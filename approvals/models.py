@@ -40,9 +40,9 @@ class ActivityRequest(AbstractRequest):
     # The thread id is used to group requests into "threads." (See `RequestThread` class below.)
     # The first request in a thread gets an automatically assigned id, and the same id is then applied to all
     # requests sharing that same thread.
-    # def increment_thread_id():
-    #     return ActivityRequest.objects.order_by('thread_id').last().thread_id + 1
-    thread_id = models.PositiveIntegerField()
+    def increment_thread_id():
+        return ActivityRequest.objects.order_by('thread_id').last().thread_id + 1
+    thread_id = models.PositiveIntegerField(default=increment_thread_id)
 
     # When the activity creation request is first created, this field should initially be blank. Once
     # the request is approved, an `Activity` object is created and linked to the request via this

@@ -10,7 +10,7 @@ from approvals.models import ActivityRequest, EventRequest, ActivityRequestRevie
 class ActivityCreateRequestForm(forms.ModelForm):
     class Meta:
         model = ActivityRequest
-        exclude = ['activity', 'submission_datetime', 'submitter', 'is_update_request']
+        exclude = ['thread_id', 'activity', 'submission_datetime', 'submitter', 'is_update_request']
         widgets = {
             'description': forms.Textarea(attrs={'class': 'autogrow', 'rows': '3'}),
             'goals': forms.Textarea(attrs={'class': 'autogrow', 'rows': '3'}),

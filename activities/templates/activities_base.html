@@ -7,18 +7,18 @@
 {% block title %}{% endblock %}
 {% block pageheaderurl %}{% url 'activities:list' %}{% endblock %}
 {% block pageheader %}الأنشطة{% endblock %}
-{% block navbar %}
+{#{% block navbar %}#}
     {# if the user is a coordinator of any club, or if they have the add_activity permission #}
-    {% if perms.activities.add_activity or user|can_submit_activities %}
-        {% if user.coordination.current_year.0.can_skip_followup_reports or not user.coordination.current_year.0.get_overdue_report_count > 3 %}
-		<li><a href="{% url 'activities:create' %}"><span class="glyphicon glyphicon-plus"></span> أضف نشاطًا</a></li>
-        {% endif %}
-	{% endif %}
-    {% if user|can_assess_any_club %}
-        <li><a href="{% url 'activities:assessment_list' %}"><span class="glyphicon glyphicon-pencil"></span> قيّم الأنشطة</a></li>
-    {% endif %}
-    
-{% endblock %}
+{#    {% if perms.activities.add_activity or user|can_submit_activities %}#}
+{#        {% if user.coordination.current_year.0.can_skip_followup_reports or not user.coordination.current_year.0.get_overdue_report_count > 3 %}#}
+{#		<li><a href="{% url 'activities:create' %}"><span class="glyphicon glyphicon-plus"></span> أضف نشاطًا</a></li>#}
+{#        {% endif %}#}
+{#	{% endif %}#}
+{#    {% if user|can_assess_any_club %}#}
+{#        <li><a href="{% url 'activities:assessment_list' %}"><span class="glyphicon glyphicon-pencil"></span> قيّم الأنشطة</a></li>#}
+{#    {% endif %}#}
+{#    #}
+{#{% endblock %}#}
 
 {% block content %}{% endblock %}  
 

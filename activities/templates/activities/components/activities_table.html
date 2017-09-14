@@ -3,7 +3,7 @@
     <thead>
         <tr>
             <th class="all">الاسم</th>
-            <th class="not-mobile">النادي المنظم</th>
+            <th class="not-mobile">الفريق المنظم</th>
             {# In privileged view, show the submission date. #}{% if privileged %}
             <th class="not-mobile">تاريخ الإرسال</th>
             {% endif %}
@@ -24,7 +24,7 @@
     {% for activity in activities %}
         <tr>
             <td dir="auto"><a href="{% url 'activities:show' activity.id %}">{{ activity.name }}</a></td>
-            <td><a href="{% url 'clubs:show' activity.primary_club.id %}">{{ activity.primary_club }}</a></td>
+            <td><a href="{% url 'teams:show' activity.team.code_name %}">{{ activity.team.ar_name }}</a></td>
             {% if privileged %}
             <td data-order="{{ activity.submission_date|date:"U" }}">{{ activity.submission_date|date:"j F" }}</td>
             {% endif %}

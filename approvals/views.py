@@ -3,6 +3,8 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from django.http.response import Http404
 from django.shortcuts import redirect
 from django.views import generic
+
+from activities.models import Activity
 from approvals.forms import ActivityCreateRequestForm, EventRequestFormSet, ActivityRequestResponseForm, \
     RequirementRequestFormSet, FileAttachmentFormSet, DepositoryItemRequestFormSet, ActivityRequestCommentForm, \
     ActivityRequestReviewForm
@@ -111,6 +113,31 @@ class HandleActivityRequestReviewForm(generic.CreateView):
             ),
         })
         return kwargs
+
+    def form_valid(self, form):
+        if form.cleaned_data.get('is_approved'):
+            # Create Activity object and link it to original activity request
+            activity_request = form.instance.request
+            activity_request.activity = Activity.objects.create(
+                team=activity_request.submitter_team,
+                name=activity_request.name,
+                description=activity_request.description,
+                public_description=activity_request.description,
+                goals=activity_request.goals,
+                category=activity_request.category,
+                gender=activity_request.gender,
+                is_approved=True,
+            )
+            for event_request in activity_request.eventrequests.all():
+                activity_request.activity.episode_set.create(
+                    start_date=event_request.date,
+                    end_date=event_request.date,
+                    start_time=event_request.start_time,
+                    end_time=event_request.end_time,
+                    location=event_request.location,
+                )
+            activity_request.save()
+        return super(HandleActivityRequestReviewForm, self).form_valid(form)
 
     def get_success_url(self):
         return reverse('approvals:requestthread-detail', args=(self.kwargs.get('pk'), ))

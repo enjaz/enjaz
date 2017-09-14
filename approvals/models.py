@@ -49,10 +49,10 @@ class ActivityRequest(AbstractRequest):
     # field. For activity update requests, it should be set to the activity that is going to be
     # updated.
     activity = models.ForeignKey(
-        'activities2.Activity',
+        'activities.Activity',
         verbose_name=_(u"النشاط"),
         null=True, blank=True,
-        related_name="requests_created",
+        related_name="activity_requests",
 
     )
 

@@ -19,7 +19,7 @@ from activities.forms import ActivityForm, ReviewerActivityForm, DirectActivityF
 from accounts.utils import get_user_gender
 from clubs.models import Club
 from core import decorators
-from core.models import Tweet
+from core.models import Tweet, StudentClubYear
 from media.models import FollowUpReport, FollowUpReportImage, Story
 import accounts.utils
 import activities.utils
@@ -61,70 +61,14 @@ def list_activities(request):
     """
     Return a list of the current year's activities displayed as a calendar as well as a table.
     (For the front-end, only the calendar is visible.)
-    * For superusers, SC Presidency members (Chairman, Deputies, and Assistants), all activities should be visible.
-    * For Deanship of Student Affairs reviewers, only activities approved by SC Presidency should be visible.
-    * For club coordinators, only activities approved by SC-P and DSA in addition to pending and rejected activities
-      of their own club.
-    * For Deanship of Student Affairs employees and other users, only activities approved by SC-P and DSA should be
-      visible.
     """
-    # Show approved activites for everybody.
-    #
+    # Show approved activities for everybody.
     # By default (i.e. for students, employees and anonymous users),
     # no pending or rejected activities should be shown.
-    context = {'approved': Activity.objects.approved().current_year(),
-               'pending': Activity.objects.none(),
-               'rejected': Activity.objects.none()}
+    context = {'approved': Activity.objects.approved().filter(team__year=StudentClubYear.objects.get_current())}
 
     if request.user.is_authenticated():
-        template = 'activities/list_privileged.html'
-
-        if request.user.is_superuser:
-            # If the user is a super user or part of the presidency,
-            # then show all activities
-            context['pending'] = Activity.objects.pending().current_year()
-            context['rejected'] = Activity.objects.rejected().current_year()
-        elif clubs.utils.is_coordinator_or_deputy_of_any_club(request.user) or \
-             clubs.utils.is_member_of_any_club(request.user):
-            # For club coordinators, deputies, and members, show
-            # approved activities as well as their own club's pending
-            # and rejected activities.
-            activity_poll = Activity.objects.undeleted().current_year().for_user_clubs(request.user).distinct()
-            context['pending'] = activity_poll.pending()
-            context['rejected'] = activity_poll.rejected()
-
-            # Only display to coordinators and deputies
-            if clubs.utils.is_coordinator_or_deputy_of_any_club(request.user):
-                # For coordinators, show also the activities waiting their
-                # action.
-                user_coordination = clubs.utils.get_user_coordination_and_deputyships(request.user)
-                context['todo'] = Activity.objects.current_year().filter(assignee__in=user_coordination).undeleted()
-                user_club = user_coordination.first()
-                if not user_club.can_skip_followup_reports:
-                    # Media-related
-                    context['due_report_count'] = user_club.get_due_report_count()
-                    context['overdue_report_count'] = user_club.get_overdue_report_count()
-                    # In activity templates, the MAX_OVERDUE_REPORTS
-                    # variable is used to check whether the current user
-                    # is a coordinator or a deputy.  This is to aviod
-                    # passing duplicated variables.  In case the following
-                    # variable is changed, the templates need to be
-                    # changed as well.
-                    context['MAX_OVERDUE_REPORTS'] = media.utils.MAX_OVERDUE_REPORTS
-
-        elif clubs.utils.is_employee_of_any_club(request.user):
-            # For employees, display all approved activities, as well
-            # as their clubs' approved activities in a separate table.
-            #
-            # An employee is basically similar to a normal user, the
-            # only difference is having another table that includes
-            # the employee's relevant activities
-            context['club_approved'] = Activity.objects.current_year().filter(primary_club__in=request.user.employee.current_year()).undeleted()
-
-            template = 'activities/list_employee.html'
-        else: # For students and other normal users.
-            context['approved'] = context['approved'].for_user_city(request.user).for_user_gender(request.user)
-            template = 'activities/list_normal.html'
+        template = 'activities/list_normal.html'
     else: # For anonymous users
         template = 'activities/front/list.html'
 
@@ -138,13 +82,13 @@ def show(request, activity_id):
     if request.user.is_authenticated():
         # Save a click, redirect reviewers to the appropriate
         # reviewing page.
-        reviewing_parents = Club.objects.activity_reviewing_parents(activity)
-        user_reviewing_clubs = reviewing_parents.filter(coordinator=request.user) | \
-                               reviewing_parents.filter(deputies=request.user)
-        if user_reviewing_clubs.exists():
-            reviewer_club = user_reviewing_clubs.first()
-            return HttpResponseRedirect(reverse('activities:review',
-                                                args=(activity.pk, reviewer_club.pk)))
+        # reviewing_parents = Club.objects.activity_reviewing_parents(activity)
+        # user_reviewing_clubs = reviewing_parents.filter(coordinator=request.user) | \
+        #                        reviewing_parents.filter(deputies=request.user)
+        # if user_reviewing_clubs.exists():
+        #     reviewer_club = user_reviewing_clubs.first()
+        #     return HttpResponseRedirect(reverse('activities:review',
+        #                                         args=(activity.pk, reviewer_club.pk)))
 
         # Anyone can view forms; yet due to URL reversing issues it
         # has to be restricted to this view only Otherwise, we'll end
@@ -154,9 +98,9 @@ def show(request, activity_id):
 
     # --- Permission checks ---
 
-    if not clubs.utils.can_view_activity(request.user, activity) and \
-       not activity.is_approved:
-        raise PermissionDenied
+    # if not clubs.utils.can_view_activity(request.user, activity) and \
+    #    not activity.is_approved:
+    #     raise PermissionDenied
 
     return render(request, 'activities/show.html', context, current_app=FORMS_CURRENT_APP)
 

@@ -6,6 +6,16 @@
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'neon/assets/js/vertical-timeline/css/default.css' %}">
   <link rel="stylesheet" href="{% static 'neon/assets/js/vertical-timeline/css/component.css' %}">
+  <style type="text/css">
+    /* Make some more space for date and time labels */
+    .cbp_tmtimeline > li .cbp_tmtime {
+      padding-right: 20px;
+    }
+    /* Override the font size specified by vertical timeline */
+    .cbp_tmtimeline > li .cbp_tmlabel {
+      font-size: inherit;
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
@@ -15,29 +25,238 @@
     </div>
     <div class="panel-body">
       <ul class="cbp_tmtimeline">
-        <li>
-          <time class="cbp_tmtime" datetime="2017-09-10T18:30">
-            <span class="hidden">10/09/2017</span>
-            <span class="large">Now</span>
-          </time>
-          <div class="cbp_tmicon">
-            <i class="entypo-flag"></i>
-          </div>
-          <div class="cbp_tmlabel empty">
-            <span>No Activity</span>
-          </div>
-        </li>
 
         {% for activity_request in request_thread.requests.all %}
 
         <li>
           <time class="cbp_tmtime" datetime="{{ activity_request.submission_datetime|date:"c" }}">
-            <span>{{ activity_request.submission_datetime|date:"h:i A" }}</span>
             <span>{{ activity_request.submission_datetime|naturalday }}</span>
+            <span>{{ activity_request.submission_datetime|date:"h:i A" }}</span>
           </time>
           <div class="cbp_tmicon bg-success"> <i class="entypo-plus"></i> </div>
           <div class="cbp_tmlabel">
-            <h2>{% trans "تم رفع نشاط جديد باسم:" %} {{ activity_request.name }}</h2>
+            <h4>
+              {% trans "أنشأ" %} {{ activity_request.submitter }} {% trans "من" %}
+              <a href="{% url 'teams:show' activity_request.submitter_team.code_name %}">{{ activity_request.submitter_team.ar_name }}</a>
+              {% trans "طلب النشاط التالي:" %}
+            </h4>
+
+            <hr>
+
+            <div class="panel panel-info panel-shadow">
+              <div class="panel-heading">
+                <div class="panel-title">{{ activity_request.name }}</div>
+              </div>
+              <div class="panel-body with-table">
+                <table class="table table-bordered table-responsive">
+                  <tbody>
+                    <tr>
+                      <th>{% trans "العنوان" %}</th>
+                      <td>{{ activity_request.name }}</td>
+                    </tr>
+                    <tr>
+                      <th>{% trans "التصنيف" %}</th>
+                      <td>{{ activity_request.category }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="panel panel-info panel-shadow">
+              <div class="panel-body with-table">
+                <table class="table table-bordered table-responsive">
+                  <tbody>
+                    <tr>
+                      <th colspan="1">{% trans "الوصف" %}</th>
+                      <td colspan="3">{{ activity_request.description|linebreaksbr }}</td>
+                    </tr>
+                    <tr>
+                      <th colspan="1">{% trans "الأهداف" %}</th>
+                      <td colspan="3">{{ activity_request.goals|linebreaksbr }}</td>
+                    </tr>
+                    <tr>
+                      <th>{% trans "عدد المنظمين" %}</th>
+                      <td>{{ activity_request.organizer_count }}</td>
+                      <th>{% trans "عدد المشاركين" %}</th>
+                      <td>{{ activity_request.participant_count }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="panel panel-info panel-shadow">
+              <div class="panel-body with-table">
+                <table class="table table-bordered table-responsive">
+                  <tbody>
+                    <tr>
+                      <th>{% trans "الفرق المتعاونة" %}</th>
+                      <td>
+                        <ul>
+                          {% for team in activity_request.collaborating_teams.all %}
+                            <li><a href="{% url 'teams:show' team.code_name %}">{{ team.ar_name }}</a></li>
+                          {% endfor %}
+                        </ul>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>{% trans "الجهات المتعاونة من داخل الجامعة" %}</th>
+                      <td>{{ activity_request.inside_collaborators|linebreaksbr }}</td>
+                    </tr>
+                    <tr>
+                      <th>{% trans "الجهات المتعاونة من خارج الجامعة" %}</th>
+                      <td>{{ activity_request.outside_collaborators|linebreaksbr }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="panel panel-info panel-shadow">
+              <div class="panel-body with-table">
+                <table class="table table-bordered table-responsive">
+                  <tbody>
+                    <tr>
+                      <th>{% trans "المدينة الجامعية" %}</th>
+                      <td>
+                        <ul>
+                          {% for campus in activity_request.campus.all %}
+                            <li>{{ campus.city }}</li>
+                          {% endfor %}
+                        </ul>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>{% trans "التخصصات" %}</th>
+                      <td>
+                        <ul>
+                          {% for specialty in activity_request.specialty.all %}
+                            <li>{{ specialty.name }}</li>
+                          {% endfor %}
+                        </ul>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>{% trans "القسم" %}</th>
+                      <td>{{ activity_request.get_gender_display }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="panel panel-info panel-shadow">
+              <div class="panel-body with-table">
+                <table class="table table-bordered table-responsive">
+                  <tbody>
+                    <tr>
+                      <th>{% trans "تاريخ البداية" %}</th>
+                      <td>{{ activity_request.start_date|date }}</td>
+                      <th>{% trans "تاريخ النهاية" %}</th>
+                      <td>{{ activity_request.end_date|date }}</td>
+                    </tr>
+                    <tr>
+                      <th>{% trans "المكان" %}</th>
+                      <td colspan="3">{{ activity_request.location }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <hr>
+
+            <h4>{% trans "الفعاليات" %}</h4>
+            {% blocktrans count counter=activity_request.eventrequests.count %}
+              <h5>يحتوي هذا النشاط على فعالية واحدة:</h5>
+              {% plural %}
+              <h5>يحتوي هذا النشاط على {{ counter }} فعاليات:</h5>
+            {% endblocktrans %}
+
+            {% for event_request in activity_request.eventrequests.all %}
+              <div class="panel panel-success panel-shadow">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <span class="badge badge-primary">{{ forloop.counter }}</span>
+                    {{ event_request.label }}
+                  </div>
+                </div>
+                <div class="panel-body with-table">
+                  <table class="table table-bordered table-responsive">
+                    <tbody>
+                      <tr>
+                        <th>{% trans "الوصف" %}</th>
+                        <td colspan="3">{{ event_request.description }}</td>
+                      </tr>
+                      <tr>
+                        <th>{% trans "التاريخ" %}</th>
+                        <td>{{ event_request.date|date }}</td>
+                        <th>{% trans "المكان" %}</th>
+                        <td>{{ event_request.location }}</td>
+                      </tr>
+                      <tr>
+                        <th>{% trans "وقت البداية" %}</th>
+                        <td>{{ event_request.start_time }}</td>
+                        <th>{% trans "وقت النهاية" %}</th>
+                        <td>{{ event_request.end_time }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            {% endfor %}
+
+            <hr>
+
+            <div class="panel panel-info panel-shadow">
+              <div class="panel-body with-table">
+                <table class="table table-bordered table-responsive">
+                  <tbody>
+                    <tr>
+                      <th>{% trans "متطلبات مخازن العمادة" %}</th>
+                      <td>
+                        <ul>
+                          {% for item_request in activity_request.depositoryitemrequests.all %}
+                            <li>{{ item_request.name }} ({% trans "عدد" %} {{ item_request.quantity }} {{ item_request.unit }})</li>
+                          {% endfor %}
+                        </ul>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>{% trans "المتطلبات الأخرى" %}</th>
+                      <td>
+                        <ul>
+                          {% for requirement in activity_request.requirementrequests.all %}
+                            <li>{{ requirement.description }}</li>
+                          {% endfor %}
+                        </ul>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="panel panel-info panel-shadow">
+              <div class="panel-body with-table">
+                <table class="table table-bordered table-responsive">
+                  <tbody>
+                    <tr>
+                      <th>{% trans "الملفات المرفقة" %}</th>
+                      <td>
+                        <ul>
+                          {% for file_attachment in activity_request.fileattachments.all %}
+                            <li><a href="{{ file_attachment.file.url }}">{{ file_attachment.description }}</a></li>
+                          {% endfor %}
+                        </ul>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
           </div>
         </li>
 

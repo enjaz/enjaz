@@ -832,12 +832,12 @@ a.btn-signup:hover{
     background-color: #acd547;
 }
 
-/* Properly style site footer */
+/* Properly style site footer for signed-in users */
 .page-container .main-content {
     padding-bottom: 100px;
 }
 
-.site-footer {
+.main-content .site-footer {
     position: absolute;
     bottom: 0;
     width: 100%;

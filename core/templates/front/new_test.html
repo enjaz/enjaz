@@ -25,76 +25,39 @@ you?
 		<!--[if lte IE 9]><link rel="stylesheet" href="{% static 'new_front/assets/css/ie9.css' %}" /><![endif]-->
 		<!--[if lte IE 8]><link rel="stylesheet" href="{% static 'new_front/assets/css/ie8.css' %}" /><![endif]-->
 
-
+		<!-- trying Flickity -->
+		<link rel="stylesheet" href="{% static 'new_front/flickity/flickity.css' %}" media="screen">
 	</head>
 
 	<body class="landing">
-
 	<style>
+		* {
+		  -webkit-box-sizing: border-box;
+		  box-sizing: border-box;
+		}
 
-	.scrollable {
-		width: auto;
-		margin: 0 auto;
-		padding: 0;
-		background: #000;
-		position: relative;
-		overflow: hidden;
-		text-align: center;
-	}
-	img {
-		max-width: auto;
-		height:400px;
-		margin: 0;
-		float:left;
+		body { font-family: sans-serif; }
 
-	}
-	.items {
-		width: auto;
-		height:400px;
-		-webkit-animation: hscroll 12s infinite;
-		-moz-animation: hscroll 12s infinite;
-		-ms-animation: hscroll 12s infinite;
-	}
+		.gallery {
+		  background: #EEE;
+		}
 
-	@-webkit-keyframes hscroll {
-	  0%   { margin-left: 0; }
-	27.33%  { margin-left: 0 }
-	  33.33%  { margin-left: -333px; }
-	60.66% { margin-left: -333px; }
-	66.66% { margin-left: -666px; }
-	94.99% { margin-left: -666px; }
-	  100%  { margin-left: 0 }
-	}
-
-	@-moz-keyframes hscroll {
-	  0%   { margin-left: 0; }
-	27.33%  { margin-left: 0 }
-	  33.33%  { margin-left: -333px; }
-	60.66% { margin-left: -333px; }
-	66.66% { margin-left: -666px; }
-	94.99% { margin-left: -666px; }
-	  100%  { margin-left: 0 }
-	}
-
-	@-ms-keyframes hscroll {
-	  0%   { margin-left: 0; }
-	27.33%  { margin-left: 0 }
-	  33.33%  { margin-left: -333px; }
-	60.66% { margin-left: -333px; }
-	66.66% { margin-left: -666px; }
-	94.99% { margin-left: -666px; }
-	  100%  { margin-left: 0 }
-	}
+		.gallery-cell {
+		  width: 100%;
+		  height: 400px;
+		  background: #8C8;
+		  counter-increment: gallery-cell;
+		}
 	</style>
 
 		<div id="page-wrapper">
 
 			<!-- Header -->
 				<header id="header">
-					<h1 id="logo"><a href="index.html">بوابة إنجاز</a></h1>
+					<h1 id="logo"><img height="50px" src="{% static 'logo/enjaz_logo_shadow.png' %}"></h1>
 					<nav id="nav">
 						<ul>
-							<li><a href="{% url 'new_home' %}"><span>الرئيسية</span></a></li>
+							<li><a href="{% url 'home' %}"><span>الرئيسية</span></a></li>
 							</li>
                             <li>
 	                            <a href="{% url 'about_sc' %}">
@@ -132,10 +95,10 @@ you?
 								<span>البرامج الكبرى</span>
 							</a>
                         	<ul>
-								<li><a href="">البرنامج الثقافي</a></li>
-								<li><a href="">مؤتمر التخصصات الصحية</a></li>
-								<li><a href="">TEDx KSAUHS</a></li>
-								<li><a href="">الأولمبياد الجامعي</a></li>
+								<li><a href="https://hpc.enjazportal.com/ar/home/">مؤتمر التخصصات الصحية</a></li>
+								<li><a href="https://enjazportal.com/programs/cultural-program/">البرنامج الثقافي</a></li>
+								<li><a href="https://enjazportal.com/programs/tedx/">TEDx KSAUHS</a></li>
+								<li><a href="https://enjazportal.com/programs/olympiad/">الأولمبياد الجامعي</a></li>
 							</ul>
 						</li>
 
@@ -182,14 +145,25 @@ you?
 					</nav>
 				</header>
 
+			{% if sliders %}
+			<section id="flickity-carousel" style="margin-top:55px">
+				<div class="main-gallery js-flickity"
+				data-flickity-options='{ "cellAlign": "left", "contain": true, "wrapAround": true }'>
+				{% for slider in sliders %}
+			  	<div class="gallery-cell">
+				<img height="400" width="100%" src="{{ slider.image.url }}" alt="{{ slider.image.alt }}">
+			  	</div>
+				{% endfor %}
+				</div>
+			</section>
+			{% endif %}
 
 			<!-- Banner -->
 				<section id="banner">
 					<div class="content">
 						<header>
-							<h2>The future has landed,<br>Enjaz has taken its first step!</h2>
-							<p>And there are no hoverboards or flying cars.
-							<br> I didn't write that last sentence ^_^ </p>
+							<h2>بوابة إنجاز</h2>
+							<p>بوابة إنجاز الإلكترونية هي بوابة المستقبل للأنشطة الطلابية في نادي الطلاب.<br> من خلال تعزيز الاستفادة من الجانب الإلكتروني و التقني، يدخل نادي الطلاب<br> مرحلة جديدة من عمره بقوة أكبر و أدوات أكثر تطورًا من أي وقت مضى! </p>
 						</header>
 						<span class="image"><img width="100%" src="{% static 'logo/enjaz_logo_shadow_no_text.png' %}"></span>
 					</div>
@@ -198,29 +172,23 @@ you?
 
 			<!-- One -->
 				<section id="one" class="spotlight style1 bottom">
-					<span class="image fit main"><img src="images/pic02.jpg" alt="" /></span>
+					<span class="image fit main"><img src="{% static 'new_front/images/bg2.png' %}" alt="" /></span>
 					<div class="content">
 						<div class="container">
 							<div class="row">
 								<div class="4u 12u$(medium)">
 									<header>
-										<h2>Odio faucibus ipsum integer consequat</h2>
-										<p>Nascetur eu nibh vestibulum amet gravida nascetur praesent</p>
+										<h2>الرسالة</h2>
+										<p>أن يستثمر طاقات الطلاب والطالبات وإبداعاتهم على المستوى الفردي وعلى مستوى الكلية ، كما يسعى النادي إلى الخروج بالطلاب من الجو الدراسي وتغييره بما يصقل مواهبهم وهواياتهم. </p>
 									</header>
 								</div>
 								<div class="4u 12u$(medium)">
-									<p>Feugiat accumsan lorem eu ac lorem amet sed accumsan donec.
-									Blandit orci porttitor semper. Arcu phasellus tortor enim mi
-									nisi praesent dolor adipiscing. Integer mi sed nascetur cep aliquet
-									augue varius tempus lobortis porttitor accumsan consequat
-									adipiscing lorem dolor.</p>
+									<h2>الرؤية</h2>
+									<p>يسعى نادي الطلاب لأن يكون نموذجًا في التميز والريادة من خلال أنديته الرئيسية والفرعية.</p>
 								</div>
 								<div class="4u$ 12u$(medium)">
-									<p>Morbi enim nascetur et placerat lorem sed iaculis neque ante
-									adipiscing adipiscing metus massa. Blandit orci porttitor semper.
-									Arcu phasellus tortor enim mi mi nisi praesent adipiscing. Integer
-									mi sed nascetur cep aliquet augue varius tempus. Feugiat lorem
-									ipsum dolor nullam.</p>
+									<h2>نادي الطلاب</h2>
+									<p>هو نادي طلابي تطوعي لجميع طلاب وطالبات جامعة الملك سعود بن عبدالعزيز للعلوم الصحية يقوم بترتيب وتنظيم الأنشطة الطلابية من خلال أنديته الرئيسية والفرعية. </p>
 								</div>
 							</div>
 						</div>
@@ -228,17 +196,49 @@ you?
 					<a href="#two" class="goto-next scrolly">Next</a>
 				</section>
 
+			<!--******* TODO: change clubs to teams ********** -->
+			<!-- Six | clubs' logos -->
+				<section id="four" class="wrapper style1 special fade-up">
+					<div class="container">
+						<header class="major">
+							<h2>أندية نادي الطلاب</h2>
+						</header>
+						<div class="box alt">
+							<div class="row uniform">
+							{% if teams %}
+							{% for team in teams %}
+								<section class="4u 6u(medium) 12u$(xsmall)">
+								<span class="image"><img height="100px" src="{{ team.logo.url }}"></span>
+									<h3>{{ team.ar_name }}</h3>
+								</section>
+							{% endfor %}
+
+							{% elif clubs %}
+							{% for club in clubs %}
+
+								<section class="4u 6u(medium) 12u$(xsmall)">
+								{% if club.logo %}
+								<span class="image"><img height="100px" src="{{ club.logo.url }}"></span>
+								{% endif %}
+									<h3>{{ club.name}}</h3>
+								</section>
+							{% endfor %}
+							{% endif %}
+							</div>
+						</div>
+					</div>
+				</section>
+
 			<!-- Two -->
 				<section id="two" class="spotlight style2 right">
-					<span class="image fit main"><img src="images/pic03.jpg" alt="" /></span>
+					<span class="image fit main"><img src="{% static 'new_front/images/hpc_bg_home.png' %}" alt="" /></span>
 					<div class="content">
 						<header>
-							<h2>Interdum amet non magna accumsan</h2>
-							<p>Nunc commodo accumsan eget id nisi eu col volutpat magna</p>
+							<h2>مؤتمر التخصصات الصحيّة</h2>
+							<p>يعتبر مؤتمر التخصصات الصحيّة من أبرز وأندر المؤتمرات السنويّة التي تقام لطلاب وطالبات المجالات الصحية، هو أوّل مؤتمر طلابي معتمد من هيئة التخصصات الصحية بساعات تدريبية معتمدة، المؤتمر غنيّ بالبرامج المتنوّعة والدورات المختلفة، بالإضافة إلى معارض الأبحاث والتنافس فيها على جوائز مُعتمدة من الهيئة.</p>
 						</header>
-						<p>Feugiat accumsan lorem eu ac lorem amet ac arcu phasellus tortor enim mi mi nisi praesent adipiscing. Integer mi sed nascetur cep aliquet augue varius tempus lobortis porttitor lorem et accumsan consequat adipiscing lorem.</p>
 						<ul class="actions">
-							<li><a href="#" class="button">Learn More</a></li>
+							<li><a href="https://hpc.enjazportal.com/ar/home/" class="button">اكتشف المزيد</a></li>
 						</ul>
 					</div>
 					<a href="#three" class="goto-next scrolly">Next</a>
@@ -246,116 +246,84 @@ you?
 
 			<!-- Three -->
 				<section id="three" class="spotlight style3 left">
-					<span class="image fit main bottom"><img src="images/pic04.jpg" alt="" /></span>
+					<span class="image fit main bottom"><img src="{% static 'new_front/images/cultural_bg_home.jpg' %}" alt="" /></span>
 					<div class="content">
 						<header>
-							<h2>Interdum felis blandit praesent sed augue</h2>
-							<p>Accumsan integer ultricies aliquam vel massa sapien phasellus</p>
+							<h2>البرنامج الثقافي</h2>
+							<p>يعتبر البرنامج الثقافي إحدى أكبر الفعاليات التي ينظّمها نادي الطلاب، ونريد في البرنامج الثقافي أن نفتح المدارك الثقافية والمعرفية للطالبات والطلاب، وأن نخلق منصة رحبة للإبداع والتعبير؛ وليس هذا فحسب بل إن البرنامج يشمل أيضًا دورات تدريبية في مجالات متخصصة يقدمها خبراء متخصصون! </p>
 						</header>
-						<p>Feugiat accumsan lorem eu ac lorem amet ac arcu phasellus tortor enim mi mi nisi praesent adipiscing. Integer mi sed nascetur cep aliquet augue varius tempus lobortis porttitor lorem et accumsan consequat adipiscing lorem.</p>
 						<ul class="actions">
-							<li><a href="#" class="button">Learn More</a></li>
+							<li><a href="https://enjazportal.com/programs/cultural-program/" class="button">اكتشف المزيد</a></li>
 						</ul>
 					</div>
 					<a href="#four" class="goto-next scrolly">Next</a>
 				</section>
 
 			<!-- Four -->
-				<section id="four" class="wrapper style1 special fade-up">
-					<div class="container">
-						<header class="major">
-							<h2>Accumsan sed tempus adipiscing blandit</h2>
-							<p>Iaculis ac volutpat vis non enim gravida nisi faucibus posuere arcu consequat</p>
+				<section id="two-repeat" class="spotlight style2 right">
+					<span class="image fit main"><img src="{% static 'new_front/images/tedx_bg_home.png' %}" alt="" /></span>
+					<div class="content">
+						<header>
+							<h2>TED<sup>x</sup> KSAUHS</h2>
+							<p>مهمتنا في TED<sup>x</sup>KSAUHS أن نصل إلى المجتمع لنتبادل الأفكار الفريدة ونناقشها! هدفنا خلط الحضور والمتحدثين والرعاة، لخلق بيئة مطوّرة للذات، بيئة مطوّرة للفرد، بيئة للتغير، بيئة ملهمة!</p>
 						</header>
-						<div class="box alt">
-							<div class="row uniform">
-								<section class="4u 6u(medium) 12u$(xsmall)">
-									<span class="icon alt major fa-area-chart"></span>
-									<h3>Ipsum sed commodo</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
-								<section class="4u 6u$(medium) 12u$(xsmall)">
-									<span class="icon alt major fa-comment"></span>
-									<h3>Eleifend lorem ornare</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
-								<section class="4u$ 6u(medium) 12u$(xsmall)">
-									<span class="icon alt major fa-flask"></span>
-									<h3>Cubilia cep lobortis</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
-								<section class="4u 6u$(medium) 12u$(xsmall)">
-									<span class="icon alt major fa-paper-plane"></span>
-									<h3>Non semper interdum</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
-								<section class="4u 6u(medium) 12u$(xsmall)">
-									<span class="icon alt major fa-file"></span>
-									<h3>Odio laoreet accumsan</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
-								<section class="4u$ 6u$(medium) 12u$(xsmall)">
-									<span class="icon alt major fa-lock"></span>
-									<h3>Massa arcu accumsan</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
-							</div>
-						</div>
-						<footer class="major">
-							<ul class="actions">
-								<li><a href="#" class="button">Magna sed feugiat</a></li>
-							</ul>
-						</footer>
+						<ul class="actions">
+							<li><a href="https://enjazportal.com/programs/tedx/" class="button">اكتشف المزيد</a></li>
+						</ul>
 					</div>
+					<a href="#three" class="goto-next scrolly">Next</a>
 				</section>
 
 			<!-- Five -->
-				<section id="five" class="wrapper style2 special fade">
-					<div class="container">
+				<section id="three-repeat" class="spotlight style3 left">
+					<span class="image fit main bottom"><img src="{% static 'new_front/images/olympiad_bg_home.png' %}" alt="" /></span>
+					<div class="content">
 						<header>
-							<h2>Magna faucibus lorem diam</h2>
-							<p>Ante metus praesent faucibus ante integer id accumsan eleifend</p>
+							<h2>الأولمبياد الجامعي</h2>
+							<p></p>
 						</header>
-						<form method="post" action="#" class="container 50%">
-							<div class="row uniform 50%">
-								<div class="8u 12u$(xsmall)"><input type="email" name="email" id="email" placeholder="Your Email Address" /></div>
-								<div class="4u$ 12u$(xsmall)"><input type="submit" value="Get Started" class="fit special" /></div>
-							</div>
-						</form>
+						<ul class="actions">
+							<li><a href="https://enjazportal.com/programs/olympiad/" class="button">اكتشف المزيد</a></li>
+						</ul>
 					</div>
+					<a href="#four" class="goto-next scrolly">Next</a>
 				</section>
 
 
+			<!-- Seven -->
+				<section id="five" class="wrapper style2 special fade">
+					<div class="container">
+						<header>
+							<h2>ماذا تنتظر؟</h2>
+						</header>
+							<a href="{% url 'userena_signup' %}">
+								<span class="button special">سجّل الآن!</span>
+							</a>
+					</div>
+				</section>
 
 			<section>
-				<div>
-				  <div class="scrollable">
-					<div class="items">
-					  {% for slider in sliders %}
-						<img src="{{ slider.image.url }}" alt="{{ slider.image.alt }}">
-					  {% endfor %}
-						</div>
-				</div>
+				<div style="margin-right:30px">
+				  <h3 style="text-align:center">   تابعنا على تويتر!</h3>
+				  <a class="twitter-timeline" data-lang="ar" data-height="400" href="https://twitter.com/StudentsofKSAUH">Tweets by StudentsofKSAUH</a>
+				  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 				</div>
 			</section>
-
-
-
-
 
 
 			<!-- Footer -->
 				<footer id="footer">
 					<ul class="icons">
-						<li><a href="#" class="icon alt fa-twitter"><span class="label">Twitter</span></a></li>
-						<li><a href="#" class="icon alt fa-facebook"><span class="label">Facebook</span></a></li>
-						<li><a href="#" class="icon alt fa-linkedin"><span class="label">LinkedIn</span></a></li>
-						<li><a href="#" class="icon alt fa-instagram"><span class="label">Instagram</span></a></li>
-						<li><a href="#" class="icon alt fa-github"><span class="label">GitHub</span></a></li>
-						<li><a href="#" class="icon alt fa-envelope"><span class="label">Email</span></a></li>
+						<!--Youtube : href="https://www.youtube.com/channel/UCQBBGI264nZhFqC4sh9L04w/"-->
+						<!-- web globe href="http://www.ksau-hs.com"-->
+						<li><a href="https://twitter.com/StudentsOfKSAUH" class="icon alt fa-twitter"><span class="label">Twitter</span></a></li>
+						<li><a href="https://facebook.com/studentsofksauhs" class="icon alt fa-facebook"><span class="label">Facebook</span></a></li>
+						<li><a href="http://www.instagram.com/studentsofksauhs" class="icon alt fa-instagram"><span class="label">Instagram</span></a></li>
+						<li><a href="https://github.com/enjaz/enjaz/" class="icon alt fa-github"><span class="label">GitHub</span></a></li>
+						<li><a href="mailto:studentsclub@ksau-hs.edu.sa" class="icon alt fa-envelope"><span class="label">Email</span></a></li>
 					</ul>
-					<ul class="copyright">
-						<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+					<ul>
+						<li>بُني بأيدٍ طلابيّة.<a target="_blank" href="https://github.com/enjaz/enjaz/"> حقّك في النسخ مكفول.</a></li>
 					</ul>
 				</footer>
 
@@ -371,6 +339,9 @@ you?
 			<script src="{% static 'new_front/assets/js/util.js' %}"></script>
 			<!--[if lte IE 8]><script src="{% static 'new_front/assets/js/ie/respond.min.js' %}"></script><![endif]-->
 			<script src="{% static 'new_front/assets/js/main.js' %}"></script>
+
+		<!-- trying Flickity -->
+			<script src="{% static 'new_front/flickity/flickity.pkgd.min.js' %}"></script>
 
 	</body>
 </html>

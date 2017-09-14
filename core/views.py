@@ -66,9 +66,28 @@ def portal_home(request):
         
         return render(request, 'home.html', context) # the dashboard
     else:
+        context = {}
+        context['logged_in'] = False
+
         sliders = CarouselSlider.objects.all()
-        context = {'sliders': sliders}
-        return render(request, 'front/new_home_front.html', context)
+        context['sliders'] = sliders
+
+        # ---- Books ----
+        context['book_sample'] = Book.objects.current_year().for_user_city(request.user).available().order_by("?")[:6]
+
+        # ----Teams----
+        #commented-out because Team model doesn't exist on this branch
+        #club_teams = Team.objects.filter(category='CC') | Team.objects.filter(category='SC')
+        #context['teams'] = teams
+
+        # temporary:
+        current_year = StudentClubYear.objects.get_current()
+        clubs = Club.objects.filter(year=current_year, city=u'الرياض', gender='M')
+        #city and gender for convenience and time shortage >.<
+        #TODO: this (^^^) should be dealt with
+        context['clubs'] = clubs
+
+        return render(request, 'front/new_test.html', context)
 
 
 def visit_announcement(request, pk):
@@ -336,7 +355,18 @@ def portal_home_new (request):
 
         sliders = CarouselSlider.objects.all()
         context['sliders'] = sliders
+
         # ---- Books ----
         context['book_sample'] = Book.objects.current_year().for_user_city(request.user).available().order_by("?")[:6]
+
+        # ----Teams----
+        #commented-out because Team model doesn't exist on this branch
+        #club_teams = Team.objects.filter(category='CC') | Team.objects.filter(category='SC')
+        #context['teams'] = teams
+
+        # temporary:
+        current_year = StudentClubYear.objects.get_current()
+        clubs = Club.objects.filter(year=current_year)
+        context['clubs'] = clubs
 
     return render(request, 'front/new_test.html', context)

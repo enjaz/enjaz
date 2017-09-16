@@ -515,3 +515,22 @@ class Post(models.Model):
 
     def __unicode__(self):
         return self.title
+
+class Snapchat(models.Model):
+    club = models.ForeignKey('clubs.Club', null=True,
+                                     on_delete=models.SET_NULL,
+                                     verbose_name=u"النادي")
+    date = models.DateField(verbose_name=u"التاريخ")
+    start_time = models.TimeField(default = "12:00", verbose_name=u"وقت البداية")
+    end_time = models.TimeField(default = "24:00", verbose_name=u"وقت النهاية")
+
+    is_approved_choices = (
+        (True, u'معتمد'),
+        (False, u'مرفوض'),
+        (None, u'معلق'),
+        )
+    is_approved = models.NullBooleanField(verbose_name=u"الحالة",
+                                          choices=is_approved_choices,)
+    
+    def __unicode__(self):
+        return self.club.name

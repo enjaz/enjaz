@@ -1,0 +1,133 @@
+{% extends 'media_base.html' %}{% load staticfiles %}{% load media_tags %}
+
+
+{% block content %}
+<div class="invoice">
+
+    {% if approved %}
+    <div class="alert alert-success" role="alert">
+    <h4>تم قبول طلب {{obj}} </h4>
+    </div>
+    {% endif %}
+    
+    {% if canceled %}
+    <div class="alert alert-success" role="alert">
+    <h4>تم الغاء طلب {{obj}} </h4>
+    </div>
+    {% endif %}
+    
+	<div class="row">
+
+		
+
+        <h2>قائمة الحجوزات المؤكدة على السناب تشات</h2>
+<div class="margin"></div>
+<div class="panel-body">
+		<table class="display snap_list dt-responsive">
+                <thead>
+                    <tr>
+                        <th>اسم النادي</th>
+                        <th class="not-mobile">التاريخ</th>
+                        <th class="not-mobile">وقت البداية</th>
+                        <th class="not-mobile">وقت النهاية</th>
+                        <th> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in snapchat_list %}
+                    <tr>
+                        <td>{{ i.club }}</td>
+                        <td>{{ i.date }}</td>
+                        <td>{{ i.start_time }}</td>
+                        <td>{{ i.end_time }}</td>
+                        {% if user|is_media_coordinator_or_member or user.is_superuser %}
+                        <td><form method="post">{% csrf_token %}<button name="cancel" class="btn btn-danger" value="{{i.pk}}"> إلغاء</button></form></td> {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div></div>
+
+
+	<hr class="margin">
+{% if user|is_media_coordinator_or_member or user.is_superuser %}
+	<div class="row">
+        <h2> قائمة الحجوزات الغير مؤكدة على السناب تشات</h2>  
+        <div class="margin"></div>
+        <table class="display snap_list dt-responsive">
+                <thead>
+                    <tr>
+                        <th>اسم النادي</th>
+                        <th>التاريخ</th>
+                        <th>وقت البداية</th>
+                        <th>وقت النهاية</th>
+                        <th> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in nonapproved_snapchat_list %}
+                    <tr>
+                        <td>{{ i.club }}</td>
+                        <td>{{ i.date }}</td>
+                        <td>{{ i.start_time }}</td>
+                        <td>{{ i.end_time }}</td>
+                        <td><form method="post">{% csrf_token %}<button name="approve" class="btn btn-primary" value="{{i.pk}}"> أكد</button></form></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        
+        </div> {% endif %}
+	
+
+	
+
+	<div class="margin"></div>
+
+	<div class="row">
+			
+<a href="{% url 'media:snapchat_laws' %}"><button class="btn btn-primary btn-block"> احجز موعدا</button></a>
+	</div>
+
+    <br>
+
+</div>
+
+<br>
+<hr>
+<br>
+
+<div class="panel-body no-padding">  </div>
+
+
+{% endblock %}
+
+{% block customscript %}
+	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/datatables/buttons/buttons.dataTables.min.css' %}">
+
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/jszip.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/buttons.html5.min.js' %}"></script>
+<script>
+$(function () {
+	$('.snap_list').dataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'copyHtml5',
+            'excelHtml5',
+            'csvHtml5',
+        ],
+		order: [[ 2, "desc" ]],
+		language: {% include 'js/dataTables-arabic.json' %}
+	});
+	// Allow the dropdown menus to cross the border of the panel without being cropped
+	$(".panel").css("overflow-x", "visible").css("overflow-y", "visible");
+});
+
+</script>
+{% endblock %}

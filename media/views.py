@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 import random
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from django.contrib.auth.decorators import permission_required, login_required, user_passes_test
 from django.contrib.auth.models import User
@@ -20,10 +20,10 @@ from core import decorators
 from clubs.models import Club
 from activities.models import Activity, Episode
 from media.models import EmployeeReport, FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, CustomTask, TaskComment, \
-    WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment, POLL_TYPE_CHOICES, ReportComment, Buzz, Post
+    WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment, POLL_TYPE_CHOICES, ReportComment, Buzz, Post, Snapchat
 from media.forms import EmployeeReportForm, FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, ArticleReviewForm, TaskForm, \
     TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm, \
-    FollowUpReportImageFormset, FollowUpReportAdImageFormset, ReportCommentForm, BuzzForm
+    FollowUpReportImageFormset, FollowUpReportAdImageFormset, ReportCommentForm, BuzzForm, SnapchatForm
 from media.utils import is_media_coordinator_or_member, is_club_coordinator_or_member, is_media_or_club_coordinator_or_member, proper_poll_type, get_poll_type_url, media_coordinator_or_member_test, get_user_media_center, get_clubs_for_assessment_by_user, can_submit_employeereport, can_submit_studentreport, get_club_media_center, media_user_test, is_media_coordinator_or_deputy, can_view_followupreport
 from accounts.utils import get_user_gender, get_user_city
 
@@ -1228,3 +1228,34 @@ def show_post(request, slug):
     if not post.is_published():
         raise Http404
     return render(request, "media/show_post.html", {'post': post})
+
+def snapchat_home(request):
+    context = {}
+    if request.method =="POST":
+        try:
+            obj = Snapchat.objects.get(pk=request.POST['approve'])
+            obj.is_approved = True
+            obj.save()
+            context= {'obj':obj, 'approved': True }
+        except:
+            obj = Snapchat.objects.get(pk=request.POST['cancel'])
+            obj.is_approved = False
+            obj.save()
+            context= {'obj':obj, 'canceled': True }
+    approved_snap_list = Snapchat.objects.filter(is_approved=True, date__gte=datetime.now())
+    context['snapchat_list']= approved_snap_list
+    nonapproved_snap_list= Snapchat.objects.exclude(is_approved=True)
+    context['nonapproved_snapchat_list']= nonapproved_snap_list
+    return render(request,"media/snapchat_home.html", context)
+
+def snapchat_laws(request):
+    return render (request, "media/snapchat_laws.html", {})
+
+def snapchat_add(request):
+    print request.method
+    if request.method == 'POST':
+        form = SnapchatForm(request.POST)
+        if form.is_valid():
+            instance = form.save()
+            return HttpResponseRedirect(reverse('media:snapchat_home'))
+    return render(request, "media/snapchat.html", {'snapchatform': SnapchatForm})

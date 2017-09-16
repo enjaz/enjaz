@@ -7,7 +7,7 @@ from django.forms.models import inlineformset_factory
 from clubs.utils import get_media_center
 
 from media.models import EmployeeReport, FollowUpReport, Story, StoryReview, Article, ArticleReview, CustomTask, TaskComment, Poll, \
-    PollResponse, WHAT_IF, HUNDRED_SAYS, PollComment, PollChoice, FollowUpReportImage, FollowUpReportAdImage, ReportComment, Buzz
+    PollResponse, WHAT_IF, HUNDRED_SAYS, PollComment, PollChoice, FollowUpReportImage, FollowUpReportAdImage, ReportComment, Buzz, Snapchat
 
 # A nice trick to display full names instead of usernames
 # Check: http://stackoverflow.com/questions/16369403/foreign-key-and-select-field-value-in-admin-interface
@@ -162,3 +162,8 @@ class BuzzForm(ModelForm):
         model = Buzz
         fields = ['title', 'body', 'image', 'colleges',
                   'announcement_date', 'is_push']
+
+class SnapchatForm(ModelForm):
+    class Meta:
+        model = Snapchat
+        fields = ['club', 'date', 'start_time', 'end_time']

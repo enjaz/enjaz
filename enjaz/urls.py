@@ -12,7 +12,6 @@ from activities.urls import activity_forms_urls
 from bulb.admin import bulb_admin
 from certificates.admin import certificate_admin
 from clubs.urls import club_forms_urls
-from core.views import visit_announcement
 from researchhub.forms import ResearchHubSignupForm
 from tedx.admin import tedx_admin
 from teams.urls import team_forms_urls

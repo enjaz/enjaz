@@ -1,0 +1,38 @@
+{% extends 'media_base.html' %}{% load staticfiles %}
+
+
+{% block content %}
+<div class="invoice">
+
+	<div class="row">
+        <h2>صفحة الحجز على سناب تشات</h2>
+	</div>
+
+
+    <div class="margin"></div>
+    
+    <div class="panel-body no-padding">    
+        <form method="post" >
+            {% csrf_token %}
+            {{ snapchatform}}
+            
+            <div class="margin"></div>
+            <button type="submit" class="btn btn-primary btn-block" >
+    		 أرسل
+            </button>  
+        </form>
+	</div>
+
+    <br>
+</div>
+
+<br>
+<hr>
+<br>
+
+ <script>
+  $( function() {
+    $( "#id_date" ).datepicker();
+  });
+  </script>
+{% endblock %}

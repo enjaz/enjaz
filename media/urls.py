@@ -56,6 +56,11 @@ urlpatterns = patterns('',
     url(r'^buzzes/list/published/$', views.buzzes_list, {"list_filter": views.ACTIVE}, name="buzzes_list_published"),
     url(r'^buzzes/list/upcoming/$', views.buzzes_list, {"list_filter": views.UPCOMING}, name="buzzes_list_upcoming"),
 
+    # Snapchat
+    url(r'^snapchat/$',views.snapchat_home, name="snapchat_home"),
+    url(r'^snapchat/add',views.snapchat_add, name="snapchat_add"),
+    url(r'^snapchat/laws',views.snapchat_laws, name="snapchat_laws"),
+
     # Polls
     url(r'^(?P<poll_type>\w+)/$', views.polls_home, name="polls_home"),
     url(r'^(?P<poll_type>\w+)/list/active/$', views.polls_list, {"filter": views.ACTIVE}, name="polls_list_active"),
@@ -71,5 +76,7 @@ urlpatterns = patterns('',
     url(r'^(?P<poll_type>\w+)/suggest/$', views.suggest_poll, name="suggest_poll"),
 
     # Buzz
+
+    
 
 )

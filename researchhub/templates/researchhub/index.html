@@ -50,7 +50,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Domain</th>
-                            <th class="hidden-xs">Date added</th>
+                            <th>City</th>
                         </tr>
                     </thead>
 
@@ -59,7 +59,7 @@
                         <tr>
                             <td><a href="{% url 'researchhub:show_supervisor' supervisor.pk %}">Dr. {{ supervisor.user.common_profile.get_en_full_name }}</a></td>
                             <td>{{ supervisor.domain }}</td>
-                            <td class="hidden-xs">{{ supervisor.submission_date|date:"Y-n-j" }}</td>
+                            <td>{{ supervisor.user.common_profile.city }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -114,6 +114,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Field</th>
+                            <th>City</th>
                             <th class="hidden-xs">Date added</th>
                         </tr>
                     </thead>
@@ -123,6 +124,7 @@
                         <tr>
                             <td><a href="{% url 'researchhub:show_project' project.pk %}">{{ project.title }}</a></td>
                             <td>{{ project.field }}</td>
+                            <td>{{ project.submitter.common_profile.city }}</td>
                             <td class="hidden-xs">{{ project.submission_date|date:"Y-n-j" }}</td>
                         </tr>
                         {% endfor %}

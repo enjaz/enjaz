@@ -351,6 +351,14 @@ you?
                             <span>مدونة النادي</span>
                         </a>
                     </li>
+                    {% if user|is_media_coordinator_or_member or user.is_superuser or user.media_representations.current_year.exists %}
+                    <li>
+                        <a href="{% url 'media:snapchat_home' %}">
+                            <i class="entypo-mobile"></i>
+                            <span>سناب تشات</span>
+                        </a>
+                    </li>
+                    {% endif %}
                     {% comment %}
                     <li>
                         <a href="{% url 'media:polls_home' 'whatif' %}">

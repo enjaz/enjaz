@@ -27,7 +27,8 @@
                 <thead>
                     <tr>
                         <th>اسم النادي</th>
-                        <th class="not-mobile">التاريخ</th>
+                        <th class="not-mobile"> تم رفع الطلب في</th>
+                        <th class="not-mobile"> التاريخ</th>
                         <th class="not-mobile">وقت البداية</th>
                         <th class="not-mobile">وقت النهاية</th>
                         <th> </th>
@@ -37,6 +38,7 @@
                     {% for i in snapchat_list %}
                     <tr>
                         <td>{{ i.club }}</td>
+                        <td>{{ i.pup_date }}</td>
                         <td>{{ i.date }}</td>
                         <td>{{ i.start_time }}</td>
                         <td>{{ i.end_time }}</td>
@@ -59,20 +61,23 @@
                 <thead>
                     <tr>
                         <th>اسم النادي</th>
-                        <th>التاريخ</th>
+                        <th class="not-mobile"> تم رفع الطلب في</th>
+                        <th class="not-mobile"> التاريخ </th>
                         <th>وقت البداية</th>
                         <th>وقت النهاية</th>
-                        <th> </th>
+                        <th> </th><th> </th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for i in nonapproved_snapchat_list %}
                     <tr>
                         <td>{{ i.club }}</td>
+                        <td>{{ i.pup_date }}</td>
                         <td>{{ i.date }}</td>
                         <td>{{ i.start_time }}</td>
                         <td>{{ i.end_time }}</td>
                         <td><form method="post">{% csrf_token %}<button name="approve" class="btn btn-primary" value="{{i.pk}}"> أكد</button></form></td>
+                        <td><form method="post">{% csrf_token %}<button name="disapprove" class="btn btn-danger" value="{{i.pk}}"> رفض</button></form></td>
                     </tr>
                     {% endfor %}
                 </tbody>

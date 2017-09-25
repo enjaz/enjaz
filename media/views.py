@@ -1238,13 +1238,24 @@ def snapchat_home(request):
             obj.save()
             context= {'obj':obj, 'approved': True }
         except:
+            pass
+        try:
             obj = Snapchat.objects.get(pk=request.POST['cancel'])
-            obj.is_approved = False
+            obj.is_approved = None
             obj.save()
             context= {'obj':obj, 'canceled': True }
+        except:
+            pass
+        try:
+            obj = Snapchat.objects.get(pk=request.POST['disapprove'])
+            obj.is_approved = False
+            obj.save()
+            context= {'obj':obj, 'disapproved': True }
+        except:
+            pass
     approved_snap_list = Snapchat.objects.filter(is_approved=True, date__gte=datetime.now())
     context['snapchat_list']= approved_snap_list
-    nonapproved_snap_list= Snapchat.objects.exclude(is_approved=True)
+    nonapproved_snap_list= Snapchat.objects.filter(is_approved=None)
     context['nonapproved_snapchat_list']= nonapproved_snap_list
     return render(request,"media/snapchat_home.html", context)
 

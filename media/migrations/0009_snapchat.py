@@ -8,7 +8,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('clubs', '0053_add_2017_2018_clubs'),
         ('media', '0008_followupreport_is_draft'),
     ]
 

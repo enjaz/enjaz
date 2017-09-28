@@ -191,10 +191,6 @@ class BuzzForm(ModelForm):
 
 
 class SnapchatForm(ModelForm):
-    club = forms.ModelChoiceField(
-        queryset=Club.objects.current_year().filter(city=u"الرياض", can_review=False),
-        label=u"النادي",
-    )
     start_time = forms.TimeField(
         input_formats=("%I:%M %p", "%H:%M:%S", "%H:%M"),
         label=u"وقت البداية",

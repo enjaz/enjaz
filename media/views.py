@@ -1296,6 +1296,7 @@ def snapchat_home(request):
             context = {'obj': obj, 'disapproved': True}
         except:
             pass
+        # TODO: Send email notifications upon approval or declination
     approved_snap_list = Snapchat.objects.filter(is_approved=True, date__gte=datetime.now())
     context['snapchat_list'] = approved_snap_list
     nonapproved_snap_list = Snapchat.objects.filter(is_approved=None)
@@ -1316,5 +1317,9 @@ def snapchat_add(request):
         form = SnapchatForm(request.POST)
         if form.is_valid():
             instance = form.save()
+            # TODO: Send email notification to media center (of appropriate city) upon request
             return HttpResponseRedirect(reverse('media:snapchat_home'))
-    return render(request, "media/snapchat.html", {'snapchatform': SnapchatForm})
+    else:
+        form = SnapchatForm()
+        form.fields['club'].queryset = Club.objects.current_year().for_user_city(request.user)
+    return render(request, "media/snapchat.html", {'snapchatform': form})

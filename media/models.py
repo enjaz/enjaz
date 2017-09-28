@@ -516,6 +516,7 @@ class Post(models.Model):
     def __unicode__(self):
         return self.title
 
+
 class Snapchat(models.Model):
     club = models.ForeignKey('clubs.Club', null=True,
                                      on_delete=models.SET_NULL,

@@ -1,0 +1,51 @@
+{% extends 'media_base.html' %}{% load staticfiles %}{% load clubs_utils %}{% load media_tags %}
+{% block title %}
+ تقرير 	{% if employee_show %}عمادة شؤون الطلاب{% else %}المركز الإعلامي{% endif %} عن {{ report.episode.activity.name }}
+{% endblock %}
+
+{% block content %}
+<div class="invoice">
+
+	<div class="row">
+        <h2>نقاط ينبغي مراعاتها عند التغطية باستخدام سناب تشات:</h2>
+
+            <ul>
+                <li>أن يكون وقت استخدام الحساب، كما هو موجود في جدول الحجز.</li>
+                <li>الألتزام بالوقت المجدول وعدم تجاوزه أو البداية قبله.</li>
+                <li>ضرورة أن تكون الصور ومقاطع الفيديو بجودة ممتازة مع ذكر اسم النشاط والنادي المقدّم له (في أوّل مقطع في التغطية).</li>
+                <li>يحق للممثل الإعلامي الحصول على ٦٠ ثانية(عدد ٦ سنابات) لتغطية نشاطه، وفي حال كنت ترى أن النشاط يستحق أكثر من ذلك، تواصل مع المركز الإعلامي في المجموعة الخاصة بك.</li>
+                <li>يفضّل أن تكون زاوية التصوير بشكل أفقي أو عامودي - بإستثناء بداية التغطية(واجهة النشاط)- للحرص على جمالية التغطية وعدم تشتيت المشاهد.</li>
+                <li> لا يسمح بإضافة أي شخص في حساب النادي بالسناب شات، وأيضاً لا يسمح بقبول أي إضافة على الحساب أو التغيير في إعدادات الحساب.</li>
+            </ul> 
+	</div>
+
+
+
+	
+
+	<div class="margin"></div>
+
+	<div class="row">
+			
+<a href="{% url 'media:snapchat_add' %}"><button class="btn btn-primary btn-block"> موافق</button></a>
+	</div>
+
+    <br>
+
+</div>
+
+<br>
+<hr>
+<br>
+
+<div class="panel-body no-padding">
+
+        
+ </div>
+
+ <script>
+  $( function() {
+    $( "#id_date" ).datepicker();
+  });
+  </script>
+{% endblock %}

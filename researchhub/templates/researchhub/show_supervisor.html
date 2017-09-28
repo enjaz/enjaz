@@ -3,7 +3,8 @@
 
 {% block content %}
 <div class="english-field">
-    <h1>Dr. {{ supervisor.user.common_profile.get_en_full_name }}</h1>
+    <h1>Dr. {{ supervisor.user.common_profile.get_en_full_name }}</h1> <p>({{ supervisor.user.common_profile.city }})</p>
+    <a id="send-email"><i class="fa fa-envelope"></i> Send Email</a>
     {% if user|can_edit_supervisor:supervisor %}
     <div class="row" style="margin-left: 0; margin-bottom: 5px;">
         <div style="float: right;">
@@ -48,10 +49,6 @@
                     <th>Communication</th>
                     <td>{{ supervisor.communication|linebreaksbr }}</td>
                 </tr>
-                <tr>
-                    <th>Email</th>
-                    <td><a href="mailto:{{ supervisor.user.email }}">{{ supervisor.user.email }}</a></td>
-                </tr>
                 {% if supervisor.available_from %}
                 <tr>
                     <th>Available from</th>
@@ -72,7 +69,6 @@
         </div>
     </div>
 </div>
-
 {% include "researchhub/partials/feedback_footer.html" %}
 
 {% endblock %}
@@ -114,5 +110,6 @@ p{
 {% with model='supervisor' %}
     {% include "researchhub/partials/delete_asset.html" %}
 {% endwith %}
+{% include "researchhub/partials/submit_feedback_asset.html" %}
+{% include "researchhub/partials/send_email_asset.html" %}
 {% endblock %}
-

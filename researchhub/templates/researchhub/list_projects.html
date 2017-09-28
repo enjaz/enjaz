@@ -19,6 +19,7 @@
                 <th>Title</th>
                 <th>Field</th>
                 <th class="not-mobile">Supervisor</th>
+                <td class="not-mobile">City</td>
                 <td class="not-mobile">Date added</td>
             </tr>
         </thead>
@@ -28,6 +29,7 @@
                 <td><a href="{% url 'researchhub:show_project' project.pk %}">{{ project.title }}</a></td>
                 <td>{{ project.field }}</td>
                 <td>{{ project.supervisor }}</td>
+                <td>{{ project.submitter.common_profile.city }}</td>
                 <td data-order="{{ project.submission_date|date:"U" }}">{{ project.submission_date|date:"Y-n-j" }}</td>
             </tr>
             {% endfor %}

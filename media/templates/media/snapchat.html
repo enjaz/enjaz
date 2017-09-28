@@ -1,5 +1,12 @@
 {% extends 'media_base.html' %}{% load staticfiles %} {% load bootstrap3 %}
 
+{% block customstyles %}
+<style>
+  div.bootstrap-timepicker-widget {
+    direction: ltr;
+  }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="invoice">
@@ -39,10 +46,17 @@
 <br>
 <hr>
 <br>
+{% endblock %}
 
- <script>
-  $( function() {
-    $( "#id_date" ).datepicker();
+{% block scripts %}
+  {{ block.super }}
+
+  <script type="text/javascript" src="{% static 'neon/assets/js/bootstrap-timepicker.min.js' %}"></script>
+  <script>
+  $(function() {
+    $("#id_date").datepicker();
+    $("#id_start_time, #id_end_time").timepicker();
   });
   </script>
+
 {% endblock %}

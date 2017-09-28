@@ -90,10 +90,16 @@
 
 <hr>
     {% endif %}
-<button class="btn btn-block btn-green" type="submit">
+
+<button class="btn btn-block btn-info" type="submit" name="draft" value="True"> 
+        إحفظ كمسودة فقط
+</button>    
+    
+<button class="btn btn-block btn-green" type="submit" name="draft" value="False">
 	<i class="glyphicon glyphicon-ok-sign"></i> 
 	أرسل
 </button>
+
 
 </form>
 {% endblock %}

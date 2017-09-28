@@ -18,6 +18,8 @@
     {% endif %}
     {% if user|is_media_coordinator_or_member or user.is_superuser or user.media_representations.current_year.exists %}
 	<li><a href="{% url 'media:list_activities' %}"><i class="entypo-flag"></i> التقارير و التغطيات</a></li>
+    <li><a href="{% url 'media:snapchat_home' %}"><i class="entypo-mobile"></i> سناب تشات</a></li>
+    
     {% endif %}
     {% if user|is_media_coordinator_or_deputy or user.is_superuser %}
 	<li><a href="{% url 'media:buzzes_home' %}"><i class="entypo-megaphone"></i> ما الجديد؟</a></li>

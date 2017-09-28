@@ -1,0 +1,62 @@
+{% extends 'media_base.html' %}{% load staticfiles %} {% load bootstrap3 %}
+
+{% block customstyles %}
+<style>
+  div.bootstrap-timepicker-widget {
+    direction: ltr;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="invoice">
+
+	<div class="row">
+        <h2>صفحة الحجز على سناب تشات</h2>
+	</div>
+
+
+    <div class="margin"></div>
+    
+    <div class="panel-body no-padding">    
+        <div class="row">
+        <form method="post" >
+            {% csrf_token %}
+            <div class="col-md-12">
+            {% bootstrap_field snapchatform.club %}
+            </div> 
+            <div class="col-md-4">{% bootstrap_field snapchatform.date %}</div>
+            <div class="col-md-4">{% bootstrap_field snapchatform.start_time %}</div>
+            <div class="col-md-4">{% bootstrap_field snapchatform.end_time %}</div>
+            
+            
+            
+        
+            <div class="margin"></div>
+            <button type="submit" class="btn btn-primary btn-block" >
+    		 أرسل
+            </button>  
+        </form>
+        </div>
+	</div>
+
+    <br>
+</div>
+
+<br>
+<hr>
+<br>
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+
+  <script type="text/javascript" src="{% static 'neon/assets/js/bootstrap-timepicker.min.js' %}"></script>
+  <script>
+  $(function() {
+    $("#id_date").datepicker();
+    $("#id_start_time, #id_end_time").timepicker();
+  });
+  </script>
+
+{% endblock %}

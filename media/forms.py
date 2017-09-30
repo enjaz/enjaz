@@ -11,7 +11,7 @@ from clubs.utils import get_media_center
 from media.models import EmployeeReport, FollowUpReport, Story, StoryReview, Article, ArticleReview, CustomTask, \
     TaskComment, Poll, \
     PollResponse, WHAT_IF, HUNDRED_SAYS, PollComment, PollChoice, FollowUpReportImage, FollowUpReportAdImage, \
-    ReportComment, Buzz, Snapchat
+    ReportComment, Buzz, SnapchatReservation
 
 
 # A nice trick to display full names instead of usernames
@@ -190,7 +190,7 @@ class BuzzForm(ModelForm):
                   'announcement_date', 'is_push']
 
 
-class SnapchatForm(ModelForm):
+class SnapchatReservationForm(ModelForm):
     start_time = forms.TimeField(
         input_formats=("%I:%M %p", "%H:%M:%S", "%H:%M"),
         label=u"وقت البداية",
@@ -201,5 +201,5 @@ class SnapchatForm(ModelForm):
     )
 
     class Meta:
-        model = Snapchat
+        model = SnapchatReservation
         fields = ['club', 'date', 'start_time', 'end_time']

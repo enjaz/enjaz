@@ -4,11 +4,13 @@ from datetime import date, time
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from model_mommy import mommy
+from post_office.models import Email
 
 from media.models import SnapchatReservation
 
 
 class TestSnapchatHome(TestCase):
+    fixtures = ['default_emailtemplates.json']
     password = '123'
 
     def create_user_and_set_password(self, *args, **kwargs):
@@ -31,6 +33,7 @@ class TestSnapchatHome(TestCase):
             english_name="Media Center",
             city=u"الرياض",
             year=self.current_year,
+            gender="M",
         )
 
         self.riyadh_media_center.coordinator = self.riyadh_coordinator
@@ -48,11 +51,11 @@ class TestSnapchatHome(TestCase):
 
         self.riyadh_reservations = [
             mommy.make('media.SnapchatReservation', club__city=u"الرياض", club__year=self.current_year,
-                       is_approved=None),  # Unreviewed reservation
+                       club__coordinator__email="example@example.com", is_approved=None),  # Unreviewed reservation
             mommy.make('media.SnapchatReservation', club__city=u"الرياض", club__year=self.current_year,
-                       is_approved=False),  # Declined reservation
+                       club__coordinator__email="example@example.com", is_approved=False),  # Declined reservation
             mommy.make('media.SnapchatReservation', club__city=u"الرياض", club__year=self.current_year,
-                       is_approved=True),  # Approved reservation
+                       club__coordinator__email="example@example.com", is_approved=True),  # Approved reservation
         ]
 
         # Jeddah
@@ -66,6 +69,7 @@ class TestSnapchatHome(TestCase):
             english_name="Media Center",
             city=u"جدة",
             year=self.current_year,
+            gender="M",
         )
 
         self.jeddah_media_center.coordinator = self.jeddah_coordinator
@@ -82,11 +86,14 @@ class TestSnapchatHome(TestCase):
         self.jeddah_club.save()
 
         self.jeddah_reservations = [
-            mommy.make('media.SnapchatReservation', club__city=u"جدة", club__year=self.current_year, is_approved=None),
+            mommy.make('media.SnapchatReservation', club__city=u"جدة", club__year=self.current_year,
+                       club__coordinator__email="example@example.com", is_approved=None),
             # Unreviewed reservation
-            mommy.make('media.SnapchatReservation', club__city=u"جدة", club__year=self.current_year, is_approved=False),
+            mommy.make('media.SnapchatReservation', club__city=u"جدة", club__year=self.current_year,
+                       club__coordinator__email="example@example.com", is_approved=False),
             # Declined reservation
-            mommy.make('media.SnapchatReservation', club__city=u"جدة", club__year=self.current_year, is_approved=True),
+            mommy.make('media.SnapchatReservation', club__city=u"جدة", club__year=self.current_year,
+                       club__coordinator__email="example@example.com", is_approved=True),
             # Approved reservation
         ]
 
@@ -143,6 +150,13 @@ class TestSnapchatHome(TestCase):
 
         self.assertTrue(self.riyadh_reservations[0].is_approved)
 
+    def test_sends_email_upon_approval_of_pending_snapchat_reservation(self):
+        self.client.login(username=self.riyadh_coordinator.username, password=self.password)
+        self.response = self.client.post(reverse('media:snapchat_home'), {'approve': self.riyadh_reservations[0].id})
+
+        self.assertEqual(Email.objects.count(), 1)
+        self.assertEqual(Email.objects.last().to, [self.riyadh_reservations[0].club.coordinator.email])
+
     def test_declines_pending_snapchat_reservation(self):
         self.client.login(username=self.riyadh_coordinator.username, password=self.password)
         self.response = self.client.post(reverse('media:snapchat_home'), {'disapprove': self.riyadh_reservations[0].id})
@@ -153,6 +167,14 @@ class TestSnapchatHome(TestCase):
         self.riyadh_reservations[0].refresh_from_db()
 
         self.assertFalse(self.riyadh_reservations[0].is_approved)
+
+    def test_sends_email_upon_decline_of_pending_snapchat_reservation(self):
+        self.client.login(username=self.riyadh_coordinator.username, password=self.password)
+        self.response = self.client.post(reverse('media:snapchat_home'),
+                                         {'disapprove': self.riyadh_reservations[0].id})
+
+        self.assertEqual(Email.objects.count(), 1)
+        self.assertEqual(Email.objects.last().to, [self.riyadh_reservations[0].club.coordinator.email])
 
     def test_cancels_approved_snapchat_reservation(self):
         self.client.login(username=self.riyadh_coordinator.username, password=self.password)
@@ -165,8 +187,17 @@ class TestSnapchatHome(TestCase):
 
         self.assertIsNone(self.riyadh_reservations[2].is_approved)
 
+    def test_sends_email_upon_revoke_of_approved_snapchat_reservation(self):
+        self.client.login(username=self.riyadh_coordinator.username, password=self.password)
+        self.response = self.client.post(reverse('media:snapchat_home'),
+                                         {'cancel': self.riyadh_reservations[2].id})
+
+        self.assertEqual(Email.objects.count(), 1)
+        self.assertEqual(Email.objects.last().to, [self.riyadh_reservations[2].club.coordinator.email])
+
 
 class TestSnapchatAdd(TestCase):
+    fixtures = ['default_emailtemplates.json']
     password = '123'
 
     def create_user_and_set_password(self, *args, **kwargs):
@@ -179,7 +210,7 @@ class TestSnapchatAdd(TestCase):
         self.current_year = mommy.make('core.StudentClubYear')
 
         # Riyadh
-        self.riyadh_coordinator = self.create_user_and_set_password(common_profile__city=u"الرياض")
+        self.riyadh_coordinator = self.create_user_and_set_password(common_profile__city=u"الرياض", email="riyadh@example.com")
         self.riyadh_deputy = self.create_user_and_set_password(common_profile__city=u"الرياض")
         self.riyadh_member = self.create_user_and_set_password(common_profile__city=u"الرياض")
         self.riyadh_representative = self.create_user_and_set_password(common_profile__city=u"الرياض")
@@ -189,6 +220,7 @@ class TestSnapchatAdd(TestCase):
             english_name="Media Center",
             city=u"الرياض",
             year=self.current_year,
+            gender="M",
         )
 
         self.riyadh_media_center.coordinator = self.riyadh_coordinator
@@ -206,7 +238,7 @@ class TestSnapchatAdd(TestCase):
         self.riyadh_clubs[0].save()
 
         # Jeddah
-        self.jeddah_coordinator = self.create_user_and_set_password(common_profile__city=u"جدة")
+        self.jeddah_coordinator = self.create_user_and_set_password(common_profile__city=u"جدة", email="jeddah@example.com")
         self.jeddah_deputy = self.create_user_and_set_password(common_profile__city=u"جدة")
         self.jeddah_member = self.create_user_and_set_password(common_profile__city=u"جدة")
         self.jeddah_representative = self.create_user_and_set_password(common_profile__city=u"جدة")
@@ -216,6 +248,7 @@ class TestSnapchatAdd(TestCase):
             english_name="Media Center",
             city=u"جدة",
             year=self.current_year,
+            gender="M",
         )
 
         self.jeddah_media_center.coordinator = self.jeddah_coordinator
@@ -271,3 +304,18 @@ class TestSnapchatAdd(TestCase):
         self.assertEqual(created_reservation.date, date(2017, 10, 10))
         self.assertEqual(created_reservation.start_time, time(12, 0))
         self.assertEqual(created_reservation.end_time, time(13, 0))
+
+    def test_sends_an_email_to_city_appropriate_media_center_up_snapchat_reservation(self):
+        self.client.login(username=self.jeddah_representative.username, password=self.password)
+        self.response = self.client.post(
+            reverse('media:snapchat_add'),
+            {
+                'club': self.jeddah_clubs[0].id,
+                'date': "10/10/2017",
+                'start_time': "12:00 PM",
+                'end_time': "1:00 PM",
+            }
+        )
+
+        self.assertEqual(Email.objects.count(), 1)
+        self.assertEqual(Email.objects.last().to, [self.jeddah_media_center.coordinator.email])

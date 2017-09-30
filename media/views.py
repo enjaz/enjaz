@@ -1283,6 +1283,14 @@ def snapchat_home(request):
 
             # Show confirmation to user
             messages.success(request, u"تم قبول طلب {}".format(obj.club.name))
+
+            # Notify club coordinator
+            mail.send(
+                [obj.club.coordinator.email],
+                template="snapchat_reservation_approved",
+                context={'user': obj.club.coordinator, 'reservation': obj}
+            )
+
         except KeyError:
             pass
         try:
@@ -1292,6 +1300,14 @@ def snapchat_home(request):
 
             # Show confirmation to user
             messages.success(request, u"تم إلغاء طلب {}".format(obj.club.name))
+
+            # Notify club coordinator
+            mail.send(
+                [obj.club.coordinator.email],
+                template="snapchat_reservation_revoked",
+                context={'user': obj.club.coordinator, 'reservation': obj}
+            )
+
         except KeyError:
             pass
         try:
@@ -1301,9 +1317,16 @@ def snapchat_home(request):
 
             # Show confirmation to user
             messages.success(request, u"تم رفض طلب {}".format(obj.club.name))
+
+            # Notify club coordinator
+            mail.send(
+                [obj.club.coordinator.email],
+                template="snapchat_reservation_declined",
+                context={'user': obj.club.coordinator, 'reservation': obj}
+            )
+
         except KeyError:
             pass
-        # TODO: Send email notifications upon approval or declination
 
         return redirect('media:snapchat_home')
 
@@ -1329,9 +1352,16 @@ def snapchat_add(request):
         form = SnapchatReservationForm(request.POST)
         if form.is_valid():
             instance = form.save()
-            # TODO: Send email notification to media center (of appropriate city) upon request
 
             messages.success(request, u"تم استلام طلبك بنجاح.")
+
+            # Notify media center of the appropriate city (and gender)
+            club_media_center = get_club_media_center(instance.club)
+            mail.send(
+                [club_media_center.coordinator.email],
+                template="snapchat_reservation_submitted",
+                context={'user': club_media_center.coordinator, 'reservation': instance}
+            )
 
             return HttpResponseRedirect(reverse('media:snapchat_home'))
     else:

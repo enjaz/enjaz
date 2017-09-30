@@ -523,8 +523,8 @@ class Snapchat(models.Model):
                                      verbose_name=u"النادي")
     date = models.DateField(verbose_name=u"التاريخ")
     pup_date = models.DateField(auto_now_add=True, null=True ,verbose_name=u"تاريخ الطلب")
-    start_time = models.TimeField(default = "12:00", verbose_name=u"وقت البداية")
-    end_time = models.TimeField(default = "24:00", verbose_name=u"وقت النهاية")
+    start_time = models.TimeField(verbose_name=u"وقت البداية")
+    end_time = models.TimeField(verbose_name=u"وقت النهاية")
 
     is_approved_choices = (
         (True, u'معتمد'),

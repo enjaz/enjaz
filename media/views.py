@@ -1297,9 +1297,12 @@ def snapchat_home(request):
         except:
             pass
         # TODO: Send email notifications upon approval or declination
-    approved_snap_list = Snapchat.objects.filter(is_approved=True, date__gte=datetime.now())
+
+    user_clubs = Club.objects.for_user_city(request.user)
+
+    approved_snap_list = Snapchat.objects.filter(is_approved=True, date__gte=datetime.now(), club__in=user_clubs)
     context['snapchat_list'] = approved_snap_list
-    nonapproved_snap_list = Snapchat.objects.filter(is_approved=None)
+    nonapproved_snap_list = Snapchat.objects.filter(is_approved=None, club__in=user_clubs)
     context['nonapproved_snapchat_list'] = nonapproved_snap_list
     return render(request, "media/snapchat_home.html", context)
 

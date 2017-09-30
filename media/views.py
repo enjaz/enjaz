@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import random
 from datetime import timedelta, datetime
 
+from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.core import mail
@@ -10,7 +11,7 @@ from django.db import IntegrityError
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators import csrf
 from django.utils import timezone
 
@@ -23,11 +24,11 @@ from clubs.models import Club
 from activities.models import Activity, Episode
 from media.models import EmployeeReport, FollowUpReport, Story, Article, StoryReview, ArticleReview, StoryTask, \
     CustomTask, TaskComment, \
-    WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment, POLL_TYPE_CHOICES, ReportComment, Buzz, Post, Snapchat
+    WHAT_IF, HUNDRED_SAYS, Poll, PollResponse, PollComment, POLL_TYPE_CHOICES, ReportComment, Buzz, Post, SnapchatReservation
 from media.forms import EmployeeReportForm, FollowUpReportForm, StoryForm, StoryReviewForm, ArticleForm, \
     ArticleReviewForm, TaskForm, \
     TaskCommentForm, PollForm, PollResponseForm, PollChoiceFormSet, PollCommentForm, PollSuggestForm, \
-    FollowUpReportImageFormset, FollowUpReportAdImageFormset, ReportCommentForm, BuzzForm, SnapchatForm
+    FollowUpReportImageFormset, FollowUpReportAdImageFormset, ReportCommentForm, BuzzForm, SnapchatReservationForm
 from media.utils import is_media_coordinator_or_member, is_club_coordinator_or_member, \
     is_media_or_club_coordinator_or_member, proper_poll_type, get_poll_type_url, media_coordinator_or_member_test, \
     get_user_media_center, get_clubs_for_assessment_by_user, can_submit_employeereport, can_submit_studentreport, \
@@ -1276,30 +1277,64 @@ def snapchat_home(request):
     context = {}
     if request.method == "POST":
         try:
-            obj = Snapchat.objects.get(pk=request.POST['approve'])
+            obj = SnapchatReservation.objects.get(pk=request.POST['approve'])
             obj.is_approved = True
             obj.save()
-            context = {'obj': obj, 'approved': True}
-        except:
+
+            # Show confirmation to user
+            messages.success(request, u"تم قبول طلب {}".format(obj.club.name))
+
+            # Notify club coordinator
+            mail.send(
+                [obj.club.coordinator.email],
+                template="snapchat_reservation_approved",
+                context={'user': obj.club.coordinator, 'reservation': obj}
+            )
+
+        except KeyError:
             pass
         try:
-            obj = Snapchat.objects.get(pk=request.POST['cancel'])
+            obj = SnapchatReservation.objects.get(pk=request.POST['cancel'])
             obj.is_approved = None
             obj.save()
-            context = {'obj': obj, 'canceled': True}
-        except:
+
+            # Show confirmation to user
+            messages.success(request, u"تم إلغاء طلب {}".format(obj.club.name))
+
+            # Notify club coordinator
+            mail.send(
+                [obj.club.coordinator.email],
+                template="snapchat_reservation_revoked",
+                context={'user': obj.club.coordinator, 'reservation': obj}
+            )
+
+        except KeyError:
             pass
         try:
-            obj = Snapchat.objects.get(pk=request.POST['disapprove'])
+            obj = SnapchatReservation.objects.get(pk=request.POST['disapprove'])
             obj.is_approved = False
             obj.save()
-            context = {'obj': obj, 'disapproved': True}
-        except:
+
+            # Show confirmation to user
+            messages.success(request, u"تم رفض طلب {}".format(obj.club.name))
+
+            # Notify club coordinator
+            mail.send(
+                [obj.club.coordinator.email],
+                template="snapchat_reservation_declined",
+                context={'user': obj.club.coordinator, 'reservation': obj}
+            )
+
+        except KeyError:
             pass
-        # TODO: Send email notifications upon approval or declination
-    approved_snap_list = Snapchat.objects.filter(is_approved=True, date__gte=datetime.now())
+
+        return redirect('media:snapchat_home')
+
+    user_clubs = Club.objects.for_user_city(request.user)
+
+    approved_snap_list = SnapchatReservation.objects.filter(is_approved=True, date__gte=datetime.now(), club__in=user_clubs)
     context['snapchat_list'] = approved_snap_list
-    nonapproved_snap_list = Snapchat.objects.filter(is_approved=None)
+    nonapproved_snap_list = SnapchatReservation.objects.filter(is_approved=None, club__in=user_clubs)
     context['nonapproved_snapchat_list'] = nonapproved_snap_list
     return render(request, "media/snapchat_home.html", context)
 
@@ -1314,12 +1349,22 @@ def snapchat_laws(request):
 @permission_required('media.can_submit_snapchat_reservations', raise_exception=True)
 def snapchat_add(request):
     if request.method == 'POST':
-        form = SnapchatForm(request.POST)
+        form = SnapchatReservationForm(request.POST)
         if form.is_valid():
             instance = form.save()
-            # TODO: Send email notification to media center (of appropriate city) upon request
+
+            messages.success(request, u"تم استلام طلبك بنجاح.")
+
+            # Notify media center of the appropriate city (and gender)
+            club_media_center = get_club_media_center(instance.club)
+            mail.send(
+                [club_media_center.coordinator.email],
+                template="snapchat_reservation_submitted",
+                context={'user': club_media_center.coordinator, 'reservation': instance}
+            )
+
             return HttpResponseRedirect(reverse('media:snapchat_home'))
     else:
-        form = SnapchatForm()
+        form = SnapchatReservationForm()
         form.fields['club'].queryset = Club.objects.current_year().for_user_city(request.user)
     return render(request, "media/snapchat.html", {'snapchatform': form})

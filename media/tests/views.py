@@ -133,7 +133,6 @@ class TestSnapchatHome(TestCase):
 
         self.assertTrue(self.riyadh_reservations[0].is_approved)
 
-
     def test_declines_pending_snapchat_reservation(self):
         self.request = self.factory.post(reverse('media:snapchat_home'), {'disapprove': self.riyadh_reservations[0].id})
         self.request.user = self.riyadh_coordinator

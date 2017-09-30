@@ -114,7 +114,7 @@ class TaskForm(ModelForm):
         super(TaskForm, self).__init__(*args, **kwargs)
         self.fields['description'].widget.attrs = {'class': 'autogrow'}
 
-    assignee = CustomUserChoiceField(queryset=User.objects.filter(memberships=get_media_center()))
+    # assignee = CustomUserChoiceField(queryset=User.objects.filter(memberships=get_media_center()))
 
     class Meta:
         model = CustomTask

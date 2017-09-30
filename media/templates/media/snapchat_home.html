@@ -4,18 +4,12 @@
 {% block content %}
 <div class="invoice">
 
-    {% if approved %}
-    <div class="alert alert-success" role="alert">
-    <h4>تم قبول طلب {{obj}} </h4>
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+      <h4>{{ message }}</h4>
     </div>
-    {% endif %}
-    
-    {% if canceled %}
-    <div class="alert alert-success" role="alert">
-    <h4>تم إلغاء طلب {{obj}} </h4>
-    </div>
-    {% endif %}
-    
+    {% endfor %}
+
 	<div class="row">
 
 		

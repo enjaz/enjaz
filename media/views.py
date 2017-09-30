@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import random
 from datetime import timedelta, datetime
 
+from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.core import mail
@@ -10,7 +11,7 @@ from django.db import IntegrityError
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators import csrf
 from django.utils import timezone
 
@@ -1279,24 +1280,32 @@ def snapchat_home(request):
             obj = SnapchatReservation.objects.get(pk=request.POST['approve'])
             obj.is_approved = True
             obj.save()
-            context = {'obj': obj, 'approved': True}
-        except:
+
+            # Show confirmation to user
+            messages.success(request, u"تم قبول طلب {}".format(obj.club.name))
+        except KeyError:
             pass
         try:
             obj = SnapchatReservation.objects.get(pk=request.POST['cancel'])
             obj.is_approved = None
             obj.save()
-            context = {'obj': obj, 'canceled': True}
-        except:
+
+            # Show confirmation to user
+            messages.success(request, u"تم إلغاء طلب {}".format(obj.club.name))
+        except KeyError:
             pass
         try:
             obj = SnapchatReservation.objects.get(pk=request.POST['disapprove'])
             obj.is_approved = False
             obj.save()
-            context = {'obj': obj, 'disapproved': True}
-        except:
+
+            # Show confirmation to user
+            messages.success(request, u"تم رفض طلب {}".format(obj.club.name))
+        except KeyError:
             pass
         # TODO: Send email notifications upon approval or declination
+
+        return redirect('media:snapchat_home')
 
     user_clubs = Club.objects.for_user_city(request.user)
 
@@ -1321,6 +1330,9 @@ def snapchat_add(request):
         if form.is_valid():
             instance = form.save()
             # TODO: Send email notification to media center (of appropriate city) upon request
+
+            messages.success(request, u"تم استلام طلبك بنجاح.")
+
             return HttpResponseRedirect(reverse('media:snapchat_home'))
     else:
         form = SnapchatReservationForm()

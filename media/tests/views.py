@@ -1,24 +1,30 @@
 # coding=utf-8
 from datetime import date, time
+
 from django.core.urlresolvers import reverse
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 from model_mommy import mommy
 
 from media.models import SnapchatReservation
-from media.views import snapchat_home, snapchat_add
 
 
 class TestSnapchatHome(TestCase):
-    def setUp(self):
-        self.factory = RequestFactory()
+    password = '123'
 
+    def create_user_and_set_password(self, *args, **kwargs):
+        user = mommy.make('auth.User', *args, **kwargs)
+        user.set_password(self.password)
+        user.save()
+        return user
+
+    def setUp(self):
         self.current_year = mommy.make('core.StudentClubYear')
 
         # Riyadh
-        self.riyadh_coordinator = mommy.make('auth.User', common_profile__city=u"الرياض")
-        self.riyadh_deputy = mommy.make('auth.User', common_profile__city=u"الرياض")
-        self.riyadh_member = mommy.make('auth.User', common_profile__city=u"الرياض")
-        self.riyadh_representative = mommy.make('auth.User', common_profile__city=u"الرياض")
+        self.riyadh_coordinator = self.create_user_and_set_password(common_profile__city=u"الرياض")
+        self.riyadh_deputy = self.create_user_and_set_password(common_profile__city=u"الرياض")
+        self.riyadh_member = self.create_user_and_set_password(common_profile__city=u"الرياض")
+        self.riyadh_representative = self.create_user_and_set_password(common_profile__city=u"الرياض")
 
         self.riyadh_media_center = mommy.make(
             'clubs.Club',
@@ -50,10 +56,10 @@ class TestSnapchatHome(TestCase):
         ]
 
         # Jeddah
-        self.jeddah_coordinator = mommy.make('auth.User', common_profile__city=u"جدة")
-        self.jeddah_deputy = mommy.make('auth.User', common_profile__city=u"جدة")
-        self.jeddah_member = mommy.make('auth.User', common_profile__city=u"جدة")
-        self.jeddah_representative = mommy.make('auth.User', common_profile__city=u"جدة")
+        self.jeddah_coordinator = self.create_user_and_set_password(common_profile__city=u"جدة")
+        self.jeddah_deputy = self.create_user_and_set_password(common_profile__city=u"جدة")
+        self.jeddah_member = self.create_user_and_set_password(common_profile__city=u"جدة")
+        self.jeddah_representative = self.create_user_and_set_password(common_profile__city=u"جدة")
 
         self.jeddah_media_center = mommy.make(
             'clubs.Club',
@@ -84,13 +90,11 @@ class TestSnapchatHome(TestCase):
             # Approved reservation
         ]
 
-        self.request = self.factory.get(reverse('media:snapchat_home'))
-
     def test_returns_a_list_of_all_approved_and_pending_reservations_for_superuser(self):
-        self.superuser = mommy.make('auth.User', is_superuser=True)
+        self.superuser = self.create_user_and_set_password(is_superuser=True)
 
-        self.request.user = self.superuser
-        self.response = snapchat_home(self.request)
+        self.client.login(username=self.superuser.username, password=self.password)
+        self.response = self.client.get(reverse('media:snapchat_home'))
 
         self.assertEqual(self.response.status_code, 200)
 
@@ -101,8 +105,8 @@ class TestSnapchatHome(TestCase):
 
     def test_returns_a_list_of_city_specific_approved_and_pending_reservations_for_media_center_team(self):
         for user in [self.riyadh_coordinator, self.riyadh_deputy, self.riyadh_member]:
-            self.request.user = user
-            self.response = snapchat_home(self.request)
+            self.client.login(username=user.username, password=self.password)
+            self.response = self.client.get(reverse('media:snapchat_home'))
 
             self.assertEqual(self.response.status_code, 200)
 
@@ -112,8 +116,8 @@ class TestSnapchatHome(TestCase):
             self.assertNotContains(self.response, self.jeddah_reservations[2].club.name)
 
     def test_returns_a_list_of_city_specific_approved_reservations_for_media_representative(self):
-        self.request.user = self.riyadh_representative
-        self.response = snapchat_home(self.request)
+        self.client.login(username=self.riyadh_representative.username, password=self.password)
+        self.response = self.client.get(reverse('media:snapchat_home'))
 
         self.assertContains(self.response, self.riyadh_reservations[2].club.name)
         self.assertNotContains(self.response, self.riyadh_reservations[0].club.name)
@@ -129,23 +133,21 @@ class TestSnapchatHome(TestCase):
     #     self.assertContains(self.response, self.riyadh_club_reservation.club.name)
 
     def test_approves_pending_snapchat_reservation(self):
-        self.request = self.factory.post(reverse('media:snapchat_home'), {'approve': self.riyadh_reservations[0].id})
-        self.request.user = self.riyadh_coordinator
-        self.response = snapchat_home(self.request)
+        self.client.login(username=self.riyadh_coordinator.username, password=self.password)
+        self.response = self.client.post(reverse('media:snapchat_home'), {'approve': self.riyadh_reservations[0].id})
 
-        self.assertEqual(self.response.status_code, 200)
-        self.assertContains(self.response, u"تم قبول طلب {}".format(self.riyadh_reservations[0].club.name))
+        self.assertEqual(self.response.status_code, 302)
+        # self.assertContains(self.response, u"تم قبول طلب {}".format(self.riyadh_reservations[0].club.name))
 
         self.riyadh_reservations[0].refresh_from_db()
 
         self.assertTrue(self.riyadh_reservations[0].is_approved)
 
     def test_declines_pending_snapchat_reservation(self):
-        self.request = self.factory.post(reverse('media:snapchat_home'), {'disapprove': self.riyadh_reservations[0].id})
-        self.request.user = self.riyadh_coordinator
-        self.response = snapchat_home(self.request)
+        self.client.login(username=self.riyadh_coordinator.username, password=self.password)
+        self.response = self.client.post(reverse('media:snapchat_home'), {'disapprove': self.riyadh_reservations[0].id})
 
-        self.assertEqual(self.response.status_code, 200)
+        self.assertEqual(self.response.status_code, 302)
         # self.assertContains(self.response, u"تم رفض طلب {}".format(self.riyadh_reservations[0].club.name))
 
         self.riyadh_reservations[0].refresh_from_db()
@@ -153,13 +155,11 @@ class TestSnapchatHome(TestCase):
         self.assertFalse(self.riyadh_reservations[0].is_approved)
 
     def test_cancels_approved_snapchat_reservation(self):
-        self.request = self.factory.post(reverse('media:snapchat_home'), {'cancel': self.riyadh_reservations[2].id})
+        self.client.login(username=self.riyadh_coordinator.username, password=self.password)
+        self.response = self.client.post(reverse('media:snapchat_home'), {'cancel': self.riyadh_reservations[2].id})
 
-        self.request.user = self.riyadh_coordinator
-        self.response = snapchat_home(self.request)
-
-        self.assertEqual(self.response.status_code, 200)
-        self.assertContains(self.response, u"تم إلغاء طلب {}".format(self.riyadh_reservations[2].club.name))
+        self.assertEqual(self.response.status_code, 302)
+        # self.assertContains(self.response, u"تم إلغاء طلب {}".format(self.riyadh_reservations[2].club.name))
 
         self.riyadh_reservations[2].refresh_from_db()
 
@@ -167,16 +167,22 @@ class TestSnapchatHome(TestCase):
 
 
 class TestSnapchatAdd(TestCase):
-    def setUp(self):
-        self.factory = RequestFactory()
+    password = '123'
 
+    def create_user_and_set_password(self, *args, **kwargs):
+        user = mommy.make('auth.User', *args, **kwargs)
+        user.set_password(self.password)
+        user.save()
+        return user
+
+    def setUp(self):
         self.current_year = mommy.make('core.StudentClubYear')
 
         # Riyadh
-        self.riyadh_coordinator = mommy.make('auth.User', common_profile__city=u"الرياض")
-        self.riyadh_deputy = mommy.make('auth.User', common_profile__city=u"الرياض")
-        self.riyadh_member = mommy.make('auth.User', common_profile__city=u"الرياض")
-        self.riyadh_representative = mommy.make('auth.User', common_profile__city=u"الرياض")
+        self.riyadh_coordinator = self.create_user_and_set_password(common_profile__city=u"الرياض")
+        self.riyadh_deputy = self.create_user_and_set_password(common_profile__city=u"الرياض")
+        self.riyadh_member = self.create_user_and_set_password(common_profile__city=u"الرياض")
+        self.riyadh_representative = self.create_user_and_set_password(common_profile__city=u"الرياض")
 
         self.riyadh_media_center = mommy.make(
             'clubs.Club',
@@ -200,10 +206,10 @@ class TestSnapchatAdd(TestCase):
         self.riyadh_clubs[0].save()
 
         # Jeddah
-        self.jeddah_coordinator = mommy.make('auth.User', common_profile__city=u"جدة")
-        self.jeddah_deputy = mommy.make('auth.User', common_profile__city=u"جدة")
-        self.jeddah_member = mommy.make('auth.User', common_profile__city=u"جدة")
-        self.jeddah_representative = mommy.make('auth.User', common_profile__city=u"جدة")
+        self.jeddah_coordinator = self.create_user_and_set_password(common_profile__city=u"جدة")
+        self.jeddah_deputy = self.create_user_and_set_password(common_profile__city=u"جدة")
+        self.jeddah_member = self.create_user_and_set_password(common_profile__city=u"جدة")
+        self.jeddah_representative = self.create_user_and_set_password(common_profile__city=u"جدة")
 
         self.jeddah_media_center = mommy.make(
             'clubs.Club',
@@ -226,21 +232,19 @@ class TestSnapchatAdd(TestCase):
         self.jeddah_clubs[0].media_representatives.add(self.jeddah_representative)
         self.jeddah_clubs[0].save()
 
-        self.request = self.factory.get(reverse('media:snapchat_add'))
-
     def test_shows_a_list_of_all_clubs_for_superuser(self):
-        self.superuser = mommy.make('auth.User', is_superuser=True)
+        self.superuser = self.create_user_and_set_password(is_superuser=True)
 
-        self.request.user = self.superuser
-        self.response = snapchat_add(self.request)
+        self.client.login(username=self.superuser.username, password=self.password)
+        self.response = self.client.get(reverse('media:snapchat_add'))
 
         for club in self.riyadh_clubs + self.jeddah_clubs:
             self.assertContains(self.response, club.name)
 
     def test_shows_a_list_of_city_specific_clubs_for_media_center_team_and_media_representative(self):
         for user in [self.riyadh_coordinator, self.riyadh_deputy, self.riyadh_member, self.riyadh_representative]:
-            self.request.user = user
-            self.response = snapchat_add(self.request)
+            self.client.login(username=user.username, password=self.password)
+            self.response = self.client.get(reverse('media:snapchat_add'))
 
             for club in self.riyadh_clubs:
                 self.assertContains(self.response, club.name)
@@ -249,7 +253,8 @@ class TestSnapchatAdd(TestCase):
                 self.assertNotContains(self.response, club.name)
 
     def test_creates_a_snapchat_reservation(self):
-        self.request = self.factory.post(
+        self.client.login(username=self.riyadh_representative.username, password=self.password)
+        self.response = self.client.post(
             reverse('media:snapchat_add'),
             {
                 'club': self.riyadh_clubs[0].id,
@@ -258,8 +263,6 @@ class TestSnapchatAdd(TestCase):
                 'end_time': "1:00 PM",
             }
         )
-        self.request.user = self.riyadh_representative
-        self.response = snapchat_add(self.request)
 
         self.assertEqual(SnapchatReservation.objects.count(), 1)
 

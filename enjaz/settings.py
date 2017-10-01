@@ -153,8 +153,12 @@ ADMINS = [('Errors', 'errors@enjazportal.com')]
 
 # Userena settings
 AUTHENTICATION_BACKENDS = (
-    'rules.permissions.ObjectPermissionBackend',
     'userena.backends.UserenaAuthenticationBackend',
+    # rules backend should come *after* userena's for loginas package to work
+    # Otherwise, an attribute error would be raised when trying to "login as"
+    # since loginas requires the backend it's using to have a `get_user` method,
+    # and rules backend doesn't have one
+    'rules.permissions.ObjectPermissionBackend',
     'guardian.backends.ObjectPermissionBackend',
     'social.backends.twitter.TwitterOAuth',
     'django.contrib.auth.backends.ModelBackend',

@@ -13,7 +13,7 @@ from dal import autocomplete
 import re
 
 from . import decorators, utils
-from .models import Announcement, Publication, StudentClubYear
+from .models import Publication, StudentClubYear
 from .forms import DebateForm
 from activities.models import Activity, Episode
 from bulb.models import Book
@@ -55,24 +55,10 @@ def portal_home(request):
         context['book_sample'] = Book.objects.current_year().for_user_city(request.user).available().order_by("?")[:6]
         context['book_count'] = Book.objects.current_year().undeleted().count()
         context['my_book_count'] = request.user.book_giveaways.current_year().undeleted().count()
-        
-        # --- announcements 
-        context['student_researches'] = Announcement.objects.filter(type='R')[::-1] # show last first
-        context['external_announcements'] = Announcement.objects.filter(type='E')[::-1]
-        context['major_program_announcement'] = None
-        if Announcement.objects.filter(type='M').count() > 0:
-            context['major_program_announcement'] = Announcement.objects.filter(type='M')[0]
-        
+
         return render(request, 'home.html', context) # the dashboard
     else:
         return render(request, 'front/home_front.html')
-
-
-def visit_announcement(request, pk):
-    announce = get_object_or_404(Announcement, pk=pk)
-    announce.visits += 1
-    announce.save()
-    return HttpResponseRedirect(announce.url)
 
 
 def about_sc(request, template_name="about_sc.html"):

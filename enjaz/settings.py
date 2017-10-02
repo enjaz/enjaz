@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rules.apps.AutodiscoverRulesConfig',
     'accounts',
     'activities',
     'api',
@@ -153,6 +154,14 @@ ADMINS = [('Errors', 'errors@enjazportal.com')]
 # Userena settings
 AUTHENTICATION_BACKENDS = (
     'userena.backends.UserenaAuthenticationBackend',
+<<<<<<< HEAD
+=======
+    # rules backend should come *after* userena's for loginas package to work
+    # Otherwise, an attribute error would be raised when trying to "login as"
+    # since loginas requires the backend it's using to have a `get_user` method,
+    # and rules backend doesn't have one
+    'rules.permissions.ObjectPermissionBackend',
+>>>>>>> 83fc4503ec4182366393476e0d220ec12d9f4172
     'guardian.backends.ObjectPermissionBackend',
     'social.backends.twitter.TwitterOAuth',
     'django.contrib.auth.backends.ModelBackend',
@@ -169,6 +178,10 @@ LOGOUT_REDIRECT_URL = '/'
 USERENA_WITHOUT_USERNAMES = True
 USERENA_ACTIVATION_RETRY = True
 USERENA_ACTIVATION_DAYS = 30
+<<<<<<< HEAD
+=======
+USERENA_USE_MESSAGES = False
+>>>>>>> 83fc4503ec4182366393476e0d220ec12d9f4172
 
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',

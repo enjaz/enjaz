@@ -90,7 +90,7 @@ class FollowUpReport(models.Model):
     A follow-up report, submitted after REPORT_DUE_AFTER days of an activity episode.
     """
     episode = models.OneToOneField(Episode, verbose_name=u"الموعد")
-    
+
     submitter = models.ForeignKey(User)
     date_submitted = models.DateTimeField(auto_now_add=True,
                                       verbose_name=u"تاريخ رفع التقرير")
@@ -116,10 +116,11 @@ class FollowUpReport(models.Model):
     announcement_sites = models.TextField(verbose_name=u"أماكن النشر و الإعلان")
     notes = models.TextField(verbose_name=u"ملاحظات", blank=True, default="")
 
+    is_draft = models.BooleanField(verbose_name=u"حفظ كمسودة", default=False)
     def __unicode__(self):
         "Return the name of the parent activity followed by the number of the episode"
         return self.episode.activity.name + " #" + str(self.episode.get_index())
-    
+
     class Meta:
         permissions = (
             ("view_followupreport", "Can view a follow-up report."),
@@ -152,16 +153,16 @@ class Story(models.Model):
     """
     episode = models.OneToOneField(Episode,
                                    verbose_name=u"الموعد")
-    
+
     writer = models.ForeignKey(User,
                                verbose_name=u"الكاتب")
     date_submitted = models.DateTimeField(auto_now_add=True,
                                       verbose_name=u"تاريخ رفع الخبر")
-    
+
     title = models.CharField(max_length=128,
                              verbose_name=u"العنوان")
     text = models.TextField(verbose_name=u"النص")
-    
+
     def __unicode__(self):
         return self.episode.activity.name + ": " + self.title
 
@@ -190,7 +191,7 @@ class Article(models.Model):
     )
     date_submitted = models.DateTimeField(auto_now_add=True,
                                       verbose_name=u"تاريخ الرفع")
-    
+
     title = models.CharField(max_length=128,
                              verbose_name=u"العنوان")
     text = models.TextField(
@@ -209,7 +210,7 @@ class Article(models.Model):
         ('E', u'ينتظر تعديلًا'),
         ('R', u'مرفوض'),
     )
-    
+
     status = models.CharField(max_length=1,
                               choices=STATUS_CHOICES,
                               default='P',
@@ -217,10 +218,10 @@ class Article(models.Model):
     assignee = models.ForeignKey(User,
                                  blank=True, null=True,
                                  verbose_name=u"المكلف بالمراجعة")
-    
+
     def __unicode__(self):
         return self.title
-    
+
     class Meta:
         permissions = (
                 ("view_article", "Can view all available articles."),
@@ -241,7 +242,7 @@ class Review(models.Model):
                                      verbose_name=u"تاريخ المراجعة")
     notes = models.TextField(verbose_name=u"الملاحظات")
     approve = models.BooleanField(default=False)
-    
+
     class Meta:
         abstract = True # This means this model won't have a table in the db
                         # but other models can inherit its fields
@@ -280,7 +281,7 @@ class Task(models.Model):
     date_assigned = models.DateTimeField(auto_now_add=True,
                                          verbose_name="تاريخ التعيين")
     completed = models.BooleanField(default=False)
-    
+
     class Meta:
         abstract = True
 
@@ -294,10 +295,10 @@ class StoryTask(Task):
                                  related_name="assigned_storytasks",
                                  verbose_name="المعيَّن")
     story = models.OneToOneField(Story, blank=True, null=True)
-    
+
     def __unicode__(self):
         return self.episode.__unicode__()
-    
+
     class Meta:
         verbose_name = u"مهمة خبر"
         verbose_name_plural = u"مهمات الأخبار"
@@ -309,7 +310,7 @@ class StoryTask(Task):
 #     A task to review or edit a task.
 #     """
 #     article = models.OneToOneField(Article)
-#     
+#
 #     def __unicode__(self):
 #         return self.article.__unicode__()
 

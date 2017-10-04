@@ -42,7 +42,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'rules.apps.AutodiscoverRulesConfig',
     'django.contrib.humanize',
-    'rules',
     'accounts',
     'approvals',
     'activities',

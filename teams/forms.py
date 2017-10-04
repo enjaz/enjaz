@@ -51,7 +51,6 @@ class DisabledTeamForm(TeamForm):
         return cleaned_data
 
 class AddTeamMembersForm(forms.ModelForm):
-
     class Meta:
         model = Team
         fields = ['members']
@@ -63,4 +62,4 @@ class EmailForm(forms.Form):
 class AddPositionForm(forms.ModelForm):
     class Meta:
         model = Position
-        fields = ['user','position']
+        fields = ['user','position','title']

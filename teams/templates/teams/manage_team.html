@@ -1,0 +1,165 @@
+{% extends "base_teams.html" %}{% load staticfiles %}{% load l10n %}{% load bootstrap3 %}{% load rules %}
+{% block title %}بيانات الفريق{% endblock %}
+
+{% block content %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+<style>
+#send-email{
+    cursor: pointer;
+}
+.panel-body li{
+    margin-bottom: 3%;
+}
+.select2-selection--single{
+    padding: 0;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__rendered{
+    width: 100% !important;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #00a651;
+    color: #fff;
+    border-radius: 3px;
+    cursor: default;
+    float: left;
+    margin-right: 2px;
+    margin-top: 2px;
+    padding: 7px 12px;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove{
+    color: white;
+}
+
+</style>
+
+
+<div class="">
+{# first #}
+<div class="panel-group" id="accordion-test"> <div class="panel panel-default"> <div class="panel-heading"> <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion-test" href="#collapseOne" aria-expanded="false" class="collapsed">
+إضافة الأعضاء
+</a> </h4> </div> <div id="collapseOne" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;"> <div class="panel-body">
+
+		<!-- panel body -->
+			<p style="font-size:1em;"><ul class="list-unstyled">
+        {% has_perm 'teams.change_team_display_details' request.user as can_edit %}
+        {% if can_edit %}
+            <form method="post" data-team_pk='{{ team.code_name }}' enctype="multipart/form-data" id="add-members-form" action="post">
+            {% bootstrap_form_errors form %}
+            {% csrf_token %}
+
+            <li>حالة التسجيل:</li>
+            <a class="openclose-btn" href="{% url 'teams:control_registration' team.code_name %}">
+                <div id="status">{% if team.is_open %}مفتوح{% else %}مغلق{% endif %} </div></a>
+
+            <div id="mem-list-header">{% if team.is_open %}أضف الأعضاء:{% else %}قائمة الأعضاء:{% endif %}</div>
+			<div class="add-members" id="add-members">
+               {{ form.members }}
+			<div class="form-control-feedback">
+				<i class=""></i>
+			</div>
+
+            <button style="float:left" id='add_members' type="submit" class="btn btn-primary">
+                            احفظ
+            </button>
+
+          </form>
+        {% endif %}
+			</ul></p>
+
+</div> </div> </div>
+{# second #}
+<div class="panel panel-default"> <div class="panel-heading"> <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion-test" href="#collapseTwo" class="" aria-expanded="true">
+    تعيين المناصب
+</a> </h4> </div> <div id="collapseTwo" class="panel-collapse collapse in" aria-expanded="true" style=""> <div class="panel-body">
+    <form method="post" data-team_pk='{{ team.code_name }}' enctype="multipart/form-data" id="add-position-form" action="post">
+            {% bootstrap_form_errors positionform %}
+            {% csrf_token %}
+        <div class="row">
+            <div class="col-sm-4">
+                <p>المستخدم</p>
+                {{ positionform.user }}
+            </div>
+            <div class="col-sm-4">
+                <p>اسم المنصب</p>
+                {{ positionform.title }}
+            </div>
+            <div class="col-sm-4">
+                <button style="float: left" id="submit_position" type="submit"  class="btn btn-primary">
+        عيّن
+    </button>
+            </div>
+        </div>
+
+
+
+
+    </form>
+</div> </div> </div>
+{# third #}
+<div class="panel panel-default"> <div class="panel-heading"> <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion-test" href="#collapseThree" class="collapsed" aria-expanded="false">
+أعضاء الفريق
+</a> </h4> </div> <div id="collapseThree" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;"> <div class="panel-body">
+<table class="datatable">
+    <tr>
+        <th>المستخدم</th>
+        <th> المنصب</th>
+    </tr>
+    {% for membership in team.membership_set.all %}
+    <tr>
+
+        <td>{{ membership.member.common_profile.get_full_ar_name|default:membership.member.username }}</td>
+        {% if membership.member.potion_set.all %}
+            <td>
+                {% for postion in membership.member.postion_set.all %}
+                {{ postion.title }}
+                {% endfor %}
+            </td>
+        {% else %}
+            <td> عضو </td>
+         {% endif %}
+    </tr>
+            {% endfor %}
+
+</table>
+
+
+</div> </div> </div> </div>
+</div>
+
+
+
+
+
+{% endblock %}
+{% block customscript %}
+    <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
+    <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+    <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+
+{% include 'bulb/groups/components/autocomplete_asset.html' %}
+{% include "teams/partials/send_email_asset.html" %}
+{% include "teams/partials/add_members_asset.html" %}
+{% include "teams/partials/add_position_asset.html" %}
+
+{% include "teams/partials/control_registration.html" %}
+<script type="text/javascript">
+$(function() {
+    {% if not team.is_open %}
+    $("#mem-list-header,#add-members").hide();
+    {% endif %}
+
+    $('#add-position-form select').select2();
+    });
+
+    $('.datatable').dataTable({
+        "order": [[ 0, "asc" ]],
+        "language": {% include 'js/dataTables-arabic.json' %}
+    });
+</script>
+
+{% endblock %}
+

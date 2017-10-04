@@ -168,6 +168,7 @@ def send_email(request, code_name):
 @decorators.ajax_only
 @csrf.csrf_exempt
 def add_position(request, code_name):
+    current_year = StudentClubYear.objects.get_current()
     team = get_object_or_404(Team, code_name=code_name, year=current_year)
     ar_name = team.ar_name
 
@@ -182,8 +183,10 @@ def add_position(request, code_name):
             return {"message": "success"}
     context['form'] = form
     return render(request, 'teams/show.html', context)
+
 @login_required
 @decorators.ajax_only
+@csrf.csrf_exempt
 def control_registration(request, code_name):
     current_year = StudentClubYear.objects.get_current()
     team = get_object_or_404(Team, code_name=code_name)
@@ -201,3 +204,25 @@ def control_registration(request, code_name):
         team.is_open = True
     team.save()
     return {'team_isopen': team.is_open}
+
+
+class ManageTeamDetailView(generic.DetailView):
+    model = Team
+    template_name = "teams/manage_team.html"
+    slug_field = 'code_name'
+    slug_url_kwarg = 'code_name'
+
+    def get_object(self):
+        current_year = StudentClubYear.objects.get_current()
+        team = get_object_or_404(
+            self.model,
+            code_name=self.kwargs['code_name'],
+            year=current_year)
+        return team
+
+    def get_context_data(self, **kwargs):
+        context = super(ManageTeamDetailView, self).get_context_data(**kwargs)
+        context['form'] = forms.AddTeamMembersForm(instance=self.object)
+        context['positionform'] = forms.AddPositionForm(instance=self.object)
+
+        return context

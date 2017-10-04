@@ -2,8 +2,8 @@
 {% block title %}بيانات الفريق{% endblock %}
 
 {% block content %}
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
 <style>
 #send-email{
     cursor: pointer;
@@ -91,11 +91,14 @@
 		<!-- panel head -->
 		<div class="panel-heading">
 			<div class="panel-title">خيارات</div>
+            <div class="panel-options"><a href="{% url 'teams:manage_team' team.code_name %}" type="button" class="btn btn-default">
+						 إدارة الفريق
+					</a></div>
 		</div>
 		<!-- panel body -->
 		<div class="panel-body">
 			<p style="font-size:1em;"><ul class="list-unstyled">
-        <li><a id="send-email"><i class="fa fa-envelope"></i> أرسل بريد إلكتروني للفريق </a></li>
+        <li><a id="send-email"><i class="fa fa-envelope"></i> راسلنا </a></li>
         {% has_perm 'teams.change_team_display_details' request.user as can_edit %}
         {% if can_edit %}<li><a href="{% url 'teams:edit' team.code_name %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
          <li>            <a href="{% url 'forms:form_list' team.pk %}"><i class="entypo-docs"></i>النماذج </a></li>

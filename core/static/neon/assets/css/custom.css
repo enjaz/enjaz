@@ -49,12 +49,12 @@ body, p, .form-control, .page-container .sidebar-menu #main-menu li, .login-page
 }
 
 .sidebar-menu #main-menu li, .main-content .user-info li a, .frontend .site-header .site-nav .main-menu li a, body, .dinar-light {
-	font-family: "GE Dinar One", Arial;
+	font-family: "GE Dinar One", Arial !important;
 	font-weight: lighter;
 }
 
 h1, h2, h3, h4, h5, h6, h7, .site-header .site-nav .main-menu > li.active > a, .dinar-medium {
-    font-family: "GE Dinar One", Arial;
+    font-family: "GE Dinar One", Arial !important;
     font-weight: normal;
 }
 
@@ -830,4 +830,16 @@ a.btn-signup{
 
 a.btn-signup:hover{
     background-color: #acd547;
+}
+
+/* Properly style site footer for signed-in users */
+.page-container .main-content {
+    padding-bottom: 100px;
+}
+
+.main-content .site-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    margin-right: -20px;
 }

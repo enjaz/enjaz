@@ -1,0 +1,40 @@
+{# Originally from https://djangosnippets.org/snippets/1442/ #}
+{% load bootstrap3 %}
+{{ formset.management_form }}
+{{ formset.non_form_errors.as_ul }}
+<table id="id_{{ formset.prefix }}_formset" class="form" style="width: 100%;">
+{% for form in formset.forms %}
+  {% if forloop.first %}
+    <colgroup>
+        <col class="col-md-2">
+        <col class="col-md-2">
+        <col class="col-md-1">
+        <col class="col-md-1">
+        <col class="col-md-1">
+        <col class="col-md-2">
+        <col class="col-md-1">
+    </colgroup>
+  <thead><tr>
+    {% for field in form.visible_fields %}
+    <th>{{ field.label|capfirst }}</th>
+    {% endfor %}
+  </tr></thead>
+  {% endif %}
+  <tr class="form-container">
+  {% for field in form.visible_fields %}
+    <td>
+    {# Include the hidden fields in the form #}
+    {% if forloop.first %}
+      {% for hidden in form.hidden_fields %}
+      {{ hidden }}
+      {% endfor %}
+    {% endif %}
+        <div class="form-group">
+      {{ field.errors.as_ul }}
+      {% bootstrap_field field show_label=False %}
+        </div>
+    </td>
+  {% endfor %}
+  </tr>
+{% endfor %}
+</table>

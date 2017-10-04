@@ -38,6 +38,12 @@ class Evaluation(models.Model):
 
 
 class Activity(models.Model):
+    team = models.ForeignKey(
+        'teams.Team',
+        related_name='old_activities',
+        verbose_name=u"الفريق المنظّم",
+        on_delete=models.SET_NULL, null=True,
+    )
     primary_club = models.ForeignKey('clubs.Club', null=True,
                                      on_delete=models.SET_NULL,
                                      related_name='primary_activity',
@@ -68,14 +74,14 @@ class Activity(models.Model):
                                             verbose_name=u"المتعاونون من داخل الجامعة")
     outside_collaborators = models.TextField(blank=True,
                                              verbose_name=u"المتعاونون من خارج الجامعة")
-    participants = models.IntegerField(verbose_name=u"عدد المشاركين",
+    participants = models.IntegerField(verbose_name=u"عدد المشاركين", null=True,
                                        help_text=u"العدد المتوقع للمستفيدين من النشاط")
     category = models.ForeignKey('Category', null=True,
                                  on_delete=models.SET_NULL,
                                  verbose_name=u"التصنيف",
                                  # If they category has sub-categories, don't show it.
                                  limit_choices_to={'category__isnull': True})
-    organizers = models.IntegerField(verbose_name=u"عدد المنظمين",
+    organizers = models.IntegerField(verbose_name=u"عدد المنظمين", null=True,
                                        help_text=u"عدد الطلاب الذين سينظمون النشاط")
     forms = GenericRelation(Form)
     assignee = models.ForeignKey('clubs.Club', null=True, blank=True,

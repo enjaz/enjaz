@@ -23,6 +23,8 @@ you?
 	<meta name="description" content="بوابة إنجاز للنشاطات الطلابية" />
 
 	<title>إنجاز | {% block title %}{% endblock %}</title>
+
+  {% block styles %}
 	<link rel="icon" href="{% static 'logo/favicon.png' %}">
 	<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
 	<link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/entypo/css/entypo.css' %}">
@@ -36,8 +38,9 @@ you?
 	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.min.css' %}">
     {% endblock %}
 	<link rel="stylesheet" href="{% static 'neon/assets/css/skins/green.css' %}">
-	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}?v=0002">
     {% block customstyles %}{% endblock %}
+  {% endblock %}
 
 	<script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
 	<script src="{% static 'neon/assets/js/custom.js' %}"></script>
@@ -389,89 +392,88 @@ you?
 	</div>
 	<div class="main-content">
 
-	<nav class="navbar navbar-default" role="navigation">
-	<!-- Brand and toggle get grouped for better mobile display -->
-	<div class="navbar-header">
-        {% block navbutton %}
-            {% include 'includes/nav-button.html' %}
-        {% endblock %}
-		<a class="navbar-brand dinar-medium" href="{% block pageheaderurl %}{% endblock %}">{% block pageheader %}{% endblock %}</a>
-	</div>
+    <nav class="navbar navbar-default" role="navigation">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+            {% block navbutton %}
+                {% include 'includes/nav-button.html' %}
+            {% endblock %}
+        <a class="navbar-brand dinar-medium" href="{% block pageheaderurl %}{% endblock %}">{% block pageheader %}{% endblock %}</a>
+      </div>
 
-	<!-- Collect the nav links, forms, and other content for toggling -->
-	<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-		<ul class="nav navbar-nav">
-			{% block navbar %}{% endblock %}
-		</ul>
-	</div>
-	<!-- /.navbar-collapse -->
-</nav>
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          {% block navbar %}{% endblock %}
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </nav>
 
-	<div class="col-xs-12 clearfix">
-{% block content %}
-
-{% endblock %}
-
-	</div>
+    <div class="row">
+      <div class="col-xs-12 clearfix">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
 
     <div class="clearfix"></div>
-        <footer class="site-footer">
-		<div>
+    <footer class="site-footer">
+      <div>
 
-			<div class="row">
-				<div class="col-md-6">
-        بُني بأيدٍ طلابيّة. <a target="_blank" href="https://github.com/osamak/student-portal">حقّك في النسخ مكفول</a>. <i style="color: red;" class="fa fa-heart" aria-hidden="true"></i>
-				</div>
-				<div class="col-md-6">
-            <a href="{% url 'about_sc' %}">
-        عن نادي الطلاب
-            </a>
-        <i class="entypo-dot"></i>
-            <a href="{% url 'about' %}">
-        عن إنجاز
-            </a>
-				</div>
-			</div>
-		</div>
-        </footer>
+        <div class="row">
+          <div class="col-xs-6">
+          بُني بأيدٍ طلابيّة. <a target="_blank" href="https://github.com/osamak/student-portal">حقّك في النسخ مكفول</a>. <i style="color: red;" class="fa fa-heart" aria-hidden="true"></i>
+          </div>
+          <div class="col-xs-6">
+              <a href="{% url 'about_sc' %}">
+          عن نادي الطلاب
+              </a>
+          <i class="entypo-dot"></i>
+              <a href="{% url 'about' %}">
+          عن إنجاز
+              </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
 </div>
-</div>
 
+  {% block scripts %}
+    <!-- Bottom Scripts -->
+    <script src="{% static 'neon/assets/js/gsap/main-gsap.js' %}"></script>
+    <!--<script src="{% static 'neon/assets/js/jquery-ui/js/jquery-ui-1.10.3.minimal.min.js' %}"></script>-->
+    <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'neon/assets/js/neon-demo.js' %}"></script>
+    <script src="{% static 'neon/assets/js/bootstrap.js' %}"></script>
+    <script src="{% static 'neon/assets/js/joinable.js' %}"></script>
+    <script src="{% static 'neon/assets/js/resizeable.js' %}"></script>
+    <script src="{% static 'neon/assets/js/neon-api.js' %}"></script>
+    <script src="{% static 'neon/assets/js/neon-custom.js' %}"></script>
+    <script src="{% static 'neon/assets/js/neon-demo.js' %}"></script>
 
-	<!-- Bottom Scripts -->
-	<script src="{% static 'neon/assets/js/gsap/main-gsap.js' %}"></script>
-	<!--<script src="{% static 'neon/assets/js/jquery-ui/js/jquery-ui-1.10.3.minimal.min.js' %}"></script>-->
-	<script src="{% static 'js/jquery-ui.min.js' %}"></script>
-	<script src="{% static 'neon/assets/js/neon-demo.js' %}"></script>
-	<script src="{% static 'neon/assets/js/bootstrap.js' %}"></script>
-	<script src="{% static 'neon/assets/js/joinable.js' %}"></script>
-	<script src="{% static 'neon/assets/js/resizeable.js' %}"></script>
-	<script src="{% static 'neon/assets/js/neon-api.js' %}"></script>
-	<script src="{% static 'neon/assets/js/neon-custom.js' %}"></script>
-	<script src="{% static 'neon/assets/js/neon-demo.js' %}"></script>
+    {% block customscript %}{% endblock %}
+  {% endblock %}
 
-	{% block customscript %}
-
-	{% endblock %}
-{% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
-	<!-- Piwik -->
-	<script type="text/javascript">
-	  var _paq = _paq || [];
-      {% if user.is_authenticated %}
-      _paq.push(['setUserId', '{{ user.username }}']);
-      {% endif %}
-	  _paq.push(['trackPageView']);
-	  _paq.push(['enableLinkTracking']);
-	  (function() {
-	    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://enjazportal.com/stats/";
-	    _paq.push(['setTrackerUrl', u+'piwik.php']);
-	    _paq.push(['setSiteId', 1]);
-	    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
-	    g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-	  })();
-	</script>
-	<noscript><p><img src="//enjazportal.com/stats/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
-        <!-- End Piwik Code -->
-{% endif %}
+  {% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
+    <!-- Piwik -->
+    <script type="text/javascript">
+      var _paq = _paq || [];
+        {% if user.is_authenticated %}
+        _paq.push(['setUserId', '{{ user.username }}']);
+        {% endif %}
+      _paq.push(['trackPageView']);
+      _paq.push(['enableLinkTracking']);
+      (function() {
+        var u=(("https:" == document.location.protocol) ? "https" : "http") + "://enjazportal.com/stats/";
+        _paq.push(['setTrackerUrl', u+'piwik.php']);
+        _paq.push(['setSiteId', 1]);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+        g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+      })();
+    </script>
+    <noscript><p><img src="//enjazportal.com/stats/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+    <!-- End Piwik Code -->
+  {% endif %}
 </body>
 </html>

@@ -1,0 +1,48 @@
+{% extends 'base_approvals.html' %}{% load i18n %}
+
+{% block title %}طلبات الأنشطة{% endblock %}
+
+{% block content %}
+  <div class="panel panel-warning panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+    <!-- panel head -->
+    <div class="panel-heading">
+      <div class="panel-title">{% trans "الطلبات النشطة" %}</div>
+    </div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{% trans "العنوان" %}</th>
+          <th>{% trans "تاريخ رفع الطلب" %}</th>
+          <th>{% trans "آخر تحديث" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for thread in active_request_threads %}
+          <tr>
+            <td><a href="{% url 'approvals:requestthread-detail' thread.id %}">{{ thread.name }}</a></td>
+            <td>{{ thread.date_opened|date }}</td>
+            <td>{{ thread.last_updated|date }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel panel-default panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
+    <!-- panel head -->
+    <div class="panel-heading">
+      <div class="panel-title">{% trans "الطلبات المغلقة" %}</div>
+    </div>
+
+    <table class="table">
+      <tbody>
+        {% for thread in inactive_request_threads %}
+          <tr>
+            <td><a href="{% url 'approvals:requestthread-detail' thread.id %}">{{ thread.name }}</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

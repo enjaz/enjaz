@@ -18,7 +18,7 @@ _GenderMapping = namedtuple('Gender', ['male', 'female'])
 # (`male` and `female`) grouped under a bigger `Gender` object. The aim is to conceal our constants as much as
 # possible and refer to them by their names instead. So instead of directly using 'M' and 'F', just import `Gender`
 # anywhere in the project and use `Gender.male` and `Gender.female`.
-# (See example below with `GENERIC_GENDER_CHOICES` AND `PLURAL_STUDENT_GENDER_CHOICES`)
+# (See example below with `GENERIC_GENDER_CHOICES` AND `INDEFINITE_PLURAL_STUDENT_GENDER_CHOICES`)
 # This way we only need to define our constants once and just reuse them around the place.
 # It's just a much cleaner approach.
 Gender = _GenderMapping(male='M', female='F')
@@ -29,10 +29,19 @@ GENERIC_GENDER_CHOICES = (
     (Gender.female, _(u"أنثى")),
 )
 
-PLURAL_STUDENT_GENDER_CHOICES = (
+INDEFINITE_PLURAL_STUDENT_GENDER_CHOICES = (
     (Gender.male, _(u"طلاب")),
     (Gender.female, _(u"طالبات")),
 )
+
+DEFINITE_PLURAL_STUDENT_GENDER_CHOICES = (
+    (Gender.male, _(u"الطلاب")),
+    (Gender.female, _(u"الطالبات")),
+)
+
+# This could be a more DRY solution
+# def gender_choices_factory(student_terms=False, plural_terms=False, definite_terms=False, neutral_choice=False):
+#     pass
 
 
 class Campus(models.Model):
@@ -150,32 +159,6 @@ class TwitterAccess(models.Model):
     access_token = models.CharField(max_length=200)
     access_token_secret = models.CharField(max_length=200)
     code_name = models.CharField(max_length=20)
-
-    def __unicode__(self):
-        return self.code_name
-
-class Campus(models.Model):
-    ar_name = models.CharField(max_length=200, verbose_name=_(u"الاسم"))
-    en_name = models.CharField(max_length=200, verbose_name=_(u"الاسم الإنجليزي"))
-    code_name = models.CharField(max_length=200, verbose_name=_(u"الاسم البرمجي"))
-
-    def __unicode__(self):
-        return self.code_name
-
-class College(models.Model):
-    ar_name = models.CharField(max_length=200, verbose_name=_(u"الاسم"))
-    en_name = models.CharField(max_length=200, verbose_name=_(u"الاسم الإنجليزي"))
-    code_name = models.CharField(max_length=200, verbose_name=_(u"الاسم البرمجي"))
-    campus = models.ForeignKey(Campus)
-
-    def __unicode__(self):
-        return self.code_name
-
-class Section(models.Model):
-    ar_name = models.CharField(max_length=200, verbose_name=_(u"الاسم"))
-    en_name = models.CharField(max_length=200, verbose_name=_(u"الاسم الإنجليزي"))
-    code_name = models.CharField(max_length=200, verbose_name=_(u"الاسم البرمجي"))
-    college = models.ForeignKey(College)
 
     def __unicode__(self):
         return self.code_name

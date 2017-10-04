@@ -54,7 +54,7 @@
 							<!-- User statuses available classes "is-online", "is-offline", "is-idle", "is-busy" -->	
 							{% endif %}
 						</strong>
-						<span><a href="{% url 'clubs:show' activity.primary_club.pk %}">{{ activity.primary_club.name }}</a></span>
+						<span><a href="{% url 'teams:show' activity.team.pk %}">{{ activity.team.ar_name }}</a></span>
 					</div>
 				</li>
 			</ul>
@@ -71,7 +71,7 @@
 				</a>
 				{% endif %}
 
-                {# if the user can edit the activity... #}
+               {% comment %} {# if the user can edit the activity... #}
 				{% if user|can_edit_activity:activity %}
 				<a href="{% url 'activities:edit' activity.pk %}" class="btn btn-default">
 					<i class="entypo-pencil"></i>
@@ -83,12 +83,12 @@
 					<i class="entypo-trash"></i>
 					احذف
 				</a>
-				{% endif %}
+				{% endif %}{% endcomment %}
 			</div>
 		</div>
 		
 	</header>
-	
+
 	<section class="profile-info-tabs">
 		
 		<div class="row">
@@ -107,11 +107,11 @@
                         {% for episode in activity.episode_set.all %}
                         <li>
                         {# if the user has privileges to add a follow-up report... #}
-						{% if user|is_employee_of_any_club or user|has_coordination_to_activity:activity or user|can_submit_studentreport:activity or perms.media.add_followupreport or user|is_deanship_of_students_affairs_coordinator_or_member %}
+						{% comment %}{% if user|is_employee_of_any_club or user|has_coordination_to_activity:activity or user|can_submit_studentreport:activity or perms.media.add_followupreport or user|is_deanship_of_students_affairs_coordinator_or_member %}
 						{# group the activity info in a div to make #}
 						{# space for the report button #}
 						<div class="col-md-10">
-						{% endif %}
+						{% endif %}{% endcomment %}
 							<div class="col-sm-4">
 								<i class="entypo-calendar"></i>
                                 {% if episode.start_date == episode.end_date %}
@@ -132,6 +132,7 @@
 								<i class="entypo-location"></i>
 								{{ episode.location }}
 							</div>
+            {% comment %}
                         {# if the user has privileges to add or view a follow-up report... #}
 						{% if user|can_view_followupreport:activity %}
 						</div>
@@ -199,12 +200,13 @@
                             </div>
 						</div>
 						{% endif %}
+            {% endcomment %}
 					</li>
 					{% endfor %}
 				</ul>
             </div>
         </div>
-        <div class="row">
+        {% comment %}<div class="row">
 				<!-- tabs for the profile links -->
 				<ul class="nav nav-tabs">
 			{% if user|can_read_reviews:activity or user.is_superuser %}
@@ -224,12 +226,11 @@
 						<a href="{% url 'activities:assessment_index' activity.pk %}">قيّم</a>
 					</li>
  		    {% endif %}
-                    {% comment %}
-                    In order to avoid URL reversing issues, the forms button has to be (at least temporarily) restricted
+                                        In order to avoid URL reversing issues, the forms button has to be (at least temporarily) restricted
                     to the `show` view and the very views of the forms app. The `show` view will pass a `can_view_forms`
                     attribute to the context. All django-pluggable-forms views pass a context variable `object_id` to
                     their templates. That's how we can know the request is coming from any of these 2.
-                    {% endcomment %}
+
                     {% if can_view_forms and activity|show_activity_forms:user or object_id %}
 					<li{% if active_tab == 'forms' %} class="active"{% endif %}>
                     {% with current_app='activity_forms' %}
@@ -238,7 +239,7 @@
 					</li>
 					{% endif %}
 				</ul>
-			</div>
+			</div>{% endcomment %}
 	</section>
 	
 	<section class="profile-feed">

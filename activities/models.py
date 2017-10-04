@@ -583,8 +583,11 @@ class Episode(models.Model):
         Return whether or not a report has been submitted for this episode.
         """
         try:
-            report = self.followupreport
-            return True
+            report = self.followupreport.is_draft
+            if report == True:
+                return False
+            else:
+                return True
         except ObjectDoesNotExist:
             return False
 

@@ -1,10 +1,13 @@
-student-portal
-==============
+enjaz
+=====
 
-The Student Portal is a [Django-based](https://www.djangoproject.com)
-platform for university student activity.  Through the platform,
-students can submit activities for approval, join clubs, enter their
-'Activity Points' (Niqati) and contribute and borrow books.
+Enjaz is a student engagement platform developed by
+the students of King Saud bin Abdulaziz University for
+Health Sciences.
+It serves as a cornerstone for student club organizations and activities in the three
+campuses of [Riyadh](https://twitter.com/StudentsofKSAUH),
+[Jeddah](https://twitter.com/jed_studentclub),
+and [Al Ahsa](https://twitter.com/sc_ksau_ahsa)
 
 # Licensing
 

@@ -34,7 +34,7 @@
             <tr>
                 <th>Name</th>
                 <th>Skill description</th>
-                <td class="not-mobile">Date added</td>
+                <td class="not-mobile">City</td>
             </tr>
         </thead>
         <tbody>
@@ -42,7 +42,7 @@
             <tr>
                 <td><a href="{% url 'researchhub:show_skill' skilledstudent.pk %}">{{ skilledstudent.user.common_profile.get_en_full_name }}</a></td>
                 <td>{{ skilledstudent.description|truncatechars:100 }}</td>
-                <td data-order="{{ project.submission_date|date:"U" }}">{{ skilledstudent.submission_date|date:"Y-n-j" }}</td>
+                <td>{{ skilledstudent.user.common_profile.city }}</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -24,6 +24,9 @@ class ConsultationForm(forms.Form):
     first_date = forms.DateField()
     second_date = forms.DateField()
 
+class EmailForm(forms.Form):
+    text = forms.CharField(label="Wtite your message here",widget=forms.Textarea)
+
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project

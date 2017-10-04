@@ -42,8 +42,8 @@ urlpatterns = [
 
     url(r'^arshidni/', RedirectView.as_view(pattern_name='studentguide:index', permanent=True)),
     url(r'^mentors/', include('studentguide.urls', namespace="studentguide")),
-
     url(r'^niqati/', include('niqati.urls', namespace="niqati")),
+
     url(r'^voice/', include('studentvoice.urls', namespace="studentvoice")),
     url(r'^mediacenter/', include('media.urls', namespace="media")),
     url(r'^questions/', include('questions.urls', namespace="cultural_program_code")),
@@ -64,6 +64,10 @@ urlpatterns = [
     url(r'^accounts/signin/$', 'userena.views.signin', {'auth_form': ModifiedAuthenticationForm}),
     url(r'^accounts/edit/$', 'accounts.views.edit_common_profile', name='edit_common_profile'),
     url(r'^accounts/', include('userena.urls')),
+
+    url(r'^questions/', include('questions.urls', namespace="cultural_program_code")),
+    url(r'^certificates/admin/', include(certificate_admin.urls)),
+    url(r'^certificates/', include('certificates.urls', namespace="certificates")),
 
     url(r'^api/', include('api.urls')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),

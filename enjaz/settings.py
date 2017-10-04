@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rules.apps.AutodiscoverRulesConfig',
     'django.contrib.humanize',
     'rules',
     'accounts',
@@ -175,6 +176,7 @@ LOGOUT_REDIRECT_URL = '/'
 USERENA_WITHOUT_USERNAMES = True
 USERENA_ACTIVATION_RETRY = True
 USERENA_ACTIVATION_DAYS = 30
+USERENA_USE_MESSAGES = False
 
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',

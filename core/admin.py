@@ -2,10 +2,6 @@
 from django.contrib import admin
 from core.models import Publication, StudentClubYear, Tweet, TwitterAccess, Campus, Specialty
 
-# Used in bulb/admin.py and events/admin.py
-class ModelAdminReadOnly:
-    def get_readonly_fields(self, request, obj=None):
-        return [field.name for field in self.model._meta.fields]
 
 # Used in bulb/admin.py and events/admin.py
 class ModelAdminReadOnly:

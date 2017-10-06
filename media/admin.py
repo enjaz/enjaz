@@ -26,6 +26,6 @@ class PostAdmin(admin.ModelAdmin):
         if not obj.id:
             obj.submitter = request.user
         super(PostAdmin, self).save_model(request, obj, form, change)
-
+    
 admin.site.register(Poll, PollAdmin)
 admin.site.register(Post, PostAdmin)

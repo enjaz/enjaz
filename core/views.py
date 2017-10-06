@@ -55,7 +55,7 @@ def portal_home(request):
         context['book_sample'] = Book.objects.current_year().for_user_city(request.user).available().order_by("?")[:6]
         context['book_count'] = Book.objects.current_year().undeleted().count()
         context['my_book_count'] = request.user.book_giveaways.current_year().undeleted().count()
-
+        
         return render(request, 'home.html', context) # the dashboard
     else:
         return render(request, 'front/home_front.html')

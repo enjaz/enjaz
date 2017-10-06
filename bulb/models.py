@@ -495,6 +495,14 @@ class Recruitment(models.Model):
     wants_reading_group_coordination = models.BooleanField(default=False)
     wants_reading_group_organization = models.BooleanField(default=False)
 
+    # Khamisia
+    khamisia_subjects = models.TextField(blank=True)
+    khamisia_guests = models.TextField(blank=True)
+    wants_khamisia_organization = models.BooleanField(default=False)
+
+    # Readathon
+    wants_readathon_organization = models.BooleanField(default=False)
+    
     # Debates
     debate_subjects = models.TextField(blank=True)
     watns_debate_participation = models.BooleanField(default=False)

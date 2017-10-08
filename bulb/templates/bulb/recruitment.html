@@ -189,7 +189,7 @@ margin-bottom: 5px;
 </p>
       		<div class="checkbox">
 			<label>
-				<input name="debate" id="id_has_debate_subjects" type="checkbox"> لدي مواضيع ومحاور أود أتثار وتناقش!
+				<input name="debate" id="id_has_debate_subjects" type="checkbox"> لدي مواضيع ومحاور أود أن تثار وتناقش!
 			</label>
       		</div>
 		<div class="form-group">
@@ -225,7 +225,7 @@ margin-bottom: 5px;
                 </label>
       		</div>
             <div class="form-group">
-                <label class="control-label col-sm-5" for="id_dewanya_subject">عظيم! ما العنواين؟</label>
+                <label class="control-label col-sm-5" for="id_dewanya_subject">عظيم! ما العناوين؟</label>
                 <div class="col-sm-7">
                     <textarea class="form-control" id="id_dewanya_subjects" name="dewanya_subjects"></textarea>
                 </div>
@@ -249,7 +249,7 @@ margin-bottom: 5px;
 </div><!--step-section-->
 
 <div class="step-section">
-            <h2 class="text-center">الريديثون</h2>
+            <h2 class="text-center">ماراثون القراءة</h2>
             <hr class="small">
 <p class="explaination instructions">
 في الريديثون، يصوغ كلٌ منّا خطّة مكثّفة للقراءة للأسبوع القادم، وبعد إنجاز الخطة يكون مطلوبا من كل مشاركة ومشارك العمل على "منتج ثقافي"، وتحصل القارئة والقارئ الذين يتمّون خططهم ويخرجون بمنتجِ ثقافي على ميدالية المارثون.
@@ -261,9 +261,9 @@ margin-bottom: 5px;
 			</label>
       		</div>
 </div><!--step-section-->
-
+{% if user.common_profile.city == 'الرياض' %}
 <div class="step-section">
-            <h2 class="text-center">الخميسية</h2>
+            <h2 class="text-center">الخميسيّة</h2>
             <hr class="small">
 <p class="explaination instructions">
 نريد أن نخلق حيّزًا رحبًا للحوار حول موضوعات ثقافية شاسعة، في خميسيّة سِراج، يستمع الطلاب والطالبات إلى ضيفـ/ـة الجلسة النقاشية، ثم يتاح بعد ذلك تجاذب أطراف الحديث وتبادل الآراء حول الموضوع المطروح، يمكنك أن تشاركـ/ـي كـمتحدثـ/ـة، أو أن تنسقـ/ـي للحدث:
@@ -296,6 +296,7 @@ margin-bottom: 5px;
 				<input name="wants_khamisia_organization" id="id_khamisia_organization" type="checkbox"> أريد المشاركة في تنظيم الخميسيات وانتقاء مواضيعها
 			</label>
       		</div>
+        {% endif %}
 </div><!--step-section-->
 <div class="step-section">
             <h2 class="text-center">الفريق الإعلامي</h2>

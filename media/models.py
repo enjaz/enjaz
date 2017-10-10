@@ -116,6 +116,7 @@ class FollowUpReport(models.Model):
     announcement_sites = models.TextField(verbose_name=u"أماكن النشر و الإعلان")
     notes = models.TextField(verbose_name=u"ملاحظات", blank=True, default="")
 
+    is_draft = models.BooleanField(verbose_name=u"حفظ كمسودة", default=False)
     def __unicode__(self):
         "Return the name of the parent activity followed by the number of the episode"
         return self.episode.activity.name + " #" + str(self.episode.get_index())
@@ -514,3 +515,24 @@ class Post(models.Model):
 
     def __unicode__(self):
         return self.title
+
+
+class SnapchatReservation(models.Model):
+    club = models.ForeignKey('clubs.Club', null=True,
+                                     on_delete=models.SET_NULL,
+                                     verbose_name=u"النادي")
+    date = models.DateField(verbose_name=u"التاريخ")
+    submission_datetime = models.DateTimeField(auto_now_add=True, null=True, verbose_name=u"تاريخ الطلب")
+    start_time = models.TimeField(verbose_name=u"وقت البداية")
+    end_time = models.TimeField(verbose_name=u"وقت النهاية")
+
+    is_approved_choices = (
+        (True, u'معتمد'),
+        (False, u'مرفوض'),
+        (None, u'معلق'),
+        )
+    is_approved = models.NullBooleanField(verbose_name=u"الحالة",
+                                          choices=is_approved_choices,)
+    
+    def __unicode__(self):
+        return self.club.name

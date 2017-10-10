@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rules.apps.AutodiscoverRulesConfig',
     'accounts',
     'activities',
     'api',
@@ -152,6 +153,7 @@ ADMINS = [('Errors', 'errors@enjazportal.com')]
 
 # Userena settings
 AUTHENTICATION_BACKENDS = (
+    'rules.permissions.ObjectPermissionBackend',
     'userena.backends.UserenaAuthenticationBackend',
     'guardian.backends.ObjectPermissionBackend',
     'social.backends.twitter.TwitterOAuth',
@@ -169,6 +171,7 @@ LOGOUT_REDIRECT_URL = '/'
 USERENA_WITHOUT_USERNAMES = True
 USERENA_ACTIVATION_RETRY = True
 USERENA_ACTIVATION_DAYS = 30
+USERENA_USE_MESSAGES = False
 
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',

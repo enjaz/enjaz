@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from media.models import FollowUpReport, Story, StoryReview, StoryTask, Article, ArticleReview, Poll, PollChoice, Post
+from media.models import FollowUpReport, Story, StoryReview, StoryTask, Article, ArticleReview, Poll, PollChoice, Post, SnapchatReservation
 
 admin.site.register(FollowUpReport)
 
@@ -11,6 +11,7 @@ admin.site.register(StoryTask)
 admin.site.register(Article)
 admin.site.register(ArticleReview)
 
+admin.site.register(SnapchatReservation)
 
 class PollChoiceAdmin(admin.TabularInline):
     model = PollChoice
@@ -25,6 +26,6 @@ class PostAdmin(admin.ModelAdmin):
         if not obj.id:
             obj.submitter = request.user
         super(PostAdmin, self).save_model(request, obj, form, change)
-    
+
 admin.site.register(Poll, PollAdmin)
 admin.site.register(Post, PostAdmin)

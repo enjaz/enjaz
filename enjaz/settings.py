@@ -24,9 +24,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = secrets.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = getattr(secrets, 'DEBUG', True)
+DEBUG = getattr(secrets, 'DEBUG', False)
 
-ALLOWED_HOSTS = ['.enjazportal.com', '127.0.0.1']
+ALLOWED_HOSTS = ['.enjazportal.com', '127.0.0.1','127.0.0.1:8000']
 
 # Application definition
 
@@ -153,8 +153,12 @@ ADMINS = [('Errors', 'errors@enjazportal.com')]
 
 # Userena settings
 AUTHENTICATION_BACKENDS = (
-    'rules.permissions.ObjectPermissionBackend',
     'userena.backends.UserenaAuthenticationBackend',
+    # rules backend should come *after* userena's for loginas package to work
+    # Otherwise, an attribute error would be raised when trying to "login as"
+    # since loginas requires the backend it's using to have a `get_user` method,
+    # and rules backend doesn't have one
+    'rules.permissions.ObjectPermissionBackend',
     'guardian.backends.ObjectPermissionBackend',
     'social.backends.twitter.TwitterOAuth',
     'django.contrib.auth.backends.ModelBackend',

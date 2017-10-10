@@ -180,7 +180,7 @@ def order_instructions(request, pk):
     book_exchange_coordinator = clubs.utils.get_team_for_user("book_exchange", book.submitter).coordinator
     last_request = book.last_pending_request()
     current_year = StudentClubYear.objects.get_current()
-    if current_year.bookexchange_closure_date and timezone.now().date() > current_year.bookexchange_closure_date:
+    if current_year.bookexchange_close_date and timezone.now().date() > current_year.bookexchange_close_date:
         return render(request, 'bulb/exchange/bookexchange_closure.html', {'current_year':current_year})
     if not (last_request and last_request.requester == request.user) and \
        not utils.can_order_book(request.user, book):
@@ -199,10 +199,9 @@ def confirm_book_order(request, pk):
     book_exchange_coordinator = clubs.utils.get_team_for_user("book_exchange", book.submitter).coordinator
     current_year = StudentClubYear.objects.get_current()
     instance = Request(requester=request.user, book=book)
-    studentclubyear = get_object_or_404(StudentClubYear, pk=pk, is_deleted=False)
 
-    if studentclubyear.bookexchange_close_date and timezone.now() > studentclubyear.bookexchange_close_date:
-        return render(request, 'bulb/exchange/book_section_is_closed.html', {'studentclubyear':studentclubyear})
+    if current_year.bookexchange_close_date and timezone.now() > current_year.bookexchange_close_date:
+        return render(request, 'bulb/exchange/book_section_is_closed.html', {'current_year':current_year})
 
     if request.method == 'POST':
         form = RequestForm(request.POST, instance=instance)

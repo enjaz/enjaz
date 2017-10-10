@@ -192,6 +192,7 @@ def submit_report(request, episode_pk):
         pass
 
     if request.method == 'POST':
+        print request.POST['draft']
         form = FollowUpReportForm(request.POST,
                                   instance=FollowUpReport(pk=episode.pk, # make pk equal to episode pk
                                                                          # to keep things synchronized

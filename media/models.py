@@ -6,6 +6,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from activities.models import Activity, Episode
+from clubs.models import Club
 from media.managers import BuzzManager, PollManager, FollowUpQuerySet
 
 
@@ -97,8 +98,14 @@ class FollowUpReport(models.Model):
 
     # Content
     description = models.TextField(verbose_name=u"الوصف",
-                                   help_text=u"")
+                                   help_text=u"", blank=True)
     twitter_announcement = models.TextField(verbose_name=u"روابط الإعلان عبر تويتر", default="")
+
+    organizers_names = models.ManyToManyField(Club, verbose_name=u"اسماء المنظمين")
+
+    collaborators_inside = models.TextField(verbose_name=u"اسماء المتعاونين من داخل الجامعة", null=True)
+
+    collaborators_outside = models.TextField(verbose_name=u"اسماء المتعاونين من خارج الجامعة", null=True)
 
     objects = FollowUpQuerySet.as_manager()
 

@@ -167,12 +167,16 @@
                                 class="btn btn-info btn-xs">ارفع تقرير العمادة (اختياري)</a>
 			            	{% endif %}
                             </div>
+                            {% endif %}
                             <div class="row">
+                                
                             {% if episode.report_is_submitted %}
 			            		<a href="{% url 'media:show_report' episode.pk %}"
 			            		class="btn btn-green btn-xs">استعرض تقرير المركز الإعلامي</a>
                             {# show a special note for employees, that the report hasn't been submitted yet. #}
-                            {% elif not episode.report_is_submitted and not user|can_submit_studentreport:activity %}
+                            {% elif user|can_view_followupreport:activity %}
+                                
+                            {% if not episode.report_is_submitted and not user|can_submit_studentreport:activity %}
 			            		<a class="btn btn-primary btn-xs disabled">لم يرفع تقرير المركز الإعلامي بعد</a>
                             {# only show the link if the user is not an employee #}
                             {% elif episode.requires_report and user|can_submit_studentreport:activity %}

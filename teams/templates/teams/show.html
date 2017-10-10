@@ -65,25 +65,6 @@
     <th>المنسق</th>
     <td>{% if team.leader %} {{ team.leader.common_profile.get_ar_full_name|default:team.leader.username }} {% else %} لا يوجد {% endif %}</td>
   </tr>
-    <th>المنصب</th>
-    <td>{% has_perm 'teams.change_members_position' request.user as can_edit_position %}
-    {% if user.position %} {{ user.position.profile.get_full_name}}
-    {% elif can_edit_position %}
-        <div class="dropdown">
-            <form action="{% url 'teams:add_position' team.pk %}" id="add-position-form" method="post">
-                {% csrf_token %}
-                    {% bootstrap_form positionform %}
-                    {% buttons %}
-                        <button style="float:left;margin-top: 3px" id='add_position' type="submit" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                        عيّن
-                        </button>
-                    {% endbuttons %}
-            </form>
-        </div>
-    {% else %} لا يوجد
-    {% endif %}
-
-    </td>
 </table>
 </div>
 <div class="col-md-4">
@@ -103,28 +84,6 @@
         {% if can_edit %}<li><a href="{% url 'teams:edit' team.code_name %}"><span class="glyphicon glyphicon-pencil"></span> عدّل</a></li>
          <li>            <a href="{% url 'forms:form_list' team.pk %}"><i class="entypo-docs"></i>النماذج </a></li>
 
-            <form method="post" data-team_pk='{{ team.code_name }}' enctype="multipart/form-data" id="add-members-form" action="post">
-            {% bootstrap_form_errors form %}
-            {% csrf_token %}
-
-<li>حالة التسجيل:</li>
-
-            <a class="openclose-btn" href="{% url 'teams:control_registration' team.code_name %}">
-                <div id="status">{% if team.is_open %}مفتوح{% else %}مغلق{% endif %} </div></a>
-<div id="mem-list-header">{% if team.is_open %}أضف الأعضاء:{% else %}قائمة الأعضاء:{% endif %}</div>
-			<div class="add-members" id="add-members">
-               {{ form.members }}
-
-			<div class="form-control-feedback">
-				<i class=""></i>
-			</div>
-                        <button style="float:left" id='add_members' type="submit" class="btn btn-primary">
-                    احفظ
-            </button>
-</div>
-
-
-          </form>
         {% endif %}
 
       <!--
@@ -136,9 +95,9 @@
       <li><a href=""><span class="entypo-docs"></span> النماذج</a></li>
       -->
 
-			</ul></p>
-            <div>
-            <a href="https://twitter.com/share" class="twitter-share-button" data-text="أنا عضو/ة في فريق" data-url="{% url 'teams:show' team.pk %}" data-via="StudentsofKSAUH" data-lang="ar" data-show-count="false">غرّد</a>
+			</ul>
+            <div style="float: left">
+            <a  href="https://twitter.com/share" class="twitter-share-button" data-text="أنا عضو/ة في فريق" data-url="{% url 'teams:show' team.pk %}" data-via="StudentsofKSAUH" data-lang="ar" data-show-count="false">غرّد</a>
             </div>
 		</div>
 	</div>

@@ -73,6 +73,7 @@ class Team(models.Model):
 
 class Membership(models.Model):
     member = models.ForeignKey(User, verbose_name=_(u"العضو"))
+    title = models.CharField(verbose_name=_(u"المنصب"), blank=True,max_length=50)
     team = models.ForeignKey(Team, verbose_name=_(u"الفريق"))
     accepted = models.BooleanField(default=False)
     registration_date = models.DateTimeField(_(u"تاريخ التسجيل"), auto_now_add=True)

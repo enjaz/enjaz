@@ -128,8 +128,8 @@ def add_members(request, code_name):
         form = forms.AddTeamMembersForm(request.POST, instance=team)
         if form.is_valid():
             form.save(commit=False)
-            membership = Membership(member=request.user, team=team)
-            #TODO: check how to specify memeber ^
+            membership = Membership(member=form.user, team=team)
+            #TODO: check how to specify memeber
             membership.save()
             return {"message": "success"}
     context['form'] = form

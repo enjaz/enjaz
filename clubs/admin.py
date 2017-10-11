@@ -39,7 +39,7 @@ class ClubAdminForm(forms.ModelForm):
         if self.instance.id:
             year = self.instance.year
         else:
-            year = StudentClubYear.objects.current_year()
+            year = StudentClubYear.objects.get_current()
         self.fields['parent'].queryset = Club.objects.filter(year=year)
         self.fields['possible_parents'].queryset = Club.objects.filter(year=year)
 
@@ -81,7 +81,7 @@ class TeamAdminForm(forms.ModelForm):
         model = Club
         fields = '__all__'
 
-    
+
 class TeamAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'city', 'gender', 'coordinator', 'get_member_count')
     list_filter = ('city', 'gender', 'year')

@@ -111,8 +111,10 @@ class RecruitmentAdmin(BulbModelAdmin):
                     'get_mobile_number', 'get_college',
                     'prefers_coordination', 'prefers_team_membership',
                     'wants_book_exchange_organization',
-                    'wants_dewanya_organization', 'submission_date']
-
+                    'wants_dewanya_organization',
+                    'wants_readathon_organization', 'submission_date']
+    list_filter = ['year']
+    
 class RecruitmentAdminReadOnly(ModelAdminReadOnly, RecruitmentAdmin):
     pass
 

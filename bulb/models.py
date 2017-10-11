@@ -481,6 +481,9 @@ class ReaderProfile(models.Model):
 class Recruitment(models.Model):
     user = models.ForeignKey(User, verbose_name=u"المستخدم",
                              related_name="bulb_recruitment")
+    year = models.ForeignKey('core.StudentClubYear', null=True,
+                             on_delete=models.SET_NULL)
+
     prefers_coordination = models.BooleanField(default=False)
     prefers_team_membership = models.BooleanField(default=False)
     prefers_alone = models.BooleanField(default=False)

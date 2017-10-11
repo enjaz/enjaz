@@ -261,6 +261,7 @@ margin-bottom: 5px;
 			</label>
       		</div>
 </div><!--step-section-->
+
 {% if user.common_profile.city == 'الرياض' %}
 <div class="step-section">
             <h2 class="text-center">الخميسيّة</h2>
@@ -296,8 +297,10 @@ margin-bottom: 5px;
 				<input name="wants_khamisia_organization" id="id_khamisia_organization" type="checkbox"> أريد المشاركة في تنظيم الخميسيات وانتقاء مواضيعها
 			</label>
       		</div>
-        {% endif %}
+
 </div><!--step-section-->
+
+{% endif %}
 <div class="step-section">
             <h2 class="text-center">الفريق الإعلامي</h2>
             <hr class="small">
@@ -333,41 +336,41 @@ margin-bottom: 5px;
 <div class="step-section">
             <h2 class="text-center">فلنتعارف!</h2>
             <hr class="small">
-<p class="explaination instructions">
-الأسئلة أدناه أسئلة اختيارية.
-</p>
-		<div class="form-group">
-			<label class="control-label col-sm-5" for="id_interests">خارج الفضاء الأكاديمي، ما اهتمامتك؟</label>
-			<div class="col-sm-7">
-				<textarea class="form-control" id="id_interests" name="interests"></textarea>
-			</div>
-      		</div>
-		<div class="form-group">
-			<label class="control-label col-sm-5" for="id_interests">ما سبب رغبتك في الانضمام إلى سِراج؟</label>
-			<div class="col-sm-7">
-				<textarea class="form-control" id="id_goals" name="goals"></textarea>
-			</div>
-      		</div>
-		<div class="form-group coordination">
-			<label class="control-label col-sm-5" for="id_activities">هل سبق أن نظّمت أنشطة في نادي الطلاب؟</label>
-			<div class="col-sm-7">
-				<textarea class="form-control" id="id_activities" name="activities"></textarea>
-			</div>
-      		</div>
-		<div class="form-group coordination">
-			<label class="control-label col-sm-5" for="id_twitter">هل لديك حساب على تويتر؟</label>
-			<div class="col-sm-7">
-				<input class="form-control" id="id_twitter" name="twitter" placeholder="اسم المستخدم على تويتر" type="text" />
-			</div>
-      		</div>
-		<div class="form-group coordination">
-			<label class="control-label col-sm-5" for="goodreads">هل لديك حساب على Goodreads؟</label>
-			<div class="col-sm-7">
-				<input class="form-control" id="id_goodreads" name="goodreads" placeholder="رابط Goodreads" type="url" />
-			</div>
-      		</div>
+  <p class="explaination instructions">
+  الأسئلة أدناه أسئلة اختيارية.
+  </p>
+  		<div class="form-group">
+  			<label class="control-label col-sm-5" for="id_interests">خارج الفضاء الأكاديمي، ما اهتمامتك؟</label>
+  			<div class="col-sm-7">
+  				<textarea class="form-control" id="id_interests" name="interests"></textarea>
+  			</div>
+        		</div>
+  		<div class="form-group">
+  			<label class="control-label col-sm-5" for="id_interests">ما سبب رغبتك في الانضمام إلى سِراج؟</label>
+  			<div class="col-sm-7">
+  				<textarea class="form-control" id="id_goals" name="goals"></textarea>
+  			</div>
+        		</div>
+  		<div class="form-group coordination">
+  			<label class="control-label col-sm-5" for="id_activities">هل سبق أن نظّمت أنشطة في نادي الطلاب؟</label>
+  			<div class="col-sm-7">
+  				<textarea class="form-control" id="id_activities" name="activities"></textarea>
+  			</div>
+        		</div>
+  		<div class="form-group coordination">
+  			<label class="control-label col-sm-5" for="id_twitter">هل لديك حساب على تويتر؟</label>
+  			<div class="col-sm-7">
+  				<input class="form-control" id="id_twitter" name="twitter" placeholder="اسم المستخدم على تويتر" type="text" />
+  			</div>
+        		</div>
+  		<div class="form-group coordination">
+  			<label class="control-label col-sm-5" for="goodreads">هل لديك حساب على Goodreads؟</label>
+  			<div class="col-sm-7">
+  				<input class="form-control" id="id_goodreads" name="goodreads" placeholder="رابط Goodreads" type="url" />
+  			</div>
+        		</div>
 
-</div><!--step-section-->
+  </div><!--step-section-->
 
 		<div id="delete-button">
 				<p><input type="submit" class="form-control btn btn-block btn-success" value="انضمّـ/ـي إلى مجتمع سِراج"/></p>

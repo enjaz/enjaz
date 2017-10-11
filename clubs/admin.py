@@ -39,7 +39,7 @@ class ClubAdminForm(forms.ModelForm):
         if self.instance.id:
             year = self.instance.year
         else:
-            year = StudentClubYear.objects.current_year()
+            year = StudentClubYear.objects.get_current()
         self.fields['parent'].queryset = Club.objects.filter(year=year)
         self.fields['possible_parents'].queryset = Club.objects.filter(year=year)
 
@@ -49,9 +49,9 @@ class ClubAdminForm(forms.ModelForm):
                                             coordination__year=year)
         self.fields['media_assessor'] = SingleUserChoiceField(required=False, queryset=media_members.order_by("username"))
 
-    coordinator = SingleUserChoiceField(required=False, queryset=User.objects.order_by("username"))
-    employee = SingleUserChoiceField(required=False, queryset=User.objects.filter(common_profile__is_student=False).order_by("username"))
-    media_assessor = SingleUserChoiceField(required=False, queryset=User.objects.order_by("username"))
+    #coordinator = SingleUserChoiceField(required=False, queryset=User.objects.order_by("username"))
+    #employee = SingleUserChoiceField(required=False, queryset=User.objects.filter(common_profile__is_student=False).order_by("username"))
+    #media_assessor = SingleUserChoiceField(required=False, queryset=User.objects.order_by("username"))
     class Meta:
         model = Club
         fields = '__all__'
@@ -63,6 +63,7 @@ class ClubAdmin(admin.ModelAdmin):
     search_fields = ('name', 'city', 'email')
     filter_horizontal = ('members', 'deputies',
                          'media_representatives', 'possible_parents')
+    raw_id_fields = ['coordinator', 'deputies', 'members', 'media_representatives', 'media_assessor', 'employee']
     form = ClubAdminForm
 
     def number_of_members(self, obj):
@@ -81,7 +82,7 @@ class TeamAdminForm(forms.ModelForm):
         model = Club
         fields = '__all__'
 
-    
+
 class TeamAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'city', 'gender', 'coordinator', 'get_member_count')
     list_filter = ('city', 'gender', 'year')

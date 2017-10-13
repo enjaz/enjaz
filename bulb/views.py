@@ -1506,7 +1506,8 @@ def edit_reader_profile(request, reader_pk):
 @login_required
 def handle_recruitment(request):
     if request.method == 'POST':
-        recruitment = Recruitment(user=request.user)
+        current_year = StudentClubYear.objects.get_current()
+        recruitment = Recruitment(user=request.user, year=current_year)
         form = RecruitmentForm(request.POST, request.FILES, instance=recruitment)
         if form.is_valid():
             recruitment = form.save()

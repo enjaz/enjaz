@@ -214,8 +214,7 @@ def submit_report(request, episode_pk):
                                   instance=FollowUpReport(pk=episode.pk,  # make pk equal to episode pk
                                                           # to keep things synchronized
                                                           episode=episode,
-                                                          submitter=request.user,
-                                                          is_draft=request.POST['draft'])
+                                                          submitter=request.user)
                                   )
         image_formset = FollowUpReportImageFormset(request.POST, request.FILES)
         ad_formset = FollowUpReportAdImageFormset(request.POST, request.FILES)

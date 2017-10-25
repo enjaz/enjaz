@@ -521,6 +521,9 @@ class SnapchatReservation(models.Model):
     club = models.ForeignKey('clubs.Club', null=True,
                                      on_delete=models.SET_NULL,
                                      verbose_name=u"النادي")
+    activity = models.ForeignKey(Activity, null=True,
+                                     on_delete=models.SET_NULL,
+                                     verbose_name=u"النشاط")
     date = models.DateField(verbose_name=u"التاريخ")
     submission_datetime = models.DateTimeField(auto_now_add=True, null=True, verbose_name=u"تاريخ الطلب")
     start_time = models.TimeField(verbose_name=u"وقت البداية")

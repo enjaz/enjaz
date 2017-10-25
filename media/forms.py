@@ -202,4 +202,4 @@ class SnapchatReservationForm(ModelForm):
 
     class Meta:
         model = SnapchatReservation
-        fields = ['club', 'date', 'start_time', 'end_time']
+        fields = ['club', 'activity','date', 'start_time', 'end_time']

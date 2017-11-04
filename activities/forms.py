@@ -3,6 +3,7 @@
 This module contains the forms used in the activities app.
 """
 from django import forms
+from django.db.models import Q
 from django.forms import ModelForm, ModelChoiceField, ModelMultipleChoiceField
 from django.forms.widgets import TextInput, Select
 from django.forms.models import inlineformset_factory
@@ -11,6 +12,7 @@ from openpyxl import load_workbook
 
 from activities.models import Activity, Episode, Review, Evaluation, Attachment, Assessment, Criterion, CriterionValue, DepositoryItem, ItemRequest
 from clubs.models import Club
+from media.models import Story
 from core.models import StudentClubYear
 from dal import autocomplete
 from media.utils import can_assess_club_as_media_coordinator
@@ -307,9 +309,16 @@ class AssessmentForm(ModelForm):
             del self.fields['cooperator_points']
 
         city = accounts.utils.get_city_code(self.activity.primary_club.city)
-        for criterion in Criterion.objects.filter(year=self.activity.primary_club.year,
+        if Story.objects.filter(episode__activity=self.activity):
+            criterion_set = Criterion.objects.filter(year=self.activity.primary_club.year,
                                                   category=self.category,
-                                                  city__contains=city):
+                                                  city__contains=city).exclude(Q(code_name__startswith="covering") | Q(code_name__startswith="designs") )
+        else:
+            criterion_set = Criterion.objects.filter(year=self.activity.primary_club.year,
+                                                  category=self.category,
+                                                  city__contains=city).exclude(code_name__startswith="story")
+            
+        for criterion in criterion_set:
             field_name = 'criterion_' + str(criterion.code_name)
             initial_value = 0
             if self.instance.id:

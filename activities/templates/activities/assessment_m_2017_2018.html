@@ -1,0 +1,404 @@
+{% extends 'activities/show.html' %}{% load bootstrap3 %}
+{% block review_content %}
+
+<div class="panel panel-default panel-shadow" data-collapsed="0">
+	<!-- panel body -->
+	<div class="panel-body with-table">
+		<table class="table table-bordered table-responsive">
+		<form method="post">
+            {{ form.errors }}
+		{% csrf_token %}
+		<colgroup>
+			<col class="col-md-2">
+			<col class="col-md-7">
+			<col class="col-md-3">
+		</colgroup>
+		<thead>
+			<tr>
+				<th>المعيار</th>
+				<th>الخيارات</th>
+				<th>النقاط</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<tr>
+				<th>التغطية بتويتر</th>
+				<td>
+					<div class="alert alert-warning">
+                        <p class="alert alert-warning"><i class="entypo-eye"></i>هل تم استخدام تويتر و سناب تشات في التغطية، وأرفق صور للإعلان عن النشاط؟
+                        </p>
+                        <!--
+                        <ul>
+                            {% for episode in activity.episode_set.all %}
+                                <li>
+                                    {% if episode.followupreport %}
+                                    انتهاء الحدث: {{ episode.end_date|date:"j F" }}. رفع التقرير: {{ episode.followupreport.date_submitted|date:"j F" }}.
+                                    {% else %}
+                                    لم يرفع تقرير لحدث {{ episode.end_date|date:"j F" }}.
+                                    {% endif %}
+                                </li>
+                            {% endfor %} 
+                        </ul> -->
+					</div>
+					<label>
+						<input type="radio" value="1" name="twitter_links_option">نعم <span class="points">(نقطة واحدة)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="٠" name="twitter_links_option">لا<span class="points">(دون نقاط)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_twitter_links }}</td>
+			</tr>
+            <tr>
+				<th>التغطية بسناب تشات</th>
+				<td>
+					<div class="alert alert-warning">
+                        <p class="alert alert-warning"><i class="entypo-eye"></i>هل تم استخدام تويتر و سناب تشات في التغطية، وأرفق صور للإعلان عن النشاط؟
+                        </p>
+					</div>
+					<label>
+						<input type="radio" value="1" name="snapchat_reservation_option">نعم <span class="points">(نقطة واحدة)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="٠" name="snapchat_reservation_option">لا<span class="points">(دون نقاط)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_snapchat_reservation }}</td>
+			</tr>
+            <tr>
+				<th>صور النشاط</th>
+				<td>
+					<div class="alert alert-warning">
+                        <p class="alert alert-warning"><i class="entypo-eye"></i>هل تم استخدام تويتر و سناب تشات في التغطية، وأرفق صور للإعلان عن النشاط؟
+                        </p>
+					</div>
+					<label>
+						<input type="radio" value="1" name="advertisement_pic_option">نعم <span class="points">(نقطة واحدة)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="٠" name="advertisement_pic_option">لا<span class="points">(دون نقاط)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_advertisement_pic }}</td>
+			</tr>
+{% if activity.primary_club.city != 'الأحساء' %}
+			<tr>
+				<th>صور النشاط</th>
+				<td>
+					<p class="alert alert-warning"><i class="entypo-eye"></i>
+                        <!--
+					هل استخدمت {% if activity.primary_club.city == 'جدة' %}وسيلتين{% else %} ثلاثة وسائل{% endif %} للنشر؟ (ورقي، تويتر، إنستغرام،سنابتشات، فاين) -->
+                        هل تم رفع ٣ صور أو أكثر مختلفة للنشاط؟
+                    </p>
+					<label>
+						<input type="radio" value="1" name="activity_pic_option"> نعم <span class="points">(نقطة واحدة)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="0" name="activity_pic_option"> لا <span class="points">(لا نقاط)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_activity_pic }}</td>
+			</tr>
+			<tr>
+				<th>جودة الصور المرفوعة</th>
+				<td>
+                    <div class="alert alert-warning">
+<!--
+                    {% if stories.exists %}
+                            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" role="tab" id="headingOne">
+                                        <h4 class="panel-title">
+                                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">تقييم المركز الإعلامي</a>
+                                        </h4>
+                                    </div>
+                                    <div id="collapseOne" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="headingOne">
+                                        <div class="panel-body">
+                                            يوما ما!
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    {% else %}<i class="entypo-eye"></i>
+                        لم يكتب أي خبر لهذا النشاط
+                    {% endif %} -->
+                        <i class="entypo-eye"></i>
+                        هل الصور المرفوعة جميعها جودتها عالية(الأبعاد ١٠٠٠) وصالحة للنشر في الصحف "تم استخدام الكاميرا الخاصة بالمركز الإعلامي"؟
+                    </div>
+					<label>
+						<input type="radio" value="2" name="activity_pic_quality_option"> نعم <span class="points">( نقطتان)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="0" name="activity_pic_quality_option"> لا <span class="points">(لا نقاط)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_activity_pic_quality }}</td>
+			</tr>
+			<tr>
+				<th>سلبيات أو مخالفات في التغطية</th>
+				<td>
+					<div class="alert alert-warning"><!--
+                        {% if stories.exists %}
+                        <ul>
+                            {% for epsiode in activity.episode_set.all %}
+                                <li>انتهاء الحدث: {{ epsiode.end_date|date:"j F" }}. رفع التقرير: {{ episode.story.date_submitted|date:"j F" }}.</li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}<i class="entypo-eye"></i>
+                        لم يكتب أي خبر لهذا النشاط
+                        {% endif %} -->
+                        هل يوجد سلبيات في الصور أو التغطية(إضاءة ضعيفة، تشويش في الصورة)، أو مخالفة إعلامية في التغطية أثناء النشاط.
+                    </div>
+					<label>
+						<input type="radio" value="0" name="pictures_drawbacks_option"> لا<span class="points">(عدم حسم النقاط)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="-2" name="pictures_drawbacks_option"> نعم<span class="points">(حسم نقطتان)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_pictures_drawbacks }}</td>
+			</tr>
+            {% if stories.exists %}
+			<tr>
+				<th>الالتزام في وقت رفع الخبر</th>
+				<td>
+					<p class="alert alert-warning">
+                        هل تم رفع الخبر الشهري الشامل في الوقت المحدد؟
+					</p>
+                    <label>
+						<input type="radio" value="2" name="story_punctuality_option"> نعم <span class="points">(نقطتان)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="0" name="story_punctuality_option"> لا <span class="points">(لا نقاط)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_story_punctuality }}</td>
+			</tr>
+            <tr>
+				<th>جودة الخبر المرفوع</th>
+				<td>
+					<p class="alert alert-warning">
+                       هل الخبر شامل لجميع أركان الخبر الصحفي وشروطه (عنوان، مقدمة، محتوى، خاتمة) بصياغة ممتازة؟
+					</p>
+                    <label>
+						<input type="radio" value="2" name="story_quality_option"> نعم، ممتاز <span class="points">(نقطتان)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="1" name="story_quality_option"> لم يشمل جميع أركان الخبر الصحفي، أو الصياغة جيدة <span class="points">(نقطة)</span>
+					</label>
+                    <br>
+					<label>
+						<input type="radio" value="0" name="story_quality_option"> لا، سيئ <span class="points">(لا نقاط)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_story_quality }}</td>
+			</tr>
+            <tr>
+				<th>الأخطاء النحوية و الإملائية</th>
+				<td>
+					<p class="alert alert-warning"> هل الخبر خال من الأخطاء الإملائية (الهمزات، علامات الترقيم...)و النحوية؟</p>
+                    <label>
+						<input type="radio" value="2" name="story_mistakes_option"> نعم <span class="points">(نقطتان)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="1" name="story_mistakes_option">توجد بعض الأخطاء الإملائية أو النحوية<span class="points">(نقطة)</span>
+					</label>
+                    <br>
+					<label>
+						<input type="radio" value="0" name="story_mistakes_option">يحتوي الكثير من الأخطاء الإملائية و النحوية<span class="points">(لا نقاط)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_story_mistakes }}</td>
+			</tr>
+            {% else %}
+            <tr>
+                <th>التصاميم</th>
+				<td>
+					<p class="alert alert-warning">
+                        هل تم استخدام تصاميم ابداعية(ليست من قوالب المركز)وكانت جيدة؟
+					</p>
+                    <label>
+						<input type="radio" value="2" name="designs_option"> نعم <span class="points">(نقطتان)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="1" name="designs_option"> لا، تم استخدام قوالب المركز <span class="points">(نقطة)</span>
+					</label>
+                    <br>
+                    <label>
+						<input type="radio" value="0" name="designs_option">تم استخدام تصاميم غير جيدة <span class="points">(لا نقاط)</span>
+					</label>
+                    <br>
+                    <label>
+						<input type="radio" value="-2" name="designs_option"> في حال عدم التقيد بلوائح التصاميم للمركز (المذكورة في الآلية)<span class="points">(حسم نقطتين)</span>
+					</label>
+                </td>
+                <td>{{ form.criterion_designs }}</td>
+            </tr>
+            <tr>
+                <th>التغطية</th>
+				<td>
+					<p class="alert alert-warning">
+                    هل تمت تغطية النشاط مصحوبة بصور وكانت جيدة وخالية من الأخطاء الإملائية؟</p>
+                    <label>
+						<input type="radio" value="2" name="covering_option"> نعم <span class="points">(نقطتان)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="1" name="covering_option">تمت التغطية بوجود بعض الأخطاء الإملائية من غير صور<span class="points">(نقطة)</span>
+					</label>
+                    <br>
+                    <label>
+						<input type="radio" value="0" name="covering_option">لم تتم التغطية<span class="points">(لا نقاط)</span>
+					</label>
+                </td>
+                <td>{{ form.criterion_covering }}</td>
+            </tr>
+                {% endif %}
+{% endif %}
+            <!--
+			<tr>
+				<th>جودة الصور والإعلان</th>
+				<td>
+					<div class="alert alert-warning">
+                        {% if images.exists %}
+                        <ul>
+                            {% for image in images %}
+                                <li>
+                                    <a href="{{ image.image.url }}" class="english-field">
+                                        <i class="entypo-picture"></i>
+                                        {{ image.image.name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}<i class="entypo-eye"></i>
+                            لا توجد صور لهذا النشاط
+                        {% endif %}
+                    </div>
+					<label>
+						<input type="radio" value="1" name="image_quality_option"> جيّدة <span class="points">(نقطة واحدة)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="0" name="image_quality_option"> غير جيّدة <span class="points">(لا نقاط)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_image_quality }}</td>
+			</tr>
+			<tr>
+				<th>المخالفات</th>
+				<td>
+					<p class="alert alert-warning"><i class="entypo-eye"></i>
+                        هل ارتكب النادي في تغطيته مخالفات إعلامية؟
+					</p>
+					<label>
+						<input type="radio" value="-2" name="violations_option"> نعم <span class="points">(احسم نقطتين)</span>
+					</label>
+					<br>
+					<label>
+						<input type="radio" value="0" name="violations_option"> لا <span class="points">(لا تحسم أي نقطة)</span>
+					</label>
+				</td>
+				<td>{{ form.criterion_violations }}</td>
+			</tr>
+			<tr>
+				<th  colspan="2">الإجمالي</th>
+				<th class="total"></th>
+
+			</tr> -->
+			<tr>
+				<td>
+				ملاحظة
+				</td>
+				<td colspan="2">
+				{{ form.notes }}
+				</td>
+			</tr>{% if form.is_reviewed %}
+            <tr>
+				<th  colspan="3">{% bootstrap_field form.is_reviewed %}</th>
+			</tr>{% endif %}
+			<tr><td colspan="3">
+		    	<button type="submit" class="btn btn-primary btn-block">
+		    		<span class="glyphicon glyphicon-ok-sign"></span> أرسل
+		    	</button>
+			</td></tr>
+		</tbody>
+	</form>
+	</table>
+
+	</div>
+</div>
+<script>
+$(function(){
+	// All criteria fields should be required.
+	$('input[type=number]').prop('required', 'required');
+
+	// Choosing a radio input changes the criterion field.
+	$('input[type=radio]').change(function(){
+		criterion_field_name = 'criterion_' + $(this).prop('name').replace('_option', '');
+		criterion_field = $('#id_' + criterion_field_name);
+		$(criterion_field).val($(this).val());
+	});
+	// Choosing the criterion field results in choosing the match radio option (or other if no matches were found).
+    function link_text_to_radio(){
+		criterion_code_name = $(this).prop('name').replace('criterion_', '');
+		entered_value = $(this).val()
+		entered_option = $('input[name=' + criterion_code_name +'_option][value=' + entered_value + ']:first');
+		if (entered_option.length){
+			entered_option.prop('checked', 'checked');
+		}else{
+			other_option = $('input[name=' + criterion_code_name +'_option][data-other=true]');
+			other_option.prop('checked', 'checked');
+		}
+	}
+    $.each($('input[name^=criterion_]'), link_text_to_radio);
+	$('input[name^=criterion_]').on('change', link_text_to_radio);
+
+	// On loading the page and on changing and click fields, update the total count. .
+    function updateTotal(){
+        var total = 0;
+		$.each($('input[type=number][name^=criterion_]'), function(index, element){
+			total += +$(element).val();
+		});
+		$('.total').html(total);
+        // If the total changes, also update the points given for cooperator, but only if equal points are given.
+        $("#id_cooperator_points.equal-points").val(total);
+    }
+    updateTotal();
+	$('input[type=number], input[type=radio]').on('click change', updateTotal);
+
+	$("textarea").removeAttr("cols")
+		.removeAttr("rows")
+		.css("height", "100%")
+		.css("width", "100%")
+		.addClass("form-control")
+		.addClass("autogrow");
+});
+</script>
+<style>
+.points{
+	color: black;
+}
+.alert{
+    margin-bottom: 5px;
+}
+blockquote{
+    margin-bottom: -8.5px;
+}
+#id_is_reviewed{
+    margin-right: 20px;
+    margin-left: 20px;
+}
+</style>
+{% endblock %}

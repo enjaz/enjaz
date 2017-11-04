@@ -94,7 +94,15 @@ class FollowUpReport(models.Model):
     submitter = models.ForeignKey(User)
     date_submitted = models.DateTimeField(auto_now_add=True,
                                       verbose_name=u"تاريخ رفع التقرير")
-
+    primary_club = models.ForeignKey('clubs.Club', null=True,
+                                     on_delete=models.SET_NULL,
+                                     verbose_name=u"النادي المنظم")
+    inside_collaborators = models.TextField(blank=True,
+                                            verbose_name=u"المتعاونون من داخل الجامعة")
+    outside_collaborators = models.TextField(blank=True,
+                                             verbose_name=u"المتعاونون من خارج الجامعة")
+    
+    
     # Content
     description = models.TextField(verbose_name=u"الوصف",
                                    help_text=u"")

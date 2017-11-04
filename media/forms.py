@@ -37,7 +37,8 @@ class EmployeeReportForm(ModelForm):
 class FollowUpReportForm(ModelForm):
     class Meta:
         model = FollowUpReport
-        fields = ['description', 'twitter_announcement']
+        fields = ['primary_club', 'inside_collaborators', 'outside_collaborators','start_date',\
+                  'end_date','start_time', 'end_time','location','organizer_count','announcement_sites','description', 'twitter_announcement']
 
 
 FollowUpReportImageFormset = inlineformset_factory(FollowUpReport, FollowUpReportImage, fields=['image'])

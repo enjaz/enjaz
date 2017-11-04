@@ -1365,6 +1365,8 @@ def snapchat_add(request):
 
             return HttpResponseRedirect(reverse('media:snapchat_home'))
     else:
+        club = Club.objects.filter(members = request.user)
         form = SnapchatReservationForm()
-        form.fields['club'].queryset = Club.objects.current_year().for_user_city(request.user)
+        form.fields['club'].queryset = club #Club.objects.current_year().for_user_city(request.user)
+        form.fields['activity'].queryset = Activity.objects.current_year().filter(primary_club = club)
     return render(request, "media/snapchat.html", {'snapchatform': form})

@@ -1350,6 +1350,12 @@ def snapchat_laws(request):
 def snapchat_add(request):
     if request.method == 'POST':
         form = SnapchatReservationForm(request.POST)
+        #for i in SnapchatReservation.objects.filter(is_approved = True, date__gte = datetime.now()):
+#            print i.date
+#            print request.POST['date']
+#            a = type(request.POST['date'])
+#            print a
+#            print "YEAH"
         if form.is_valid():
             instance = form.save()
 

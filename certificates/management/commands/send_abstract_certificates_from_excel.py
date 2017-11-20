@@ -7,13 +7,15 @@ from django.utils import translation
 from openpyxl import load_workbook
 
 from certificates.models import Certificate
-from events.models import Abstract
+from events.models import Abstract, Event
 from post_office import mail
 
 
 class Command(BaseCommand):
     help = "Send badges emails."
     def add_arguments(self, parser):
+        parser.add_argument('--event-code-name', dest='event_code_name',
+                            type=str)
         parser.add_argument('--excel-file', dest='excel_file',
                             type=str)
         parser.add_argument('--send-emails', dest='send_emails',
@@ -23,6 +25,7 @@ class Command(BaseCommand):
         translation.activate(settings.LANGUAGE_CODE)
         wb = load_workbook(options['excel_file'], read_only=True)
         domain = Site.objects.get_current().domain
+        event = Event.objects.get(code_name=options['event_code_name'])
         from_email = event.get_notification_email()
         url = "https://{}{}".format(domain,
                                     reverse('certificates:list_certificates_per_user'))
@@ -35,7 +38,7 @@ class Command(BaseCommand):
                 pk = row[0].value
                 # If pk is empty, we are done from this sheet.
                 if not pk:
-                    break 
+                    break
                 try:
                     pk = int(pk)
                 except ValueError:
@@ -43,7 +46,7 @@ class Command(BaseCommand):
                     # (i.e. header), skip!
                     continue
 
-                if pk in previous_pks:
+                if pk in generated_pks:
                     print "Skipping {} as previously generated.".format(pk)
                     continue
 

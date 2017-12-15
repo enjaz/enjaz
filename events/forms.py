@@ -20,7 +20,7 @@ class NonUserForm(forms.ModelForm):
                   'en_first_name', 'en_middle_name', 'en_last_name',
                   'email', 'mobile_number', 'university', 'college',
                   'gender']
-        
+
 class RegistrationForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
@@ -234,7 +234,7 @@ class SurveyForm(forms.Form):
                 if not question.choices.strip():
                     raise Exception
                 choices = [('', '-----')]
-                
+
                 choices += [(choice.strip(), choice.strip()) for choice in question.choices.split('\n') if choice]
                 self.fields[field_name] = forms.ChoiceField(label=label,
                                                             choices=choices,

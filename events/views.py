@@ -132,21 +132,42 @@ def delete_abstract(request, event_code_name, pk):
 def list_abstracts(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name,
                               receives_abstract_submission=True)
+
     if not utils.can_evaluate_abstracts(request.user, event) and \
             not utils.is_organizing_team_member(request.user, event):
         raise PermissionDenied
 
     pending_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=2)
     evaluated_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=2)
+    deleted_abstracts = Abstract.objects.filter(event=event, is_deleted=True)
+    accepted_poster_abstracts = Abstract.objects.filter(event=event, is_deleted=False, accepted_presentaion_preference= 'P')
+    accepted_oral_abstracts = Abstract.objects.filter(event=event, is_deleted=False, accepted_presentaion_preference= 'O')
     context = {'event': event,
                'pending_abstracts': pending_abstracts,
-               'evaluated_abstracts': evaluated_abstracts}
+               'evaluated_abstracts': evaluated_abstracts,
+               'deleted_abstracts': deleted_abstracts,
+               'accepted_poster_abstracts': accepted_poster_abstracts,
+               'accepted_oral_abstracts': accepted_oral_abstracts}
 
     if request.method == "POST":
         action = request.POST.get('action')
         pks = [int(field.lstrip('pk_')) for field in request.POST if field.startswith('pk_')]
+
         if action == "delete":
             Abstract.objects.filter(pk__in=pks).update(is_deleted=True)
+
+        if action == "restore":
+            Abstract.objects.filter(pk__in=pks).update(is_deleted=False)
+
+        if action == "accepte_as_oral":
+            Abstract.objects.filter(pk__in=pks).update(status='A', accepted_presentaion_preference='O')
+
+        if action == "accepte_as_poster":
+            Abstract.objects.filter(pk__in=pks).update(status='A', accepted_presentaion_preference='P')
+
+        if action == "regect":
+            Abstract.objects.filter(pk__in=pks).update(status='R', accepted_presentaion_preference='')
+
         return HttpResponseRedirect(reverse('events:list_abstracts',
                                                 args=(event.code_name,)))
 
@@ -189,7 +210,20 @@ def list_presenter_attendance(request, event_code_name):
         return render(request, 'events/abstracts/list_presenter_attendance.html', context)
 
 @login_required
-def list_my_abstracts(request):
+def list_my_abstracts(request, event_code_name=None, user_pk=None):
+    if user_pk and event_code_name:
+        event = get_object_or_404(Event, code_name=event_code_name,
+                                  receives_abstract_submission=True)
+        abstract_user = get_object_or_404(User, pk=user_pk)
+    else:
+        event = None
+        abstract_user = request.user
+
+    if not abstract_user == request.user and \
+            not request.user.is_superuser and \
+            not utils.is_organizing_team_member(request.user, event):
+            raise PermissionDenied
+
     abstracts = Abstract.objects.filter(is_deleted=False, user=request.user)
     casereports = CaseReport.objects.filter(is_deleted=False, user=request.user)
     context = {'abstracts': abstracts,'casereports':casereports}
@@ -891,7 +925,7 @@ def show_event_stats(request, event_code_name):
     return render(request, 'events/show_event_stats.html', context)
 
 def get_csv(request, event_code_name, session_pk):
-    # TODO: This should probably be changed into a commandline 
+    # TODO: This should probably be changed into a commandline
     session = get_object_or_404(Session,
                                 event__code_name=event_code_name,
                                 pk=session_pk)

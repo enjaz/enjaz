@@ -12,7 +12,8 @@
         {% if not user|can_evaluate_abstracts:event or user.is_superuser %}
         <tr>
             <th class="text-center">Authors</th>
-            <td class="activity-description">{{ abstract.authors|linebreaksbr }}</td>
+            <td class="activity-description">{% for author in abstract.author.all %}{{ author.name }} | {% endfor %} </td>
+
         </tr>
         <tr>
             <th class="text-center">Presenting author</th>

@@ -481,6 +481,9 @@ class ReaderProfile(models.Model):
 class Recruitment(models.Model):
     user = models.ForeignKey(User, verbose_name=u"المستخدم",
                              related_name="bulb_recruitment")
+    year = models.ForeignKey('core.StudentClubYear', null=True,
+                             on_delete=models.SET_NULL)
+
     prefers_coordination = models.BooleanField(default=False)
     prefers_team_membership = models.BooleanField(default=False)
     prefers_alone = models.BooleanField(default=False)
@@ -495,6 +498,14 @@ class Recruitment(models.Model):
     wants_reading_group_coordination = models.BooleanField(default=False)
     wants_reading_group_organization = models.BooleanField(default=False)
 
+    # Khamisia
+    khamisia_subjects = models.TextField(blank=True)
+    khamisia_guests = models.TextField(blank=True)
+    wants_khamisia_organization = models.BooleanField(default=False)
+
+    # Readathon
+    wants_readathon_organization = models.BooleanField(default=False)
+    
     # Debates
     debate_subjects = models.TextField(blank=True)
     watns_debate_participation = models.BooleanField(default=False)

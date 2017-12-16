@@ -25,7 +25,7 @@
     font-weight: lighter;
     src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
 }
-		
+
 @font-face {
     font-family: 'GE Dinar One';
     font-weight: normal;
@@ -37,7 +37,7 @@ body {
 }
 
 html.detail{
-    background: linear-gradient( rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8) ), url("{% static 'img/bulb/recruitment-background.jpg' %}") no-repeat center center fixed; 
+    background: linear-gradient( rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8) ), url("{% static 'img/bulb/recruitment-background.jpg' %}") no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -128,10 +128,12 @@ margin-bottom: 5px;
 </div>
 
             <p class="intro instructions">
-أهلا بك!<br><br>
-سِراج مبادرة طموحة. نريد أن نبني مجتمعًا معرفيا فكريا ثقافيًا في الحرم الجامعي.  يتبادل هذا المجتمع الخبرات، وينمّي المعارف، ويكون عالمًا منعشًا، حيّا!<br><br>
-انطلقت سِراج خلال العام الدراسي 2015/2016, وخلال عامها الأوّل شيّدت مكتبة إلكترونية عامرة أعلن فيه الطلاب والطالبات عن أثمن ما لديهم من كتب، وأسس الطلاب والطالبات مجموعات نقاش وقراءة تنمّي شتّى المهارات والاهتمامات العلمية والفكرية والأدبية، وساهمت في نقل الكتب إلى المكفوفين بتحويلها إلى صيغة برايل، وشاركت في معرض الرياض الدولي للكتب.<br><br>
-نريد لعام سِراج الثاني أن يكون امتدادا لما فات وأن يكون أوسع مدى وأكثر عمقًا، وهذا لن يكون إلا بمبادرة الطالبات والطلاب ذوي الاهتمام المعرفي، والفكري، والثقافي!  يقيننا أن  المجتمع الجامعي مليء بشخصيات فارقة قادرة على البذل والعطاء. أنت منهم.
+
+أهلًا بك<br><br>
+سِراج مبادرة طموحة. نريد أن نبني مجتمعًا معرفيًا، فكريًا، ثقافيًا داخل الجامعة. يتبادل هذا المجتمع الخبرات، وينمّي المعارف، ويكون عالمًا منعشًا حيًا!   اِنطلقت سِراج في أكتوبر 2015، وخلال عامها الدراسي الأول 2015/2016، شيّدت مكتبة إلكترونية تعاونية عامرة أعلن فيها الطلاب والطالبات عن أثمن ما لديهم من كتب، وأسس الطلاب والطالبات مجموعات نقاش وقراءة تنمّي شتّى المهارات والاهتمامات العلمية والفكرية والأدبية، وشاركت أيضًا في معرض الرياض الدولي للكتاب.<br><br>
+في عامها الثاني (2016/2017)، توسّع مجتمع سِراج ليشمل جدّة والأحساء، ومعها توسّعت المكتبة الطلابية التعاونية لتتضمن أكثر من 1000 كتاب من أثمن ما تحويه مكتبات الطلاب والطالبات. أطلقتْ أيضًا سِراج عدّة مشاريع مع انطلاقة عامها الثاني: كـ ديوانية سِراج، والتي نجتمع فيها طلابًا وطالبات لنستضيف متحدثًا أو متحدثة حول موضوعٍ فكريّ أو ثقافي، كما أُطلقتْ منافسة ماراثون القراءة (الريديثون)، والتي يصوغ فيها كل منّا خطةً مكثّفة للقراءة للأسبوع القادم، وبعد إنجاز الخطة يكون مطلوبا من كل مشاركة ومشارك العمل على "منتج ثقافي". خلال نفس العام، أُطلقتْ أيضًا مناظرات سِراج، والتي نناقش فيها الأسئلة المحورية والمواضيع الشيّقة، ونتبادل الحجج بين مؤيّدٍ ومُعارِض.<br><br>
+نريد لعام سِراج الثالث (2017/2018) أن يكون امتدادا لما فات وأن يكون أوسع مدى وأكثر عمقًا، وهذا لن يكون إلا بمبادرة الطالبات والطلاب ذوي الاهتمام المعرفي، والفكري، والثقافي! يقيننا أن المجتمع الجامعي مليء بشخصيات فارقة قادرة على البذل والعطاء. أنت منهم.
+
 </p>
 
 <div class="step-section">
@@ -167,7 +169,7 @@ margin-bottom: 5px;
       		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-5" for="id_book_estimate">شكرا جزيلا لك! بشكل تقديري، كم عدد الكتب التي تستطيع المساهمة بها؟</label>
-			<div class="col-sm-7">			
+			<div class="col-sm-7">
 				<input class="form-control" id="id_book_estimate" min="0" name="book_estimate" placeholder="العدد التقديري" type="number" />
 			</div>
       		</div>
@@ -178,38 +180,6 @@ margin-bottom: 5px;
       		</div>
 
 </div><!--step-section-->
-<div class="step-section">
-            <h2 class="text-center">جلسات النقاش والقراءة</h2>
-            <hr class="small">
-<p class="explaination instructions">
-خلال العام الدراسي 2015/2016، أسس الطلاب والطالبات 16 مجموعة قراءة تناولت مختلف الاهتمامات العلمية والفكرية والأدبية. من خلال مجموعات القراءة، يلتقي المهتمون والمهتمّات لنقاش مواضيع ذات اهتمام مشترك، ويتفقوا سويا على منهج للقراءة، وعلى أسئلة للنقاش.  يمكنك المشاركة كمنسّقـ/ـة للمجموعة أو عضو/ة فيها، أو كمنظّمـ/ـة داعمـ/ـة للمجموعات.
-</p>
-      		<div class="checkbox">
-			<label>
-				<input name="wants_group_reading" id="id_has_group_reading_subjects" type="checkbox"> أحب القراءة الجماعية وأودّ أن أكون في مجموعة عن موضوع أحبّه!
-			</label>
-      		</div>
-    
-    		<div class="form-group">
-            <div class="row">
-                <label class="control-label col-sm-5" for="id_reading_group_subjects">عظيم! ما المواضيع التي تودّ القراءة عنها ونقاشها؟</label>
-                <div class="col-sm-6">
-                    <textarea class="form-control" id="id_reading_group_subjects" name="reading_group_subjects"></textarea>
-                </div>
-            </div>
-      			<div class="checkbox">
-				<label>
-					<input name="wants_reading_group_coordination" id="id_reading_group_coordination" type="checkbox"> أود تأسيس مجموعة هذه هذا الموضوع/المواضيع (سنتواصل معك!)
-				</label>
-      			</div>
-      		</div>
-    
-      		<div class="checkbox">
-			<label>
-				<input name="wants_reading_group_organization" id="id_reading_group_organization" type="checkbox"> أريد المشاركة في فريق الإشراف على مجموعات القراءة ومتابعتها والمساعدة في رسم خططها وتلبية متطلباتها. (سنتواصل معك!)
-			</label>
-      		</div>
-</div><!--step-section-->
 
 <div class="step-section">
             <h2 class="text-center">المناظرات</h2>
@@ -219,7 +189,7 @@ margin-bottom: 5px;
 </p>
       		<div class="checkbox">
 			<label>
-				<input name="debate" id="id_has_debate_subjects" type="checkbox"> لدي مواضيع ومحاور أود أتثار وتناقش!
+				<input name="debate" id="id_has_debate_subjects" type="checkbox"> لدي مواضيع ومحاور أود أن تثار وتناقش!
 			</label>
       		</div>
 		<div class="form-group">
@@ -246,7 +216,7 @@ margin-bottom: 5px;
             <h2 class="text-center">الديوانية</h2>
             <hr class="small">
 <p class="explaination instructions">
-كانت الديوانيات واحدة من أنجح أنشطة سِراج وأكثرها حضورها خلال السنة الماضية. في جلسات الديوانية، يجتمع الطلاب والطالبات للاستماع إلى متحدثـ/ـة عن موضوع ثقافي أو فكري، ويتلو ذلك نقاش مفتوح لما طُرح، يمكنك أن تشاركـ/ـي كـمتحدثـ/ـة، أو أن تنسقـ/ـي للحدث.
+نريد أن نخلق حيّزًا رحبًا للحوار حول موضوعات ثقافية شاسعة، في ديوانيّة سِراج، يستمع الطلاب والطالبات إلى ضيفـ/ـة الجلسة النقاشية، ثم يتاح بعد ذلك تجاذب أطراف الحديث وتبادل الآراء حول الموضوع المطروح، يمكنك أن تشاركـ/ـي كـمتحدثـ/ـة، أو أن تنسقـ/ـي للحدث:
 </p>
 
       		<div class="checkbox">
@@ -255,19 +225,19 @@ margin-bottom: 5px;
                 </label>
       		</div>
             <div class="form-group">
-                <label class="control-label col-sm-5" for="id_dewanya_subject">عظيم! ما العنواين؟</label>
-                <div class="col-sm-7">			
+                <label class="control-label col-sm-5" for="id_dewanya_subject">عظيم! ما العناوين؟</label>
+                <div class="col-sm-7">
                     <textarea class="form-control" id="id_dewanya_subjects" name="dewanya_subjects"></textarea>
                 </div>
             </div>
           		<div class="checkbox">
                 <label>
-                    <input name="dewanya" id="id_has_dewanya_guests" type="checkbox"> أود اقتراح مثقّفين ومثقّفات (من داخل الجامعة أو من خارجها)، وأتمنى أن تتم استضافتهم
+                    <input name="dewanya" id="id_has_dewanya_guests" type="checkbox"> أود اقتراح مثقّفين ومثقّفات (من داخل الجامعة)، وأتمنى أن تتم استضافتهم
                 </label>
       		</div>
             <div class="form-group">
                 <label class="control-label col-sm-5" for="id_dewanya_guests">عظيم! من هم؟</label>
-                <div class="col-sm-7">			
+                <div class="col-sm-7">
                     <textarea class="form-control" id="id_dewanya_guests" name="dewanya_guests"></textarea>
                 </div>
             </div>
@@ -277,6 +247,60 @@ margin-bottom: 5px;
 			</label>
       		</div>
 </div><!--step-section-->
+
+<div class="step-section">
+            <h2 class="text-center">ماراثون القراءة</h2>
+            <hr class="small">
+<p class="explaination instructions">
+في الريديثون، يصوغ كلٌ منّا خطّة مكثّفة للقراءة للأسبوع القادم، وبعد إنجاز الخطة يكون مطلوبا من كل مشاركة ومشارك العمل على "منتج ثقافي"، وتحصل القارئة والقارئ الذين يتمّون خططهم ويخرجون بمنتجِ ثقافي على ميدالية المارثون.
+</p>
+
+      		<div class="checkbox">
+			<label>
+				<input name="wants_dewanya_organization" id="id_dewanya_organization" type="checkbox"> يمكنك المشاركة بتنسيق الحدث، أو صياغته.
+			</label>
+      		</div>
+</div><!--step-section-->
+
+{% if user.common_profile.city == 'الرياض' %}
+<div class="step-section">
+            <h2 class="text-center">الخميسيّة</h2>
+            <hr class="small">
+<p class="explaination instructions">
+نريد أن نخلق حيّزًا رحبًا للحوار حول موضوعات ثقافية شاسعة، في خميسيّة سِراج، يستمع الطلاب والطالبات إلى ضيفـ/ـة الجلسة النقاشية، ثم يتاح بعد ذلك تجاذب أطراف الحديث وتبادل الآراء حول الموضوع المطروح، يمكنك أن تشاركـ/ـي كـمتحدثـ/ـة، أو أن تنسقـ/ـي للحدث:
+</p>
+
+      		<div class="checkbox">
+                <label>
+                    <input name="has_khamisia" id="id_has_khamisia_subjects" type="checkbox"> أود اقتراح عناوين ومحاور، وأتمنى أن تطرح للنقاش
+                </label>
+      		</div>
+            <div class="form-group">
+                <label class="control-label col-sm-5" for="id_khamisia_subject">عظيم! ما العنواين؟</label>
+                <div class="col-sm-7">
+                    <textarea class="form-control" id="id_khamisia_subjects" name="khamisia_subjects"></textarea>
+                </div>
+            </div>
+          		<div class="checkbox">
+                <label>
+                    <input name="khamisia" id="id_has_khamisia_guests" type="checkbox"> أود اقتراح مثقّفين ومثقّفات (من داخل الجامعة)، وأتمنى أن تتم استضافتهم
+                </label>
+      		</div>
+            <div class="form-group">
+                <label class="control-label col-sm-5" for="id_khamisia_guests">عظيم! من هم؟</label>
+                <div class="col-sm-7">
+                    <textarea class="form-control" id="id_khamisia_guests" name="khamisia_guests"></textarea>
+                </div>
+            </div>
+      		<div class="checkbox">
+			<label>
+				<input name="wants_khamisia_organization" id="id_khamisia_organization" type="checkbox"> أريد المشاركة في تنظيم الخميسيات وانتقاء مواضيعها
+			</label>
+      		</div>
+
+</div><!--step-section-->
+
+{% endif %}
 <div class="step-section">
             <h2 class="text-center">الفريق الإعلامي</h2>
             <hr class="small">
@@ -312,41 +336,41 @@ margin-bottom: 5px;
 <div class="step-section">
             <h2 class="text-center">فلنتعارف!</h2>
             <hr class="small">
-<p class="explaination instructions">
-الأسئلة أدناه أسئلة اختيارية.
-</p>
-		<div class="form-group">
-			<label class="control-label col-sm-5" for="id_interests">خارج الفضاء الأكاديمي، ما اهتمامتك؟</label>
-			<div class="col-sm-7">			
-				<textarea class="form-control" id="id_interests" name="interests"></textarea>
-			</div>
-      		</div>
-		<div class="form-group">
-			<label class="control-label col-sm-5" for="id_interests">ما سبب رغبتك في الانضمام إلى سِراج؟</label>
-			<div class="col-sm-7">			
-				<textarea class="form-control" id="id_goals" name="goals"></textarea>
-			</div>
-      		</div>
-		<div class="form-group coordination">
-			<label class="control-label col-sm-5" for="id_activities">هل سبق أن نظّمت أنشطة في نادي الطلاب؟</label>
-			<div class="col-sm-7">			
-				<textarea class="form-control" id="id_activities" name="activities"></textarea>
-			</div>
-      		</div>
-		<div class="form-group coordination">
-			<label class="control-label col-sm-5" for="id_twitter">هل لديك حساب على تويتر؟</label>
-			<div class="col-sm-7">			
-				<input class="form-control" id="id_twitter" name="twitter" placeholder="اسم المستخدم على تويتر" type="text" />
-			</div>
-      		</div>
-		<div class="form-group coordination">
-			<label class="control-label col-sm-5" for="goodreads">هل لديك حساب على Goodreads؟</label>
-			<div class="col-sm-7">			
-				<input class="form-control" id="id_goodreads" name="goodreads" placeholder="رابط Goodreads" type="url" />
-			</div>
-      		</div>
+  <p class="explaination instructions">
+  الأسئلة أدناه أسئلة اختيارية.
+  </p>
+  		<div class="form-group">
+  			<label class="control-label col-sm-5" for="id_interests">خارج الفضاء الأكاديمي، ما اهتمامتك؟</label>
+  			<div class="col-sm-7">
+  				<textarea class="form-control" id="id_interests" name="interests"></textarea>
+  			</div>
+        		</div>
+  		<div class="form-group">
+  			<label class="control-label col-sm-5" for="id_interests">ما سبب رغبتك في الانضمام إلى سِراج؟</label>
+  			<div class="col-sm-7">
+  				<textarea class="form-control" id="id_goals" name="goals"></textarea>
+  			</div>
+        		</div>
+  		<div class="form-group coordination">
+  			<label class="control-label col-sm-5" for="id_activities">هل سبق أن نظّمت أنشطة في نادي الطلاب؟</label>
+  			<div class="col-sm-7">
+  				<textarea class="form-control" id="id_activities" name="activities"></textarea>
+  			</div>
+        		</div>
+  		<div class="form-group coordination">
+  			<label class="control-label col-sm-5" for="id_twitter">هل لديك حساب على تويتر؟</label>
+  			<div class="col-sm-7">
+  				<input class="form-control" id="id_twitter" name="twitter" placeholder="اسم المستخدم على تويتر" type="text" />
+  			</div>
+        		</div>
+  		<div class="form-group coordination">
+  			<label class="control-label col-sm-5" for="goodreads">هل لديك حساب على Goodreads؟</label>
+  			<div class="col-sm-7">
+  				<input class="form-control" id="id_goodreads" name="goodreads" placeholder="رابط Goodreads" type="url" />
+  			</div>
+        		</div>
 
-</div><!--step-section-->
+  </div><!--step-section-->
 
 		<div id="delete-button">
 				<p><input type="submit" class="form-control btn btn-block btn-success" value="انضمّـ/ـي إلى مجتمع سِراج"/></p>
@@ -408,6 +432,23 @@ function controlGroupReading(){
 	}
 }
 
+function controlKhamisia(){
+	if( $('#id_has_khamisia_subjects').is(':checked')) {
+		$("#id_khamisia_subjects").closest("div.form-group").show();
+        $("#id_khamisia_subjects").attr("required", true)
+	} else {
+		$("#id_khamisia_subjects").closest("div.form-group").hide();
+        $("#id_khamisia_subjects").attr("required", false)
+	}
+	if( $('#id_has_khamisia_guests').is(':checked')) {
+		$("#id_khamisia_guests").closest("div.form-group").show();
+        $("#id_khamisia_guests").attr("required", true)
+	} else {
+		$("#id_khamisia_guests").closest("div.form-group").hide();
+        $("#id_khamisia_guests").attr("required", false)
+	}
+}
+
 function controlDewanya(){
 	if( $('#id_has_dewanya_subjects').is(':checked')) {
 		$("#id_dewanya_subjects").closest("div.form-group").show();
@@ -434,7 +475,7 @@ function controlDebate(){
         $("#id_debate_subjects").attr("required", false)
 	}
 }
-    
+
 function controlMedia(){
 	if( $('#id_media_design').is(':checked')) {
 		$("#id_example_design").closest("div.form-group").show();
@@ -450,6 +491,8 @@ $(function() {
 	$('#id_contribute_books').click(controlBookContribution);
  	controlGroupReading();
 	$('#id_has_group_reading_subjects').click(controlGroupReading);
+ 	controlKhamisia();
+	$('#id_has_khamisia_subjects, #id_has_khamisia_guests').click(controlKhamisia);
  	controlDewanya();
 	$('#id_has_dewanya_subjects, #id_has_dewanya_guests').click(controlDewanya);
  	controlDebate();
@@ -484,4 +527,3 @@ $(function() {
 
 </body>
 </html>
-

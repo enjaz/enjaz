@@ -507,6 +507,10 @@ class Abstract(models.Model):
     def __unicode__(self):
         return self.title
 
+class AbstractAuthor(models.Model):
+    abstract = models.ForeignKey(Abstract, related_name='author')
+    name = models.CharField(verbose_name="Name of authors", max_length=255)
+
 class AbstractPoster (models.Model):
     abstract = models.ForeignKey(Abstract, related_name='posters', null=True)
     first_image= models.FileField(verbose_name=u"Attach the first image", upload_to="events/posters/")

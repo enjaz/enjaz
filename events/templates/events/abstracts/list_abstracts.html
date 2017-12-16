@@ -1,45 +1,62 @@
-{% extends 'events_evaluation_base.html' %}{% load staticfiles %} {%  load events_tags %}
-
-{% block title %}{{ event.english_name }}: Abstract list{% endblock %}
-
-{% block content %}
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %} {% load events_tags %} {% block title %}{{ event.english_name }}: Abstract list{% endblock %} {% block content %}
+<div class="row">
+        <br>
+    <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
+        <h2 class="mentor-section-header">All Abstracts</h2>
+    </div>
+</div>
 <div class="english-field">
     <div class="panel panel-warning">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseThree-2" class="english-field notcollapsed">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseOne-2" class="english-field notcollapsed">
                     Pending abstracts ({{ pending_abstracts.count }})
                 </a>
             </h4>
         </div>
-        <div id="collapseThree-2" class="panel-collapse collapse" style="height: 0px;">
+        <div id="collapseOne-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
-                <div class="row">
-                    <table id="pending" class="display datatable dt-responsive">
-                        <thead>
-                            <tr>
-                                <th class="all">Title</th>
-                                {% if not user|can_evaluate_abstracts:event or user.is_superuser  %}
-                                <th class="not-mobile">Presenting author</th>
-                                {% endif %}
-                                <th class="not-mobile">Presentation preference</th>
-                                <th class="not-mobile">Submission date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for abstract in pending_abstracts %}
-                            <tr>
-                                <td><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
-                                {% if not user|can_evaluate_abstracts:event or user.is_superuser  %}
-                                <th class="not-mobile">{{ abstract.presenting_author }}</th>
-                                {% endif %}
-                                <td>{{ abstract.get_presentation_preference_display }}</td>
-                                <td data-order="{{ abstract.date_submitted|date:"U" }}">{{ abstract.date_submitted|date:"Y-m-d" }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                {% if user|is_organizing_team_member:event %}
+                <form method="post">
+                    {% csrf_token %}
+                    <select name="action">
+                      <option>Choose Action</option>
+                      <option value="delete">Delete</option>
+                    </select> {% endif %}
+                    <div class="row">
+                        <table id="pending" class="display datatable dt-responsive">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th class="all">ID</th>
+                                    <th class="not-mobile">Title</th>
+                                    {% if not user|can_evaluate_abstracts:event or user.is_superuser %}
+                                    <th>Presenting author</th>
+                                    {% endif %}
+                                    <th>Presentation preference</th>
+                                    <th>Submission date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for abstract in pending_abstracts %}
+                                <tr>
+                                    <td><input type="checkbox" value="1" name="pk_{{ abstract.pk }}"></td>
+                                    <td>{{ abstract.pk }}</td>
+                                    <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
+                                    {% if not user|can_evaluate_abstracts:event or user.is_superuser %}
+                                    <th><a href="{% url 'events:list_user_abstracts' event.code_name abstract.pk %}">{{ abstract.presenting_author }}</a></th>
+                                    {% endif %}
+                                    <td>{{ abstract.get_presentation_preference_display }}</td>
+                                    <td data-order="{{ abstract.date_submitted|date:" U " }}">{{ abstract.date_submitted|date:"Y-m-d" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if user|is_organizing_team_member:event %}
+                    <button type="submit" class="btn btn-warning">Submit</button>
+                </form>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -49,73 +66,322 @@
         <div class="panel-heading">
             <h4 class="panel-title">
                 <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseTwo-2" class="english-field collapsed">
-                    Evaluated abstracts ({{ evaluated_abstracts.count }} )
+                    Evaluated abstracts ({{ evaluated_abstracts.count }})
                 </a>
             </h4>
         </div>
         <div id="collapseTwo-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
-                <div class="row">
-                    <table id="evaluated" class="display datatable dt-responsive">
-                        <thead>
-                            <tr>
-                                <th class="all">Title</th>
-                                {% if not user|can_evaluate_abstracts:event  %}
-                                <th class="not-mobile">Presenting author</th>
-                                {% endif %}
-                                <th class="not-mobile">Presentation preference</th>
-                                <th class="not-mobile">Score</th>
-                                <th class="not-mobile">Evaluation date</th>
-                                <th class="not-mobile">Evaluators</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for abstract in evaluated_abstracts %}
-                            <tr>
-                                <td><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
-                                {% if not user|can_evaluate_abstracts:event %}
-                                <td>{{ abstract.presenting_author }}</td>
-                                {% endif %}
-                                <td>{{ abstract.get_presentation_preference_display }}</td>
-                                <td>ِ{{ abstract.get_average_score }}</td>
-                                <td data-order="{{ abstract.evaluation_set.last.date_submitted|date:"U" }}">{{ evaluation.date_submitted|date:"Y-m-d" }}</td>
-                                <td>
-                                  <ul>
-                                  {% for evaluator in abstract.evaluators.all %}
-                                    <li>{{ evaluator.common_profile.en_last_name|default:evaluator.username }}</li>
-                                  {% endfor %}
-                                  </ul>
-                                </td>
-
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                {% if user|is_organizing_team_member:event %}
+                <form method="post">
+                    {% csrf_token %}
+                    <select name="action">
+                        <option>Choose Action</option>
+                        <option value="delete">Delete</option>
+                        <option value="accepte_as_oral">Accept As Oral</option>
+                        <option value="accepte_as_poster">Accept As Poster</option>
+                        <option value="regect">Regect</option>
+                    </select> {% endif %}
+                    <div class="row">
+                        <table id="evaluated" class="display datatable dt-responsive">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th class="all">ID</th>
+                                    <th class="not-mobile">Title</th>
+                                    {% if not user|can_evaluate_abstracts:event %}
+                                    <th>Presenting author</th>
+                                    {% endif %}
+                                    <th>Presentation preference</th>
+                                    <th>Score</th>
+                                    <th>Accepted presentation preference</th>
+                                    <th>Evaluators</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for abstract in evaluated_abstracts %}
+                                <tr>
+                                    <td><input type="checkbox" value="1" name="pk_{{ abstract.pk }}"></td>
+                                    <td>{{ abstract.pk }}</td>
+                                    <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
+                                    {% if not user|can_evaluate_abstracts:event %}
+                                    <td><a href="{% url 'events:list_user_abstracts' event.code_name abstract.pk %}">{{ abstract.presenting_author }}</a></td>
+                                    {% endif %}
+                                    <td>{{ abstract.get_presentation_preference_display }}</td>
+                                    <td>ِ{{ abstract.get_average_score }}</td>
+                                    {% if abstract.get_accepted_presentaion_preference_display %}
+                                    <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
+                                    {% else %}
+                                    <td>{{ abstract.get_status_display }}</td>
+                                    {% endif %}
+                                    <td>
+                                        <ul>
+                                            {% for evaluator in abstract.evaluators.all %}
+                                            <li>{{ evaluator.common_profile.en_last_name|default:evaluator.username }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if user|is_organizing_team_member:event %}
+                <button type="submit" class="btn btn-success">Submit</button>
+                    </form>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block customscript %}
-	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
-	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
-	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
-    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<div class="english-field">
+    <div class="panel panel-danger">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseThree-2" class="english-field notcollapsed">
+                    Deleted abstracts ({{ deleted_abstracts.count }})
+                </a>
+            </h4>
+        </div>
+        <div id="collapseThree-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                {% if user|is_organizing_team_member:event %}
+                <form method="post">
+                    {% csrf_token %}
+                    <select name="action">
+                      <option>Choose Action</option>
+                      <option value="restore">Restore</option>
+                    </select> {% endif %}
+                    <div class="row">
+                        <table id="deleted" class="display datatable dt-responsive">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th class="all">ID</th>
+                                    <th class="not-mobile">Title</th>
+                                    {% if not user|can_evaluate_abstracts:event or user.is_superuser %}
+                                    <th>Presenting author</th>
+                                    {% endif %}
+                                    <th>Presentation preference</th>
+                                    <th>Submission date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for abstract in deleted_abstracts %}
+                                <tr>
+                                    <td><input type="checkbox" value="1" name="pk_{{ abstract.pk }}"></td>
+                                    <td>{{ abstract.pk }}</td>
+                                    <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
+                                    {% if not user|can_evaluate_abstracts:event or user.is_superuser %}
+                                    <th><a href="{% url 'events:list_user_abstracts' event.code_name abstract.pk %}">{{ abstract.presenting_author }}</a></th>
+                                    {% endif %}
+                                    <td>{{ abstract.get_presentation_preference_display }}</td>
+                                    <td data-order="{{ abstract.date_submitted|date:" U " }}">{{ abstract.date_submitted|date:"Y-m-d" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if user|is_organizing_team_member:event %}
+                    <button type="submit" class="btn btn-danger">Submit</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+        <br>
+    <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
+        <h2 class="mentor-section-header">Accepted Abstracts</h2>
+    </div>
+</div>
+<div class="english-field">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseFour-2" class="english-field collapsed">
+                    Poster abstracts ({{ accepted_poster_abstracts.count }})
+                </a>
+            </h4>
+        </div>
+        <div id="collapseFour-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                {% if user|is_organizing_team_member:event %}
+                <form method="post">
+                    {% csrf_token %}
+                    <select name="action">
+                        <option>Choose Action</option>
+                        <option value="delete">Delete</option>
+                        <option value="accepte_as_oral">Accept As Oral</option>
+                        <option value="accepte_as_poster">Accept As Poster</option>
+                        <option value="regect">Regect</option>
+                    </select> {% endif %}
+                    <div class="row">
+                        <table id="poster" class="display datatable dt-responsive">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th class="all">ID</th>
+                                    <th class="not-mobile">Title</th>
+                                    {% if not user|can_evaluate_abstracts:event %}
+                                    <th><a href="{% url 'events:list_user_abstracts' event.code_name abstract.pk %}">{{ abstract.presenting_author }}</a></th>
+                                    {% endif %}
+                                    <th>Presentation preference</th>
+                                    <th>Score</th>
+                                    <th>Accepted presentation preference</th>
+                                    <th>Evaluators</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for abstract in accepted_poster_abstracts %}
+                                <tr>
+                                    <td><input type="checkbox" value="1" name="pk_{{ abstract.pk }}"></td>
+                                    <td>{{ abstract.pk }}</td>
+                                    <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
+                                    {% if not user|can_evaluate_abstracts:event %}
+                                    <td>{{ abstract.presenting_author }}</td>
+                                    {% endif %}
+                                    <td>{{ abstract.get_presentation_preference_display }}</td>
+                                    <td>ِ{{ abstract.get_average_score }}</td>
+                                    {% if abstract.get_accepted_presentaion_preference_display %}
+                                    <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
+                                    {% else %}
+                                    <td>{{ abstract.get_status_display }}</td>
+                                    {% endif %}
+                                    <td>
+                                        <ul>
+                                            {% for evaluator in abstract.evaluators.all %}
+                                            <li>{{ evaluator.common_profile.en_last_name|default:evaluator.username }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if user|is_organizing_team_member:event %}
+                <button type="submit" class="btn btn-info">Submit</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="english-field">
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseFive-2" class="english-field collapsed">
+                    Oral abstracts ({{ accepted_oral_abstracts.count }})
+                </a>
+            </h4>
+        </div>
+        <div id="collapseFive-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                {% if user|is_organizing_team_member:event %}
+                <form method="post">
+                    {% csrf_token %}
+                    <select name="action">
+                        <option>Choose Action</option>
+                        <option value="delete">Delete</option>
+                        <option value="accepte_as_oral">Accept As Oral</option>
+                        <option value="accepte_as_poster">Accept As Poster</option>
+                        <option value="regect">Regect</option>
+                    </select> {% endif %}
+                    <div class="row">
+                        <table id="oral" class="display datatable dt-responsive">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th class="all">ID</th>
+                                    <th class="not-mobile">Title</th>
+                                    {% if not user|can_evaluate_abstracts:event %}
+                                    <th><a href="{% url 'events:list_user_abstracts' event.code_name abstract.pk %}">{{ abstract.presenting_author }}</a></th>
+                                    {% endif %}
+                                    <th>Presentation preference</th>
+                                    <th>Score</th>
+                                    <th>Accepted presentation preference</th>
+                                    <th>Evaluators</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for abstract in accepted_oral_abstracts %}
+                                <tr>
+                                    <td><input type="checkbox" value="1" name="pk_{{ abstract.pk }}"></td>
+                                    <td>{{ abstract.pk }}</td>
+                                    <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
+                                    {% if not user|can_evaluate_abstracts:event %}
+                                    <td>{{ abstract.presenting_author }}</td>
+                                    {% endif %}
+                                    <td>{{ abstract.get_presentation_preference_display }}</td>
+                                    <td>ِ{{ abstract.get_average_score }}</td>
+                                    {% if abstract.get_accepted_presentaion_preference_display %}
+                                    <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
+                                    {% else %}
+                                    <td>{{ abstract.get_status_display }}</td>
+                                    {% endif %}
+                                    <td>
+                                        <ul>
+                                            {% for evaluator in abstract.evaluators.all %}
+                                            <li>{{ evaluator.common_profile.en_last_name|default:evaluator.username }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if user|is_organizing_team_member:event %}
+                <button type="submit" class="btn btn-success">Submit</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} {% block customscript %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
 <style type="text/css">
-    th, td{
+    th,
+    td {
         text-align: left;
     }
+
 </style>
-	<script>
-    $(function(){
+<script>
+    $(function() {
         $("#pending").dataTable({
-            "order": [[ 2, "asc" ]]
+            "order": [
+                [1, "desc"]
+            ]
         });
         $("#evaluated").dataTable({
-            "order": [[ 3, "desc" ]]
+            "order": [
+                [1, "desc"]
+            ]
+        });
+        $("#deleted").dataTable({
+            "order": [
+                [1, "desc"]
+            ]
+        });
+        $("#poster").dataTable({
+            "order": [
+                [1, "desc"]
+            ]
+        });
+        $("#oral").dataTable({
+            "order": [
+                [1, "desc"]
+            ]
         });
     });
-    </script>
+
+</script>
 {% endblock %}

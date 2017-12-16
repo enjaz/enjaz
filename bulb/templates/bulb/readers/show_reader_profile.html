@@ -59,22 +59,6 @@
                 {% endfor %}
                 </ul>
         </td>
-    </tr>{% endif %}{% if group_coordination.exists %}
-    <tr>
-        <th>مجموعات أسستها</th>
-        <td>
-                {% with groups=group_coordination %}
-                    {% include "bulb/groups/list_group_previews.html" %}
-                {% endwith %}
-        </td>
-    </tr>{% endif %}{% if group_memberships.exists %}
-    <tr>
-        <th>مجموعات أنا عضو فيها</th>
-        <td>
-                {% with groups=group_memberships %}
-                    {% include "bulb/groups/list_group_previews.html" %}
-                {% endwith %}
-        </td>
     </tr>{% endif %}
 </table>
 {% endblock %}

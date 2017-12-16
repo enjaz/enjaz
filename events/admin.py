@@ -29,10 +29,31 @@ def mark_deleted(modeladmin, request, queryset):
 mark_deleted.short_description = u"علم السجلات المُحدّدة أنها محذوفة (دون إزالتها من قاعدة البيانات)"
 
 
+class AuthorInline(admin.TabularInline):
+    model = models.AbstractAuthor
+    form = OptionalForm
+    extra = 1
+
 class AbstractFigureInline(admin.TabularInline):
     model = models.AbstractFigure
     form = OptionalForm
     extra = 0
+
+
+class AbstractPosterInline(admin.TabularInline):
+    model = models.AbstractPoster
+    form = OptionalForm
+    extra = 0
+
+class AbstractAdmin(admin.ModelAdmin):
+    search_fields = BASIC_SEARCH_FIELDS + ["email", "title"]
+    actions = [mark_deleted]
+    list_filter = ["event", "is_deleted"]
+    list_display = ['__unicode__', 'is_deleted', 'status',
+                    'date_submitted']
+    inlines = [AuthorInline, AbstractFigureInline, AbstractPosterInline]
+    filter_horizontal = ('evaluators',)
+    introduction = forms.CharField(widget=CKEditorWidget())
 
 
 class QuestionInline(admin.TabularInline):
@@ -113,12 +134,15 @@ class NonUserAdmin(admin.ModelAdmin):
 
     inlines = [RegistrationInline]
 
+<<<<<<< HEAD
 
 class AbstractPosterInline(admin.TabularInline):
     model = models.AbstractPoster
     form = OptionalForm
     extra = 0
 
+=======
+>>>>>>> c286bfc4be7117b2626a2e68915fcdd4917c0203
 
 class SurveyQuestionInline(admin.TabularInline):
     model = models.SurveyQuestion
@@ -130,6 +154,7 @@ class SurveyAnswerInline(CertificateAdminPermission, admin.TabularInline):
     readonly_fields = ['question', 'get_value']
 
 
+<<<<<<< HEAD
 class AbstractAdmin(admin.ModelAdmin):
     search_fields = BASIC_SEARCH_FIELDS + ["email", "title"]
     actions = [mark_deleted]
@@ -140,6 +165,8 @@ class AbstractAdmin(admin.ModelAdmin):
     introduction = forms.CharField(widget=CKEditorWidget())
 
 
+=======
+>>>>>>> c286bfc4be7117b2626a2e68915fcdd4917c0203
 class InitiativeAdmin(admin.ModelAdmin):
     inlines = [InitiativeFigureInline]
     actions = [mark_deleted]

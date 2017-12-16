@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="english-field">
-    <h1>{{ project.title }}</h1>
+    <h1>{{ project.title }}</h1> <p>{{ project.submitter.common_profile.city }}</p>
 
     <div class="row" style="margin-left: 0; margin-bottom: 5px;">
         <div style="float: right;">
@@ -101,5 +101,5 @@ p{
 {% with model='project' %}
     {% include "researchhub/partials/delete_asset.html" %}
 {% endwith %}
+{% include "researchhub/partials/submit_feedback_asset.html" %}
 {% endblock %}
-

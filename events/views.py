@@ -224,9 +224,11 @@ def list_my_abstracts(request, event_code_name=None, user_pk=None):
             not utils.is_organizing_team_member(request.user, event):
             raise PermissionDenied
 
-    abstracts = Abstract.objects.filter(is_deleted=False, user=request.user)
-    casereports = CaseReport.objects.filter(is_deleted=False, user=request.user)
-    context = {'abstracts': abstracts,'casereports':casereports}
+    abstracts = Abstract.objects.filter(event__code_name=event_code_name, is_deleted=False, user=abstract_user)
+    casereports = CaseReport.objects.filter(event__code_name=event_code_name, is_deleted=False, user=abstract_user)
+    context = {'abstract_user' :abstract_user, 
+				'abstracts': abstracts,
+				'casereports':casereports}
     return render(request, 'events/abstracts/list_my_abstracts.html', context)
 
 @login_required

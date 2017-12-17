@@ -538,7 +538,7 @@ will result in a refusal of my application.
      $(function(){
         $("textarea").autoGrow();
         // add formset controls
-        $("#figure-formset .form-container, #author-formset .form-container").formset({
+        $("#figure-formset .form-container").formset({
             prefix: '{{ figure_formset.prefix }}',
             addText: 'Add a figure',
             deleteText: 'Delete',
@@ -546,6 +546,13 @@ will result in a refusal of my application.
             deleteCssClass: 'delete-row btn btn-xs btn-danger',
         });
 
+        $("#author-formset .form-container").formset({
+            prefix: '{{ author_formset.prefix }}',
+            addText: 'Add another author',
+            deleteText: 'Delete',
+            addCssClass: 'add-row btn btn-xs btn-primary',
+            deleteCssClass: 'delete-row btn btn-xs btn-danger',
+        });
 
         $('#agree').change(function(){
             if (this.checked){

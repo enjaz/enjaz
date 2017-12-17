@@ -180,20 +180,48 @@
 
 
 
-			<div class="form-group">
-				<div class="english-field input-group{% if form.presenting_author.errors %} validate-has-error{% endif %}">
-					<div class="input-group-addon">
-						<i class="entypo-user"></i>
-					</div>
-
-					<input {% if form.presenting_author.value and not form.presenting_author.errors %}value="{{ form.presenting_author.value }}" {% endif %}type="text" class="form-control english-field" name="presenting_author" id="presenting_author" placeholder="Presenting author" required="required"/>
-					{% if form.presenting_author.errors %}
-					    {% for error in form.presenting_author.errors %}
-					        <label class='error' for='presenting_author' style='display: inline-block'>{{ error|escape }}</label>
-					    {% endfor %}
-					{% endif %}
-				</div>
-			</div>
+{#				<div class="english-field input-group{% if form.presenting_author.errors %} validate-has-error{% endif %}">#}
+{#					<div class="input-group-addon">#}
+{#						<i class="entypo-user"></i>#}
+{#					</div>#}
+                                                {# -------- #}
+                        {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #}
+                        {{ author_formset.management_form }}
+                        {{ author_formset.non_form_errors.as_ul }}
+                        <table id="author-formset" class="form" style="width: 100%;">
+                        {% for form in author_formset.forms %}
+                          {% if forloop.first %}
+                            <colgroup>
+                                <col class="col-xs-8">
+                                <col class="col-xs-4">
+                            </colgroup>
+                          {% endif %}
+                          <tr class="form-container">
+                          {% for field in form.visible_fields %}
+                            <td>
+                            {# Include the hidden fields in the form #}
+                            {% if forloop.first %}
+                              {% for hidden in form.hidden_fields %}
+                              {{ hidden }}
+                              {% endfor %}
+                            {% endif %}
+                                <div class="form-group">
+                              {{ field.errors.as_ul }}
+                              {{ field }}
+                                </div>
+                            </td>
+                          {% endfor %}
+                          </tr>
+                        {% endfor %}
+                        </table>
+                        {# ------- #}
+{#					<input {% if form.presenting_author.value and not form.presenting_author.errors %}value="{{ form.presenting_author.value }}" {% endif %}type="text" class="form-control english-field" name="presenting_author" id="presenting_author" placeholder="Presenting author" required="required"/>#}
+{#					{% if form.presenting_author.errors %}#}
+{#					    {% for error in form.presenting_author.errors %}#}
+{#					        <label class='error' for='presenting_author' style='display: inline-block'>{{ error|escape }}</label>#}
+{#					    {% endfor %}#}
+{#					{% endif %}#}
+{#				</div>#}
 			<div class="form-group">
 				<div class="english-field input-group{% if form.email.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
@@ -510,7 +538,7 @@ will result in a refusal of my application.
      $(function(){
         $("textarea").autoGrow();
         // add formset controls
-        $("#figure-formset .form-container").formset({
+        $("#figure-formset .form-container, #author-formset .form-container").formset({
             prefix: '{{ figure_formset.prefix }}',
             addText: 'Add a figure',
             deleteText: 'Delete',

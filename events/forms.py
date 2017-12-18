@@ -10,7 +10,7 @@ from .models import NonUser, Session, Registration, Abstract, \
     AbstractFigure, Initiative, InitiativeFigure, \
     Criterion, CriterionValue, Evaluation,CaseReport, \
     AbstractPoster, Attendance, Question, SurveyQuestion, \
-    SurveyResponse, SurveyAnswer, SessionRegistration
+    SurveyResponse, SurveyAnswer, SessionRegistration,AbstractAuthor
 from django.forms.models import inlineformset_factory
 
 class NonUserForm(forms.ModelForm):
@@ -78,7 +78,7 @@ class RegistrationForm(forms.Form):
 class AbstractForm(forms.ModelForm):
     class Meta:
         model = Abstract
-        fields = ['title', 'authors', 'university', 'college',
+        fields = ['title', 'university', 'college',
                   'study_field', 'presenting_author', 'email',
                   'phone', 'level', 'presentation_preference',
                   'introduction','methodology', 'results',
@@ -91,6 +91,13 @@ AbstractFigureFormset = inlineformset_factory(Abstract,
                                               fields=['figure'],
                                               max_num=1,
                                               validate_max=True)
+
+AbsractAuthorFormset = inlineformset_factory(Abstract,
+                                             AbstractAuthor,
+                                             fields=['name'],
+                                             max_num=7,
+                                             validate_max=True)
+
 
 
 class AbstractFigureForm(forms.ModelForm):

@@ -14,9 +14,13 @@
     }
     .add-row{
         margin-bottom: 5%;
+        border: white solid thin !important;
     }
     .delete-row{
         float: right;
+    }
+    #authors-div{
+        padding: 3%;
     }
 
 
@@ -40,7 +44,8 @@
 				</div>
 			</div>
     <div class="form-group">
-
+    <div class="input-group" style="width:100% !important; ">
+                            <div id="authors-div">
                        <h4 class="english-field" style="color:white">Authors' names:</h4>
                        <h4 class="english-field" style="color:white">You can add as many as you want</h4>
 
@@ -76,6 +81,8 @@
                         {% endfor %}
                         </table>
                         {# ------- #}
+        </div>
+    </div>
     </div>
 			<div class="form-group" id="university-group">
 				<div class="input-group{% if form.university.errors %} validate-has-error{% endif %}" style="text-align: left; color: #ffffff;">

@@ -95,7 +95,6 @@ AbstractFigureFormset = inlineformset_factory(Abstract,
 AbsractAuthorFormset = inlineformset_factory(Abstract,
                                              AbstractAuthor,
                                              fields=['name'],
-                                             max_num=7,
                                              validate_max=True)
 
 

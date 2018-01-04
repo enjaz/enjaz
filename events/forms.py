@@ -118,12 +118,9 @@ class AbstractPresentationForm(AbstractPosterForm):
 class CaseReportForm(forms.ModelForm):
     class Meta:
         model = CaseReport
-        fields = ['title', 'authors', 'university', 'college', 'email','phone',
-                  'introduction','patient_info', 'clinical_presentation',
-                  'diagnosis', 'treatment', 'outcome','discussion','conclusion',
-                  'was_published',
-                  'was_presented_at_others',
-                  'was_presented_previously','study_field']
+        fields = ['title', 'authors', 'presenting_author','university', 'college', 'email',
+                    'phone', 'introduction', 'level', 'presentation_preference',
+                  'was_published', 'was_presented_at_others', 'was_presented_previously','study_field']
 
 class EvaluationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):

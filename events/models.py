@@ -588,12 +588,34 @@ class CaseReport(models.Model):
                              related_name='event_casereport')
     event = models.ForeignKey(Event, verbose_name=u"الحدث")
     title = models.CharField(verbose_name="Title", max_length=255)
+    presenting_author = models.CharField(verbose_name="Presenting author", max_length=255, default="")
     authors = models.TextField(verbose_name=u"Name of authors")
     study_field = models.CharField(verbose_name="Field", max_length=255, default="")
     university = models.CharField(verbose_name="University", max_length=255)
     college = models.CharField(verbose_name="College", max_length=255)
     email = models.EmailField(verbose_name="Email")
     phone = models.CharField(verbose_name="Phone number", max_length=20)
+    level_choices = (
+        ('U', 'Undergraduate'),
+        ('G', 'Graduate')
+        )
+    level = models.CharField(verbose_name="Level", max_length=1,
+                             default='', choices=level_choices)
+    presentation_preference_choices = (
+        ('O', 'Oral'),
+        ('P', 'Poster'),
+        )
+    presentation_preference = models.CharField(verbose_name="Presentation preference", max_length=1,
+                                                choices=presentation_preference_choices, default="")
+    status_choices = (
+        ('A', 'Accepted'),
+        ('P', 'Pending'),
+        ('R','Rejected'),
+        )
+    status=models.CharField(verbose_name="acceptance status", max_length=1, choices=status_choices, default='P')
+    accepted_presentaion_preference = models.CharField(verbose_name="Accepted presentation preference",
+                                                       max_length=1, choices=presentation_preference_choices,
+                                                       blank=True)
     introduction = models.TextField(u"Introduction", default="")
     patient_info = models.TextField(u"Patient info", default="")
     clinical_presentation = models.TextField(u"clinical presentation", default="")
@@ -608,6 +630,9 @@ class CaseReport(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
+
+    def __unicode__(self):
+        return self.title
 
 
 class Attendance(models.Model):

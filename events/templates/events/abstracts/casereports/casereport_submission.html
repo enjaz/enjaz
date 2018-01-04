@@ -22,13 +22,24 @@
 					{% endif %}
 				</div>
 			</div>
+
+      <div class="form-group">
+          <div class="english-field input-group{% if form.presenting_author.errors %} validate-has-error{% endif %}">
+              <div class="input-group-addon">
+                  <i class="entypo-user"></i>
+              </div>
+              <input {% if form.presenting_author.value and not form.presenting_author.errors %}value="{{ form.presenting_author.value }}" {% endif %}type="text" class="form-control english-field" name="presenting_author" id="presenting_author" placeholder="Presenting author" required="required" /> {% if form.presenting_author.errors %} {% for error in form.presenting_author.errors %}
+              <label class='error' for='presenting_author' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+          </div>
+      </div>
+
 			<div class="form-group">
 				<div class="input-group{% if form.authors.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
 						<i class="entypo-users"></i>
 					</div>
 
-					<textarea {% if form.authors.value and not form.authors.errors %}value="{{ form.authors.value }}" {% endif %}type="text" class="form-control english-field" name="authors" id="authors" placeholder="Authors' names" required="required"></textarea>
+					<textarea {% if form.authors.value and not form.authors.errors %}value="{{ form.authors.value }}" {% endif %}type="text" class="form-control english-field" name="authors" id="authors" placeholder="Authors' names (Do NOT repeat presenting author name again)" required="required"></textarea>
 					{% if form.authors.errors %}
 					    {% for error in form.authors.errors %}
 					        <label class='error' for='authors' style='display: inline-block'>{{ error|escape }}</label>
@@ -37,36 +48,102 @@
 				</div>
 			</div>
 
-			<div class="form-group" id="university-group">
-				<div class="input-group{% if form.university.errors %} validate-has-error{% endif %}" style="text-align: left; color: #ffffff;">
-					<div class="input-group-addon">
-						<i class="entypo-graduation-cap"></i>
-					</div>
-                    <input class="english-field" type="radio" id="ksauhs-university" name="university-radio" value="KSAU-HS" style="margin-left: 10px;margin-right: 5px;" checked required>King Saud bin Abdulaziz University for Health Sciences<br>
-                    <input class="english-field" type="radio" id="other-university" name="university-radio" value="Other" style="margin-left: 10px; margin-right: 5px;" required>Other
-					<input {% if form.university.value and not form.university.errors %}value="{{ form.university.value }}" {% endif %}type="text" class="form-control english-field" id="university-text-field" placeholder="Type university name" style="display: none"/>
-					{% if form.university.errors %}
-					    {% for error in form.university.errors %}
-					        <label class='error' for='university' style='display: inline-block'>{{ error|escape }}</label>
-					    {% endfor %}
-					{% endif %}
-				</div>
-			</div>
+      <div class="form-group">
+          <div class="input-group{% if form.university.errors %} validate-has-error{% endif %}">
+              <div class="input-group-addon">
+                  <i class="entypo-graduation-cap"></i>
+              </div>
 
-			<div class="form-group">
-				<div class="english-field input-group{% if form.college.errors %} validate-has-error{% endif %}">
-					<div class="input-group-addon">
-						<i class="entypo-graduation-cap"></i>
-					</div>
+              <select {% if form.university.value and not form.university.errors %}value="{{ form.university.value }}" {% endif %}class="form-control" id="university-list" title="{{ form.university.label }}" required="required">
+                              <option value="">{{ form.university.label }}</option>
+      <option value="King Saud bin Abdulaziz University for Health Sciences">King Saud bin Abdulaziz University for Health Sciences</option>
+      <option value="King Abdullah International Medical Research Center">King Abdullah International Medical Research Center</option>
+      <option value="Al Baha University">Al Baha University</option>
+      <option value="Alfaisal University">Al Faisal University</option>
+      <option value="Al Farabi College of Dentistry and Nursing">Al Farabi College of Dentistry and Nursing</option>
+      <option value="Al Jawf University">Al Jawf University</option>
+      <option value="Almaarefa College for Science and Technology">Almaarefa College for Science and Technology</option>
+      <option value="Al Qassim Province">Al Qassim Province</option>
+      <option value="Al Yamamah University">Al Yamamah University</option>
+      <option value="Arab East Colleges">Arab East Colleges</option>
+      <option value="Arab Open University">Arab Open University</option>
+      <option value="Batterjee Medical College">Batterjee Medical College</option>
+      <option value="Dammam Community College">Dammam Community College</option>
+      <option value="Dar Al-Hekma College">Dar Al-Hekma College</option>
+      <option value="Dar Al Uloom University">Dar Al Uloom University</option>
+      <option value="Effat University">Effat University</option>
+      <option value="Fahd bin Sultan University">Fahd bin Sultan University</option>
+      <option value="Ibn Sina National College for Medical Studies">Ibn Sina National College for Medical Studies</option>
+      <option value="Imam Muhammad bin Saud Islamic University">Imam Muhammad bin Saud Islamic University</option>
+      <option value="Institute of Public Administration">Institute of Public Administration</option>
+      <option value="Islamic University of Medina">Islamic University of Medina</option>
+      <option value="Jazan University">Jazan University</option>
+      <option value="King Abdulaziz University">King Abdulaziz University</option>
+      <option value="King Abdullah University of Science and Technology">King Abdullah University of Science and Technology</option>
+      <option value="King Fahd University for Petroleum and Minerals">King Fahd University for Petroleum and Minerals</option>
+      <option value="King Faisal University">King Faisal University</option>
+      <option value="King Khalid University">King Khalid University</option>
+      <option value="King Saud University">King Saud University</option>
+      <option value="Majmaah University">Majmaah University</option>
+      <option value="Najran University">Najran University</option>
+      <option value="Northern Borders University">Northern Borders University</option>
+      <option value="Prince Mohammad University">Prince Mohammad University</option>
+      <option value="Prince Mugrin University">Prince Mugrin University</option>
+      <option value="Prince Sattam Bin Abdulaziz University">Prince Sattam Bin Abdulaziz University</option>
+      <option value="Princess Nora bint Abdulrahman University">Princess Nora bint Abdulrahman University</option>
+      <option value="Prince Sultan Military College of Health Sciences">Prince Sultan Military College of Health Sciences</option>
+      <option value="Prince Sultan University">Prince Sultan University</option>
+      <option value="Qassim University">Qassim University</option>
+      <option value="Riyadh College of Dentistry and Pharmacy">Riyadh College of Dentistry and Pharmacy</option>
+      <option value="Saudi Electronic University">Saudi Electronic University</option>
+      <option value="Shaqra University">Shaqra University</option>
+      <option value="Sulaiman Al Rajhi University">Sulaiman Al Rajhi University</option>
+      <option value="Tabuk University">Tabuk University</option>
+      <option value="Taibah University">Taibah University</option>
+      <option value="Taif University">Taif University</option>
+      <option value="Umm Al-Qura University">Umm Al-Qura University</option>
+      <option value="University of Dammam">University of Dammam</option>
+      <option value="University of Hafr al Batin">University of Hafr al Batin</option>
+      <option value="University of Hail">University of Hail</option>
+      <option value="University of Jeddah">University of Jeddah</option>
+      <option value="Other">Other</option>
+                          </select>
+              <input {% if form.university.value and not form.university.errors %}value="{{ form.university.value }}" {% endif %} type="text" class="form-control" id="university-text" placeholder="Write your university" style="display: none" /> {% if form.university.errors %} {% for error in form.university.errors %}
+              <label class='error' for='field' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+          </div>
+      </div>
 
-					<input {% if form.college.value and not form.college.errors %}value="{{ form.college.value }}" {% endif %}type="text" class="form-control english-field" name="college" id="college" placeholder="College" required="required"/>
-					{% if form.college.errors %}
-					    {% for error in form.college.errors %}
-					        <label class='error' for='college' style='display: inline-block'>{{ error|escape }}</label>
-					    {% endfor %}
-					{% endif %}
-				</div>
-			</div>
+      <div class="form-group">
+          <div class="input-group{% if form.college.errors %} validate-has-error{% endif %}">
+              <div class="input-group-addon">
+                  <i class="entypo-graduation-cap"></i>
+              </div>
+
+              <select {% if form.college.value and not form.college.errors %}value="{{ form.college.value }}" {% endif %}class="form-control" id="college-list" title="{{ form.college.label }}" required="required">
+                              <option value="">{{ form.college.label }}</option>
+      <option value="College of Medicine">College of Medicine</option>
+      <option value="College of Dentistry">College of Dentistry</option>
+      <option value="College of Pharmacy">College of Pharmacy</option>
+      <option value="College of Applied Medical Sciences">College of Applied Medical Sciences</option>
+      <option value="College of Nursing">College of Nursing</option>
+      <option value="College of Public Health and Health Informatics">College of Public Health and Health Informatics</option>
+      <option value="Other">Other</option>
+                          </select>
+              <input {% if form.college.value and not form.college.errors %}value="{{ form.college.value }}" {% endif %}type="text" class="form-control" id="college-text" placeholder="Write your college" style="display: none" /> {% if form.college.errors %} {% for error in form.college.errors %}
+              <label class='error' for='field' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+          </div>
+      </div>
+
+      <div class="form-group" id="level-group">
+          <div class="input-group{% if form.level.errors %} validate-has-error{% endif %}" style="text-align: left; color: #ffffff;">
+              <div class="input-group-addon">
+                  <i class="entypo-address"></i>
+              </div>
+              <input class="english-field" type="radio" name="level" value="U" style="margin-left: 10px;margin-right: 5px;" checked required>Undergraduate<br>
+              <input class="english-field" type="radio" name="level" value="G" style="margin-left: 10px; margin-right: 5px;" required>Graduate {% if form.level.errors %} {% for error in form.level.errors %}
+              <label class='error' for='level' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+          </div>
+      </div>
     <div class="form-group">
 				<div class="input-group{% if form.study_field.errors %} validate-has-error{% endif %}">
 					<div class="input-group-addon">
@@ -163,21 +240,6 @@
 					{% endif %}
 				</div>
 			</div>
-			<div class="form-group" id="level-group">
-				<div class="input-group{% if form.level.errors %} validate-has-error{% endif %}" style="text-align: left; color: #ffffff;">
-					<div class="input-group-addon">
-						<i class="entypo-address"></i>
-					</div>
-                    <input class="english-field" type="radio" name="level" value="U" style="margin-left: 10px;margin-right: 5px;" checked required>Undergraduate<br>
-                    <input class="english-field" type="radio" name="level" value="G" style="margin-left: 10px; margin-right: 5px;" required>Graduate
-					{% if form.level.errors %}
-					    {% for error in form.level.errors %}
-					        <label class='error' for='level' style='display: inline-block'>{{ error|escape }}</label>
-					    {% endfor %}
-					{% endif %}
-				</div>
-			</div>
-
 
 			<div class="form-group">
 				<div class="english-field input-group{% if form.email.errors %} validate-has-error{% endif %}">
@@ -208,9 +270,23 @@
 				</div>
 			</div>
 
+      <div class="form-group" id="presentation_preference-group">
+          <div class="input-group{% if form.presentation_preference.errors %} validate-has-error{% endif %}">
+              <div class="input-group-addon">
+                  <i class="entypo-doc"></i>
+              </div>
+              <select {% if form.presentation_preference.value and not form.presentation_preference.errors %}value="{{ form.presentation_preference.value }}" {% endif %}class="form-control english-field" id="presentation_preference" name="presentation_preference" required title="Presentation preference">
+                                              <option value="">Presentation preference</option>
+                                              <option value="O">Oral presentation</option>
+                                              <option value="P">Poster</option>
+        </select> {% if form.presentation_preference.errors %} {% for error in form.presentation_preference.errors %}
+              <label class='error' for='presentation_preference' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+          </div>
+      </div>
+
             <h3 class="english-field">Post your Case Report</h3>
-        <p>In the {{ event.english_name }}, case reports are divided into eight sections: introduction, patient's information, clinical presentation, diagnosis ,treatment, outcome , discussion and conclusion.  Make sure that you have read <a target="_blank" href="{{ event.abstract_submission_instruction_url }}">the regulations carefully</a> and post your case report below.</p>
-            <h4 class="english-field" style="color:white">Introduction:</h4>
+        <p>Before you submit your Case Report in {{ event.english_name }}, Make sure that you have read <a target="_blank" href="{{ event.abstract_submission_instruction_url }}">the regulations carefully</a> and post your case report below.</p>
+            <h4 class="english-field" style="color:white">Required</h4>
 
             <div class="form-group">
 				<div class="input-group{% if form.introduction.errors %} validate-has-error{% endif %}">
@@ -227,111 +303,6 @@
 				</div>
 			</div>
 
-            <h4 class="english-field" style="color:white" >Patient's Information,:</h4>
-
-            <div class="form-group">
-				<div class="input-group{% if form.patient_info.errors %} validate-has-error{% endif %}">
-
-
-					<textarea {% if form.patient_info.value and not form.patient_info.errors %}value="{{ form.patient_info.value }}" {% endif %}type="text" class="form-control english-field" name="patient_info" id="patient_info" placeholder="Case's patient information" required="required"></textarea>
-					{% if form.patient_info.errors %}
-					    {% for error in form.patient_info.errors %}
-					        <label class='error' for='patient_info' style='display: inline-block'>{{ error|escape }}</label>
-					    {% endfor %}
-					{% endif %}
-				</div>
-			</div>
-
-            <h4 class="english-field" style="color:white" >Clinical Presentation:</h4>
-
-            <div class="form-group">
-				<div class="input-group{% if form.clinical_presentation.errors %} validate-has-error{% endif %}">
-
-
-					<textarea {% if form.clinical_presentation.value and not form.clinical_presentation.errors %}value="{{ form.clinical_presentation.value }}" {% endif %}type="text" class="form-control english-field" name="clinical_presentation" id="clinical_presentation" placeholder="Casereport's clinical_presentation" required="required"></textarea>
-					{% if form.clinical_presentation.errors %}
-					    {% for error in form.clinical_presentation.errors %}
-					        <label class='error' for='clinical_presentation' style='display: inline-block'>{{ error|escape }}</label>
-					    {% endfor %}
-					{% endif %}
-				</div>
-			</div>
-
-            <h4 class="english-field" style="color:white">Diagnosis:</h4>
-
-            <div class="form-group">
-				<div class="input-group{% if form.diagnosis.errors %} validate-has-error{% endif %}">
-
-
-					<textarea {% if form.diagnosis.value and not form.diagnosis.errors %}value="{{ form.diagnosis.value }}" {% endif %}type="text" class="form-control english-field" name="diagnosis" id="diagnosis" placeholder="Casereports's diagnosis" required="required"></textarea>
-					{% if form.diagnosis.errors %}
-					    {% for error in form.diagnosis.errors %}
-					        <label class='error' for='diagnosis' style='display: inline-block'>{{ error|escape }}</label>
-					    {% endfor %}
-					{% endif %}
-				</div>
-			</div>
-
-                <h4 class="english-field" style="color:white">Treatment:</h4>
-
-            <div class="form-group">
-				<div class="input-group{% if form.treatment.errors %} validate-has-error{% endif %}">
-
-
-					<textarea {% if form.treatment.value and not form.treatment.errors %}value="{{ form.treatment.value }}" {% endif %}type="text" class="form-control english-field" name="treatment" id="treatment" placeholder="Casereports's treatment" required="required"></textarea>
-					{% if form.treatment.errors %}
-					    {% for error in form.treatment.errors %}
-					        <label class='error' for='treatment' style='display: inline-block'>{{ error|escape }}</label>
-					    {% endfor %}
-					{% endif %}
-				</div>
-			</div>
-
-                <h4 class="english-field" style="color:white">Outcome:</h4>
-
-            <div class="form-group">
-				<div class="input-group{% if form.outcome.errors %} validate-has-error{% endif %}">
-
-
-					<textarea {% if form.outcome.value and not form.outcome.errors %}value="{{ form.outcome.value }}" {% endif %}type="text" class="form-control english-field" name="outcome" id="outcome" placeholder="Casereports's outcome" required="required"></textarea>
-					{% if form.outcome.errors %}
-					    {% for error in form.outcome.errors %}
-					        <label class='error' for='outcome' style='display: inline-block'>{{ error|escape }}</label>
-					    {% endfor %}
-					{% endif %}
-				</div>
-			</div>
-
-
-            <h4 class="english-field" style="color:white">Discussion:</h4>
-
-            <div class="form-group">
-				<div class="input-group{% if form.discussion.errors %} validate-has-error{% endif %}">
-
-
-					<textarea {% if form.discussion.value and not form.discussion.errors %}value="{{ form.discussion.value }}" {% endif %}type="text" class="form-control english-field" name="discussion" id="discussion" placeholder="Case Report's discussion" required="required"></textarea>
-					{% if form.discussion.errors %}
-					    {% for error in form.discussion.errors %}
-					        <label class='error' for='discussion' style='display: inline-block'>{{ error|escape }}</label>
-					    {% endfor %}
-					{% endif %}
-				</div>
-			</div>
-
-            <h4 class="english-field" style="color:white">Conclusion:</h4>
-
-            <div class="form-group">
-				<div class="input-group{% if form.conclusion.errors %} validate-has-error{% endif %}">
-
-
-					<textarea {% if form.conclusion.value and not form.conclusion.errors %}value="{{ form.conclusion.value }}" {% endif %}type="text" class="form-control english-field" name="conclusion" id="conclusion" placeholder="Case Report's conclusion" required="required"></textarea>
-					{% if form.conclusion.errors %}
-					    {% for error in form.conclusion.errors %}
-					        <label class='error' for='conclusion' style='display: inline-block'>{{ error|escape }}</label>
-					    {% endfor %}
-					{% endif %}
-				</div>
-			</div>
             <h3 class="english-field">Previous participations and publications</h3>
             <div class="form-group" style="text-align: justify;">
                 <div class="checkbox">
@@ -343,14 +314,14 @@
             <div class="form-group" style="text-align: justify;">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="was_presented_at_others">I have presented this research in any other conference before.
+                        <input type="checkbox" name="was_presented_previously">I have presented this research in one of the previous editions of Health Professions Confrence.
                     </label>
                 </div>
             </div>
             <div class="form-group" style="text-align: justify;">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="was_presented_previously">I have presented this research in a previous year of this conference.
+                        <input type="checkbox" name="was_presented_at_others">I have presented this research in other conferences before.
                     </label>
                 </div>
             </div>
@@ -364,7 +335,8 @@ will result in a refusal of my application.
                     </label>
                 </div>
             </div>
-            <input type="hidden" name="university" value="KSAU-HS">
+            <input type="hidden" name="university">
+            <input type="hidden" name="college">
             <input type="hidden" name="study_field">
 			<div class="form-group">
 				<button disabled type="submit" class="btn btn-success btn-block btn-login">
@@ -563,20 +535,36 @@ will result in a refusal of my application.
                 $('button').attr('disabled', 'disabled')
             }
         });
-        $('input[name=university-radio]').change(function(){
-            if ($('input[name=university-radio][value=Other]').prop('checked')){
-                $('#university-text-field').show();
-                $('#university-text-field').attr('required', 'required');
+        $('#university-list').change(function() {
+            value = $(this).val();
+            if ($('#university-list option[value=Other]:checked').length) {
+                $('#university-text').show();
+                $('#university-text').attr('required', 'required');
             } else {
-                $('#university-text-field').hide();
-                $('#university-text-field').removeAttr('required');
-                $('input[name=university]').val('KSAU-HS');
+                $('#university-text').hide();
+                $('#university-text').removeAttr('required');
+                $('input[name=university]').val(value);
             }
         });
-        $('#university-text-field').change(function(){
+        $('#university-text').change(function() {
             value = $(this).val();
             $('input[name=university]').val(value);
+        })
+        $('#college-list').change(function() {
+            value = $(this).val();
+            if ($('#college-list option[value=Other]:checked').length) {
+                $('#college-text').show();
+                $('#college-text').attr('required', 'required');
+            } else {
+                $('#college-text').hide();
+                $('#college-text').removeAttr('required');
+                $('input[name=college]').val(value);
+            }
         });
+        $('#college-text').change(function() {
+            value = $(this).val();
+            $('input[name=college]').val(value);
+        })
         $('#study-field-list').change(function(){
             value = $(this).val();
             if ($('#study-field-list option[value=Other]:checked').length){

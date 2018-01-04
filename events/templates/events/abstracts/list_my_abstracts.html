@@ -18,13 +18,13 @@
                         <th class="all">Title</th>
                         <th class="not-mobile">Presenting author</th>
                         <th class="not-mobile">Presentation preference</th>
-                        {% if user|is_organizing_team_member:event or user.is_superuser %}
+                        {% if not abstract_user == request.user %}
                         <th class="not-mobile">Status</th>
                         <th class="not-mobile">Accepted presentation preference</th>
                         <th class="not-mobile">Score</th>
                         {% endif %}
                         <th class="not-mobile">Submission date</th>
-                        {% if not user|is_organizing_team_member:event %}
+                        {% if abstract_user == request.user %}
                         <th class="not-mobile">Event</th>
                         {% endif %}
                     </tr>
@@ -36,13 +36,13 @@
                         <td><a href="{% url 'events:show_abstract' abstract.event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
                         <td>{{ abstract.presenting_author }}</td>
                         <td>{{ abstract.get_presentation_preference_display }}</td>
-                        {% if user|is_organizing_team_member:event or user.is_superuser%}
+                        {% if not abstract_user == request.user %}
                         <td>{{ abstract.get_status_display }}</td>
                         <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
                         <td>ِ{{ abstract.get_average_score }}</td>
                         {% endif %}
                         <td data-order="{{ abstract.date_submitted|date:" U " }}">{{ abstract.date_submitted|date:"Y-m-d" }}</td>
-                        {% if not user|is_organizing_team_member:event %}
+                        {% if abstract_user == request.user %}
                         <td>{{ abstract.event }}</td>
                         {% endif %}
                     </tr>

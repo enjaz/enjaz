@@ -91,6 +91,9 @@ def edit_abstract(request, event_code_name, pk):
     if abstract.event.abstract_submission_closing_date and timezone.now() > abstract.event.abstract_submission_closing_date:
         raise Exception(u"انتهت المدة المتاحة لتعديل الملخص ")
 
+    if Abstract.objects.annotate(num_b=Count('evaluation')).filter(pk=pk, num_b__gte=1):
+        raise Exception(u"انتهت المدة المتاحة لتعديل الملخص ")
+
     if request.method == 'POST':
         instance = Abstract(event=abstract.event,user=request.user)
         form = forms.AbstractForm(request.POST, request.FILES,
@@ -127,6 +130,9 @@ def delete_abstract(request, event_code_name, pk):
 
     if event.abstract_submission_closing_date and timezone.now() > event.abstract_submission_closing_date and \
         not utils.is_organizing_team_member(request.user, event):
+        raise Exception(u"انتهت المدة المتاحة لحذف الملخص ")
+
+    if Abstract.objects.annotate(num_b=Count('evaluation')).filter(pk=pk, num_b__gte=1):
         raise Exception(u"انتهت المدة المتاحة لحذف الملخص ")
 
     abstract.is_deleted = True
@@ -222,13 +228,13 @@ def list_my_abstracts(request, event_code_name=None, user_pk=None):
         event = get_object_or_404(Event, code_name=event_code_name,
                                   receives_abstract_submission=True)
         abstract_user = get_object_or_404(User, pk=user_pk)
-        
+
         abstracts = Abstract.objects.filter(event__code_name=event_code_name, is_deleted=False, user=abstract_user)
         casereports = CaseReport.objects.filter(event__code_name=event_code_name, is_deleted=False, user=abstract_user)
     else:
         event = None
         abstract_user = request.user
-        
+
         abstracts = Abstract.objects.filter(is_deleted=False, user=request.user)
         casereports = CaseReport.objects.filter(is_deleted=False, user=request.user)
 
@@ -237,7 +243,7 @@ def list_my_abstracts(request, event_code_name=None, user_pk=None):
             not utils.is_organizing_team_member(request.user, event):
             raise PermissionDenied
 
-    context = {'abstract_user' :abstract_user, 
+    context = {'abstract_user' :abstract_user,
 				'abstracts': abstracts,
 				'casereports':casereports}
     return render(request, 'events/abstracts/list_my_abstracts.html', context)
@@ -369,6 +375,11 @@ def handle_ajax(request):
     action = request.POST.get('action')
     session_pk = request.POST.get('pk')
     session = get_object_or_404(Session, pk=session_pk)
+
+    if request.user.common_profile.gender == 'M' and session.gender == 'F':
+        raise Exception(u'جلسة خاصة بالإناث')
+    if request.user.common_profile.gender == 'F' and session.gender == 'M':
+        raise Exception(u'جلسة خاصة بالذكور')
 
     if session.acceptance_method == 'F':
         is_approved = True

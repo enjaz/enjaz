@@ -294,7 +294,7 @@
 					</div>
 
 					<textarea {% if form.introduction.value and not form.introduction.errors %}value="{{ form.introduction.value }}" {% endif %}type="text" class="form-control english-field" name="introduction" id="introduction" placeholder="Casereports
-					's introduction" required="required"></textarea>
+					's abstract" required="required"></textarea>
 					{% if form.introduction.errors %}
 					    {% for error in form.introduction.errors %}
 					        <label class='error' for='introduction' style='display: inline-block'>{{ error|escape }}</label>

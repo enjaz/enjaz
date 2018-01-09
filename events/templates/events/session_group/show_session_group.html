@@ -123,6 +123,12 @@ margin-bottom: 5px;
 .form-group .checkbox{
     margin-right: 15px;
 }
+.fa-male {
+  color: blue;
+}
+.fa-female {
+  color: deeppink;
+}
 </style>
 </head>
 
@@ -133,7 +139,7 @@ margin-bottom: 5px;
         <br>
           <div class="col-sm-6 col-sm-offset-3 mentor-section-intro text-center">
               <h1 class="mentor-section-header">{{ session_group.title }}</h1>
-                <p class="section-intro">{{ session_group.description }}</p>
+                <p class="section-intro">{{ session_group.description|linebreaksbr }}</p>
                 {% if not user.social_auth.exists %}
                 <br>
                 <a style="margin-top: 5px; background-color: #1da1f3; color: white;" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-sm"><i class="fa fa-twitter"></i> اربط حسابي بتويتر</a>
@@ -144,12 +150,14 @@ margin-bottom: 5px;
         <div class="row">
             <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
                 <div class="text-center">
-                    <h1>{{ session.name }}</h1>
+                    <h1>{% if session.gender == 'F' %}<i class="fa fa-female" aria-hidden="true"></i>{% elif session.gender == 'M' %}<i class="fa fa-male" aria-hidden="true"></i>{% else %}<i class="fa fa-female" aria-hidden="true"></i>  <i class="fa fa-male" aria-hidden="true"></i>{% endif %}  {{ session.name }}</h1>
                     <p style="font-size: 1.2em;">{{ invitation.short_description|safe }}</p>
                 </div>
+              {% if session.description %}
                 <div class="intro instructions">
                     {% autoescape off %}{{ session.description|safe }}{% endautoescape %}
                 </div>
+              {% endif %}
                 <div class="row text-center" style="font-size: 1.2em; margin-bottom: 10px;">
 							<div>
 								<i class="entypo-calendar"></i>
@@ -189,7 +197,7 @@ margin-bottom: 5px;
                 {% elif user.is_authenticated and user|is_registered:session  %}
                         <button class="btn btn-danger cancel" data-action="cancel" data-pk="{{ session.pk }}">ألغِ تسجيلي!</button>
                 {% else %}
-                <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لإنجاز كي أؤكد الحضور</a>
+                <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني إنجاز للحصول على التذكرة</a>
                 {% endif %}
                 <br>
               {% if session.acceptance_method == 'M' %}

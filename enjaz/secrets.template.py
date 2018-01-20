@@ -1,6 +1,6 @@
 # Only one variable is required here, SECRET_KEY.  Fill this using:
 # http://www.miniwebtool.com/django-secret-key-generator/
-SECRET_KEY = ''
+SECRET_KEY = '-+6c()szlt_x-%lrh#lrr#$2)i!4-zas+b#z%$1my9-!-*3r)+'
 
 # You may optionally want to copy the following keys from the
 # production server, if you are going to deal with them:

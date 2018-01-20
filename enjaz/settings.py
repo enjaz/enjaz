@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = secrets.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = getattr(secrets, 'DEBUG', True)
+DEBUG = getattr(secrets, 'DEBUG', False)
 
 ALLOWED_HOSTS = ['.enjazportal.com', '127.0.0.1','127.0.0.1:8000']
 

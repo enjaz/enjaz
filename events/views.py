@@ -417,7 +417,7 @@ def handle_ajax(request):
                         registration.badge_sent = True
                     if session.event.is_auto_tweet:
                         if session_group_pk:
-                            relative_url = reverse("events:show_session_group", args=(session.event.code_name, session_group.code_name))
+                            relative_url = "https://enjazportal.com/programs/cultural-program/"
                         else:
                             relative_url = reverse("events:list_timeslots", args=(session.event.code_name,))
                         full_url = request.build_absolute_uri(relative_url)

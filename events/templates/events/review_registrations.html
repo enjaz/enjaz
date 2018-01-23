@@ -41,6 +41,7 @@
                             <tr>
                                 <th class="all"></th>
                                 <th class="not-mobile">Name</th>
+                                <th class="not-mobile">Gender</th>
                                 <th class="not-mobile">University</th>
                                 <th class="not-mobile">Registration date</th>
                             </tr>
@@ -50,6 +51,7 @@
                             <tr>
                                 <td><input type="checkbox" value="1" name="pk_{{ registration.pk }}"></td>
                                 <td>{{ registration.user.common_profile.get_en_full_name }}</td>
+                                <td>{{ registration.user.common_profile.get_gender_display }}</td>
                                 <td>{{ registration.user.common_profile.get_university_or_affiliation }}</td>
                                 <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted|date:"Y-m-d" }}</td>
                             </tr>

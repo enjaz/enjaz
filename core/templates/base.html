@@ -211,26 +211,20 @@ you?
             <li>
                 <a>
                     <i class="entypo-calendar"></i>
-                    <span>{% if user|can_evaluate_abstracts:event %}Events Management{% else %}إدارة الأنشطة الكبرى{% endif %}</span>
+										<span class="english-field">{% if user.common_profile.profile_type == 'E' %}Events Management{% else %}إدارة الأنشطة الكبرى{% endif %}</span>
                 </a>
                 <ul>
                 {% for event in user|get_user_admistrative_events %}
                 <li>
                     <a>
                         <i class="entypo-calendar"></i>
-                        <span>{{ event.get_html_name|safe }}</span>
+                        <span class="english-field">{% if user.common_profile.profile_type == 'E' %}{{ event.english_name }}{% else %}{{ event.get_html_name|safe }}{% endif %}</span>
                     </a>
                     <ul>{% if user|is_organizing_team_member:event or user|is_attendance_team_member:event or user.is_superuser  %}
                         <li>
                             <a href="{% url 'events:list_sessions_privileged' event.code_name %}">
                                 <i class="entypo-chart-pie"></i>
                                 <span>الجلسات</span>
-                            </a>
-                        </li>
-												<li>
-                            <a href="{% url 'events:list_presenter_attendance' event.code_name %}">
-                                <i class="entypo-chart-pie"></i>
-                                <span>تحضير مقدمي الأبحاث</span>
                             </a>
                         </li>
                         {% if event.has_attendance %}
@@ -247,6 +241,12 @@ you?
                             <a href="{% url 'events:list_abstracts' event.code_name %}">
                                 <i class="entypo-pencil"></i>
                                 <span>الملخصات</span>
+                            </a>
+                        </li>
+												<li>
+                            <a href="{% url 'events:list_presenter_attendance' event.code_name %}">
+                                <i class="entypo-chart-pie"></i>
+                                <span>تحضير مقدمي الأبحاث</span>
                             </a>
                         </li>
                         <li>

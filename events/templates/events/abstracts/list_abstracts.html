@@ -16,25 +16,26 @@
         </div>
         <div id="collapseOne-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
-                {% if user|is_organizing_team_member:event %}
                 <form method="post">
                     {% csrf_token %}
                     <select name="action">
                       <option>Choose Action</option>
                       <option value="delete">Delete</option>
-                    </select> {% endif %}
+                    </select>
                     <div class="row">
                         <table id="pending" class="display datatable dt-responsive">
                             <thead>
                                 <tr>
                                     <th></th>
                                     <th class="all">ID</th>
-                                    <th class="not-mobile">Title</th>
-                                    {% if not user|can_evaluate_abstracts:event or user.is_superuser %}
-                                    <th>Presenting author</th>
-                                    {% endif %}
-                                    <th>Presentation preference</th>
-                                    <th>Submission date</th>
+                                    <th class="all">Title</th>
+                                    <th class="all">Presenting author</th>
+                                    <th class="all">University</th>
+                                    <th class="all">Presentation preference</th>
+                                    <th class="none">Puplished?</th>
+                                    <th class="none">Presented previously at HPC?</th>
+                                    <th class="none">Presented previously at others?</th>
+                                    <th class="none">Submission date</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -43,20 +44,20 @@
                                     <td><input type="checkbox" value="1" name="pk_{{ abstract.pk }}"></td>
                                     <td>{{ abstract.pk }}</td>
                                     <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
-                                    {% if not user|can_evaluate_abstracts:event or user.is_superuser %}
                                     <th><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></th>
-                                    {% endif %}
+                                    <td>{{ abstract.university }}</td>
                                     <td>{{ abstract.get_presentation_preference_display }}</td>
-                                    <td data-order="{{ abstract.date_submitted|date:" U " }}">{{ abstract.date_submitted|date:"Y-m-d" }}</td>
+                                    <td>{{ abstract.was_published|yesno:"Yes,No" }}</td>
+                                    <td>{{ abstract.was_presented_previously|yesno:"Yes,No" }}</td>
+                                    <td>{{ abstract.was_presented_at_others|yesno:"Yes,No" }}</td>
+                                    <td data-order="{{ abstract.date_submitted|date:" U " }}">{{ abstract.date_submitted }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                    {% if user|is_organizing_team_member:event %}
                     <button type="submit" class="btn btn-warning">Submit</button>
                 </form>
-                {% endif %}
             </div>
         </div>
     </div>
@@ -72,7 +73,6 @@
         </div>
         <div id="collapseTwo-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
-                {% if user|is_organizing_team_member:event %}
                 <form method="post">
                     {% csrf_token %}
                     <select name="action">
@@ -81,21 +81,24 @@
                         <option value="accepte_as_oral">Accept As Oral</option>
                         <option value="accepte_as_poster">Accept As Poster</option>
                         <option value="regect">Regect</option>
-                    </select> {% endif %}
+                    </select>
                     <div class="row">
                         <table id="evaluated" class="display datatable dt-responsive">
                             <thead>
                                 <tr>
                                     <th></th>
                                     <th class="all">ID</th>
-                                    <th class="not-mobile">Title</th>
-                                    {% if not user|can_evaluate_abstracts:event %}
-                                    <th>Presenting author</th>
-                                    {% endif %}
-                                    <th>Presentation preference</th>
-                                    <th>Score</th>
-                                    <th>Accepted presentation preference</th>
-                                    <th>Evaluators</th>
+                                    <th class="all">Title</th>
+                                    <th class="all">Presenting author</th>
+                                    <th class="all">University</th>
+                                    <th class="all">Presentation preference</th>
+                                    <th class="all">Score</th>
+                                    <th class="all">Accepted presentation preference</th>
+                                    <th class="none">Evaluators</th>
+                                    <th class="none">Puplished?</th>
+                                    <th class="none">Presented previously at HPC?</th>
+                                    <th class="none">Presented previously at others?</th>
+                                    <th class="none">Submission date</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -104,9 +107,8 @@
                                     <td><input type="checkbox" value="1" name="pk_{{ abstract.pk }}"></td>
                                     <td>{{ abstract.pk }}</td>
                                     <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
-                                    {% if not user|can_evaluate_abstracts:event %}
                                     <td><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></td>
-                                    {% endif %}
+                                    <td>{{ abstract.university }}</td>
                                     <td>{{ abstract.get_presentation_preference_display }}</td>
                                     <td>ِ{{ abstract.get_average_score }}</td>
                                     {% if abstract.get_accepted_presentaion_preference_display %}
@@ -121,15 +123,17 @@
                                             {% endfor %}
                                         </ul>
                                     </td>
+                                    <td>{{ abstract.was_published|yesno:"Yes,No" }}</td>
+                                    <td>{{ abstract.was_presented_previously|yesno:"Yes,No" }}</td>
+                                    <td>{{ abstract.was_presented_at_others|yesno:"Yes,No" }}</td>
+                                    <td data-order="{{ abstract.date_submitted|date:" U " }}">{{ abstract.date_submitted }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                    {% if user|is_organizing_team_member:event %}
                 <button type="submit" class="btn btn-success">Submit</button>
                     </form>
-                {% endif %}
             </div>
         </div>
     </div>
@@ -145,25 +149,25 @@
         </div>
         <div id="collapseThree-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
-                {% if user|is_organizing_team_member:event %}
                 <form method="post">
                     {% csrf_token %}
                     <select name="action">
                       <option>Choose Action</option>
                       <option value="restore">Restore</option>
-                    </select> {% endif %}
+                    </select>
                     <div class="row">
                         <table id="deleted" class="display datatable dt-responsive">
                             <thead>
                                 <tr>
                                     <th></th>
                                     <th class="all">ID</th>
-                                    <th class="not-mobile">Title</th>
-                                    {% if not user|can_evaluate_abstracts:event or user.is_superuser %}
-                                    <th>Presenting author</th>
-                                    {% endif %}
-                                    <th>Presentation preference</th>
-                                    <th>Submission date</th>
+                                    <th class="all">Title</th>
+                                    <th class="all">Presenting author</th>
+                                    <th class="all">Presentation preference</th>
+                                    <th class="none">Puplished?</th>
+                                    <th class="none">Presented previously at HPC?</th>
+                                    <th class="none">Presented previously at others?</th>
+                                    <th class="none">Submission date</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -172,20 +176,19 @@
                                     <td><input type="checkbox" value="1" name="pk_{{ abstract.pk }}"></td>
                                     <td>{{ abstract.pk }}</td>
                                     <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
-                                    {% if not user|can_evaluate_abstracts:event or user.is_superuser %}
                                     <th><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></th>
-                                    {% endif %}
                                     <td>{{ abstract.get_presentation_preference_display }}</td>
-                                    <td data-order="{{ abstract.date_submitted|date:" U " }}">{{ abstract.date_submitted|date:"Y-m-d" }}</td>
+                                    <td>{{ abstract.was_published|yesno:"Yes,No" }}</td>
+                                    <td>{{ abstract.was_presented_previously|yesno:"Yes,No" }}</td>
+                                    <td>{{ abstract.was_presented_at_others|yesno:"Yes,No" }}</td>
+                                    <td data-order="{{ abstract.date_submitted|date:" U " }}">{{ abstract.date_submitted }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                    {% if user|is_organizing_team_member:event %}
                     <button type="submit" class="btn btn-danger">Submit</button>
                 </form>
-                {% endif %}
             </div>
         </div>
     </div>
@@ -207,7 +210,6 @@
         </div>
         <div id="collapseFour-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
-                {% if user|is_organizing_team_member:event %}
                 <form method="post">
                     {% csrf_token %}
                     <select name="action">
@@ -216,21 +218,23 @@
                         <option value="accepte_as_oral">Accept As Oral</option>
                         <option value="accepte_as_poster">Accept As Poster</option>
                         <option value="regect">Regect</option>
-                    </select> {% endif %}
+                    </select>
                     <div class="row">
                         <table id="poster" class="display datatable dt-responsive">
                             <thead>
                                 <tr>
                                     <th></th>
                                     <th class="all">ID</th>
-                                    <th class="not-mobile">Title</th>
-                                    {% if not user|can_evaluate_abstracts:event %}
-                                    <th>Presenting author</th>
-                                    {% endif %}
-                                    <th>Presentation preference</th>
-                                    <th>Score</th>
-                                    <th>Accepted presentation preference</th>
-                                    <th>Evaluators</th>
+                                    <th class="all">Title</th>
+                                    <th class="all">Presenting author</th>
+                                    <th class="all">Presentation preference</th>
+                                    <th class="all">Score</th>
+                                    <th class="all">Accepted presentation preference</th>
+                                    <th class="none">Evaluators</th>
+                                    <th class="none">Puplished?</th>
+                                    <th class="none">Presented previously at HPC?</th>
+                                    <th class="none">Presented previously at others?</th>
+                                    <th class="none">Submission date</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -239,9 +243,7 @@
                                     <td><input type="checkbox" value="1" name="pk_{{ abstract.pk }}"></td>
                                     <td>{{ abstract.pk }}</td>
                                     <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
-                                    {% if not user|can_evaluate_abstracts:event %}
                                     <td><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></td>
-                                    {% endif %}
                                     <td>{{ abstract.get_presentation_preference_display }}</td>
                                     <td>ِ{{ abstract.get_average_score }}</td>
                                     {% if abstract.get_accepted_presentaion_preference_display %}
@@ -256,15 +258,17 @@
                                             {% endfor %}
                                         </ul>
                                     </td>
+                                    <td>{{ abstract.was_published|yesno:"Yes,No" }}</td>
+                                    <td>{{ abstract.was_presented_previously|yesno:"Yes,No" }}</td>
+                                    <td>{{ abstract.was_presented_at_others|yesno:"Yes,No" }}</td>
+                                    <td data-order="{{ abstract.date_submitted|date:" U " }}">{{ abstract.date_submitted }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                    {% if user|is_organizing_team_member:event %}
                 <button type="submit" class="btn btn-info">Submit</button>
                     </form>
-                {% endif %}
             </div>
         </div>
     </div>
@@ -280,7 +284,6 @@
         </div>
         <div id="collapseFive-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
-                {% if user|is_organizing_team_member:event %}
                 <form method="post">
                     {% csrf_token %}
                     <select name="action">
@@ -289,21 +292,23 @@
                         <option value="accepte_as_oral">Accept As Oral</option>
                         <option value="accepte_as_poster">Accept As Poster</option>
                         <option value="regect">Regect</option>
-                    </select> {% endif %}
+                    </select>
                     <div class="row">
                         <table id="oral" class="display datatable dt-responsive">
                             <thead>
                                 <tr>
                                     <th></th>
                                     <th class="all">ID</th>
-                                    <th class="not-mobile">Title</th>
-                                    {% if not user|can_evaluate_abstracts:event %}
-                                    <th>Presenting author</th>
-                                    {% endif %}
-                                    <th>Presentation preference</th>
-                                    <th>Score</th>
-                                    <th>Accepted presentation preference</th>
-                                    <th>Evaluators</th>
+                                    <th class="all">Title</th>
+                                    <th class="all">Presenting author</th>
+                                    <th class="all">Presentation preference</th>
+                                    <th class="all">Score</th>
+                                    <th class="all">Accepted presentation preference</th>
+                                    <th class="none">Evaluators</th>
+                                    <th class="none">Puplished?</th>
+                                    <th class="none">Presented previously at HPC?</th>
+                                    <th class="none">Presented previously at others?</th>
+                                    <th class="none">Submission date</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -312,9 +317,7 @@
                                     <td><input type="checkbox" value="1" name="pk_{{ abstract.pk }}"></td>
                                     <td>{{ abstract.pk }}</td>
                                     <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
-                                    {% if not user|can_evaluate_abstracts:event %}
                                     <td><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></td>
-                                    {% endif %}
                                     <td>{{ abstract.get_presentation_preference_display }}</td>
                                     <td>ِ{{ abstract.get_average_score }}</td>
                                     {% if abstract.get_accepted_presentaion_preference_display %}
@@ -329,15 +332,70 @@
                                             {% endfor %}
                                         </ul>
                                     </td>
+                                    <td>{{ abstract.was_published|yesno:"Yes,No" }}</td>
+                                    <td>{{ abstract.was_presented_previously|yesno:"Yes,No" }}</td>
+                                    <td>{{ abstract.was_presented_at_others|yesno:"Yes,No" }}</td>
+                                    <td data-order="{{ abstract.date_submitted|date:" U " }}">{{ abstract.date_submitted }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                    {% if user|is_organizing_team_member:event %}
                 <button type="submit" class="btn btn-success">Submit</button>
                     </form>
-                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+        <br>
+    <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
+        <h2 class="mentor-section-header">Case Reports</h2>
+    </div>
+</div>
+<div class="english-field">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseSix-2" class="english-field collapsed">
+                    Case Reports ({{ casereports.count }})
+                </a>
+            </h4>
+        </div>
+        <div id="collapseSix-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                    <div class="row">
+                        <table id="casereport" class="display datatable dt-responsive">
+                            <thead>
+                                <tr>
+                                    <th class="all">ID</th>
+                                    <th class="not-mobile">Title</th>
+                                    <th>Presenting author</th>
+                                    <th>University</th>
+                                    <th>Presentation preference</th>
+                                    <th>Accepted presentation preference</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for casereport in casereports %}
+                                <tr>
+                                    <td>{{ casereport.pk }}</td>
+                                    <td class="not-mobile"><a href="{% url 'events:show_casereport' event.code_name casereport.pk %}">{{ casereport.title }}</a></td>
+                                    <td><a href="{% url 'events:list_user_abstracts' event.code_name casereport.user.pk %}">{{ casereport.presenting_author }}</a></td>
+                                    <td>ِ{{ casereport.university }}</td>
+                                    <td>{{ casereport.get_presentation_preference_display }}</td>
+                                    {% if casereport.get_accepted_presentaion_preference_display %}
+                                    <td>{{ casereport.get_accepted_presentaion_preference_display }}</td>
+                                    {% else %}
+                                    <td>{{ casereport.get_status_display }}</td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                <button type="submit" class="btn btn-info">Submit</button>
+                    </form>
             </div>
         </div>
     </div>
@@ -377,6 +435,11 @@
             ]
         });
         $("#oral").dataTable({
+            "order": [
+                [1, "desc"]
+            ]
+        });
+        $("#casereport").dataTable({
             "order": [
                 [1, "desc"]
             ]

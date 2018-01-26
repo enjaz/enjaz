@@ -146,8 +146,7 @@ def list_abstracts(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name,
                               receives_abstract_submission=True)
 
-    if not utils.can_evaluate_abstracts(request.user, event) and \
-            not utils.is_organizing_team_member(request.user, event):
+    if not utils.is_organizing_team_member(request.user, event):
         raise PermissionDenied
 
     pending_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=2)
@@ -155,12 +154,14 @@ def list_abstracts(request, event_code_name):
     deleted_abstracts = Abstract.objects.filter(event=event, is_deleted=True)
     accepted_poster_abstracts = Abstract.objects.filter(event=event, is_deleted=False, accepted_presentaion_preference= 'P')
     accepted_oral_abstracts = Abstract.objects.filter(event=event, is_deleted=False, accepted_presentaion_preference= 'O')
+    casereports = CaseReport.objects.filter(event=event, is_deleted=False)
     context = {'event': event,
                'pending_abstracts': pending_abstracts,
                'evaluated_abstracts': evaluated_abstracts,
                'deleted_abstracts': deleted_abstracts,
                'accepted_poster_abstracts': accepted_poster_abstracts,
-               'accepted_oral_abstracts': accepted_oral_abstracts}
+               'accepted_oral_abstracts': accepted_oral_abstracts,
+               'casereports': casereports,}
 
     if request.method == "POST":
         action = request.POST.get('action')

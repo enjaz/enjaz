@@ -211,7 +211,7 @@ you?
             <li>
                 <a>
                     <i class="entypo-calendar"></i>
-                    <span>إدارة الأنشطة الكبرى</span>
+                    <span>{% if user|can_evaluate_abstracts:event %}Events Management{% else %}إدارة الأنشطة الكبرى{% endif %}</span>
                 </a>
                 <ul>
                 {% for event in user|get_user_admistrative_events %}

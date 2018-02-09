@@ -150,7 +150,7 @@ ones) deal with the User model."""
     get_en_full_name.short_description = u"الاسم الإنجليزي الكامل"
 
     def get_ar_full_name(self, obj):
-        return utils.get_user_en_full_name(obj)
+        return utils.get_user_ar_full_name(obj)
     get_ar_full_name.short_description = u"الاسم العربي الكامل"
 
     def get_college(self, obj):

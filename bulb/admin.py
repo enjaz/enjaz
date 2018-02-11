@@ -195,7 +195,7 @@ bulb_admin.register(models.NewspaperSignup)
 admin.site.register(models.Session, SessionAdmin)
 admin.site.register(models.Group, GroupAdmin)
 admin.site.register(models.BookCommitment, BookCommitmentAdmin)
-bulb_admin.register(models.BookCommitment, BookCommitmentAdminReadOnly)`
+bulb_admin.register(models.BookCommitment, BookCommitmentAdminReadOnly)
 admin.site.register(models.Readathon, ReadathonAdmin)
 bulb_admin.register(models.Readathon, ReadathonAdminReadOnly)
 admin.site.register(models.RecommendedBook, RecommendedBookAdmin)

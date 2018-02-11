@@ -12,13 +12,13 @@ from . import models, utils
 class BulbAuthenticationForm(AdminAuthenticationForm):
     def confirm_login_allowed(self, user):
         if not user.is_active and \
-                not (utils.is_bulb_coordinator_or_deputy(user) or \
-                             utils.is_bulb_member(user)):
+            not (utils.is_bulb_coordinator_or_deputy(user) or \
+                         utils.is_bulb_member(user)):
             raise forms.ValidationError(
                 self.error_messages['invalid_login'],
                 code='invalid_login',
                 params={'username': self.username_field.verbose_name}
-            )
+                )
 
 
 class BulbAdmin(admin.sites.AdminSite):
@@ -26,8 +26,8 @@ class BulbAdmin(admin.sites.AdminSite):
 
     def has_permission(self, request):
         return utils.is_bulb_coordinator_or_deputy(request.user) or \
-               utils.is_bulb_member(request.user) or \
-               request.user.is_superuser
+           utils.is_bulb_member(request.user) or \
+           request.user.is_superuser
 
 
 class BookRecommendationInline(admin.TabularInline):
@@ -52,11 +52,11 @@ class MembershipInline(admin.TabularInline):
 
 class BookAdmin(admin.ModelAdmin):
     search_fields = ['title', 'submitter__common_profile__en_first_name',
-                     'submitter__common_profile__en_middle_name',
-                     'submitter__common_profile__en_last_name',
-                     'submitter__common_profile__ar_first_name',
-                     'submitter__common_profile__ar_middle_name',
-                     'submitter__common_profile__ar_last_name']
+                    'submitter__common_profile__en_middle_name',
+                    'submitter__common_profile__en_last_name',
+                    'submitter__common_profile__ar_first_name',
+                    'submitter__common_profile__ar_middle_name',
+                    'submitter__common_profile__ar_last_name']
 
     list_display = ['title', 'submitter', 'category', 'is_available',
                     'submission_date']
@@ -64,20 +64,18 @@ class BookAdmin(admin.ModelAdmin):
 
 class NeededBookAdmin(admin.ModelAdmin):
     search_fields = ['title', 'requester__common_profile__en_first_name',
-                     'requester__common_profile__en_middle_name',
-                     'requester__common_profile__en_last_name',
-                     'requester__common_profile__ar_first_name',
-                     'requester__common_profile__ar_middle_name',
-                     'requester__common_profile__ar_last_name']
+                    'requester__common_profile__en_middle_name',
+                    'requester__common_profile__en_last_name',
+                    'requester__common_profile__ar_first_name',
+                    'requester__common_profile__ar_middle_name',
+                    'requester__common_profile__ar_last_name']
 
     list_display = ['title', 'requester', 'category',
                     'submission_date']
 
-
 class GroupAdmin(admin.ModelAdmin):
     list_filter = ["is_deleted", ]
     inlines = [MembershipInline, ]
-
 
 class BulbModelAdmin(admin.ModelAdmin):
     def get_full_ar_name(self, obj):
@@ -119,7 +117,6 @@ class BulbModelAdmin(admin.ModelAdmin):
                utils.is_bulb_member(request.user) or \
                request.user.is_superuser
 
-
 class RecruitmentAdmin(BulbModelAdmin):
     list_display = ['get_full_ar_name', 'get_email',
                     'get_mobile_number', 'get_college',
@@ -129,10 +126,8 @@ class RecruitmentAdmin(BulbModelAdmin):
                     'wants_readathon_organization', 'submission_date']
     list_filter = ['year']
 
-
 class RecruitmentAdminReadOnly(ModelAdminReadOnly, RecruitmentAdmin):
     pass
-
 
 class SessionAdmin(admin.ModelAdmin):
     search_fields = ['title', 'group__name',
@@ -146,7 +141,6 @@ class SessionAdmin(admin.ModelAdmin):
     list_filter = ['submitter__common_profile__city', 'group']
 
     list_display = ['title', 'submitter', 'submission_date']
-
 
 class BookCommitmentAdmin(BulbModelAdmin):
     search_fields = ['title', 'reason',
@@ -162,10 +156,8 @@ class BookCommitmentAdmin(BulbModelAdmin):
                     'get_mobile_number', 'get_college',
                     'submission_date']
 
-
 class BookCommitmentAdminReadOnly(ModelAdminReadOnly, BookCommitmentAdmin):
     pass
-
 
 class ReadathonAdmin(BulbModelAdmin):
     search_fields = ['publication_date', 'start_date',
@@ -175,10 +167,8 @@ class ReadathonAdmin(BulbModelAdmin):
                     'end_date', 'submission_date',
                     'template_name']
 
-
 class ReadathonAdminReadOnly(ModelAdminReadOnly, ReadathonAdmin):
     pass
-
 
 class RecommendedBookAdmin(admin.ModelAdmin):
     search_fields = ['title', 'authors']
@@ -189,10 +179,8 @@ class RecommendedBookAdmin(admin.ModelAdmin):
     def get_recommendation_count(self, obj):
         return obj.bookrecommendation_set.count()
 
-
 class RecommendedBookAdminReadOnly(ModelAdminReadOnly, RecommendedBookAdmin):
     pass
-
 
 bulb_admin = BulbAdmin("Bulb Admin")
 admin.site.register(models.Category)

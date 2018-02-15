@@ -418,7 +418,7 @@ def handle_ajax(request):
                         registration.badge_sent = True
                     if session.event.is_auto_tweet:
                         if session_group_pk:
-                            relative_url = "https://goo.gl/2oqa49"
+                            relative_url = "https://goo.gl/HwBfKL"
                         else:
                             relative_url = reverse("events:list_timeslots", args=(session.event.code_name,))
                         full_url = request.build_absolute_uri(relative_url)

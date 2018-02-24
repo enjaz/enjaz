@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+<<<<<<< HEAD
 from django.db import models, migrations
+=======
+from django.db import migrations, models
+>>>>>>> 07b5042b519a3e6c88661bf11541554fde18b19f
 from django.conf import settings
 
 
@@ -30,9 +34,15 @@ class Migration(migrations.Migration):
                 ('status', models.CharField(default=b'A', max_length=10, choices=[(b'A', b'applied'), (b'N', b'new'), (b'IP', b'in progress'), (b'P', b'puplished')])),
                 ('communication', models.TextField()),
                 ('date', models.DateTimeField(auto_now_add=True)),
+<<<<<<< HEAD
                 ('creator', models.ForeignKey(related_name='creator', to=settings.AUTH_USER_MODEL)),
                 ('field', models.ForeignKey(verbose_name=b'field', to='matching_program.Field', null=True)),
                 ('members', models.ManyToManyField(related_name='members', verbose_name=b'members', to=settings.AUTH_USER_MODEL, blank=True)),
+=======
+                ('creator', models.OneToOneField(related_name='creator', to=settings.AUTH_USER_MODEL)),
+                ('field', models.ManyToManyField(to='matching_program.Field', verbose_name=b'field')),
+                ('members', models.ManyToManyField(related_name='members', verbose_name=b'members', to=settings.AUTH_USER_MODEL)),
+>>>>>>> 07b5042b519a3e6c88661bf11541554fde18b19f
             ],
         ),
         migrations.CreateModel(
@@ -51,7 +61,11 @@ class Migration(migrations.Migration):
                 ('date', models.DateTimeField(auto_now_add=True)),
                 ('research', models.ForeignKey(to='matching_program.ResearchProject')),
                 ('skills', models.ManyToManyField(to='matching_program.Skills')),
+<<<<<<< HEAD
                 ('user', models.ForeignKey(related_name='user', to=settings.AUTH_USER_MODEL)),
+=======
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+>>>>>>> 07b5042b519a3e6c88661bf11541554fde18b19f
             ],
         ),
     ]

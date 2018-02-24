@@ -38,6 +38,8 @@ urlpatterns = [
     url(r'^researchhub/supervisors/signup/$', 'userena.views.signup', {'signup_form': ResearchHubSignupForm, 'template_name': 'researchhub/supervisor_signup_form.html'}, name="supervisor_signup"),
     url(r'^researchhub/', include('researchhub.urls', namespace="researchhub")),
 
+    url(r'^matching_program/', include('matching_program.urls', namespace="matching_program")),
+
     url(r'^arshidni/', RedirectView.as_view(pattern_name='studentguide:index', permanent=True)),
     url(r'^mentors/', include('studentguide.urls', namespace="studentguide")),
 

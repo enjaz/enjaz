@@ -1,0 +1,56 @@
+{% extends 'mp_base.html' %}{% load staticfiles %}{% load matching_program_tags %}{% load l10n %}
+{% block content %}
+<div class="english-field">
+    <div class="row" style="margin-left: 0; margin-bottom: 5px;">
+        <div style="float: right;">
+            
+            
+        <a href="{% url 'matching_program:add_member' student.id %}">
+    <button class="btn btn-sm btn-icon btn-success">
+                <i class="entypo-pencil"></i>
+                accept
+            </button></a>
+            
+            
+            <a href="{% url 'matching_program:delete_app' student.id %}">
+    <button class="confirm-delete-project btn btn-icon btn-danger">
+                <i class="entypo-block"></i>
+               refuse
+                </button></a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-8">
+            <table class="table">
+                <colgroup>
+                    <col class="col-xs-2">
+                    <col class="col-xs-6">
+                </colgroup>
+                <tr>
+                    <th>Name</th>
+                    <td>{{ student.user }}</td>
+                </tr>
+                <tr>
+                    <th>Skills</th>
+                    <td>{% for skill in student.skills.all %}{{skill|capfirst}}, {% endfor %}</td>
+                </tr>
+                <tr>
+                    <th>experience</th>
+                    <td>{{ student.experience }}</td>
+                </tr>
+                <tr>
+                    <th>Prequisitries</th>
+                    <td>{{ student.advantages }}</td>
+                </tr>
+                <tr>
+                    <th>Date added</th>
+                    <td>{{ student.date|date:"Y-n-j" }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block customstyles %}
+<link href='https://fonts.googleapis.com/css?family=Candal' rel='stylesheet' type='text/css'>
+{% endblock %}

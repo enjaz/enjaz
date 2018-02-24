@@ -59,7 +59,7 @@ def edit_project(request, pk):
     if request.method == "POST":
         ResearchProject.update_project(project, request)
         return HttpResponseRedirect(reverse('matching_program:project',kwargs={"pk":pk}))
-    return render(request, "matching_program/edit_project_form.html",
+    return render(request, "matching_program/edit_form.html",
                   {'form':ResearchProjectForm(instance=project), "pk":pk})
 
 def delete_project(request,pk):

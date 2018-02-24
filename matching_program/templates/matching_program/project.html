@@ -1,0 +1,117 @@
+{% extends 'mp_base.html' %}{% load staticfiles %}{% load matching_program_tags %}{% load l10n %}
+{% block content %}
+
+<div class="english-field">
+    <h1>{{ project.title }}</h1>
+    <div class="row" style="margin-left: 0; margin-bottom: 5px;">
+        <div style="float: right;">
+            
+            <a id="edit" type="button" class="btn btn-success">
+                <i class="entypo-pencil"></i>
+                Edit
+                </a>
+            
+            <a href="{% url 'matching_program:delete_project' project.id %}">
+    <button data-url="#" class="confirm-delete-project btn btn-icon btn-danger">
+                <i class="entypo-block"></i>
+                Delete
+            </button></a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-8">
+            <table class="table">
+                <colgroup>
+                    <col class="col-xs-2">
+                    <col class="col-xs-6">
+                </colgroup>
+                <tr>
+                    <th>Supervisor</th>
+                    <td>{{ project.supervisor }}</td>
+                </tr>
+                <tr>
+                    <th>Creator</th>
+                    <td>{{ project.creator }}</td>
+                </tr>
+                <tr>
+                    <th>Description</th>
+                    <td>{{ project.description|linebreaksbr }}</td>
+                </tr>
+                <tr>
+                    <th>Required role</th>
+                    <td>{{ project.required_role|linebreaksbr }}</td>
+                </tr>
+                <tr>
+                    <th>Field</th>
+                    <td>{{ project.field }}</td>
+                </tr>
+                <tr>
+                    <th>Communication</th>
+                    <td>{{ project.communication }}</td>
+                </tr>
+                <tr>
+                    <th>Date added</th>
+                    <td>{{ project.date|date:"Y-n-j" }}</td>
+                </tr>
+                <tr>
+                    <th>All members</th>
+                    <td>{% for member in project.members.all%}<a href="{% url 'matching_program:remove_member' project.id member.id %}"><i class="fa fa-minus-circle" style="color:red;"></i></a> {{ member|capfirst }}, {% endfor %}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    {% if project.status = 'N' %}
+    <a id="participate" type="button" class="btn btn-default">
+                         <i class="entypo-graduation-cap"></i> Participate in this Research!
+    </a>
+    {% endif %}
+    {% if user|is_matchingProgram_coordinator_or_member or user.is_superuser %}
+    <hr style="margin: 50px 0 50px 0;">
+    <div class="row">
+        <div class="panel-body">
+        <div class="col-md-10 col-md-offset-1 ">
+            <div class="panel panel-warning panel-shadow" data-collapsed="0">
+                <div class="panel-heading">
+                    <div class="panel-title ">Students' Application</div>
+                </div>
+                <div class="panel-body">
+                    {% if applications %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Skills</th>
+                                <th class="hidden-xs">Date added</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for student in applications %}
+                            <tr>
+                                <td><a href="{% url 'matching_program:application' student.id %}">{{ student.user }}</a></td>
+                                <td>{% for skill in student.skills.all %}{{skill|capfirst}},    {% endfor %}</td>
+                                <td class="hidden-xs">{{ student.date|date:"Y-n-j" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p>No applications listed yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+{% include "matching_program/partials/edit_project_asset.html" %}
+{% include "matching_program/partials/participate_asset.html" %}
+
+{% endblock %}
+{% block customstyles %}
+<link href='https://fonts.googleapis.com/css?family=Candal' rel='stylesheet' type='text/css'>
+{% endblock %}

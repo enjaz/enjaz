@@ -1,0 +1,232 @@
+{% extends 'mp_base.html' %}{% load staticfiles %}{% load matching_program_tags %}{% load l10n %}
+{% block content %}
+
+<div class="english-field">
+<div style="margin-top:20px;" class="row">
+    <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1">
+        <h1 class="hidden-xs" style="display: inline; font-family: 'Candal', sans-serif; font-size: 55px;" class="researchhub-name english-field">Matching Program</h1>
+        <p style="font-size: 20px; display: inline;  color: rgb(55, 62, 74); line-height: 2;"><strong class="visible-xs">Matching Program</strong> is a research opportunity initiative for the students of King Saud bin Abdulaziz University for Health Sciences, aiming at connecting students and easing the path towards research.</p>
+    </div>
+</div>
+{% if user|is_matchingProgram_coordinator_or_member or user.is_superuser %}
+<hr style="margin: 50px 0 100px 0;">
+<div class="row">
+    <div class="col-md-3 col-sm-offset-1">
+        <div class="tile-stats tile-green">
+            <div class="icon"><i class="fa fa-inbox"></i></div>
+            <div class="num" data-start="0" data-end="{{ applied_projects.count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+            <h3 class="english-field">Applied Project</h3>
+            <p>Research projects enlisted on Enjaz</p>
+        </div>
+    </div>
+    <div style="border-color: #09a052;" class="col-sm-6 mentor-section-intro">
+        <h2 class="english-field mentor-section-header"><i class="fa fa-inbox"></i><br>Applied projects!</h2>
+        <p class="section-intro">Matching Program's list of applied projects not approved yet!</p>
+    </div>
+</div>
+<div class="row">
+    <div class="panel-body">
+        <div class="col-md-10 col-md-offset-1 ">
+            <div class="panel panel-success panel-shadow" data-collapsed="0">
+                <div class="panel-heading">
+                    <div class="panel-title ">Applied Projects</div>
+                </div>
+                <div class="panel-body">
+                    {% if applied_projects %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Field</th>
+                                <th class="hidden-xs">Date added</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for project in applied_projects %}
+                            <tr>
+                                <td><a href="{% url 'matching_program:project' project.id %}">{{ project.title }}</a></td>
+                                <td>{{ project.field }}</td>
+                                <td class="hidden-xs">{{ project.date|date:"Y-n-j" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p>No applied Projects listed yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+<hr style="margin: 50px 0 100px 0;">
+<div class="row">
+    <div style="border-color: #ffd78a;" class="col-sm-6 col-sm-offset-2 mentor-section-intro">
+        <h2 class="english-field mentor-section-header"><i class="fa fa-hand-o-right"></i><br>Partcipate in a project!</h2>
+        <p class="section-intro">Matching Program's list of new research projects is waiting for you to paticipate!</p>
+    </div>
+    <div class="col-md-3">
+        <div class="tile-stats tile-orange">
+            <div class="icon"><i class="fa fa-hand-o-right"></i></div>
+            <div class="num" data-start="0" data-end="{{ new_projects.count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+            <h3 class="english-field">New Projects</h3>
+            <p>Research projects enlisted on Enjaz</p>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="panel-body">
+        <div class="col-md-10 col-md-offset-1 ">
+            <div class="panel panel-warning panel-shadow" data-collapsed="0">
+                <div class="panel-heading">
+                    <div class="panel-title ">New Projects</div>
+                    <div class="panel-options">
+                    <a id="add-project" type="button" class="btn btn-default">
+                         <i class="fa fa-user-plus"></i> Start a new project
+                    </a>
+                </div>
+                </div>
+                <div class="panel-body">
+                    {% if new_projects %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Field</th>
+                                <th class="hidden-xs">Date added</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for project in new_projects %}
+                            <tr>
+                                <td><a href="{% url 'matching_program:project' project.id %}">{{ project.title }}</a></td>
+                                <td>{{ project.field }}</td>
+                                <td class="hidden-xs">{{ project.date|date:"Y-n-j" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p>No New Projects listed yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<hr style="margin: 50px 0 100px 0;">
+<div class="row">
+    <div class="col-md-3 col-sm-offset-1">
+        <div class="tile-stats tile-blue">
+            <div class="icon"><i class="fa fa fa-cogs"></i></div>
+            <div class="num" data-start="0" data-end="{{ inProgress_projects.count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+            <h3 class="english-field">Projects in progress</h3>
+            <p>Research projects enlisted on Enjaz</p>
+        </div>
+    </div>
+    <div style="border-color: #2c7ea1;" class="col-sm-6 mentor-section-intro">
+        <h2 class="english-field mentor-section-header"><i class="fa fa fa-cogs"></i><br>Projects in progress!</h2>
+        <p class="section-intro">Matching Program's list of projects with complete team!</p>
+    </div>
+</div>
+<div class="row">
+    <div class="panel-body">
+        <div class="col-md-10 col-md-offset-1 ">
+            <div class="panel panel-info panel-shadow" data-collapsed="0">
+                <div class="panel-heading">
+                    <div class="panel-title ">In-progress Projects</div>
+                </div>
+                <div class="panel-body">
+                    {% if inProgress_projects %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Field</th>
+                                <th class="hidden-xs">Date added</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for project in inProgress_projects %}
+                            <tr>
+                                <td><a href="{% url 'matching_program:project' project.id %}">{{ project.title }}</a></td>
+                                <td>{{ project.field }}</td>
+                                <td class="hidden-xs">{{ project.date|date:"Y-n-j" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p>No In-Progress Projects listed yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<hr style="margin: 50px 0 100px 0;">
+<div class="row">
+    <div style="border-color: #e54040;" class="col-sm-6 col-sm-offset-2 mentor-section-intro">
+        <h2 class="english-field mentor-section-header"><i class="fa fa-graduation-cap"></i><br>Puplished Projects!</h2>
+        <p class="section-intro">Matching Program's list of Puplished Projects!</p>
+    </div>
+    <div class="col-md-3 ">
+        <div class="tile-stats tile-red">
+            <div class="icon"><i class="fa fa-graduation-cap"></i></div>
+            <div class="num" data-start="0" data-end="{{ puplished_projects.count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+            <h3 class="english-field">Puplished Project</h3>
+            <p>Research projects enlisted on Enjaz</p>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="panel-body">
+        <div class="col-md-10 col-md-offset-1 ">
+            <div class="panel panel-danger panel-shadow" data-collapsed="0">
+                <div class="panel-heading">
+                    <div class="panel-title ">Puplished Projects</div>
+                </div>
+                <div class="panel-body">
+                    {% if puplished_projects %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Field</th>
+                                <th class="hidden-xs">Date added</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for project in puplished_projects %}
+                            <tr>
+                                <td><a href="{% url 'matching_program:project' project.id %}">{{ project.title }}</a></td>
+                                <td>{{ project.field }}</td>
+                                <td class="hidden-xs">{{ project.date|date:"Y-n-j" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p>No In-Progress Projects listed yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+{% include "matching_program/partials/add_project_asset.html" %}
+{% endblock %}
+
+{% block customstyles %}
+<link href='https://fonts.googleapis.com/css?family=Candal' rel='stylesheet' type='text/css'>
+{% endblock %}

@@ -59,6 +59,7 @@ INSTALLED_APPS = (
     'guardian',
     'loginas',
     'hpc',
+    'matching_program',
     'media',
     'niqati',
     'post_office',

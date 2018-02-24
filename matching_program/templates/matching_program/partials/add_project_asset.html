@@ -1,0 +1,32 @@
+{% load staticfiles %}
+<script type="text/javascript">
+    $(function () {
+        // initialize project edit modal
+        $('#edit-project-modal').modal({
+          keyboard: false,
+          backdrop: 'static',
+          show    : false,
+        });
+        $("a#add-project").click(function () {
+            $("#edit-project-modal").modal('show');
+
+            $("#edit-project-modal .modal-title").html("Add a project");
+            $("#edit-project-modal .modal-body").load("{% url 'matching_program:add_project_introduction' %}", function(){
+                $('.end-project-introduction').click(function() {
+                    $("#edit-project-modal .modal-body").load("{% url 'matching_program:add_project' %}");
+                });
+            });
+
+            var $submitButton = $("#edit-project-modal button.submit-button");
+            $submitButton.off('click');
+            $submitButton.click(function () {
+                $("form#edit-project-form").submit();
+            });
+        });
+    });
+{% include 'bulb/adjust_modal_size.js' %}
+</script>
+
+{% with modal_id='edit-project-modal' %}
+    {% include "researchhub/partials/common_edit_modal.html" %}
+{% endwith %}

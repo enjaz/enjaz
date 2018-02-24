@@ -330,6 +330,14 @@ you?
 				</a>
 			</li>
             {% endif %}
+            {% if user.is_superuser %}
+			<li class="highlighted-section">
+				<a href="{% url 'matching_program:index' %}">
+					<i class="fa fa-search"></i>
+					<span class="english-field">Matching Program</span>
+				</a>
+			</li>
+            {% endif %}
 			<li>
 				<a href="{% url 'media:index' %}">
 					<i class="entypo-megaphone"></i>

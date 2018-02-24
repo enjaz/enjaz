@@ -91,9 +91,6 @@ class TeamAdmin(admin.ModelAdmin):
     raw_id_fields = ['members']
     form = TeamAdminForm
 
-
-raw_id_fields = ['members']
-
 admin.site.register(College, CollegeAdmin)
 admin.site.register(Club, ClubAdmin)
 admin.site.register(Team, TeamAdmin)

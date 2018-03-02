@@ -52,6 +52,7 @@ class AbstractAdmin(admin.ModelAdmin):
                     'date_submitted']
     inlines = [AuthorInline, AbstractFigureInline, AbstractPosterInline]
     filter_horizontal = ('evaluators',)
+    raw_id_fields = ['evaluators']
     introduction = forms.CharField(widget=CKEditorWidget())
 
 

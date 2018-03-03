@@ -2,10 +2,23 @@
 {% block content %}
 
 <div class="english-field">
+    {% if massage == "success" %}
+    <div style="margin-top:20px;" class="row">
+    <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 alert alert-success"><strong>
+        Well done!</strong> Your request has been received. We will review it soon, please check the status of your request frequently.
+    </div></div>
+{% endif %}
+{% if massage == "fail" %}
+    <div style="margin-top:20px;" class="row">
+    <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 alert alert-danger"><strong>
+        Sorry!</strong> Your request was deciled. make sure that you fill all the fields.
+    </div></div>
+{% endif %}
     <h1>{{ project.title }}</h1>
     <div class="row" style="margin-left: 0; margin-bottom: 5px;">
         <div style="float: right;">
             
+            {% if user|is_matchingProgram_coordinator_or_member or user.is_superuser or user == project.creator%}
             <a id="edit" type="button" class="btn btn-success">
                 <i class="entypo-pencil"></i>
                 Edit
@@ -16,6 +29,7 @@
                 <i class="entypo-block"></i>
                 Delete
             </button></a>
+            {% endif %}
         </div>
     </div>
     <div class="row">
@@ -55,7 +69,9 @@
                 </tr>
                 <tr>
                     <th>All members</th>
-                    <td>{% for member in project.members.all%}<a href="{% url 'matching_program:remove_member' project.id member.id %}"><i class="fa fa-minus-circle" style="color:red;"></i></a> {{ member|capfirst }}, {% endfor %}</td>
+                    <td>{% for member in project.members.all%}
+                         {% if user|is_matchingProgram_coordinator_or_member or user.is_superuser or user == project.creator%}
+                        <a href="{% url 'matching_program:remove_member' project.id member.id %}"><i class="fa fa-minus-circle" style="color:red;"></i></a>{% endif %} {{ member|capfirst }}, {% endfor %}</td>
                 </tr>
             </table>
         </div>

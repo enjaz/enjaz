@@ -9,12 +9,13 @@ from matching_program.forms import ResearchProjectForm, StudentApplicationForm
 
 
 @login_required
-def index(request):
+def index(request, massage):
+    my_projects = ResearchProject.objects.filter(creator= request.user)
     new_projects = ResearchProject.objects.filter(status="N")
     inProgress_projects = ResearchProject.objects.filter(status="IP")
     puplished_projects = ResearchProject.objects.filter(status="P")
     context= {"new_projects":new_projects,"inProgress_projects":inProgress_projects,
-              "puplished_projects":puplished_projects}
+              "puplished_projects":puplished_projects, "massage":massage, "my_projects":my_projects}
     
     if utils.is_matchingProgram_coordinator_or_member(request.user) or\
        request.user.is_superuser:
@@ -27,12 +28,14 @@ def index(request):
 def add_project(request):
     if request.method == 'POST':
         Project = ResearchProject(creator= request.user)
-        form = ResearchProjectForm(request.POST, instance= Project)
+        form = ResearchProjectForm(request,request.POST, instance= Project)
+        print form.errors
         if form.is_valid():
             form_object = form.save()
-            return HttpResponseRedirect(reverse('matching_program:index'))
+            return HttpResponseRedirect(reverse('matching_program:massage', kwargs={"massage":"success"}))
+        return HttpResponseRedirect(reverse('matching_program:massage', kwargs={"massage":"fail"}))
     return render(request, "matching_program/edit_project_form.html",
-                  {"form":ResearchProjectForm})
+                  {"form":ResearchProjectForm(request)})
     
 @login_required
 def project(request,pk):
@@ -42,7 +45,6 @@ def project(request,pk):
     if utils.is_matchingProgram_coordinator_or_member(request.user) or\
        request.user.is_superuser:
         members = project.members.all
-        print members
         applications= StudentApplication.objects.filter(research__id=pk).exclude(user__in=members)
         context['applications']= applications
         
@@ -60,7 +62,7 @@ def edit_project(request, pk):
         ResearchProject.update_project(project, request)
         return HttpResponseRedirect(reverse('matching_program:project',kwargs={"pk":pk}))
     return render(request, "matching_program/edit_form.html",
-                  {'form':ResearchProjectForm(instance=project), "pk":pk})
+                  {'form':ResearchProjectForm(request, instance=project), "pk":pk})
 
 def delete_project(request,pk):
     project = ResearchProject.objects.get(id=pk)
@@ -92,13 +94,18 @@ def student_app(request,pk):
 
 def add_student_app(request,pk):
     if request.method == "POST":
+        project= ResearchProject.objects.get(id=pk)
         if utils.is_new_application(request.user, pk):
             student_app = StudentApplication(user=request.user, research_id=pk)
             form = StudentApplicationForm(request.POST ,instance=student_app)
             if form.is_valid():
                 form_object= form.save()
-        url = reverse('matching_program:project', kwargs={"pk":pk})
-        return HttpResponseRedirect(url)
+                context = {"project":project, "massage":"success"}
+                return render(request, "matching_program/project.html",
+                  context)
+        context = {"project":project, "massage":"fail"}
+        return render(request, "matching_program/project.html",
+                  context)
     return render(request, "matching_program/edit_app_form.html",{"form":StudentApplicationForm, 'pk':pk})
     
 def edit_app(request):

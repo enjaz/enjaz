@@ -11,7 +11,14 @@ class ResearchProjectForm(forms.ModelForm):
     class Meta:
         model = ResearchProject
         fields = ['title','supervisor','description','field',
-                  'required_role','communication']
+                  'required_role','communication', 'status']
+
+    def __init__(self,user, *args, **kwargs):
+        from django.forms.widgets import HiddenInput
+        super(ResearchProjectForm, self).__init__(*args, **kwargs)
+        if user.user.is_superuser or utils.is_matchingProgram_coordinator_or_member(user.user) == False:
+            self.fields['status'].widget = HiddenInput()
+        
 
      
  

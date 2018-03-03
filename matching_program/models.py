@@ -28,8 +28,8 @@ class ResearchProject(models.Model):
                                     blank=True,
                                     verbose_name='members',
                                     )
-    field= models.ForeignKey(Field,
-                             verbose_name='field',
+    field= models.CharField(max_length= 255,
+                            verbose_name='field',
                              null=True)
     supervisor= models.CharField(max_length=100,
                                  verbose_name="Supervisor's name")
@@ -47,6 +47,8 @@ class ResearchProject(models.Model):
         self.description = request.POST.get('description')
         self.required_role = request.POST.get('required_role')
         self.communication = request.POST.get('communication')
+        self.field = request.POST.get('field')
+        self.status = request.POST.get('status')
         self.save()
 
         

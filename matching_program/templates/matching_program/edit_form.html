@@ -3,6 +3,100 @@
 {% csrf_token %}
 <div class="english-field">
     
-    {% bootstrap_form form %}
+    <div class="form-group"><label class="control-label" for="id_title">Title</label><input class="form-control" id="id_title" maxlength="100" name="title" placeholder="Title" required="required" title="" type="text" value="{{form.title.value}}"></div>
+<div class="form-group"><label class="control-label" for="id_supervisor">Supervisor's name</label><input class="form-control" id="id_supervisor" maxlength="100" name="supervisor" placeholder="Supervisor's name" required="required" title="" type="text" value="{{form.supervisor.value}}"></div>
+<div class="form-group"><label class="control-label" for="id_description">Description</label><textarea class="form-control" cols="40" id="id_description" name="description" placeholder="Description" required="required" rows="10" title="">{{form.description.value}}</textarea></div>
+<div class="form-group"><label class="control-label" for="id_field">Field</label><select class="form-control" id="id_field" name="field" required="required" title="">
+<option value="{{form.field.value}}">{{ form.field.value }}</option>
+<option value="Addiction Medicine">Addiction Medicine</option>
+<option value="Allergic Disease">Allergic Disease</option>
+<option value="Anatomy">Anatomy</option>
+<option value="Anesthesiology">Anesthesiology</option>
+<option value="Angiology">Angiology</option>
+<option value="Audiology">Audiology</option>
+<option value="Cardiology">Cardiology</option>
+<option value="Cardiovascular surgery">Cardiovascular surgery</option>
+<option value="Clinical laboratory sciences">Clinical laboratory sciences</option>
+<option value="Dentistry">Dentistry</option>
+<option value="Dermatology">Dermatology</option>
+<option value="Emergency medicine">Emergency medicine</option>
+<option value="Endocrinology">Endocrinology</option>
+<option value="Family medicine">Family medicine</option>
+<option value="Forensic medicine">Forensic medicine</option>
+<option value="Genetic Counselling">Genetic Counselling</option>
+<option value="Gastroenterology">Gastroenterology</option>
+<option value="Geriatrics">Geriatrics</option>
+<option value="Gynecology">Gynecology</option>
+<option value="Hematology">Hematology</option>
+<option value="Hepatology">Hepatology</option>
+<option value="Histology">Histology</option>
+<option value="Immunology">Immunology</option>
+<option value="Infectious Disease, including Virology">Infectious Disease, including Virology</option>
+<option value="Intensive care medicine">Intensive care medicine</option>
+<option value="Kinesiology, including Exercise Physiology">Kinesiology, including Exercise Physiology</option>
+<option value="Medical genetics">Medical genetics</option>
+<option value="Medical Physics">Medical Physics</option>
+<option value="Medical Technology">Medical Technology</option>
+<option value="Medicine">Medicine</option>
+<option value="Midwifery">Midwifery</option>
+<option value="Nephrology">Nephrology</option>
+<option value="Neuroscience">Neuroscience</option>
+<option value="Neurology">Neurology</option>
+<option value="Neuropsychology">Neuropsychology</option>
+<option value="Neurosurgery">Neurosurgery</option>
+<option value="Nursing">Nursing</option>
+<option value="Nutrition, including Dietetics">Nutrition, including Dietetics</option>
+<option value="Obstetrics">Obstetrics</option>
+<option value="Occupational Therapy">Occupational Therapy</option>
+<option value="Oncology">Oncology</option>
+<option value="Ophthalmology">Ophthalmology</option>
+<option value="Optometry">Optometry</option>
+<option value="Oral and maxillofacial surgery">Oral and maxillofacial surgery</option>
+<option value="Orthopedics">Orthopedics</option>
+<option value="Orthopedic surgery">Orthopedic surgery</option>
+<option value="Otorhinolaryngology">Otorhinolaryngology</option>
+<option value="Palliative care">Palliative care</option>
+<option value="Pathology">Pathology</option>
+<option value="Pediatrics">Pediatrics</option>
+<option value="Pediatric surgery">Pediatric surgery</option>
+<option value="Pharmacology">Pharmacology</option>
+<option value="Pharmacy">Pharmacy</option>
+<option value="Physical medicine and rehabilitation Or Physiatry">Physical medicine and rehabilitation Or Physiatry</option>
+<option value="Physical Therapy (Physiotherapy)">Physical Therapy (Physiotherapy)</option>
+<option value="Physiology">Physiology</option>
+<option value="Plastic surgery">Plastic surgery</option>
+<option value="Podiatry">Podiatry</option>
+<option value="Population health & Public Health, including Epidemiology">Population health & Public Health, including Epidemiology</option>
+<option value="Proctology">Proctology</option>
+<option value="Psychotherapy, including Cognitive Therapy">Psychotherapy, including Cognitive Therapy</option>
+<option value="Psychiatry">Psychiatry</option>
+<option value="Pulmonology">Pulmonology</option>
+<option value="Radiation therapy">Radiation therapy</option>
+<option value="Radiology">Radiology</option>
+<option value="Rheumatology">Rheumatology</option>
+<option value="Sleep Medicine">Sleep Medicine</option>
+<option value="Speech-Language Pathology">Speech-Language Pathology</option>
+<option value="Social Work">Social Work</option>
+<option value="Stomatology">Stomatology</option>
+<option value="Surgery">Surgery</option>
+<option value="Surgical oncology">Surgical oncology</option>
+<option value="Thoracic surgery">Thoracic surgery</option>
+<option value="Translational medicine">Translational medicine</option>
+<option value="Transplant surgery">Transplant surgery</option>
+<option value="Urology">Urology</option>
+<option value="Vascular surgery">Vascular surgery</option>
+<option value="Veterinary Medicine">Veterinary Medicine</option>
+<option value="Other">Other</option>
+</select></div>
+<div class="form-group"><label class="control-label" for="id_required_role">Required role</label><input class="form-control" id="id_required_role" maxlength="100" name="required_role" placeholder="Required role" required="required" title="" type="text" value="{{form.required_role.value}}"></div>
+<div class="form-group"><label class="control-label" for="id_communication">Communication</label><textarea class="form-control" cols="40" id="id_communication" name="communication" placeholder="Communication" required="required" rows="10" title="">{{form.communication.value}}</textarea></div>
+    {% if form.status.is_hidden == False %}
+<div class="form-group" ><label class="control-label"  for="id_status">Status</label><select  class="form-control" id="id_status" name="status" required="required" title="">
+<option value="{{form.status.value}}" selected="selected">{{form.status.value}}</option>
+<option value="A">applied</option>   
+<option value="N">new</option>
+<option value="IP">in progress</option>
+<option value="P">puplished</option>
+</select></div> {% endif %}
 </div>
 </form>

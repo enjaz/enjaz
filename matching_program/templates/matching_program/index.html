@@ -8,6 +8,69 @@
         <p style="font-size: 20px; display: inline;  color: rgb(55, 62, 74); line-height: 2;"><strong class="visible-xs">Matching Program</strong> is a research opportunity initiative for the students of King Saud bin Abdulaziz University for Health Sciences, aiming at connecting students and easing the path towards research.</p>
     </div>
 </div>
+{% if massage == "success" %}
+    <div style="margin-top:20px;" class="row">
+    <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 alert alert-success"><strong>
+        Well done!</strong> Your request has been received. We will review it soon, please check the status of your proposal frequently.
+    </div></div>
+{% endif %}
+{% if massage == "fail" %}
+    <div style="margin-top:20px;" class="row">
+    <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 alert alert-danger"><strong>
+        Sorry!</strong> Your request was deciled. make sure that you fill all the fields.
+    </div></div>
+{% endif %}
+{% if my_projects %}
+<hr style="margin: 50px 0 100px 0;">
+<div class="row">
+    <div class="col-md-3 col-sm-offset-1">
+        <div class="tile-stats tile-green">
+            <div class="icon"><i class="fa fa-inbox"></i></div>
+            <div class="num" data-start="0" data-end="{{ my_projects.count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
+            <h3 class="english-field">My Projects</h3>
+            <p>Research projects enlisted on Enjaz</p>
+        </div>
+    </div>
+    <div style="border-color: #09a052;" class="col-sm-6 mentor-section-intro">
+        <h2 class="english-field mentor-section-header"><i class="fa fa-inbox"></i><br>My projects!</h2>
+        <p class="section-intro">Matching Program's list of your projects!</p>
+    </div>
+</div>
+<div class="row">
+    <div class="panel-body">
+        <div class="col-md-10 col-md-offset-1 ">
+            <div class="panel panel-success panel-shadow" data-collapsed="0">
+                <div class="panel-heading">
+                    <div class="panel-title ">My Projects</div>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Field</th>
+                                <th class="hidden-xs">Date added</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for project in my_projects %}
+                            <tr>
+                                <td><a href="{% url 'matching_program:project' project.id %}">{{ project.title }}</a></td>
+                                <td>{{ project.field }}</td>
+                                <td class="hidden-xs">{{ project.date|date:"Y-n-j" }}</td>
+                                <td>{{ project.status }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% if user|is_matchingProgram_coordinator_or_member or user.is_superuser %}
 <hr style="margin: 50px 0 100px 0;">
 <div class="row">

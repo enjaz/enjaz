@@ -3,7 +3,8 @@ from django.views.generic import TemplateView
 from . import views
 
 urlpatterns = patterns('',
-        url(r'^$',views.index,name='index'),
+        url(r'^$',views.index,{'massage': 'no'},name='index'),
+        url(r'^massage/(?P<massage>\w+)$',views.index,name='massage'),
                        
         url(r'^project/(?P<pk>\d+)/$',views.project,name='project'),
         url(r'^projects/add/intro/$', TemplateView.as_view(template_name='matching_program/add_project_introduction.html'), name="add_project_introduction"),

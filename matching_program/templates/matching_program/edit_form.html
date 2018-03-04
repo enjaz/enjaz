@@ -90,13 +90,15 @@
 </select></div>
 <div class="form-group"><label class="control-label" for="id_required_role">Required role</label><input class="form-control" id="id_required_role" maxlength="100" name="required_role" placeholder="Required role" required="required" title="" type="text" value="{{form.required_role.value}}"></div>
 <div class="form-group"><label class="control-label" for="id_communication">Communication</label><textarea class="form-control" cols="40" id="id_communication" name="communication" placeholder="Communication" required="required" rows="10" title="">{{form.communication.value}}</textarea></div>
-    {% if form.status.is_hidden == False %}
-<div class="form-group" ><label class="control-label"  for="id_status">Status</label><select  class="form-control" id="id_status" name="status" required="required" title="">
+    
+    <div class="form-group"><label class="control-label" for="id_status">Status</label><select class="form-control" id="id_status" name="status" required="required" title="">
 <option value="{{form.status.value}}" selected="selected">{{form.status.value}}</option>
-<option value="A">applied</option>   
+{% if form.status.is_hidden == False %}
+<option value="A">Applied</option>
 <option value="N">new</option>
 <option value="IP">in progress</option>
 <option value="P">puplished</option>
-</select></div> {% endif %}
+{% endif %}</select></div>
+    
 </div>
 </form>

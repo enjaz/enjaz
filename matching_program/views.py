@@ -24,7 +24,7 @@ def index(request, massage):
         
     return render(request, "matching_program/index.html",
                   context)
-
+    
 def add_project(request):
     if request.method == 'POST':
         Project = ResearchProject(creator= request.user)
@@ -38,9 +38,16 @@ def add_project(request):
                   {"form":ResearchProjectForm(request)})
     
 @login_required
-def project(request,pk):
+def project(request,pk, massage):
     project= ResearchProject.objects.get(id=pk)
-    context={'project':project, 'form': StudentApplicationForm}
+    context={'project':project, 'form': StudentApplicationForm, "massage":massage}
+
+    try:
+        if StudentApplication.objects.get(research__id=pk,user=request.user):
+            context['my_app']= StudentApplication.objects.get(research__id=pk,user=request.user)
+    except :
+        pass
+    
 
     if utils.is_matchingProgram_coordinator_or_member(request.user) or\
        request.user.is_superuser:
@@ -100,12 +107,10 @@ def add_student_app(request,pk):
             form = StudentApplicationForm(request.POST ,instance=student_app)
             if form.is_valid():
                 form_object= form.save()
-                context = {"project":project, "massage":"success"}
-                return render(request, "matching_program/project.html",
-                  context)
-        context = {"project":project, "massage":"fail"}
-        return render(request, "matching_program/project.html",
-                  context)
+                url = reverse('matching_program:project_massage', kwargs={"pk":pk,"massage":"success"})
+                return HttpResponseRedirect(url)
+        url = reverse('matching_program:project_massage', kwargs={"pk":pk,"massage":"fail"})
+        return HttpResponseRedirect(url)
     return render(request, "matching_program/edit_app_form.html",{"form":StudentApplicationForm, 'pk':pk})
     
 def edit_app(request):

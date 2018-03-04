@@ -2,18 +2,28 @@
 {% block content %}
 
 <div class="english-field">
-    {% if massage == "success" %}
+{% if massage == "success" %}
     <div style="margin-top:20px;" class="row">
     <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 alert alert-success"><strong>
         Well done!</strong> Your request has been received. We will review it soon, please check the status of your request frequently.
     </div></div>
-{% endif %}
-{% if massage == "fail" %}
+{% elif massage == "fail" %}
     <div style="margin-top:20px;" class="row">
     <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 alert alert-danger"><strong>
         Sorry!</strong> Your request was deciled. make sure that you fill all the fields.
     </div></div>
+{% elif user in project.members.all %}
+    <div style="margin-top:20px;" class="row">
+    <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 alert alert-success"><strong >
+        Congradulations</strong> your request has  been accepted. you are a member in this research.
+    </div></div>
+{% elif my_app %}
+    <div style="margin-top:20px;" class="row">
+    <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 alert alert-warning"><strong style="color:red;">
+        Your reqeust</strong> has not been accepted yet. please check the status of your request frequently.
+    </div></div>
 {% endif %}
+
     <h1>{{ project.title }}</h1>
     <div class="row" style="margin-left: 0; margin-bottom: 5px;">
         <div style="float: right;">
@@ -76,11 +86,19 @@
             </table>
         </div>
     </div>
-    {% if project.status = 'N' %}
+    {% if project.status = 'N' and user != project.creator %}
+    {% if my_app %}
+    <a href="{% url 'matching_program:delete_app' my_app.id %}" type="button" class="btn btn-danger">
+                         <i class="entypo-graduation-cap"></i> Delete your request!
+    </a>
+    {% else %}
     <a id="participate" type="button" class="btn btn-default">
                          <i class="entypo-graduation-cap"></i> Participate in this Research!
     </a>
     {% endif %}
+    {% endif %}
+    
+    <div style="margin-top:20px;" class="row"></div>
     {% if user|is_matchingProgram_coordinator_or_member or user.is_superuser %}
     <hr style="margin: 50px 0 50px 0;">
     <div class="row">

@@ -44,7 +44,7 @@
                     <div class="panel-title ">My Projects</div>
                 </div>
                 <div class="panel-body">
-                    <table class="table table-hover">
+                    <table class="display projects_list dt-responsive">
                         <thead>
                             <tr>
                                 <th>Title</th>
@@ -60,7 +60,7 @@
                                 <td><a href="{% url 'matching_program:project' project.id %}">{{ project.title }}</a></td>
                                 <td>{{ project.field }}</td>
                                 <td class="hidden-xs">{{ project.date|date:"Y-n-j" }}</td>
-                                <td>{{ project.status }}</td>
+                                <td>{{ project.get_status_display }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -96,7 +96,7 @@
                 </div>
                 <div class="panel-body">
                     {% if applied_projects %}
-                    <table class="table table-hover">
+                    <table class="display projects_list dt-responsive">
                         <thead>
                             <tr>
                                 <th>Title</th>
@@ -153,7 +153,7 @@
                 </div>
                 <div class="panel-body">
                     {% if new_projects %}
-                    <table class="table table-hover">
+                    <table class="display projects_list dt-responsive">
                         <thead>
                             <tr>
                                 <th>Title</th>
@@ -204,7 +204,7 @@
                 </div>
                 <div class="panel-body">
                     {% if inProgress_projects %}
-                    <table class="table table-hover">
+                    <table class="display projects_list dt-responsive">
                         <thead>
                             <tr>
                                 <th>Title</th>
@@ -255,7 +255,7 @@
                 </div>
                 <div class="panel-body">
                     {% if puplished_projects %}
-                    <table class="table table-hover">
+                    <table class="display projects_list dt-responsive">
                         <thead>
                             <tr>
                                 <th>Title</th>
@@ -284,9 +284,32 @@
 </div>
 </div>
 {% endblock %}
-
 {% block customscript %}
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+    
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/jszip.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/buttons.html5.min.js' %}"></script>
+<script>
+$(function () {
+    
+	$('.projects_list').dataTable({
+        dom: 'Bfrtip',
+        buttons: [
+        ],
+		order: [[ 2, "desc" ]],
+		language: {% include 'js/dataTables-arabic.json' %}
+	});
+	// Allow the dropdown menus to cross the border of the panel without being cropped
+	$(".panel").css("overflow-x", "visible").css("overflow-y", "visible");
+    $('.dataTables_filter').remove();
+});
+
+</script>
 {% include "matching_program/partials/add_project_asset.html" %}
 {% endblock %}
 

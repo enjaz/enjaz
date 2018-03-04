@@ -32,7 +32,8 @@ class ResearchProject(models.Model):
                             verbose_name='field',
                              null=True)
     supervisor= models.CharField(max_length=100,
-                                 verbose_name="Supervisor's name")
+                                 verbose_name="Suggested supervisor's name",
+                                 blank=True)
     title= models.CharField(max_length=100)
     description= models.TextField()
     required_role= models.CharField(max_length=100)
@@ -59,7 +60,7 @@ class ResearchProject(models.Model):
 class StudentApplication(models.Model):
     user= models.ForeignKey(User, related_name="user")
     research= models.ForeignKey(ResearchProject)
-    skills= models.ManyToManyField(Skills)
+    skills= models.CharField(max_length=255)
     experience= models.TextField()
     advantages= models.TextField(verbose_name="Why we should pick you?")
     date= models.DateTimeField(auto_now_add=True)

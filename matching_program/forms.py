@@ -16,7 +16,7 @@ class ResearchProjectForm(forms.ModelForm):
     def __init__(self,user, *args, **kwargs):
         from django.forms.widgets import HiddenInput
         super(ResearchProjectForm, self).__init__(*args, **kwargs)
-        if user.user.is_superuser or utils.is_matchingProgram_coordinator_or_member(user.user) == False:
+        if not user.user.is_superuser and not utils.is_matchingProgram_coordinator_or_member(user.user):
             self.fields['status'].widget = HiddenInput()
         
 
@@ -27,5 +27,10 @@ class StudentApplicationForm(forms.ModelForm):
     class Meta:
         model = StudentApplication
         fields = ['skills','experience', 'advantages']
+        widgets = {
+            'skills': forms.TextInput(attrs={'placeholder': 'ex. writing manuscripts, data analysis'}),
+            'experience': forms.Textarea(
+                attrs={'placeholder': 'have you participated in any researches?'}),
+        }
 
 

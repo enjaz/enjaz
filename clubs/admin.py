@@ -32,6 +32,13 @@ class SingleUserChoiceField(forms.ModelChoiceField):
             return "%s (%s)" % (obj.username, profile.get_ar_full_name())
         except ObjectDoesNotExist:
             return obj.username
+class MultipleUserChoiceField(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        try:
+            profile = obj.common_profile
+            return "%s (%s)" % (obj.username, profile.get_ar_full_name())
+        except ObjectDoesNotExist:
+            return obj.username
 
 class ClubAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):

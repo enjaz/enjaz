@@ -52,11 +52,11 @@ class ResearchProject(models.Model):
         self.status = request.POST.get('status')
         self.save()
 
-        
+
     def __unicode__(self):
         return self.title
 
-    
+
 class StudentApplication(models.Model):
     user= models.ForeignKey(User, related_name="user")
     research= models.ForeignKey(ResearchProject)
@@ -67,5 +67,5 @@ class StudentApplication(models.Model):
 
     def __unicode__(self):
         return unicode(self.user)
-    
+
 # Create your models here.

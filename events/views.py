@@ -151,6 +151,7 @@ def list_abstracts(request, event_code_name):
 
     pending_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=2)
     evaluated_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=2)
+    one_evaluator = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=1, num_b__lt=2)
     deleted_abstracts = Abstract.objects.filter(event=event, is_deleted=True)
     accepted_poster_abstracts = Abstract.objects.filter(event=event, is_deleted=False, accepted_presentaion_preference= 'P')
     accepted_oral_abstracts = Abstract.objects.filter(event=event, is_deleted=False, accepted_presentaion_preference= 'O')
@@ -158,6 +159,7 @@ def list_abstracts(request, event_code_name):
     context = {'event': event,
                'pending_abstracts': pending_abstracts,
                'evaluated_abstracts': evaluated_abstracts,
+               'one_evaluator': one_evaluator,
                'deleted_abstracts': deleted_abstracts,
                'accepted_poster_abstracts': accepted_poster_abstracts,
                'accepted_oral_abstracts': accepted_oral_abstracts,

@@ -135,7 +135,7 @@ you?
                             <span>حدّث معلوماتي</span>
                         </a>
                     </li>
-                    {% if user.event_abstracts.exists %}
+                    {% if user.event_abstracts.exists or user.event_casereport.exists %}
                     <li>
                         <a href="{% url 'events:list_my_abstracts' %}">
                             <i class="entypo-pencil"></i>

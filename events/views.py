@@ -149,7 +149,7 @@ def list_abstracts(request, event_code_name):
     if not utils.is_organizing_team_member(request.user, event):
         raise PermissionDenied
 
-    pending_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=2)
+    pending_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=1)
     evaluated_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=2)
     one_evaluator = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=1, num_b__lt=2)
     deleted_abstracts = Abstract.objects.filter(event=event, is_deleted=True)
@@ -717,9 +717,9 @@ def evaluators_homepage(request,event_code_name):
                                                     event=event)\
                                             .exclude(evaluation__user=user_evaluations)\
                                             .distinct()
-    riyadh_evaluators = Team.objects.get(code_name='hpc2-r-e')
-    jeddah_evaluators = Team.objects.get(code_name='hpc2-j-e')
-    alahsa_evaluators = Team.objects.get(code_name='hpc2-a-e')
+    riyadh_evaluators = Team.objects.get(code_name='hpc3-r-e')
+    jeddah_evaluators = Team.objects.get(code_name='hpc3-j-e')
+    alahsa_evaluators = Team.objects.get(code_name='hpc3-a-e')
     context = {'riyadh_evaluators': riyadh_evaluators,
                'jeddah_evaluators':jeddah_evaluators,
                'alahsa_evaluators':alahsa_evaluators,

@@ -32,6 +32,7 @@
                                     <th class="all">Presenting author</th>
                                     <th class="all">University</th>
                                     <th class="all">Presentation preference</th>
+                                    <th class="none">Evaluators</th>
                                     <th class="none">Puplished?</th>
                                     <th class="none">Presented previously at HPC?</th>
                                     <th class="none">Presented previously at others?</th>
@@ -47,6 +48,13 @@
                                     <th><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></th>
                                     <td>{{ abstract.university }}</td>
                                     <td>{{ abstract.get_presentation_preference_display }}</td>
+                                    <td>
+                                        <ul>
+                                            {% for evaluator in abstract.evaluators.all %}
+                                            <li>{{ evaluator.common_profile.en_last_name|default:evaluator.username }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
                                     <td>{{ abstract.was_published|yesno:"Yes,No" }}</td>
                                     <td>{{ abstract.was_presented_previously|yesno:"Yes,No" }}</td>
                                     <td>{{ abstract.was_presented_at_others|yesno:"Yes,No" }}</td>
@@ -58,6 +66,82 @@
                     </div>
                     <button type="submit" class="btn btn-warning">Submit</button>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="english-field">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseTwotwo-2" class="english-field collapsed">
+                    One evaluator ({{ one_evaluator.count }})
+                </a>
+            </h4>
+        </div>
+        <div id="collapseTwotwo-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <select name="action">
+                        <option>Choose Action</option>
+                        <option value="delete">Delete</option>
+                        <option value="accepte_as_oral">Accept As Oral</option>
+                        <option value="accepte_as_poster">Accept As Poster</option>
+                        <option value="regect">Regect</option>
+                    </select>
+                    <div class="row">
+                        <table id="one_evaluator" class="display datatable dt-responsive">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th class="all">ID</th>
+                                    <th class="all">Title</th>
+                                    <th class="all">Presenting author</th>
+                                    <th class="all">University</th>
+                                    <th class="all">Presentation preference</th>
+                                    <th class="all">Score</th>
+                                    <th class="all">Accepted presentation preference</th>
+                                    <th class="none">Evaluators</th>
+                                    <th class="none">Puplished?</th>
+                                    <th class="none">Presented previously at HPC?</th>
+                                    <th class="none">Presented previously at others?</th>
+                                    <th class="none">Submission date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for abstract in one_evaluator %}
+                                <tr>
+                                    <td><input type="checkbox" value="1" name="pk_{{ abstract.pk }}"></td>
+                                    <td>{{ abstract.pk }}</td>
+                                    <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
+                                    <td><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></td>
+                                    <td>{{ abstract.university }}</td>
+                                    <td>{{ abstract.get_presentation_preference_display }}</td>
+                                    <td>ِ{{ abstract.get_average_score }}</td>
+                                    {% if abstract.get_accepted_presentaion_preference_display %}
+                                    <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
+                                    {% else %}
+                                    <td>{{ abstract.get_status_display }}</td>
+                                    {% endif %}
+                                    <td>
+                                        <ul>
+                                            {% for evaluator in abstract.evaluators.all %}
+                                            <li>{{ evaluator.common_profile.en_last_name|default:evaluator.username }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                    <td>{{ abstract.was_published|yesno:"Yes,No" }}</td>
+                                    <td>{{ abstract.was_presented_previously|yesno:"Yes,No" }}</td>
+                                    <td>{{ abstract.was_presented_at_others|yesno:"Yes,No" }}</td>
+                                    <td data-order="{{ abstract.date_submitted|date:" U " }}">{{ abstract.date_submitted }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                <button type="submit" class="btn btn-success">Submit</button>
+                    </form>
             </div>
         </div>
     </div>
@@ -415,6 +499,11 @@
 <script>
     $(function() {
         $("#pending").dataTable({
+            "order": [
+                [1, "desc"]
+            ]
+        });
+        $("#one_evaluator").dataTable({
             "order": [
                 [1, "desc"]
             ]

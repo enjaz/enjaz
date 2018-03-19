@@ -9,5 +9,7 @@ register = template.Library()
 def is_matchingProgram_coordinator_or_member(user):
     return utils.is_matchingProgram_coordinator_or_member(user)
 
-
+@register.filter
+def is_matchingProgram_coordinator(user):
+    return utils.is_matchingProgram_coordinator(user)
 

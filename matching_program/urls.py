@@ -5,7 +5,15 @@ from . import views
 urlpatterns = patterns('',
         url(r'^$',views.index,{'massage': 'no'},name='index'),
         url(r'^massage/(?P<massage>\w+)$',views.index,name='massage'),
-                       
+
+        url(r'^coordinator/$', views.coordinator_page,name='coordinator_page'),
+        url(r'^coordinator/search/$', views.search_ajax, name='search_ajax'),
+        url(r'^coordinator/members/$', views.members_list, name='members_list'),
+        url(r'^coordinator/(?P<pk>\d+)/add/$', views.add_team, name="add_team"),
+        url(r'^coordinator/(?P<pk>\d+)/remove/$', views.remove_team, name="add_remove"),
+
+
+
         url(r'^project/(?P<pk>\d+)/$',views.project,{'massage': 'no'},name='project'),
         url(r'^project/(?P<pk>\d+)/(?P<massage>\w+)$',views.project,name='project_massage'),
         url(r'^projects/add/intro/$', TemplateView.as_view(template_name='matching_program/add_project_introduction.html'), name="add_project_introduction"),

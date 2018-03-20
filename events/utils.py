@@ -4,6 +4,8 @@ import json
 import StringIO
 import qrcode
 import qrcode.image.svg
+import barcode
+from barcode.writer import ImageWriter
 
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
@@ -162,6 +164,11 @@ def get_barcode(text):
     qrcode_value = "".join(qrcode_output.getvalue().split('\n')[1:])
     return qrcode_value
 
+def get_dbarcode(text):
+    ean = barcode.codex.Code39(text, writer=ImageWriter(), add_checksum=False)
+    filename = ean.save('ean13')
+    return filename
+
 def get_user_sidebar_events(user):
     user_city = accounts.utils.get_user_city(user)
     event_pool = Event.objects.filter(end_date__gte=timezone.now().date(),
@@ -199,7 +206,7 @@ def email_badge(user, event, my_registration_url):
     attachments = {'Badge.pdf': ContentFile(pdf_content)}
     notification_email = event.get_notification_email()
     cc = accounts.utils.get_user_cc(user)
-   
+
     try:
         mail.send([user.email],
                   u"بوابة إنجاز <{}>".format(notification_email),

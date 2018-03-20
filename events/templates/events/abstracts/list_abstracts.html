@@ -74,12 +74,12 @@
     <div class="panel panel-info">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseTwotwo-2" class="english-field collapsed">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseTwo-2" class="english-field collapsed">
                     One evaluator ({{ one_evaluator.count }})
                 </a>
             </h4>
         </div>
-        <div id="collapseTwotwo-2" class="panel-collapse collapse" style="height: 0px;">
+        <div id="collapseTwo-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
                 <form method="post">
                     {% csrf_token %}
@@ -150,12 +150,12 @@
     <div class="panel panel-success">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseTwo-2" class="english-field collapsed">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseThree-2" class="english-field collapsed">
                     Evaluated abstracts ({{ evaluated_abstracts.count }})
                 </a>
             </h4>
         </div>
-        <div id="collapseTwo-2" class="panel-collapse collapse" style="height: 0px;">
+        <div id="collapseThree-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
                 <form method="post">
                     {% csrf_token %}
@@ -226,12 +226,12 @@
     <div class="panel panel-danger">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseThree-2" class="english-field notcollapsed">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseFour-2" class="english-field notcollapsed">
                     Deleted abstracts ({{ deleted_abstracts.count }})
                 </a>
             </h4>
         </div>
-        <div id="collapseThree-2" class="panel-collapse collapse" style="height: 0px;">
+        <div id="collapseFour-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
                 <form method="post">
                     {% csrf_token %}
@@ -287,12 +287,12 @@
     <div class="panel panel-info">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseFour-2" class="english-field collapsed">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseFive-2" class="english-field collapsed">
                     Poster abstracts ({{ accepted_poster_abstracts.count }})
                 </a>
             </h4>
         </div>
-        <div id="collapseFour-2" class="panel-collapse collapse" style="height: 0px;">
+        <div id="collapseFive-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
                 <form method="post">
                     {% csrf_token %}
@@ -300,8 +300,9 @@
                         <option>Choose Action</option>
                         <option value="delete">Delete</option>
                         <option value="accepte_as_oral">Accept As Oral</option>
-                        <option value="accepte_as_poster">Accept As Poster</option>
                         <option value="regect">Regect</option>
+                        <option value="first_day">First Day</option>
+                        <option value="second_day">Second Day</option>
                     </select>
                     <div class="row">
                         <table id="poster" class="display datatable dt-responsive">
@@ -314,6 +315,7 @@
                                     <th class="all">Presentation preference</th>
                                     <th class="all">Score</th>
                                     <th class="all">Accepted presentation preference</th>
+                                    <th class="all">Presentation date</th>
                                     <th class="none">Evaluators</th>
                                     <th class="none">Puplished?</th>
                                     <th class="none">Presented previously at HPC?</th>
@@ -335,6 +337,7 @@
                                     {% else %}
                                     <td>{{ abstract.get_status_display }}</td>
                                     {% endif %}
+                                    <td>{{ abstract.presentaion_date }}</td>
                                     <td>
                                         <ul>
                                             {% for evaluator in abstract.evaluators.all %}
@@ -361,21 +364,22 @@
     <div class="panel panel-success">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseFive-2" class="english-field collapsed">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseSix-2" class="english-field collapsed">
                     Oral abstracts ({{ accepted_oral_abstracts.count }})
                 </a>
             </h4>
         </div>
-        <div id="collapseFive-2" class="panel-collapse collapse" style="height: 0px;">
+        <div id="collapseSix-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
                 <form method="post">
                     {% csrf_token %}
                     <select name="action">
                         <option>Choose Action</option>
                         <option value="delete">Delete</option>
-                        <option value="accepte_as_oral">Accept As Oral</option>
                         <option value="accepte_as_poster">Accept As Poster</option>
                         <option value="regect">Regect</option>
+                        <option value="first_day">First Day</option>
+                        <option value="second_day">Second Day</option>
                     </select>
                     <div class="row">
                         <table id="oral" class="display datatable dt-responsive">
@@ -388,6 +392,7 @@
                                     <th class="all">Presentation preference</th>
                                     <th class="all">Score</th>
                                     <th class="all">Accepted presentation preference</th>
+                                    <th class="all">Presentation date</th>
                                     <th class="none">Evaluators</th>
                                     <th class="none">Puplished?</th>
                                     <th class="none">Presented previously at HPC?</th>
@@ -409,6 +414,7 @@
                                     {% else %}
                                     <td>{{ abstract.get_status_display }}</td>
                                     {% endif %}
+                                    <td>{{ abstract.presentaion_date }}</td>
                                     <td>
                                         <ul>
                                             {% for evaluator in abstract.evaluators.all %}
@@ -441,12 +447,12 @@
     <div class="panel panel-info">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseSix-2" class="english-field collapsed">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseSeven-2" class="english-field collapsed">
                     Case Reports ({{ casereports.count }})
                 </a>
             </h4>
         </div>
-        <div id="collapseSix-2" class="panel-collapse collapse" style="height: 0px;">
+        <div id="collapseSeven-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
                     <div class="row">
                         <table id="casereport" class="display datatable dt-responsive">

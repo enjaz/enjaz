@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-from datetime import time
+from datetime import time, date
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.templatetags.staticfiles import static
@@ -165,6 +165,9 @@ def list_abstracts(request, event_code_name):
                'accepted_oral_abstracts': accepted_oral_abstracts,
                'casereports': casereports,}
 
+    first_day = date(2018, 4, 17)
+    second_day = date(2018, 4, 18)
+
     if request.method == "POST":
         action = request.POST.get('action')
         pks = [int(field.lstrip('pk_')) for field in request.POST if field.startswith('pk_')]
@@ -183,6 +186,12 @@ def list_abstracts(request, event_code_name):
 
         if action == "regect":
             Abstract.objects.filter(pk__in=pks).update(status='R', accepted_presentaion_preference='')
+
+        if action == "first_day":
+            Abstract.objects.filter(pk__in=pks).update(presentaion_date=first_day)
+
+        if action == "second_day":
+            Abstract.objects.filter(pk__in=pks).update(presentaion_date=second_day)
 
         return HttpResponseRedirect(reverse('events:list_abstracts',
                                                 args=(event.code_name,)))
@@ -764,8 +773,10 @@ def show_barcode(request, event_code_name=None, user_pk=None):
 
     text = ("{:0%s}" % utils.BARCODE_LENGTH).format(barcode_user.pk)
     qrcode_value = utils.get_barcode(text)
+    dcode_value = utils.get_dbarcode(text)
 
-    context = {'qrcode_value' : qrcode_value,
+    context = {'dcode_value': dcode_value,
+                'qrcode_value' : qrcode_value,
                'event': event,
                'text': text,
                'barcode_user': barcode_user}
@@ -886,11 +897,12 @@ def download_barcode_pdf(request, event_code_name=None, user_pk=None):
     response.write(pdf_content)
     return response
 
+@login_required
 def show_question_session(request, event_code_name, pk):
     question_session = get_object_or_404(QuestionSession, pk=pk,
                                          event__code_name=event_code_name)
 
-    old_questions = question_session.question_set.order_by('-submission_date')
+    old_questions = question_session.question_set.filter(is_deleted=False).order_by('-submission_date')
     last_question = old_questions.first()
     if last_question:
         last_pk = old_questions.first().pk
@@ -904,11 +916,25 @@ def show_question_session(request, event_code_name, pk):
     if request.method == "GET":
         form = forms.QuestionForm()
     elif request.method == "POST":
-        instance = Question(question_session=question_session)
-        form = forms.QuestionForm(request.POST, instance=instance)
-        if form.is_valid():
-            question = form.save()
-            return HttpResponseRedirect(reverse('events:show_question_session',
+
+        if request.user.is_superuser and \
+           utils.is_organizing_team_member(request.user, question_session.event):
+
+           action = request.POST.get('action')
+           pks = [int(field.lstrip('pk_')) for field in request.POST if field.startswith('pk_')]
+
+           if "delete":
+               Question.objects.filter(pk__in=pks).update(is_deleted=True)
+
+               return HttpResponseRedirect(reverse('events:show_question_session',
+                                                args=(question_session.event.code_name, pk,)))
+
+        else:
+            instance = Question(user=request.user, question_session=question_session)
+            form = forms.QuestionForm(request.POST, instance=instance)
+            if form.is_valid():
+                question = form.save()
+                return HttpResponseRedirect(reverse('events:show_question_session',
                                                 args=(question_session.event.code_name, pk,)) + \
                                         "#q"+str(question.pk))
 
@@ -916,6 +942,7 @@ def show_question_session(request, event_code_name, pk):
 
     return render(request, "events/questions/index.html", context)
 
+@login_required
 @csrf.csrf_exempt
 @decorators.ajax_only
 def handle_question_ajax(request, event_code_name, pk):
@@ -926,7 +953,7 @@ def handle_question_ajax(request, event_code_name, pk):
     new_last_pk = question_session.question_set.order_by('-submission_date').first().pk
 
     if old_last_pk != new_last_pk:
-        new_questions = question_session.question_set.filter(pk__gt=old_last_pk)
+        new_questions = question_session.question_set.filter(pk__gt=old_last_pk, is_deleted=False)
         new_questions = new_questions.values_list('text', flat=True)
         new_questions = list(new_questions)
         response = {'new_questions':new_questions,

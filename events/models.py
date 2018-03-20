@@ -494,6 +494,7 @@ class Abstract(models.Model):
     accepted_presentaion_preference = models.CharField(verbose_name="Accepted presentation preference",
                                                        max_length=1, choices=presentation_preference_choices,
                                                        blank=True)
+    presentaion_date = models.DateField(u"تاريخ العرض", null=True)
     did_presenter_attend = models.BooleanField(verbose_name=u"حضر المقدم؟", default=False)
     certificates = GenericRelation('certificates.Certificate', related_query_name="abstracts")
 
@@ -627,6 +628,7 @@ class CaseReport(models.Model):
     was_published = models.BooleanField(u"Have you published this research?", default=False)
     was_presented_at_others = models.BooleanField(u"Have you presented this research in any other conference before?", default=False)
     was_presented_previously = models.BooleanField(u"Have you presented this research in a previous year of this conference?", default=False)
+    presentaion_date = models.DateField(u"تاريخ العرض", null=True)
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
@@ -666,9 +668,12 @@ class QuestionSession(models.Model):
         return self.title
 
 class Question(models.Model):
+    user = models.ForeignKey(User, null=True, blank=True,
+                             verbose_name='اسم السائل')
     question_session = models.ForeignKey(QuestionSession, verbose_name="جلسة السؤال")
     text = models.TextField(u"نص السؤال")
     submission_date = models.DateTimeField(u"تاريخ الإرسال", auto_now_add=True)
+    is_deleted = models.BooleanField(u"محذوف؟", default=False)
 
     def __unicode__(self):
         return self.question_text[:20]

@@ -7,6 +7,12 @@
 {% endblock %}
 {% block pageheader %}<span class="english-field">Matching Program</span>{% endblock %}
 
+{% block navbar %}
+{% if user|is_matchingProgram_coordinator or user.is_superuser%}
+    <li><a href="{% url 'matching_program:coordinator_page' %}"><span class="glyphicon glyphicon-user"></span> Coordinator's Page</a></li>
+{% endif %}
+{% endblock %}
+
 {% block content %}{% endblock %}
 
 {% block customscript %}{% endblock %}

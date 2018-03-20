@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.core import serializers
@@ -42,7 +43,7 @@ def members_list(request):
 
 def search_ajax(request):
     matching_program_members = Club.objects.get(name="matching_program").members.all().values_list('id', flat=True)
-    object_list = User.objects.exclude(id__in=matching_program_members)
+    object_list = User.objects.filter(common_profile__city="جدة").exclude(id__in=matching_program_members)
     json = serializers.serialize('json', object_list)
     return HttpResponse(json, content_type='application/json')
 

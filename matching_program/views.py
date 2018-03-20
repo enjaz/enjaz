@@ -1,8 +1,11 @@
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.core import serializers
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from clubs.models import Club
 from matching_program import utils
 from models import ResearchProject, StudentApplication
 from matching_program.forms import ResearchProjectForm, StudentApplicationForm
@@ -24,6 +27,36 @@ def index(request, massage):
         
     return render(request, "matching_program/index.html",
                   context)
+
+def coordinator_page(request):
+    if utils.is_matchingProgram_coordinator(request.user) == False:
+        return HttpResponseRedirect(reverse("matching_program:index"))
+    return render(request, "matching_program/coordinator.html",{})
+
+def members_list(request):
+    matching_program_members = Club.objects.get(name="matching_program").members.all().values_list('id', flat=True)
+    object_list = User.objects.filter(id__in=matching_program_members)
+    json = serializers.serialize('json', object_list)
+    return HttpResponse(json, content_type='application/json')
+
+
+def search_ajax(request):
+    matching_program_members = Club.objects.get(name="matching_program").members.all().values_list('id', flat=True)
+    object_list = User.objects.exclude(id__in=matching_program_members)
+    json = serializers.serialize('json', object_list)
+    return HttpResponse(json, content_type='application/json')
+
+def add_team(request, pk):
+    user = User.objects.get(pk=pk)
+    Club.objects.get(name="matching_program").members.add(user)
+    return HttpResponseRedirect(reverse("matching_program:coordinator_page"))
+
+def remove_team(request, pk):
+    user = User.objects.get(pk=pk)
+    Club.objects.get(name="matching_program").members.remove(user)
+    return HttpResponseRedirect(reverse("matching_program:coordinator_page"))
+
+
     
 def add_project(request):
     if request.method == 'POST':

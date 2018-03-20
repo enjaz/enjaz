@@ -211,17 +211,18 @@
             <p>
             </p>
         </div>
+        {% if user.is_superuser or user|is_organizing_team_member:event %}
     <div class="start">
-      {% if user|is_organizing_team_member:event or user.is_superuser %}
         {% for question in old_questions %}
         <form method="post">
             {% csrf_token %}
-            <p class="intro" id="q-{{ question.pk }}">{{ question.text }} | <span style="color: #daa520;">{{ question.user }}</span><button style="float: left;"type="submit" class="btn btn-danger" value="delete" name="pk_{{ question.pk }}">Delete</button></p>
+            <p class="intro" id="q-{{ question.pk }}">{{ question.text }} | <span style="color: #daa520;">{{ question.user.common_profile.get_ar_full_name }}</span><button style="float: left;"type="submit" class="btn" value="delete" name="pk_{{ question.pk }}"><i class="far fa-times-circle"></i></button></p>
         </form>
         {% endfor %}
-        {% else %}
+        {% endif %}
+        {% if not user|is_organizing_team_member:event or not user.is_superuser %}
           {% for question in old_questions %}
-              <p class="intro" id="q-{{ question.pk }}">{{ question.text }} | <span style="color: #daa520;">{{ question.user }}</span></p>
+              <p class="intro" id="q-{{ question.pk }}">{{ question.text }} | <span style="color: #daa520;">{{ question.user.common_profile.get_ar_full_name }}</span></p>
           {% endfor %}
           {% endif %}
     </div>

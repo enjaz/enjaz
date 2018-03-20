@@ -4,8 +4,6 @@ import json
 import StringIO
 import qrcode
 import qrcode.image.svg
-import barcode
-from barcode.writer import ImageWriter
 
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
@@ -163,11 +161,6 @@ def get_barcode(text):
     qrcode.make(text, image_factory=qrcode.image.svg.SvgImage, version=3).save(qrcode_output)
     qrcode_value = "".join(qrcode_output.getvalue().split('\n')[1:])
     return qrcode_value
-
-def get_dbarcode(text):
-    ean = barcode.codex.Code39(text, writer=ImageWriter(), add_checksum=False)
-    filename = ean.save('ean13')
-    return filename
 
 def get_user_sidebar_events(user):
     user_city = accounts.utils.get_user_city(user)

@@ -773,10 +773,8 @@ def show_barcode(request, event_code_name=None, user_pk=None):
 
     text = ("{:0%s}" % utils.BARCODE_LENGTH).format(barcode_user.pk)
     qrcode_value = utils.get_barcode(text)
-    dcode_value = utils.get_dbarcode(text)
 
-    context = {'dcode_value': dcode_value,
-                'qrcode_value' : qrcode_value,
+    context = {'qrcode_value' : qrcode_value,
                'event': event,
                'text': text,
                'barcode_user': barcode_user}

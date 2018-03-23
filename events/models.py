@@ -456,7 +456,7 @@ class Abstract(models.Model):
     event = models.ForeignKey(Event, verbose_name=u"الحدث")
     evaluators = models.ManyToManyField(User, blank=True, verbose_name=u"المقيمين")
     title = models.CharField(verbose_name="Title", max_length=255)
-    authors = models.TextField(verbose_name=u"Name of authors")
+    authors = models.TextField(verbose_name=u"Name of authors", blank=True)
     study_field = models.CharField(verbose_name="Field", max_length=255, default="")
     university = models.CharField(verbose_name="University", max_length=255)
     college = models.CharField(verbose_name="College", max_length=255)
@@ -494,7 +494,7 @@ class Abstract(models.Model):
     accepted_presentaion_preference = models.CharField(verbose_name="Accepted presentation preference",
                                                        max_length=1, choices=presentation_preference_choices,
                                                        blank=True)
-    presentaion_date = models.DateField(u"تاريخ العرض", null=True)
+    presentaion_date = models.DateField(u"تاريخ العرض", null=True, blank=True)
     did_presenter_attend = models.BooleanField(verbose_name=u"حضر المقدم؟", default=False)
     certificates = GenericRelation('certificates.Certificate', related_query_name="abstracts")
 

@@ -190,22 +190,36 @@ you?
             </li>
             {% endif %}
             {% if user|has_user_sidebar_events %}
-            <li>
+						<li>
                 <a>
                     <i class="entypo-calendar"></i>
-                    <span>التسجيل في الأنشطة الكبرى</span>
+										<span>التسجيل في الأنشطة الكبرى</span>
                 </a>
                 <ul>
-                {% for event in user|get_user_sidebar_events %}
+									{% for event in user|get_user_sidebar_events %}
                 <li>
-                    <a href="{% url 'events:list_timeslots' event.code_name %}">
+                    <a>
                         <i class="entypo-calendar"></i>
-                        <span>{{ event.get_html_name|safe }}</span>
+                        <span class="english-field">{{ event.get_html_name|safe }}</span>
                     </a>
+                    <ul>
+                        <li>
+                            <a href="{% url 'events:list_timeslots' event.code_name %}">
+                                <i class="fa fa-pencil"></i>
+                                <span>التسجيل</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'events:list_question_session' event.code_name %}">
+                                <i class="fa fa-question"></i>
+                                <span>الأسئلة التفاعلية</span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
-               {% endfor %}
-               </ul>
-             </li>
+                {% endfor %}
+                </ul>
+            </li>
             {% endif %}
             {% if user|has_user_adminstrative_events %}
             <li>

@@ -150,23 +150,30 @@ def list_abstracts(request, event_code_name):
         raise PermissionDenied
 
     pending_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=1)
-    evaluated_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=2)
     one_evaluator = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=1, num_b__lt=2)
+    evaluated_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=2)
     deleted_abstracts = Abstract.objects.filter(event=event, is_deleted=True)
+
+    evaluated_abstracts_pending = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=2, status='P')
     accepted_poster_abstracts = Abstract.objects.filter(event=event, is_deleted=False, accepted_presentaion_preference= 'P')
     accepted_oral_abstracts = Abstract.objects.filter(event=event, is_deleted=False, accepted_presentaion_preference= 'O')
+    evaluated_abstracts_regected = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=2, status='R')
+
     casereports = CaseReport.objects.filter(event=event, is_deleted=False)
+
     context = {'event': event,
                'pending_abstracts': pending_abstracts,
-               'evaluated_abstracts': evaluated_abstracts,
                'one_evaluator': one_evaluator,
+               'evaluated_abstracts': evaluated_abstracts,
                'deleted_abstracts': deleted_abstracts,
+               'evaluated_abstracts_pending': evaluated_abstracts_pending,
                'accepted_poster_abstracts': accepted_poster_abstracts,
                'accepted_oral_abstracts': accepted_oral_abstracts,
+               'evaluated_abstracts_regected': evaluated_abstracts_regected,
                'casereports': casereports,}
 
-    first_day = date(2018, 4, 17)
-    second_day = date(2018, 4, 18)
+    first_day = date(2018, 4, 18)
+    second_day = date(2018, 4, 19)
 
     if request.method == "POST":
         action = request.POST.get('action')
@@ -896,6 +903,14 @@ def download_barcode_pdf(request, event_code_name=None, user_pk=None):
     return response
 
 @login_required
+def list_question_session(request, event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name)
+    question_session = QuestionSession.objects.filter(event=event)
+
+    context = {'event': event, 'question_session': question_session }
+    return render(request, 'events/questions/list.html', context)
+
+@login_required
 def show_question_session(request, event_code_name, pk):
     question_session = get_object_or_404(QuestionSession, pk=pk,
                                          event__code_name=event_code_name)
@@ -915,8 +930,7 @@ def show_question_session(request, event_code_name, pk):
         form = forms.QuestionForm()
     elif request.method == "POST":
 
-        if request.user.is_superuser and \
-           utils.is_organizing_team_member(request.user, question_session.event):
+        if utils.is_organizing_team_member(request.user, question_session.event):
 
            action = request.POST.get('action')
            pks = [int(field.lstrip('pk_')) for field in request.POST if field.startswith('pk_')]
@@ -952,7 +966,8 @@ def handle_question_ajax(request, event_code_name, pk):
 
     if old_last_pk != new_last_pk:
         new_questions = question_session.question_set.filter(pk__gt=old_last_pk, is_deleted=False)
-        new_questions = new_questions.values_list('text', flat=True)
+        #TODO AlQumaizy knows ^_^
+        #new_questions = new_questions.values_list('text', 'user__common_profile__ar_first_name', 'user__common_profile__ar_middle_name', 'user__common_profile__ar_last_name')
         new_questions = list(new_questions)
         response = {'new_questions':new_questions,
                    'new_last_pk':new_last_pk}

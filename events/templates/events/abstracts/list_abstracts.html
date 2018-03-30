@@ -75,7 +75,7 @@
         <div class="panel-heading">
             <h4 class="panel-title">
                 <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseTwo-2" class="english-field collapsed">
-                    One evaluator ({{ one_evaluator.count }})
+                    One evaluation ({{ one_evaluator.count }})
                 </a>
             </h4>
         </div>
@@ -280,15 +280,15 @@
 <div class="row">
         <br>
     <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
-        <h2 class="mentor-section-header">Accepted Abstracts</h2>
+        <h2 class="mentor-section-header">Evaluated Abstracts</h2>
     </div>
 </div>
 <div class="english-field">
-    <div class="panel panel-info">
+    <div class="panel panel-warning">
         <div class="panel-heading">
             <h4 class="panel-title">
                 <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseFive-2" class="english-field collapsed">
-                    Poster abstracts ({{ accepted_poster_abstracts.count }})
+                    Pending abstracts ({{ evaluated_abstracts_pending.count }})
                 </a>
             </h4>
         </div>
@@ -300,9 +300,85 @@
                         <option>Choose Action</option>
                         <option value="delete">Delete</option>
                         <option value="accepte_as_oral">Accept As Oral</option>
+                        <option value="accepte_as_poster">Accept As Poster</option>
                         <option value="regect">Regect</option>
-                        <option value="first_day">First Day</option>
-                        <option value="second_day">Second Day</option>
+                    </select>
+                    <div class="row">
+                        <table id="pending_evaluated" class="display datatable dt-responsive">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th class="all">ID</th>
+                                    <th class="all">Title</th>
+                                    <th class="all">Presenting author</th>
+                                    <th class="all">Presentation preference</th>
+                                    <th class="all">Score</th>
+                                    <th class="all">Accepted presentation preference</th>
+                                    <th class="all">Presentation date</th>
+                                    <th class="none">Evaluators</th>
+                                    <th class="none">Puplished?</th>
+                                    <th class="none">Presented previously at HPC?</th>
+                                    <th class="none">Presented previously at others?</th>
+                                    <th class="none">Submission date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for abstract in evaluated_abstracts_pending %}
+                                <tr>
+                                    <td><input type="checkbox" value="1" name="pk_{{ abstract.pk }}"></td>
+                                    <td>{{ abstract.pk }}</td>
+                                    <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
+                                    <td><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></td>
+                                    <td>{{ abstract.get_presentation_preference_display }}</td>
+                                    <td>ِ{{ abstract.get_average_score }}</td>
+                                    {% if abstract.get_accepted_presentaion_preference_display %}
+                                    <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
+                                    {% else %}
+                                    <td>{{ abstract.get_status_display }}</td>
+                                    {% endif %}
+                                    <td>{{ abstract.presentaion_date }}</td>
+                                    <td>
+                                        <ul>
+                                            {% for evaluator in abstract.evaluators.all %}
+                                            <li>{{ evaluator.common_profile.en_last_name|default:evaluator.username }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                    <td>{{ abstract.was_published|yesno:"Yes,No" }}</td>
+                                    <td>{{ abstract.was_presented_previously|yesno:"Yes,No" }}</td>
+                                    <td>{{ abstract.was_presented_at_others|yesno:"Yes,No" }}</td>
+                                    <td data-order="{{ abstract.date_submitted|date:" U " }}">{{ abstract.date_submitted }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                <button type="submit" class="btn btn-warning">Submit</button>
+                    </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="english-field">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseSix-2" class="english-field collapsed">
+                    Poster abstracts ({{ accepted_poster_abstracts.count }})
+                </a>
+            </h4>
+        </div>
+        <div id="collapseSix-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <select name="action">
+                        <option>Choose Action</option>
+                        <option value="delete">Delete</option>
+                        <option value="accepte_as_oral">Accept As Oral</option>
+                        <option value="regect">Regect</option>
+                        <option value="first_day">18 April 2018</option>
+                        <option value="second_day">19 April 2018</option>
                     </select>
                     <div class="row">
                         <table id="poster" class="display datatable dt-responsive">
@@ -364,12 +440,12 @@
     <div class="panel panel-success">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseSix-2" class="english-field collapsed">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseSeven-2" class="english-field collapsed">
                     Oral abstracts ({{ accepted_oral_abstracts.count }})
                 </a>
             </h4>
         </div>
-        <div id="collapseSix-2" class="panel-collapse collapse" style="height: 0px;">
+        <div id="collapseSeven-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
                 <form method="post">
                     {% csrf_token %}
@@ -378,8 +454,8 @@
                         <option value="delete">Delete</option>
                         <option value="accepte_as_poster">Accept As Poster</option>
                         <option value="regect">Regect</option>
-                        <option value="first_day">First Day</option>
-                        <option value="second_day">Second Day</option>
+                        <option value="first_day">18 April 2018</option>
+                        <option value="second_day">19 April 2018</option>
                     </select>
                     <div class="row">
                         <table id="oral" class="display datatable dt-responsive">
@@ -437,6 +513,81 @@
         </div>
     </div>
 </div>
+<div class="english-field">
+    <div class="panel panel-danger">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseEight-2" class="english-field collapsed">
+                    Regected abstracts ({{ evaluated_abstracts_regected.count }})
+                </a>
+            </h4>
+        </div>
+        <div id="collapseEight-2" class="panel-collapse collapse" style="height: 0px;">
+            <div class="panel-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <select name="action">
+                        <option>Choose Action</option>
+                        <option value="delete">Delete</option>
+                        <option value="accepte_as_oral">Accept As Oral</option>
+                        <option value="accepte_as_poster">Accept As Poster</option>
+                    </select>
+                    <div class="row">
+                        <table id="regected" class="display datatable dt-responsive">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th class="all">ID</th>
+                                    <th class="all">Title</th>
+                                    <th class="all">Presenting author</th>
+                                    <th class="all">Presentation preference</th>
+                                    <th class="all">Score</th>
+                                    <th class="all">Accepted presentation preference</th>
+                                    <th class="all">Presentation date</th>
+                                    <th class="none">Evaluators</th>
+                                    <th class="none">Puplished?</th>
+                                    <th class="none">Presented previously at HPC?</th>
+                                    <th class="none">Presented previously at others?</th>
+                                    <th class="none">Submission date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for abstract in evaluated_abstracts_regected %}
+                                <tr>
+                                    <td><input type="checkbox" value="1" name="pk_{{ abstract.pk }}"></td>
+                                    <td>{{ abstract.pk }}</td>
+                                    <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
+                                    <td><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></td>
+                                    <td>{{ abstract.get_presentation_preference_display }}</td>
+                                    <td>ِ{{ abstract.get_average_score }}</td>
+                                    {% if abstract.get_accepted_presentaion_preference_display %}
+                                    <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
+                                    {% else %}
+                                    <td>{{ abstract.get_status_display }}</td>
+                                    {% endif %}
+                                    <td>{{ abstract.presentaion_date }}</td>
+                                    <td>
+                                        <ul>
+                                            {% for evaluator in abstract.evaluators.all %}
+                                            <li>{{ evaluator.common_profile.en_last_name|default:evaluator.username }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                    <td>{{ abstract.was_published|yesno:"Yes,No" }}</td>
+                                    <td>{{ abstract.was_presented_previously|yesno:"Yes,No" }}</td>
+                                    <td>{{ abstract.was_presented_at_others|yesno:"Yes,No" }}</td>
+                                    <td data-order="{{ abstract.date_submitted|date:" U " }}">{{ abstract.date_submitted }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                <button type="submit" class="btn btn-danger">Submit</button>
+                    </form>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
         <br>
     <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
@@ -447,12 +598,12 @@
     <div class="panel panel-info">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseSeven-2" class="english-field collapsed">
+                <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseNine-2" class="english-field collapsed">
                     Case Reports ({{ casereports.count }})
                 </a>
             </h4>
         </div>
-        <div id="collapseSeven-2" class="panel-collapse collapse" style="height: 0px;">
+        <div id="collapseNine-2" class="panel-collapse collapse" style="height: 0px;">
             <div class="panel-body">
                     <div class="row">
                         <table id="casereport" class="display datatable dt-responsive">
@@ -524,12 +675,22 @@
                 [1, "desc"]
             ]
         });
+        $("#pending_evaluated").dataTable({
+            "order": [
+                [1, "desc"]
+            ]
+        });
         $("#poster").dataTable({
             "order": [
                 [1, "desc"]
             ]
         });
         $("#oral").dataTable({
+            "order": [
+                [1, "desc"]
+            ]
+        });
+        $("#regected").dataTable({
             "order": [
                 [1, "desc"]
             ]

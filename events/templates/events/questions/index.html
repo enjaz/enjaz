@@ -198,7 +198,7 @@
         <h2>{{ question_session.title }}</h2>
 
     </div>
-    {% if not user|is_organizing_team_member:event or not user.is_superuser %}
+    {% if not user|is_organizing_team_member:question_session.event %}
     <form role="form" method="post" style="color:black">
         {% csrf_token %}
         {% bootstrap_form form %}
@@ -207,20 +207,20 @@
     </form>
     {% endif %}
         <h2>الأسئلة المطروحة:</h2>
+        <h4 style="color: red;">قم بتحديث الصفحة للحصول على الأسئلة الجديدة</h4>
         <div class="questions">
             <p>
             </p>
         </div>
-        {% if user.is_superuser or user|is_organizing_team_member:event %}
+        {% if user|is_organizing_team_member:question_session.event  %}
     <div class="start">
         {% for question in old_questions %}
         <form method="post">
             {% csrf_token %}
-            <p class="intro" id="q-{{ question.pk }}">{{ question.text }} | <span style="color: #daa520;">{{ question.user.common_profile.get_ar_full_name }}</span><button style="float: left;"type="submit" class="btn" value="delete" name="pk_{{ question.pk }}"><i class="far fa-times-circle"></i></button></p>
+            <p class="intro" id="q-{{ question.pk }}">{{ question.text }} | <span style="color: #daa520;">{{ question.user.common_profile.get_ar_full_name }}</span><button style="float: left;margin-top: 0px;"type="submit" class="btn btn-danger" value="delete" name="pk_{{ question.pk }}">Delete</button></p>
         </form>
         {% endfor %}
-        {% endif %}
-        {% if not user|is_organizing_team_member:event or not user.is_superuser %}
+        {% else %}
           {% for question in old_questions %}
               <p class="intro" id="q-{{ question.pk }}">{{ question.text }} | <span style="color: #daa520;">{{ question.user.common_profile.get_ar_full_name }}</span></p>
           {% endfor %}

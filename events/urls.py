@@ -17,7 +17,7 @@ urlpatterns = patterns('',
     url(r'^(?P<event_code_name>[\d\w_\-]+)/$', views.redirect_home, name="redirect_home"),
     #URL already puplished (to be changed after the end of hpc2)
     url(r'^(?P<event_code_name>[\d\w_\-]+)/sessions/list/$', views.list_sessions_privileged, name="list_sessions_privileged"),
-    url(r'^(?P<event_code_name>[\d\w_\-]+)/sessions/', views.list_timeslots, name="list_timeslots"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/sessions/$', views.list_timeslots, name="list_timeslots"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/timeslots/(?P<pk>\d+)/$', views.list_sessions, name="list_sessions"),
     url(r'^sessions/ajax/group$', views.handle_ajax, name="handle_ajax"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/sessions/(?P<pk>\d+)/$', views.show_session, name="show_session"),

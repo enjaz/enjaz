@@ -23,18 +23,21 @@
         <br>
     <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
         <h2 class="mentor-section-header">{{ timeslot.name }}</h2>
+            {% if not children_total == 0  %}
+            <strong style="text-align:center !important;" id="counter">  الحد الأقصى للتسجيل هو  {% if timeslot.limit %} {{ timeslot.limit }} {% else %} 1 {% endif %}</strong>
+            {% endif %}
     </div>
 </div>
 
-        <div class="row text-center">
+    <div class="row text-center">
 
             {% autoescape off %}<div class="row"> {% endautoescape %}
                         {% if  timeslot.children %}
             {% for child_timeslot in timeslot.children.all %}
                 <div class="col-md-4 col-xs-8 col-xs-offset-2 {% if children_total == 1  %}col-md-offset-4{% elif children_total == 2 %}col-md-offset-2{% endif %} body-containter">
-                   <div class="mentor-section-intro ">
-                    {% if child_timeslot.event.image %}
-			            <img src="{{ child_timeslot.event.image.url }}" class="img-circle img-responsive " style="max-width: 100% ">
+                   <div >
+                    {% if child_timeslot.event.logo %}
+			            <img src="{{ child_timeslot.event.logo.url }}" class="img-circle img-responsive center-block" style="max-width: 150px ;">
 			        {% else %}
 			            <img src="{% static 'logo/enjaz_logo_shadow_no_text.png' %}" class="img-circle img-responsive center-block" style="max-width: 150px ;">
 			        {% endif %}
@@ -110,8 +113,13 @@
             {% cycle '' '' '' '</div>' %}
 
             {% endautoescape %}
-
-
+    {% if children_total == 0  %}
+    <div style="text-align: center">
+        <strong> سيتم إضافة ورش العمل قريبا.</strong>
+        <br>
+        <strong>Workshops will be added soon .</strong>
+    </div>
+    {% endif %}
 
     </div>
         <hr>
@@ -171,6 +179,7 @@ $(document).ready(function(){
                       timeslot_buttons.html('سجلني!');
                       timeslot_buttons.addClass('btn-success');
 
+
                       status_button.hide();
 
                   } else if (action == 'signup'){
@@ -180,6 +189,7 @@ $(document).ready(function(){
                             timeslot_buttons.removeClass('btn-success');
                             timeslot_buttons.addClass('btn-warning');
                             timeslot_buttons.html("وصلت الحد الأقصى للجلسات المسموح بها");
+
 
                       }
 

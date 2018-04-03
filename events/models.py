@@ -93,11 +93,13 @@ class Event(models.Model):
     notification_email = models.EmailField(u'البريد الإلكتروني للتنبيهات', blank=True)
     city = models.CharField(u"المدينة", max_length=20,
                             choices=city_choices, default="")
+    logo = models.FileField(verbose_name=u"Attach the event logo", upload_to="events/logos/"
+                             , blank=True, null=True)
 
     def is_on_sidebar(self, user):
         if user.is_superuser or \
            (user.common_profile.city == self.city and \
-            end_date > timezone.now().date()):
+            self.end_date > timezone.now().date()):
             return True
         else:
             return False
@@ -145,10 +147,17 @@ class Event(models.Model):
         return self.official_name
 
 class TimeSlot(models.Model):
+    image = models.FileField(verbose_name=u"Attach the schedule to be displayed", upload_to="events/timeslots/", blank=True, null=True)
     name = models.CharField(max_length=50)
     event = models.ForeignKey(Event)
     date_submitted = models.DateTimeField(auto_now_add=True)
     date_edited = models.DateTimeField(auto_now=True)
+    parent = models.ForeignKey('self', null=True, blank=True,
+                               related_name="children",
+                               on_delete=models.SET_NULL,
+                               default=None, verbose_name=u"القسم الأب")
+    limit = models.PositiveSmallIntegerField(null=True, blank=True,
+                                             default=None)
 
     def is_user_already_on(self, user):
         return SessionRegistration.objects.filter(session__time_slot=self,
@@ -225,6 +234,8 @@ class Session(models.Model):
     optional_survey = models.ForeignKey('Survey', verbose_name=u"استبيان اختياري",
                                         related_name="optional_sessions",
                                         null=True, blank=True)
+    image = models.FileField(verbose_name=u"Attach the speaker image to be displayed", upload_to="events/sessions/",
+                             blank=True, null=True)
 
     def get_all_registrations(self):
         return (self.first_priority_registrations.all() | \

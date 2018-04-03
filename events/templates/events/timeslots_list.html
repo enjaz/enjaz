@@ -11,9 +11,11 @@
 
 <br>
 <div class="row">
-        {% for timeslot in timeslots %}
-        <br>
-    <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
+    {% for timeslot in timeslots %}
+    <div class="col-md-5  col-12 mentor-section-intro">
+			{% if timeslot.logo %}
+                	<img src="{{ timeslot.logo.url }}" class="img-responsive session-image" style="max-width: 100%;padding: 3%">
+			{% endif %}
         <h2 class="mentor-section-header">{{ timeslot.name }}</h2>
         <a style="float: left;" class="btn btn-Success" href="{% url 'events:list_sessions' timeslot.event.code_name timeslot.pk %}">المزيد </a>
     </div>

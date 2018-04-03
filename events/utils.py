@@ -14,7 +14,7 @@ from django.utils import timezone
 from core.utils import hindi_to_arabic
 from post_office import mail
 from wkhtmltopdf.utils import render_pdf_from_template
-from .models import Event, SessionRegistration
+from .models import Event, SessionRegistration,Session
 import accounts.utils
 import clubs.utils
 
@@ -230,3 +230,24 @@ def has_user_adminstrative_events (user):
        get_user_organizing_events(user).exists() or \
        get_user_attendance_events(user).exists():
         return True
+
+def has_remaining_sessions(user, timeslot):
+
+    user_sessions = user.session_registrations.filter(session__time_slot=timeslot,is_deleted=False).count()
+
+    if timeslot.limit:
+        if user_sessions < timeslot.limit:
+            return True
+        elif user_sessions == timeslot.limit:
+            return False
+    elif timeslot.parent and timeslot.parent.limit:
+        if user_sessions < timeslot.parent.limit:
+            return True
+        elif user_sessions == timeslot.parent.limit:
+            return False
+    else:
+        # if there is no limit assume the limit is one. (debatable)
+        if user_sessions < 1:
+            return True
+        elif user_sessions == 1:
+            return False

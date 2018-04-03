@@ -1,0 +1,6 @@
+<div>
+    {% if session.image %}
+    <img src="{{ session.image.url }}"  class="img-responsive" style="max-width: 100%;">
+    {% endif %}
+    <h3 style="text-align: left">{{ session.description }}</h3>
+</div>

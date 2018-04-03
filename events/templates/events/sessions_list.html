@@ -6,6 +6,9 @@
   min-height: 120px;
   text-align: center;
 }
+.body-containter {
+  min-height: 120px;
+}
 </style>
 <div class="text-center">
     <h1>التسجيل في {{ event.official_name }}</h1>
@@ -17,7 +20,6 @@
 
 <br>
 <div class="row">
-        {% for timeslot in timeslots %}
         <br>
     <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
         <h2 class="mentor-section-header">{{ timeslot.name }}</h2>
@@ -25,10 +27,28 @@
 </div>
 
         <div class="row text-center">
+
             {% autoescape off %}<div class="row"> {% endautoescape %}
+                        {% if  timeslot.children %}
+            {% for child_timeslot in timeslot.children.all %}
+                <div class="col-md-4 col-xs-8 col-xs-offset-2 {% if children_total == 1  %}col-md-offset-4{% elif children_total == 2 %}col-md-offset-2{% endif %} body-containter">
+                   <div class="mentor-section-intro ">
+                    {% if child_timeslot.event.image %}
+			            <img src="{{ child_timeslot.event.image.url }}" class="img-circle img-responsive " style="max-width: 100% ">
+			        {% else %}
+			            <img src="{% static 'logo/enjaz_logo_shadow_no_text.png' %}" class="img-circle img-responsive center-block" style="max-width: 150px ;">
+			        {% endif %}
+                    <h3 class="english-field" style="text-align: center">  {{ child_timeslot.name }}  </h3>
+                    <a href="{% url 'events:list_sessions' child_timeslot.event.code_name child_timeslot.pk %}"> <button style="float: left" class="btn btn-success">المزيد</button>
+                    </a>
+                </div>
+                </div>
+            {% endfor %}
+            {% endif %}
             {% for session in timeslot.session_set.all %}
-            <div class="col-md-4 col-xs-8 col-xs-offset-2 {% if timeslot.session_set.count == 1 %}col-md-offset-4{% elif timeslot.session_set.count == 2 %}col-md-offset-2{% endif %}">
-                <h3 class="english-field session-title"><a {% if user|is_organizing_team_member:event or user|is_regestrations_team_member:event %} href="{% url 'events:review_registrations' session.event.code_name session.pk %}" {% endif %}>{{ session.name }}</a></h3>
+            <div class="col-md-4 col-xs-8 col-xs-offset-2 {% if children_total == 1 %}col-md-offset-4{% elif children_total == 2 %}col-md-offset-2{% endif %}">
+
+              <h3 class="english-field session-title"> <a {% if user|is_organizing_team_member:event or user|is_regestrations_team_member:event %} href="{% url 'events:review_registrations' session.event.code_name session.pk %}" {% endif %}> {{ session.name }}</a> </h3>
                 <div>
   								<i class="entypo-calendar"></i>
                                   {{ session.date|date:"l j F Y" }}
@@ -54,9 +74,11 @@
                 {% else %}
                 <br>
                 {% endif %}
+{#                <h3>{% if session.gender == 'F' %}<i class="fa fa-female" aria-hidden="true"></i>{% elif session.gender == 'M' %}<i class="fa fa-male" aria-hidden="true"></i>{% else %}<i class="fa fa-female" aria-hidden="true"></i>  <i class="fa fa-male" aria-hidden="true"></i>{% endif %}</h3>#}
+
                 {% if user.is_authenticated and not user|is_registered:session %}
-          {% if user|is_already_on_timeslot:timeslot %}
-                <button class="btn btn-warning signup" data-action="signup" data-pk="{{ session.pk }}" data-timeslot-pk="{{ timeslot.pk }}" disabled>يمكنك التسجيل جلسة واحدة فقط</button>
+          {% if not user|has_remaining_sessions:timeslot  %}
+                <button class="btn btn-warning signup" data-action="signup" data-pk="{{ session.pk }}" data-timeslot-pk="{{ timeslot.pk }}" disabled>وصلت الحد الأقصى للجلسات المسموح بها</button>
           {% else %}
                 <button class="btn btn-success signup" data-action="signup" data-pk="{{ session.pk }}" data-timeslot-pk="{{ timeslot.pk }}">سجلني!</button>
           {% endif %}
@@ -65,6 +87,9 @@
                 {% else %}
                 <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لإنجاز كي أؤكد الحضور</a>
                 {% endif %}
+            {% if session.image or session.description %}
+                <button type="button" data-name="{{ session.name }}" data-url="{% url 'events:session_info' session.time_slot.event.code_name session.pk %}" class="btn btn-info session-info"> <i class="entypo-info"></i> </button>
+            {% endif %}
                 <br>
             {% if session.acceptance_method == 'M' and user.is_authenticated %}
                 <div {% if not user|is_registered:session %}style="display: none;" {% endif %} id="status-{{ session.pk }}" class="btn btn-xs {% if user|get_status:session == True %}
@@ -90,7 +115,6 @@
 
     </div>
         <hr>
-        {% endfor %}
 <a style="margin-bottom: 5px; margin-left: 15px; float: left;"class="btn btn-default" href="{% url 'events:list_timeslots' event.code_name %}" >العودة للخلف </a>
 {% endblock %}
 
@@ -99,6 +123,27 @@
 
 <script>
 $(document).ready(function(){
+      // initialize project edit modal
+    $('#session-details-modal').modal({
+      keyboard: false,
+      backdrop: 'static',
+      show    : false,
+    });
+    $(".session-info").click(function () {
+        url = $(this).data("url");
+        name = $(this).data("name");
+
+        $("#session-details-modal").modal('show');
+        $("#session-details-modal .modal-title").html(name);
+        $("#session-details-modal .modal-title").addClass('english-field');
+            $("#session-details-modal .modal-body").load(url);
+{#                , function(){#}
+    {#            $('.end-project-introduction').click(function() {#}
+    {#                $("#edit-project-modal .modal-body").load("{% url 'researchhub:add_project' %}");#}
+    {#            });#}
+        });
+
+
   toastr.options.positionClass = "toast-top-left";
 	$(".signup, .cancel").click(function(){
     button = this;
@@ -130,11 +175,13 @@ $(document).ready(function(){
 
                   } else if (action == 'signup'){
                     toastr.success("تمّ تسجيلك!");
+                      if (data['remaining'] == false) {
+                            timeslot_buttons.attr("disabled", "disabled");
+                            timeslot_buttons.removeClass('btn-success');
+                            timeslot_buttons.addClass('btn-warning');
+                            timeslot_buttons.html("وصلت الحد الأقصى للجلسات المسموح بها");
 
-                      timeslot_buttons.attr("disabled", "disabled");
-                      timeslot_buttons.removeClass('btn-success');
-                      timeslot_buttons.addClass('btn-warning');
-                      timeslot_buttons.html("يمكنك التسجيل جلسة واحدة فقط");
+                      }
 
                       $(button).html('ألغِ تسجيلي!');
                       $(button).data('action', 'cancel');
@@ -157,6 +204,7 @@ $(document).ready(function(){
         }
 		});
   });
+
 });
 
 </script>
@@ -208,4 +256,7 @@ $(function(){
 });
 </script>
 {% endif %}
+    {% with modal_id='session-details-modal' no_footer=True %}
+    {% include "bulb/groups/common_edit_modal.html" %}
+{% endwith %}
 {% endblock %}

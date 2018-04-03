@@ -90,3 +90,7 @@ def can_evaluate_abstracts(user, event):
 @register.filter
 def has_user_adminstrative_events(user):
     return utils.has_user_adminstrative_events(user)
+
+@register.filter
+def has_remaining_sessions(user,timeslot):
+    return utils.has_remaining_sessions(user,timeslot)

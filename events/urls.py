@@ -17,7 +17,7 @@ urlpatterns = patterns('',
     url(r'^(?P<event_code_name>[\d\w_\-]+)/$', views.redirect_home, name="redirect_home"),
     #URL already puplished (to be changed after the end of hpc2)
     url(r'^(?P<event_code_name>[\d\w_\-]+)/sessions/list/$', views.list_sessions_privileged, name="list_sessions_privileged"),
-    url(r'^(?P<event_code_name>[\d\w_\-]+)/sessions/$', views.list_timeslots, name="list_timeslots"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/sessions/', views.list_timeslots, name="list_timeslots"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/timeslots/(?P<pk>\d+)/$', views.list_sessions, name="list_sessions"),
     url(r'^sessions/ajax/group$', views.handle_ajax, name="handle_ajax"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/sessions/(?P<pk>\d+)/$', views.show_session, name="show_session"),
@@ -57,7 +57,9 @@ urlpatterns = patterns('',
     url(r'^survey/(?P<session_pk>\d+)/(?P<optional>optional)?$', views.handle_survey, name="handle_survey"),
     url(r'^survey/(?P<session_pk>\d+)/delete$', views.delete_survey_response, name="delete_survey_response"),
     url(r'^survey/thanks/$', TemplateView.as_view(template_name='events/thank_you.html'),name="survey_submission_completed"),
-    # Has to be the last URL so it doesn't catch unintended patterns.
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/stats/(?P<session_pk>\d+)/info/$', views.session_info ,name="session_info"),
+
+                       # Has to be the last URL so it doesn't catch unintended patterns.
     url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<code_name>[\d\w\-]+)/$', views.show_session_group,name="show_session_group"),
 
                        )

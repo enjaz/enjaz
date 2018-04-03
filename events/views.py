@@ -338,9 +338,11 @@ def upload_abstract_image(request):
                     "message": u"لم أستطع رفع الملف"}
                 }
 
+
 def list_timeslots(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
-    timeslots = TimeSlot.objects.filter(event=event)
+    timeslots = TimeSlot.objects.filter(event=event,parent__isnull=True)
+
     context = {'timeslots': timeslots,
                'event': event}
 
@@ -368,9 +370,12 @@ def list_sessions_privileged(request, event_code_name):
 
 def list_sessions(request, event_code_name, pk):
     event = get_object_or_404(Event, code_name=event_code_name)
-    timeslots = TimeSlot.objects.filter(event=event, pk=pk)
-    context = {'timeslots': timeslots,
-               'event': event}
+    timeslot = TimeSlot.objects.get(event=event, pk=pk)
+    children_total = timeslot.session_set.count() + timeslot.children.count()
+
+    context = {'timeslot': timeslot,
+               'event': event,
+               'children_total':children_total}
 
     if event.registration_opening_date and timezone.now() < event.registration_opening_date:
         raise Http404
@@ -394,6 +399,7 @@ def handle_ajax(request):
     action = request.POST.get('action')
     session_pk = request.POST.get('pk')
     session = get_object_or_404(Session, pk=session_pk)
+    time_slot = session.time_slot
 
     if request.user.common_profile.gender == 'M' and session.gender == 'F':
         raise Exception(u'جلسة خاصة بالإناث')
@@ -417,8 +423,8 @@ def handle_ajax(request):
                 raise Exception(u'سبق أن سجّلت!')
         else:
             timeslot = session.time_slot
-            if timeslot and timeslot.is_user_already_on(request.user):
-                raise Exception(u'سبق أن سجّلت!')
+            if timeslot and not utils.has_remaining_sessions(request.user,timeslot):
+                raise Exception(u'وصلت الحد الأقصى للتسجيل!')
 
         if not session.limit is None and\
            not session.get_remaining_seats() > 0:
@@ -463,7 +469,9 @@ def handle_ajax(request):
     registration.save()
 
     return {'remaining_seats': session.get_remaining_seats(),
-            'status': registration.get_status()}
+            'status': registration.get_status(),
+            'remaining':utils.has_remaining_sessions(request.user,time_slot),
+            'registered':utils.is_registered(request.user, session)}
 
 @login_required
 def list_registrations(request, event_code_name):
@@ -1135,3 +1143,12 @@ def list_attendance(request, event_code_name,user_pk=None):
     context ={'event':event,'user':user,'attendances':attendances}
 
     return render(request, 'events/list_attendance.html', context)
+
+
+def session_info(request, event_code_name, session_pk):
+
+    session = get_object_or_404(Session,event__code_name=event_code_name,pk=session_pk)
+
+    context ={'session':session}
+
+    return render(request, 'events/partials/session_info.html', context)

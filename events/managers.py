@@ -26,3 +26,6 @@ class SessionQuerySet(models.QuerySet):
 
     def onsite(self):
         return self.filter(for_onsite_registration=True)
+
+
+

@@ -165,7 +165,10 @@ class TimeSlot(models.Model):
                                                   user=user).exists()
 
     def __unicode__(self):
-        return self.name
+        if self.parent:
+            return u"%s (%s)" % (self.parent.name, self.name)
+        else:
+            return self.name
 
 class SessionGroup(models.Model):
     event = models.ForeignKey(Event, null=True, blank=True)
@@ -196,6 +199,7 @@ class Session(models.Model):
                                              verbose_name=u"قالب شهادة الجلسة")
     time_slot = models.ForeignKey(TimeSlot, blank=True, null=True)
     name = models.CharField(max_length=255)
+    presenter = models.CharField(max_length=255,blank=True, default="")
     limit = models.PositiveSmallIntegerField(null=True, blank=True,
                                              default=None)
     acceptance_method_choices = (
@@ -236,6 +240,7 @@ class Session(models.Model):
                                         null=True, blank=True)
     image = models.FileField(verbose_name=u"Attach the speaker image to be displayed", upload_to="events/sessions/",
                              blank=True, null=True)
+
 
     def get_all_registrations(self):
         return (self.first_priority_registrations.all() | \

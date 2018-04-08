@@ -23,7 +23,7 @@
     <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
         <h2 class="mentor-section-header">{{ timeslot.name }}</h2>
             {% if not children_total == 0  %}
-            <strong style="text-align:center !important;" id="counter">  الحد الأقصى للتسجيل هو  {% if timeslot.limit %} {{ timeslot.limit }} {% else %} 1 {% endif %}</strong>
+            <strong style="text-align:center !important;" id="counter">  الحد الأقصى للتسجيل هو {{ limit }}  </strong>
             {% endif %}
     </div>
 </div>

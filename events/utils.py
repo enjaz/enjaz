@@ -233,21 +233,31 @@ def has_user_adminstrative_events (user):
 
 def has_remaining_sessions(user, timeslot):
 
-    user_sessions = user.session_registrations.filter(session__time_slot=timeslot,is_deleted=False).count()
-
     if timeslot.limit:
+        user_sessions = user.session_registrations.filter(session__time_slot=timeslot, is_deleted=False).count()
         if user_sessions < timeslot.limit:
             return True
         elif user_sessions == timeslot.limit:
             return False
     elif timeslot.parent and timeslot.parent.limit:
+        user_sessions = user.session_registrations.filter(session__time_slot__pk__in=[timeslot.parent.pk,timeslot.pk], is_deleted=False).count()
         if user_sessions < timeslot.parent.limit:
             return True
         elif user_sessions == timeslot.parent.limit:
             return False
     else:
+        user_sessions = user.session_registrations.filter(session__time_slot=timeslot, is_deleted=False).count()
         # if there is no limit assume the limit is one. (debatable)
         if user_sessions < 1:
             return True
         elif user_sessions == 1:
             return False
+
+def get_timeslot_limit(timeslot):
+
+    if timeslot.limit:
+        return timeslot.limit
+    elif timeslot.parent and timeslot.parent.limit:
+        return u"تابع للقسم السابق %s" % (timeslot.parent.limit)
+    else:
+        return 1

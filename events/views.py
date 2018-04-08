@@ -376,10 +376,12 @@ def list_sessions(request, event_code_name, pk):
         remaining_number = timeslot.limit - request.user.session_registrations.filter(session__time_slot=timeslot,is_deleted=False).count()
     else:
         remaining_number = 1
+    limit = utils.get_timeslot_limit(timeslot)
     context = {'timeslot': timeslot,
                'event': event,
                'children_total':children_total,
-               'remaining_number':remaining_number}
+               'remaining_number':remaining_number,
+               'limit':limit}
 
     if event.registration_opening_date and timezone.now() < event.registration_opening_date:
         raise Http404

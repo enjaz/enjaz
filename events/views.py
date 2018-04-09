@@ -338,7 +338,7 @@ def upload_abstract_image(request):
                     "message": u"لم أستطع رفع الملف"}
                 }
 
-
+@login_required 
 def list_timeslots(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
     timeslots = TimeSlot.objects.filter(event=event,parent__isnull=True)
@@ -368,6 +368,7 @@ def list_sessions_privileged(request, event_code_name):
     return render(request,  'events/session_list_privileged.html',
                   {'event': event})
 
+@login_required
 def list_sessions(request, event_code_name, pk):
     event = get_object_or_404(Event, code_name=event_code_name)
     timeslot = TimeSlot.objects.get(event=event, pk=pk)

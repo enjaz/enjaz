@@ -18,7 +18,7 @@
 			margin-right: auto;
 			border-radius: 5px;
 			-webkit-border-radius: 5px;
-			border: 4px solid #0477bf;
+			border: 4px solid #B08D2E;
 		}
 
 		.wrapper {
@@ -49,9 +49,11 @@
 	<div class="wrapper">
 		<img id="logo" src="{{ image_url }}">
 	</div>
+    <!--
 	<div class="wrapper">
 		{{ qrcode_value|safe }}
 	</div>
+        -->
 	<div class="wrapper">
 		<img src='https://barcode.tec-it.com/barcode.ashx?data={{ text }}&code=Code128&dpi=96&dataseparator=' alt='Barcode Generator TEC-IT'/>
 	</div>

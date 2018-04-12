@@ -23,8 +23,10 @@
     <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
         <h2 class="mentor-section-header">{{ timeslot.name }}</h2>
             {% if not children_total == 0  %}
+{% if timeslot.limit %}
             <strong style="text-align:center !important;" id="counter">  الحد الأقصى للتسجيل هو {{ limit }}  </strong>
-            {% endif %}
+{% endif %}
+	    {% endif %}
     </div>
 </div>
 
@@ -91,7 +93,7 @@
                 <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لإنجاز كي أؤكد الحضور</a>
                 {% endif %}
             {% if session.image or session.description %}
-                <button type="button" data-name="{{ session.name }}" data-url="{% url 'events:session_info' session.time_slot.event.code_name session.pk %}" class="btn btn-info session-info"> <i class="entypo-info"></i> </button>
+                <button type="button" data-name="{{ session.name }}" data-url="{% url 'events:session_info' session.time_slot.event.code_name session.pk %}" class="btn btn-info session-info"> <i class="entypo-info"></i>التفاصيل </button>
             {% endif %}
                 <br>
             {% if session.acceptance_method == 'M' and user.is_authenticated %}

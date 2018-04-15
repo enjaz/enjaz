@@ -313,6 +313,7 @@
                                     <th class="all">Presenting author</th>
                                     <th class="all">Presentation preference</th>
                                     <th class="all">Score</th>
+                                    <th class="all">University</th>
                                     <th class="all">Accepted presentation preference</th>
                                     <th class="all">Presentation date</th>
                                     <th class="none">Evaluators</th>
@@ -331,6 +332,7 @@
                                     <td><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></td>
                                     <td>{{ abstract.get_presentation_preference_display }}</td>
                                     <td>ِ{{ abstract.get_average_score }}</td>
+                                    <td>{{ abstract.university }}</td>
                                     {% if abstract.get_accepted_presentaion_preference_display %}
                                     <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
                                     {% else %}
@@ -390,6 +392,7 @@
                                     <th class="all">Presenting author</th>
                                     <th class="all">Presentation preference</th>
                                     <th class="all">Score</th>
+                                    <th class="all">University</th>
                                     <th class="all">Accepted presentation preference</th>
                                     <th class="all">Presentation date</th>
                                     <th class="none">Evaluators</th>
@@ -408,6 +411,7 @@
                                     <td><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></td>
                                     <td>{{ abstract.get_presentation_preference_display }}</td>
                                     <td>ِ{{ abstract.get_average_score }}</td>
+                                    <td>{{ abstract.university }}</td>
                                     {% if abstract.get_accepted_presentaion_preference_display %}
                                     <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
                                     {% else %}
@@ -467,6 +471,7 @@
                                     <th class="all">Presenting author</th>
                                     <th class="all">Presentation preference</th>
                                     <th class="all">Score</th>
+                                    <th class="all">University</th>
                                     <th class="all">Accepted presentation preference</th>
                                     <th class="all">Presentation date</th>
                                     <th class="none">Evaluators</th>
@@ -485,6 +490,7 @@
                                     <td><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></td>
                                     <td>{{ abstract.get_presentation_preference_display }}</td>
                                     <td>ِ{{ abstract.get_average_score }}</td>
+                                    <td>{{ abstract.university }}</td>
                                     {% if abstract.get_accepted_presentaion_preference_display %}
                                     <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
                                     {% else %}
@@ -542,6 +548,7 @@
                                     <th class="all">Presenting author</th>
                                     <th class="all">Presentation preference</th>
                                     <th class="all">Score</th>
+                                    <th class="all">University</th>
                                     <th class="all">Accepted presentation preference</th>
                                     <th class="all">Presentation date</th>
                                     <th class="none">Evaluators</th>
@@ -560,6 +567,7 @@
                                     <td><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></td>
                                     <td>{{ abstract.get_presentation_preference_display }}</td>
                                     <td>ِ{{ abstract.get_average_score }}</td>
+                                    <td>{{ abstract.university }}</td>
                                     {% if abstract.get_accepted_presentaion_preference_display %}
                                     <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
                                     {% else %}

@@ -43,6 +43,7 @@
                                 <th class="not-mobile">Name</th>
                                 <th class="not-mobile">Gender</th>
                                 <th class="not-mobile">University</th>
+                                <th class="not-mobile">Student ID or scfhs</th>
                                 <th class="not-mobile">Registration date</th>
                             </tr>
                         </thead>
@@ -53,6 +54,7 @@
                                 <td>{{ registration.user.common_profile.get_en_full_name }}</td>
                                 <td>{{ registration.user.common_profile.get_gender_display }}</td>
                                 <td>{{ registration.user.common_profile.get_university_or_affiliation }}</td>
+                                <td>{% if student_id %}{{ registration.user.common_profile.student_id }}{% else %}{{ registration.user.common_profile.scfhs_number }}{% endif %}</td>
                                 <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted|date:"Y-m-d" }}</td>
                             </tr>
                         {% endfor %}
@@ -89,6 +91,7 @@
                                 <th class="not-mobile">Name</th>
                                 <th class="not-mobile">Gender</th>
                                 <th class="not-mobile">University</th>
+                                <th class="not-mobile">Student ID or scfhs</th>
                                 <th class="not-mobile">Registration date</th>
                             </tr>
                         </thead>
@@ -99,6 +102,7 @@
                                 <td>{{ registration.user.common_profile.get_en_full_name }}</td>
                                 <td>{{ registration.user.common_profile.get_gender_display }}</td>
                                 <td>{{ registration.user.common_profile.get_university_or_affiliation }}</td>
+                                <td>{% if student_id %}{{ registration.user.common_profile.student_id }}{% else %}{{ registration.user.common_profile.scfhs_number }}{% endif %}</td>
                                 <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted|date:"Y-m-d" }}</td>
                             </tr>
                         {% endfor %}
@@ -135,6 +139,7 @@
                                 <th class="not-mobile">Name</th>
                                 <th class="not-mobile">Gender</th>
                                 <th class="not-mobile">University</th>
+                                <th class="not-mobile">Student ID or scfhs</th>
                                 <th class="not-mobile">Registration date</th>
                             </tr>
                         </thead>
@@ -145,6 +150,7 @@
                                 <td>{{ registration.user.common_profile.get_en_full_name }}</td>
                                 <td>{{ registration.user.common_profile.get_gender_display }}</td>
                                 <td>{{ registration.user.common_profile.get_university_or_affiliation }}</td>
+                                <td>{% if student_id %}{{ registration.user.common_profile.student_id }}{% else %}{{ registration.user.common_profile.scfhs_number }}{% endif %}</td>
                                 <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted|date:"Y-m-d" }}</td>
                             </tr>
                         {% endfor %}

@@ -42,7 +42,7 @@
                                 <th class="not-mobile">ID</th>
                                 <th class="all">Title</th>
                                 <th class="not-mobile">Presenting author</th>
-                                <th class="not-mobile">Presentation status</th>
+                                <th class="not-mobile">Presentation</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -50,9 +50,9 @@
                             <tr>
                                 <td><input type="checkbox" value="1" name="pk_{{ presenter.pk }}"></td>
                                 <td>{{ presenter.pk }}</td>
-                                <td>{{ presenter.title }}</td>
+                                <td><a href="{% url 'events:show_abstract' event.code_name presenter.pk %}">{{ presenter.title }}</a></td>
                                 <td>{{ presenter.presenting_author }}</td>
-                                <td>{{ presenter.status }}</td>
+                                <td>{% for presentation in presenter.posters.all %}<a href="{{  presentation.presentation_file.url }}">{{ presentation.presentation_file.name }}</a>{% endfor %}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -87,7 +87,7 @@
                                 <th class="not-mobile">ID</th>
                                 <th class="all">Title</th>
                                 <th class="not-mobile">Presenting author</th>
-                                <th class="not-mobile">Presentation status</th>
+                                <th class="not-mobile">Presentation</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -95,9 +95,9 @@
                             <tr>
                                 <td><input type="checkbox" value="1" name="pk_{{ presenter.pk }}"></td>
                                 <td>{{ presenter.pk }}</td>
-                                <td>{{ presenter.title }}</td>
+                                <td><a href="{% url 'events:show_abstract' event.code_name presenter.pk %}">{{ presenter.title }}</a></td>
                                 <td>{{ presenter.presenting_author }}</td>
-                                <td>{{ presenter.status }}</td>
+                                <td>{% for presentation in presenter.posters.all %}<a href="{{  presentation.presentation_file.url }}">{{ presentation.presentation_file.name }}</a>{% endfor %}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -142,7 +142,9 @@
                                 <th class="not-mobile">ID</th>
                                 <th class="all">Title</th>
                                 <th class="not-mobile">Presenting author</th>
-                                <th class="not-mobile">Presentation status</th>
+                                <th class="not-mobile">PowerPoint</th>
+								<th class="not-mobile">First Image</th>
+								<th class="not-mobile">Second Image</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -150,9 +152,11 @@
                             <tr>
                                 <td><input type="checkbox" value="1" name="pk_{{ presenter.pk }}"></td>
                                 <td>{{ presenter.pk }}</td>
-                                <td>{{ presenter.title }}</td>
+                                <td><a href="{% url 'events:show_abstract' event.code_name presenter.pk %}">{{ presenter.title }}</a></td>
                                 <td>{{ presenter.presenting_author }}</td>
-                                <td>{{ presenter.status }}</td>
+                                <td>{% for poster  in presenter.posters.all %}<a href="{{  poster.poster_powerpoint.url }}">{{ poster.poster_powerpoint.name }}</a>{% endfor %}</td>
+								<td>{% for poster  in presenter.posters.all %}<a href="{{  poster.first_image.url }}">{{ poster.first_image.name }}</a>{% endfor %}</td>
+								<td>{% for poster  in presenter.posters.all %}<a href="{{  poster.second_image.url }}">{{ poster.second_image.name }}</a>{% endfor %}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -187,7 +191,9 @@
                                 <th class="not-mobile">ID</th>
                                 <th class="all">Title</th>
                                 <th class="not-mobile">Presenting author</th>
-                                <th class="not-mobile">Presentation status</th>
+                                <th class="not-mobile">PowerPoint</th>
+								<th class="not-mobile">First Image</th>
+								<th class="not-mobile">Second Image</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -195,9 +201,11 @@
                             <tr>
                                 <td><input type="checkbox" value="1" name="pk_{{ presenter.pk }}"></td>
                                 <td>{{ presenter.pk }}</td>
-                                <td>{{ presenter.title }}</td>
+                                <td><a href="{% url 'events:show_abstract' event.code_name presenter.pk %}">{{ presenter.title }}</a></td>
                                 <td>{{ presenter.presenting_author }}</td>
-                                <td>{{ presenter.status }}</td>
+                                <td>{% for poster  in presenter.posters.all %}<a href="{{  poster.poster_powerpoint.url }}">{{ poster.poster_powerpoint.name }}</a>{% endfor %}</td>
+								<td>{% for poster  in presenter.posters.all %}<a href="{{  poster.first_image.url }}">{{ poster.first_image.name }}</a>{% endfor %}</td>
+								<td>{% for poster  in presenter.posters.all %}<a href="{{  poster.second_image.url }}">{{ poster.second_image.name }}</a>{% endfor %}</td>
                             </tr>
                         {% endfor %}
                         </tbody>

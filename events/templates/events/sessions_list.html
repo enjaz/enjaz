@@ -45,6 +45,10 @@
                     <h3 class="english-field" style="text-align: center">  {{ child_timeslot.name }}  </h3>
                     <a href="{% url 'events:list_sessions' child_timeslot.event.code_name child_timeslot.pk %}"> <button style="float: left" class="btn btn-success">المزيد</button>
                     </a>
+                    {% if child_timeslot.image %}
+                    <button  style="float: left; margin-left: 1px"  type="button" data-name="{{ child_timeslot.name }}" data-url="{% url 'events:timeslot_info' child_timeslot.event.code_name child_timeslot.pk %}" class="btn btn-info session-info"> <i class="entypo-info"></i>التفاصيل </button>
+                    {% endif %}
+
                 </div>
                 </div>
             {% endfor %}
@@ -147,10 +151,7 @@ $(document).ready(function(){
         $("#session-details-modal .modal-title").html(name);
         $("#session-details-modal .modal-title").addClass('english-field');
             $("#session-details-modal .modal-body").load(url);
-{#                , function(){#}
-    {#            $('.end-project-introduction').click(function() {#}
-    {#                $("#edit-project-modal .modal-body").load("{% url 'researchhub:add_project' %}");#}
-    {#            });#}
+
         });
 
 

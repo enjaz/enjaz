@@ -57,7 +57,8 @@ urlpatterns = patterns('',
     url(r'^survey/(?P<session_pk>\d+)/(?P<optional>optional)?$', views.handle_survey, name="handle_survey"),
     url(r'^survey/(?P<session_pk>\d+)/delete$', views.delete_survey_response, name="delete_survey_response"),
     url(r'^survey/thanks/$', TemplateView.as_view(template_name='events/thank_you.html'),name="survey_submission_completed"),
-    url(r'^(?P<event_code_name>[\d\w_\-]+)/stats/(?P<session_pk>\d+)/info/$', views.session_info ,name="session_info"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/stats/(?P<pk>\d+)/info/$', views.session_info ,name="session_info"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/stats/timeslot/(?P<pk>\d+)/info/$', views.timeslot_info ,name="timeslot_info"),
 
                        # Has to be the last URL so it doesn't catch unintended patterns.
     url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<code_name>[\d\w\-]+)/$', views.show_session_group,name="show_session_group"),

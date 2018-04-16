@@ -338,13 +338,19 @@ def upload_abstract_image(request):
                     "message": u"لم أستطع رفع الملف"}
                 }
 
-@login_required 
+@login_required
 def list_timeslots(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
-    timeslots = TimeSlot.objects.filter(event=event,parent__isnull=True)
+    timeslots = TimeSlot.objects.filter(event=event ,parent__isnull=True)
+
+    if timeslots.filter(image__isnull=False):
+        have_image = True
+    else:
+        have_image = False
 
     context = {'timeslots': timeslots,
-               'event': event}
+               'event': event,
+               'have_image': have_image}
 
     if event.registration_opening_date and timezone.now() < event.registration_opening_date:
         raise Http404
@@ -1152,10 +1158,20 @@ def list_attendance(request, event_code_name,user_pk=None):
     return render(request, 'events/list_attendance.html', context)
 
 
-def session_info(request, event_code_name, session_pk):
+def session_info(request, event_code_name, pk):
 
-    session = get_object_or_404(Session,event__code_name=event_code_name,pk=session_pk)
+    session = get_object_or_404(Session,event__code_name=event_code_name,pk=pk)
 
-    context ={'session':session}
+    context ={'session':session,
+              'is_session':True}
+
+    return render(request, 'events/partials/session_info.html', context)
+
+def timeslot_info(request, event_code_name, pk):
+
+    timeslot = get_object_or_404(TimeSlot ,event__code_name=event_code_name,pk=pk)
+
+    context ={'session':timeslot,
+              'is_session':False}
 
     return render(request, 'events/partials/session_info.html', context)

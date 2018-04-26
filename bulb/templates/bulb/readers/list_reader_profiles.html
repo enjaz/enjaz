@@ -22,7 +22,6 @@
         <th>الاسم</th>
         <th class="not-mobile">الكلية</th>
         <th>عدد الكتب المساهم بها</th>
-        <th class="not-mobile">مجموعات القراءة</th>
     </thead>
     <tbody>
         {% for reader_profile in reader_profiles %}
@@ -30,20 +29,6 @@
             <td><a href="{% url 'bulb:show_reader_profile' reader_profile.pk %}">{{ reader_profile.user.common_profile.get_ar_full_name }}</a></td>
             <td>{{ reader_profile.user.common_profile.college.get_name_display }}</td>
             <td>{{ reader_profile.user.book_giveaways.undeleted.count }}</td>
-            <td>
-                {% if reader_profile.user.reading_group_coordination.undeleted.exists or reader_profile.user.reading_group_memberships.active.exists  %}
-                <ul>
-                    {% for group in reader_profile.user.reading_group_coordination.undeleted %}
-                    <li><a href="{% url 'bulb:show_group' group.pk %}">{{ group.name }}</a></li>
-                    {% endfor %}
-                    {% for membership in reader_profile.user.reading_group_memberships.active %}
-                    <li><a href="{% url 'bulb:show_group' membership.group.pk %}">{{ membership.group.name }}</a></li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                -
-                {% endif %}
-            </td>
         </tr>
         {% endfor %}
     </tbody>

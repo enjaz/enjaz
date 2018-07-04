@@ -135,7 +135,7 @@ you?
                             <span>حدّث معلوماتي</span>
                         </a>
                     </li>
-                    {% if user.event_abstracts.exists %}
+                    {% if user.event_abstracts.exists or user.event_casereport.exists %}
                     <li>
                         <a href="{% url 'events:list_my_abstracts' %}">
                             <i class="entypo-pencil"></i>
@@ -190,47 +190,55 @@ you?
             </li>
             {% endif %}
             {% if user|has_user_sidebar_events %}
-            <li>
+						<li>
                 <a>
                     <i class="entypo-calendar"></i>
-                    <span>التسجيل في الأنشطة الكبرى</span>
+										<span>التسجيل في الأنشطة الكبرى</span>
                 </a>
                 <ul>
-                {% for event in user|get_user_sidebar_events %}
+									{% for event in user|get_user_sidebar_events %}
                 <li>
-                    <a href="{% url 'events:list_timeslots' event.code_name %}">
+                    <a>
                         <i class="entypo-calendar"></i>
-                        <span>{{ event.get_html_name|safe }}</span>
+                        <span class="english-field">{{ event.get_html_name|safe }}</span>
                     </a>
+                    <ul>
+                        <li>
+                            <a href="{% url 'events:list_timeslots' event.code_name %}">
+                                <i class="fa fa-pencil"></i>
+                                <span>التسجيل</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'events:list_question_session' event.code_name %}">
+                                <i class="fa fa-question"></i>
+                                <span>الأسئلة التفاعلية</span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
-               {% endfor %}
-               </ul>
-             </li>
+                {% endfor %}
+                </ul>
+            </li>
             {% endif %}
             {% if user|has_user_adminstrative_events %}
             <li>
                 <a>
                     <i class="entypo-calendar"></i>
-                    <span>إدارة الأنشطة الكبرى</span>
+										<span class="english-field">{% if user.common_profile.profile_type == 'E' %}Events Management{% else %}إدارة الأنشطة الكبرى{% endif %}</span>
                 </a>
                 <ul>
                 {% for event in user|get_user_admistrative_events %}
                 <li>
                     <a>
                         <i class="entypo-calendar"></i>
-                        <span>{{ event.get_html_name|safe }}</span>
+                        <span class="english-field">{% if user.common_profile.profile_type == 'E' %}{{ event.english_name }}{% else %}{{ event.get_html_name|safe }}{% endif %}</span>
                     </a>
                     <ul>{% if user|is_organizing_team_member:event or user|is_attendance_team_member:event or user.is_superuser  %}
                         <li>
                             <a href="{% url 'events:list_sessions_privileged' event.code_name %}">
                                 <i class="entypo-chart-pie"></i>
                                 <span>الجلسات</span>
-                            </a>
-                        </li>
-												<li>
-                            <a href="{% url 'events:list_presenter_attendance' event.code_name %}">
-                                <i class="entypo-chart-pie"></i>
-                                <span>تحضير مقدمي الأبحاث</span>
                             </a>
                         </li>
                         {% if event.has_attendance %}
@@ -247,6 +255,12 @@ you?
                             <a href="{% url 'events:list_abstracts' event.code_name %}">
                                 <i class="entypo-pencil"></i>
                                 <span>الملخصات</span>
+                            </a>
+                        </li>
+												<li>
+                            <a href="{% url 'events:list_presenter_attendance' event.code_name %}">
+                                <i class="entypo-chart-pie"></i>
+                                <span>تحضير مقدمي الأبحاث</span>
                             </a>
                         </li>
                         <li>
@@ -327,6 +341,14 @@ you?
 				<a href="{% url 'researchhub:index' %}">
 					<i class="fa fa-search"></i>
 					<span class="english-field">ResearchHub</span>
+				</a>
+			</li>
+            {% endif %}
+            {% if user.is_superuser %}
+			<li class="highlighted-section">
+				<a href="{% url 'matching_program:index' %}">
+					<i class="fa fa-search"></i>
+					<span class="english-field">Matching Program</span>
 				</a>
 			</li>
             {% endif %}

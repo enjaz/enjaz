@@ -7,6 +7,9 @@
 <div class="col-sm-6 col-sm-offset-3">
 {{ qrcode_value|safe }}
 </div>
+<div class="col-sm-6 col-sm-offset-3">
+<img src='https://barcode.tec-it.com/barcode.ashx?data={{ text }}&code=Code128&dpi=96&dataseparator=' alt='Barcode Generator TEC-IT'/>
+</div>
 </div>
 <div class="row ">
 <p style="text-align: center; color: black;"><span style="font-family: monospace;">{{ text }}</span><br>{{ barcode_user.common_profile.get_en_short_name|default:barcode_user.username }}</p>
@@ -15,4 +18,3 @@
 </div>
 </div>
 {% endblock %}
-

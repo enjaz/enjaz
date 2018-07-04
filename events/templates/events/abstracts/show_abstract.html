@@ -33,13 +33,13 @@ h4{
     {% if abstract.accepted_presentaion_preference == 'P' %}
         {% if  abstract.posters.exists %}
         {% else %}
-            <h2>Accepted</h2>
-            <h3><b>Congratulations!</b><br> Your abstract has been accepted.  We require all accepted abstract submitters to upload their poser image and powerpoint,make sure you have follow the guidlines : </h3>
+            <h2>Accepted as {{ abstract.get_accepted_presentaion_preference_display }}</h2>
+            <h3 class="english-field"><b>Congratulations!</b><br> Your abstract has been accepted to be presented on {{ abstract.event.english_name }} | {{ abstract.presentaion_date|date:"Y-n-j" }}.  We require all accepted abstract submitters to upload their poster image and powerpoint,make sure you have follow the guidlines : </h3>
 
 
             <h4><li>Each poster can have maximally two slides (dont crowd everything in one slide, you have enough space with two slides).</li>
 
-                <li>Size and dimensions of the slide are already set in <a href="https://enjazportal.com/media/files/events/presentations/HPC_2017_Poster_Template.pptx"> the template</a>, so PLEASE, don't make any changes of size and dimensions of the slides.AND PLEASE do not add any additonal logos.</li>
+                <li>Size and dimensions of the slide are already set in {% if abstract.event.code_name == 'hpc3-a' %}<a href="https://enjazportal.com/media/files/events/HPC_AlAhsa_Poster.pptx">{% else %}<a href="https://enjazportal.com/media/files/events/HPC_2018_Poster_Template.pptx">{% endif %} the template</a>, so PLEASE, don't make any changes of size and dimensions of the slides.AND PLEASE do not add any additonal logos.</li>
 
                 <li>The least acceptable font size in the body texts is 40.</li>
 
@@ -49,9 +49,11 @@ h4{
 
                 <li>Each eposter should be saved into two formats PPT and JPEG (make sure that the picture in  JPEG format is not distorted after you export the file).</li>
 
-                <li>Both the PPT and JPEG should be uploaded to the enjaz system. (each file should be named with the presenter name and the reference number of the abstract).</li>
+                <li>Both the PPT and JPEG should be uploaded to the enjaz system. <b>Files MUST be named: <span style= "color: red">"{{ abstract.event.code_name }}_{{ abstract.pk }}"</span></b>.</li>
 
-                <li>Please upload your poster before the 13th of April as we will not accept any posters after that date.</li></h4>
+                <li>Please upload your poster before the <b>{% if abstract.event.code_name == 'hpc3-j' %}14th{% elif abstract.event.code_name == 'hpc3-a' %}15th{% else %}10th{% endif %} of April 2018</b> as we will not accept any posters after that date.</li>
+               
+                <li>Please do not hesitate to contact us for any further assistance hpc-notifications@enjazportal.com</li></h4>
             <div class="submit" style="margin-left: 9%; margin-bottom: 10px; margin-right: 9%;">
             <form method="post" action="{% url 'events:show_abstract' event.code_name abstract.pk %}" enctype="multipart/form-data">
                 {% csrf_token %}
@@ -80,8 +82,15 @@ h4{
     {% if abstract.accepted_presentaion_preference == 'O' %}
         {% if abstract.posters.exists %}
         {% else %}
-            <h2>Accepted</h2>
-                <h3><b>Congratulations!</b><br> Your abstract has been accepted.  We require all accepted abstract submitters to upload their presntation file: </h3>
+            <h2>Accepted as {{ abstract.get_accepted_presentaion_preference_display }}</h2>
+                <h3 class="english-field"><b>Congratulations!</b><br> Your abstract has been accepted to be presented on {{ abstract.event.english_name }} | {{ abstract.presentaion_date|date:"Y-n-j" }}.  We require all accepted abstract submitters to upload their presntation file: </h3>
+    
+                <h4><li>Please upload your presntation before the <b>{% if abstract.event.code_name == 'hpc3-j' %}14th{% elif abstract.event.code_name == 'hpc3-a' %}15th{% else %}10th{% endif %} of April 2018</b> as we will not accept any presntation after that date.</li>
+                <li><b>File MUST be named: <span style= "color: red">"{{ abstract.event.code_name }}_{{ abstract.pk }}"</span></b></li>
+                <li>File MUST be on PowePoint format</li>
+                {% if abstract.event.code_name == 'hpc3-a' %}<li><a href="https://enjazportal.com/media/files/events/HPC_AlAhsa_Poster.pptx">Use this trmplate</a></li>{% endif %}
+                <li>You have 7 minutes for the presentation and 3 minutes for the discussion</li>
+                <li>Please do not hesitate to contact us for any further assistance hpc-notifications@enjazportal.com</li></h4>
                 <div class="submit" style="margin-left: 9%; margin-bottom: 10px; margin-right: 9%;">
                 <form method="post" action="{% url 'events:presntation_upload' event.code_name abstract.pk %}" enctype="multipart/form-data">
                     {% csrf_token %}

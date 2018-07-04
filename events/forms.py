@@ -10,7 +10,7 @@ from .models import NonUser, Session, Registration, Abstract, \
     AbstractFigure, Initiative, InitiativeFigure, \
     Criterion, CriterionValue, Evaluation,CaseReport, \
     AbstractPoster, Attendance, Question, SurveyQuestion, \
-    SurveyResponse, SurveyAnswer, SessionRegistration
+    SurveyResponse, SurveyAnswer, SessionRegistration,AbstractAuthor
 from django.forms.models import inlineformset_factory
 
 class NonUserForm(forms.ModelForm):
@@ -20,7 +20,7 @@ class NonUserForm(forms.ModelForm):
                   'en_first_name', 'en_middle_name', 'en_last_name',
                   'email', 'mobile_number', 'university', 'college',
                   'gender']
-        
+
 class RegistrationForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
@@ -78,7 +78,7 @@ class RegistrationForm(forms.Form):
 class AbstractForm(forms.ModelForm):
     class Meta:
         model = Abstract
-        fields = ['title', 'authors', 'university', 'college',
+        fields = ['title', 'university', 'college',
                   'study_field', 'presenting_author', 'email',
                   'phone', 'level', 'presentation_preference',
                   'introduction','methodology', 'results',
@@ -91,6 +91,12 @@ AbstractFigureFormset = inlineformset_factory(Abstract,
                                               fields=['figure'],
                                               max_num=1,
                                               validate_max=True)
+
+AbsractAuthorFormset = inlineformset_factory(Abstract,
+                                             AbstractAuthor,
+                                             fields=['name'],
+                                             validate_max=True)
+
 
 
 class AbstractFigureForm(forms.ModelForm):
@@ -112,12 +118,9 @@ class AbstractPresentationForm(AbstractPosterForm):
 class CaseReportForm(forms.ModelForm):
     class Meta:
         model = CaseReport
-        fields = ['title', 'authors', 'university', 'college', 'email','phone',
-                  'introduction','patient_info', 'clinical_presentation',
-                  'diagnosis', 'treatment', 'outcome','discussion','conclusion',
-                  'was_published',
-                  'was_presented_at_others',
-                  'was_presented_previously','study_field']
+        fields = ['title', 'authors', 'presenting_author','university', 'college', 'email',
+                    'phone', 'introduction', 'level', 'presentation_preference',
+                  'was_published', 'was_presented_at_others', 'was_presented_previously','study_field']
 
 class EvaluationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -234,7 +237,7 @@ class SurveyForm(forms.Form):
                 if not question.choices.strip():
                     raise Exception
                 choices = [('', '-----')]
-                
+
                 choices += [(choice.strip(), choice.strip()) for choice in question.choices.split('\n') if choice]
                 self.fields[field_name] = forms.ChoiceField(label=label,
                                                             choices=choices,

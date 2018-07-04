@@ -1,0 +1,104 @@
+{% extends 'mp_base.html' %}{% load staticfiles %}{% load matching_program_tags %}{% load l10n %}
+{% block content %}
+<div class="english-field">
+<div class="row" style="display:flex; justify-content: center;">
+    <h1 style="display: inline; font-family: 'Candal', sans-serif; font-size: 55px;">Welcome {{user|capfirst}}</h1>
+</div>
+<br>
+<div class="row col-md-10 col-sm-offset-1" style="text-align: center;">
+    <h3>Here is where the Matching Program Coordinator can add or remove members from the team. For any problems please inform Enjaz team.</h3>
+</div>
+    <hr style="margin: 50px 0 100px 0;">
+<div class="row col-md-10 col-sm-offset-1" style="text-align: center;">
+    <h1 style="display: inline; font-family: 'Candal', sans-serif;">Your Team Members</h1>
+</div>
+    <table id="MembersTable" class="display dt-responsive" style="width:100%">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+    </table>
+    
+<hr style="margin: 50px 0 100px 0;">
+<div class="row col-md-10 col-sm-offset-1" style="text-align: center;">
+    <h1 style="display: inline; font-family: 'Candal', sans-serif;">Add Members</h1>
+</div> 
+    <table id="ListTable" class="display dt-responsive" style="width:100%">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+    </table>
+    
+</div>
+<br>
+{% endblock %}
+
+
+{% block customscript %}    
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/jszip.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/buttons.html5.min.js' %}"></script>
+
+
+
+<script type="text/javascript" language="javascript" class="init">
+    $('#ListTable').dataTable( {
+             "processing": true,
+             "ajax": {
+                 "processing": true,
+                 "url": "{% url 'matching_program:search_ajax' %}",
+                 "dataSrc": ""
+             },
+             "columns": [
+                     { "data": "pk" },
+                     { "data": "fields.username" },
+                     { "data": "fields.first_name" },
+                     { "data": "fields.last_name" },
+                     { "data": "pk", 
+                      "render": function ( data ) {
+      return '<a href="'+data+'/add"><button class="btn btn-primary btn-block">Add</button></a>';}}
+                 ],      
+         } ); 
+    
+ </script>
+<script type="text/javascript" language="javascript" class="init">
+    $('#MembersTable').dataTable( {
+             "processing": true,
+             "ajax": {
+                 "processing": true,
+                 "url": "{% url 'matching_program:members_list' %}",
+                 "dataSrc": ""
+             },
+             "columns": [
+                     { "data": "pk" },
+                     { "data": "fields.username" },
+                     { "data": "fields.first_name" },
+                     { "data": "fields.last_name" },
+                     { "data": "pk", 
+                      "render": function ( data ) {
+      return '<a href="'+data+'/remove"><button class="btn btn-danger btn-block">Remove</button></a>';}}
+                 ],      
+         } ); 
+    
+ </script>
+ 
+{% endblock %}
+
+{% block customstyles %}
+<link href='https://fonts.googleapis.com/css?family=Candal' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+{% endblock %}

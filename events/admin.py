@@ -29,10 +29,31 @@ def mark_deleted(modeladmin, request, queryset):
 mark_deleted.short_description = u"علم السجلات المُحدّدة أنها محذوفة (دون إزالتها من قاعدة البيانات)"
 
 
+class AuthorInline(admin.TabularInline):
+    model = models.AbstractAuthor
+    form = OptionalForm
+    extra = 1
+
 class AbstractFigureInline(admin.TabularInline):
     model = models.AbstractFigure
     form = OptionalForm
     extra = 0
+
+class AbstractPosterInline(admin.TabularInline):
+    model = models.AbstractPoster
+    form = OptionalForm
+    extra = 0
+
+class AbstractAdmin(admin.ModelAdmin):
+    search_fields = BASIC_SEARCH_FIELDS + ["email", "title"]
+    actions = [mark_deleted]
+    list_filter = ["event", "is_deleted"]
+    list_display = ['__unicode__', 'is_deleted', 'status',
+                    'date_submitted']
+    inlines = [AuthorInline, AbstractFigureInline, AbstractPosterInline]
+    filter_horizontal = ('evaluators',)
+    raw_id_fields = ['evaluators']
+    introduction = forms.CharField(widget=CKEditorWidget())
 
 
 class QuestionInline(admin.TabularInline):
@@ -114,12 +135,6 @@ class NonUserAdmin(admin.ModelAdmin):
     inlines = [RegistrationInline]
 
 
-class AbstractPosterInline(admin.TabularInline):
-    model = models.AbstractPoster
-    form = OptionalForm
-    extra = 0
-
-
 class SurveyQuestionInline(admin.TabularInline):
     model = models.SurveyQuestion
 
@@ -128,16 +143,6 @@ class SurveyAnswerInline(CertificateAdminPermission, admin.TabularInline):
     model = models.SurveyAnswer
     exclude = ['text_value', 'numerical_value']
     readonly_fields = ['question', 'get_value']
-
-
-class AbstractAdmin(admin.ModelAdmin):
-    search_fields = BASIC_SEARCH_FIELDS + ["email", "title"]
-    actions = [mark_deleted]
-    list_filter = ["event", "is_deleted"]
-    form = events.forms.AbstractForm
-    inlines = [AbstractFigureInline, AbstractPosterInline]
-    filter_horizontal = ('evaluators',)
-    introduction = forms.CharField(widget=CKEditorWidget())
 
 
 class InitiativeAdmin(admin.ModelAdmin):

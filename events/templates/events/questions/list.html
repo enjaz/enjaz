@@ -1,0 +1,56 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}{% load events_tags %}
+{% block title %}{{ event.official_name }} abstracts{% endblock %}
+{% block content %}
+<div class="row">
+        <br>
+    <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
+        <h2 class="mentor-section-header">{{ event.official_name }}</h2>
+    </div>
+</div>
+<div>
+    <h1>الأسئلة التفاعلية للجلسات</h1>
+    <div class="panel-body">
+        <div class="row">
+            <table id="sessions" class="display datatable dt-responsive">
+                <thead>
+                    <tr>
+                        <th>رقم الجلسة</th>
+                        <th>عنوان الجلسة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for session in question_session %}
+                    <tr>
+                        <td>{{ session.pk }}</td>
+                        <td><a href="{% url 'events:show_question_session' session.event.code_name session.pk %}">{{ session.title }}</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %} {% block customscript %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<style type="text/css">
+    th,
+    td {
+        text-align: right;
+    }
+
+</style>
+<script>
+    $(function() {
+        $("#sessions").dataTable({
+            "order": [
+                [1, "dec"]
+            ]
+        });
+    });
+
+</script>
+{% endblock %}

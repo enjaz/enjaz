@@ -260,8 +260,7 @@ class Session(models.Model):
 
     def has_mandatory_survey_to_fill(self, user):
         if not self.mandatory_survey or \
-           SurveyResponse.objects.filter(survey=self.mandatory_survey,
-                                         user=user).exists():
+           SurveyResponse.objects.filter(survey=self.mandatory_survey,user=user).exists():
             return False
         else:
             return True
@@ -270,6 +269,14 @@ class Session(models.Model):
         if not self.optional_survey or \
            SurveyResponse.objects.filter(survey=self.optional_survey,
                                          user=user).exists():
+            return False
+        else:
+            return True
+
+    def has_mandatory_child_survey_to_fill(self, user):
+        pks = self.mandatory_survey.children.values_list('pk', flat=True)
+        if not self.mandatory_survey.children or \
+              SurveyResponse.objects.filter(survey__pk__in=pks, user=user).exists():
             return False
         else:
             return True
@@ -694,10 +701,28 @@ class Question(models.Model):
     def __unicode__(self):
         return self.question_text[:20]
 
+
+survey_target_choices = (
+    ('M', u'كلية الطب'),
+    ('D', u'كلية الاسنان'),
+    ('A', u'العلوم الطبية التطبيقية'),
+    )
+
+class UserSurveyCategory(models.Model):
+    event = models.ForeignKey(Event, null=True, blank=True)
+    category = models.CharField(max_length=1,choices=survey_target_choices)
+    user = models.ForeignKey(User, verbose_name=u"المستخدمـ/ـة",
+                             blank=True, null=True)
+
 class Survey(models.Model):
     name = models.CharField(u"الاسم", max_length=100)
     date_submitted = models.DateTimeField(u"تاريخ الإرسال",
                                           auto_now_add=True)
+    parent = models.ForeignKey('self', null=True, blank=True,
+                               related_name="children",
+                               on_delete=models.SET_NULL,
+                               default=None,verbose_name='parent survey')
+    category = models.CharField(max_length=1, choices=survey_target_choices,null=True, blank=True)
 
     def get_response_count(self):
         return self.responses.count()
@@ -753,3 +778,4 @@ class SurveyAnswer(models.Model):
 
     def __unicode__(self):
         return u"{}'s answer to {}".format(self.survey_response.user.username, self.question.text)
+

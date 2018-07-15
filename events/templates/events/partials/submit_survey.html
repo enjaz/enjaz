@@ -33,13 +33,14 @@
 <script type="text/javascript">
 $(function () {
     formData = null;
-{% if session|has_mandatory_survey_to_fill:user %}
+{% if session|has_mandatory_survey_to_fill:user or not session|known_user_category:user or session|has_mandatory_child_survey_to_fill:user%}
     is_optional = false;
-    $("#mandatory-alert").show()
+    $("#mandatory-alert").show();
     $("form#edit-survey-form").attr('action', "{% url 'events:handle_survey' session.pk %}");
+
 {% else %}
     is_optional = true;
-    $("#optional-alert").show()
+    $("#optional-alert").show();
     $("form#edit-survey-form").attr('action', "{% url 'events:handle_survey' session.pk 'optional' %}");
 {% endif %}
     // modify form submission behaviour to be ajaxy
@@ -93,6 +94,8 @@ $(function () {
                        $("#edit-survey-form").hide();
                        $("#confirm-message").show();
                     }
+
+
                 } else {
                     $("#edit-survey-modal .modal-body").html(data);
                 }}

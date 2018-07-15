@@ -16,8 +16,8 @@
             <td class="english-field">{{ certificate.verification_code }}</td>
             <td data-order="{{ certificate.submission_date|date:'U' }}">{{ certificate.submission_date|date:"j F Y" }}</td>
             <td>
-                {% if certificate.is_related_to_session and certificate.content_object|has_mandatory_survey_to_fill:user %}
-                <button data-session-title="{{ certificate.content_object.name }}" data-session-pk="{{ certificate.content_object.pk }}" data-url="{% url 'events:handle_survey' certificate.content_object.pk %}" class="survey btn btn-icon btn-success">
+                {% if certificate.is_related_to_session and certificate.content_object|has_mandatory_survey_to_fill:user or certificate.is_related_to_session and certificate.content_object|has_mandatory_child_survey_to_fill:user %}
+                <button data-session-title="{{ certificate.content_object.name }}" data-session-pk="{{ certificate.content_object.pk }}"  data-url="{% url 'events:handle_survey' certificate.content_object.pk  %}" class="survey btn btn-icon btn-success">
                     <i class="entypo-pencil"></i>
                    تعبئة الاستبيان
                 </button>
@@ -70,7 +70,7 @@
         });
         $(".survey").click(function () {
             session_pk =  $(this).data("session-pk");
-            url = $(this).data('url')
+            url = $(this).data('url');
             session_title = $(this).data("session-title");
 
             $("#edit-survey-modal").modal('show');
@@ -82,6 +82,7 @@
             $submitButton.off('click');
             $submitButton.click(function () {
                 $("form#edit-survey-form").submit();
+                location.reload();
             });
         });
         if (window.location.hash == '#fill_survey'){

@@ -94,3 +94,11 @@ def has_user_adminstrative_events(user):
 @register.filter
 def has_remaining_sessions(user,timeslot):
     return utils.has_remaining_sessions(user,timeslot)
+
+@register.filter
+def known_user_category(user,event):
+    return utils.known_user_category(user,event)
+
+@register.filter
+def has_mandatory_child_survey_to_fill(session, user):
+    return session.has_mandatory_child_survey_to_fill(user)

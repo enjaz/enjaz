@@ -48,7 +48,7 @@ $(function () {
     $(".header-field").removeClass("form-control");
     $("div.radio").removeClass("radio").css("display", "inline");
     $("div:has(> label > span.english), p:has(span.english)").addClass("english-field text-center");
-    $("div.english-field textarea, div.english-field input[type=text]").attr("placeholder", "")
+    $("div.english-field textarea, div.english-field input[type=text]").attr("placeholder", "");
 
     $("#agree").click(function(){
         $("#edit-survey-modal").modal('hide');
@@ -90,6 +90,7 @@ $(function () {
                        $("#edit-survey-modal .modal-body").html(data.html);
                        $("form#edit-survey-form").attr('action', data.submit_url);
                        is_optional = true;
+                       location.reload();
                     } else if (is_optional){
                        $("#edit-survey-form").hide();
                        $("#confirm-message").show();

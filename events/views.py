@@ -1065,10 +1065,10 @@ def get_csv(request, event_code_name, session_pk):
 @login_required
 def handle_survey(request, session_pk, optional=False):
     session = get_object_or_404(Session, pk=session_pk)
-    is_optional = bool(optional)
-
     optional_survey = session.optional_survey
     child_survey = session.mandatory_survey.children.exists()
+
+    is_optional = bool(optional)
 
     if session.has_mandatory_child_survey_to_fill(request.user) and SurveyResponse.objects.filter(survey=session.mandatory_survey, user=request.user).exists() and UserSurveyCategory.objects.filter(user=request.user, event=session.event).first():
         category = UserSurveyCategory.objects.filter(user=request.user, event=session.event).first()
@@ -1084,8 +1084,8 @@ def handle_survey(request, session_pk, optional=False):
             if form.is_valid():
                 form.save()
                 form = forms.SurveyForm(session=session,
-                                            is_optional=True,
-                                            second_survey=survey)
+                                        is_optional=True,
+                                        second_survey=survey)
                 context['form'] = form
                 template = get_template('events/partials/submit_survey.html')
                 html = template.render(context)
@@ -1097,7 +1097,7 @@ def handle_survey(request, session_pk, optional=False):
         if request.method == 'POST':
             form = forms.SurveyForm(request.POST, session=session,
                                     is_optional=is_optional,
-                                    second_survey= survey)
+                                    second_survey=survey)
             if form.is_valid():
                 form.save(user=request.user)
                 if child_survey and SurveyResponse.objects.filter(survey=session.mandatory_survey,user=request.user).exists():

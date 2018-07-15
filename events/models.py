@@ -703,14 +703,14 @@ class Question(models.Model):
 
 
 survey_target_choices = (
-    ('M', u'كلية الطب'),
-    ('D', u'كلية الاسنان'),
-    ('A', u'العلوم الطبية التطبيقية'),
+    ('M', 'College of Medicine'),
+    ('D', 'College of Dentistry'),
+    ('P', 'College of Pharmacy'),
     )
 
 class UserSurveyCategory(models.Model):
     event = models.ForeignKey(Event, null=True, blank=True)
-    category = models.CharField(max_length=1,choices=survey_target_choices)
+    category = models.CharField(max_length=1,choices=survey_target_choices,verbose_name='chose your studying profession')
     user = models.ForeignKey(User, verbose_name=u"المستخدمـ/ـة",
                              blank=True, null=True)
 

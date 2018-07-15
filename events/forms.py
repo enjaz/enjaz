@@ -10,7 +10,7 @@ from .models import NonUser, Session, Registration, Abstract, \
     AbstractFigure, Initiative, InitiativeFigure, \
     Criterion, CriterionValue, Evaluation,CaseReport, \
     AbstractPoster, Attendance, Question, SurveyQuestion, \
-    SurveyResponse, SurveyAnswer, SessionRegistration,AbstractAuthor
+    SurveyResponse, SurveyAnswer, SessionRegistration,AbstractAuthor,UserSurveyCategory
 from django.forms.models import inlineformset_factory
 
 class NonUserForm(forms.ModelForm):
@@ -207,10 +207,13 @@ class SurveyForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.session = kwargs.pop("session")
         self.is_optional = kwargs.pop("is_optional")
+        self.second_survey= kwargs.pop("second_survey")
         super(SurveyForm, self).__init__(*args, **kwargs)
 
         if self.is_optional:
             self.survey = self.session.optional_survey
+        elif self.second_survey:
+            self.survey = self.second_survey
         else:
             self.survey = self.session.mandatory_survey
 
@@ -290,3 +293,8 @@ class AttendanceAdminForm(forms.ModelForm):
 class SessionRegistrationAdminForm(forms.ModelForm):
     class Meta(UserAutocompleteFormMeta):
         model = SessionRegistration
+
+class UserSurveyCategoryForm (forms.ModelForm):
+    class Meta:
+        model = UserSurveyCategory
+        fields = ['category']

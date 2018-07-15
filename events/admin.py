@@ -88,7 +88,7 @@ class EventFilter(admin.SimpleListFilter):
     parameter_name = 'event'
 
     def lookups(self, request, model_admin):
-        return models.Event.objects.values_list('pk', 'name')
+        return models.Event.objects.values_list('pk', 'official_name')
 
     def queryset(self, request, queryset):
         if self.value():
@@ -290,3 +290,4 @@ admin.site.register(models.Survey, SurveyAdmin)
 admin.site.register(models.SurveyResponse, SurveyResponseAdmin)
 certificate_admin.register(models.Survey, SurveyAdmin)
 certificate_admin.register(models.SurveyResponse, SurveyResponseAdmin)
+admin.site.register(models.UserSurveyCategory)

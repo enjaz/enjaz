@@ -21,7 +21,7 @@ from .models import Event, Session, Abstract, AbstractFigure,\
                           Evaluation, TimeSlot,\
                           SessionRegistration, Initiative,\
                           SessionGroup,CaseReport, Attendance,\
-                          QuestionSession, Question, Survey
+                          QuestionSession, Question, Survey,SurveyResponse,UserSurveyCategory
 from . import utils, forms
 import core.utils
 import clubs.utils
@@ -1002,8 +1002,8 @@ def show_event_stats(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
 
     if not request.user.is_superuser and \
-       not utils.is_organizing_team_member(request.user, session.event) and \
-       not utils.is_attendance_team_member(request.user, session.event):
+       not utils.is_organizing_team_member(request.user, event) and \
+       not utils.is_attendance_team_member(request.user, event):
         raise PermissionDenied
 
     sessions = {}
@@ -1065,32 +1065,71 @@ def get_csv(request, event_code_name, session_pk):
 @login_required
 def handle_survey(request, session_pk, optional=False):
     session = get_object_or_404(Session, pk=session_pk)
+    optional_survey = session.optional_survey
+    child_survey = session.mandatory_survey.children.exists()
 
     is_optional = bool(optional)
-    optional_survey = session.optional_survey
+
+    if session.has_mandatory_child_survey_to_fill(request.user) and SurveyResponse.objects.filter(survey=session.mandatory_survey, user=request.user).exists() and UserSurveyCategory.objects.filter(user=request.user, event=session.event).first():
+        category = UserSurveyCategory.objects.filter(user=request.user, event=session.event).first()
+        survey = session.mandatory_survey.children.filter(category=category.category).first()
+    else:
+        survey = None
 
     context = {'session': session, 'is_optional': is_optional}
-
-    if request.method == 'POST':
-        form = forms.SurveyForm(request.POST, session=session,
-                                is_optional=is_optional)
-        if form.is_valid():
-            form.save(user=request.user)
-            if not is_optional and optional_survey:
+    if child_survey and not UserSurveyCategory.objects.filter(user=request.user, event=session.event).exists() and SurveyResponse.objects.filter(survey=session.mandatory_survey,user=request.user).exists():
+        if request.method == 'POST':
+            instance = UserSurveyCategory(event=session.event, user=request.user)
+            form = forms.UserSurveyCategoryForm(request.POST, instance=instance)
+            if form.is_valid():
+                form.save()
                 form = forms.SurveyForm(session=session,
-                                        is_optional=True)
+                                        is_optional=True,
+                                        second_survey=survey)
                 context['form'] = form
                 template = get_template('events/partials/submit_survey.html')
                 html = template.render(context)
-                submit_url = reverse('events:handle_survey', args=(session.pk, 'optional'))
-                return {"message": "success", 'html': html,
-                        'submit_url': submit_url}
-            else:
-                show_url = reverse('certificates:list_certificates_per_user')
-                return {"message": "success", "show_url": show_url}
-    elif request.method == 'GET':
-        form = forms.SurveyForm(session=session,
-                                is_optional=is_optional)
+                submit_url = reverse('events:handle_survey', args=(session.pk))
+                return {"message": "success", 'html': html, 'submit_url': submit_url}
+        elif request.method == 'GET':
+            form = forms.UserSurveyCategoryForm()
+    else:
+        if request.method == 'POST':
+            form = forms.SurveyForm(request.POST, session=session,
+                                    is_optional=is_optional,
+                                    second_survey=survey)
+            if form.is_valid():
+                form.save(user=request.user)
+                if child_survey and SurveyResponse.objects.filter(survey=session.mandatory_survey,user=request.user).exists():
+                    # users_category = UserSurveyCategory.objects.filter(user=request.user, event=session.event).first()
+                    # survey = session.mandatory_survey.children.filter(category=users_category.category)
+                    form = forms.SurveyForm(session=session,
+                                            is_optional=True,
+                                            second_survey=survey)
+                    context['form'] = form
+                    template = get_template('events/partials/submit_survey.html')
+                    html = template.render(context)
+                    submit_url = reverse('events:handle_survey', args=(session.pk))
+                    return {"message": "success", 'html': html,
+                            'submit_url': submit_url}
+
+                elif not is_optional and optional_survey:
+                    form = forms.SurveyForm(session=session,
+                                            is_optional=True,
+                                            second_survey=survey)
+                    context['form'] = form
+                    template = get_template('events/partials/submit_survey.html')
+                    html = template.render(context)
+                    submit_url = reverse('events:handle_survey', args=(session.pk, 'optional'))
+                    return {"message": "success", 'html': html,
+                            'submit_url': submit_url}
+                else:
+                    show_url = reverse('certificates:list_certificates_per_user')
+                    return {"message": "success", "show_url": show_url}
+        elif request.method == 'GET':
+            form = forms.SurveyForm(session=session,
+                                    is_optional=is_optional,
+                                    second_survey=survey)
 
     context['form'] = form
     return render(request, 'events/partials/submit_survey.html', context)
@@ -1101,7 +1140,7 @@ def delete_survey_response(reuqest, session_pk):
     session = get_object_or_404(Session, pk=session_pk,
                                 optional_survey__isnull=False)
 
-    SurveyResponse.objects.filter(user=request.user,
+    SurveyResponse.objects.filter(user=reuqest.user,
                                   survey=session.optional_survey,
                                   session=session).delete()
 
@@ -1175,3 +1214,4 @@ def timeslot_info(request, event_code_name, pk):
               'is_session':False}
 
     return render(request, 'events/partials/session_info.html', context)
+

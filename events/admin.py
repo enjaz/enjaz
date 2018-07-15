@@ -157,7 +157,7 @@ class SessionGroupAdmin(admin.ModelAdmin):
 
 class AttendanceAdmin(admin.ModelAdmin):
     form = events.forms.AttendanceAdminForm
-    list_filter = ['session_registration__session__event', 'category', 'is_deleted']
+    list_filter = ['session_registration__session__event', 'session_registration__session', 'category', 'is_deleted']
     list_display = ['__unicode__', 'category', 'date_submitted', 'is_deleted']
     readonly_fields = ['session_registration']
     actions = [mark_deleted]

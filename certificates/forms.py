@@ -28,6 +28,7 @@ class CertificateRequestForm(forms.ModelForm):
         certificate_request = super(CertificateRequestForm, self).save(commit=False)
         certificate_request.submitter_club = self.club
         certificate_request.save()
+        self.save_m2m()
         return certificate_request
 
     class Meta:

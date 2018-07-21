@@ -14,7 +14,7 @@ from django.utils import timezone
 from core.utils import hindi_to_arabic
 from post_office import mail
 from wkhtmltopdf.utils import render_pdf_from_template
-from .models import Event, SessionRegistration,Session
+from .models import Event, SessionRegistration,Session, UserSurveyCategory,SurveyResponse
 import accounts.utils
 import clubs.utils
 
@@ -261,3 +261,10 @@ def get_timeslot_limit(timeslot):
         return u"تابع للقسم السابق %s" % (timeslot.parent.limit)
     else:
         return 1
+
+def known_user_category(user,event):
+    if UserSurveyCategory.objects.filter(user=user,event=event).exists():
+        return True
+    else:
+        return False
+

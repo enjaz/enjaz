@@ -88,7 +88,7 @@ class EventFilter(admin.SimpleListFilter):
     parameter_name = 'event'
 
     def lookups(self, request, model_admin):
-        return models.Event.objects.values_list('pk', 'name')
+        return models.Event.objects.values_list('pk', 'official_name')
 
     def queryset(self, request, queryset):
         if self.value():
@@ -157,7 +157,7 @@ class SessionGroupAdmin(admin.ModelAdmin):
 
 class AttendanceAdmin(admin.ModelAdmin):
     form = events.forms.AttendanceAdminForm
-    list_filter = ['session_registration__session__event', 'category', 'is_deleted']
+    list_filter = ['session_registration__session__event', 'session_registration__session', 'category', 'is_deleted']
     list_display = ['__unicode__', 'category', 'date_submitted', 'is_deleted']
     readonly_fields = ['session_registration']
     actions = [mark_deleted]
@@ -290,3 +290,4 @@ admin.site.register(models.Survey, SurveyAdmin)
 admin.site.register(models.SurveyResponse, SurveyResponseAdmin)
 certificate_admin.register(models.Survey, SurveyAdmin)
 certificate_admin.register(models.SurveyResponse, SurveyResponseAdmin)
+admin.site.register(models.UserSurveyCategory)

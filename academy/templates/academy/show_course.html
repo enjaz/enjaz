@@ -1,0 +1,138 @@
+{% extends 'academy/base.html' %}{% load staticfiles %}
+{% block title %}{{ parent_course.name }}{% endblock %}
+{% block content %}
+
+<div class="profile-page sidebar-collapse">
+  <div class="page-header header-filter" data-parallax="true" style="background-color:#000000"></div>
+  <div class="main main-raised">
+    <div class="profile-content">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 ml-auto mr-auto">
+            <div class="profile">
+              <div class="avatar">
+                <img style="background-color:#fff; padding:15px" src="{{parent_course.logo.url}}" class="img-raised img-thumbnail img-fluid">
+              </div>
+              <div class="name">
+                <h3 class="title">{{parent_course.name}}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="description text-center">
+            {{ parent_course.description }}
+          <br><br>
+        <ul class="nav nav-justified nav-pills nav-pills-icons" role="tablist">
+                            <li class="nav-item">
+                                <a id="projects" class="nav-link" href="#dashboard-1" role="tab" data-toggle="tab" aria-selected="false">
+                                    <i class="material-icons">wb_incandescent</i>
+                                    المشاريع
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a id="graduates" class="nav-link" href="" role="tab" data-toggle="tab" aria-selected="false">
+                                    <i class="material-icons">school</i>
+                                    الخريجون والخريجات
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a id="instructors" class="nav-link" href="#tasks-1" role="tab" data-toggle="tab" aria-selected="true">
+                                    <i class="material-icons">people</i>
+                                    مقدمو ومقدمات الدورة
+                                </a>
+                            </li>
+                        </ul>
+        </div><br><br>
+        <div class="container" id="dynamic_info">
+        <div class="row" id="graduate_list">
+          {% for course in parent_course.subcourse_set.all %}
+          <div class="col-lg-4" align="right">
+          <ul>
+            <li>الدورة {{course.batch_no}}
+              <ul>
+              {% for graduate in course.course_graduates.all %}
+              <li><a href="{% url 'academy:show_person' 'graduate' graduate.pk %}">{{ graduate.user.common_profile.get_ar_short_name }}</a></li>
+              {% endfor %}
+              {{ batch.batch_note }}
+              </ul>
+            </li>
+          </ul>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="row" id="project_list">
+        <div class="col-lg-4" align="right">
+            <ul>
+            {% for course in parent_course.subcourse_set.all %}
+            {% for graduate in course.course_graduates.all %}
+                {% for work in graduate.work_set.all %}
+                    <li>{{ work.short_description }}</li>
+                {% endfor %}
+            {% endfor %}
+            {% endfor %}
+            </ul>
+        </div>
+        </div>
+
+        <div class="row" id="instructor_list">
+        <div class="col-lg-4" align="right">
+            <ul>
+            {% for instructor in parent_course.course_instructors.all %}
+                    <li><a href="{% url 'academy:show_person' 'instructor' instructor.pk %}">{{ instructor.user.common_profile.get_ar_short_name }}</a></li>
+            {% endfor %}
+            </ul>
+        </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+        <div class="row">
+          <div class="col-md-6 ml-auto mr-auto">
+            <div class="profile-tabs">
+              <ul class="nav nav-pills nav-pills-icons justify-content-center" role="tablist">
+                <li class="nav-item">
+                  <a class="nav-link" target="_blank" href="{{ course.plan.url }}">
+                    <i class="material-icons">description</i>الخطة
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'academy:register' course_name%}">
+                    <i class="material-icons">add_circle</i>التسجيل
+                  </a>
+                </li>
+              </ul>
+              <br><br><br>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block customscript %}
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script type="text/javascript">
+$("#dynamic_info").hide();
+$("#graduates").click(function(){
+    $("#project_list").hide();
+    $("#instructor_list").hide();
+    $("#dynamic_info").show();
+    $("#graduate_list").show();
+    });
+$("#projects").click(function(){
+    $("#graduate_list").hide();
+    $("#instructor_list").hide();
+    $("#dynamic_info").show();
+    $("#project_list").show();
+    });
+$("#instructors").click(function(){
+    $("#graduate_list").hide();
+    $("#project_list").hide();
+    $("#dynamic_info").show();
+    $("#instructor_list").show();
+    });
+</script>
+{% endblock %}

@@ -12,7 +12,8 @@
         {% if not user|can_evaluate_abstracts:event or user.is_superuser %}
         <tr>
             <th class="text-center">Authors</th>
-            <td class="activity-description">{{ abstract.authors|linebreaksbr }}</td>
+            <td class="activity-description">{% for author in abstract.author.all %}{{ author.name }} | {% endfor %} </td>
+
         </tr>
         <tr>
             <th class="text-center">Presenting author</th>
@@ -39,6 +40,18 @@
             <th class="text-center">Level</th>
             <td>{{ abstract.get_level_display }}</td>
         </tr>
+        <tr>
+  					<th class="text-center">Puplished?</th>
+  					<td>{{ abstract.was_published|yesno:"Yes,No" }}</td>
+  			</tr>
+  			<tr>
+  					<th class="text-center">Presented previously at HPC?</th>
+  					<td>{{ abstract.was_presented_previously|yesno:"Yes,No" }}</td>
+  			</tr>
+  			<tr>
+  					<th class="text-center">Presented previously at others?</th>
+  					<td>{{ abstract.was_presented_at_others|yesno:"Yes,No" }}</td>
+  			</tr>
         {%  if abstract.status == 'A' %}
         <tr>
             <th class="text-center">Accepted Presentation </th>

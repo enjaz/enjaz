@@ -279,7 +279,7 @@ class ReaderProfileForm(forms.ModelForm):
 class RecruitmentForm(forms.ModelForm):
     class Meta:
         model = models.Recruitment
-        exclude = ['user']
+        exclude = ['user', 'year']
 
 class NewspaperSignupForm(forms.ModelForm):
     email = forms.EmailField(required=True)

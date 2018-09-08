@@ -17,46 +17,59 @@
 		</thead>
 
 		<tbody>
-            <tr>
-                <th class="text-center">Presentation preference</th>
-                <td>{{ casereport.get_presentation_preference_display }}</td>
-            </tr>
 			<tr>
 				<th class="text-center">Authors</th>
 				<td class="activity-description">{{ casereport.authors|linebreaksbr }}</td>
 			</tr>
-
 			<tr>
-				<th class="text-center">University</th>
-				<td>{{ casereport.university }}</td>
+					<th class="text-center">Presenting author</th>
+					<td>{{ casereport.presenting_author }}</td>
 			</tr>
 			<tr>
-				<th class="text-center">College</th>
-				<td>{{ casereport.college }}</td>
+					<th class="text-center">Email</th>
+					<td><a href="mailto:{{ casereport.email }}">{{ casereport.email }}</a></td>
 			</tr>
-
-            <tr>
-				<th class="text-center">Email</th>
-				<td><a href="mailto:{{ casereport.email }}">{{ casereport.email }}</a></td>
-			</tr>
-
 			<tr>
-				<th class="text-center">Phone</th>
-				<td>{{ casereport.phone }}</td>
-            </tr>
-            <tr>
-
-            </tr>
+					<th class="text-center">Phone</th>
+					<td>{{ casereport.phone }}</td>
+			</tr>
+			<tr>
+					<th class="text-center">University</th>
+					<td>{{ casereport.university }}</td>
+			</tr>
+			<tr>
+					<th class="text-center">College</th>
+					<td>{{ casereport.college }}</td>
+			</tr>
+			<tr>
+					<th class="text-center">Level</th>
+					<td>{{ casereport.get_level_display }}</td>
+			</tr>
+			<tr>
+					<th class="text-center">Puplished?</th>
+					<td>{{ casereport.was_published|yesno:"Yes,No" }}</td>
+			</tr>
+			<tr>
+					<th class="text-center">Presented previously at HPC?</th>
+					<td>{{ casereport.was_presented_previously|yesno:"Yes,No" }}</td>
+			</tr>
+			<tr>
+					<th class="text-center">Presented previously at others?</th>
+					<td>{{ casereport.was_presented_at_others|yesno:"Yes,No" }}</td>
+			</tr>
+			{%  if casereport.status == 'A' %}
+			<tr>
+					<th class="text-center">Accepted Presentation </th>
+					<td>{{ casereport.get_accepted_presentaion_preference_display }}</td>
+			</tr>
+			{% endif %}
 		</tbody>
 	</table>
 
-<h3>Introduction</h3>
+<h3>Your Case Report</h3>
 {{ casereport.introduction|safe }}
-<h3>Discussion</h3>
-{{ casereport.discussion|safe }}
-<h3>Conclusion</h3>
-{{ casereport.conclusion|safe }}
-    
+
+
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
 <div class="row" style="margin-left: 0; margin-bottom: 5px;">
 <div style="float: right;">
@@ -71,33 +84,6 @@
 </div>
 </div>
 
-{% comment %}
-   {# <h2>Evaluate</h2> #}
-{% if form.errors %}
-        <p class="alert alert-danger"><i class="entypo-flag"></i>Make sure that you have filled all questions.</p>
-{% endif %}
-    {% if abstract.evaluation.pk %}
-    <p class="alert alert-success"><i class="entypo-flag"></i>This abstract was evaluated by {{ abstract.evaluation.evaluator.en_last_name|default:abstract.evaluation.evaluator }} on {{ abstract.evaluation.date_submitted|date:"Y-m-d" }}.</p>
-    {% endif %}
-    {% if not abstract.evaluation.pk or abstract.evaluation.evaluator == user or user.is_superuser %}
-    <form class="form" method="post">
-        {% csrf_token %}
-        {% for field in form %}
-          <div class="form-group">
-            <h4 class="english-field">{{ field.label }}</h4>
-              {% for choice in field %}
-               {% if not forloop.first %}
-                 {{ choice }}
-               {% endif %}
-              {% endfor %}
-        </div>
-        {% endfor %}
-        {#  <div class="form-group"> #}
-            {#  <button type="submit" class="btn btn-success">Submit</button>#}
-        {#  </div>#}
-    </form>
-    {% endif %}
-{% endcomment %}
 </div>
 {% endblock %}
 

@@ -39,18 +39,24 @@
                     <table id="approved" class="display datatable dt-responsive">
                         <thead>
                             <tr>
-                                <th class="all"></th>
+                                <th style="width: 5%"><input type="checkbox" id="checkAll-approved"/></th>
                                 <th class="not-mobile">Name</th>
+                                <th class="not-mobile">Gender</th>
                                 <th class="not-mobile">University</th>
+                                <th class="not-mobile">Student ID</th>
+								<th class="not-mobile">Email</th>
                                 <th class="not-mobile">Registration date</th>
                             </tr>
                         </thead>
                         <tbody>
                         {% for registration in approved_registrations %}
                             <tr>
-                                <td><input type="checkbox" value="1" name="pk_{{ registration.pk }}"></td>
+                                <td><input class="checkbox-approved" type="checkbox" value="1" name="pk_{{ registration.pk }}"></td>
                                 <td>{{ registration.user.common_profile.get_en_full_name }}</td>
+                                <td>{{ registration.user.common_profile.get_gender_display }}</td>
                                 <td>{{ registration.user.common_profile.get_university_or_affiliation }}</td>
+                                <td>{{ registration.user.common_profile.student_id }}</td>
+								<td>{{ registration.user.email }}</td>
                                 <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted|date:"Y-m-d" }}</td>
                             </tr>
                         {% endfor %}
@@ -83,18 +89,24 @@
                     <table id="pending" class="display datatable dt-responsive">
                         <thead>
                             <tr>
-                                <th class="all"></th>
+                                <th style="width: 5%"><input type="checkbox" id="checkAll-pending"/></th>
                                 <th class="not-mobile">Name</th>
+                                <th class="not-mobile">Gender</th>
                                 <th class="not-mobile">University</th>
+                                <th class="not-mobile">Student ID</th>
+								<th class="not-mobile">Email</th>
                                 <th class="not-mobile">Registration date</th>
                             </tr>
                         </thead>
                         <tbody>
                         {% for registration in pending_registrations %}
                             <tr>
-                                <td><input type="checkbox" value="1" name="pk_{{ registration.pk }}"></td>
+                                <td><input class="checkbox-pending" type="checkbox" value="1" name="pk_{{ registration.pk }}"></td>
                                 <td>{{ registration.user.common_profile.get_en_full_name }}</td>
+                                <td>{{ registration.user.common_profile.get_gender_display }}</td>
                                 <td>{{ registration.user.common_profile.get_university_or_affiliation }}</td>
+                                <td>{{ registration.user.common_profile.student_id }}</td>
+								<td>{{ registration.user.email }}</td>
                                 <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted|date:"Y-m-d" }}</td>
                             </tr>
                         {% endfor %}
@@ -127,18 +139,24 @@
                     <table id="regected" class="display datatable dt-responsive">
                         <thead>
                             <tr>
-                                <th class="all"></th>
+                                <th style="width: 5%"><input type="checkbox" id="checkAll-regected"/></th>
                                 <th class="not-mobile">Name</th>
+                                <th class="not-mobile">Gender</th>
                                 <th class="not-mobile">University</th>
+                                <th class="not-mobile">Student ID</th>
+								<th class="not-mobile">Email</th>
                                 <th class="not-mobile">Registration date</th>
                             </tr>
                         </thead>
                         <tbody>
                         {% for registration in regected_registrations %}
                             <tr>
-                                <td><input type="checkbox" value="1" name="pk_{{ registration.pk }}"></td>
+                                <td><input class="checkbox-regected" type="checkbox" value="1" name="pk_{{ registration.pk }}"></td>
                                 <td>{{ registration.user.common_profile.get_en_full_name }}</td>
+                                <td>{{ registration.user.common_profile.get_gender_display }}</td>
                                 <td>{{ registration.user.common_profile.get_university_or_affiliation }}</td>
+                                <td>{{ registration.user.common_profile.student_id }}</td>
+								<td>{{ registration.user.email }}</td>
                                 <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted|date:"Y-m-d" }}</td>
                             </tr>
                         {% endfor %}
@@ -168,12 +186,24 @@
         $("#approved").dataTable({
             "order": [[ 3, "desc" ]]
         });
+        $("#checkAll-approved").change(function () {
+        $(".checkbox-approved").prop('checked', $(this).prop("checked"));
+        });
+        
         $("#pending").dataTable({
             "order": [[ 3, "desc" ]]
         });
+        $("#checkAll-pending").change(function () {
+        $(".checkbox-pending").prop('checked', $(this).prop("checked"));
+        });
+        
         $("#regected").dataTable({
             "order": [[ 3, "desc" ]]
         });
+        $("#checkAll-regected").change(function () {
+        $(".checkbox-regected").prop('checked', $(this).prop("checked"));
+        });
     });
+    
     </script>
 {% endblock %}

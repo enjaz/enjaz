@@ -28,9 +28,9 @@
 	</div>
 	<div class="col-md-9">
 	<h1>{{ major_program_announcement.title }}</h1>
-	
+
 	<p>{{ major_program_announcement.description }}</p>
-	
+
 	<p>
 		<br>
 		</p><a href="{% url 'visit_announcement' major_program_announcement.pk %}" style="float: left;" class="btn btn-primary btn-lg">المزيد <i class="entypo-left"></i></a>
@@ -57,7 +57,7 @@
 	<div class="panel-body">
 		<div class="col-md-9">
 		<div class="panel panel-warning panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
-			
+
 			<!-- panel head -->
 			<div class="panel-heading">
 				<div class="panel-title">ملخصاتي البحثية</div>
@@ -67,10 +67,10 @@
 					</a>
 				</div>
 			</div>
-			
+
 			<!-- panel body -->
 			<div class="panel-body">
-				
+
 				<table class="table table-hover">
 					<thead>
 						<tr>
@@ -78,26 +78,30 @@
 							<th class="hidden-xs">الحدث</th>
 						</tr>
 					</thead>
-					
+
 					<tbody>
 						{% for abstract in user.event_abstracts.all %}
+            {% if not abstract.is_deleted %}
 						<tr>
 							<td dir="auto" class="english-field"><a href="{% url 'events:show_abstract' abstract.event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
 							<td class="hidden-xs">{{ abstract.event.get_html_name|safe }}</td>
 						</tr>
+            {% endif %}
 						{% endfor %}
 
 						{% for casereport in user.event_casereport.all %}
+            {% if not casereport.is_deleted %}
 						<tr>
 							<td dir="auto" class="english-field"><a href="{% url 'events:show_casereport' casereport.event.code_name casereport.pk %}">{{ casereport.title }}</a></td>
 							<td class="hidden-xs">{{ casereport.event.get_html_name|safe }}</td>
 						</tr>
+            {% endif %}
 						{% endfor %}
 					</tbody>
 				</table>
-				
+
 			</div>
-			
+
 		</div>
 	</div>
 </div>
@@ -111,7 +115,7 @@
 	<div class="panel-body">
 		<div class="col-md-9">
 		<div class="panel panel-success panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
-			
+
 			<!-- panel head -->
 			<div class="panel-heading">
 				<div class="panel-title">أنشطة الأسبوع القادم</div>
@@ -121,10 +125,10 @@
 					</a>
 				</div>
 			</div>
-			
+
 			<!-- panel body -->
 			<div class="panel-body">
-				
+
 				<table class="table table-hover">
 					<thead>
 						<tr>
@@ -134,7 +138,7 @@
 							<th class="hidden-md hidden-xs">المكان</th>
 						</tr>
 					</thead>
-					
+
 					<tbody>
 						{% for a in upcoming_activities %}
 						<tr>
@@ -146,16 +150,16 @@
 						{% endfor %}
 					</tbody>
 				</table>
-				
+
 			</div>
-			
+
 		</div>
 	</div>
 	<div class="col-md-3">
 		<div class="tile-stats tile-green">
 			<div class="icon"><i class="entypo-chart-bar"></i></div>
 			<div class="num" data-start="0" data-end="{{ activity_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
-			
+
 			<h3>عدد الأنشطة</h3>
 			<p>مجموع عدد أنشطة النادي لهذا العام</p>
 		</div>
@@ -174,36 +178,36 @@
 		<div class="tile-stats tile-aqua">
 			<div class="icon"><i class="entypo-gauge"></i></div>
 			<div class="num" data-start="0" data-end="{{ niqati_sum }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
-			
+
 			<h3>عدد نقاطي</h3>
 			<p>مجموع النقاط المسجلة لك في برنامج نقاطي</p>
 		</div>
 		<div class="tile-stats tile-white-aqua">
 			<div class="icon"><i class="entypo-gauge"></i></div>
 			<div class="num" data-start="0" data-end="{{ niqati_count }}" data-postfix="" data-duration="1000" data-delay="600">0</div>
-			
+
 			<h3>عدد أنشطتي</h3>
 			<p>عدد الأنشطة التي حصلت فيها على نقاط</p>
 		</div>
 	</div>
 	<div class="col-md-9">
 		<div class="panel panel-info panel-shadow" data-collapsed="0"><!-- to apply shadow add class "panel-shadow" -->
-			
+
 			<!-- panel head -->
 			<div class="panel-heading">
 				<div class="panel-title">آخر إدخالاتي في نقاطي</div>
-				
+
 				<div class="panel-options">
 					<a href="{% url 'niqati:student_report' %}" type="button" class="btn btn-default">
 						 استعرض تقريري الكامل
 					</a>
 				</div>
-				
+
 			</div>
-			
+
 			<!-- panel body -->
 			<div class="panel-body">
-				
+
 				<table class="table table-hover">
 					<thead>
 						<tr>
@@ -212,7 +216,7 @@
 							<th>تاريخ الإدخال</th>
 						</tr>
 					</thead>
-					
+
 					<tbody>
 						{% for code in latest_entries %}
 						<tr>
@@ -223,9 +227,9 @@
 						{% endfor %}
 					</tbody>
 				</table>
-				
+
 			</div>
-			
+
 		</div>
 	</div>
 	</div>
@@ -297,7 +301,7 @@
 	</div>
 	<div class="panel-body scrollable" data-height="250px" style="max-height: 250px;">
 		<div class="panel-group joined" id="accordion-student-researches">
-			
+
 			{% for research in student_researches %}
 			<div class="panel panel-default">
 				<div class="panel-heading">
@@ -305,7 +309,7 @@
 						<a data-toggle="collapse" data-parent="#accordion-student-researches" href="#student-research-{{ forloop.counter }}" class="collapsed">
 							{{ research.title }}
 							{# a little hack to avoid using a link because it would mess up the styles #}
-							
+
 							<button type="button" style="float:left;" onclick="window.location.href = '{% url 'visit_announcement' research.pk %}'" class="btn btn-xs btn-default">
 								<i class="entypo-link"></i>
 							</button>
@@ -334,7 +338,7 @@
 	</div>
 	<div class="panel-body scrollable" data-height="250px" style="max-height: 250px;">
 		<div class="panel-group joined" id="accordion-external-anns">
-			
+
 			{% for ann in external_announcements %}
 			<div class="panel panel-default">
 				<div class="panel-heading">
@@ -342,7 +346,7 @@
 						<a data-toggle="collapse" data-parent="#accordion-external-anns" href="#external-ann-{{ forloop.counter }}" class="collapsed">
 							{{ ann.title }}
 							{# a little hack to avoid using a link because it would mess up the styles #}
-							
+
 							<button type="button" style="float:left;" onclick="window.location.href = '{% url 'visit_announcement' ann.pk %}'" class="btn btn-xs btn-default">
 								<i class="entypo-link"></i>
 							</button>

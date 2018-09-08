@@ -8,7 +8,13 @@
     {# Also make sure you pass request.FILES to the django form. #}
     {# See: https://docs.djangoproject.com/en/dev/topics/http/file-uploads/#basic-file-uploads #}
 {% csrf_token %}
-{% bootstrap_form form %}
+    {% if employee_submit or employee_edit %}
+      {% bootstrap_form form %}
+    {% else %}
+      {% bootstrap_field form.description %}
+      {% bootstrap_field form.twitter_announcement %}
+      {# `is_draft` field is omitted as it's handled by the submit buttons below. #}
+    {% endif %}
 
     {% if not employee_submit and not employee_edit %}
     <h4>صور الإعلان عن النشاط</h4>
@@ -91,11 +97,18 @@
 <hr>
     {% endif %}
 
-<button class="btn btn-block btn-info" type="submit" name="draft" value="True"> 
-        إحفظ كمسودة فقط
-</button>    
+{% if not employee_submit and not employee_edit %}{% if not edit or form.instance.is_draft == True %}
+  {# In order not to confuse things, we'll just show saving to draft option when: #}
+  {# (1) the report is being submitted for the first time, or #}
+  {# (2) the report draft is being edited #}
+  {# (It won't be shown if the report has already been submitted as a final version; i.e. a final #}
+  {# report can't be converted back to a draft) #}
+  <button class="btn btn-block btn-info" type="submit" name="is_draft" value="1">
+          احفظ كمسودة فقط
+  </button>
+{% endif %}{% endif %}
     
-<button class="btn btn-block btn-green" type="submit" name="draft" value="False">
+<button class="btn btn-block btn-green" type="submit">
 	<i class="glyphicon glyphicon-ok-sign"></i> 
 	أرسل
 </button>

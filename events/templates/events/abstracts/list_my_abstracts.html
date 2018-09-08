@@ -1,85 +1,115 @@
-{% extends 'events_evaluation_base.html' %}{% load staticfiles %}
-
-{% block title %}My abstracts{% endblock %}
-
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}{% load events_tags %}
+{% block title %}{{ abstract_user.common_profile.get_en_short_name }} abstracts{% endblock %}
 {% block content %}
-<div class="english-field">
-<h1 class="english-field">My abstracts</h1>
-            <div class="panel-body">
-                <div class="row">
-                    <table id="abstracts" class="display datatable dt-responsive">
-                        <thead>
-                            <tr>
-                                <th class="all">Title</th>
-                                <th class="not-mobile">Presenting author</th>
-                                <th class="not-mobile">Presentation preference</th>
-                                <th class="not-mobile">Submission date</th>
-                                <th class="not-mobile">ID</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for abstract in abstracts %}
-                            <tr>
-                                <td><a href="{% url 'events:show_abstract' abstract.event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
-                                <td>{{ abstract.presenting_author }}</td>
-                                <td>{{ abstract.get_presentation_preference_display }}</td>
-                                <td data-order="{{ abstract.date_submitted|date:"U" }}">{{ abstract.date_submitted|date:"Y-m-d" }}</td>
-                                <td>{{ abstract.pk }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+<div class="row">
+        <br>
+    <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
+        <h2 class="mentor-section-header">{{ abstract_user.common_profile.get_en_short_name }}</h2>
+    </div>
 </div>
 <div class="english-field">
-<h1 class="english-field">My Casereports</h1>
-            <div class="panel-body">
-                <div class="row">
-                    <table id="casereports" class="display datatable dt-responsive">
-                        <thead>
-                            <tr>
-                                <th class="all">Title</th>
-                                <th class="not-mobile">Submission date</th>
-                                <th class="not-mobile">ID</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for casereport in casereports %}
-                            <tr>
-                                <td><a href="{% url 'events:show_casereport' casereport.event.code_name casereport.pk %}">{{ casereport.title }}</a></td>
-                                <td data-order="{{ casereport.date_submitted|date:"U" }}">{{ casereport.date_submitted|date:"Y-m-d" }}</td>
-                                <td>{{ casereport.pk }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    <h1 class="english-field">Abstracts</h1>
+    <div class="panel-body">
+        <div class="row">
+            <table id="abstracts" class="display datatable dt-responsive">
+                <thead>
+                    <tr>
+                        <th class="not-mobile">ID</th>
+                        <th class="all">Title</th>
+                        <th class="not-mobile">Presenting author</th>
+                        <th class="not-mobile">Presentation preference</th>
+                        {% if not abstract_user == request.user %}
+                        <th class="not-mobile">Status</th>
+                        <th class="not-mobile">Accepted presentation preference</th>
+                        <th class="not-mobile">Score</th>
+                        {% endif %}
+                        <th class="not-mobile">Submission date</th>
+                        {% if abstract_user == request.user %}
+                        <th class="not-mobile">Event</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for abstract in abstracts %}
+                    <tr>
+                        <td>{{ abstract.pk }}</td>
+                        <td><a href="{% url 'events:show_abstract' abstract.event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
+                        <td>{{ abstract.presenting_author }}</td>
+                        <td>{{ abstract.get_presentation_preference_display }}</td>
+                        {% if not abstract_user == request.user %}
+                        <td>{{ abstract.get_status_display }}</td>
+                        <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
+                        <td>ِ{{ abstract.get_average_score }}</td>
+                        {% endif %}
+                        <td data-order="{{ abstract.date_submitted|date:" U " }}">{{ abstract.date_submitted|date:"Y-m-d" }}</td>
+                        {% if abstract_user == request.user %}
+                        <td>{{ abstract.event }}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+    </div>
 </div>
-{% endblock %}
+<div class="english-field">
+    <h1 class="english-field">Case reports</h1>
+    <div class="panel-body">
+        <div class="row">
+            <table id="casereports" class="display datatable dt-responsive">
+                <thead>
+                    <tr>
+                        <th class="not-mobile">ID</th>
+                        <th class="all">Title</th>
+                        <th class="not-mobile">Presenting author</th>
+                        <th class="not-mobile">Presentation preference</th>
+                        <th class="not-mobile">Submission date</th>
+                        <th class="not-mobile">Event</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for casereport in casereports %}
+                    <tr>
+                        <td>{{ casereport.pk }}</td>
+                        <td><a href="{% url 'events:show_casereport' casereport.event.code_name casereport.pk %}">{{ casereport.title }}</a></td>
+                        <td>{{ casereport.presenting_author }}</td>
+                        <td>{{ casereport.get_presentation_preference_display }}</td>
+                        <td data-order="{{ casereport.date_submitted|date:" U " }}">{{ casereport.date_submitted|date:"Y-m-d" }}</td>
+                        <td>{{ casereport.event }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-{% block customscript %}
-	<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
-	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
-	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
-    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+{% endblock %} {% block customscript %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
 <style type="text/css">
-    th, td{
+    th,
+    td {
         text-align: left;
     }
+
 </style>
-	<script>
-    $(function(){
+<script>
+    $(function() {
         $("#abstracts").dataTable({
-            "order": [[ 3, "asc" ]]
+            "order": [
+                [3, "asc"]
+            ]
         });
 
         $("#casereports").dataTable({
-            "order": [[ 3, "asc" ]]
+            "order": [
+                [3, "asc"]
+            ]
         });
     });
-    </script>
+
+</script>
 {% endblock %}

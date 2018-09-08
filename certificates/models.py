@@ -173,7 +173,7 @@ class CertificateTemplate(models.Model):
                                            auto_now=True)
 
     def generate_certificate(self, user, texts, description="", content_object=None):
-        verification_code = Certificate.objects.objects.get_vacant_code()
+        verification_code = Certificate.objects.get_vacant_code()
         file_path, relative_url = utils.generate_certificate_image(self.certificate_request.pk,
                                                                    template=self,
                                                                    texts=texts,

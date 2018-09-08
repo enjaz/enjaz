@@ -9,8 +9,7 @@ from post_office.models import Email
 from media.models import SnapchatReservation
 
 
-class TestSnapchatHome(TestCase):
-    fixtures = ['default_emailtemplates.json']
+class TestUserMixin(object):
     password = '123'
 
     def create_user_and_set_password(self, *args, **kwargs):
@@ -18,6 +17,68 @@ class TestSnapchatHome(TestCase):
         user.set_password(self.password)
         user.save()
         return user
+
+
+class TestSubmitFollowUpReport(TestUserMixin, TestCase):
+    def setUp(self):
+        self.user = self.create_user_and_set_password()
+        self.client.login(username=self.user.username, password=self.password)
+        self.episode = mommy.make('activities.Episode', activity__primary_club=mommy.make('clubs.Club'))
+        self.episode.activity.primary_club.media_representatives.add(self.user)
+
+    def test_submit_follow_up_report(self):
+        response = self.client.get(reverse('media:submit_report', args=(self.episode.id,)))
+        self.assertEqual(response.status_code, 200)
+
+
+class TestEditFollowUpReport(TestUserMixin, TestCase):
+    def setUp(self):
+        self.user = self.create_user_and_set_password()
+        self.client.login(username=self.user.username, password=self.password)
+        self.episode = mommy.make('activities.Episode', activity__primary_club=mommy.make('clubs.Club'))
+        self.episode.activity.primary_club.media_representatives.add(self.user)
+        mommy.make('media.FollowUpReport', episode=self.episode)
+
+    def test_edit_follow_up_report(self):
+        response = self.client.get(reverse('media:edit_report', args=(self.episode.id,)))
+        self.assertEqual(response.status_code, 200)
+
+
+class TestSubmitEmployeeReport(TestUserMixin, TestCase):
+    def setUp(self):
+        self.user = self.create_user_and_set_password()
+        self.client.login(username=self.user.username, password=self.password)
+        self.episode = mommy.make('activities.Episode', activity__primary_club__employee=self.user)
+
+    def test_submit_employee_report(self):
+        response = self.client.get(reverse('media:submit_employee_report', args=(self.episode.id,)))
+        self.assertEqual(response.status_code, 200)
+
+    def test_employee_report_page_does_not_show_save_as_draft_button(self):
+        response = self.client.get(reverse('media:submit_employee_report', args=(self.episode.id,)))
+        self.assertNotContains(response, u"احفظ كمسودة فقط")
+
+
+class TestEditEmployeeReport(TestUserMixin, TestCase):
+    def setUp(self):
+        self.user = self.create_user_and_set_password()
+        self.client.login(username=self.user.username, password=self.password)
+        self.episode = mommy.make('activities.Episode', activity__primary_club__employee=self.user)
+        self.employee_report = mommy.make('media.EmployeeReport', episode=self.episode)
+
+    def test_edit_employee_report(self):
+        response = self.client.get(reverse('media:edit_employee_report', args=(self.employee_report.id,)))
+        self.assertEqual(response.status_code, 200)
+
+    def test_employee_report_page_does_not_show_save_as_draft_button(self):
+        response = self.client.get(reverse('media:edit_employee_report', args=(self.employee_report.id,)))
+        self.assertNotContains(response, u"احفظ كمسودة فقط")
+
+
+
+
+class TestSnapchatHome(TestUserMixin, TestCase):
+    fixtures = ['default_emailtemplates.json']
 
     def setUp(self):
         self.current_year = mommy.make('core.StudentClubYear')
@@ -196,15 +257,8 @@ class TestSnapchatHome(TestCase):
         self.assertEqual(Email.objects.last().to, [self.riyadh_reservations[2].club.coordinator.email])
 
 
-class TestSnapchatAdd(TestCase):
+class TestSnapchatAdd(TestUserMixin, TestCase):
     fixtures = ['default_emailtemplates.json']
-    password = '123'
-
-    def create_user_and_set_password(self, *args, **kwargs):
-        user = mommy.make('auth.User', *args, **kwargs)
-        user.set_password(self.password)
-        user.save()
-        return user
 
     def setUp(self):
         self.current_year = mommy.make('core.StudentClubYear')

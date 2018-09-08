@@ -66,15 +66,20 @@ def get_club_assessing_club_by_user(user, club):
                 return
         return user_media_center
 
-    if clubs.utils.is_riyadh_club(club):
-        if club.gender:
-            club_gender = club.gender
-        else:
-            # Just in case a Riyadh club doesn't have a gender fall
-            # back to male Media Center.
-            club_gender = 'M'
-    else: # For other cities
-        club_gender = ''
+    #if clubs.utils.is_riyadh_club(club):
+    #    if club.gender:
+    #        club_gender = club.gender
+    #    else:
+    #        # Just in case a Riyadh club doesn't have a gender fall
+    #        # back to male Media Center.
+    #        club_gender = 'M'
+    #else: # For other cities
+    #    club_gender = ''
+    
+    # Based on current year's presidency preference for both male and female
+    # deputies to review activities of either side, it's no longer necessary to
+    # filter by gender
+    club_gender = ''
 
 
     presidency = Club.objects.current_year().get(english_name__contains='Presidency',

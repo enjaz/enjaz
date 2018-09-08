@@ -14,7 +14,7 @@ from django.utils import timezone
 from core.utils import hindi_to_arabic
 from post_office import mail
 from wkhtmltopdf.utils import render_pdf_from_template
-from .models import Event, SessionRegistration
+from .models import Event, SessionRegistration,Session, UserSurveyCategory,SurveyResponse
 import accounts.utils
 import clubs.utils
 
@@ -199,7 +199,7 @@ def email_badge(user, event, my_registration_url):
     attachments = {'Badge.pdf': ContentFile(pdf_content)}
     notification_email = event.get_notification_email()
     cc = accounts.utils.get_user_cc(user)
-   
+
     try:
         mail.send([user.email],
                   u"بوابة إنجاز <{}>".format(notification_email),
@@ -230,3 +230,41 @@ def has_user_adminstrative_events (user):
        get_user_organizing_events(user).exists() or \
        get_user_attendance_events(user).exists():
         return True
+
+def has_remaining_sessions(user, timeslot):
+
+    if timeslot.limit:
+        user_sessions = user.session_registrations.filter(session__time_slot=timeslot, is_deleted=False).count()
+        if user_sessions < timeslot.limit:
+            return True
+        elif user_sessions == timeslot.limit:
+            return False
+    elif timeslot.parent and timeslot.parent.limit:
+        user_sessions = user.session_registrations.filter(session__time_slot__pk__in=[timeslot.parent.pk,timeslot.pk], is_deleted=False).count()
+        if user_sessions < timeslot.parent.limit:
+            return True
+        elif user_sessions == timeslot.parent.limit:
+            return False
+    else:
+        user_sessions = user.session_registrations.filter(session__time_slot=timeslot, is_deleted=False).count()
+        # if there is no limit assume the limit is one. (debatable)
+        if user_sessions < 1:
+            return True
+        elif user_sessions == 1:
+            return False
+
+def get_timeslot_limit(timeslot):
+
+    if timeslot.limit:
+        return timeslot.limit
+    elif timeslot.parent and timeslot.parent.limit:
+        return u"تابع للقسم السابق %s" % (timeslot.parent.limit)
+    else:
+        return 1
+
+def known_user_category(user,event):
+    if UserSurveyCategory.objects.filter(user=user,event=event).exists():
+        return True
+    else:
+        return False
+

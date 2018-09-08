@@ -93,11 +93,13 @@ class Event(models.Model):
     notification_email = models.EmailField(u'البريد الإلكتروني للتنبيهات', blank=True)
     city = models.CharField(u"المدينة", max_length=20,
                             choices=city_choices, default="")
+    logo = models.FileField(verbose_name=u"Attach the event logo", upload_to="events/logos/"
+                             , blank=True, null=True)
 
     def is_on_sidebar(self, user):
         if user.is_superuser or \
            (user.common_profile.city == self.city and \
-            end_date > timezone.now().date()):
+            self.end_date > timezone.now().date()):
             return True
         else:
             return False
@@ -145,10 +147,17 @@ class Event(models.Model):
         return self.official_name
 
 class TimeSlot(models.Model):
+    image = models.FileField(verbose_name=u"Attach the schedule to be displayed", upload_to="events/timeslots/", blank=True, null=True)
     name = models.CharField(max_length=50)
     event = models.ForeignKey(Event)
     date_submitted = models.DateTimeField(auto_now_add=True)
     date_edited = models.DateTimeField(auto_now=True)
+    parent = models.ForeignKey('self', null=True, blank=True,
+                               related_name="children",
+                               on_delete=models.SET_NULL,
+                               default=None, verbose_name=u"القسم الأب")
+    limit = models.PositiveSmallIntegerField(null=True, blank=True,
+                                             default=None)
 
     def is_user_already_on(self, user):
         return SessionRegistration.objects.filter(session__time_slot=self,
@@ -156,7 +165,10 @@ class TimeSlot(models.Model):
                                                   user=user).exists()
 
     def __unicode__(self):
-        return self.name
+        if self.parent:
+            return u"%s (%s)" % (self.parent.name, self.name)
+        else:
+            return self.name
 
 class SessionGroup(models.Model):
     event = models.ForeignKey(Event, null=True, blank=True)
@@ -187,6 +199,7 @@ class Session(models.Model):
                                              verbose_name=u"قالب شهادة الجلسة")
     time_slot = models.ForeignKey(TimeSlot, blank=True, null=True)
     name = models.CharField(max_length=255)
+    presenter = models.CharField(max_length=255,blank=True, default="")
     limit = models.PositiveSmallIntegerField(null=True, blank=True,
                                              default=None)
     acceptance_method_choices = (
@@ -225,6 +238,9 @@ class Session(models.Model):
     optional_survey = models.ForeignKey('Survey', verbose_name=u"استبيان اختياري",
                                         related_name="optional_sessions",
                                         null=True, blank=True)
+    image = models.FileField(verbose_name=u"Attach the speaker image to be displayed", upload_to="events/sessions/",
+                             blank=True, null=True)
+
 
     def get_all_registrations(self):
         return (self.first_priority_registrations.all() | \
@@ -244,8 +260,7 @@ class Session(models.Model):
 
     def has_mandatory_survey_to_fill(self, user):
         if not self.mandatory_survey or \
-           SurveyResponse.objects.filter(survey=self.mandatory_survey,
-                                         user=user).exists():
+           SurveyResponse.objects.filter(survey=self.mandatory_survey,user=user).exists():
             return False
         else:
             return True
@@ -254,6 +269,14 @@ class Session(models.Model):
         if not self.optional_survey or \
            SurveyResponse.objects.filter(survey=self.optional_survey,
                                          user=user).exists():
+            return False
+        else:
+            return True
+
+    def has_mandatory_child_survey_to_fill(self, user):
+        pks = self.mandatory_survey.children.values_list('pk', flat=True)
+        if not self.mandatory_survey.children or \
+              SurveyResponse.objects.filter(survey__pk__in=pks, user=user).exists():
             return False
         else:
             return True
@@ -456,7 +479,7 @@ class Abstract(models.Model):
     event = models.ForeignKey(Event, verbose_name=u"الحدث")
     evaluators = models.ManyToManyField(User, blank=True, verbose_name=u"المقيمين")
     title = models.CharField(verbose_name="Title", max_length=255)
-    authors = models.TextField(verbose_name=u"Name of authors")
+    authors = models.TextField(verbose_name=u"Name of authors", blank=True)
     study_field = models.CharField(verbose_name="Field", max_length=255, default="")
     university = models.CharField(verbose_name="University", max_length=255)
     college = models.CharField(verbose_name="College", max_length=255)
@@ -494,6 +517,7 @@ class Abstract(models.Model):
     accepted_presentaion_preference = models.CharField(verbose_name="Accepted presentation preference",
                                                        max_length=1, choices=presentation_preference_choices,
                                                        blank=True)
+    presentaion_date = models.DateField(u"تاريخ العرض", null=True, blank=True)
     did_presenter_attend = models.BooleanField(verbose_name=u"حضر المقدم؟", default=False)
     certificates = GenericRelation('certificates.Certificate', related_query_name="abstracts")
 
@@ -506,6 +530,10 @@ class Abstract(models.Model):
 
     def __unicode__(self):
         return self.title
+
+class AbstractAuthor(models.Model):
+    abstract = models.ForeignKey(Abstract, related_name='author')
+    name = models.CharField(verbose_name="Name of authors", max_length=255)
 
 class AbstractPoster (models.Model):
     abstract = models.ForeignKey(Abstract, related_name='posters', null=True)
@@ -584,12 +612,34 @@ class CaseReport(models.Model):
                              related_name='event_casereport')
     event = models.ForeignKey(Event, verbose_name=u"الحدث")
     title = models.CharField(verbose_name="Title", max_length=255)
+    presenting_author = models.CharField(verbose_name="Presenting author", max_length=255, default="")
     authors = models.TextField(verbose_name=u"Name of authors")
     study_field = models.CharField(verbose_name="Field", max_length=255, default="")
     university = models.CharField(verbose_name="University", max_length=255)
     college = models.CharField(verbose_name="College", max_length=255)
     email = models.EmailField(verbose_name="Email")
     phone = models.CharField(verbose_name="Phone number", max_length=20)
+    level_choices = (
+        ('U', 'Undergraduate'),
+        ('G', 'Graduate')
+        )
+    level = models.CharField(verbose_name="Level", max_length=1,
+                             default='', choices=level_choices)
+    presentation_preference_choices = (
+        ('O', 'Oral'),
+        ('P', 'Poster'),
+        )
+    presentation_preference = models.CharField(verbose_name="Presentation preference", max_length=1,
+                                                choices=presentation_preference_choices, default="")
+    status_choices = (
+        ('A', 'Accepted'),
+        ('P', 'Pending'),
+        ('R','Rejected'),
+        )
+    status=models.CharField(verbose_name="acceptance status", max_length=1, choices=status_choices, default='P')
+    accepted_presentaion_preference = models.CharField(verbose_name="Accepted presentation preference",
+                                                       max_length=1, choices=presentation_preference_choices,
+                                                       blank=True)
     introduction = models.TextField(u"Introduction", default="")
     patient_info = models.TextField(u"Patient info", default="")
     clinical_presentation = models.TextField(u"clinical presentation", default="")
@@ -601,9 +651,13 @@ class CaseReport(models.Model):
     was_published = models.BooleanField(u"Have you published this research?", default=False)
     was_presented_at_others = models.BooleanField(u"Have you presented this research in any other conference before?", default=False)
     was_presented_previously = models.BooleanField(u"Have you presented this research in a previous year of this conference?", default=False)
+    presentaion_date = models.DateField(u"تاريخ العرض", null=True)
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
+
+    def __unicode__(self):
+        return self.title
 
 
 class Attendance(models.Model):
@@ -637,17 +691,38 @@ class QuestionSession(models.Model):
         return self.title
 
 class Question(models.Model):
+    user = models.ForeignKey(User, null=True, blank=True,
+                             verbose_name='اسم السائل')
     question_session = models.ForeignKey(QuestionSession, verbose_name="جلسة السؤال")
     text = models.TextField(u"نص السؤال")
     submission_date = models.DateTimeField(u"تاريخ الإرسال", auto_now_add=True)
+    is_deleted = models.BooleanField(u"محذوف؟", default=False)
 
     def __unicode__(self):
         return self.question_text[:20]
+
+
+survey_target_choices = (
+    ('M', 'College of Medicine'),
+    ('D', 'College of Dentistry'),
+    ('P', 'College of Pharmacy'),
+    )
+
+class UserSurveyCategory(models.Model):
+    event = models.ForeignKey(Event, null=True, blank=True)
+    category = models.CharField(max_length=1,choices=survey_target_choices,verbose_name='chose your studying profession')
+    user = models.ForeignKey(User, verbose_name=u"المستخدمـ/ـة",
+                             blank=True, null=True)
 
 class Survey(models.Model):
     name = models.CharField(u"الاسم", max_length=100)
     date_submitted = models.DateTimeField(u"تاريخ الإرسال",
                                           auto_now_add=True)
+    parent = models.ForeignKey('self', null=True, blank=True,
+                               related_name="children",
+                               on_delete=models.SET_NULL,
+                               default=None,verbose_name='parent survey')
+    category = models.CharField(max_length=1, choices=survey_target_choices,null=True, blank=True)
 
     def get_response_count(self):
         return self.responses.count()
@@ -703,3 +778,4 @@ class SurveyAnswer(models.Model):
 
     def __unicode__(self):
         return u"{}'s answer to {}".format(self.survey_response.user.username, self.question.text)
+

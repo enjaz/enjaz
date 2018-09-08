@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-from datetime import time
+from datetime import time, date
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.templatetags.staticfiles import static
@@ -21,7 +21,7 @@ from .models import Event, Session, Abstract, AbstractFigure,\
                           Evaluation, TimeSlot,\
                           SessionRegistration, Initiative,\
                           SessionGroup,CaseReport, Attendance,\
-                          QuestionSession, Question, Survey
+                          QuestionSession, Question, Survey,SurveyResponse,UserSurveyCategory
 from . import utils, forms
 import core.utils
 import clubs.utils
@@ -52,18 +52,25 @@ def submit_abstract(request, event_code_name):
         instance = Abstract(event=event,user=request.user)
         form = forms.AbstractForm(request.POST, request.FILES,
                             instance=instance)
+
         figure_formset = forms.AbstractFigureFormset(request.POST, request.FILES)
-        if form.is_valid() and figure_formset.is_valid():
+        author_formset = forms.AbsractAuthorFormset(request.POST, request.FILES)
+
+        if form.is_valid() and figure_formset.is_valid() and author_formset.is_valid():
             abstract = form.save()
             figure_formset.instance = abstract
             figure_formset.save()
+            author_formset.instance = abstract
+            author_formset.save()
             return HttpResponseRedirect(reverse('events:show_abstract',
                                                 args=(event.code_name, abstract.pk)))
     elif request.method == 'GET':
         form = forms.AbstractForm()
         figure_formset = forms.AbstractFigureFormset()
+        author_formset = forms.AbsractAuthorFormset()
     context['form'] = form
     context['figure_formset'] = figure_formset
+    context['author_formset'] = author_formset
 
     return render(request, 'events/abstracts/abstract_submission.html', context)
 
@@ -82,6 +89,9 @@ def edit_abstract(request, event_code_name, pk):
         raise PermissionDenied
 
     if abstract.event.abstract_submission_closing_date and timezone.now() > abstract.event.abstract_submission_closing_date:
+        raise Exception(u"انتهت المدة المتاحة لتعديل الملخص ")
+
+    if Abstract.objects.annotate(num_b=Count('evaluation')).filter(pk=pk, num_b__gte=1):
         raise Exception(u"انتهت المدة المتاحة لتعديل الملخص ")
 
     if request.method == 'POST':
@@ -122,6 +132,9 @@ def delete_abstract(request, event_code_name, pk):
         not utils.is_organizing_team_member(request.user, event):
         raise Exception(u"انتهت المدة المتاحة لحذف الملخص ")
 
+    if Abstract.objects.annotate(num_b=Count('evaluation')).filter(pk=pk, num_b__gte=1):
+        raise Exception(u"انتهت المدة المتاحة لحذف الملخص ")
+
     abstract.is_deleted = True
     abstract.save()
     list_my_abstracts_url = reverse('events:list_my_abstracts')
@@ -132,21 +145,61 @@ def delete_abstract(request, event_code_name, pk):
 def list_abstracts(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name,
                               receives_abstract_submission=True)
-    if not utils.can_evaluate_abstracts(request.user, event) and \
-            not utils.is_organizing_team_member(request.user, event):
+
+    if not utils.is_organizing_team_member(request.user, event):
         raise PermissionDenied
 
-    pending_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=2)
+    pending_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=1)
+    one_evaluator = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=1, num_b__lt=2)
     evaluated_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=2)
+    deleted_abstracts = Abstract.objects.filter(event=event, is_deleted=True)
+
+    evaluated_abstracts_pending = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=2, status='P')
+    accepted_poster_abstracts = Abstract.objects.filter(event=event, is_deleted=False, accepted_presentaion_preference= 'P')
+    accepted_oral_abstracts = Abstract.objects.filter(event=event, is_deleted=False, accepted_presentaion_preference= 'O')
+    evaluated_abstracts_regected = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=2, status='R')
+
+    casereports = CaseReport.objects.filter(event=event, is_deleted=False)
+
     context = {'event': event,
                'pending_abstracts': pending_abstracts,
-               'evaluated_abstracts': evaluated_abstracts}
+               'one_evaluator': one_evaluator,
+               'evaluated_abstracts': evaluated_abstracts,
+               'deleted_abstracts': deleted_abstracts,
+               'evaluated_abstracts_pending': evaluated_abstracts_pending,
+               'accepted_poster_abstracts': accepted_poster_abstracts,
+               'accepted_oral_abstracts': accepted_oral_abstracts,
+               'evaluated_abstracts_regected': evaluated_abstracts_regected,
+               'casereports': casereports,}
+
+    first_day = date(2018, 4, 18)
+    second_day = date(2018, 4, 19)
 
     if request.method == "POST":
         action = request.POST.get('action')
         pks = [int(field.lstrip('pk_')) for field in request.POST if field.startswith('pk_')]
+
         if action == "delete":
             Abstract.objects.filter(pk__in=pks).update(is_deleted=True)
+
+        if action == "restore":
+            Abstract.objects.filter(pk__in=pks).update(is_deleted=False)
+
+        if action == "accepte_as_oral":
+            Abstract.objects.filter(pk__in=pks).update(status='A', accepted_presentaion_preference='O')
+
+        if action == "accepte_as_poster":
+            Abstract.objects.filter(pk__in=pks).update(status='A', accepted_presentaion_preference='P')
+
+        if action == "regect":
+            Abstract.objects.filter(pk__in=pks).update(status='R', accepted_presentaion_preference='')
+
+        if action == "first_day":
+            Abstract.objects.filter(pk__in=pks).update(presentaion_date=first_day)
+
+        if action == "second_day":
+            Abstract.objects.filter(pk__in=pks).update(presentaion_date=second_day)
+
         return HttpResponseRedirect(reverse('events:list_abstracts',
                                                 args=(event.code_name,)))
 
@@ -189,10 +242,29 @@ def list_presenter_attendance(request, event_code_name):
         return render(request, 'events/abstracts/list_presenter_attendance.html', context)
 
 @login_required
-def list_my_abstracts(request):
-    abstracts = Abstract.objects.filter(is_deleted=False, user=request.user)
-    casereports = CaseReport.objects.filter(is_deleted=False, user=request.user)
-    context = {'abstracts': abstracts,'casereports':casereports}
+def list_my_abstracts(request, event_code_name=None, user_pk=None):
+    if user_pk and event_code_name:
+        event = get_object_or_404(Event, code_name=event_code_name,
+                                  receives_abstract_submission=True)
+        abstract_user = get_object_or_404(User, pk=user_pk)
+
+        abstracts = Abstract.objects.filter(event__code_name=event_code_name, is_deleted=False, user=abstract_user)
+        casereports = CaseReport.objects.filter(event__code_name=event_code_name, is_deleted=False, user=abstract_user)
+    else:
+        event = None
+        abstract_user = request.user
+
+        abstracts = Abstract.objects.filter(is_deleted=False, user=request.user)
+        casereports = CaseReport.objects.filter(is_deleted=False, user=request.user)
+
+    if not abstract_user == request.user and \
+            not request.user.is_superuser and \
+            not utils.is_organizing_team_member(request.user, event):
+            raise PermissionDenied
+
+    context = {'abstract_user' :abstract_user,
+				'abstracts': abstracts,
+				'casereports':casereports}
     return render(request, 'events/abstracts/list_my_abstracts.html', context)
 
 @login_required
@@ -266,11 +338,19 @@ def upload_abstract_image(request):
                     "message": u"لم أستطع رفع الملف"}
                 }
 
+@login_required
 def list_timeslots(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
-    timeslots = TimeSlot.objects.filter(event=event)
+    timeslots = TimeSlot.objects.filter(event=event ,parent__isnull=True)
+
+    if timeslots.filter(image__isnull=False):
+        have_image = True
+    else:
+        have_image = False
+
     context = {'timeslots': timeslots,
-               'event': event}
+               'event': event,
+               'have_image': have_image}
 
     if event.registration_opening_date and timezone.now() < event.registration_opening_date:
         raise Http404
@@ -294,11 +374,21 @@ def list_sessions_privileged(request, event_code_name):
     return render(request,  'events/session_list_privileged.html',
                   {'event': event})
 
+@login_required
 def list_sessions(request, event_code_name, pk):
     event = get_object_or_404(Event, code_name=event_code_name)
-    timeslots = TimeSlot.objects.filter(event=event, pk=pk)
-    context = {'timeslots': timeslots,
-               'event': event}
+    timeslot = TimeSlot.objects.get(event=event, pk=pk)
+    children_total = timeslot.session_set.count() + timeslot.children.count()
+    if timeslot.limit:
+        remaining_number = timeslot.limit - request.user.session_registrations.filter(session__time_slot=timeslot,is_deleted=False).count()
+    else:
+        remaining_number = 1
+    limit = utils.get_timeslot_limit(timeslot)
+    context = {'timeslot': timeslot,
+               'event': event,
+               'children_total':children_total,
+               'remaining_number':remaining_number,
+               'limit':limit}
 
     if event.registration_opening_date and timezone.now() < event.registration_opening_date:
         raise Http404
@@ -322,6 +412,12 @@ def handle_ajax(request):
     action = request.POST.get('action')
     session_pk = request.POST.get('pk')
     session = get_object_or_404(Session, pk=session_pk)
+    time_slot = session.time_slot
+
+    if request.user.common_profile.gender == 'M' and session.gender == 'F':
+        raise Exception(u'جلسة خاصة بالإناث')
+    if request.user.common_profile.gender == 'F' and session.gender == 'M':
+        raise Exception(u'جلسة خاصة بالذكور')
 
     if session.acceptance_method == 'F':
         is_approved = True
@@ -340,8 +436,8 @@ def handle_ajax(request):
                 raise Exception(u'سبق أن سجّلت!')
         else:
             timeslot = session.time_slot
-            if timeslot and timeslot.is_user_already_on(request.user):
-                raise Exception(u'سبق أن سجّلت!')
+            if timeslot and not utils.has_remaining_sessions(request.user,timeslot):
+                raise Exception(u'وصلت الحد الأقصى للتسجيل!')
 
         if not session.limit is None and\
            not session.get_remaining_seats() > 0:
@@ -359,7 +455,7 @@ def handle_ajax(request):
                         registration.badge_sent = True
                     if session.event.is_auto_tweet:
                         if session_group_pk:
-                            relative_url = reverse("events:show_session_group", args=(session.event.code_name, session_group.code_name))
+                            relative_url = "https://goo.gl/HwBfKL"
                         else:
                             relative_url = reverse("events:list_timeslots", args=(session.event.code_name,))
                         full_url = request.build_absolute_uri(relative_url)
@@ -386,7 +482,9 @@ def handle_ajax(request):
     registration.save()
 
     return {'remaining_seats': session.get_remaining_seats(),
-            'status': registration.get_status()}
+            'status': registration.get_status(),
+            'remaining':utils.has_remaining_sessions(request.user,time_slot),
+            'registered':utils.is_registered(request.user, session)}
 
 @login_required
 def list_registrations(request, event_code_name):
@@ -656,9 +754,9 @@ def evaluators_homepage(request,event_code_name):
                                                     event=event)\
                                             .exclude(evaluation__user=user_evaluations)\
                                             .distinct()
-    riyadh_evaluators = Team.objects.get(code_name='hpc2-r-e')
-    jeddah_evaluators = Team.objects.get(code_name='hpc2-j-e')
-    alahsa_evaluators = Team.objects.get(code_name='hpc2-a-e')
+    riyadh_evaluators = Team.objects.get(code_name='hpc3-r-e')
+    jeddah_evaluators = Team.objects.get(code_name='hpc3-j-e')
+    alahsa_evaluators = Team.objects.get(code_name='hpc3-a-e')
     context = {'riyadh_evaluators': riyadh_evaluators,
                'jeddah_evaluators':jeddah_evaluators,
                'alahsa_evaluators':alahsa_evaluators,
@@ -825,11 +923,20 @@ def download_barcode_pdf(request, event_code_name=None, user_pk=None):
     response.write(pdf_content)
     return response
 
+@login_required
+def list_question_session(request, event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name)
+    question_session = QuestionSession.objects.filter(event=event)
+
+    context = {'event': event, 'question_session': question_session }
+    return render(request, 'events/questions/list.html', context)
+
+@login_required
 def show_question_session(request, event_code_name, pk):
     question_session = get_object_or_404(QuestionSession, pk=pk,
                                          event__code_name=event_code_name)
 
-    old_questions = question_session.question_set.order_by('-submission_date')
+    old_questions = question_session.question_set.filter(is_deleted=False).order_by('-submission_date')
     last_question = old_questions.first()
     if last_question:
         last_pk = old_questions.first().pk
@@ -843,11 +950,24 @@ def show_question_session(request, event_code_name, pk):
     if request.method == "GET":
         form = forms.QuestionForm()
     elif request.method == "POST":
-        instance = Question(question_session=question_session)
-        form = forms.QuestionForm(request.POST, instance=instance)
-        if form.is_valid():
-            question = form.save()
-            return HttpResponseRedirect(reverse('events:show_question_session',
+
+        if utils.is_organizing_team_member(request.user, question_session.event):
+
+           action = request.POST.get('action')
+           pks = [int(field.lstrip('pk_')) for field in request.POST if field.startswith('pk_')]
+
+           if "delete":
+               Question.objects.filter(pk__in=pks).update(is_deleted=True)
+
+               return HttpResponseRedirect(reverse('events:show_question_session',
+                                                args=(question_session.event.code_name, pk,)))
+
+        else:
+            instance = Question(user=request.user, question_session=question_session)
+            form = forms.QuestionForm(request.POST, instance=instance)
+            if form.is_valid():
+                question = form.save()
+                return HttpResponseRedirect(reverse('events:show_question_session',
                                                 args=(question_session.event.code_name, pk,)) + \
                                         "#q"+str(question.pk))
 
@@ -855,6 +975,7 @@ def show_question_session(request, event_code_name, pk):
 
     return render(request, "events/questions/index.html", context)
 
+@login_required
 @csrf.csrf_exempt
 @decorators.ajax_only
 def handle_question_ajax(request, event_code_name, pk):
@@ -865,8 +986,9 @@ def handle_question_ajax(request, event_code_name, pk):
     new_last_pk = question_session.question_set.order_by('-submission_date').first().pk
 
     if old_last_pk != new_last_pk:
-        new_questions = question_session.question_set.filter(pk__gt=old_last_pk)
-        new_questions = new_questions.values_list('text', flat=True)
+        new_questions = question_session.question_set.filter(pk__gt=old_last_pk, is_deleted=False)
+        #TODO AlQumaizy knows ^_^
+        #new_questions = new_questions.values_list('text', 'user__common_profile__ar_first_name', 'user__common_profile__ar_middle_name', 'user__common_profile__ar_last_name')
         new_questions = list(new_questions)
         response = {'new_questions':new_questions,
                    'new_last_pk':new_last_pk}
@@ -880,8 +1002,8 @@ def show_event_stats(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
 
     if not request.user.is_superuser and \
-       not utils.is_organizing_team_member(request.user, session.event) and \
-       not utils.is_attendance_team_member(request.user, session.event):
+       not utils.is_organizing_team_member(request.user, event) and \
+       not utils.is_attendance_team_member(request.user, event):
         raise PermissionDenied
 
     sessions = {}
@@ -891,7 +1013,7 @@ def show_event_stats(request, event_code_name):
     return render(request, 'events/show_event_stats.html', context)
 
 def get_csv(request, event_code_name, session_pk):
-    # TODO: This should probably be changed into a commandline 
+    # TODO: This should probably be changed into a commandline
     session = get_object_or_404(Session,
                                 event__code_name=event_code_name,
                                 pk=session_pk)
@@ -943,32 +1065,71 @@ def get_csv(request, event_code_name, session_pk):
 @login_required
 def handle_survey(request, session_pk, optional=False):
     session = get_object_or_404(Session, pk=session_pk)
+    optional_survey = session.optional_survey
+    child_survey = session.mandatory_survey.children.exists()
 
     is_optional = bool(optional)
-    optional_survey = session.optional_survey
+
+    if session.has_mandatory_child_survey_to_fill(request.user) and SurveyResponse.objects.filter(survey=session.mandatory_survey, user=request.user).exists() and UserSurveyCategory.objects.filter(user=request.user, event=session.event).first():
+        category = UserSurveyCategory.objects.filter(user=request.user, event=session.event).first()
+        survey = session.mandatory_survey.children.filter(category=category.category).first()
+    else:
+        survey = None
 
     context = {'session': session, 'is_optional': is_optional}
-
-    if request.method == 'POST':
-        form = forms.SurveyForm(request.POST, session=session,
-                                is_optional=is_optional)
-        if form.is_valid():
-            form.save(user=request.user)
-            if not is_optional and optional_survey:
+    if child_survey and not UserSurveyCategory.objects.filter(user=request.user, event=session.event).exists() and SurveyResponse.objects.filter(survey=session.mandatory_survey,user=request.user).exists():
+        if request.method == 'POST':
+            instance = UserSurveyCategory(event=session.event, user=request.user)
+            form = forms.UserSurveyCategoryForm(request.POST, instance=instance)
+            if form.is_valid():
+                form.save()
                 form = forms.SurveyForm(session=session,
-                                        is_optional=True)
+                                        is_optional=True,
+                                        second_survey=survey)
                 context['form'] = form
                 template = get_template('events/partials/submit_survey.html')
                 html = template.render(context)
-                submit_url = reverse('events:handle_survey', args=(session.pk, 'optional'))
-                return {"message": "success", 'html': html,
-                        'submit_url': submit_url}
-            else:
-                show_url = reverse('certificates:list_certificates_per_user')
-                return {"message": "success", "show_url": show_url}
-    elif request.method == 'GET':
-        form = forms.SurveyForm(session=session,
-                                is_optional=is_optional)
+                submit_url = reverse('events:handle_survey', args=(session.pk))
+                return {"message": "success", 'html': html, 'submit_url': submit_url}
+        elif request.method == 'GET':
+            form = forms.UserSurveyCategoryForm()
+    else:
+        if request.method == 'POST':
+            form = forms.SurveyForm(request.POST, session=session,
+                                    is_optional=is_optional,
+                                    second_survey=survey)
+            if form.is_valid():
+                form.save(user=request.user)
+                if child_survey and SurveyResponse.objects.filter(survey=session.mandatory_survey,user=request.user).exists():
+                    # users_category = UserSurveyCategory.objects.filter(user=request.user, event=session.event).first()
+                    # survey = session.mandatory_survey.children.filter(category=users_category.category)
+                    form = forms.SurveyForm(session=session,
+                                            is_optional=True,
+                                            second_survey=survey)
+                    context['form'] = form
+                    template = get_template('events/partials/submit_survey.html')
+                    html = template.render(context)
+                    submit_url = reverse('events:handle_survey', args=(session.pk))
+                    return {"message": "success", 'html': html,
+                            'submit_url': submit_url}
+
+                elif not is_optional and optional_survey:
+                    form = forms.SurveyForm(session=session,
+                                            is_optional=True,
+                                            second_survey=survey)
+                    context['form'] = form
+                    template = get_template('events/partials/submit_survey.html')
+                    html = template.render(context)
+                    submit_url = reverse('events:handle_survey', args=(session.pk, 'optional'))
+                    return {"message": "success", 'html': html,
+                            'submit_url': submit_url}
+                else:
+                    show_url = reverse('certificates:list_certificates_per_user')
+                    return {"message": "success", "show_url": show_url}
+        elif request.method == 'GET':
+            form = forms.SurveyForm(session=session,
+                                    is_optional=is_optional,
+                                    second_survey=survey)
 
     context['form'] = form
     return render(request, 'events/partials/submit_survey.html', context)
@@ -979,7 +1140,7 @@ def delete_survey_response(reuqest, session_pk):
     session = get_object_or_404(Session, pk=session_pk,
                                 optional_survey__isnull=False)
 
-    SurveyResponse.objects.filter(user=request.user,
+    SurveyResponse.objects.filter(user=reuqest.user,
                                   survey=session.optional_survey,
                                   session=session).delete()
 
@@ -1034,3 +1195,23 @@ def list_attendance(request, event_code_name,user_pk=None):
     context ={'event':event,'user':user,'attendances':attendances}
 
     return render(request, 'events/list_attendance.html', context)
+
+
+def session_info(request, event_code_name, pk):
+
+    session = get_object_or_404(Session,event__code_name=event_code_name,pk=pk)
+
+    context ={'session':session,
+              'is_session':True}
+
+    return render(request, 'events/partials/session_info.html', context)
+
+def timeslot_info(request, event_code_name, pk):
+
+    timeslot = get_object_or_404(TimeSlot ,event__code_name=event_code_name,pk=pk)
+
+    context ={'session':timeslot,
+              'is_session':False}
+
+    return render(request, 'events/partials/session_info.html', context)
+

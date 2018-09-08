@@ -29,10 +29,31 @@ def mark_deleted(modeladmin, request, queryset):
 mark_deleted.short_description = u"علم السجلات المُحدّدة أنها محذوفة (دون إزالتها من قاعدة البيانات)"
 
 
+class AuthorInline(admin.TabularInline):
+    model = models.AbstractAuthor
+    form = OptionalForm
+    extra = 1
+
 class AbstractFigureInline(admin.TabularInline):
     model = models.AbstractFigure
     form = OptionalForm
     extra = 0
+
+class AbstractPosterInline(admin.TabularInline):
+    model = models.AbstractPoster
+    form = OptionalForm
+    extra = 0
+
+class AbstractAdmin(admin.ModelAdmin):
+    search_fields = BASIC_SEARCH_FIELDS + ["email", "title"]
+    actions = [mark_deleted]
+    list_filter = ["event", "is_deleted"]
+    list_display = ['__unicode__', 'is_deleted', 'status',
+                    'date_submitted']
+    inlines = [AuthorInline, AbstractFigureInline, AbstractPosterInline]
+    filter_horizontal = ('evaluators',)
+    raw_id_fields = ['evaluators']
+    introduction = forms.CharField(widget=CKEditorWidget())
 
 
 class QuestionInline(admin.TabularInline):
@@ -67,7 +88,7 @@ class EventFilter(admin.SimpleListFilter):
     parameter_name = 'event'
 
     def lookups(self, request, model_admin):
-        return models.Event.objects.values_list('pk', 'name')
+        return models.Event.objects.values_list('pk', 'official_name')
 
     def queryset(self, request, queryset):
         if self.value():
@@ -114,12 +135,6 @@ class NonUserAdmin(admin.ModelAdmin):
     inlines = [RegistrationInline]
 
 
-class AbstractPosterInline(admin.TabularInline):
-    model = models.AbstractPoster
-    form = OptionalForm
-    extra = 0
-
-
 class SurveyQuestionInline(admin.TabularInline):
     model = models.SurveyQuestion
 
@@ -128,16 +143,6 @@ class SurveyAnswerInline(CertificateAdminPermission, admin.TabularInline):
     model = models.SurveyAnswer
     exclude = ['text_value', 'numerical_value']
     readonly_fields = ['question', 'get_value']
-
-
-class AbstractAdmin(admin.ModelAdmin):
-    search_fields = BASIC_SEARCH_FIELDS + ["email", "title"]
-    actions = [mark_deleted]
-    list_filter = ["event", "is_deleted"]
-    form = events.forms.AbstractForm
-    inlines = [AbstractFigureInline, AbstractPosterInline]
-    filter_horizontal = ('evaluators',)
-    introduction = forms.CharField(widget=CKEditorWidget())
 
 
 class InitiativeAdmin(admin.ModelAdmin):
@@ -152,7 +157,7 @@ class SessionGroupAdmin(admin.ModelAdmin):
 
 class AttendanceAdmin(admin.ModelAdmin):
     form = events.forms.AttendanceAdminForm
-    list_filter = ['session_registration__session__event', 'category', 'is_deleted']
+    list_filter = ['session_registration__session__event', 'session_registration__session', 'category', 'is_deleted']
     list_display = ['__unicode__', 'category', 'date_submitted', 'is_deleted']
     readonly_fields = ['session_registration']
     actions = [mark_deleted]
@@ -285,3 +290,4 @@ admin.site.register(models.Survey, SurveyAdmin)
 admin.site.register(models.SurveyResponse, SurveyResponseAdmin)
 certificate_admin.register(models.Survey, SurveyAdmin)
 certificate_admin.register(models.SurveyResponse, SurveyResponseAdmin)
+admin.site.register(models.UserSurveyCategory)

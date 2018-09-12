@@ -20,8 +20,9 @@
           </div>
         </div>
         <div class="description text-center">
-            {{ parent_course.description }}
+            {{ parent_course.description|linebreaksbr }}
           <br><br>
+        {% if course != parent_course %}
         <ul class="nav nav-justified nav-pills nav-pills-icons" role="tablist">
                             <li class="nav-item">
                                 <a id="projects" class="nav-link" href="#dashboard-1" role="tab" data-toggle="tab" aria-selected="false">
@@ -103,14 +104,13 @@
                   </a>
                 </li>
               </ul>
+              {% endif %}
               <br><br><br>
             </div>
           </div>
         </div>
         </div>
       </div>
-    </div>
-  </div>
 {% endblock %}
 {% block customscript %}
 <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>

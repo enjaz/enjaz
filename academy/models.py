@@ -132,3 +132,11 @@ class NewStudent(models.Model):
 
     def __unicode__(self):
         return self.user.common_profile.get_ar_short_name()
+
+# for temporary convenience
+class IndexBG(models.Model):
+    img = models.FileField(u'الصورة ', null=True)
+
+    class Meta:
+        verbose_name = u"صورة خلفية"
+        verbose_name_plural = u"الصور الخلفية"

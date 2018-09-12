@@ -316,12 +316,18 @@ you?
 			</li>
 			<li>
 				<a href="{% url 'bulb:index' %}">
-					<i class="fa fa-fire"></i>
-					<span>سِراج</span>
+                    <!--edits because icon not from Entypo like the rest-->
+					<i class="fa fa-fire" style="margin-right:5px; margin-left:2px"></i>
+					<span style="padding-right:8px">سِراج</span>
 				</a>
 			</li>
             {% endif %}
-
+            <li>
+				<a href="{% url 'academy:index' %}">
+					<img height="20px" src="{%static 'academy/images/logo-greenish 2.png' %}">
+					<span style="padding:5px">أكاديمية نادي الطلاب</span>
+				</a>
+			</li>
 				  {% if not user.common_profile.profile_type == 'N' %}
 				<li>
 					<li class="highlighted-section">

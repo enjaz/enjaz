@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 
-from models import Course, Instructor, Graduate
+from models import Course, Instructor, Graduate, IndexBG
 
 course_codes = (
     ('PR', 'programming'),
@@ -18,8 +18,13 @@ course_codes = (
 
 def index(request):
     courses = Course.objects.all()
-    context = {'courses':courses,
-               'course_codes': course_codes}
+    try:
+        bg = IndexBG.objects.all().latest('pk')
+    except ObjectDoesNotExist:
+        bg = ''
+    context = {'courses': courses,
+               'course_codes': course_codes,
+               'bg': bg}
     return render(request, 'academy/index.html', context)
 
 def show_course(request, course_name):
@@ -33,7 +38,7 @@ def show_course(request, course_name):
     try:
         course = parent_course.subcourse_set.latest('reg_open_date')
     except ObjectDoesNotExist:
-        raise Http404
+        course = parent_course
     context = {'course': course,
                'course_name': course_name,
                'parent_course': parent_course}

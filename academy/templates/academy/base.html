@@ -25,9 +25,21 @@
         {% block head %}{% endblock %}
 
     <style>
-    body{
-        background-color: #fff;
+    @font-face {
+       font-family: 'GE Dinar One';
+       font-weight: normal;
+       src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
     }
+
+    body, h1, h2, h3, h4, h5{
+        background-color: #fff;
+        font-family: 'GE Dinar One';
+    }
+
+    .title{
+        font-family: 'GE Dinar One';
+    }
+
     footer.main-footer{
        <!--position: fixed;-->
        bottom: 0;

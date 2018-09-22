@@ -268,6 +268,24 @@
                 <label class='error' for='field' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
         </div>
+        
+        <div class="form-group">
+            <div class="input-group{% if form.collection_method.errors %} validate-has-error{% endif %}">
+                <div class="input-group-addon">
+                    <i class="entypo-graduation-cap"></i>
+                </div>
+
+                <select {% if form.collection_method.value and not form.collection_method.errors %}value="{{ form.collection_method.value }}" {% endif %}class="form-control" id="collection-method-list" title="{{ form.collection_method.label }}" required="required">
+                                <option value="">{{ form.collection_method.label }}</option>
+        <option value="Experimental">Experimental</option>
+        <option value="Survey">Survey</option>
+        <option value="Chart review">Chart review</option>
+        <option value="Other">Other</option>
+                            </select>
+                <input {% if form.collection_method.value and not form.collection_method.errors %}value="{{ form.collection_method.value }}" {% endif %}type="text" class="form-control" id="collection-method-text" placeholder="Write your data collection method" style="display: none" /> {% if form.collection_method.errors %} {% for error in form.collection_method.errors %}
+                <label class='error' for='field' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+            </div>
+        </div>
 
         <div class="form-group">
             <div class="english-field input-group{% if form.email.errors %} validate-has-error{% endif %}">
@@ -417,6 +435,7 @@ will result in a refusal of my application.
         <input type="hidden" name="university">
         <input type="hidden" name="college">
         <input type="hidden" name="study_field">
+        <input type="hidden" name="collection_method">
         <div class="form-group">
             <button disabled type="submit" class="btn btn-success btn-block btn-login">
 					<i class="entypo-right-open-mini"></i>
@@ -806,6 +825,21 @@ will result in a refusal of my application.
             value = $(this).val();
             $('input[name=study_field]').val(value);
         });
+        $('#collection-method-list').change(function() {
+            value = $(this).val();
+            if ($('#collection-method-list option[value=Other]:checked').length) {
+                $('#collection-method-text').show();
+                $('#collection-method-text').attr('required', 'required');
+            } else {
+                $('#collection-method-text').hide();
+                $('#collection-method-text').removeAttr('required');
+                $('input[name=collection_method]').val(value);
+            }
+        });
+        $('#collection-method-text').change(function() {
+            value = $(this).val();
+            $('input[name=collection_method]').val(value);
+        })
 
     });
 </script>

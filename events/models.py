@@ -481,6 +481,7 @@ class Abstract(models.Model):
     title = models.CharField(verbose_name="Title", max_length=255)
     authors = models.TextField(verbose_name=u"Name of authors", blank=True)
     study_field = models.CharField(verbose_name="Field", max_length=255, default="")
+    collection_method = models.CharField(verbose_name="Data Collection Method", max_length=255, default="")
     university = models.CharField(verbose_name="University", max_length=255)
     college = models.CharField(verbose_name="College", max_length=255)
     presenting_author = models.CharField(verbose_name="Presenting author", max_length=255)

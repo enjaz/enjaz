@@ -78,7 +78,7 @@ class RegistrationForm(forms.Form):
 class AbstractForm(forms.ModelForm):
     class Meta:
         model = Abstract
-        fields = ['title', 'university', 'college',
+        fields = ['title', 'university', 'college', 'collection_method',
                   'study_field', 'presenting_author', 'email',
                   'phone', 'level', 'presentation_preference',
                   'introduction','methodology', 'results',

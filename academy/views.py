@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 
-from models import Course, Instructor, Graduate, IndexBG
+from models import Course, Instructor, Graduate, IndexBG, Work
 
 course_codes = (
     ('PR', 'programming'),
@@ -35,14 +35,46 @@ def show_course(request, course_name):
         else:
             continue
     parent_course = get_object_or_404(Course, code=course_code)
-    try:
-        course = parent_course.subcourse_set.latest('reg_open_date')
-    except ObjectDoesNotExist:
-        course = parent_course
-    context = {'course': course,
-               'course_name': course_name,
+    context = {'course_name': course_name,
                'parent_course': parent_course}
+    try:
+        subcourses = parent_course.subcourse_set.all()
+        last_subcourse = subcourses.latest('reg_open_date')
+        grad_list = []
+        instruct_list = []
+        total_sessions = 0
+        for course in subcourses:
+            if course.session_count:
+                total_sessions += course.session_count
+            graduates = Graduate.objects.filter(course=course)
+            grad_list.append(graduates)
+            instructors = Instructor.objects.filter(course=course)
+            instruct_list.append(instructors)
+        context['subcourses'] = subcourses
+        context['last_subcourse'] = last_subcourse
+        context['grad_list'] = grad_list
+        context['instruct_list'] = instruct_list
+        context['total_sessions'] = total_sessions
+    except ObjectDoesNotExist:
+        context['subcourses'] = 'none'
     return render(request, 'academy/show_course.html', context)
+
+def show_subcourse(request, course_name, batch_no):
+    for code, name in course_codes:
+        if name == course_name:
+            course_code = code
+            break
+        else:
+            continue
+    parent_course = get_object_or_404(Course, code=course_code)
+    context = {'course_name': course_name,
+               'parent_course': parent_course}
+    try:
+        subcourse = parent_course.subcourse_set.get(batch_no=batch_no)
+        context['subcourse'] = subcourse
+    except ObjectDoesNotExist:
+        raise Http404
+    return render(request, 'academy/show_subcourse.html', context)
 
 def list_graduates(request):
      pass
@@ -56,6 +88,23 @@ def show_person(request, position, person_id):
     context = {'person': person,
                'position': position}
     return render(request, 'academy/show_person.html', context)
+
+def list_works(request, course_name):
+    for code, name in course_codes:
+        if name == course_name:
+            course_code = code
+            break
+        else:
+            continue
+    parent_course = get_object_or_404(Course, code=course_code)
+    context = {'course_name': course_name,
+               'parent_course': parent_course}
+    try:
+        subcourses = parent_course.subcourse_set.all()
+        context['subcourses'] = subcourses
+    except ObjectDoesNotExist:
+        context['subcourses'] = 'none'
+    return render(request, 'academy/list_works.html', context)
 
 def register_for_course(request, course_name):
     for code, name in course_codes:
@@ -75,7 +124,7 @@ def register_for_course(request, course_name):
     return render(request, 'academy/register.html', context)
 
 
-# TODO: Work on the form: form-builder vs -forms , who will prevail?
+# TODO: Work on the form: form-builder vs fobi-forms , who will prevail?
 
 # @login_required
 # def signup_for_course(request, course_id):

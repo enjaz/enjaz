@@ -11,22 +11,39 @@
           <div class="col-md-6 ml-auto mr-auto">
             <div class="profile">
               <div class="name">
-                <h3 style="color:white" class="title">{{person.user.common_profile.get_ar_short_name}}</h3>
+                <h3 style="color:white; background-color:#fff0" class="title">{{person.user.common_profile.get_ar_short_name}}</h3>
               </div>
-              <br><br><br><br><br><br><br><br><br><br><br><br>
-              <!-- deal with this later-->
             </div>
           </div>
         </div>
+        <div class="description text-right">
+          <ul>
+            <li>الخبرة: {{person.experience}}</li>
+            <li>حساب التويتر: {{person.twitter_account}}</li>
+            <li>حساب التلقرام: {{person.telegram_account}}</li>
+            <li>المشاريع
+              {% for work in person.work_set.all %}
+                <ul>
+                <li>{{ work.short_description }}</li>
+                  <p>{{work.long_description}}</p>
+                {% if work.attachments %}
+                    {% for attachment in work.attachments.all %}
+                    <div class="col-sm-12">
+                        <a href="{{attachment.file.url}}"><img src="{{attachment.file.url}}" width="100%" style="padding:30px"></a>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                </ul>
+              {% endfor %}
+            </li>
+          </ul>
+
+          </div>
+        </div>
       </div>
-
-      <div class="container">
-
-      </div>
-
-    </div>
   </div>
   </div>
 </div>
+
 {% endblock %}
 

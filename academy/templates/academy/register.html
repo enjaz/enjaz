@@ -1,8 +1,12 @@
 {% extends 'academy/base.html' %}{% load staticfiles %}
 {% block title %}التسجيل في {{ parent_course.name }}{% endblock %}
+{% block style %}
+.header-filter::before {
+    background: rgba(0, 0, 0, 0);
+{% endblock %}
 {% block content %}
 <div class="profile-page sidebar-collapse">
-  <div class="page-header header-filter" data-parallax="true" style="background-color:#000000"></div>
+  <div class="page-header header-filter" data-parallax="true" style=" {% if parent_course.background %} background-image: url({{parent_course.background.url}}) {% endif %}; background-color:#000000" "></div>
   <div class="main main-raised">
     <div class="profile-content">
       <div class="container">
@@ -33,17 +37,4 @@
 {% endblock %}
 
 {% block customscript %}
-  <!--   Core JS Files   -->
-  <script src="{% static 'academy/assets/js/core/jquery.min.js'%}" type="text/javascript"></script>
-  <script src="{% static 'academy/assets/js/core/popper.min.js'%}" type="text/javascript"></script>
-  <script src="{% static 'academy/assets/js/core/bootstrap-material-design.min.js'%}" type="text/javascript"></script>
-  <script src="{% static 'academy/assets/js/plugins/moment.min.js'%}"></script>
-  <!--	Plugin for the Datepicker, full documentation here: https://github.com/Eonasdan/bootstrap-datetimepicker -->
-  <script src="{% static 'academy/assets/js/plugins/bootstrap-datetimepicker.js'%}" type="text/javascript"></script>
-  <!--  Plugin for the Sliders, full documentation here: http://refreshless.com/nouislider/ -->
-  <script src="{% static 'academy/assets/js/plugins/nouislider.min.js'%}" type="text/javascript"></script>
-  <!--	Plugin for Sharrre btn -->
-  <script src="{% static 'academy/assets/js/plugins/jquery.sharrre.js'%}" type="text/javascript"></script>
-  <!-- Control Center for Material Kit: parallax effects, scripts for the example pages etc -->
-  <script src="{% static 'academy/assets/js/material-kit.js'%}" type="text/javascript"></script>
-{% endblock %}
+  {% endblock %}

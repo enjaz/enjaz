@@ -2,8 +2,8 @@
 
 {% block style %}
 .col-centered{
-float: none;
-margin: 0 auto;
+    float: none;
+    margin: 0 auto;
 }
 .container {
     padding: 25px;
@@ -47,15 +47,9 @@ margin: 0 auto;
 {% block title %}الصفحة الرئيسة{% endblock %}
 
 {% block content %}
-<nav class="navbar navbar-color-on-scroll navbar-transparent fixed-top navbar-expand-lg" color-on-scroll="100">
-      <div class="navbar-translate">
-        <a class="navbar-brand" href="#course_list">دورات الأكاديمية</a>
-        <a class="navbar-brand" href="{% url 'academy:about' %}">عن الأكاديمية</a>
-      </div>
-</nav>
 
 
-<div class="page-header header-filter" data-parallax="true" style="background-image: url({{bg.img.url}}) ">
+<div class="page-header header-filter" data-parallax="true" style="background-image: url({{bg.img.url}})">
   <div class="container">
     <div class="row">
       <div class="col-md-8 ml-auto mr-auto">
@@ -91,16 +85,19 @@ margin: 0 auto;
     <div class="col-sm-2 col-centered">
         {% for code, name in course_codes %}
         {% if course.code == code %}
-        <div onclick="location.href='{% url 'academy:show' name %}';" style="cursor: pointer;">
-        <img class="img-fluid" width="70" src="{{course.logo.url}}">
+        {% if course.hex_colour %}
+            <script>
+                $(function(){
+                    $("style").append("#{{name}}:hover{color: {{course.hex_colour}} }");
+                });
+            </script>
+        {% endif %}
+        <div id="{{name}}" onclick="location.href='{% url 'academy:show' name %}';" style="cursor: pointer;">
+        <div class="icon-{{name}}" style="font-size:80px"></div>
         <h4>{{ course.name }}</h4>
         </div>
         {% endif %}{% endfor %}
     </div>{% endfor %}
-
-
-
-
 </div></div>
 {% endblock %}
 

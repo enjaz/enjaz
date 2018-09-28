@@ -13,6 +13,11 @@ urlpatterns = [
     url(r'^(?P<course_name>\w+)/$',views.show_course, name='show'),
     url(r'^(?P<course_name>\w+)/register/$',views.register_for_course,
         name='register'),
+    url(r'^(?P<course_name>\w+)/projects/$',views.list_works,
+        name='list_works'),
+    url(r'^(?P<course_name>\w+)/batch(?P<batch_no>\d+)/$',
+        views.show_subcourse, name='show_subcourse'),
+
 ]
 
 #delete these when fobi works -soon hopefully >_< -

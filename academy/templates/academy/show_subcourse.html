@@ -11,17 +11,7 @@ a{
 }
 
 {% endblock %}
-{% block title %}{{ parent_course.name }}{% endblock %}
-{% block navbar %}
-    <li class="dropdown nav-item">
-              <a style="font-size:16px" href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">الدفعات</a>
-              <div class="dropdown-menu">
-              {% for course in subcourses %}
-                    <div class="text-center"><a href="{% url 'academy:show_subcourse' course_name course.batch_no %}" class="nav-link">الدفعة {{course.batch_no}}</a></div>
-              {% endfor %}
-              </div>
-          </li>
-{% endblock %}
+{% block title %}{{ parent_course.name }} الدفعة {{subcourse.batch_no}}{% endblock %}
 {% block content %}
 <div class="profile-page sidebar-collapse">
   <div class="page-header header-filter" data-parallax="true" style=" {% if parent_course.background %} background-image: url({{parent_course.background.url}}) {% endif %}; background-color:#000000" "></div>
@@ -36,6 +26,7 @@ a{
               </div>
               <div class="name">
                 <h3 class="title">{{parent_course.name}}</h3>
+                <h4>الدفعة رقم ({{subcourse.batch_no}})</h4>
               </div>
             </div>
           </div>
@@ -72,78 +63,46 @@ a{
             </div>
             </div>
         {% endif %}
-        <div class="row">
-            <br><br>
-            {{ parent_course.description|linebreaksbr }}
-            <br><br><br>
-            </div>
-        {% if subcourses != 'none' %}
-        <ul class="nav nav-justified" role="tablist">
-                            <li class="nav-item">
-                                <i class="material-icons" style="font-size:2em">wb_incandescent</i>
-                                <a id="projects" class="nav-link" href="#dashboard-1" role="tab" data-toggle="tab" aria-selected="false">
-                                    المشاريع
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <i class="material-icons" style="font-size:2em">school</i>
-                                <a id="graduates" class="nav-link" href="" role="tab" data-toggle="tab" aria-selected="false">
-                                    الخريجون والخريجات
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <i class="material-icons" style="font-size:2em">people</i>
-                                <a id="instructors" class="nav-link" href="#tasks-1" role="tab" data-toggle="tab" aria-selected="true">
-                                    مقدمو ومقدمات الدورة
-                                </a>
-                            </li>
+        <br><br>
+
+        <div class="description" align="right">
+            <h3><i class="material-icons">people</i>  مقدمو ومقدمات الدورة</h3>
+                <ul>
+                   {% for instructor in subcourse.course_instructors.all %}
+                        <li><a href="{% url 'academy:show_person' 'instructor' instructor.pk %}">{{ instructor.user.common_profile.get_ar_short_name }}</a></li>
+                   {% endfor %}
+                </ul>
+            <h3><i class="material-icons">school</i>  الخريجون والخريجات</h3>
+                <ul>
+                   {% for graduate in subcourse.course_graduates.all %}
+                        <li><a href="{% url 'academy:show_person' 'graduate' graduate.pk %}">{{ graduate.user.common_profile.get_ar_short_name }}</a></li>
+                   {% endfor %}
+                </ul>
+            <h3><i class="material-icons">wb_incandescent</i>  المشاريع</h3>
+                <ul>
+                        {% for graduate in subcourse.course_graduates.all %}
+                            {% for work in graduate.work_set.all %}
+                            <li>{{ work.short_description }}</li>
+                            {% if work.attachments %}
+                            <div class="row">
+                                {% for attachment in work.attachments.all %}
+                                <div class="col-sm-3">
+                                    <a href="{{attachment.file.url}}"><img src="{{attachment.file.url}}" class="rounded img-fluid"></a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                </ul>
+        </div>
+
+        <ul class="nav nav-justified" style="padding-right:0px" role="tablist">
                         </ul>
-        <div class="container" id="dynamic_info">
-        <div class="row" id="graduate_list">
-          {% for course in subcourses %}
-          <div class="col-lg-4" align="right">
-          <ul>
-            <li><a href="{% url 'academy:show_subcourse' course_name course.batch_no %}">الدورة {{course.batch_no}}</a>
-              <ul>
-              {% for graduate in course.course_graduates.all %}
-              <li><a href="{% url 'academy:show_person' 'graduate' graduate.pk %}">{{ graduate.user.common_profile.get_ar_short_name }}</a></li>
-              {% endfor %}
-              {{ batch.batch_note }}
-              </ul>
-            </li>
-          </ul>
-          </div>
-          {% endfor %}
-        </div>
 
-        <div class="row" id="project_list">
-        <div class="col-lg-4" align="right">
-            <ul>
-            {% for course in subcourses %}
-            {% for graduate in course.course_graduates.all %}
-                {% for work in graduate.work_set.all %}
-                    <li>{{ work.short_description }}</li>
-                {% endfor %}
-            {% endfor %}
-            {% endfor %}
-            </ul>
         </div>
-        </div>
-
-        <div class="row" id="instructor_list">
-        <div class="col-lg-4" align="right">
-            <ul>
-            {% for instructor in parent_course.course_instructors.all %}
-                    <li><a href="{% url 'academy:show_person' 'instructor' instructor.pk %}">{{ instructor.user.common_profile.get_ar_short_name }}</a></li>
-            {% endfor %}
-            </ul>
-        </div>
-        </div>
-      </div>
-      {% endif %}
 
 <br><br>
-{% if last_subcourse %}
 <div class="row">
           <div class="col-md-6 ml-auto mr-auto">
               <ul class="nav nav-justified" role="tablist">
@@ -155,48 +114,25 @@ a{
                     </a>
                 </li>
                 {% endif %}
+                {% if subcourse.reg_open_date and subcourse.is_reg_open  %}
                 <li class="nav-item">
                     <i class="material-icons" style="font-size:2em">add_circle</i>
                     <a  class="nav-link" href="{% url 'academy:register' course_name%}">
                         التسجيل
                     </a>
                 </li>
+                {% endif %}
               </ul>
           </div>
 </div>
-{% endif %}
           </div>
-
       </div>
       </div>
+</div>
 
-
-        </div>
-        </div>
-    </div>
 {% endblock %}
 {% block customscript %}
 <script type="text/javascript">
-$("#dynamic_info").hide();
-$("#graduates").click(function(){
-    $("#project_list").hide();
-    $("#instructor_list").hide();
-    $("#dynamic_info").show();
-    $("#graduate_list").show();
-    });
-$("#projects").click(function(){
-    $("#graduate_list").hide();
-    $("#instructor_list").hide();
-    $("#dynamic_info").show();
-    $("#project_list").show();
-    });
-$("#instructors").click(function(){
-    $("#graduate_list").hide();
-    $("#project_list").hide();
-    $("#dynamic_info").show();
-    $("#instructor_list").show();
-    });
-
 <!--Counter-->
 $(document).ready(function ($) {
 	$.fn.countTo = function (options) {

@@ -24,6 +24,8 @@ class Course(models.Model):
     code = models.CharField(u'الرمز', max_length=2, choices=course_choices)
     logo = models.FileField(u'الشعار', null=True)
     description = models.TextField(u'الوصف', null=True, blank=True)
+    background = models.FileField(u'الصورة الخلفية', null=True, blank=True)
+    hex_colour = models.CharField(u'لون الثيم بصيغة hex', max_length=7, null=True, blank=True)
 
     class Meta:
         verbose_name = u"دورة أساسية"
@@ -34,15 +36,19 @@ class Course(models.Model):
 
 class SubCourse(models.Model):
     parent_course = models.ForeignKey(Course, verbose_name=u"الدورة الأب")
-    plan = models.FileField(u"ملف الخطة", null=True)
-    session_count = models.IntegerField(u'عدد الجلسات', null=True)
-    homework_count = models.IntegerField(u'عدد المهام والواجبات', null=True)
+    plan = models.FileField(u"ملف الخطة", null=True, blank=True)
+    session_count = models.IntegerField(u'عدد الجلسات', null=True, blank=True)
+    homework_count = models.IntegerField(u'عدد المهام والواجبات',
+                                         null=True, blank=True)
     batch_no = models.IntegerField(u'رقم الدفعة', null=True)
-    batch_note = models.TextField(u'ملاحظة على العدد', null=True)
-    form_url = models.TextField(u'رابط نموذج التسجيل', null=True)
+    batch_note = models.TextField(u'ملاحظة على العدد', null=True, blank=True)
+    form_url = models.TextField(u'رابط نموذج التسجيل', null=True, blank=True)
     #forms = GenericRelation(Form)
-    reg_open_date = models.DateTimeField(u'تاريخ فتح التسجيل', null=True)
-    reg_close_date = models.DateTimeField(u'تاريخ إغلاق التسجيل', null=True)
+    reg_open_date = models.DateTimeField(u'تاريخ فتح التسجيل',
+                                         null=True, blank=True)
+    reg_close_date = models.DateTimeField(u'تاريخ إغلاق التسجيل',
+                                          null=True, blank=True)
+    background = models.FileField(u'الصورة الخلفية', null=True, blank=True)
 
     class Meta:
         verbose_name = u"دورة فرعية"
@@ -72,10 +78,12 @@ class SubCourse(models.Model):
 class Instructor(models.Model):
     user = models.OneToOneField(User, verbose_name=u"المستخدمـ/ـة")
     experience = models.TextField(verbose_name='الخبرة', blank=True, null=True)
-    course = models.ManyToManyField(Course, verbose_name=u'الدورة',
+    course = models.ManyToManyField(SubCourse, verbose_name=u'الدورة',
                                     related_name='course_instructors')
-    twitter_account = models.CharField(verbose_name='حساب التويتر', max_length=200, null=True)
-    telegram_account = models.CharField(verbose_name='حساب التلقرام', max_length=200, null=True)
+    twitter_account = models.CharField(verbose_name='حساب التويتر',
+                                       max_length=200, null=True, blank=True)
+    telegram_account = models.CharField(verbose_name='حساب التلقرام',
+                                        max_length=200, null=True, blank=True)
 
     class Meta:
         verbose_name = u"مقدمـ/ـة"
@@ -86,12 +94,13 @@ class Instructor(models.Model):
 
 class Graduate(models.Model):
     user = models.OneToOneField(User, verbose_name=u"المستخدمـ/ـة")
-    batch = models.IntegerField(u"رقم الدفعة")
     experience = models.TextField(u'الخبرة', blank=True)
     course = models.ManyToManyField(SubCourse, verbose_name=u'الدورة',
                                     related_name='course_graduates')
-    twitter_account = models.CharField(u"حساب التويتر", null=True, max_length=200)
-    telegram_account = models.CharField(u"حساب التلقرام", null=True, max_length=200)
+    twitter_account = models.CharField(u"حساب التويتر", null=True,
+                                       max_length=200, blank=True)
+    telegram_account = models.CharField(u"حساب التلقرام", null=True,
+                                        max_length=200, blank=True)
 
     class Meta:
         verbose_name = u"خريجـ/ـة"
@@ -100,15 +109,36 @@ class Graduate(models.Model):
     def __unicode__(self):
         return self.user.common_profile.get_ar_short_name()
 
+class Media_File(models.Model):
+    subcourse = models.ForeignKey(SubCourse, verbose_name=u"الدورة التابعة",
+                                  related_name='subcourse_media')
+    file = models.FileField(verbose_name=u'الملف',
+                                     upload_to="academy/photos_n_projects",
+                                     blank=True, null=True)
+
+    class Meta:
+        verbose_name = u"مرفق"
+        verbose_name_plural = u"المرفقات"
+
+    def __unicode__(self):
+        return self.file.url
+
 class Work(models.Model):
-    graduate = models.ManyToManyField(Graduate, verbose_name=u"الخريجـ/ـة")
+    instructor = models.ManyToManyField(Instructor, verbose_name=u"المشرفـ/ـة",
+                                        blank=True)
+    graduate = models.ManyToManyField(Graduate, verbose_name=u"الخريجـ/ـة",
+                                      blank=True)
     short_description = models.CharField(u"وصف قصير", max_length=200)
-    long_description =  models.TextField(u"وصف كامل", blank=True)
-    projects_in_sc = models.TextField(verbose_name=u'مشاريع في نادي الطلاب', blank=True)
-    projects_outside_sc = models.TextField(verbose_name=u'مشاريع خارج نادي الطلاب', blank=True)
-    done_projects = models.FileField(verbose_name=u'مشاريع مكتملة',
-                                     upload_to="academy/done_projects",
-                                     blank=True)
+    long_description =  models.TextField(u"وصف كامل", blank=True, null=True)
+    type = models.CharField(verbose_name=u'نوع العمل', max_length=2,
+                            choices=(
+                                ('in', 'داخل نادي الطلاب'),
+                                ('out', 'خارج نادي الطلاب'),
+                            ),
+                            blank=True, null=True)
+    attachments = models.ManyToManyField(Media_File,
+                                         verbose_name=u'مرفقات',
+                                         blank=True)
 
     class Meta:
         verbose_name = u"عمل"
@@ -119,8 +149,7 @@ class Work(models.Model):
 
 class NewStudent(models.Model):
     user = models.OneToOneField(User, verbose_name=u"المستخدمـ/ـة")
-    batch = models.IntegerField()
-    course = models.ForeignKey(Course, verbose_name=u"الدورة", related_name='new_student')
+    course = models.ForeignKey(SubCourse, verbose_name=u"الدورة", related_name='new_student')
     sc_work = models.TextField(u"مشاركة في نادي الطلاب ")
     past_exp = models.TextField(u"خبرة سابقة")
     why_join = models.TextField(u"سبب التسجيل")
@@ -135,7 +164,7 @@ class NewStudent(models.Model):
 
 # for temporary convenience
 class IndexBG(models.Model):
-    img = models.FileField(u'الصورة ', null=True)
+    img = models.FileField(u'الصورة ', null=True, blank=True)
 
     class Meta:
         verbose_name = u"صورة خلفية"

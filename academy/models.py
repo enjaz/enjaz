@@ -169,3 +169,11 @@ class IndexBG(models.Model):
     class Meta:
         verbose_name = u"صورة خلفية"
         verbose_name_plural = u"الصور الخلفية"
+
+# for temporary convenience
+# TODO: should actually be calculated from individual courses
+class Temporary_Stats(models.Model):
+    grad_count = models.CharField(u'عدد الخريجين والخريجات',max_length=10)
+    course_count = models.CharField(u'عدد الدورات',max_length=10)
+    instr_count = models.CharField(u'عدد المقدمين والمقدمات',max_length=10)
+    session_count = models.CharField(u'عدد الجلسات',max_length=10)

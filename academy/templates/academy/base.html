@@ -147,6 +147,9 @@ element.style {
           </li>
           {% block navbar %}{% endblock %}
           <li class="nav-item">
+              <a style="font-size:16px" href="{% url 'academy:about' %}" class="nav-link" ">عن الأكاديمية</a>
+          </li>
+          <li class="nav-item">
             <a style="font-size:16px" class="nav-link" href="{% url 'home' %}">
               <i class="fa fa-home"></i>  العودة لصفحة إنجاز الرئيسة
             </a>

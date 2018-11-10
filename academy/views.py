@@ -16,20 +16,41 @@ course_codes = (
     ('PH', 'photography'),
 )
 
+def count_stats(request):
+    parent_courses = Course.objects.all()
+    all_graduates = []
+    all_instructors = []
+    all_sessions = 0
+    for parent_course in parent_courses:
+        subcourses = parent_course.subcourse_set.all()
+        for subcourse in subcourses:
+            if subcourse.session_count:
+                all_sessions += subcourse.session_count
+            graduates = Graduate.objects.filter(course=subcourse)
+            for grad in graduates:
+                all_graduates.append(grad)
+            instructors = Instructor.objects.filter(course=subcourse)
+            for inst in instructors:
+                all_instructors.append(inst)
+
+    return(parent_courses, all_graduates, all_instructors, all_sessions)
+
 def index(request):
     courses = Course.objects.all()
     try:
         bg = IndexBG.objects.all().latest('pk')
     except ObjectDoesNotExist:
         bg = ''
-    try:
-        stats = Temporary_Stats.objects.all().latest('pk')
-    except ObjectDoesNotExist:
-        stats = ''
+    parent_courses, all_graduates, all_instructors, all_sessions = count_stats(request)
     context = {'courses': courses,
                'course_codes': course_codes,
                'bg': bg,
-               'stats': stats}
+               'parent_courses': parent_courses,
+               'all_graduates': all_graduates,
+               'all_instructors': all_instructors,
+               'all_sessions': all_sessions,
+               }
+
     return render(request, 'academy/index.html', context)
 
 def show_course(request, course_name):
@@ -52,9 +73,11 @@ def show_course(request, course_name):
             if course.session_count:
                 total_sessions += course.session_count
             graduates = Graduate.objects.filter(course=course)
-            grad_list.append(graduates)
+            for grad in graduates:
+                grad_list.append(grad)
             instructors = Instructor.objects.filter(course=course)
-            instruct_list.append(instructors)
+            for inst in instructors:
+                instruct_list.append(inst)
         context['subcourses'] = subcourses
         context['last_subcourse'] = last_subcourse
         context['grad_list'] = grad_list
@@ -72,8 +95,10 @@ def show_subcourse(request, course_name, batch_no):
         else:
             continue
     parent_course = get_object_or_404(Course, code=course_code)
+    subcourses = parent_course.subcourse_set.all()
     context = {'course_name': course_name,
-               'parent_course': parent_course}
+               'parent_course': parent_course,
+               'subcourses': subcourses}
     try:
         subcourse = parent_course.subcourse_set.get(batch_no=batch_no)
         context['subcourse'] = subcourse

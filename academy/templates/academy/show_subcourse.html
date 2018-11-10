@@ -12,6 +12,16 @@ a{
 
 {% endblock %}
 {% block title %}{{ parent_course.name }} الدفعة {{subcourse.batch_no}}{% endblock %}
+{% block navbar %}
+    <li class="dropdown nav-item">
+              <a style="font-size:16px" href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">الدفعات</a>
+              <div class="dropdown-menu">
+              {% for course in subcourses %}
+                    <div class="text-center"><a href="{% url 'academy:show_subcourse' course_name course.batch_no %}" class="nav-link">الدفعة {{course.batch_no}}</a></div>
+              {% endfor %}
+              </div>
+          </li>
+{% endblock %}
 {% block content %}
 <div class="profile-page sidebar-collapse">
   <div class="page-header header-filter" data-parallax="true" style=" {% if parent_course.background %} background-image: url({{parent_course.background.url}}) {% endif %}; background-color:#000000" "></div>
@@ -37,21 +47,15 @@ a{
                         <div class="col-md">
                         <div class="counter">
                   <i class="fa fa-graduation-cap fa-2x"></i>
-                  <h2 class="timer count-title count-number" data-to="{{grad_list|length}}" data-speed="1500"></h2>
+                  <h2 class="timer count-title count-number" data-to="{{subcourse.course_graduates.count}}" data-speed="1500"></h2>
                    <p class="count-text ">خريج وخريجة</p>
-                </div>
                         </div>
-                          <div class="col-md">
-                           <div class="counter">
-                  <i class="fa fa-lightbulb-o fa-2x"></i>
-                  <h2 class="timer count-title count-number" data-to="{{subcourses.count}}" data-speed="1500"></h2>
-                  <p class="count-text ">دفعة</p>
-                </div>
-                          </div>
+                        </div>
+
                           <div class="col-md">
                               <div class="counter">
                   <i class="fa fa-users fa-2x"></i>
-                  <h2 class="timer count-title count-number" data-to="{{instruct_list|length}}" data-speed="1500"></h2>
+                  <h2 class="timer count-title count-number" data-to="{{subcourse.course_instructors.count}}" data-speed="1500"></h2>
                   <p class="count-text ">مقدم ومقدمة</p>
                 </div></div>
                           <div class="col-md">

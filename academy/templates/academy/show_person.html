@@ -19,8 +19,6 @@
         <div class="description text-right">
           <ul>
             <li>الخبرة: {{person.experience}}</li>
-            <li>حساب التويتر: {{person.twitter_account}}</li>
-            <li>حساب التلقرام: {{person.telegram_account}}</li>
             <li>المشاريع
               {% for work in person.work_set.all %}
                 <ul>

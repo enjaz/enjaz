@@ -66,7 +66,7 @@ a{
                           <div class="col-md">
                           <div class="counter">
                   <i class="fa fa-cogs fa-2x"></i>
-                  <h2 class="timer count-title count-number" data-to="{{total_ssions}}" data-speed="1500"></h2>
+                  <h2 class="timer count-title count-number" data-to="{{total_sessions}}" data-speed="1500"></h2>
                   <p class="count-text ">جلسة تدريبية</p>
                 </div>
             </div>
@@ -131,13 +131,19 @@ a{
         </div>
 
         <div class="row" id="instructor_list">
-        <div class="col-lg-4" align="right">
-            <ul>
-            {% for instructor in parent_course.course_instructors.all %}
+            {% for course in subcourses %}
+          <div class="col-lg-4" align="right">
+          <ul>
+            <li><a href="{% url 'academy:show_subcourse' course_name course.batch_no %}">الدورة {{course.batch_no}}</a>
+              <ul>
+              {% for instructor in course.course_instructors.all %}
                     <li><a href="{% url 'academy:show_person' 'instructor' instructor.pk %}">{{ instructor.user.common_profile.get_ar_short_name }}</a></li>
-            {% endfor %}
-            </ul>
-        </div>
+              {% endfor %}
+              </ul>
+            </li>
+          </ul>
+          </div>
+          {% endfor %}
         </div>
       </div>
       {% endif %}

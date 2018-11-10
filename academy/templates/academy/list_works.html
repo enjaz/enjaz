@@ -12,6 +12,16 @@ a{
 
 {% endblock %}
 {% block title %}مشاريع {{ parent_course.name }}{% endblock %}
+{% block navbar %}
+    <li class="dropdown nav-item">
+              <a style="font-size:16px" href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">الدفعات</a>
+              <div class="dropdown-menu">
+              {% for course in subcourses %}
+                    <div class="text-center"><a href="{% url 'academy:show_subcourse' course_name course.batch_no %}" class="nav-link">الدفعة {{course.batch_no}}</a></div>
+              {% endfor %}
+              </div>
+          </li>
+{% endblock %}
 {% block content %}
 <div class="profile-page sidebar-collapse">
   <div class="page-header header-filter" data-parallax="true" style=" {% if parent_course.background %} background-image: url({{parent_course.background.url}}) {% endif %}; background-color:#000000" "></div>

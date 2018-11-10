@@ -76,7 +76,7 @@ class SubCourse(models.Model):
     #         return None
 
 class Instructor(models.Model):
-    user = models.OneToOneField(User, verbose_name=u"المستخدمـ/ـة")
+    user = models.ForeignKey(User, verbose_name=u"المستخدمـ/ـة")
     experience = models.TextField(verbose_name='الخبرة', blank=True, null=True)
     course = models.ManyToManyField(SubCourse, verbose_name=u'الدورة',
                                     related_name='course_instructors')

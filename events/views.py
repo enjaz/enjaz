@@ -436,8 +436,9 @@ def handle_ajax(request):
                 raise Exception(u'سبق أن سجّلت!')
         else:
             timeslot = session.time_slot
-            if timeslot and not utils.has_remaining_sessions(request.user,timeslot):
-                raise Exception(u'وصلت الحد الأقصى للتسجيل!')
+            if timeslot:
+                if not utils.has_remaining_sessions(request.user, timeslot):
+                    raise Exception(u'وصلت الحد الأقصى للتسجيل!')
 
         if not session.limit is None and\
            not session.get_remaining_seats() > 0:
@@ -480,12 +481,16 @@ def handle_ajax(request):
             registration.is_deleted = True
 
     registration.save()
+    if time_slot:
 
-    return {'remaining_seats': session.get_remaining_seats(),
-            'status': registration.get_status(),
-            'remaining':utils.has_remaining_sessions(request.user,time_slot),
-            'registered':utils.is_registered(request.user, session)}
-
+        return {'remaining_seats': session.get_remaining_seats(),
+                'status': registration.get_status(),
+                'remaining':utils.has_remaining_sessions(request.user,time_slot),
+                'registered':utils.is_registered(request.user, session)}
+    else:
+        return {'remaining_seats': session.get_remaining_seats(),
+                'status': registration.get_status(),
+                'registered': utils.is_registered(request.user, session)}
 @login_required
 def list_registrations(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)

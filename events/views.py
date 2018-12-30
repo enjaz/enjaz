@@ -172,8 +172,8 @@ def list_abstracts(request, event_code_name):
                'evaluated_abstracts_regected': evaluated_abstracts_regected,
                'casereports': casereports,}
 
-    first_day = date(2018, 4, 18)
-    second_day = date(2018, 4, 19)
+    first_day = date(2018, 1, 16)
+    second_day = date(2018, 1, 17)
 
     if request.method == "POST":
         action = request.POST.get('action')
@@ -759,9 +759,9 @@ def evaluators_homepage(request,event_code_name):
                                                     event=event)\
                                             .exclude(evaluation__user=user_evaluations)\
                                             .distinct()
-    riyadh_evaluators = Team.objects.get(code_name='hpc3-r-e')
-    jeddah_evaluators = Team.objects.get(code_name='hpc3-j-e')
-    alahsa_evaluators = Team.objects.get(code_name='hpc3-a-e')
+    riyadh_evaluators = Team.objects.get(code_name='hpc2019-r-e')
+    jeddah_evaluators = Team.objects.get(code_name='hpc2019-j-e')
+    alahsa_evaluators = Team.objects.get(code_name='hpc2019-a-e')
     context = {'riyadh_evaluators': riyadh_evaluators,
                'jeddah_evaluators':jeddah_evaluators,
                'alahsa_evaluators':alahsa_evaluators,
@@ -1219,4 +1219,3 @@ def timeslot_info(request, event_code_name, pk):
               'is_session':False}
 
     return render(request, 'events/partials/session_info.html', context)
-

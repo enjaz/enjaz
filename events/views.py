@@ -172,8 +172,8 @@ def list_abstracts(request, event_code_name):
                'evaluated_abstracts_regected': evaluated_abstracts_regected,
                'casereports': casereports,}
 
-    first_day = date(2018, 1, 16)
-    second_day = date(2018, 1, 17)
+    first_day = date(2019, 1, 16)
+    second_day = date(2019, 1, 17)
 
     if request.method == "POST":
         action = request.POST.get('action')

@@ -166,9 +166,9 @@ class TimeSlot(models.Model):
 
     def __unicode__(self):
         if self.parent:
-            return u"%s (%s)" % (self.parent.name, self.name)
+            return u"%s/%s (%s)" % (self.parent.name, self.name, self.event)
         else:
-            return self.name
+            return u"%s (%s)" % (self.name, self.event)
 
 class SessionGroup(models.Model):
     event = models.ForeignKey(Event, null=True, blank=True)

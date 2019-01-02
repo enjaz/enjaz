@@ -17,6 +17,7 @@ from wkhtmltopdf.utils import render_pdf_from_template
 from .models import Event, SessionRegistration,Session, UserSurveyCategory,SurveyResponse
 import accounts.utils
 import clubs.utils
+from clubs.models import Team
 
 
 WKHTMLTOPDF_OPTIONS = {'margin-top': 10, 'margin-right': 10,
@@ -267,4 +268,9 @@ def known_user_category(user,event):
         return True
     else:
         return False
+
+def is_in_entry_team(user):
+    team = Team.objects.get(code_name='hpc-entry')
+    is_hpc_entry_team_member = team.members.filter(pk=user.pk).exists() or team.coordinator == user
+    return is_hpc_entry_team_member
 

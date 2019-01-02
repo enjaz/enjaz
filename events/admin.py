@@ -20,8 +20,30 @@ from core.utils import BASIC_SEARCH_FIELDS
 from events.models import Survey
 from . import models
 import events.forms
+from . import utils
+
+from django.contrib.admin.forms import AdminAuthenticationForm
+from clubs.models import Team
 
 
+class SessionsAuthenticationForm(AdminAuthenticationForm):
+    def confirm_login_allowed(self, user):
+        if not user.is_superuser and not\
+                user.is_active and not\
+                utils.is_in_entry_team(user):
+            raise forms.ValidationError(
+                self.error_messages['invalid_login'],
+                code='invalid_login',
+                params={'username': self.username_field.verbose_name}
+                )
+
+class SessionsAdminSite(admin.sites.AdminSite):
+
+    login_form = SessionsAuthenticationForm
+
+    def has_permission(self, request):
+        return utils.is_in_entry_team(request.user) or \
+               request.user.is_superuser
 
 
 def mark_deleted(modeladmin, request, queryset):
@@ -177,6 +199,23 @@ class SessionAdmin(admin.ModelAdmin):
     search_fields = ['name', 'event__official_name',
                      'event__english_name']
 
+    def has_module_permission(self, request, obj=None):
+        return utils.is_in_entry_team(request.user) or \
+               request.user.is_superuser
+
+    def has_change_permission(self, request, obj=None):
+        return utils.is_in_entry_team(request.user)  or \
+               request.user.is_superuser
+
+    def has_add_permission(self, request, obj=None):
+        return utils.is_in_entry_team(request.user) or \
+               request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return utils.is_in_entry_team(request.user)  or \
+               request.user.is_superuser
+
+
 
 class SessionRegistrationAdmin(admin.ModelAdmin):
     form = events.forms.SessionRegistrationAdminForm
@@ -271,6 +310,7 @@ class SurveyResponseAdmin(CertificateAdminPermission, ModelAdminReadOnly, admin.
     fields = []
     inlines = [SurveyAnswerInline]
 
+sessions_admin = SessionsAdminSite("Sessions Admin")
 
 admin.site.register(models.Event, EventAdmin)
 admin.site.register(models.Session, SessionAdmin)
@@ -291,3 +331,4 @@ admin.site.register(models.SurveyResponse, SurveyResponseAdmin)
 certificate_admin.register(models.Survey, SurveyAdmin)
 certificate_admin.register(models.SurveyResponse, SurveyResponseAdmin)
 admin.site.register(models.UserSurveyCategory)
+sessions_admin.register(models.Session , SessionAdmin)

@@ -16,6 +16,8 @@ from researchhub.forms import ResearchHubSignupForm
 from tedx.admin import tedx_admin
 from academy.urls import academy_forms_urls
 
+from events.admin import sessions_admin
+
 urlpatterns = [
     url(r'^', include('core.urls')),
 
@@ -33,7 +35,10 @@ urlpatterns = [
     url(r'^bulb/admin/', include(bulb_admin.urls)),
     url(r'^bulb/', include('bulb.urls', namespace="bulb")),
 
+    url(r'^events/admin/', include(sessions_admin.urls)),
     url(r'^events/', include('events.urls', namespace="events")),
+
+
     url(r'^hpc/', include('hpc.urls', namespace="hpc")),
 
     url(r'^researchhub/supervisors/signup/$', 'userena.views.signup', {'signup_form': ResearchHubSignupForm, 'template_name': 'researchhub/supervisor_signup_form.html'}, name="supervisor_signup"),

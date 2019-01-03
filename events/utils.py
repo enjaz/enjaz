@@ -165,8 +165,7 @@ def get_barcode(text):
 
 def get_user_sidebar_events(user):
     user_city = accounts.utils.get_user_city(user)
-    event_pool = Event.objects.filter(end_date__gte=timezone.now().date(),
-                                      session__isnull=False)
+    event_pool = Event.objects.filter(registration_opening_date__lte=timezone.now(),registration_closing_date__gte=timezone.now(),end_date__gte=timezone.now().date(),session__isnull=False)
     if user_city:
         events = event_pool.filter(city=user_city) | \
                  event_pool.filter(city="")

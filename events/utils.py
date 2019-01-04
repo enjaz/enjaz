@@ -246,12 +246,9 @@ def has_remaining_sessions(user, timeslot):
         elif user_sessions == timeslot.parent.limit:
             return False
     else:
-        user_sessions = user.session_registrations.filter(session__time_slot=timeslot, is_deleted=False).count()
-        # if there is no limit assume the limit is one. (debatable)
-        if user_sessions < 1:
-            return True
-        elif user_sessions == 1:
-            return False
+        # if there is no limit assume there is no limit.
+        return True
+
 
 def get_timeslot_limit(timeslot):
 

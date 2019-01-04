@@ -390,7 +390,10 @@ def list_sessions(request, event_code_name, pk):
                'remaining_number':remaining_number,
                'limit':limit}
 
-    if event.registration_opening_date and timezone.now() < event.registration_opening_date:
+    if event.registration_opening_date and timezone.now() < event.registration_opening_date and \
+        not request.user.is_superuser and \
+        not utils.is_organizing_team_member(request.user, event) and \
+        not utils.is_in_entry_team(request.user):
         raise Http404
     elif event.registration_closing_date and timezone.now() > event.registration_closing_date:
         return HttpResponseRedirect(reverse('events:registration_closed',

@@ -62,8 +62,12 @@
   			</tr>
         {%  if abstract.status == 'A' %}
         <tr>
-            <th class="text-center">Accepted Presentation </th>
+            <th class="text-center">Accepted Presentation</th>
             <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
+        </tr>
+        <tr>
+            <th class="text-center">Presentation Date</th>
+            <td>{{ abstract.presentaion_date|date:"Y-n-j" }}</td>
         </tr>
         {% endif %}
         {% if abstract.figures.exists  %}

@@ -1,0 +1,10 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}{% load bootstrap3 %}{% load events_tags %} {% block title %}{{ booths.event.english_name }}: Booth list{% endblock %} {% block content %}
+
+<form role="form" method="post" style="color:black">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <h6 style="color: red;">لاتستطيع التعديل على التصويت</h6>
+        <button class="btn btn-success" type="submit" value="" style="margin-top: 5px;">صوّت</button>
+</form>
+<br>
+{% endblock %}

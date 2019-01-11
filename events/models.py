@@ -780,3 +780,23 @@ class SurveyAnswer(models.Model):
     def __unicode__(self):
         return u"{}'s answer to {}".format(self.survey_response.user.username, self.question.text)
 
+class Booth(models.Model):
+    event = models.ForeignKey(Event, verbose_name="الحدث")
+    name = models.CharField(u"اسم الركن", max_length=100)
+
+    def get_voter_count(self):
+        return Vote.objects.filter(booth=self, is_deleted=False).count()
+
+    def __unicode__(self):
+        return self.name
+
+
+class Vote(models.Model):
+    submitter = models.ForeignKey(User, null=True, blank=True,
+                             verbose_name='اسم المصوت', related_name='event_booth_voter')
+    booth = models.ForeignKey(Booth, verbose_name="اسم الركن")
+    submission_date = models.DateTimeField(u"تاريخ التصويت", auto_now_add=True)
+    is_deleted = models.BooleanField(u"محذوف؟", default=False)
+
+    def __unicode__(self):
+        return u"{}'s vote to {}".format(self.submitter.username, self.booth.name)

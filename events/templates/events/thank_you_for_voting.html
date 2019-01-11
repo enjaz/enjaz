@@ -1,0 +1,15 @@
+{% extends 'events_submission_base.html' %}{% load staticfiles %}
+{% block meta_description %}{{ event.english_name }} Thank You!{% endblock %}
+{% block title %}Thank You!{% endblock %}
+
+{% block content %}
+<div class="form-register-success visible english-field">
+	<i class="entypo-info"></i>
+	<h3 style="text-align: center;">Thank You!</h3>
+    <p style="text-align: center;">We recived your vote</p>
+</div>
+{% endblock %}
+
+{% block customscript %}
+<script src="{% static 'neon/assets/js/neon-register.js' %}?v=0001"></script>
+{% endblock %}

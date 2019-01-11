@@ -21,7 +21,7 @@ from .models import Event, Session, Abstract, AbstractFigure,\
                           Evaluation, TimeSlot,\
                           SessionRegistration, Initiative,\
                           SessionGroup,CaseReport, Attendance,\
-                          QuestionSession, Question, Survey,SurveyResponse,UserSurveyCategory
+                          QuestionSession, Question, Survey,SurveyResponse,UserSurveyCategory, Booth, Vote
 from . import utils, forms
 import core.utils
 import clubs.utils
@@ -1222,3 +1222,26 @@ def timeslot_info(request, event_code_name, pk):
               'is_session':False}
 
     return render(request, 'events/partials/session_info.html', context)
+
+@login_required
+def list_booths(request, event_code_name):
+    event = get_object_or_404(Event, code_name=event_code_name)
+    booths = Booth.objects.filter(event=event)
+
+    previous_vote = Vote.objects.filter(submitter=request.user, booth__event=event)
+
+    if previous_vote:
+        return render(request, 'events/thank_you_for_voting.html', {'event': event})
+
+    if request.method == "POST":
+        instance = Vote(submitter=request.user)
+        form = forms.BoothVoteForm(request.POST, instance=instance)
+        if form.is_valid():
+            vote = form.save()
+            return render(request, 'events/thank_you_for_voting.html', {'event': event})
+
+    elif request.method == "GET":
+        form = forms.BoothVoteForm()
+
+        context = {'event': event, 'booths':booths, 'form': form}
+        return render(request, 'events/list_booths.html', context)

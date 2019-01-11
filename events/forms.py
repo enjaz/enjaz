@@ -10,7 +10,7 @@ from .models import NonUser, Session, Registration, Abstract, \
     AbstractFigure, Initiative, InitiativeFigure, \
     Criterion, CriterionValue, Evaluation,CaseReport, \
     AbstractPoster, Attendance, Question, SurveyQuestion, \
-    SurveyResponse, SurveyAnswer, SessionRegistration,AbstractAuthor,UserSurveyCategory
+    SurveyResponse, SurveyAnswer, SessionRegistration,AbstractAuthor,UserSurveyCategory, Vote
 from django.forms.models import inlineformset_factory
 
 class NonUserForm(forms.ModelForm):
@@ -201,6 +201,11 @@ class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
         fields = ['text']
+
+class BoothVoteForm(forms.ModelForm):
+    class Meta:
+        model = Vote
+        fields = ['booth']
 
 
 class SurveyForm(forms.Form):

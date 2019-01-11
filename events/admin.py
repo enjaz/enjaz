@@ -231,6 +231,11 @@ class QustionSessionAdmin(admin.ModelAdmin):
     list_filter = ['event']
     inlines = [QuestionInline]
 
+class VoteAdmin(admin.ModelAdmin):
+    list_filter = ['event']
+    list_display = ['name', 'event', 'get_voter_count']
+    search_fields = ['name', 'event__official_name',
+                     'event__english_name']
 
 class SurveyAdmin(CertificateAdminPermission, admin.ModelAdmin):
     search_fields = ['name', 'mandatory_sessions__event__official_name',
@@ -332,3 +337,5 @@ certificate_admin.register(models.Survey, SurveyAdmin)
 certificate_admin.register(models.SurveyResponse, SurveyResponseAdmin)
 admin.site.register(models.UserSurveyCategory)
 sessions_admin.register(models.Session , SessionAdmin)
+admin.site.register(models.Booth, VoteAdmin)
+admin.site.register(models.Vote)

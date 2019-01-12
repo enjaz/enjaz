@@ -57,7 +57,7 @@
 	<div class="wrapper">
 		<img src='https://barcode.tec-it.com/barcode.ashx?data={{ text }}&code=Code128&dpi=96&dataseparator=' alt='Barcode Generator TEC-IT'/>
 	</div>
-	<p id="name"><span id="id">{{ text }}</span><br>{{ barcode_user.common_profile.get_en_short_name|default:barcode_user.username }}</p>
+	<p id="name"><!--<span id="id">{{ text }}</span> --><br>{{ barcode_user.common_profile.get_en_short_name|default:barcode_user.username }}</p>
 </body>
 
 </html>

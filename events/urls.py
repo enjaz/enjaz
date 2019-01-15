@@ -13,6 +13,7 @@ urlpatterns = patterns('',
     url(r'^(?P<event_code_name>[\d\w_\-]+)/barcode/(?P<user_pk>\d+)/download$', views.download_barcode_pdf, name="download_barcode_pdf_privileged"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/barcode/(?P<user_pk>\d+)/$', views.show_barcode, name="show_barcode_privileged"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/attendance/(?P<user_pk>\d+)/$', views.list_attendance,name="list_attendance"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<session_pk>\d+)/attendance/$', views.list_session_attendance,name="list_session_attendance"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/barcode_list/$', views.list_barcodes, name="list_barcodes"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/$', views.redirect_home, name="redirect_home"),
     #URL already puplished (to be changed after the end of hpc2)

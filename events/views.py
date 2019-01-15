@@ -1204,6 +1204,21 @@ def list_attendance(request, event_code_name,user_pk=None):
 
     return render(request, 'events/list_attendance.html', context)
 
+@login_required
+def list_session_attendance(request, event_code_name,session_pk=None):
+
+    event = get_object_or_404(Event, code_name=event_code_name,
+                                  has_attendance = True)
+    session = get_object_or_404(Session, pk=session_pk)
+
+    if not request.user.is_superuser and not utils.is_organizing_team_member(request.user,event):
+        raise PermissionDenied
+
+    attendances = Attendance.objects.filter(session_registration__session=session)
+
+    context ={'event':event,'session':session,'attendances':attendances}
+
+    return render(request, 'events/list_attendance.html', context)
 
 def session_info(request, event_code_name, pk):
 
@@ -1227,6 +1242,7 @@ def timeslot_info(request, event_code_name, pk):
 def list_booths(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name)
     booths = Booth.objects.filter(event=event)
+    booths_list = list(booths)
 
     previous_vote = Vote.objects.filter(submitter=request.user, booth__event=event)
 
@@ -1243,5 +1259,5 @@ def list_booths(request, event_code_name):
     elif request.method == "GET":
         form = forms.BoothVoteForm()
 
-        context = {'event': event, 'booths':booths, 'form': form}
+        context = {'event': event, 'booths':booths, 'form': form,'booths_list':booths_list}
         return render(request, 'events/list_booths.html', context)

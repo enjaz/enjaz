@@ -22,7 +22,7 @@
     {% for attendance in attendances %}
         <tr>
             {% if session  %}
-            {{ attendance.session_registration.user.common_profile.get_ar_full_name|default:barcode_user.username }}
+            {{ attendance.session_registration.user.common_profile.get_ar_full_name|default: attendance.session_registration.username }}
             {% else %}
             <td>{{ attendance.session_registration.session.name }}</td>
             {% endif %}

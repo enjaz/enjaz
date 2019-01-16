@@ -8,7 +8,11 @@
 <table id="users" class="display datatable db-responsive">
     <thead>
         <tr>
+            {% if session  %}
+                الاسم
+            {% else %}
             <th>اسم الجلسة</th>
+            {% endif %}
             <th>نوع التحضير</th>
             <th>وقت التحضير</th>
             <th>الشخص الذي حضر</th>
@@ -17,7 +21,11 @@
     <tbody>
     {% for attendance in attendances %}
         <tr>
+            {% if session  %}
+            {{ attendance.session_registration.user.common_profile.get_ar_full_name|default:barcode_user.username }}
+            {% else %}
             <td>{{ attendance.session_registration.session.name }}</td>
+            {% endif %}
             <td>{{ attendance.get_category_display }}</td>
             <td>{{ attendance.date_submitted }}</td>
             <td>{{ attendance.submitter.common_profile.get_ar_short_name|default:attendance.submitter.username }}</td>

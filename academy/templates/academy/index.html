@@ -48,7 +48,6 @@
 
 {% block content %}
 
-
 <div class="page-header header-filter" data-parallax="true" style="background-image: url({{bg.img.url}})">
   <div class="container">
     <div class="row">
@@ -94,12 +93,21 @@
         {% endif %}
         <div id="{{name}}" onclick="location.href='{% url 'academy:show' name %}';" style="cursor: pointer;">
         <div class="icon-{{name}}" style="font-size:80px"></div>
-        <h4>{{ course.name }}</h4>
+        {% for parent_course, latest_subcourse in latest_subcourses.items %}
+            {% if parent_course == course %}
+                {% if latest_subcourse != '' %}
+                    <h4>{{ latest_subcourse.official_name }}</h4>
+                {% else %}
+                    <h4>{{ parent_course.name }}</h4>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
         </div>
         {% endif %}{% endfor %}
     </div>{% endfor %}
 </div></div>
 {% endblock %}
+
 
 {% block customscript %}
 <script>

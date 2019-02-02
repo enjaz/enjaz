@@ -106,6 +106,7 @@ TEMPLATES = [
                 'social.apps.django_app.context_processors.login_redirect',
                 'academy.context_processors.parent_courses',
                 'academy.context_processors.academy_codes',
+                'academy.context_processors.workshops',
             ],
         },
     },

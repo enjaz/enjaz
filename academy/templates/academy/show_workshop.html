@@ -1,0 +1,184 @@
+{% extends 'academy/base.html' %}{% load staticfiles %}
+{% block style %}
+.header-filter::before {
+    background: rgba(0, 0, 0, 0);
+}
+a{
+    color: #3C4858;
+}
+.nav-item:hover,a:hover{
+    color: {{workshop.hex_colour}};
+}
+
+{% endblock %}
+{% block title %}{{ workshop.name }}{% endblock %}
+
+{% block content %}
+    <div class="profile-page sidebar-collapse">
+  <div class="page-header header-filter" data-parallax="true" style=" {% if workshop.background %} background-image: url({{workshop.background.url}}) {% endif %}; background-color:#000000" "></div>
+  <div class="main main-raised">
+    <div class="profile-content">
+        <div class="description text-center">
+ <h2 style="padding-top: 30px; padding-bottom: 50px" align="center">{{workshop.name}}</h2>
+        <div class="container" id="dynamic_info">
+        <div class="row">
+        <div align="right">
+        <div class="row" style="padding-bottom: 30px">
+        <div class="col-sm-6">
+                {% for instructor in workshop.workshop_instructors.all %}
+                <h4>المقدمـ/ـة: {{ instructor.user.common_profile.get_ar_short_name}}</h4>
+                {% endfor %}
+        </div>
+        <div class="col-sm-6" align="left">
+                {% if workshop.attend_count %}
+                <h4> الحضور: {{ workshop.attend_count }}</h4>
+                {% endif %}
+        </div>
+        </div>
+            <div class="description text-center">
+                    <h4>{{ workshop.description }}</h4>
+                        <p>{{ work.long_description|linebreaksbr }}</p>
+                        <div class="col-sm-12">
+                            <a href="{{attachment.file.url}}"><img src="{{attachment.file.url}}" width="100%" style="padding:30px"></a>
+                        </div>
+                        <img src="{{work.attachment.file.url}}">
+
+        </div>
+
+
+
+      </div>
+
+<br><br>
+{% if workshop.plan %}
+                <li class="nav-item">
+                    <i class="material-icons" style="font-size:2em">description</i>
+                    <a  class="nav-link" href="{{ workshop.plan.url }}">
+                        الخطة
+                    </a>
+                </li>
+{% endif %}
+{% if workshop.reg_is_open %}
+                <li class="nav-item">
+                    <i class="material-icons" style="font-size:2em">add_circle</i>
+{#                    <a  class="nav-link" href="{% url 'academy:register' workshop.pk %}">#}
+                        التسجيل
+                    </a>
+                </li>
+{% endif %}
+              </ul>
+          </div>
+</div>
+          </div>
+
+      </div>
+      </div>
+
+
+        </div>
+        </div>
+    </div>
+{% endblock %}
+{% block customscript %}
+<script>
+<!--Counter-->
+$(document).ready(function ($) {
+	$.fn.countTo = function (options) {
+		options = options || {};
+
+		return $(this).each(function () {
+			// set options for current element
+			var settings = $.extend({}, $.fn.countTo.defaults, {
+				from:            $(this).data('from'),
+				to:              $(this).data('to'),
+				speed:           $(this).data('speed'),
+				refreshInterval: $(this).data('refresh-interval'),
+				decimals:        $(this).data('decimals')
+			}, options);
+
+			// how many times to update the value, and how much to increment the value on each update
+			var loops = Math.ceil(settings.speed / settings.refreshInterval),
+				increment = (settings.to - settings.from) / loops;
+
+			// references & variables that will change with each update
+			var self = this,
+				$self = $(this),
+				loopCount = 0,
+				value = settings.from,
+				data = $self.data('countTo') || {};
+
+			$self.data('countTo', data);
+
+			// if an existing interval can be found, clear it first
+			if (data.interval) {
+				clearInterval(data.interval);
+			}
+			data.interval = setInterval(updateTimer, settings.refreshInterval);
+
+			// initialize the element with the starting value
+			render(value);
+
+			function updateTimer() {
+				value += increment;
+				loopCount++;
+
+				render(value);
+
+				if (typeof(settings.onUpdate) == 'function') {
+					settings.onUpdate.call(self, value);
+				}
+
+				if (loopCount >= loops) {
+					// remove the interval
+					$self.removeData('countTo');
+					clearInterval(data.interval);
+					value = settings.to;
+
+					if (typeof(settings.onComplete) == 'function') {
+						settings.onComplete.call(self, value);
+					}
+				}
+			}
+
+			function render(value) {
+				var formattedValue = settings.formatter.call(self, value, settings);
+				$self.html(formattedValue);
+			}
+		});
+	};
+
+	$.fn.countTo.defaults = {
+		from: 0,               // the number the element should start at
+		to: 0,                 // the number the element should end at
+		speed: 1000,           // how long it should take to count between the target numbers
+		refreshInterval: 100,  // how often the element should be updated
+		decimals: 0,           // the number of decimal places to show
+		formatter: formatter,  // handler for formatting the value before rendering
+		onUpdate: null,        // callback method for every time the element is updated
+		onComplete: null       // callback method for when the element finishes updating
+	};
+
+	function formatter(value, settings) {
+		return value.toFixed(settings.decimals);
+	}
+}(jQuery));
+
+jQuery(function ($) {
+  // custom formatting example
+  $('.count-number').data('countToOptions', {
+	formatter: function (value, options) {
+	  return value.toFixed(options.decimals).replace(/\B(?=(?:\d{3})+(?!\d))/g, ',');
+	}
+  });
+
+  // start all the timers
+  $('.timer').each(count);
+
+  function count(options) {
+	var $this = $(this);
+	options = $.extend({}, options || {}, $this.data('countToOptions') || {});
+	$this.countTo(options);
+  }
+});
+</script>
+{% endblock %}

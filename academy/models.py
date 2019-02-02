@@ -35,6 +35,7 @@ class Course(models.Model):
         return self.name
 
 class SubCourse(models.Model):
+    official_name = models.CharField(u'الاسم الرسمي', max_length=200,  null=True, blank=True)
     parent_course = models.ForeignKey(Course, verbose_name=u"الدورة الأب")
     plan = models.FileField(u"ملف الخطة", null=True, blank=True)
     session_count = models.IntegerField(u'عدد الجلسات', null=True, blank=True)
@@ -75,11 +76,28 @@ class SubCourse(models.Model):
     #     else:
     #         return None
 
+class Workshop(models.Model):
+    name = models.CharField(u'الاسم', max_length=200)
+    description = models.TextField(u'الوصف', null=True, blank=True)
+    plan = models.FileField(u"ملف الخطة", null=True, blank=True)
+    attend_count = models.IntegerField(u'عدد الحضور', null=True, blank=True)
+    background = models.FileField(u'الصورة الخلفية', null=True, blank=True)
+    hex_colour = models.CharField(u'لون الثيم بصيغة hex', max_length=7, null=True, blank=True)
+
+    class Meta:
+        verbose_name = u"ورشة عمل"
+        verbose_name_plural = u"ورش العمل"
+
+    def __unicode__(self):
+        return self.name
+
 class Instructor(models.Model):
     user = models.ForeignKey(User, verbose_name=u"المستخدمـ/ـة")
     experience = models.TextField(verbose_name='الخبرة', blank=True, null=True)
     course = models.ManyToManyField(SubCourse, verbose_name=u'الدورة',
-                                    related_name='course_instructors')
+                                    related_name='course_instructors', blank=True)
+    workshop = models.ManyToManyField(Workshop, verbose_name=u'ورشة العمل',
+                                    related_name='workshop_instructors', blank=True)
     twitter_account = models.CharField(verbose_name='حساب التويتر',
                                        max_length=200, null=True, blank=True)
     telegram_account = models.CharField(verbose_name='حساب التلقرام',
@@ -111,7 +129,8 @@ class Graduate(models.Model):
 
 class Media_File(models.Model):
     subcourse = models.ForeignKey(SubCourse, verbose_name=u"الدورة التابعة",
-                                  related_name='subcourse_media')
+                                  related_name='subcourse_media',
+                                  blank=True, null=True)
     file = models.FileField(verbose_name=u'الملف',
                                      upload_to="academy/photos_n_projects",
                                      blank=True, null=True)

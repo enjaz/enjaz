@@ -6,3 +6,6 @@ def parent_courses(request):
 
 def academy_codes(request):
     return {'course_codes': course_codes}
+
+def workshops(request):
+    return {'workshops': Workshop.objects.all()}

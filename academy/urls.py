@@ -10,6 +10,9 @@ urlpatterns = [
     url(r'^about/$',
         TemplateView.as_view(template_name='academy/about.html'),
         name='about'),
+    url(r'^FAQ/$',
+        TemplateView.as_view(template_name='academy/FAQ.html'),
+        name='FAQ'),
     url(r'^(?P<course_name>\w+)/$',views.show_course, name='show'),
     url(r'^(?P<course_name>\w+)/register/$',views.register_for_course,
         name='register'),
@@ -17,6 +20,8 @@ urlpatterns = [
         name='list_works'),
     url(r'^(?P<course_name>\w+)/batch(?P<batch_no>\d+)/$',
         views.show_subcourse, name='show_subcourse'),
+    url(r'^workshop/(?P<workshop_id>\d+)/$',
+        views.show_workshop, name='show_workshop'),
 
 ]
 

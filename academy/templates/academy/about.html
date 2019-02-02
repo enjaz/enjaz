@@ -1,6 +1,9 @@
 {% extends 'academy/base.html' %}{% load staticfiles %}
 {% block title %}عن الأكاديمية{% endblock %}
 {% block style %}
+    p{
+        color: #30687F };
+
 {% endblock %}
 {% block content %}
 
@@ -11,27 +14,108 @@
       <div class="container">
         <div class="description text-center">
             <div class="container" align="right">
-            <div id="header">
-                <h2>عن الأكاديمية وأسئلة شائعة</h2>
+            <div id="header" align="center">
+                <h2 style="color: #48B382">أكاديمية نادي الطلاب</h2>
             </div>
-            <h4>أسئلة شائعة</h4>
-            <ul>
-                <li>متى تأسست الأكاديمية؟ ولماذا؟ </li>
-                تأسست الأكاديمية في العام الدراسي ٢٠١٥-٢٠١٦، كتلبية لحاجة النادي لطلاب وطالبات مهرة في مجالات تقنيّة مختلفة، بدأت الدورة بدورتي التصميم والبرمجة، ثم توسّعت في الأعوام التالية لتقدم ٦ دورات مختلفة. تهدف الأكاديميّة لتمكين الطلاب والطالبات وتنمية مهاراتهم، ثم استثمارها في مشاريع حقيقية داخل نادي الطلاب والجامعة وخارجها.
-                <li>من يقدم هذه الدورات التي تطرحها الأكاديميّة؟</li>
-                <li>من يمكنه التسجيل بالدورات التي تقدمها الأكاديميّة؟</li>
-                يمكن لجميع طلاب وطالبات الجامعة التسجيل في الدورات.
-                <li>متى يمكن التسجيل في الدورات؟</li>
-                تطرح كل دورة مواعيد التسجيل بشكل مستقل عن الدورات الأخرى، لاختلاف مدّة الدورات والتنسيق المطلوب لإقامتها. لذا فكل دورة لها مواعيد مختلفة يمكن من خلالها التسجيل فيها، يمكن متابعة حساب نادي الطلاب عبر تويتر وتيليغرام لمعرفة مواعيد التسجيل في كل دورة.
-                <li>كيف يمكنني التسجيل في الدورات؟ </li>
-                يمكن التسجيل عن طريق رابط التسجيل لكل دورة في صفحة الأكاديمية في إنجاز.
-                <li>كيف يمكنني التعرف على محتوى الدورة؟ </li>
-                هناك ملف مفصّل لمحتويات كل دورة، يمكن تحميله عن طريق صفحات الدورات والتعرف أكثر على كل دورة.
-                <li>هل هناك تكاليف للتسجيل في الدورات؟</li>
-                لا! تقدم جميع الدورات بالمجّان وبدون تكاليف.
-                <li>هل هناك وسيلة للتواصل معكم؟</li>
-                نعم، يمكنك التواصل معنا عبر البريد الالكتروني، وكذلك عبر تطبيق تيليغرام.
-            </ul>
+
+            <p>
+                <br><br>
+                تأسست أكاديميّة نادي الطلاب عام 2016/2015 وتهدف بشكل أساسي لتقدّيم الفرصة للطلاب والطالبات لتنمية مهاراتهم ومواهبهم، وذلك عبر انخراطهم في دورات مختلفة يقدمها نخبة من الطلاب والطالبات في نادي الطلاب، تستمر هذه الدورات لعدة أسابيع، ويتم فيها تدريب الطلبة بشكل مكثّف ليحصلوا على المهارات التي تأهلهم لخوض وممارسة المهارة التي حصلو عليها..
+                <br><br>
+                بدأت الأكاديمية بتقديم دورتين, دورة أساسيات الفوتوشوب و دورة البرمجة, وذلك على يد مؤسسيها: فهد القباع, أسامة خالد, وسعيد عرابي. واستمرت على ذلك لمدة عامين, وفي العام الثالث للأكاديمة وعلى يد قائدها فهد القباع, توسعت الأكاديمية لتقدم 4 دورات: أساسيات الفوتوشوب, البرمجة, الكتابة المسرحية, و المونتاج.
+            </p>
+
+            <div class="row text-center">
+                <div class="col-sm-4"><img height="350px" src="{% static 'academy/images/structure/فهد القباع.png' %}"></div>
+                <div class="col-sm-4"><img height="350px" src="{% static 'academy/images/structure/أسامة خالد.png' %}"></div>
+                <div class="col-sm-4"><img height="350px" src="{% static 'academy/images/structure/سعيد عرابي.png' %}"></div>
+            </div>
+
+            <p>
+                وفي هذا العام 2019/2018 تم اعتماد الأكاديمية رسمياً لتنضم إلى اللائحة التنظيمية لبرامج عمادة شؤؤون الطلاب بقيادة نواف الغامدي. ستقدم الأكاديمية هذا العام 5 دورات: أسياسيات الفوتوشوب و التصميم الجرافيكي, أساسيات برمجة المواقع, أساسيات التصوير, أساسيات التصوير السينمائي و المونتاج, و كتابة وصناعة المحتوى. كما نطمح لتقديم ورش عمل متنوعة تشتمل على: التصوير بالسناب شات, فويس اوفر, الحملات… وغيرها
+            </p>
+
+            <div class="row text-center">
+                <div class="col-sm-12"><img height="350px" src="{% static 'academy/images/structure/نواف_الغامدي.png' %}"></div>
+            </div>
+
+            </div>
+
+
+            <div align="center">
+                <h2 style="color: #48B382">هيكلة أكاديمية نادي الطلاب 2019 / 2018</h2>
+            </div>
+
+            <div class="row text-center">
+                <div class="col-sm-4"><img height="200px" src="{% static 'academy/images/structure/غادة الدهيمي.png' %}"></div>
+                <div class="col-sm-4"><img height="200px" src="{% static 'academy/images/structure/عبدالرحمن القميزي.png' %}"></div>
+                <div class="col-sm-4"><img height="200px" src="{% static 'academy/images/structure/صالحة الخيري.png' %}"></div>
+            </div>
+            <div class="row text-center">
+                <div class="col-sm-3"><img height="200px" src="{% static 'academy/images/structure/لمياء الجهني.png' %}"></div>
+                <div class="col-sm-5"><img height="250px" style="padding-right:30px" src="{% static 'academy/images/structure/نواف الغامدي 2.png' %}"></div>
+                <div class="col-sm-3"><img height="200px" src="{% static 'academy/images/structure/مشعل الغانم.png' %}"></div>
+            </div>
+            <div class="row text-center">
+                <div class="col-sm-4"><img height="200px" src="{% static 'academy/images/structure/زياد الجعفري.png' %}"></div>
+                <div class="col-sm-4"><img height="200px" src="{% static 'academy/images/structure/غزلان آل مفرح.png' %}"></div>
+                <div class="col-sm-4"><img height="200px" src="{% static 'academy/images/structure/عيسى المطيري.png' %}"></div>
+            </div>
+
+            <div align="center">
+                <h2 style="color: #48B382">دورات أكاديمية نادي الطلاب 2019 / 2018</h2>
+            </div>
+            <div class="row text-center" style="margin-right: -55px; margin-left: -125px;">
+                <div class="col-sm-2 col-centered" style="padding:30px"><img height="100px" src="{% static 'academy/images/coloured course logo/Programming.svg' %}">
+                <br><div style="padding-left: 45px; width:150px; color:rgb(85,202,181)"> أساسيات برمجة المواقع</div></div>
+                <div class="photoshop col-sm-2 col-centered" style="padding:30px"><img height="100px" src="{% static 'academy/images/coloured course logo/Photoshop.svg' %}">
+                <br><div style="padding-left: 45px; width:150px; color:rgb(112,63,150)">أساسيات الفوتوشوب و التصميم الجرافيكي</div></div>
+                <div class="video col-sm-2 col-centered" style="padding:30px"><img height="100px" src="{% static 'academy/images/coloured course logo/Video Editing.svg' %}">
+                <br><div style="padding-left: 30px; width:150px; color:rgb(231,113,1)">أساسيات التصوير السينمائي و المونتاج</div></div>
+                <div class="writing col-sm-2 col-centered" style="padding:30px"><img height="100px" src="{% static 'academy/images/coloured course logo/Writing.svg' %}">
+                <br><div style="padding-left: 30px; width:150px; color:rgb(2,194,229)">الكتابة وصناعة المحتوى</div></div>
+                <div class="photography col-sm-2 col-centered" style="padding:30px"><img height="100px" src="{% static 'academy/images/coloured course logo/Photography.svg' %}">
+                <br><div style="padding-right: 23px; color:rgb(176,130,131)">أساسيات التصوير</div></div>
+            </div>
+
+            <div align="center">
+                <h2 style="color: #48B382">مقدمو الدورات</h2>
+            </div>
+            <div class="row text-center">
+                <div class="col-sm-2 col-centered" style="padding-top:30px; padding-bottom: 30px">
+                    <div style="padding-left: 113px; width:200px; color:rgb(85,202,181">
+                        صالحة الخيري<br>
+                        زها الجمعان<br>
+                        عبد الرحمن القميزي<br>
+                        نورا السبيعي
+                    </div>
+                </div>
+                <div class="col-sm-2 col-centered" style="padding:30px">
+                    <div style="padding-left: 115px; width:200px; color:rgb(112,63,150)">
+                        عبد الرحمن القميزي<br>
+                        عبد الإله العليوه<br>
+                        نواف الغامدي
+                    </div>
+                </div>
+                <div class="col-sm-2 col-centered" style="padding:30px">
+                    <div style="padding-left: 20px; width:150px; color:rgb(231,113,1)">
+                        سليمان التويجري<br>
+                        ملك الشبل
+                    </div>
+                </div>
+                <div class="col-sm-2 col-centered" style="padding:30px">
+                    <div style="padding-right: 40px; width:150px; color:rgb(2,194,229)">
+                        عبد الكريم الحربي<br>
+                        رائد الأحمري
+                    </div>
+                </div>
+                <div class="col-sm-2 col-centered" style="padding:30px">
+                    <div style="padding-right: 67px; width:150px; color:rgb(176,130,131)">
+                        عبد الرحمن الجريسي
+                    </div>
+                </div>
+            </div>
+
         </div>
         </div>
       </div>

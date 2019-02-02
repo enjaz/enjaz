@@ -146,8 +146,20 @@ element.style {
               </div>
           </li>
           {% block navbar %}{% endblock %}
-          <li class="nav-item">
-              <a style="font-size:16px" href="{% url 'academy:about' %}" class="nav-link" ">عن الأكاديمية</a>
+          <li class="dropdown nav-item">
+              <a style="font-size:16px" href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">ورش العمل</a>
+              <div class="dropdown-menu">
+              {% for workshop in workshops %}
+                <div class="text-center"><a href="{% url 'academy:show_workshop' workshop.pk %}" class="nav-link">{{ workshop.name }}</a></div>
+              {% endfor %}
+              </div>
+          </li>
+          <li class="dropdown nav-item">
+              <a style="font-size:16px" href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">عن الأكاديمية</a>
+              <div class="dropdown-menu">
+                <div class="text-center"><a href="{% url 'academy:about' %}" class="nav-link">عن الأكاديمية</a></div>
+                  <div class="text-center"><a href="{% url 'academy:FAQ' %}" class="nav-link">أسئلة شائعة</a></div>
+              </div>
           </li>
           <li class="nav-item">
             <a style="font-size:16px" class="nav-link" href="{% url 'home' %}">

@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 
-from models import Course, Instructor, Graduate, IndexBG, Work, Temporary_Stats
+from models import Course, Instructor, Graduate, IndexBG, Work, Temporary_Stats, Workshop
 
 course_codes = (
     ('PR', 'programming'),
@@ -18,6 +18,7 @@ course_codes = (
 
 def count_stats(request):
     parent_courses = Course.objects.all()
+    workshops = Workshop.objects.all()
     all_graduates = []
     all_instructors = []
     all_sessions = 0
@@ -33,7 +34,7 @@ def count_stats(request):
             for inst in instructors:
                 all_instructors.append(inst)
 
-    return(parent_courses, all_graduates, all_instructors, all_sessions)
+    return(parent_courses, all_graduates, all_instructors, all_sessions, workshops)
 
 def index(request):
     courses = Course.objects.all()
@@ -41,14 +42,28 @@ def index(request):
         bg = IndexBG.objects.all().latest('pk')
     except ObjectDoesNotExist:
         bg = ''
-    parent_courses, all_graduates, all_instructors, all_sessions = count_stats(request)
+    parent_courses, all_graduates, all_instructors, all_sessions, workshops = count_stats(request)
+    latest_subcourses = {}
+    for parent_course in courses:
+        if parent_course.subcourse_set.all().exists():
+            latest_subcourse = parent_course.subcourse_set.latest('reg_open_date')
+            latest_subcourses[parent_course] = latest_subcourse
+        else:
+            latest_subcourses[parent_course] = ''
+        # try:
+        #     latest_subcourse = parent_course.subcourse_set.latest('reg_open_date')
+        #     latest_subcourses[parent_course] = latest_subcourse
+        # except ObjectDoesNotExist:
+        #     continue
     context = {'courses': courses,
                'course_codes': course_codes,
+               'workshops': workshops,
                'bg': bg,
                'parent_courses': parent_courses,
                'all_graduates': all_graduates,
                'all_instructors': all_instructors,
                'all_sessions': all_sessions,
+               'latest_subcourses': latest_subcourses,
                }
 
     return render(request, 'academy/index.html', context)
@@ -108,6 +123,11 @@ def show_subcourse(request, course_name, batch_no):
 
 def list_graduates(request):
      pass
+
+def show_workshop(request, workshop_id):
+    workshop = get_object_or_404(Workshop, pk=workshop_id)
+    context = {'workshop': workshop}
+    return render(request, 'academy/show_workshop.html', context)
 
 def show_person(request, position, person_id):
     if position == "graduate":

@@ -4,4 +4,4 @@ from .models import Registration
 class RegistrationForm(forms.ModelForm):
     class Meta:
         model = Registration
-        exclude = ['submission', 'modification']
+        fields = ['name','gender','age','mobile','emial','city','fromNGH','job_title','about_tedx','attend_tedx','expectations']

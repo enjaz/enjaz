@@ -8,6 +8,8 @@ from core import decorators
 from .forms import RegistrationForm
 from .models import Choice, Question, Game, Registration
 from . import utils
+from django.core.urlresolvers import reverse
+
 
 def handle_registration(request):
     if request.method == 'POST':
@@ -24,7 +26,7 @@ def handle_registration(request):
         form = RegistrationForm()
     context = {'form': form}
 
-    return render(request, 'tedx/the_end.html', context)
+    return render(request, 'tedx/index.html', context)
 
 @login_required
 def list_registration(request):
@@ -35,7 +37,7 @@ def list_registration(request):
        not is_tedx_member:
         raise PermissionDenied
 
-    list_registration = Registration.objects.all()
+    list_registration = Registration.objects.filter(submission__year=2019)
     context = {'list_registration' : list_registration}
     return render(request, 'tedx/list_registration.html', context)
 

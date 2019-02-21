@@ -20,14 +20,13 @@
                 <div class="row">
                     <div class="col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3 form-box">
                         {% bootstrap_form_errors form %}
-                        {% bootstrap_messages %}
                     	<form role="form" method="post" class="f1">
                         {% csrf_token %}
                     		<h3>التسجيل في تدكس "لو أن"</h3>
                     		<p>سنتعرف عليك من خلال النموذج التالي ;)</p>
                     		<div class="f1-steps">
                     			<div class="f1-progress">
-                    			    <div class="f1-progress-line" data-now-value="25" data-number-of-steps="2" style="width: 50%;"></div>
+                    			    <div class="f1-progress-line" data-now-value="16.66" data-number-of-steps="3" style="width: 16.66%;"></div>
                     			</div>
                     			<div class="f1-step active">
                     				<div class="f1-step-icon"><i class="fa fa-user"></i></div>
@@ -37,7 +36,10 @@
                     				<div class="f1-step-icon"><i class="fa fa-key"></i></div>
                     				<p>عن TEDx</p>
                     			</div>
-
+                    		    <div class="f1-step">
+                    				<div class="f1-step-icon"><i class="fa fa-calendar"></i></div>
+                    				<p>عن الحدث</p>
+                    			</div>
                     		</div>
 
                     		<fieldset>
@@ -49,12 +51,12 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="sr-only" for="id_gender">الجندر</label>
-                                        <select {% if form.gender.value and not form.gender.errors %}value="{{ form.gender.value }}" {% endif %}class="form-control" id="id_gender" name="gender"  title="{{ form.gender.label }}"  required="required">
+                                        <select {% if form.gender.value and not form.gender.errors %}value="{{ form.gender.value }}" {% endif %}class="form-control" id="id_gender" name="gender"  title="{{ form.gender.label }}" required>
                                                 <option value="">{{ form.gender.label }}</option>
                                                 {% for value, label in form.fields.gender.widget.choices %}{% if value %}
                                                 <option {% if form.gender.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endif %}{% endfor %}
 
-					                    </select>
+					</select>
                                 </div>
                                 <div class="form-group">
                                     <label class="sr-only" for="id_age">العمر</label>
@@ -67,9 +69,8 @@
 
                                 </div>
                                 <div class="form-group english-field">
-                                    {{ form.emial.errors.as_ul }}
                                     <label class="sr-only" for="id_email">البريد الإلكتروني</label>
-				     {% bootstrap_field form.emial show_label=False required_css_class='required' %}
+				     {% bootstrap_field form.emial show_label=False  %}
 
                                 </div>
                                 <div class="form-group">
@@ -87,11 +88,11 @@
                                   {% bootstrap_field form.job_title show_label=False  %}
 
                                 </div>
-{#                                <div class="form-group">#}
-{#                                  <label class="sr-only" for="id_yourself">تحدث عن نفسك</label>#}
-{#				  {% bootstrap_field form.yourself show_label=False  %}#}
-{##}
-{#                                </div>#}
+                                <div class="form-group">
+                                  <label class="sr-only" for="id_yourself">تحدث عن نفسك</label>
+				  {% bootstrap_field form.yourself show_label=False  %}
+
+                                </div>
                                 <div class="f1-buttons">
                                     <button type="button" class="btn btn-next">التالي</button>
                                 </div>
@@ -100,7 +101,7 @@
                             <fieldset>
                                 <h4>عن TEDx:</h4>
                                 <div class="form-group">
-                                    <label class="sr-only" for="id_about_tedx">ماذا تعرف عن TEDx</label>
+                                    <label class="sr-only" for="id_about_tedx">تحدث عن TEDx</label>
 					    {% bootstrap_field form.about_tedx show_label=False  %}
 
                                 </div>
@@ -109,58 +110,57 @@
 				   {% bootstrap_field form.attend_tedx %}
                                 </div>
 
-{#                                <div class="form-group">#}
-{#                                    <label class="sr-only" for="id_past_experience">تحدث عن تجربتك السابقة</label>#}
-{#					    {% bootstrap_field form.past_experience show_label=False %}#}
-{##}
-{#                                </div>#}
-
-{#                                <div class="form-group">#}
-{#                                    <label class="sr-only" for="id_referral">كيف سمعت عن TEDxKSAUSH?</label>#}
-{#					    {% bootstrap_field form.referral show_label=False %}#}
-{#                                </div>#}
                                 <div class="form-group">
-                                      <label class="sr-only" for="id_expectations">ماذا تتوقع أن تستفيد من  TEDxKSAUSH?</label>
+                                    <label class="sr-only" for="id_past_experience">تحدث عن تجربتك السابقة</label>
+					    {% bootstrap_field form.past_experience show_label=False %}
+
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="sr-only" for="id_referral">كيف سمعت عن TEDxKSAUSH?</label>
+					    {% bootstrap_field form.referral show_label=False %}
+                                </div>
+                                <div class="form-group">
+                                      <label class="sr-only" for="id_expectations">ماذا تتوقع من TEDxKSAUSH?</label>
 					    {% bootstrap_field form.expectations show_label=False %}
 
                                 </div>
 
                                 <div class="f1-buttons">
                                     <button type="button" class="btn btn-previous">عودة</button>
-                                    <button type="submit" class="btn btn-submit">سجلني</button>
-
+                                    <button type="button" class="btn btn-next">التالي</button>
                                 </div>
                             </fieldset>
-{##}
-{#                            <fieldset>#}
-{#                                <h4>عن الحدث:</h4>#}
-{#                                <div class="form-group">#}
-{#                                    <label class="sr-only" for="id_meaning">ماذا تعني لك "لو أن"؟</label>#}
-{#					    {% bootstrap_field form.meaning show_label=False %}#}
-{##}
-{#                                </div>#}
-{##}
-{#                                <div class="form-group">#}
-{#                                    {% bootstrap_field form.interview  %}#}
-{#				</div>#}
-{##}
-{#                                <div class="form-group">#}
-{#                                  {% bootstrap_field form.take_pic %}#}
-{#				</div>#}
-{#                                <div class="form-group">#}
-{#                                    <label class="sr-only" for="id_your_interest">اختر أحد الاهتمامات التالية التي تناسب ميولك:</label>#}
-{#                                     <select {% if form.your_interest.value and not form.your_interst.errors %}value="{{ form.your_interest.value }}" {% endif %}class="form-control" id="id_your_interest" name="your_interest"  title="{{ form.your_interest.label }}" required>#}
-{#                                                <option value="">{{ form.your_interest.label }}</option>#}
-{#                                                {% for value, label in form.fields.your_interest.widget.choices %}#}
-{#                                                <option {% if form.your_interest.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}#}
-{#					 </select>#}
-{#                                </div>#}
-{##}
-{#                                <div class="f1-buttons">#}
-{#                                    <button type="button" class="btn btn-previous">عودة</button>#}
-{#                                    <button type="submit" class="btn btn-submit">سجلني</button>#}
-{#                                </div>#}
-{#                            </fieldset>#}
+
+                            <fieldset>
+                                <h4>عن الحدث:</h4>
+                                <div class="form-group">
+                                    <label class="sr-only" for="id_meaning">ماذا تعني لك "لو أن"؟</label>
+					    {% bootstrap_field form.meaning show_label=False %}
+
+                                </div>
+
+                                <div class="form-group">
+                                    {% bootstrap_field form.interview  %}
+				</div>
+
+                                <div class="form-group">
+                                  {% bootstrap_field form.take_pic %}
+				</div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="id_your_interest">اختر أحد الاهتمامات التالية التي تناسب ميولك:</label>
+                                     <select {% if form.your_interest.value and not form.your_interst.errors %}value="{{ form.your_interest.value }}" {% endif %}class="form-control" id="id_your_interest" name="your_interest"  title="{{ form.your_interest.label }}" required>
+                                                <option value="">{{ form.your_interest.label }}</option>
+                                                {% for value, label in form.fields.your_interest.widget.choices %}
+                                                <option {% if form.your_interest.value == value %}selected="selected" {% endif %}value="{{ value }}">{{ label }}</option>{% endfor %}
+					 </select>
+                                </div>
+
+                                <div class="f1-buttons">
+                                    <button type="button" class="btn btn-previous">عودة</button>
+                                    <button type="submit" class="btn btn-submit">سجلني</button>
+                                </div>
+                            </fieldset>
 
                     	</form>
                     </div>

@@ -1,29 +1,29 @@
 {% extends 'tedx/base.html' %}{% load bootstrap3 %}
 {% block content %}
-                <div class="row">
-                    <div class="col-sm-8 col-sm-offset-2 text">
-                        <h1>تسجيل حضور<br>  <span style="color: #ff2b06;">TED<sup>x</sup></span></b> KSAUHS.</h1>
-                        <div class="description">
-                       	  <p class="intro"> أهلا {{ user.common_profile.ar_first_name|default:user.username }}!<br>
-			 يُنظّم نادي الطلاب في جامعة الملك سعود بن عبد العزيز للعلوم الصحية <a href="https://tedxksauhs.com/"><b><strong>تدكس "لو أن"</strong></b></a> في يوم السبت 15 أبريل في <a target="_blank" href="https://goo.gl/maps/XQ3Cctff1qH2">مركز المؤتمرات</a> في جامعةالملك سعود بن عبدالعزيز للعلوم الصحية!
-       {% if not user.is_authenticated %}
-       <br>
-       <span style="background: yellow; padding: 4px;">
-       هل لديك حساب على إنجاز؟ <a href="{% url 'userena_signin' %}?next={{ request.path }}">نأمل الحرص على تسجيل الدخول لتسهيل التواصل معك</a>!
-     </span>
-       {% endif %}
-
-			    </p>
-                        </div>
-                    </div>
-                </div>
+{#                <div class="row">#}
+{#                    <div class="col-sm-8 col-sm-offset-2 text">#}
+{#                        <h1>تسجيل حضور<br>  <span style="color: #ff2b06;">TED<sup>x</sup></span></b> KSAUHS.</h1>#}
+{#                        <div class="description">#}
+{#                       	  <p class="intro"> أهلا {{ user.common_profile.ar_first_name|default:user.username }}!<br>#}
+{#			 يُنظّم نادي الطلاب في جامعة الملك سعود بن عبد العزيز للعلوم الصحية <a href="https://tedxksauhs.com/"><b><strong>تدكس "لو أن"</strong></b></a> في يوم السبت 15 أبريل في <a target="_blank" href="https://goo.gl/maps/XQ3Cctff1qH2">مركز المؤتمرات</a> في جامعةالملك سعود بن عبدالعزيز للعلوم الصحية!#}
+{#       {% if not user.is_authenticated %}#}
+{#       <br>#}
+{#       <span style="background: yellow; padding: 4px;">#}
+{#       هل لديك حساب على إنجاز؟ <a href="{% url 'userena_signin' %}?next={{ request.path }}">نأمل الحرص على تسجيل الدخول لتسهيل التواصل معك</a>!#}
+{#     </span>#}
+{#       {% endif %}#}
+{##}
+{#			    </p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
                 <div class="row">
                     <div class="col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3 form-box">
                         {% bootstrap_form_errors form %}
                         {% bootstrap_messages %}
                     	<form role="form" method="post" class="f1">
                         {% csrf_token %}
-                    		<h3>التسجيل في تدكس "لو أن"</h3>
+                    		<h3>التسجيل في تدكس </h3>
                     		<p>سنتعرف عليك من خلال النموذج التالي ;)</p>
                     		<div class="f1-steps">
                     			<div class="f1-progress">

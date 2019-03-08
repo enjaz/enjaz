@@ -22,6 +22,8 @@ urlpatterns = [
         views.show_subcourse, name='show_subcourse'),
     url(r'^workshop/(?P<workshop_id>\d+)/$',
         views.show_workshop, name='show_workshop'),
+    url(r'^(?P<theme>\w+)/invite/(?P<invitee_id>\w+)/$',views.invite_to_ceremony,
+        name='invite_to_ceremony'),
 
 ]
 

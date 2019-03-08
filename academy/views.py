@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.http import Http404
+from django.contrib.auth.models import User
 
 from models import Course, Instructor, Graduate, IndexBG, Work, Temporary_Stats, Workshop
 
@@ -173,6 +174,11 @@ def register_for_course(request, course_name):
                'parent_course': parent_course}
     return render(request, 'academy/register.html', context)
 
+def invite_to_ceremony(request, theme, invitee_id):
+    invitee = get_object_or_404(User, username=invitee_id)
+    context = {'theme': theme,
+                'invitee': invitee}
+    return render(request, 'academy/invite_ceremony.html', context)
 
 # TODO: Work on the form: form-builder vs fobi-forms , who will prevail?
 

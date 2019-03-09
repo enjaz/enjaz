@@ -1,0 +1,94 @@
+{% extends 'tedx/base.html' %} {% load staticfiles%}
+{% block content %}
+<div class="panel minimal minimal-gray">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<h2>المسجلات والمسجلين في تدكس</h2>
+		</div>
+	</div>
+
+	<table style="width:90%" id="participants-table" class="display datatable compact dt-responsive">
+		<thead>
+			<tr>
+				<th>الاسم</th>
+				<th>الجوال</th>
+				<th>الإيميل</th>
+				<th>CODE</th>
+                <th>Signin</th>
+                <th class="none">المسجل</th>
+
+
+			</tr>
+		</thead>
+		<tbody>
+			{% for registration in list_registration %}
+			<tr>
+				<td> {{ registration.name }}</td>
+				<td> {{ registration.mobile }} </td>
+				<td> {{ registration.emial }} </td>
+				<td> {{ registration.id_code }} </td>
+                {% if registration.attended == False  %}
+                <td> <button data-url='{% url 'tedx:process_signing' %}', data-registrationid={{ registration.pk }} class="sign"> sign </button> </td>
+                {% else %}
+
+                <td>singed</td>
+
+                {% endif %}
+                <td>
+                    {% if  registration.registration_user %}
+                    {{  registration.registration_user.common_profile.get_ar_full_name|default:registration.registration_user.username }}
+                    {% endif %}
+                </td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}
+
+{% block customscript %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'js/datatables/buttons/buttons.dataTables.min.css' %}">
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/jszip.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/buttons.html5.min.js' %}"></script>
+<script>
+	$(function(){
+        $("#participants-table").DataTable({
+			dom: 'Bfrtip',
+			buttons: [
+					'copyHtml5',
+					'excelHtml5',
+					'csvHtml5',
+			],
+			language: {% include 'js/dataTables-arabic.json' %}
+		});
+
+
+
+        $(".sign").click(function () {
+             var btn = this;
+            $.ajax({
+                    data: {registration_pk: $(this).data('registrationid'),},
+                    url: "{% url 'tedx:process_signing' %}",
+                    type: 'POST',
+                    cache: false,
+                    success: function(data){
+                        console.log(data.message)
+                        if (data.message == "success") {
+                            $(btn).html('تم!');
+                            $(btn).attr('disabled','disabled');
+                        } else {
+                            alert(data.message);
+                        }
+                    },
+
+            });
+        });
+
+
+	});
+</script>
+{% endblock %}

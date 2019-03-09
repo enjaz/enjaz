@@ -50,7 +50,8 @@ class Registration(models.Model):
     modification = models.DateTimeField(u'تاريخ الإرسال', auto_now=True)
     id_code = models.CharField(max_length=30,default='')
     work_place = models.CharField(max_length=50, verbose_name=u"مكان العمل او الدراسة", null=True, blank=True)
-
+    attended = models.BooleanField(u"هل حضر الحدث؟",default=False)
+    registration_user = models.ForeignKey(User, null=True, blank=True,related_name='registrations_attendance_user')
 
 class Game(models.Model):
     first_question = models.ForeignKey('Question', on_delete=models.CASCADE)

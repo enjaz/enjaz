@@ -9,6 +9,7 @@ from .forms import RegistrationForm
 from .models import Choice, Question, Game, Registration
 from . import utils
 from django.core.urlresolvers import reverse
+from django.shortcuts import get_object_or_404
 
 
 def handle_registration(request):
@@ -66,3 +67,28 @@ def handle_game_ajax(request):
                     "flag": choice.flag}
 
     return response
+
+@login_required
+def signin_page(request):
+    list_registration = Registration.objects.filter(submission__year=2019,id_code__isnull=False)
+    context = {'list_registration': list_registration}
+    return render(request, 'tedx/signin.html', context)
+
+@login_required
+@decorators.ajax_only
+@decorators.post_only
+@csrf.csrf_exempt
+def process_signing(request):
+    pk = request.POST.get("registration_pk")
+    registration = get_object_or_404(Registration,pk=pk)
+    if registration.attended == True:
+        message = 'this ticket have been used already'
+    else:
+        registration.attended = True
+        registration.registration_user = request.user
+        registration.save()
+        message = 'success'
+
+    return {'message':message}
+
+

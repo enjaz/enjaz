@@ -159,11 +159,22 @@ element.style {
       <div class="row">
       <div class="col-xl-7 ml-auto mr-auto">
         <h1>
-        {% if invitee.common_profile.gender == 'F' %}أنتِ مدعوّة!
+        {% if invitee.common_profile.gender == 'F' or invitee.username == 'elhamalmuzaini'%}أنتِ مدعوّة!
         {% else %}أنت مدعوّ!
         {% endif%}
         </h1>
-        <h2>{{invitee.common_profile.get_ar_short_name}}<br>
+        <h2>{% if invitee.username == 'queflies' or invitee.username == 'mubayrik080' or invitee.username == 'alkaabba039' or invitee.username == 'arabi091' %}
+            د. {{invitee.common_profile.get_ar_short_name}}
+            {% elif invitee.username == 'alewaha' or invitee.username == 'amrl' or invitee.username == 'marzooqh' %}
+            أ. {{invitee.common_profile.get_ar_short_name}}
+            {% elif invitee.username == 'elhamalmuzaini' %}
+            أ. إلهام المزيني
+            {% elif invitee.username == 'alsudairy243' %}
+            نواف السديري
+            {% else %}
+            {{invitee.common_profile.get_ar_short_name}}
+            {% endif %}
+            <br>
         للحفل الختامي لأكاديمية نادي الطلاب
         </h2>
           <img style="height:350px; padding:15px" src="{% static 'academy/images/logo-white.png' %}">

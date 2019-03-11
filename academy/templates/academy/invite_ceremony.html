@@ -159,11 +159,7 @@ element.style {
       <div class="row">
       <div class="col-xl-7 ml-auto mr-auto">
         <h1>
-        {% if invitee.common_profile.gender == 'F' or invitee.username == 'elhamalmuzaini'%}أنتِ مدعوّة!
-        {% else %}أنت مدعوّ!
-        {% endif%}
-        </h1>
-        <h2>{% if invitee.username == 'queflies' or invitee.username == 'mubayrik080' or invitee.username == 'alkaabba039' or invitee.username == 'arabi091' %}
+            {% if invitee.username == 'queflies' or invitee.username == 'mubayrik080' or invitee.username == 'alkaabba039' or invitee.username == 'arabi091' %}
             د. {{invitee.common_profile.get_ar_short_name}}
             {% elif invitee.username == 'alewaha' or invitee.username == 'amrl' or invitee.username == 'marzooqh' %}
             أ. {{invitee.common_profile.get_ar_short_name}}
@@ -174,6 +170,11 @@ element.style {
             {% else %}
             {{invitee.common_profile.get_ar_short_name}}
             {% endif %}
+        </h1>
+        <h2>
+            {% if invitee.common_profile.gender == 'F' or invitee.username == 'elhamalmuzaini'%}أنتِ مدعوّة!
+            {% else %}أنت مدعوّ!
+            {% endif%}
             <br>
         للحفل الختامي لأكاديمية نادي الطلاب
         </h2>

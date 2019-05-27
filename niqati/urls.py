@@ -21,4 +21,5 @@ urlpatterns = patterns('',
     url(r'^generalreport/(?P<city_code>\w+)/$', views.general_report, name='general_report_for_city'),
     url(r'^medicinereport/(?P<year>\d+)/$', views.medicine_general_report, name='medicine_general_report'),
     url(r'^niqati-user-autocomplete/$', views.NiqatiUserAutocomplete.as_view(), name='niqati-user-autocomplete',),
+    url(r'^report/(?P<username>[\.\w\d\-]+)/(?P<year>\d+)/$', views.student_report,name='student_report_with_year'),
 )

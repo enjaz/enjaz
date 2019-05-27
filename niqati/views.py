@@ -89,7 +89,7 @@ def claim_code(request):
         return {'errors': errors}
 
 @login_required
-def student_report(request, username=None):
+def student_report(request, username=None,year=None):
     # Only the superuser can see a specific user.  Coordinators will
     # get an introduction page to Niqati becaues they are not supposed
     # to register any codes.
@@ -104,8 +104,21 @@ def student_report(request, username=None):
         niqati_user = get_object_or_404(User, username=username)
     else:
         niqati_user = request.user
-    # TODO: sort codes
-    total_points = niqati_user.code_set.current_year().aggregate(total_points=Sum('points'))['total_points']
+    if year :
+        if year == '2019':
+            current_year = StudentClubYear.objects.get(pk=6)
+        elif year == '2018':
+            current_year = StudentClubYear.objects.get(pk=5)
+        elif year == '2017':
+            current_year = StudentClubYear.objects.get(pk=3)
+        elif year == '2016':
+            current_year = StudentClubYear.objects.get(pk=2)
+        elif year == '2015':
+            current_year = StudentClubYear.objects.get(pk=1)
+        total_points = niqati_user.code_set.filter(year=current_year).aggregate(total_points=Sum('points'))['total_points']
+    else:
+        # TODO: sort codes
+        total_points = niqati_user.code_set.current_year().aggregate(total_points=Sum('points'))['total_points']
     if total_points is None:
         total_points = 0
     context = {'total_points': total_points, 'niqati_user': niqati_user}
@@ -397,12 +410,16 @@ def medicine_general_report(request,year=None):
         current_year = StudentClubYear.objects.get(pk=5)
     elif year == '2017':
         current_year = StudentClubYear.objects.get(pk=3)
+    elif year == '2016':
+        current_year = StudentClubYear.objects.get(pk=2)
+    elif year == '2015':
+        current_year = StudentClubYear.objects.get(pk=1)
 
 
     users = User.objects.filter(common_profile__city=u"الرياض",common_profile__college__name='M',
                                 code__year=current_year).annotate(point_sum=Sum('code__points')).filter(point_sum__gt=0).order_by('-point_sum')
     count = User.objects.filter(common_profile__city=u"الرياض",common_profile__college__name='M',
                                 code__year=current_year).annotate(point_sum=Sum('code__points')).filter(point_sum__gt=0).order_by('-point_sum').count()
-    context = {'users': users,'count':count}
+    context = {'users': users,'count':count, 'year':year}
 
     return render(request, 'niqati/general_report_medicine.html', context)

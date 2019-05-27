@@ -28,7 +28,7 @@
     <tbody>
     {% for niqati_user in users %}
         <tr>
-            <td><a href="{% url 'niqati:student_report_with_username' niqati_user.username %}">{{ niqati_user.pk }}</a></td>
+            <td><a href="{% url 'niqati:student_report_with_year' niqati_user.username year %}">{{ niqati_user.pk }}</a></td>
             <td>{{ niqati_user.common_profile.college }}</td>
             <td class="points">{{ niqati_user.point_sum }}</td>
         </tr>

@@ -392,9 +392,9 @@ class NiqatiUserAutocomplete(autocomplete.Select2QuerySetView):
 def medicine_general_report(request):
 
     current_year = StudentClubYear.objects.get_current()
-    users = User.objects.filter(common_profile__city=u"الرياض",common_profile__college__name='M',
+    users = User.objects.filter(common_profile__section='NG',common_profile__city=u"الرياض",common_profile__college__name='M',
                                 code__year=current_year).annotate(point_sum=Sum('code__points')).filter(point_sum__gt=0).order_by('-point_sum')
-    count = User.objects.filter(common_profile__city=u"الرياض",common_profile__college__name='M',
+    count = User.objects.filter(common_profile__section='NG',common_profile__city=u"الرياض",common_profile__college__name='M',
                                 code__year=current_year).annotate(point_sum=Sum('code__points')).filter(point_sum__gt=0).order_by('-point_sum').count()
     context = {'users': users,'count':count}
 

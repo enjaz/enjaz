@@ -3,6 +3,7 @@
 
 {% block content %}
 
+
 <style type="text/css">
     .points {
         font-weight: bold !important;
@@ -12,13 +13,14 @@
     }
 </style>
 <div class="page-header">
-  <h2> التقرير العام لكلية الطب</h2>
+  <h2>  كلية الطب التقرير العام</h2>
+<p> عدد الطلاب {{ count }}</p>
 </div>
 
 <table class="table datatable dt-responsive">
     <thead>
       <tr>
-        <th class="not-mobile">الرقم الطالبـ/ـة</th>
+        <th>رقم الطالب</th>
         <th class="not-mobile">الكلية</th>
         <th>عدد النقاط</th>
       </tr>
@@ -26,8 +28,7 @@
     <tbody>
     {% for niqati_user in users %}
         <tr>
-                    <td>{{ niqati_user.pk }}</td>
-
+            <td><a href="{% url 'niqati:student_report_with_username' niqati_user.username %}">{{ niqati_user.pk }}</a></td>
             <td>{{ niqati_user.common_profile.college }}</td>
             <td class="points">{{ niqati_user.point_sum }}</td>
         </tr>
@@ -54,7 +55,7 @@
                 'excelHtml5',
                 'csvHtml5',
             ],
-            "order": [[ 7, "desc" ]],
+            "order": [[ 2, "desc" ]],
             "language": {% include 'js/dataTables-arabic.json' %}
         });
     });

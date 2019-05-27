@@ -1,0 +1,62 @@
+{% extends "niqati_base.html" %}{% load staticfiles %}
+{% block title %}التقرير العام{% endblock %}
+
+{% block content %}
+
+<style type="text/css">
+    .points {
+        font-weight: bold !important;
+        color: #0088ff !important;
+        background-color: #eeeeee;
+
+    }
+</style>
+<div class="page-header">
+  <h2> التقرير العام لكلية الطب</h2>
+</div>
+
+<table class="table datatable dt-responsive">
+    <thead>
+      <tr>
+        <th class="not-mobile">الرقم الطالبـ/ـة</th>
+        <th class="not-mobile">الكلية</th>
+        <th>عدد النقاط</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for niqati_user in users %}
+        <tr>
+                    <td>{{ niqati_user.pk }}</td>
+
+            <td>{{ niqati_user.common_profile.college }}</td>
+            <td class="points">{{ niqati_user.point_sum }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block customscript %}
+    <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+	<link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/datatables/buttons/buttons.dataTables.min.css' %}">
+    <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/jszip.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static 'js/datatables/buttons/buttons.html5.min.js' %}"></script>
+    <script type="text/javascript">
+    $(document).ready(function () {
+        $(".datatable").DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copyHtml5',
+                'excelHtml5',
+                'csvHtml5',
+            ],
+            "order": [[ 7, "desc" ]],
+            "language": {% include 'js/dataTables-arabic.json' %}
+        });
+    });
+    </script>
+{% endblock %}

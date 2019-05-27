@@ -385,3 +385,17 @@ class NiqatiUserAutocomplete(autocomplete.Select2QuerySetView):
     def get_result_label(self, item):
         return "%s (<span class=\"english-field\">%s</span>)" % (item.common_profile.get_ar_full_name(), item.username)
         return u"%s (%s)" % (item.common_profile.get_ar_full_name(), item.username)
+
+
+
+@login_required
+def medicine_general_report(request):
+
+    current_year = StudentClubYear.objects.get_current()
+    users = User.objects.filter(common_profile__city=u"الرياض",common_profile__college__name='M',
+                                code__year=current_year).annotate(point_sum=Sum('code__points')).filter(point_sum__gt=0).order_by('-point_sum')
+    count = User.objects.filter(common_profile__city=u"الرياض",common_profile__college__name='M',
+                                code__year=current_year).annotate(point_sum=Sum('code__points')).filter(point_sum__gt=0).order_by('-point_sum').count()
+    context = {'users': users,'count':count}
+
+    return render(request, 'niqati/general_report_medicine.html', context)

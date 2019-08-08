@@ -9,6 +9,11 @@ from django.contrib.auth.models import User
 
 from models import Course, Instructor, Graduate, IndexBG, Work, Temporary_Stats, Workshop
 
+from forms_builder.forms.models import FormEntry
+
+FORMS_CURRENT_APP = "academy_forms"
+
+
 course_codes = (
     ('PR', 'programming'),
     ('PS', 'photoshop'),

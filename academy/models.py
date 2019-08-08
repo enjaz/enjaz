@@ -6,7 +6,8 @@ from django.utils import timezone
 
 from django.db import models
 from django.contrib.auth.models import User
-#from forms_builder.forms.models import Form
+
+from forms_builder.forms.models import Form
 
 from core.models import StudentClubYear
 
@@ -44,7 +45,7 @@ class SubCourse(models.Model):
     batch_no = models.IntegerField(u'رقم الدفعة', null=True)
     batch_note = models.TextField(u'ملاحظة على العدد', null=True, blank=True)
     form_url = models.TextField(u'رابط نموذج التسجيل', null=True, blank=True)
-    #forms = GenericRelation(Form)
+    # forms = GenericRelation(Form)
     reg_open_date = models.DateTimeField(u'تاريخ فتح التسجيل',
                                          null=True, blank=True)
     reg_close_date = models.DateTimeField(u'تاريخ إغلاق التسجيل',
@@ -75,6 +76,29 @@ class SubCourse(models.Model):
     #         return self.forms.get(is_primary=True)
     #     else:
     #         return None
+
+    # def is_form_open(self):
+    #     """
+    #     Return ``True`` if there is 1 published form marked as primary. Return ``False`` if there isn't or,
+    #     by any chance, there is more than one
+    #     """
+    #     return self.forms.published().filter(is_primary=True).count() == 1
+    #
+    # def has_registration_form(self):
+    #     """
+    #     A memory-efficient method to check for the presence of 1 (an only 1) primary form for a club.
+    #     """
+    #     return self.forms.filter(is_primary=True).count() == 1
+    #
+    # def get_registration_form(self):
+    #     """
+    #     If registration is open, return the registration form; otherwise return ``None``.
+    #     """
+    #     if self.has_registration_form():
+    #         return self.forms.get(is_primary=True)
+    #     else:
+    #         return None
+
 
 class Workshop(models.Model):
     name = models.CharField(u'الاسم', max_length=200)
@@ -196,3 +220,4 @@ class Temporary_Stats(models.Model):
     course_count = models.CharField(u'عدد الدورات',max_length=10)
     instr_count = models.CharField(u'عدد المقدمين والمقدمات',max_length=10)
     session_count = models.CharField(u'عدد الجلسات',max_length=10)
+

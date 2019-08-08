@@ -134,7 +134,7 @@ element.style {
               </div>
           </li>
           <li class="dropdown nav-item">
-              <a style="font-size:16px" href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">المشاريع</a>
+              <a style="font-size:16px" href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">مشاريع التخرج</a>
               <div class="dropdown-menu">
               {% for course in parent_courses %}
                   {% for code, name in course_codes %}
@@ -146,14 +146,14 @@ element.style {
               </div>
           </li>
           {% block navbar %}{% endblock %}
-          <li class="dropdown nav-item">
-              <a style="font-size:16px" href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">ورش العمل</a>
-              <div class="dropdown-menu">
-              {% for workshop in workshops %}
-                <div class="text-center"><a href="{% url 'academy:show_workshop' workshop.pk %}" class="nav-link">{{ workshop.name }}</a></div>
-              {% endfor %}
-              </div>
-          </li>
+          <!--<li class="dropdown nav-item">-->
+              <!--<a style="font-size:16px" href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">ورش العمل</a>-->
+              <!--<div class="dropdown-menu">-->
+              <!--{% for workshop in workshops %}-->
+                <!--<div class="text-center"><a href="{% url 'academy:show_workshop' workshop.pk %}" class="nav-link">{{ workshop.name }}</a></div>-->
+              <!--{% endfor %}-->
+              <!--</div>-->
+          <!--</li>-->
           <li class="dropdown nav-item">
               <a style="font-size:16px" href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">عن الأكاديمية</a>
               <div class="dropdown-menu">

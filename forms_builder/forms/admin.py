@@ -76,7 +76,7 @@ class FormAdmin(admin.ModelAdmin):
         Annotate the queryset with the entries count for use in the
         admin list view.
         """
-        qs = super(FormAdmin, self).queryset(request)
+        qs = super(FormAdmin, self).get_queryset(request)
         return qs.annotate(total_entries=Count("entries"))
 
     def get_urls(self):

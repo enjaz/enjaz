@@ -84,13 +84,15 @@
     <div class="col-sm-2 col-centered">
         {% for code, name in course_codes %}
         {% if course.code == code %}
-        {% if course.hex_colour %}
-            <script>
-                $(function(){
-                    $("style").append("#{{name}}:hover{color: {{course.hex_colour}} }");
-                });
-            </script>
-        {% endif %}
+                {% for k, v in latest_subcourses.items %}
+                {% if course == k %}
+                <script>
+                    $(function(){
+                        $("style").append("#{{name}}:hover{color: {{v.hex_colour}} }");
+                    });
+                </script>
+                {% endif %}
+                {% endfor %}
         <div id="{{name}}" onclick="location.href='{% url 'academy:show' name %}';" style="cursor: pointer;">
         <div class="icon-{{name}}" style="font-size:80px"></div>
         {% for parent_course, latest_subcourse in latest_subcourses.items %}

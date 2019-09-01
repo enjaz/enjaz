@@ -7,7 +7,7 @@ a{
     color: #3C4858;
 }
 .nav-item:hover,a:hover{
-    color: {{parent_course.hex_colour}};
+    color: {{subcourse.hex_colour}};
 }
 
 {% endblock %}
@@ -24,7 +24,7 @@ a{
 {% endblock %}
 {% block content %}
 <div class="profile-page sidebar-collapse">
-  <div class="page-header header-filter" data-parallax="true" style=" {% if parent_course.background %} background-image: url({{parent_course.background.url}}) {% endif %}; background-color:#000000" "></div>
+  <div class="page-header header-filter" data-parallax="true" style=" {% if subcourse.background %} background-image: url({{ subcourse.background.url}}) {% endif %}; background-color:#000000 "></div>
   <div class="main main-raised">
     <div class="profile-content">
       <div class="container">
@@ -32,7 +32,9 @@ a{
           <div class="col-md-6 ml-auto mr-auto">
             <div class="profile">
               <div class="avatar">
-                <img style="background-color:#fff; padding:15px" src="{{parent_course.logo.url}}" class="img-raised img-thumbnail img-fluid">
+                  {% if subcourse.logo %}
+                  <img style="background-color:#fff; padding:15px" src="{{ subcourse.logo.url}}" class="img-raised img-thumbnail img-fluid">
+                  {% endif %}
               </div>
               <div class="name">
                 <h3 class="title">{{parent_course.name}}</h3>
@@ -56,7 +58,7 @@ a{
                               <div class="counter">
                   <i class="fa fa-users fa-2x"></i>
                   <h2 class="timer count-title count-number" data-to="{{subcourse.course_instructors.count}}" data-speed="1500"></h2>
-                  <p class="count-text ">مقدم ومقدمة</p>
+                  <p class="count-text">مقدم ومقدمة</p>
                 </div></div>
                           <div class="col-md">
                           <div class="counter">

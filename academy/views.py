@@ -20,6 +20,11 @@ course_codes = (
     ('VE', 'videoediting'),
     ('CW', 'contentwriting'),
     ('PH', 'photography'),
+    ('MM', 'marketing'),
+    ('VP', 'voiceperformance'),
+    ('IL', 'illustrator'),
+    ('CM', 'campaignmanagement'),
+    ('3D', '3D'),
 )
 
 def count_stats(request):

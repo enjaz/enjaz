@@ -17,16 +17,18 @@ course_choices = (
     ('PS', 'دورة الفوتوشوب'),
     ('VE', 'دورة المونتاج'),
     ('CW', 'دورة كتابة المحتوى'),
-    ('PH', 'دورة التصوير')
+    ('PH', 'دورة التصوير'),
+    ('MM', 'دورة مهارات التسويق والإعلام'),
+    ('VP', 'دورة الأداء الصوتي'),
+    ('IL', 'دورة الillustrator'),
+    ('CM', 'دورة إدارة الحملات الصحية'),
+    ('3D', 'دورة تصميم ثلاثي الأبعاد'),
 )
 
 class Course(models.Model):
     name = models.CharField(u'الاسم', max_length=200)
     code = models.CharField(u'الرمز', max_length=2, choices=course_choices)
-    logo = models.FileField(u'الشعار', null=True)
     description = models.TextField(u'الوصف', null=True, blank=True)
-    background = models.FileField(u'الصورة الخلفية', null=True, blank=True)
-    hex_colour = models.CharField(u'لون الثيم بصيغة hex', max_length=7, null=True, blank=True)
 
     class Meta:
         verbose_name = u"دورة أساسية"
@@ -38,6 +40,7 @@ class Course(models.Model):
 class SubCourse(models.Model):
     official_name = models.CharField(u'الاسم الرسمي', max_length=200,  null=True, blank=True)
     parent_course = models.ForeignKey(Course, verbose_name=u"الدورة الأب")
+    logo = models.FileField(u'الشعار', null=True)
     plan = models.FileField(u"ملف الخطة", null=True, blank=True)
     session_count = models.IntegerField(u'عدد الجلسات', null=True, blank=True)
     homework_count = models.IntegerField(u'عدد المهام والواجبات',
@@ -51,6 +54,7 @@ class SubCourse(models.Model):
     reg_close_date = models.DateTimeField(u'تاريخ إغلاق التسجيل',
                                           null=True, blank=True)
     background = models.FileField(u'الصورة الخلفية', null=True, blank=True)
+    hex_colour = models.CharField(u'لون الثيم بصيغة hex', max_length=7, null=True, blank=True)
 
     class Meta:
         verbose_name = u"دورة فرعية"

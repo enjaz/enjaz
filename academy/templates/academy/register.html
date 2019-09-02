@@ -17,8 +17,10 @@
                 <img style="background-color:#fff; padding:15px" src="{{course.logo.url}}" class="img-raised img-thumbnail img-fluid">
               </div>
               <div class="name">
-                <h3 class="title">التسجيل في {{course.name}}</h3>
+                <h3 class="title">التسجيل في {{course.official_name}}</h3>
+                {% if course.reg_close_date %}
                 <h5 class="description text-center">تنتهي فترة التسجيل في يوم {{course.reg_close_date}}</h5>
+                {% endif %}
               </div>
               <div align="center">
                 <iframe src="{{ course.form_url }}" width="430" height="800" frameborder="0" marginheight="0" marginwidth="0">جاري التحميل</iframe>

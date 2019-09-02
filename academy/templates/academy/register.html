@@ -1,12 +1,12 @@
 {% extends 'academy/base.html' %}{% load staticfiles %}
-{% block title %}التسجيل في {{ parent_course.name }}{% endblock %}
+{% block title %}التسجيل في {{ course.name }}{% endblock %}
 {% block style %}
 .header-filter::before {
     background: rgba(0, 0, 0, 0);
 {% endblock %}
 {% block content %}
 <div class="profile-page sidebar-collapse">
-  <div class="page-header header-filter" data-parallax="true" style=" {% if parent_course.background %} background-image: url({{parent_course.background.url}}) {% endif %}; background-color:#000000" "></div>
+  <div class="page-header header-filter" data-parallax="true" style=" {% if course.background %} background-image: url({{course.background.url}}) {% endif %}; background-color:#000000" "></div>
   <div class="main main-raised">
     <div class="profile-content">
       <div class="container">
@@ -14,10 +14,10 @@
           <div class="col-md-6 ml-auto mr-auto">
             <div class="profile">
               <div class="avatar">
-                <img style="background-color:#fff; padding:15px" src="{{parent_course.logo.url}}" class="img-raised img-thumbnail img-fluid">
+                <img style="background-color:#fff; padding:15px" src="{{course.logo.url}}" class="img-raised img-thumbnail img-fluid">
               </div>
               <div class="name">
-                <h3 class="title">التسجيل في {{parent_course.name}}</h3>
+                <h3 class="title">التسجيل في {{course.name}}</h3>
                 <h5 class="description text-center">تنتهي فترة التسجيل في يوم {{course.reg_close_date}}</h5>
               </div>
               <div align="center">

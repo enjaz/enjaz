@@ -1211,9 +1211,7 @@ def list_session_attendance(request, event_code_name,session_pk=None):
                                   has_attendance = True)
     session = get_object_or_404(Session, pk=session_pk)
 
-    if not request.user.is_superuser and not utils.is_organizing_team_member(request.user,event):
-        raise PermissionDenied
-
+        
     attendances = Attendance.objects.filter(session_registration__session=session)
 
     context ={'event':event,'session':session,'attendances':attendances}

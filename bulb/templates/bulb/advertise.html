@@ -49,7 +49,7 @@
 </head>
 <body>
 <div align="center">
-    <h2>عينك علينا!</h2>
+<img id="eyes" src="{% static 'bulb/eyes.gif'%}" style="height:100%; width:auto"><br><br>
 <form dir="rtl" style="padding:20px">
         <br>1) كيف توصف مودك الحين؟<br><br>
         <input type="radio" name="1" value="a"><img style="height:auto; width:35%" src="{% static 'bulb/happy.gif'%}"></a><br><br>
@@ -74,9 +74,8 @@
 <div id="b1"><img src="{% static 'bulb/dreamer.gif'%}" style="height:auto; width:35%"></div><br>
 <div id="b3"><img src="{% static 'bulb/artist.gif'%}" style="height:auto; width:35%"></div><br>
 <div id="b2"><img src="{% static 'bulb/bookworm.gif'%}" style="height:auto; width:35%"></div><br>
-<div id="eyes"><img src="{% static 'bulb/eyes.gif'%}" style="height:auto; width:35%"></div><br><br>
 <a target="_blank" href="{% static 'bulb/info.jpg'%}">
-    <img id="info" src="{% static 'bulb/info.jpg'%}" style="height:auto; width:35%"></a>
+    <img id="info" src="{% static 'bulb/info.jpg'%}" style="height:100%; width:auto"></a>
 
 
 </div>
@@ -84,39 +83,37 @@
 <script type="text/javascript">
 // it's crude but I don't speak Javascript =S
 $(document).ready(function() {
+    $("#eyes").hide();
+    $("#eyes").fadeIn(500);
     $("#b1").hide();
     $("#b2").hide();
     $("#b3").hide();
-    $("#eyes").hide();
     $("#info").hide();
 
     $("#btn1").click(function() {
         $("#b2").hide();
         $("#b3").hide();
-        $("#eyes").hide();
         $("#info").hide();
-        $("#b1").show();
+        $("#b1").fadeIn();
     });
 
     $("#btn2").click(function() {
         $("#b1").hide();
         $("#b3").hide();
-        $("#eyes").hide();
         $("#info").hide();
-        $("#b2").show();
+        $("#b2").fadeIn();
     });
 
     $("#btn3").click(function() {
         $("#b1").hide();
         $("#b2").hide();
-        $("#eyes").hide();
         $("#info").hide();
-        $("#b3").show();
+        $("#b3").fadeIn();
     });
 
     $("#done").click(function() {
-        $("#eyes").show();
-        $("#info").show();
+        $("#info").fadeIn(900);
+        window.scrollTo(0,document.body.scrollHeight);
     });
 
 

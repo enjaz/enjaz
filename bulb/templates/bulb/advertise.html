@@ -1,0 +1,135 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>عينك علينا!</title>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <style>
+    @font-face {
+       font-family: 'GE Dinar One';
+       font-weight: normal;
+       src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
+    }
+
+    body, h1, h2, h3, h4, h5{
+        background-color: #fff;
+        font-family: 'GE Dinar One';
+        color: #BE8319;
+    }
+
+    .pin {
+      background-color: #BE8319
+      border: none;
+      color: white;
+      padding: 16px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      font-family: 'GE Dinar One';
+      margin: 4px 2px;
+      -webkit-transition-duration: 0.4s; /* Safari */
+      transition-duration: 0.4s;
+      cursor: pointer;
+    }
+    .pin1 {
+      background-color: white;
+      color: #BE8319;
+      border: 2px solid #BE8319;
+    }
+
+    .pin1:hover {
+      background-color: #BE8319;
+      color: white;
+    }
+</style>
+</head>
+<body>
+<div align="center">
+    <h2>عينك علينا!</h2>
+<form dir="rtl" style="padding:20px">
+        <br>1) كيف توصف مودك الحين؟<br><br>
+        <input type="radio" name="1" value="a"><img style="height:auto; width:35%" src="{% static 'bulb/happy.gif'%}"></a><br><br>
+        <input type="radio" name="1" value="b"><img style="height:auto; width:35%" src="{% static 'bulb/disappointed.gif'%}"></a><br><br>
+        <input type="radio" name="1" value="c"><img style="height:auto; width:35%" src="{% static 'bulb/confused.gif'%}"></a><br>
+
+        <br><br>2) وش أحسن طريقة توصف فيها كلمة "عطاء"؟<br><br>
+        <input id="btn1" type="radio" name="b" value="1"> لا تكثري في الجُودِ لائمتي وإذا بخلتُ فأكثري لومي<br>
+                                                كُفِّي فلست بحاملٍ أبدًا ما عشتُ همَّ غدٍ على يوم<br><br>
+        <input id="btn2" type="radio" name="b" value="2"> We make a living by what we get. We make a life by what we give.<br><br>
+        <input id="btn3" type="radio" name="b" value="3"> <a target="_blank" href="{% static 'bulb/painting.jpg'%}">
+            <img style="height:auto; width:25%" src="{% static 'bulb/painting.jpg'%}"></a><br>
+
+        <br><br>3) لو عطيناك ألف ريال وش رح تسوي فيهم؟<br><br>
+        <input type="radio" name="3" value="a"> أكل<br>
+        <input type="radio" name="3" value="b"> كتب<br>
+        <input type="radio" name="3" value="c"> أتبرع بهم<br>
+        <input type="radio" name="3" value="d"> كل اللي مكتوب<br>
+
+        <br><br><br><div id="done" class="pin pin1">وروني أكثر</div>
+</form>
+<div id="b1"><img src="{% static 'bulb/dreamer.gif'%}" style="height:auto; width:35%"></div><br>
+<div id="b3"><img src="{% static 'bulb/artist.gif'%}" style="height:auto; width:35%"></div><br>
+<div id="b2"><img src="{% static 'bulb/bookworm.gif'%}" style="height:auto; width:35%"></div><br>
+<div id="eyes"><img src="{% static 'bulb/eyes.gif'%}" style="height:auto; width:35%"></div><br><br>
+<a target="_blank" href="{% static 'bulb/info.jpg'%}">
+    <img id="info" src="{% static 'bulb/info.jpg'%}" style="height:auto; width:35%"></a>
+
+
+</div>
+
+<script type="text/javascript">
+// it's crude but I don't speak Javascript =S
+$(document).ready(function() {
+    $("#b1").hide();
+    $("#b2").hide();
+    $("#b3").hide();
+    $("#eyes").hide();
+    $("#info").hide();
+
+    $("#btn1").click(function() {
+        $("#b2").hide();
+        $("#b3").hide();
+        $("#eyes").hide();
+        $("#info").hide();
+        $("#b1").show();
+    });
+
+    $("#btn2").click(function() {
+        $("#b1").hide();
+        $("#b3").hide();
+        $("#eyes").hide();
+        $("#info").hide();
+        $("#b2").show();
+    });
+
+    $("#btn3").click(function() {
+        $("#b1").hide();
+        $("#b2").hide();
+        $("#eyes").hide();
+        $("#info").hide();
+        $("#b3").show();
+    });
+
+    $("#done").click(function() {
+        $("#eyes").show();
+        $("#info").show();
+    });
+
+
+});
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
+
+

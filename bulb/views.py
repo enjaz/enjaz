@@ -1874,3 +1874,6 @@ def show_recommended_book(request, pk):
     recommended_book = get_object_or_404(RecommendedBook, pk=pk)
     context = {'recommended_book': recommended_book}
     return render(request, "bulb/recommendations/show_recommended_book.html", context)
+
+def advertise(request):
+    return render(request, "bulb/advertise.html")

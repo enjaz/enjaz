@@ -115,4 +115,6 @@ urlpatterns = patterns('',
     url(r'^recommendations/books/(?P<pk>\d+)/duplicate/$', views.duplicate_book_recommendation, name="duplicate_book_recommendation"),
     url(r'^recommendations/books/(?P<pk>\d+)/delete/$', views.delete_book_recommendation, name="delete_book_recommendation"),
     url(r'^recommendations/categories/(?P<code_name>[\w\d_]+)/$', views.show_recommendation_category, name="show_recommendation_category"),
+
+    url(r'^eyes_on_us/$', views.advertise, name="advertise"),
     )

@@ -8,7 +8,6 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-
     <style>
     @font-face {
        font-family: 'GE Dinar One';
@@ -17,9 +16,12 @@
     }
 
     body, h1, h2, h3, h4, h5{
-        background-color: #fff;
+        background-color: #05182C;
         font-family: 'GE Dinar One';
         color: #BE8319;
+    }
+    .row{
+    padding:30px;
     }
 
     .pin {
@@ -50,26 +52,40 @@
 </style>
 </head>
 <body>
+
 <div align="center">
-<img id="eyes" src="{% static 'bulb/eyes.gif'%}" style="height:100%; width:auto"><br><br>
+<img id="eyes" src="{% static 'bulb/eyes.gif'%}" style="height:auto; width:100%"><br><br>
 <form dir="rtl" style="padding:20px">
-        <br>1) كيف توصف مودك الحين؟<br><br>
-        <input type="radio" name="1" value="a"><img style="height:auto; width:35%" src="{% static 'bulb/happy.gif'%}"></a><br><br>
-        <input type="radio" name="1" value="b"><img style="height:auto; width:35%" src="{% static 'bulb/disappointed.gif'%}"></a><br><br>
-        <input type="radio" name="1" value="c"><img style="height:auto; width:35%" src="{% static 'bulb/confused.gif'%}"></a><br>
 
-        <br><br>2) وش أحسن طريقة توصف فيها كلمة "عطاء"؟<br><br>
-        <input id="btn1" type="radio" name="b" value="1"> لا تكثري في الجُودِ لائمتي وإذا بخلتُ فأكثري لومي<br>
-                                                كُفِّي فلست بحاملٍ أبدًا ما عشتُ همَّ غدٍ على يوم<br><br>
-        <input id="btn2" type="radio" name="b" value="2"> We make a living by what we get. We make a life by what we give.<br><br>
-        <input id="btn3" type="radio" name="b" value="3"> <a target="_blank" href="{% static 'bulb/painting.jpg'%}">
-            <img style="height:auto; width:25%" src="{% static 'bulb/painting.jpg'%}"></a><br>
+        <div align="center"><div class="row"></div>
+        1) كيف توصف مودك الحين؟
+        </div>
+        <div class="row">
+            <div class="col col-lg-4"><input type="radio" name="1" value="a"><img style="height:auto; width:100%" src="{% static 'bulb/happy.gif'%}"></a></div>
+            <div class="col col-lg-4"><input type="radio" name="1" value="b"><img style="height:auto; width:100%" src="{% static 'bulb/disappointed.gif'%}"></a></div>
+            <div class="col col-lg-4"><input type="radio" name="1" value="c"><img style="height:auto; width:100%" src="{% static 'bulb/confused.gif'%}"></a></div>
+        </div>
 
-        <br><br>3) لو عطيناك ألف ريال وش رح تسوي فيهم؟<br><br>
-        <input type="radio" name="3" value="a"> أكل<br>
-        <input type="radio" name="3" value="b"> كتب<br>
-        <input type="radio" name="3" value="c"> أتبرع بهم<br>
-        <input type="radio" name="3" value="d"> كل اللي مكتوب<br>
+        <div align="center"><div class="row"></div>
+        2) وش أحسن طريقة توصف فيها كلمة "عطاء"؟
+        </div>
+        <div class="row">
+            <div class="col col-lg-4"><input id="btn1" type="radio" name="b" value="1"> لا تكثري في الجُودِ لائمتي وإذا بخلتُ فأكثري لومي<br>
+                                                كُفِّي فلست بحاملٍ أبدًا ما عشتُ همَّ غدٍ على يوم</div>
+            <div class="col col-lg-4"><input id="btn2" type="radio" name="b" value="2"> We make a living by what we get. We make a life by what we give.</div>
+            <div class="col col-lg-4"><input id="btn3" type="radio" name="b" value="3"> <a target="_blank" href="{% static 'bulb/painting.jpg'%}">
+            <img style="height:auto; width:80%" src="{% static 'bulb/painting.jpg'%}"></a></div>
+        </div>
+
+        <div align="center"><div class="row"></div>        3) لو عطيناك ألف ريال وش رح تسوي فيهم؟
+        </div>
+        <div class="row">
+            <div class="col col-lg-3"><input type="radio" name="3" value="a"> أكل</div>
+            <div class="col col-lg-3"><input type="radio" name="3" value="b"> كتب</div>
+            <div class="col col-lg-3"><input type="radio" name="3" value="c"> أتبرع بهم</div>
+            <div class="col col-lg-3"><input type="radio" name="3" value="d"> كل اللي مكتوب</div>
+        </div>
+
 
         <br><br><br><div id="done" class="pin pin1">وروني أكثر</div>
 </form>
@@ -128,6 +144,7 @@ $(document).ready(function() {
 
 
 </script>
+
 </body>
 </html>
 

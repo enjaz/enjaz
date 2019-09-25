@@ -18,6 +18,7 @@
     body, h1, h2, h3, h4, h5{
         background-color: #05182C;
         font-family: 'GE Dinar One';
+        font-size: 2rem;
         color: #BE8319;
     }
     .row{
@@ -32,7 +33,7 @@
       text-align: center;
       text-decoration: none;
       display: inline-block;
-      font-size: 16px;
+      font-size: 26px;
       font-family: 'GE Dinar One';
       margin: 4px 2px;
       -webkit-transition-duration: 0.4s; /* Safari */
@@ -49,58 +50,67 @@
       background-color: #BE8319;
       color: white;
     }
+
+    .radio{
+        width:1.5em;
+        height:1.5em;
+    }
 </style>
 </head>
-<body>
+<body id="top">
 
 <div align="center">
-<img id="eyes" src="{% static 'bulb/eyes.gif'%}" style="height:auto; width:100%"><br><br>
+<div id="init_content">
+    <img id="eyes" src="{% static 'bulb/eyes.gif'%}" style="height:auto; width:100%"><br><br>
 <form dir="rtl" style="padding:20px">
 
         <div align="center"><div class="row"></div>
         1) كيف توصف مودك الحين؟
         </div>
         <div class="row">
-            <div class="col col-lg-4"><input type="radio" name="1" value="a"><img style="height:auto; width:100%" src="{% static 'bulb/happy.gif'%}"></a></div>
-            <div class="col col-lg-4"><input type="radio" name="1" value="b"><img style="height:auto; width:100%" src="{% static 'bulb/disappointed.gif'%}"></a></div>
-            <div class="col col-lg-4"><input type="radio" name="1" value="c"><img style="height:auto; width:100%" src="{% static 'bulb/confused.gif'%}"></a></div>
+            <div class="col col-lg-4"><input class="radio" type="radio" name="1" value="a"><img style="height:auto; width:100%" src="{% static 'bulb/happy.gif'%}"></a></div>
+            <div class="col col-lg-4"><input class="radio" type="radio" name="1" value="b"><img style="height:auto; width:100%" src="{% static 'bulb/disappointed.gif'%}"></a></div>
+            <div class="col col-lg-4"><input class="radio" type="radio" name="1" value="c"><img style="height:auto; width:100%" src="{% static 'bulb/confused.gif'%}"></a></div>
         </div>
 
         <div align="center"><div class="row"></div>
         2) وش أحسن طريقة توصف فيها كلمة "عطاء"؟
         </div>
         <div class="row">
-            <div class="col col-lg-4"><input id="btn1" type="radio" name="b" value="1"> لا تكثري في الجُودِ لائمتي وإذا بخلتُ فأكثري لومي<br>
+            <div class="col col-lg-4"><input class="radio"  id="btn1" type="radio" name="b" value="1"> لا تكثري في الجُودِ لائمتي وإذا بخلتُ فأكثري لومي<br>
                                                 كُفِّي فلست بحاملٍ أبدًا ما عشتُ همَّ غدٍ على يوم</div>
-            <div class="col col-lg-4"><input id="btn2" type="radio" name="b" value="2"> We make a living by what we get. We make a life by what we give.</div>
-            <div class="col col-lg-4"><input id="btn3" type="radio" name="b" value="3"> <a target="_blank" href="{% static 'bulb/painting.jpg'%}">
+            <div class="col col-lg-4"><input class="radio" id="btn2" type="radio" name="b" value="2"> We make a living by what we get. We make a life by what we give.</div>
+            <div class="col col-lg-4"><input class="radio" id="btn3" type="radio" name="b" value="3"> <a target="_blank" href="{% static 'bulb/painting.jpg'%}">
             <img style="height:auto; width:80%" src="{% static 'bulb/painting.jpg'%}"></a></div>
         </div>
 
         <div align="center"><div class="row"></div>        3) لو عطيناك ألف ريال وش رح تسوي فيهم؟
         </div>
         <div class="row">
-            <div class="col col-lg-3"><input type="radio" name="3" value="a"> أكل</div>
-            <div class="col col-lg-3"><input type="radio" name="3" value="b"> كتب</div>
-            <div class="col col-lg-3"><input type="radio" name="3" value="c"> أتبرع بهم</div>
-            <div class="col col-lg-3"><input type="radio" name="3" value="d"> كل اللي مكتوب</div>
+            <div class="col col-lg-3"><input class="radio" type="radio" name="3" value="a"> أكل</div>
+            <div class="col col-lg-3"><input class="radio" type="radio" name="3" value="b"> كتب</div>
+            <div class="col col-lg-3"><input class="radio" type="radio" name="3" value="c"> أتبرع بهم</div>
+            <div class="col col-lg-3"><input class="radio" type="radio" name="3" value="d"> كل اللي مكتوب</div>
         </div>
 
 
-        <br><br><br><div id="done" class="pin pin1">وروني أكثر</div>
+        <br><br><br><a href="#top" onclick="scrollToTop(); return false"><div id="done" class="pin pin1">وروني أكثر</div></a>
 </form>
+
+</div>
+
 <div id="b1"><img src="{% static 'bulb/dreamer.gif'%}" style="height:auto; width:35%"></div><br>
 <div id="b3"><img src="{% static 'bulb/artist.gif'%}" style="height:auto; width:35%"></div><br>
 <div id="b2"><img src="{% static 'bulb/bookworm.gif'%}" style="height:auto; width:35%"></div><br>
 <a target="_blank" href="{% static 'bulb/info.jpg'%}">
     <img id="info" src="{% static 'bulb/info.jpg'%}" style="height:100%; width:auto"></a>
 
-
 </div>
 
 <script type="text/javascript">
 // it's crude but I don't speak Javascript =S
 $(document).ready(function() {
+
     $("#eyes").hide();
     $("#eyes").fadeIn(500);
     $("#b1").hide();
@@ -108,32 +118,32 @@ $(document).ready(function() {
     $("#b3").hide();
     $("#info").hide();
 
-    $("#btn1").click(function() {
-        $("#b2").hide();
-        $("#b3").hide();
-        $("#info").hide();
-        $("#b1").fadeIn();
-    });
-
-    $("#btn2").click(function() {
-        $("#b1").hide();
-        $("#b3").hide();
-        $("#info").hide();
-        $("#b2").fadeIn();
-    });
-
-    $("#btn3").click(function() {
-        $("#b1").hide();
-        $("#b2").hide();
-        $("#info").hide();
-        $("#b3").fadeIn();
-    });
+    function infographic(){
+        if (document.getElementById('btn1').checked) {
+            $("#b2").hide();
+            $("#b3").hide();
+            $("#info").hide();
+            $("#b1").fadeIn();
+        };
+        if (document.getElementById('btn2').checked) {
+            $("#b1").hide();
+            $("#b3").hide();
+            $("#info").hide();
+            $("#b2").fadeIn();
+        };
+        if (document.getElementById('btn3').checked) {
+            $("#b1").hide();
+            $("#b2").hide();
+            $("#info").hide();
+            $("#b3").fadeIn();
+        };
+    };
 
     $("#done").click(function() {
+        $("#init_content").hide()
+        infographic();
         $("#info").fadeIn(900);
-        window.scrollTo(0,document.body.scrollHeight);
     });
-
 
 });
 

@@ -1,0 +1,62 @@
+<!--
+ =========================================================
+ * Material Kit - v2.0.6
+ =========================================================
+
+ * Product Page: https://www.creative-tim.com/product/material-kit
+ * Copyright 2019 Creative Tim (http://www.creative-tim.com)
+   Licensed under MIT (https://github.com/creativetimofficial/material-kit/blob/master/LICENSE.md)
+
+
+ =========================================================
+
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. -->
+
+{% extends 'science_olympiad/base.html' %}{% load static %}
+
+{% block title %}مسار{% endblock %}
+
+{% block style %}
+.header-filter::before {
+    background: rgba(0, 0, 0, 0);
+}
+a{
+    color: #3C4858;
+}
+.nav-item:hover,a:hover{
+    color: {{last_subcourse.hex_colour}};
+}
+{% endblock %}
+
+{% block content %}
+<div class="profile-page sidebar-collapse">
+  <div class="page-header header-filter" data-parallax="true" style=" {% if last_subcourse.background %} background-image: url({{last_subcourse.background.url}}) {% endif %}; background-color:#000000"></div>
+  <div class="main main-raised">
+    <div class="profile-content">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 ml-auto mr-auto">
+            <div class="profile">
+              <div class="avatar">
+                  <img style="background-color:#fff; padding:15px" src="{% static 'science_olympiad/images/temporary/cute.gif' %}" class="img-raised img-thumbnail img-fluid">
+              </div>
+              <div class="name">
+                <h3 class="title">اسم المسار</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+          <div style="padding-bottom:100px" class="description text-center">
+
+        <div class="row">
+            أبجد هوز حطي كلمن صعفس قرشت ثخذ ضغظ أبجد هوز حطي كلمن صعفس قرشت ثخذ ضغظ أبجد هوز حطي كلمن صعفس قرشت ثخذ ضغظ أبجد هوز حطي كلمن صعفس قرشت ثخذ ضغظ أبجد هوز حطي كلمن صعفس قرشت ثخذ ضغظ أبجد هوز حطي كلمن صعفس قرشت ثخذ ضغظ أبجد هوز حطي كلمن صعفس قرشت ثخذ ضغظ أبجد هوز حطي كلمن صعفس قرشت ثخذ ضغظ أبجد هوز حطي كلمن صعفس قرشت ثخذ ضغظ أبجد هوز حطي كلمن صعفس قرشت ثخذ ضغظ أبجد هوز حطي كلمن صعفس قرشت ثخذ ضغظ أبجد هوز حطي كلمن صعفس قرشت ثخذ ضغظ 
+        </div>
+        </div>
+        </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+

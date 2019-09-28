@@ -1,0 +1,139 @@
+<!--
+ =========================================================
+ * Material Kit - v2.0.6
+ =========================================================
+
+ * Product Page: https://www.creative-tim.com/product/material-kit
+ * Copyright 2019 Creative Tim (http://www.creative-tim.com)
+   Licensed under MIT (https://github.com/creativetimofficial/material-kit/blob/master/LICENSE.md)
+
+
+ =========================================================
+
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. -->
+
+<!DOCTYPE html>{% load staticfiles %}
+<html lang="ar" dir="rtl">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+        <title>الأولمبياد العلمي | {% block title %}{% endblock %}</title>
+        <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
+        <link rel="icon" href="">
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+
+        <!-- CSS Files -->
+        <link href="{% static 'science_olympiad/assets/css/material-kit.css' %}" rel="stylesheet"/>
+
+        <!--     Fonts and icons     -->
+        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+
+        {% block head %}{% endblock %}
+
+    <style>
+    @font-face {
+       font-family: 'GE Dinar One';
+       font-weight: normal;
+       src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
+    }
+
+
+    element.style {
+    }
+    @media (max-width: 991px)
+    .navbar .dropdown-menu .dropdown-item {
+        margin-left: 1.5rem;
+        margin-right: 1.5rem;
+    }
+    .dropdown-menu .dropdown-item:hover, .dropdown-menu .dropdown-item:focus, .dropdown-menu a:hover, .dropdown-menu a:focus, .dropdown-menu a:active {
+        background-color:#aba7ac;
+        box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(218, 218, 218, 0.4);
+    }
+
+        body, h1, h2, h3, h4, h5{
+            font-family: 'GE Dinar One';
+        }
+
+        .title{
+            font-family: 'GE Dinar One';
+        }
+
+        .container{
+            padding-top: 0.1px;
+            padding-bottom: 0.1px;
+            margin-bottom: 50px;
+        }
+
+        footer.main-footer{
+           <!--position: fixed;-->
+           bottom: 0;
+           width: 100%;
+           padding-right: 10px;
+           margin-right: 0;
+           background-color: #000000;
+           color: #fff;
+        }
+
+    {% block style %}{% endblock %}
+
+    </style>
+        {% block header %}{% endblock %}
+    </head>
+
+    <body class="index-page sidebar-collapse">
+
+
+    <!------------------------Navbar Start------------------>
+    <nav style="height:100px" class="navbar navbar-transparent fixed-top navbar-expand-lg" id="sectionsNav">
+    <div class="container">
+      <div  class="navbar-translate">
+        <a class="navbar-brand" href="{% url 'science_olympiad:index'%}">
+            <img height="40px" src="{% static 'science_olympiad/images/temporary/cute.gif' %}">
+        </a>
+      </div>
+    </div>
+    </nav>
+    <!------------------------Navbar End------------------>
+
+
+     {% block content %}{% endblock %}
+    <footer class="footer main-footer">
+        <strong>بُنيَ بأيدِ طلابية. <a style="color:#ffffff hover-color:#ff0099" href="https://github.com/enjaz/enjaz/" target="_blank">حقّك في النسخ مكفول</a>. <i class="fa fa-heart"></i></strong>
+    </footer>
+
+    <!--Bootstrap's JS-->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <!--  Material Kit Theme  -->
+    <!--	Plugin for Sharrre btn -->
+    <script src="{% static 'science_olympiad/assets/js/plugins/jquery.sharrre.js'%}" type="text/javascript"></script>
+
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+     <!--   Core JS Files   -->
+    <script src="{% static 'science_olympiad/assets/js/core/jquery.min.js' %}" type="text/javascript"></script>
+    <script src="{% static 'science_olympiad/assets/js/core/popper.min.js' %}" type="text/javascript"></script>
+    <script src="{% static 'science_olympiad/assets/js/core/bootstrap-material-design.min.js' %}" type="text/javascript"></script>
+    <script src="{% static 'science_olympiad/assets/js/plugins/moment.min.js' %}"></script>
+    <!--	Plugin for the Datepicker, full documentation here: https://github.com/Eonasdan/bootstrap-datetimepicker -->
+    <script src="{% static 'science_olympiad/assets/js/plugins/bootstrap-datetimepicker.js' %}" type="text/javascript"></script>
+    <!--  Plugin for the Sliders, full documentation here: http://refreshless.com/nouislider/ -->
+    <script src="{% static 'science_olympiad/assets/js/plugins/nouislider.min.js' %}" type="text/javascript"></script>
+    <!--  Google Maps Plugin    Not needed I think=D  -->
+    <!--<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>-->
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <!-- Control Center for Material Kit: parallax effects, scripts for the example pages etc -->
+    <script src="{% static 'science_olympiad/assets/js/material-kit.js' %}" type="text/javascript"></script>
+
+    {% block customscript %}{% endblock %}
+</body>
+</html>

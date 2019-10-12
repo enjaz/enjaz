@@ -20,28 +20,27 @@
 .header-filter::before {
     background: rgba(0, 0, 0, 0);
 }
-a{
-    color: #3C4858;
+
+.profile-page .profile img{
+  max-width: 200px;
 }
-.nav-item:hover,a:hover{
-    color: {{last_subcourse.hex_colour}};
-}
+
 {% endblock %}
 
 {% block content %}
 <div class="profile-page sidebar-collapse">
-  <div class="page-header header-filter" data-parallax="true" style=" {% if last_subcourse.background %} background-image: url({{last_subcourse.background.url}}) {% endif %}; background-color:#000000"></div>
-  <div class="main main-raised">
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url({% static 'science_olympiad/images/header.jpg' %});"></div>
+  <div class="main ">
     <div class="profile-content">
       <div class="container">
         <div class="row">
           <div class="col-md-6 ml-auto mr-auto">
             <div class="profile">
               <div class="avatar">
-                  <img style="background-color:#fff; padding:15px" src="{% static 'science_olympiad/images/temporary/cute.gif' %}" class="img-raised img-thumbnail img-fluid">
+                  <img style="background-color:#fff; padding:15px" src="{% static 'science_olympiad/images/sections/black/lectures_black.png' %}" class="rounded-circle img-fluid">
               </div>
               <div class="name">
-                <h3 class="title">اسم المسار</h3>
+                <h3 class="title">المحاضرات العلمية</h3>
               </div>
             </div>
           </div>

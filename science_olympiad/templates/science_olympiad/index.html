@@ -45,21 +45,22 @@
     color: #000000;
 }
 
-body{
-    background-color: #fff
+.btn:focus, .btn.focus, .btn:hover, .btn.btn-default:focus, .btn.btn-default.focus, .btn.btn-default:hover {
+    background-color: #153642;
 }
+
 {% endblock %}
 
 {% block title %}الصفحة الرئيسة{% endblock %}
 
 {% block content %}
 
-<div class="page-header header-filter" data-parallax="true" style="background-image: ">
-  <div class="container">
+<div class="page-header header-filter" data-parallax="true" style="background-image: url({% static 'science_olympiad/images/header.jpg' %}); ">
+    <div class="container">
     <div class="row">
       <div class="col-md-8 ml-auto mr-auto">
         <div class="brand text-center">
-            <div class="text-center"><img style="padding-top:80px" class="rounded-circle img-fluid" width="100%" src="{% static 'science_olympiad/images/temporary/cute.gif' %}"></div>
+            <div class="text-center"><img style="padding-top:80px" class="rounded-circle img-fluid" width="100%" src="{% static 'science_olympiad/images/logo_white.png' %}"></div>
         </div>
       </div>
     </div>
@@ -78,29 +79,33 @@ body{
   <div class="container" align="center">
     <h3 style="" class="title">المسارات</h3>
     <div class="row">
-    <div class="col col-3"><img src="{% static 'science_olympiad/images/temporary/cute.gif' %}"></div>
-    <div class="col col-3"><img src="{% static 'science_olympiad/images/temporary/cute.gif' %}"></div>
-    <div class="col col-3"><img src="{% static 'science_olympiad/images/temporary/cute.gif' %}"></div>
-    <div class="col col-3"><img src="{% static 'science_olympiad/images/temporary/cute.gif' %}"></div>
+    <div class="col col-sm-12 col-md-3"><a href="{% url 'science_olympiad:view_section' %}"><img height="130px" src="{% static 'science_olympiad/images/sections/white/lectures_white.png' %}">
+    <br><h4>المحاضرات</h4></a></div>
+    <div class="col col-sm-12 col-md-3"><img height="130px" src="{% static 'science_olympiad/images/sections/white/culture_white.png' %}">
+    <br><h4>المسابقة الثقافية</h4></div>
+    <div class="col col-sm-12 col-md-3"><img height="130px" src="{% static 'science_olympiad/images/sections/white/gallery_white.png' %}">
+    <br><h4>المعرض</h4></div>
+    <div class="col col-sm-12 col-md-3"><img height="130px" src="{% static 'science_olympiad/images/sections/white/hackathon_white.png' %}">
+    <br><h4>الهاكثون</h4></div>
     </div>
 
     <h3>____________________________________________________________________</h3>
   </div>
   <div class="container">
   <div class="row">
-      <div class="col-sm-6">
+      <div class="col-md-6 sm-12">
         <div class="card" style="height: 28rem;">
           <div class="card-body">
             <a class="twitter-timeline" data-height="400" href="https://twitter.com/IAU_KSAUHS?ref_src=twsrc%5Etfw">Tweets by IAU_KSAUHS</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
           </div>
         </div>
       </div>
-      <div class="col-sm-6">
+      <div class="col-md-6 sm-12">
         <div class="card" style="height: 28rem;">
           <div class="card-body">
             <div align="center">
                 <br><br><br><br><br>
-            <p class="card-text">نموذج التسجيل للمخترعين هنا</p>
+            <p class="card-text">النص هنا بيتغير</p>
             <a href="{% url 'science_olympiad:view_form' %}" class="btn">سجّل الآن</a></div>
           </div>
         </div>

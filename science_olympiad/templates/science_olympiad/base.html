@@ -45,6 +45,14 @@
        src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
     }
 
+    .main {
+    background: #153642;
+    }
+
+    body{
+    background-color: #153642;
+    font-color: #ffffff;
+    }
 
     element.style {
     }
@@ -60,10 +68,12 @@
 
         body, h1, h2, h3, h4, h5{
             font-family: 'GE Dinar One';
+            color: #ffffff;
         }
 
         .title{
             font-family: 'GE Dinar One';
+            color: #fff;
         }
 
         .container{
@@ -72,13 +82,29 @@
             margin-bottom: 50px;
         }
 
+        .form-control, .is-focused .form-control {
+
+            background-image: linear-gradient(to top, #153642 2px, rgba(156, 39, 176, 0) 2px), linear-gradient(to top, #d2d2d2 1px, rgba(210, 210, 210, 0) 1px);
+
+        }
+
+        .btn.btn-primary.btn-link:hover, .btn.btn-primary.btn-link:focus, .btn.btn-primary.btn-link:active {
+
+           background-color: #929aa763;
+            color: #4a5c92;
+        }
+
+        .btn.btn-primary.btn-link {
+            color: #153642;
+        }
+
         footer.main-footer{
            <!--position: fixed;-->
            bottom: 0;
            width: 100%;
            padding-right: 10px;
            margin-right: 0;
-           background-color: #000000;
+           background-color: #0000;
            color: #fff;
         }
 
@@ -96,7 +122,7 @@
     <div class="container">
       <div  class="navbar-translate">
         <a class="navbar-brand" href="{% url 'science_olympiad:index'%}">
-            <img height="40px" src="{% static 'science_olympiad/images/temporary/cute.gif' %}">
+            <img height="130px" src="{% static 'science_olympiad/images/logo_white.png' %}">
         </a>
       </div>
     </div>
@@ -106,7 +132,7 @@
 
      {% block content %}{% endblock %}
     <footer class="footer main-footer">
-        <strong>بُنيَ بأيدِ طلابية. <a style="color:#ffffff hover-color:#ff0099" href="https://github.com/enjaz/enjaz/" target="_blank">حقّك في النسخ مكفول</a>. <i class="fa fa-heart"></i></strong>
+            <strong>بُنيَ بأيدِ طلابية. <a style="color:#ffffff hover-color:#ff0099" href="https://github.com/enjaz/enjaz/" target="_blank">حقّك في النسخ مكفول</a> <i class="fa fa-heart"></i></strong>
     </footer>
 
     <!--Bootstrap's JS-->

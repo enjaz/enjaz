@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # blog post and author models
 class BlogPost(models.Model):
@@ -7,7 +8,7 @@ class BlogPost(models.Model):
     title = models.CharField(max_length=400)
     summary = models.TextField(verbose_name="240 character summary")
     text = models.TextField()
-    image = models.ImageField(upload_to='hpc/blogposts/', blank=True, null=True)
+    image = models.ImageField(upload_to='hpc/blog', blank=True, null=True)
 
 #FAQ Questions and answers
 class FaqCategory(models.Model):
@@ -15,7 +16,7 @@ class FaqCategory(models.Model):
 
 class FaqQuestion(models.Model):
     category = models.ForeignKey(FaqCategory, related_name="faq_category")
-    is_tech = models.BooleanField(default=False,verbose_name="Is the question technical ?")
+    is_tech = models.BooleanField(default=False,verbose_name="Is the question technical?")
     question = models.TextField()
     answer = models.TextField()
 
@@ -42,7 +43,7 @@ class PreviousStatistics(models.Model):
 class MediaSponser(models.Model):
     version = models.ForeignKey(PreviousVersion)
     name = models.CharField(max_length=255)
-    logo = models.ImageField(upload_to='hpc/previous/mediasponser', blank=True, null=True)
+    logo = models.ImageField(upload_to='hpc/previous/media', blank=True, null=True)
 class winner(models.Model):
     version = models.ForeignKey(PreviousVersion)
     name = models.CharField(max_length=255)

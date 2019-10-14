@@ -1,0 +1,515 @@
+{% load staticfiles %}{% load studentguide_tags %}{% load events_tags %}  {% load clubs_utils %}
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<!--
+  ______         _               _   _                  _       __     __            _
+ |  ____|       (_)             | \ | |                | |      \ \   / /           | |
+ | |__    _ __   _   __ _  ____ |  \| |  ___   ___   __| | ___   \ \_/ /___   _   _ | |
+ |  __|  | '_ \ | | / _` ||_  / | . ` | / _ \ / _ \ / _` |/ __|   \   // _ \ | | | || |
+ | |____ | | | || || (_| | / /  | |\  ||  __/|  __/| (_| |\__ \    | || (_) || |_| ||_|
+ |______||_| |_|| | \__,_|/___| |_| \_| \___| \___| \__,_||___/    |_| \___/  \__,_|(_)
+               _/ |
+              |__/
+
+You must be so cool if you are reading this! Our Studnets' Club can
+totally use your help! Drop us a line at hello@enjazportal.com, will
+you?
+-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="description" content="بوابة إنجاز للنشاطات الطلابية" />
+
+	<title>إنجاز | {% block title %}{% endblock %}</title>
+	<link rel="icon" href="{% static 'logo/favicon.png' %}">
+	<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/entypo/css/entypo.css' %}">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/font-icons/font-awesome/css/font-awesome.min.css' %}">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:400,700,400italic">
+    <link rel="stylesheet" href="{% static 'neon/assets/css/bootstrap.min.css' %}">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-core.min.css' %}">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-theme.min.css' %}">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-forms.min.css' %}">
+    {% block rtlcss %}
+	<link rel="stylesheet" href="{% static 'neon/assets/css/neon-rtl.min.css' %}">
+    {% endblock %}
+	<link rel="stylesheet" href="{% static 'neon/assets/css/skins/green.css' %}">
+	<link rel="stylesheet" href="{% static 'neon/assets/css/custom.css' %}">
+    {% block customstyles %}{% endblock %}
+
+	<script src="{% static 'neon/assets/js/jquery-1.11.0.min.js' %}"></script>
+	<script src="{% static 'neon/assets/js/custom.js' %}"></script>
+	<!--[if lt IE 9]><script src="{% static 'neon/assets/js/ie8-responsive-file-warning.js' %}"></script><![endif]-->
+
+	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+
+
+</head>
+<body class="page-body skin-green" data-url="http://neon.dev">
+<div class="page-container right-sidebar"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+
+		<div class="sidebar-menu">
+
+
+		<header class="logo-env">
+
+			<!-- logo -->
+			<div class="logo">
+				<a href="{% url 'home' %}">
+					<img src="{% static 'logo/enjaz_portal_logo_white.png' %}" width="170" alt="" />
+				</a>
+			</div>
+
+						<!-- logo collapse icon -->
+
+			<div class="sidebar-collapse">
+				<a href="#" class="sidebar-collapse-icon with-animation"><!-- add class "with-animation" if you want sidebar to have animation during expanding/collapsing transition -->
+					<i class="entypo-menu"></i>
+				</a>
+			</div>
+
+
+
+			<!-- open/close menu icon (do not remove if you want to enable menu on mobile devices) -->
+			<div class="sidebar-mobile-menu visible-xs">
+				<a href="#" class="with-animation"><!-- add class "with-animation" to support animation -->
+					<i class="entypo-menu"></i>
+				</a>
+			</div>
+
+		</header>
+
+
+
+
+
+
+		<ul id="main-menu" class="">
+			<!-- add class "multiple-expanded" to allow multiple submenus to open -->
+			<!-- class "auto-inherit-active-class" will automatically add "active" class for parent elements who are marked already with class "active" -->
+            {% if user.is_authenticated %}
+			<li>
+                <a>
+                    <i class="entypo-user"></i>
+                    <span>حسابي</span>
+                </a>
+                <ul>
+                    {% if user.common_profile.profile_type == 'S' or user.is_superuser %}
+                    <li>
+                        <a href="{% url 'bulb:my_books' %}">
+                            <i class="fa fa-book"></i>
+                            <span>كتبي على سِراج</span>
+                        </a>
+                    </li>
+                    {% if user.guide_requests.current_year.exists %}
+                    <li>
+                        <a href="{% url 'studentguide:list_my_requests' %}">
+                            <i class="glyphicon glyphicon-star"></i>
+                            طلباتي للإرشاد
+                        </a>
+                    </li>
+                    {% elif user|has_guide_profile %}
+                    <li {% if user|has_pending_requests %}class="action-required"{% endif %}>
+                        <a href="{% url 'studentguide:requests_to_me' %}">
+                            <i class="glyphicon glyphicon-star"></i>
+                            طلبات إرشاد موجّهة إلي
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{% url 'niqati:student_report' %}">
+                            <i class="fa fa-tag"></i>
+                            تقرير نقاطي
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{% url 'edit_common_profile' %}">
+                            <i class="entypo-cw"></i>
+                            <span>حدّث معلوماتي</span>
+                        </a>
+                    </li>
+                    {% if user.event_abstracts.exists or user.event_casereport.exists %}
+                    <li>
+                        <a href="{% url 'events:list_my_abstracts' %}">
+                            <i class="entypo-pencil"></i>
+                            <span>ملخصاتي</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{% url 'events:show_my_barcode' %}">
+                            <i class="fa fa-id-badge"></i>
+                            <span>بطاقتي</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'certificates:list_certificates_per_user' %}">
+                            <i class="fa fa-trophy"></i>
+                            <span>شهاداتي</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'events:list_my_registration' %}">
+                            <i class="entypo-pencil"></i>
+                            <span>تسجيلاتي</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'userena_password_change' user.username %}">
+                            <i class="entypo-pencil"></i>
+                            <span>غيّر كلمة السر</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'userena_signout' %}">
+                            <i class="entypo-export"></i>
+                            <span>اخرج</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            {% else %}
+            <li>
+                <a href="{% url 'userena_signin' %}">
+                    <i class="fa fa-sign-in"></i>
+                    <span>ادخل</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'userena_signup' %}">
+                    <i class="fa fa-plus-square-o"></i>
+                    <span>سجّل</span>
+                </a>
+            </li>
+            {% endif %}
+            {% if user|has_user_sidebar_events %}
+						<li>
+                <a>
+                    <i class="entypo-calendar"></i>
+										<span>التسجيل في الأنشطة الكبرى</span>
+                </a>
+                <ul>
+									{% for event in user|get_user_sidebar_events %}
+                <li>
+                    <a>
+                        <i class="entypo-calendar"></i>
+                        <span class="english-field">{{ event.get_html_name|safe }}</span>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="{% url 'events:list_timeslots' event.code_name %}">
+                                <i class="fa fa-pencil"></i>
+                                <span>التسجيل</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'events:list_question_session' event.code_name %}">
+                                <i class="fa fa-question"></i>
+                                <span>الأسئلة التفاعلية</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                {% endfor %}
+                </ul>
+            </li>
+            {% endif %}
+            {% if user|has_user_adminstrative_events %}
+            <li>
+                <a>
+                    <i class="entypo-calendar"></i>
+										<span class="english-field">{% if user.common_profile.profile_type == 'E' %}Events Management{% else %}إدارة الأنشطة الكبرى{% endif %}</span>
+                </a>
+                <ul>
+                {% for event in user|get_user_admistrative_events %}
+                <li>
+                    <a>
+                        <i class="entypo-calendar"></i>
+                        <span class="english-field">{% if user.common_profile.profile_type == 'E' %}{{ event.english_name }}{% else %}{{ event.get_html_name|safe }}{% endif %}</span>
+                    </a>
+                    <ul>{% if user|is_organizing_team_member:event or user|is_attendance_team_member:event or user.is_superuser  %}
+                        <li>
+                            <a href="{% url 'events:list_sessions_privileged' event.code_name %}">
+                                <i class="entypo-chart-pie"></i>
+                                <span>الجلسات</span>
+                            </a>
+                        </li>
+                        {% if event.has_attendance %}
+                        <li>
+                            <a href="{% url 'events:list_barcodes' event.code_name %}">
+                                <i class="fa fa-id-badge"></i>
+                                <span>البطاقات والحضور</span>
+                            </a>
+                        </li>
+						<li>
+                            <a href="{% url 'events:list_presenter_attendance' event.code_name %}">
+                                <i class="entypo-chart-pie"></i>
+                                <span>تحضير مقدمي الأبحاث</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% endif %}
+                        {% if event.receives_abstract_submission and user|is_organizing_team_member:event or event.receives_abstract_submission and user.is_superuser %}
+                        <li>
+                            <a href="{% url 'events:list_abstracts' event.code_name %}">
+                                <i class="entypo-pencil"></i>
+                                <span>الملخصات</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'events:list_abstract_certificates' event.code_name %}">
+                                <i class="fa fa-trophy"></i>
+                                <span>شهادات الأبحاث</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% if event.receives_initiative_submission and user|is_organizing_team_member:event or event.receives_initiative_submission and user.is_superuser %}
+                        <li>
+                            <a href="{% url 'events:list_initiatives' event.code_name %}">
+                                <i class="entypo-network"></i>
+                                <span>المبادرات</span>
+                            </a>
+                        </li>
+                        {% endif %}
+												{% if event.receives_abstract_submission and user|can_evaluate_abstracts:event %}
+						            <li class="english-field">
+						                <a href="{% url 'events:evaluators_homepage' event.code_name %}">
+															<i class="entypo-flow-tree"></i>
+															<span>Evaluate abstracts</span>
+														</a>
+						            </li>
+						            {% endif %}
+                    </ul>
+                </li>
+                {% endfor %}
+                </ul>
+            </li>
+            {% endif %}
+            {% if not user.common_profile.profile_type == 'N' %}
+            <li>
+				<a href="{% url 'clubs:list' %}">
+					<i class="entypo-users"></i>
+					<span>أندية</span>
+				</a>
+			</li>
+			<li>
+				<a href="{% url 'activities:list' %}">
+					<i class="entypo-calendar"></i>
+					<span>أنشطة</span>
+				</a>
+			</li>
+            {% endif %}
+            {# Limit the access to students #}
+            {% if user.common_profile.profile_type == 'S' or user.is_superuser %}
+			<li>
+				<a href="{% url 'niqati:index' %}">
+					<i class="entypo-chart-bar"></i>
+					<span>نقاطي</span>
+				</a>
+			</li>
+			<li>
+				<a href="{% url 'bulb:index' %}">
+                    <!--edits because icon not from Entypo like the rest-->
+					<i class="fa fa-fire" style="margin-right:5px; margin-left:2px"></i>
+					<span style="padding-right:8px">سِراج</span>
+				</a>
+			</li>
+            {% endif %}
+            <li>
+				<a style="padding-right:22px" href="{% url 'academy:index' %}">
+					<img height="20px" src="{%static 'academy/images/logo-greenish 2.png' %}">
+					<span style="padding-right:6px">الأكاديمية الطلابية</span>
+				</a>
+			</li>
+				  {% if not user.common_profile.profile_type == 'N' %}
+				<li>
+					<li class="highlighted-section">
+					<a href="https://enjazportal.com/menhaj/">
+						<i class="entypo-book"></i>
+						<span>مِنهاج</span>
+					</a>
+				</li>
+			<li>
+				<a href="{% url 'studentguide:index' %}">
+					<i class="entypo-graduation-cap"></i>
+					<span>الإرشاد الطلابي</span>
+				</a>
+
+            {% if not user.common_profile.get_city_code == "A" or user.is_superuser %}
+			<li class="highlighted-section">
+				<a href="{% url 'researchhub:index' %}">
+					<i class="fa fa-search"></i>
+					<span class="english-field">ResearchHub</span>
+				</a>
+			</li>
+            {% endif %}
+            {% if user.is_superuser %}
+			<li class="highlighted-section">
+				<a href="{% url 'matching_program:index' %}">
+					<i class="fa fa-search"></i>
+					<span class="english-field">Matching Program</span>
+				</a>
+			</li>
+            {% endif %}
+			<li>
+				<a href="{% url 'media:index' %}">
+					<i class="entypo-megaphone"></i>
+					<span>المركز الإعلامي</span>
+				</a>
+                <ul>
+                    {% load media_tags %}
+                    {% if user|is_media_coordinator_or_member or user|is_coordinator_of_any_club or user.is_superuser or user.media_representations.current_year.exists or user.employee.current_year.exists %}
+                    <li>
+                        <a href="{% url 'media:list_activities' %}">
+                            <i class="entypo-flag"></i>
+                            <span>التقارير و التغطيات</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{% url 'media:list_articles' %}">
+                            <i class="entypo-newspaper"></i>
+                            <span>مدونة النادي</span>
+                        </a>
+                    </li>
+                    {% if user|is_media_coordinator_or_member or user.is_superuser or user.media_representations.current_year.exists %}
+                    <li>
+                        <a href="{% url 'media:snapchat_home' %}">
+                            <i class="entypo-mobile"></i>
+                            <span>سناب تشات</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% comment %}
+                    <li>
+                        <a href="{% url 'media:polls_home' 'whatif' %}">
+                            <i class="glyphicon glyphicon-question-sign"></i>
+                            <span>ماذا لو... ؟</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'media:polls_home' '100says' %}">
+                            <i class="entypo-chart-pie"></i>
+                            <span>المئة تقول</span>
+                        </a>
+                    </li>
+                    {% if user|is_media_coordinator_or_member or user.is_superuser %}
+                    <li>
+                        <a href="{% url 'media:list_tasks' %}">
+                            <i class="glyphicon glyphicon-ok-circle"></i>
+                            <span>المهام</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endcomment %}
+                </ul>
+			</li>
+            {% endif %}
+            {% comment %}
+			<li>
+				<a href="{% url 'studentvoice:home' %}">
+					<i class="entypo-chat"></i>
+					<span>صوتك مسموع</span>
+				</a>
+			</li>
+            {% endcomment %}
+		</ul>
+
+	</div>
+	<div class="main-content">
+
+	<nav class="navbar navbar-default" role="navigation">
+	<!-- Brand and toggle get grouped for better mobile display -->
+	<div class="navbar-header">
+        {% block navbutton %}
+            {% include 'includes/nav-button.html' %}
+        {% endblock %}
+		<a class="navbar-brand dinar-medium" href="{% block pageheaderurl %}{% endblock %}">{% block pageheader %}{% endblock %}</a>
+	</div>
+
+	<!-- Collect the nav links, forms, and other content for toggling -->
+	<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+		<ul class="nav navbar-nav">
+			{% block navbar %}{% endblock %}
+		</ul>
+	</div>
+	<!-- /.navbar-collapse -->
+</nav>
+
+	<div class="col-xs-12 clearfix">
+{% block content %}
+
+{% endblock %}
+
+	</div>
+
+    <div class="clearfix"></div>
+        <footer class="site-footer">
+		<div>
+
+			<div class="row">
+				<div class="col-md-6">
+        بُني بأيدٍ طلابيّة. <a target="_blank" href="https://github.com/osamak/student-portal">حقّك في النسخ مكفول</a>. <i style="color: red;" class="fa fa-heart" aria-hidden="true"></i>
+				</div>
+				<div class="col-md-6">
+            <a href="{% url 'about_sc' %}">
+        عن نادي الطلاب
+            </a>
+        <i class="entypo-dot"></i>
+            <a href="{% url 'about' %}">
+        عن إنجاز
+            </a>
+				</div>
+			</div>
+		</div>
+        </footer>
+</div>
+</div>
+
+  {% block scripts %}
+    <!-- Bottom Scripts -->
+    <script src="{% static 'neon/assets/js/gsap/main-gsap.js' %}"></script>
+    <!--<script src="{% static 'neon/assets/js/jquery-ui/js/jquery-ui-1.10.3.minimal.min.js' %}"></script>-->
+    <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'neon/assets/js/neon-demo.js' %}"></script>
+    <script src="{% static 'neon/assets/js/bootstrap.js' %}"></script>
+    <script src="{% static 'neon/assets/js/joinable.js' %}"></script>
+    <script src="{% static 'neon/assets/js/resizeable.js' %}"></script>
+    <script src="{% static 'neon/assets/js/neon-api.js' %}"></script>
+    <script src="{% static 'neon/assets/js/neon-custom.js' %}"></script>
+    <script src="{% static 'neon/assets/js/neon-demo.js' %}"></script>
+
+    {% block customscript %}{% endblock %}
+  {% endblock %}
+
+
+  {% if request.get_host == 'enjazportal.com' or request.get_host == 'www.enjazportal.com' %}
+    <!-- Piwik -->
+    <script type="text/javascript">
+      var _paq = _paq || [];
+        {% if user.is_authenticated %}
+        _paq.push(['setUserId', '{{ user.username }}']);
+        {% endif %}
+      _paq.push(['trackPageView']);
+      _paq.push(['enableLinkTracking']);
+      (function() {
+        var u=(("https:" == document.location.protocol) ? "https" : "http") + "://enjazportal.com/stats/";
+        _paq.push(['setTrackerUrl', u+'piwik.php']);
+        _paq.push(['setSiteId', 1]);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+        g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+      })();
+    </script>
+    <noscript><p><img src="//enjazportal.com/stats/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+    <!-- End Piwik Code -->
+  {% endif %}
+
+</body>
+</html>

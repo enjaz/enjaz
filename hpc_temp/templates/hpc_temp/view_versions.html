@@ -1,0 +1,29 @@
+{% extends 'hpc_temp/base.html' %}{% load staticfiles %}
+{% block title %}النسخ السابقة{% endblock %}
+{% block content %}
+
+<h2>مؤتمر التخصصات الصحية</h2>
+
+<div class="row">
+    مجموع عدد تسجيلات الدخول والخروج خلال أيام المؤتمر الثلاث: 33398
+    <br>
+    مجموع عدد ورش العمل: 169
+    <br>
+    مجموع عدد المحاضرات: 278
+    <br>
+    مجموع عدد المتحدثين: 475
+    <br>
+    مجموع عدد الأبحاث المُقدمة: 2949
+    <br>
+    مجموع عدد الأبحاث المقبولة: 1119
+    <br>
+    مجموع عدد الفائزين بالأبحاث بجميع نسخ المؤتمر: 92
+</div>
+
+<div class="row">
+{% for v in versions %}
+    <a href="{% url 'hpc_temp:view_version' v.pk %}"><h3>{{v.version_number}}<br>{{ v.name }}</h3></a>
+{% endfor %}
+</div>
+
+{% endblock %}

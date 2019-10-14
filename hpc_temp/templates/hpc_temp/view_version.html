@@ -1,0 +1,10 @@
+{% extends 'hpc_temp/base.html' %}{% load staticfiles %}
+{% block title %}{{version.name}}{% endblock %}
+{% block content %}
+
+<h2>{{version.name}}</h2>
+{% for s in version.statistic_set.all %}
+    <h3>{{s.description}} : {{s.number}}</h3>
+{% endfor %}
+
+{% endblock %}

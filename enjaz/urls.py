@@ -81,7 +81,12 @@ urlpatterns = [
     url(r'^tagging_autocomplete/', include('tagging_autocomplete.urls')),
 
     academy_forms_urls,
-    url(r'^academy/', include('academy.urls', namespace="academy"))
+    url(r'^academy/', include('academy.urls', namespace="academy")),
+
+
+
+    #to be deleted
+    url(r'^hpc_temp/', include('hpc_temp.urls', namespace="hpc_temp")),
 ]
 
 if settings.DEBUG:

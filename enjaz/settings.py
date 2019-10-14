@@ -60,6 +60,9 @@ INSTALLED_APPS = (
     'guardian',
     'loginas',
     'hpc',
+
+    'hpc_temp',
+
     'matching_program',
     'media',
     'niqati',

@@ -79,14 +79,14 @@
   <div class="container" align="center">
     <h3 style="" class="title">المسارات</h3>
     <div class="row">
-    <div class="col col-sm-12 col-md-3"><a href="{% url 'science_olympiad:view_section' %}"><img height="130px" src="{% static 'science_olympiad/images/sections/white/lectures_white.png' %}">
-    <br><h4>المحاضرات</h4></a></div>
+    <div class="col col-sm-12 col-md-3"><img height="130px" src="{% static 'science_olympiad/images/sections/white/lectures_white.png' %}">
+    <br><h4>المحاضرات</h4></div>
     <div class="col col-sm-12 col-md-3"><img height="130px" src="{% static 'science_olympiad/images/sections/white/culture_white.png' %}">
     <br><h4>المسابقة الثقافية</h4></div>
     <div class="col col-sm-12 col-md-3"><img height="130px" src="{% static 'science_olympiad/images/sections/white/gallery_white.png' %}">
     <br><h4>المعرض</h4></div>
-    <div class="col col-sm-12 col-md-3"><img height="130px" src="{% static 'science_olympiad/images/sections/white/hackathon_white.png' %}">
-    <br><h4>الهاكثون</h4></div>
+    <div class="col col-sm-12 col-md-3"><a href="{% url 'science_olympiad:gallery_form' %}"><img height="130px" src="{% static 'science_olympiad/images/sections/white/hackathon_white.png' %}">
+    <br><h4>الهاكثون</h4></a></div>
     </div>
 
     <h3>____________________________________________________________________</h3>
@@ -104,9 +104,9 @@
         <div class="card" style="height: 28rem;">
           <div class="card-body">
             <div align="center">
-                <br><br><br><br><br>
-            <p class="card-text">النص هنا بيتغير</p>
-            <a href="{% url 'science_olympiad:view_form' %}" class="btn">سجّل الآن</a></div>
+                <br><br><br><br><br><br>
+            <p class="card-text" style="font-size:20px;">معرض المخترعين</p>
+            <a href="{% url 'science_olympiad:gallery_form' %}" class="btn" style="font-size:20px">سجّلـ/ـي الآن!</a></div>
           </div>
         </div>
       </div>

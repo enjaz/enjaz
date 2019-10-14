@@ -68,6 +68,7 @@ INSTALLED_APPS = (
     'researchhub',
     'rest_framework',
     'rest_framework.authtoken',
+    'science_olympiad',
     'social.apps.django_app.default',
     'studentguide',
     'studentvoice',

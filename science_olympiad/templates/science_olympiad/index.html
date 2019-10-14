@@ -1,0 +1,116 @@
+{% extends 'science_olympiad/base.html' %}{% load staticfiles %}
+
+{% block style %}
+.index-page .page-header{
+    height: 100vh;
+}
+
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
+
+.img-fluid {
+    padding-top: 15px;
+}
+.counter {
+    background-color:#ffffff;
+    padding: 20px 0;
+    border-radius: 5px;
+    color: #000000;
+}
+
+.count-title {
+    color: #000000;
+    font-size: 40px;
+    font-weight: normal;
+    margin-top: 10px;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.count-text {
+    color: #000000;
+    font-size: 13px;
+    font-weight: normal;
+    margin-top: 10px;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.fa-2x {
+    margin: 0 auto;
+    float: none;
+    display: table;
+    color: #000000;
+}
+
+.btn:focus, .btn.focus, .btn:hover, .btn.btn-default:focus, .btn.btn-default.focus, .btn.btn-default:hover {
+    background-color: #153642;
+}
+
+{% endblock %}
+
+{% block title %}الصفحة الرئيسة{% endblock %}
+
+{% block content %}
+
+<div class="page-header header-filter" data-parallax="true" style="background-image: url({% static 'science_olympiad/images/header.jpg' %}); ">
+    <div class="container">
+    <div class="row">
+      <div class="col-md-8 ml-auto mr-auto">
+        <div class="brand text-center">
+            <div class="text-center"><img style="padding-top:80px" class="rounded-circle img-fluid" width="100%" src="{% static 'science_olympiad/images/logo_white.png' %}"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="container">
+    <div class="section text-center">
+      <h3 style="" class="title" id="about">
+          محتوى عن الألمبياد العلمي. شرح ، كلام بسيط، إلخ... أبجد هوز حطي كلمن صعفس قرشت ثخذ ضظغ.أبجد هوز حطي كلمن صعفس قرشت ثخذ ضظغ. أبجد هوز حطي كلمن صعفس قرشت ثخذ ضظغ. أبجد هوز حطي كلمن صعفس قرشت ثخذ ضظغ. أبجد هوز حطي كلمن صعفس قرشت ثخذ ضظغ. أبجد هوز حطي كلمن صعفس قرشت ثخذ ضظغ. أبجد هوز حطي كلمن صعفس قرشت ثخذ ضظغ. أبجد هوز حطي كلمن صعفس قرشت ثخذ ضظغ. أبجد هوز حطي كلمن صعفس قرشت ثخذ ضظغ. أبجد هوز حطي كلمن صعفس قرشت ثخذ ضظغ. أبجد هوز حطي كلمن صعفس قرشت ثخذ ضظغ.
+      </h3>
+      <h3>____________________________________________________________________</h3>
+    </div>
+  </div>
+  <div class="container" align="center">
+    <h3 style="" class="title">المسارات</h3>
+    <div class="row">
+    <div class="col col-sm-12 col-md-3"><img height="130px" src="{% static 'science_olympiad/images/sections/white/lectures_white.png' %}">
+    <br><h4>المحاضرات</h4></div>
+    <div class="col col-sm-12 col-md-3"><img height="130px" src="{% static 'science_olympiad/images/sections/white/culture_white.png' %}">
+    <br><h4>المسابقة الثقافية</h4></div>
+    <div class="col col-sm-12 col-md-3"><img height="130px" src="{% static 'science_olympiad/images/sections/white/gallery_white.png' %}">
+    <br><h4>المعرض</h4></div>
+    <div class="col col-sm-12 col-md-3"><a href="{% url 'science_olympiad:hackathon_form' %}"><img height="130px" src="{% static 'science_olympiad/images/sections/white/hackathon_white.png' %}">
+    <br><h4>الهاكثون</h4></a></div>
+    </div>
+
+    <h3>____________________________________________________________________</h3>
+  </div>
+  <div class="container">
+  <div class="row">
+      <div class="col-md-6 sm-12">
+        <div class="card" style="height: 28rem;">
+          <div class="card-body">
+            <a class="twitter-timeline" data-height="400" href="https://twitter.com/IAU_KSAUHS?ref_src=twsrc%5Etfw">Tweets by IAU_KSAUHS</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 sm-12">
+        <div class="card" style="height: 28rem;">
+          <div class="card-body">
+            <div align="center">
+                <br><br><br><br><br><br>
+            <p class="card-text" style="font-size:20px;">معرض المخترعين</p>
+            <a href="{% url 'science_olympiad:gallery_form' %}" class="btn" style="font-size:20px">سجّلـ/ـي الآن!</a></div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+</div>
+{% endblock %}

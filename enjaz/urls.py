@@ -81,7 +81,9 @@ urlpatterns = [
     url(r'^tagging_autocomplete/', include('tagging_autocomplete.urls')),
 
     academy_forms_urls,
-    url(r'^academy/', include('academy.urls', namespace="academy"))
+    url(r'^academy/', include('academy.urls', namespace="academy")),
+
+    url(r'^science_olympiad/', include('science_olympiad.urls', namespace="science_olympiad")),
 ]
 
 if settings.DEBUG:

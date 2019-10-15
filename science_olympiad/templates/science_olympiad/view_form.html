@@ -1,0 +1,72 @@
+<!--
+ =========================================================
+ * Material Kit - v2.0.6
+ =========================================================
+
+ * Product Page: https://www.creative-tim.com/product/material-kit
+ * Copyright 2019 Creative Tim (http://www.creative-tim.com)
+   Licensed under MIT (https://github.com/creativetimofficial/material-kit/blob/master/LICENSE.md)
+
+
+ =========================================================
+
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. -->
+
+{% extends 'science_olympiad/base.html' %}{% load static %}
+
+{% block title %}نموذج التسجيل{% endblock %}
+
+{% block style %}
+
+{% endblock %}
+
+{% block content %}
+<body class="login-page sidebar-collapse">
+
+  <div class="page-header header-filter" style="background-image:url({% static 'science_olympiad/images/header.jpg' %}) ; background-size: cover; background-position: top center;">
+    <div class="container" style="padding-top:150px;">
+      <div class="row">
+        <div class="col-lg-4 col-md-6 ml-auto mr-auto">
+          <div class="card card-login">
+            <form class="form" method="" action="">
+              <div class="card-header text-center">
+                <h4 class="card-title">التسجيل</h4>
+              </div>
+              <div class="card-body">
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">
+                      <i class="material-icons">face</i>
+                    </span>
+                  </div>
+                  <input type="text" class="form-control" placeholder="الاسم الثلاثي...">
+                </div>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">
+                      <i class="material-icons">mail</i>
+                    </span>
+                  </div>
+                  <input type="email" class="form-control" placeholder="البريد الإلكتروني...">
+                </div>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">
+                      <i class="material-icons">lock_outline</i>
+                    </span>
+                  </div>
+                  <input type="password" class="form-control" placeholder="كلمة السر...">
+                </div>
+              </div>
+              <div class="footer text-center">
+                <a href="#" class="btn btn-primary btn-link btn-wd btn-lg">سجّلني</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br><br>
+</body>
+{% endblock %}

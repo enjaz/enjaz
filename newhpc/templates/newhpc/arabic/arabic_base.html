@@ -1,0 +1,36 @@
+<!DOCTYPE html>{% load staticfiles %}
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>New Hpc Website</title>
+    <link href="https://fonts.googleapis.com/css?family=Tajawal:300,400,700&display=swap&subset=arabic" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'newhpc/assets/css/style.css' %}" type="text/css">
+    <style>
+        body {
+            font-family: Tajawal, sans-serif;
+            font-weight: 300;
+        }
+        h2 {
+            font-weight: 400;
+        }
+        h1 {
+            font-weight: 700;
+        }
+
+    </style>
+</head>
+<body>
+    {% block body %}
+    {% endblock %}
+    <h1> Welcome to new HPC Website</h1>
+    <h1>اهلا بكم في صفحة المؤتمر</h1>
+    <h2>Hello Wolrd</h2>
+    <h2>اهلا بالعالم</h2>
+<p>This is very entertainting</p>
+<p>ما ودّك تشغّل اغاني وتطربنا ؟</p>
+<p class="t1">ما ودّك تشغّل اغاني وتطربنا 1 ؟</p>
+<p class="t2">ما ودّك تشغّل اغاني وتطربنا 2 ؟</p>
+<p class="t3">ما ودّك تشغّل اغاني وتطربنا 3 ؟</p>
+
+</body>
+</html>

@@ -69,7 +69,7 @@ class AbstractPosterInline(admin.TabularInline):
 class AbstractAdmin(admin.ModelAdmin):
     search_fields = BASIC_SEARCH_FIELDS + ["email", "title"]
     actions = [mark_deleted]
-    list_filter = ["event", "is_deleted"]
+    list_filter = ["event", "is_deleted", "accepted_presentaion_preference"]
     list_display = ['__unicode__', 'is_deleted', 'status',
                     'date_submitted']
     inlines = [AuthorInline, AbstractFigureInline, AbstractPosterInline]

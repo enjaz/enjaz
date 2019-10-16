@@ -1,0 +1,167 @@
+// SHOP - PRODUCT TAB 1
+
+.c-shop-product-tab-1{
+	padding-bottom:60px;
+
+	.c-product-tab-container{
+		width:100%;
+		position: relative;
+	}
+
+	.nav {
+		padding: 0 8em; 
+		margin-bottom: 1em;
+
+		> li {
+			padding:0 0.5em;
+
+			> a {
+				color: $general-font-color;
+				background-color: #ffffff;
+
+				&:hover, &:focus {
+					background-color: #ffffff;
+					color: #eb5d68;
+					border-top:2px solid;
+					border-color: #eb5d68;
+				}
+			} 
+
+			&.active, 
+			&:active {
+
+				> a {
+					color: #eb5d68; 
+					background-color: #ffffff;
+					border-top:2px solid;
+					border-color: #eb5d68;
+				}
+			}
+
+		}
+	}
+
+	.tab-content{
+
+		.c-product-tab-meta-bg {
+			padding:40px 0;
+
+			.c-product-tab-meta{
+				display:inline-block;
+				margin:0 auto;
+				padding: 0 1em;
+			}
+		}
+
+		.c-product-desc{
+			padding:60px 0;
+			overflow:auto;
+
+			img{
+				max-width:100%;
+			}
+
+			.c-content-title-1{
+				margin-top:5em;
+			}
+
+			.c-float-r{
+				float:right;
+			}
+
+			&.c-opt-2{
+				.c-content-title-1{
+					margin-top:0;
+				}
+			}
+		}
+
+		.c-product-review-margin{
+			padding:1em 0;
+		}
+
+		.c-user-avatar{
+			overflow:hidden;
+			display:inline-block;
+			width:80px;
+			height:80px;
+			border-radius:60px;
+			float:left;
+			margin-right:15px;
+
+			> img{
+				width:100%;
+			}
+		}
+
+		.c-product-review-name{
+			display:inline-block;
+			float:left;
+		}
+
+		.c-product-review-content{
+			padding-left: 95px;
+		}
+
+		.c-product-review-input{
+			margin-top:2em;
+			padding-top:0.5em;
+			border-top:1px solid;
+			border-color:rgba(0,0,0,0.2);
+
+			> h3{
+				margin-bottom:1em;
+			}
+
+			>.c-review-rating-input{
+				color:#5c6873;
+				
+				> i:hover{
+					color:#eb5d68;
+				}
+			}
+
+			> textarea{
+				width:100%;
+				height:4em;
+				margin-bottom:1em;
+			}
+ 
+		}
+	}
+
+}
+
+// END
+
+// MOBILE
+
+@media (max-width: $screen-sm-max) {
+	/* 1199px */
+
+	.c-shop-product-tab-1{ 
+		.nav {
+			padding: 0; 
+		}
+
+		.tab-content{
+
+			.c-product-desc {
+
+				img{
+					width:100%;
+				}
+
+				.c-content-title-1{
+					margin-top:1em;
+				}
+			}
+
+			.c-product-review-content{
+				padding-left: 0;
+			}
+		}
+	}
+}
+
+// END 

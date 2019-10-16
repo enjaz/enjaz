@@ -1,0 +1,121 @@
+// Footer 10
+
+.c-layout-footer-10{
+	padding: 110px 0 0 0;
+	background-image: url(../../../base/img/content/misc/bg-map.png);
+	background-position: 20% 70px;
+	background-repeat: no-repeat;
+
+	.c-layout-footer-10-content{
+		margin-bottom: 110px;
+
+		.c-layout-footer-10-title-container{
+			display: table;
+			margin-bottom: 40px;
+			
+			.c-layout-footer-10-title{
+				display: table-cell;
+				color:#24282a;
+				font-size: 15px;
+				font-weight: 500;
+				letter-spacing: 0.5px;
+			}
+			.c-layout-footer-10-title-line{
+				display: table-cell;
+				vertical-align: middle;
+				
+				> span{
+					width: 20px;
+					height: 2px;
+					margin-left: 10px;
+					display: block;
+				}
+			}
+		}		
+
+		.c-layout-footer-10-desc{
+			color:#4f4f4f;
+			font-size: 13px;
+			letter-spacing: 0.5px;
+			font-weight: 300;
+			padding-right: 80px;
+			line-height: 1.7em;
+		}
+
+		.c-layout-footer-10-list{
+			color:#4f4f4f;
+			font-size: 13px;
+			letter-spacing: 0.5px;
+			font-weight: 300;
+			padding:0;
+
+			>.c-layout-footer-10-list-item{
+				list-style-type: none;
+				margin-bottom: 15px;
+
+				&:last-child{
+					margin-bottom: 0;
+				}
+
+				> a:hover{
+					color:#7e7d7d;
+					border-bottom: 1px solid #eee;
+				}
+			}
+		}
+	}
+	.c-layout-footer-10-subfooter{
+		display: table;
+		padding:35px 0;
+
+		>.c-layout-footer-10-subfooter-content,
+		>.c-layout-footer-10-subfooter-social{
+			display: table-cell;
+			vertical-align: middle;
+		}
+
+		>.c-layout-footer-10-subfooter-content{
+			font-size: 12px;
+			font-weight: 300;
+			color:#7c8387;
+			letter-spacing: 0.5px;
+		}
+
+		>.c-layout-footer-10-subfooter-social{
+			text-align: right;
+
+			> ul{
+				padding: 0;
+				display: block;
+
+				> li{
+					display: inline-block;
+					margin:0 0 0 10px;
+					color:#a6a8a9;
+
+					>.socicon-btn{
+						border:none;
+					}
+				}
+			}
+		}
+	}
+}
+
+@media (max-width: $screen-sm-max){ // 991px
+
+	.c-layout-footer-10{
+		.c-layout-footer-10-content{
+			margin-bottom: 50px;
+
+			.c-layout-footer-10-desc,
+			.c-layout-footer-10-list{
+				margin-bottom: 40px;
+			}
+		}
+
+		.c-layout-footer-10-subfooter{
+			padding:20px 15px;
+		}
+	}
+}

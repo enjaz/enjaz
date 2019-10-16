@@ -1,0 +1,126 @@
+{% extends 'newhpc/arabic/arabic_base.html' %}
+{% load staticfiles %}
+{% block title %}مؤتمر التخصّصات الصحّية 2020 | الرياض{% endblock %}
+{% block style %}
+    @media (min-width: 992px) {
+    slide1h3 {
+        margin-top:55px
+    }
+    slide1p {
+        margin:60px 0 30px 0;
+    }
+    }
+    @media (max-width: 991px) {
+
+    .c-font-48 {
+        font-size:19px !important;
+    }
+    .c-font-70 {
+        font-size: 25px !important;
+    }
+    .c-font-40 {
+        font-size: 14px !important;
+    }
+    #slide1p{
+        margin:0 !important;
+    }
+    slide1h3 {
+        margin-top: 15px !important;
+    }
+    }
+{% endblock %}
+{% block content %}
+    <!-- BEGIN: PAGE CONTAINER -->
+	<div class="c-layout-page">
+    <!-- BEGIN: PAGE CONTENT -->
+    <!-- BEGIN: LAYOUT/SLIDERS/REVO-SLIDER-4 -->
+        <section class="c-layout-revo-slider c-layout-revo-slider-4" dir="ltr">
+            <div class="tp-banner-container c-theme">
+                <div class="tp-banner rev_slider" data-version="5.0">
+                    <ul>
+                        <!--BEGIN: SLIDE #1 -->
+                        <li data-transition="fade" data-slotamount="1" data-masterspeed="1000">
+                            <img
+                                alt=""
+                                src="{% static 'newhpc/images/slides/KSAUHS-TOWER4.jpg' %}"
+                                data-bgposition="center bottom"
+                                data-bgfit="cover"
+                                data-bgrepeat="no-repeat"
+                                >
+                            <div class="tp-caption customin customout"
+                                data-x="center"
+                                data-y="center"
+                                data-hoffset=""
+                                data-voffset="-50"
+                                data-speed="0"
+                                data-start="0"
+                                data-transform_idle="o:1;"
+                                data-transform_in="rX:0.5;scaleX:0.75;scaleY:0.75;o:0;s:500;e:Back.easeInOut;"
+                                data-transform_out="rX:0.5;scaleX:0.75;scaleY:0.75;o:0;s:500;e:Back.easeInOut;"
+                                data-splitin="none"
+                                data-splitout="none"
+                                data-elementdelay="0.1"
+                                data-endelementdelay="0.1"
+                                data-endspeed="600">
+                                <h3 style="direction: rtl;" id="slide1h3" class="c-font-70 c-font-bold c-font-center c-font-uppercase c-font-white c-block">
+                                   مؤتمر التخصّصات الصحّية 2020
+                                </h3>
+                                <p style="direction: rtl;" id="slide1p" class="c-font-40 c-font-bold c-font-center c-font-uppercase c-font-white c-block">
+                                   جامعة الملك سعود بن عبدالعزيز للعلوم الصحّية, الرياض
+                                </p>
+                                <h2 style="direction: rtl" class="c-font-40 c-font-bold c-font-center c-font-uppercase c-font-white c-block">
+                                   28 الى 30 يناير 2020
+                                </h2>
+                            </div>
+                        </li>
+                        <!--END -->
+
+                        <!--BEGIN: SLIDE #2 -->
+                        <li data-transition="fade" data-slotamount="1" data-masterspeed="1000">
+                            <img
+                                alt=""
+                                src="{% static 'newhpc/images/slides/hpc-students.jpg' %}"
+                                data-bgposition="center center"
+                                data-bgfit="cover"
+                                data-bgrepeat="no-repeat"
+                                >
+                            <div class="tp-caption customin customout"
+                                data-x="center"
+                                data-y="center"
+                                data-hoffset=""
+                                data-voffset="-50"
+                                data-speed="0"
+                                data-start="0"
+                                data-transform_idle="o:1;"
+                                data-transform_in="rX:0.5;scaleX:0.75;scaleY:0.75;o:0;s:500;e:Back.easeInOut;"
+                                data-transform_out="rX:0.5;scaleX:0.75;scaleY:0.75;o:0;s:600;e:Back.easeInOut;"
+                                data-splitin="none"
+                                data-splitout="none"
+                                data-elementdelay="0.1"
+                                data-endelementdelay="0.1"
+                                data-endspeed="600">
+                                <h3 style="direction: rtl" class="c-font-48 c-font-bold c-font-center c-font-uppercase c-font-white c-block">
+                                    مؤتمر التخصّصات الصحّية هو مؤتمر طلّابي<br> مُعتمد من قبل هيئة التخصّصات الصحّية.
+                                </h3>
+                            </div>
+                            <div class="tp-caption lft"
+                                data-x="center"
+                                data-y="center"
+                                data-voffset="110"
+                                data-speed="1000"
+                                data-start="1000"
+                                data-transform_idle="o:1;"
+                                data-transform_in="x:100;y:100;rX:120;scaleX:0.75;scaleY:0.75;o:0;s:500;e:Back.easeInOut;"
+                                data-transform_out="x:100;y:100;rX:120;scaleX:0.75;scaleY:0.75;o:0;s:600;e:Back.easeInOut;">
+                                <a href="#" class="c-action-btn btn btn-lg c-btn-square c-theme-btn c-btn-bold c-btn-uppercase">عن المؤتمر</a>
+                            </div>
+                        </li>
+                        <!--END -->
+
+                    </ul>
+                </div>
+            </div>
+        </section><!-- END: LAYOUT/SLIDERS/REVO-SLIDER-4 -->
+
+    </div>
+{% endblock %}

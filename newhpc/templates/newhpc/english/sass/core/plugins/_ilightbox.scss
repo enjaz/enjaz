@@ -1,0 +1,28 @@
+// iLightbox
+.ilightbox-caption{
+	>h4{
+		font-size: 18px;
+		text-shadow:none;
+	}
+
+	>p{
+		font-size: 14px;
+		text-shadow:none;
+	}
+}
+
+.ilightbox-holder.dark{
+	.ilightbox-caption{
+		> h1,h2,h3,h4{
+			color:#fff;
+		}
+	}
+}
+
+.ilightbox-holder.light{
+	.ilightbox-caption{
+		> h1,h2,h3,h4{
+			color:#000;
+		}
+	}
+}

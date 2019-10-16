@@ -44,8 +44,8 @@ class FaqQuestion(models.Model):
 class PreviousVersion(models.Model):
     arabic_title = models.CharField(max_length=255, null=True, verbose_name="اسم النسخة باللغة العربيّة")
     english_title = models.CharField(max_length=255, null=True, verbose_name="اسم النسخة باللغة الانجليزيّة")
-    arabic_vision = models.TextField(null=True, verbose_name="الرؤية باللغة العربيّة")
-    english_vision = models.TextField(null=True, verbose_name="الرؤية باللغة الانجليزيّة")
+    arabic_vision = models.TextField(null=True, blank=True,verbose_name="الرؤية باللغة العربيّة")
+    english_vision = models.TextField(null=True, blank= True,verbose_name="الرؤية باللغة الانجليزيّة")
     def __unicode__(self):
         return self.english_title
 

@@ -1,0 +1,360 @@
+<!DOCTYPE html> {% load staticfiles %}
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en"  >
+<!--<![endif]-->
+<!-- BEGIN HEAD -->
+<head>
+	<meta charset="utf-8"/>
+	<title>{% block title %}{% endblock %}</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta content="" name="description"/>
+	<meta content="" name="author"/>
+    <!-- BEGIN GLOBAL MANDATORY STYLES -->
+    <link rel="shortcut icon" href="{% static 'newhpc/images/favicon2.ico' %}" type="image/x-icon">
+    <link rel="icon" href="{% static 'newhpc/images/favicon2.ico' %}" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css?family=Tajawal:300,400,700&display=swap" rel="stylesheet">
+    <link href="{% static 'newhpc/english/assets/plugins/socicon/socicon.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'newhpc/english/assets/plugins/bootstrap-social/bootstrap-social.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'newhpc/english/assets/plugins/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'newhpc/english/assets/plugins/simple-line-icons/simple-line-icons.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'newhpc/english/assets/plugins/animate/animate.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'newhpc/english/assets/plugins/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+    <!-- END GLOBAL MANDATORY STYLES -->
+    <!-- BEGIN: BASE PLUGINS  -->
+    <link href="{% static 'newhpc/english/assets/plugins/revo-slider/css/settings.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'newhpc/english/assets/plugins/revo-slider/css/layers.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'newhpc/english/assets/plugins/revo-slider/css/navigation.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'newhpc/english/assets/plugins/cubeportfolio/css/cubeportfolio.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'newhpc/english/assets/plugins/owl-carousel/assets/owl.carousel.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'newhpc/english/assets/plugins/fancybox/jquery.fancybox.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'newhpc/english/assets/plugins/slider-for-bootstrap/css/slider.css' %}" rel="stylesheet" type="text/css" />
+    <!-- END: BASE PLUGINS -->
+    <!-- BEGIN: PAGE STYLES -->
+    <link href="{% static 'newhpc/english/assets/plugins/ilightbox/css/ilightbox.css' %}" rel="stylesheet" type="text/css" />
+    <!-- END: PAGE STYLES -->
+    <!-- BEGIN THEME STYLES -->
+    <link href="{% static 'newhpc/english/assets/demos/index/css/plugins.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'newhpc/english/assets/demos/index/css/components.css' %}" id="style_components" rel="stylesheet" type="text/css" />
+    <link href="{% static 'newhpc/english/assets/demos/index/css/themes/hpc-colors.css' %}" rel="stylesheet" id="style_theme" type="text/css" />
+    <link href="{% static 'newhpc/english/assets/demos/index/css/custom.css' %}" rel="stylesheet" type="text/css" />
+    <!-- END THEME STYLES -->
+
+
+    <link rel="shortcut icon" href="favicon.ico"/>
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif !important;
+        }
+        #simple-footer {
+            left: 0;
+            bottom: 0;
+            width: 100%;
+        }
+        .white-footer {
+            color: #fafefe;
+        }
+        @media (min-width: 992px) {
+            #hpcnav {
+            }
+            .c-desktop-logo {
+                height: 50px;
+            }
+            .c-layout-header .c-navbar .c-mega-menu.c-fonts-uppercase > .nav.navbar-nav > li > .c-link {
+                font-size: 12px;
+            }
+            .c-layout-header .c-navbar .c-mega-menu.c-fonts-uppercase > .nav.navbar-nav > li .dropdown-menu > li > a {
+                font-size: 14px;
+            }
+            .dropdown-menu.c-menu-type-classic.c-pull-left {
+                margin: -30px 0 0 -30px;
+            }
+        }
+            @media (max-width: 991px) {
+            #hpcnav {
+                margin-top: -13px;
+            }}
+            @media (max-width: 767px) {
+            #hpcnav {
+
+            }}
+            @media (max-width: 370px) {
+            #hpcnav {
+            }}
+            @media (min-width: 1200px) {
+            #hpcnav {
+            }
+            .c-layout-header .c-navbar .c-mega-menu.c-fonts-uppercase > .nav.navbar-nav > li > .c-link {
+                font-size: 16px;
+                text-transform: uppercase;
+                color: #242b2c;
+            }
+            .c-layout-header .c-navbar .c-mega-menu.c-fonts-uppercase > .nav.navbar-nav > li .dropdown-menu > li > a {
+                font-size: 16px;
+            }
+            .c-desktop-logo {
+                height: 60px;
+                margin-top: -7px;
+            }
+            }
+        {% block style %}
+        {% endblock %}
+    </style>
+</head>
+
+    <body class="c-layout-header-fixed c-layout-header-mobile-fixed c-layout-header-topbar c-layout-header-topbar-collapse c-topbar-expanded">
+
+    <!-- BEGIN: LAYOUT/HEADERS/HEADER-1 -->
+    <!-- BEGIN: HEADER -->
+    <header class="c-layout-header c-layout-header-4 c-layout-header-default-mobile" data-minimize-offset="80">
+        <div class="c-topbar c-topbar-light">
+            <div class="container">
+            <!-- BEGIN: INLINE NAV -->
+                <nav class="c-top-menu c-pull-left">
+                    <ul class="c-icons c-theme-ul">
+                        <li><a href="#"><i class="icon-social-twitter"></i></a></li>
+                        <li><a href="#"><i class="icon-social-facebook"></i></a></li>
+                        <li><a href="#"><i class="icon-social-dribbble"></i></a></li>
+                    </ul>
+                </nav>
+            <!-- END: INLINE NAV -->
+            <!-- BEGIN: INLINE NAV -->
+                <nav class="c-top-menu c-pull-right">
+                    <ul class="c-links c-theme-ul">
+                        <li><a href="#">Contact Us</a></li>
+                        <li class="c-divider">|</li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+
+                    <ul class="c-ext c-theme-ul">
+                        <li class="c-lang dropdown c-last">
+                            <a href="#">en</a>
+                            <ul class="dropdown-menu pull-right" role="menu">
+                                <li class="active"><a href="{% url 'newhpc:riy_en_index' %}">English</a></li>
+                                <li><a href="{% url 'newhpc:riy_ar_index' %}" style="letter-spacing: 0;">العربيّة</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                </nav>
+            <!-- END: INLINE NAV -->
+        </div>
+    </div>
+    <div class="c-navbar">
+        <div class="container">
+            <!-- BEGIN: BRAND -->
+            <div class="c-navbar-wrapper clearfix">
+                <div class="c-brand c-pull-left">
+                    <a href="index.html" class="c-logo">
+                        <img style="height: 55px;" src="{% static 'newhpc/english/assets/base/img/layout/logos/hpc-logo-3.png' %}" alt="Health Professions Conference" class="c-desktop-logo">
+                        <img style="height: 50px;margin-top: -12px;" src="{% static 'newhpc/english/assets/base/img/layout/logos/hpc-logo-3.png' %}" alt="Health Professions Conference" class="c-desktop-logo-inverse">
+                        <img style="height: 50px;margin-top: -12px;" src="{% static 'newhpc/english/assets/base/img/layout/logos/hpc-logo-3.png' %}" alt="Health Professions Conference" class="c-mobile-logo">
+                    </a>
+                    <button class="c-hor-nav-toggler" type="button" data-target=".c-mega-menu">
+                    <span class="c-line"></span>
+                    <span class="c-line"></span>
+                    <span class="c-line"></span>
+                    </button>
+                </div>
+                <!-- END: BRAND -->
+                <!-- BEGIN: HOR NAV -->
+                <!-- BEGIN: LAYOUT/HEADERS/MEGA-MENU -->
+                <!-- BEGIN: MEGA MENU -->
+                <!-- Dropdown menu toggle on mobile: c-toggler class can be applied to the link arrow or link itself depending on toggle mode -->
+                <nav class="c-mega-menu c-pull-right c-mega-menu-dark c-mega-menu-dark-mobile c-fonts-uppercase c-fonts-bold">
+                    <ul class="nav navbar-nav c-theme-nav">
+                        <li class="c-onepage-link">
+                            <a href="#" class="c-link" >Previous Versions</a>
+                        </li>
+                        <li class="c-onepage-link">
+                            <a href="#" class="c-link" >About Us</a>
+                        </li>
+
+                        <li class="c-onepage-link">
+                            <a href="#" class="c-link" >Media Center</a>
+                        </li>
+                        <li class="c-menu-type-classic">
+                        <a href="javascript:;" class="c-link dropdown-toggle">HPC Programs<span class="c-arrow c-toggler"></span></a>
+                            <ul class="dropdown-menu c-menu-type-classic c-pull-left">
+                                <li>
+                                    <a href="#">Exhibition</a>
+                                </li>
+                                <li>
+                                    <a href="#">Research Tract</a>
+                                </li>
+                                <li class="dropdown-submenu">
+                                    <a href="javascript:;">Lectures &amp; Workshops<span class="c-arrow c-toggler"></span></a>
+                                    <ul class="dropdown-menu c-pull-right">
+                                            <li>
+                                                <a href="#">General Program</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">Research Program</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">Collages’ Programs</a>
+                                            </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                                </li>
+                                <li class="c-onepage-link">
+                                    <a href="#" class="c-link" >Research</a>
+                                </li>
+                                <li class="c-onepage-link">
+                                    <a href="#" class="c-link" >Registration</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    <!-- END: MEGA MENU -->
+                     <!-- END: LAYOUT/HEADERS/MEGA-MENU -->
+                    <!-- END: HOR NAV -->
+                    </div>
+                </div>
+            </div>
+        </header>
+        {% block content %}
+        {% endblock %}
+        <!-- BEGIN: LAYOUT/FOOTERS/FOOTER-1 -->
+        <footer class="c-layout-footer c-layout-footer-1" id="simple-footer">
+            <div class="c-postfooter">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6" style="width: 100%;">
+                            <p style="text-align: center;" class="c-copyright c-font-oswald c-font-15 c-font-white c-font-bold footer-responsive">
+                            Built by the students of KSAU-HS.<br><a href="https://github.com/enjaz/enjaz" class="c-font-15 c-link c-font-bold white-footer" target="_blank">&copy; Enjaz Team 2020</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- END: LAYOUT/FOOTERS/FOOTER-1 -->
+
+        <!-- BEGIN: LAYOUT/FOOTERS/GO2TOP -->
+        <div class="c-layout-go2top">
+            <i class="icon-arrow-up"></i>
+        </div><!-- END: LAYOUT/FOOTERS/GO2TOP -->
+    <!-- END: HEADER --><!-- END: LAYOUT/HEADERS/HEADER-1 -->
+    
+        <!-- BEGIN: LAYOUT/BASE/BOTTOM -->
+        <!-- BEGIN: CORE PLUGINS -->
+        <!--[if lt IE 9]>
+        <script src="{% static 'newhpc/english/assets/global/plugins/excanvas.min.js' %}"></script>
+        <![endif]-->
+        <script src="{% static 'newhpc/english/assets/plugins/jquery.min.js' %}" type="text/javascript" ></script>
+        <script src="{% static 'newhpc/english/assets/plugins/jquery-migrate.min.js' %}" type="text/javascript" ></script>
+        <script src="{% static 'newhpc/english/assets/plugins/bootstrap/js/bootstrap.min.js' %}" type="text/javascript" ></script>
+        <script src="{% static 'newhpc/english/assets/plugins/jquery.easing.min.js' %}" type="text/javascript" ></script>
+        <script src="{% static 'newhpc/english/assets/plugins/reveal-animate/wow.js' %}" type="text/javascript" ></script>
+        <script src="{% static 'newhpc/english/assets/demos/default/js/scripts/reveal-animate/reveal-animate.js' %}" type="text/javascript" ></script>
+    
+        <!-- END: CORE PLUGINS -->
+
+        <!-- BEGIN: LAYOUT PLUGINS -->
+        <script src="{% static 'newhpc/english/assets/plugins/revo-slider/js/jquery.themepunch.tools.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/english/assets/plugins/revo-slider/js/jquery.themepunch.revolution.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/english/assets/plugins/revo-slider/js/extensions/revolution.extension.slideanims.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/english/assets/plugins/revo-slider/js/extensions/revolution.extension.layeranimation.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/english/assets/plugins/revo-slider/js/extensions/revolution.extension.navigation.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/english/assets/plugins/revo-slider/js/extensions/revolution.extension.video.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/english/assets/plugins/revo-slider/js/extensions/revolution.extension.parallax.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/english/assets/plugins/cubeportfolio/js/jquery.cubeportfolio.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/english/assets/plugins/owl-carousel/owl.carousel.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/english/assets/plugins/counterup/jquery.waypoints.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/english/assets/plugins/counterup/jquery.counterup.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/english/assets/plugins/fancybox/jquery.fancybox.pack.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/english/assets/plugins/smooth-scroll/jquery.smooth-scroll.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/english/assets/plugins/typed/typed.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/english/assets/plugins/slider-for-bootstrap/js/bootstrap-slider.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/english/assets/plugins/js-cookie/js.cookie.js' %}" type="text/javascript"></script>
+            <!-- END: LAYOUT PLUGINS -->
+	
+        <!-- BEGIN: THEME SCRIPTS -->
+        <script src="{% static 'newhpc/english/assets/base/js/components.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/english/assets/base/js/components-shop.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/english/assets/base/js/app.js' %}" type="text/javascript"></script>
+        <script>
+        $(document).ready(function() {    
+            App.init(); // init core    
+        });
+        </script>
+        <!-- END: THEME SCRIPTS -->
+        <!-- BEGIN: PAGE SCRIPTS -->
+        <script>
+                $(document).ready(function() {
+        
+        var slider = $('.c-layout-revo-slider .tp-banner');
+        var cont = $('.c-layout-revo-slider .tp-banner-container');
+        var height = (App.getViewPort().width < App.getBreakpoint('md') ? 400 : 620);
+    
+        var api = slider.show().revolution({
+            sliderType:"standard",
+            sliderLayout:"fullwidth",
+            delay: 15000,    
+            autoHeight: 'off',
+            gridheight:500,
+    
+            navigation: {
+                keyboardNavigation:"off",
+                keyboard_direction: "horizontal",
+                mouseScrollNavigation:"off",
+                onHoverStop:"on",
+                arrows: {
+                    style:"circle",
+                    enable:true,
+                    hide_onmobile:false,
+                    hide_onleave:false,
+                    tmp:'',
+                    left: {
+                        h_align:"left",
+                        v_align:"center",
+                        h_offset:30,
+                        v_offset:0
+                    },
+                    right: {
+                        h_align:"right",
+                        v_align:"center",
+                        h_offset:30,
+                        v_offset:0
+                    }
+                },     
+                touch:{
+                    touchenabled:"on",
+                    swipe_threshold: 75,
+                    swipe_min_touches: 1,
+                    swipe_direction: "horizontal",
+                    drag_block_vertical: false
+                },     
+            },
+            viewPort: {
+                enable:true,
+                outof:"pause",
+                visible_area:"80%"
+            },
+    
+            shadow: 0,
+    
+            spinner: "spinner2",
+    
+            disableProgressBar:"on",
+    
+            fullScreenOffsetContainer: '.tp-banner-container',
+    
+            hideThumbsOnMobile: "on",
+            hideNavDelayOnMobile: 1500,
+            hideBulletsOnMobile: "on",
+            hideArrowsOnMobile: "on",
+            hideThumbsUnderResolution: 0,
+        
+        });
+    }); //ready	
+                </script>
+        {% block script %}
+        {% endblock %}
+        <!-- END: PAGE SCRIPTS -->
+		<!-- END: LAYOUT/BASE/BOTTOM -->
+    </body>
+</html>

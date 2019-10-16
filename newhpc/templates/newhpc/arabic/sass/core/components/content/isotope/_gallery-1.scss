@@ -1,0 +1,155 @@
+// ISOTOPE - GALLERY
+
+.c-content-isotope-gallery{
+
+	.c-content-isotope-item{
+		height:auto;
+		position: relative;
+
+		>.c-content-isotope-image-container{
+			position: relative;
+
+			>.c-content-isotope-image{
+				width:100%;
+				height: auto;
+			}
+
+			>.c-content-isotope-overlay{
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0,0,0,0.7);
+				top:0;
+				left:0;
+				opacity: 0;
+				@include transition(all .2s ease-in-out);
+
+				>.c-content-isotope-overlay-icon{
+					color:#fff;
+					position: absolute;
+					top:50%;
+					left:50%;
+					transform:translateY(-50%) translateX(-50%);
+				}
+
+				&:hover{
+					opacity: 1;
+					cursor: pointer;
+				}
+			}
+		}
+	}
+
+	&.c-opt-1, 
+	&.c-opt-4,
+	&.c-opt-5{
+		.c-content-isotope-item{
+			width:20%;
+
+			&.c-item-size-double{
+				width:40%;
+			}
+		}
+	}
+
+	&.c-opt-2{
+		margin:-10px;
+
+		.c-content-isotope-item{
+			width: 20%;
+			padding:10px;
+
+			.c-content-isotope-image-container{
+				padding:7px;
+				background-color: rgba(0,0,0,0.1);
+			}
+		}
+	}
+
+	&.c-opt-3{
+		margin: -5px;
+
+		.c-content-isotope-item{
+			width:50%;
+			padding:5px;
+		}
+	}
+
+	&.c-opt-4{
+		margin: -5px;
+		.c-content-isotope-item{
+			padding:5px;
+		}
+	}
+}
+
+.c-content-isotope-filter-1,
+.c-content-isotope-filter-2{
+	margin: 20px auto;
+	display: block;
+
+	>.c-isotope-filter-btn{
+		border: none;
+		background-color: transparent;
+		font-weight:600;
+		text-transform: uppercase;
+		padding:10px 20px;
+		opacity: 0.6;
+		font-size: 15px;
+		@include transition(all .2s ease-in-out);
+
+		&.c-active,
+		&:hover{
+			opacity: 1;
+			border-bottom: 3px solid;
+		}
+
+		&:focus,
+		&:active{
+			outline:none;
+		}
+	}
+}
+
+@media (max-width: $screen-sm-max){ // 991px
+
+	.c-content-isotope-gallery{
+		&.c-opt-1,
+		&.c-opt-4,
+		&.c-opt-5{
+			.c-content-isotope-item{
+				width:50%;
+
+				&.c-item-size-double{
+					width:100%;
+				}
+			}
+		}
+
+		&.c-opt-2{
+			.c-content-isotope-item{
+				width:50%;
+			}
+		}
+
+		&.c-opt-3{		
+			.c-content-isotope-item{
+				width:100%;
+			}
+		}
+	}
+}
+
+@media (max-width: $screen-xs-min){ // 480px;
+
+	.c-content-isotope-gallery{
+
+		&.c-opt-2{
+			.c-content-isotope-item{
+				width:100%;
+			}
+		}
+	}
+
+}
+

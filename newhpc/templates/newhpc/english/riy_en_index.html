@@ -8,25 +8,29 @@
     #slide1p {
         margin:60px 0 30px 0;
     }
+    #our-vision.c-feature-15-container {
+        margin: 0 -30px 0 350px;
     }
-    @media (max-width: 1200px) {
-    .c-font-48 {
+    }
+    @media
+    (max-width: 1200px) {
+    #slide2h3.c-font-48 {
         font-size:43px !important;
     }
-    .c-font-70 {
+    #slide1h3.c-font-70 {
         font-size: 50px !important;
     }
-    .c-font-40 {
+    #slide1p.c-font-40 {
         font-size: 30px !important;
     }
     @media (max-width: 991px) {
-    .c-font-48 {
+    #slide2h3.c-font-48 {
         font-size:19px !important;
     }
-    .c-font-70 {
+    #slide1h3.c-font-70 {
         font-size: 25px !important;
     }
-    .c-font-40 {
+    #slide1p.c-font-40 {
         font-size: 14px !important;
     }
     #slide1p{
@@ -34,6 +38,9 @@
     }
     #slide1h3 {
         margin-top: 15px !important;
+    }
+    #our-vision.c-feature-15-container {
+        margin: 0 !important;
     }
     }
 {% endblock %}
@@ -107,7 +114,7 @@
                                 data-elementdelay="0.1"
                                 data-endelementdelay="0.1"
                                 data-endspeed="600">
-                                <h3 class="c-font-48 c-font-bold c-font-center c-font-white c-block">
+                                <h3 class="c-font-48 c-font-bold c-font-center c-font-white c-block" id="slide2h3">
                                     The Health Professions Conference<br>is a students-based conference accredited by<br>the Saudi Commission for Health Specialties.
                                 </h3>
                             </div>
@@ -129,6 +136,47 @@
                 </div>
             </div>
         </section><!-- END: LAYOUT/SLIDERS/REVO-SLIDER-4 -->
-
     </div>
+
+    <!-- BEGIN: CONTENT/FEATURES/FEATURES-15-3 -->
+    <div id="feature-15-1" class="c-bg-parallax c-content-feature-15 c-bg-img-center" style="">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <div class="c-feature-15-container c-bg-white">
+                        <h2 class="c-feature-15-title c-font-bold c-font-uppercase c-theme-border c-font-40">Our Vision</h2>
+                        <p class="c-feature-15-desc c-font-20" style="margin-bottom:40px ">
+                            To accomplish innovation and excel in the methods of knowledge exchange in health education and medical research nationally and internationally.
+                        </p>
+                        <h2 class="c-feature-15-title c-font-bold c-font-uppercase c-theme-border c-font-40" style="margin-top: 130px;border-color: #9d0051 !important;">Health Professions Conference Concept</h2>
+                        <p class="c-feature-15-desc c-font-20">
+                            The Health Professions Conference is the first students-based conference accredited by the Saudi Commission for Health Specialties. It is one of the major annual programs held at King Saud Bin Abdulaziz University for Health Sciences that is planned, organized, and executed by the students’ club under the supervision of deanship of students affairs. The Fifth Health Professions Conference offers multiple lectures and various workshops that interest health practitioners. Selection of the best researches are also presented competing for the top positions.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- END: CONTENT/FEATURES/FEATURES-15-3 -->
+
+
+    <!-- BEGIN: CONTENT/FEATURES/FEATURES-15-1 -->
+    <div id="feature-15-1" class="c-content-feature-15 c-bg-img-center" style="background-image: url({% static 'newhpc/images/backgrounds/king-vision.jpg' %})">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-xs-12" style="opacity: 0.97;">
+                    <div class="c-feature-15-container c-bg-white" id="our-vision">
+                        <h2 class="c-feature-15-title c-font-bold c-font-uppercase c-theme-border c-font-50">Our Vision</h2>
+                        <p class="c-feature-15-desc c-font-30">
+                            To accomplish innovation and excel in the methods of knowledge
+                            exchange in health education and medical research nationally
+                            and internationally.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END: CONTENT/FEATURES/FEATURES-15-1 -->
 {% endblock %}

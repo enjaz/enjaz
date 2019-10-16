@@ -1,0 +1,33 @@
+// SHOPPING RESULT FILTER 1
+
+.c-shop-result-filter-1 {
+
+	.c-filter {
+		float: right;
+		& + .c-filter {
+			padding-right: 20px;
+		}
+
+		.c-input {
+			font-size: 12px;
+			padding-left: 5px;
+			padding-right: 0;
+		}
+	}
+}
+
+// END
+
+//MOBILE
+
+@media (max-width: $screen-sm-max) {
+	/* 991px */
+	.c-shop-result-filter-1 {
+	}
+}
+
+@media (max-width: $screen-xs-max) {
+	/* 767px */
+	.c-shop-result-filter-1 {
+	}
+}

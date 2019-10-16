@@ -1,0 +1,60 @@
+// SHOP BANNER 
+
+.c-shop-banner-2 {
+
+	.c-line {
+		padding: 15px 0;
+		border-top: 1px solid #d8dde1;
+		border-bottom: 1px solid #d8dde1;
+	}
+
+	.btn {
+		margin-top: 50px;
+	}
+
+	.c-image {
+		height: 470px;
+		background-size: contain;
+	}
+
+	.c-ad {
+		margin: 164px 0;
+	}
+
+}
+
+// END DESKTOP
+
+// MOBILE
+@media (max-width: $screen-sm-max) {
+	/* 991px */
+
+	.c-shop-banner-2 {
+
+		.c-ad {
+			margin: 58px 0 40px;
+		}
+
+		.c-image {
+			height: 300px;
+			background-position: bottom;
+		}
+
+	}
+
+}
+
+@media (max-width: $screen-xs-max) {
+	/* 767px */
+
+	.c-shop-banner-2 {
+
+		.c-image {
+			height: 250px;
+		}
+
+	}
+
+}
+
+// END

@@ -1,0 +1,40 @@
+// SHOP - PRODUCT COMPARISON
+
+.c-shop-product-compare{
+
+	.c-product-compare-table{
+		width:100%;
+
+		tr{
+
+			> th{
+				border-top:2px solid;
+				border-bottom:1px solid;
+				border-color:#cccccc;
+
+			}
+
+			> td {
+				padding: 0.5em;
+				border-bottom:1px solid;
+				border-color:#cccccc;
+			}
+		}
+
+		.c-compare-info{
+			background-color:#f2f2f2;
+		}
+
+		
+	} 
+
+	.c-compare-item{
+		text-align:center;
+
+		> a {
+			> img{
+				width: 80px;
+			}
+		}
+	}	 
+}  

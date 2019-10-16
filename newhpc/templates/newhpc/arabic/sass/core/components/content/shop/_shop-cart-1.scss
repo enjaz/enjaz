@@ -1,0 +1,172 @@
+// SHOPPING CART PAGE 1
+
+.c-shop-cart-page-1{
+
+	>.c-cart-table-title,
+	>.c-cart-table-row {
+		border-bottom:1px solid;
+		border-color:rgba(135, 151, 174, 0.15);
+	}
+
+	>.c-cart-table-row{
+		padding:15px 0;	
+
+		>.c-cart-item-title{
+			margin:0 15px 20px 15px;
+			padding:10px;
+			border:2px solid;
+			float:left;
+
+		}
+
+		>.c-cart-image{
+			position:relative;
+			clear:both;
+
+			> img{
+				width:65%;
+			}
+		}
+
+		>.c-cart-desc{
+			h3{
+				margin-top:0;
+			}
+		}
+
+		>.c-cart-remove{
+			>.c-cart-remove-desktop{
+				line-height:1em; 
+				font-size:24px;
+			} 
+		}
+	}
+
+	>.c-cart-buttons{
+		margin-top:20px;
+		clear:both;
+
+		>a{
+			display:inline-block;
+		}
+
+		>.c-cart-float-l{
+			float:left;
+		}
+
+		>.c-cart-float-r{
+			float:right;
+		}
+	}
+
+	.c-cart-subtotal-border {
+		border-bottom:1px solid;
+		border-color: rgba(135, 151, 174, 0.15);
+	}
+
+
+	.c-cart-sub-title,
+	.c-cart-remove-mobile,
+	.c-cart-item-title  {
+		display:none;
+	}
+
+}
+
+// END
+
+//MOBILE
+
+@media (max-width: $screen-sm-max) { /* 991px */
+	.c-shop-cart-page-1{
+
+		.c-cart-table-title,
+		.c-cart-remove-desktop {
+			display:none;
+		}
+
+		.c-cart-sub-title,
+		.c-cart-remove-mobile {
+			display:block;
+		}
+
+		>.c-cart-table-row{
+			box-shadow:0px 4px 4px -4px #ccc;
+			border:none;
+
+			>.c-cart-item-title{
+				margin-top:10px;
+				display:block;
+
+				&.c-cart-item-first{
+					margin-top:0;
+				}
+			}
+
+			
+			>.c-cart-ref, 
+			>.c-cart-qty, 
+			>.c-cart-price, 
+			>.c-cart-total {
+				margin:20px 0;
+			}
+
+			>.c-cart-remove{
+				text-align:center;
+				margin:20px 0;
+
+				>.c-cart-remove-mobile{
+					display:inline-block;
+				}
+			}
+		}
+
+
+	}
+}
+
+@media (max-width: $screen-xs-max) { /* 767px */
+	.c-shop-cart-page-1{
+
+		>.c-cart-table-row{
+
+			>.c-cart-image{
+
+				> img{
+					width:100%;
+				}
+			}
+
+			>.c-cart-ref,
+			>.c-cart-price,
+			>.c-cart-remove {
+				clear:both;
+			}
+		}
+	}
+}
+
+@media (max-width: $screen-xs-min) { /* 480px */
+	.c-shop-cart-page-1{
+
+		>.c-cart-buttons{
+
+			>a{
+				display:block;
+				margin-bottom:20px;
+
+				&:last-child{
+					margin:0;
+				}
+			}
+
+			>.c-cart-float-l{
+				float:none;
+			}
+
+			>.c-cart-float-r{
+				float:none;
+			}
+		}
+	}
+}

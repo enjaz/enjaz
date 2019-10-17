@@ -95,8 +95,7 @@ class TeamAdmin(admin.ModelAdmin):
     list_filter = ('city', 'gender', 'year')
     search_fields = ('name', 'city', 'gender', 'code_name', 'email')
     filter_horizontal = ('members',)
-    raw_id_fields = ['members']
-    form = TeamAdminForm
+    raw_id_fields = ['members','coordinator']
 
 admin.site.register(College, CollegeAdmin)
 admin.site.register(Club, ClubAdmin)

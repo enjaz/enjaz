@@ -1,43 +1,109 @@
-{% extends 'events_submission_base.html' %}{% load staticfiles %} {% block meta_description %}{{ event.english_name }} Abstract Submission{% endblock %} {% block title %}Abstract submission{% endblock %} {% block description %}{% if event.abstract_submission_instruction_url %}
-<div class="english-field">
-    <p class="text-center">Please fill in the following form. Make sure that you have read <a target="_blank" href="{{ event.abstract_submission_instruction_url }}">the regulations carefully</a>.</div>{% endif %}{% endblock %} {% block content %}
+{% extends 'events_submission_base.html' %}{% load staticfiles %}
+{% block meta_description %}{{ event.english_name }} Abstract Submission{% endblock %}
+{% block title %} HPC 2020 Abstract submission | {{ event.city }}{% endblock %}
+{% block font %}
+    <link href="https://fonts.googleapis.com/css?family=Tajawal:300,400,700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block description %}
+    <br>
+    <a href="{% url 'newhpc:riy_en_index' %}" class="logo">
+				<img src="{% static 'newhpc/images/logos/hpc-logo-white2.png' %}" style="margin: 15px 5px 5px 0;width: 160px" alt="Health professions conference">
+    </a>
+    <div class="english-field">
+        <h1 class="text-center" style="color: #fefefe;font-weight: 700">Abstract Submission Form</h1>
+            <a target="_blank" href="#">
+                <div>
+                    <button class="btn btn-block btn-red" style="background-color: #9d0051; border-color: #670031;">Click here for Case Reports<br>submission form.</button>
+                </div>
+            </a>
+    </div>
+{% endblock %}
+{% block content %}
 
 <style>
     #author-formset {
         color: black;
     }
-    
+
     #author-formset input {
         width: 100%
     }
-    
+
     .add-row {
         margin-bottom: 5%;
         border: white solid thin !important;
     }
-    
+
     .delete-row {
         float: right;
     }
-    
+
     #authors-div {
         padding: 3%;
+    }
+    * {
+        font-family: 'Tajawal', sans-serif !important;
+    }
+    body .login-container .login-header {
+        background-color: #838487;
+    }
+    body .login-container .login-header.login-caret:after {
+        border-top-color: #838487;
+        z-index: 9999;
+    }
+    body .login-form {
+        background: #6d6e71;
+    }
+    body.login-page {
+        background: #838487 !important;
+    }
+    body.login-page .login-form .form-group .input-group {
+        background: #838487;
+        border-color: #6b6c6f;
+    }
+    body.login-page .login-form .form-group .input-group .input-group-addon:after {
+        background: #41e9fb;
+    }
+    body .btn-primary {
+        background: #33b2c1;
+    }
+    .btn-danger {
+        background: #9d0051;
+        border-color: #9d0051;
+    }
+    body.login-page .login-form .form-group .btn-login {
+        background: #33b2c1;
+        border-color: #41e9fb;
+    }
+    body.login-page .login-form .form-group .btn-login:hover {
+        background: #9d0051;
+        border-color: #9d0051;
+    }
+    .btn-red {
+        font-size:17px;
+        margin-top: 20px;
+    }
+    .btn-red:hover {
+        color: #41e9fb;
+    }
+    .text-semibold {
+        font-weight: 400;
+    }
+    .form-question {
+        font-size: 15px;
+        font-weight: 500;
+        text-align: left !important;
+        color: white;
+    }
+    h3 {
+        color: white;
     }
 </style>
 <form method="post" role="form" id="form_register" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="english-field registration-form">
-        <h3 class="english-field">Your details</h3>
-        <div class="form-group">
-            <div class="english-field input-group{% if form.title.errors or form.ar_middle_name.errors or form.ar_last_name.errors %} validate-has-error{% endif %}">
-                <div class="input-group-addon">
-                    <i class="entypo-flag"></i>
-                </div>
-
-                <input {% if form.title.value and not form.title.errors %}value="{{ form.title.value }}" {% endif %}type="text" class="form-control english-field" name="title" id="title" placeholder="Abstract title" required="required" /> {% if form.title.errors %} {% for error in form.title.errors %}
-                <label class='error' for='title' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
-            </div>
-        </div>
+        <h3 class="english-field text-semibold">Presenting Author Information</h3>
         <div class="form-group">
             <div class="english-field input-group{% if form.presenting_author.errors %} validate-has-error{% endif %}">
                 <div class="input-group-addon">
@@ -49,39 +115,20 @@
         </div>
     </div>
 
-        <div class="form-group">
-            <div class="input-group" style="width:100% !important; ">
-                <div id="authors-div">
-                    <h4 class="english-field" style="color:white">Authors' names:</h4>
-                    <h4 class="english-field" style="color:white">Do NOT repeat presenting author name again</h4>
-
-
-                    {# -------- #} {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #} {{ author_formset.management_form }} {{ author_formset.non_form_errors.as_ul }}
-                    <table id="author-formset" class="form" style="width: 100%;">
-                        {% for form in author_formset.forms %} {% if forloop.first %}
-                        <colgroup>
-                            <col class="col-xs-8">
-                            <col class="col-xs-4">
-                        </colgroup>
-                        {% endif %}
-                        <tr class="form-container">
-                            {% for field in form.visible_fields %}
-                            <td>
-                                {# Include the hidden fields in the form #} {% if forloop.first %} {% for hidden in form.hidden_fields %} {{ hidden }} {% endfor %} {% endif %}
-                                <div class="form-group">
-                                    {{ field.errors.as_ul }} {{ field }}
-                                </div>
-                            </td>
-                            {% endfor %}
-                        </tr>
-                        {% endfor %}
-                    </table>
-                    {# ------- #}
+            <div class="form-group" id="gender-group">
+            <div class="input-group{% if form.gender.errors %} validate-has-error{% endif %}">
+                <div class="input-group-addon">
+                    <i class="entypo-doc"></i>
                 </div>
+                <select {% if form.gender.value and not form.gender.errors %}value="{{ form.gender.value }}" {% endif %}class="form-control english-field" id="gender" name="gender" required title="Gender">
+                                                <option value="">Gender</option>
+                                                <option value="F">Female</option>
+                                                <option value="M">Male</option>
+					</select> {% if form.gender.errors %} {% for error in form.gender.errors %}
+                <label class='error' for='gender' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
         </div>
-
-        <div class="form-group">
+            <div class="form-group">
             <div class="input-group{% if form.university.errors %} validate-has-error{% endif %}">
                 <div class="input-group-addon">
                     <i class="entypo-graduation-cap"></i>
@@ -170,16 +217,92 @@
             </div>
         </div>
 
-        <div class="form-group" id="level-group">
-            <div class="input-group{% if form.level.errors %} validate-has-error{% endif %}" style="text-align: left; color: #ffffff;">
+        <div class="form-group">
+            <p class="form-question">When did you graduate/ Expected year of graduation:</p>
+            <div class="english-field input-group{% if form.graduation_year.errors %} validate-has-error{% endif %}">
                 <div class="input-group-addon">
-                    <i class="entypo-address"></i>
+                    <i class="entypo-graduation-cap"></i>
                 </div>
-                <input class="english-field" type="radio" name="level" value="U" style="margin-left: 10px;margin-right: 5px;" checked required>Undergraduate<br>
-                <input class="english-field" type="radio" name="level" value="G" style="margin-left: 10px; margin-right: 5px;" required>Graduate {% if form.level.errors %} {% for error in form.level.errors %}
-                <label class='error' for='level' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+                <input {% if form.graduation_year.value and not form.graduation_year.errors %}value="{{ form.graduation_year.value }}" {% endif %}type="text" class="form-control english-field" name="graduation_year" id="graduation_year" placeholder="Graduation Year" required="required" data-mask="[\d\+]+" data-is-regex="true"  /> {% if form.graduation_year.errors %} {% for error in form.graduation_year.errors %}
+                <label class='error' for='graduation_year' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
         </div>
+        <div class="form-group">
+            <div class="english-field input-group{% if form.email.errors %} validate-has-error{% endif %}">
+                <div class="input-group-addon">
+                    <i class="entypo-mail"></i>
+                </div>
+
+                <input {% if form.email.value and not form.email.errors %}value="{{ form.email.value }}" {% endif %}type="text" class="form-control english-field" name="email" id="email" {% if not form.email.errors %}placeholder="Email address" {% endif %} required="required" /> {% if form.email.errors %} {% for error in form.email.errors %}
+                <label class='error' for='email' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="english-field input-group{% if form.phone.errors %} validate-has-error{% endif %}">
+                <div class="input-group-addon">
+                    <i class="entypo-mobile"></i>
+                </div>
+
+                <input {% if form.phone.value and not form.phone.errors %}value="{{ form.phone.value }}" {% endif %}type="text" class="form-control english-field" name="phone" id="phone" placeholder="Contact number" required="required" data-mask="[\d\+]+" data-is-regex="true" /> {% if form.phone.errors %} {% for error in form.phone.errors %}
+                <label class='error' for='phone' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+            </div>
+        </div>
+
+        <div class="english-field registration-form">
+        <h3 class="english-field text-semibold">Study Information:</h3>
+        <div class="form-group">
+            <div class="english-field input-group{% if form.title.errors or form.ar_middle_name.errors or form.ar_last_name.errors %} validate-has-error{% endif %}">
+                <div class="input-group-addon">
+                    <i class="entypo-flag"></i>
+                </div>
+                <input {% if form.title.value and not form.title.errors %}value="{{ form.title.value }}" {% endif %}type="text" class="form-control english-field" name="title" id="title" placeholder="Abstract title" required="required" /> {% if form.title.errors %} {% for error in form.title.errors %}
+                <label class='error' for='title' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+            </div>
+        </div>
+            <div class="form-group">
+            <div class="english-field input-group{% if form.principle_investigator.errors %} validate-has-error{% endif %}">
+                <div class="input-group-addon">
+                    <i class="entypo-user"></i>
+                </div>
+                <input {% if form.principle_investigator.value and not form.principle_investigator.errors %}value="{{ form.principle_investigator.value }}" {% endif %}type="text" class="form-control english-field" name="principle_investigator" id="principle_investigator" placeholder="Principle Investigator" required="required" /> {% if form.principle_investigator.errors %} {% for error in form.principle_investigator.errors %}
+                <label class='error' for='principle_investigator' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="input-group" style="width:100% !important; ">
+                <div id="authors-div">
+                    <h4 class="english-field" style="color:white"><b>Co-Authors' names:</b></h4>
+                    <h4 class="english-field" style="color:white"><b>Without</b> Presenting Author and Principle Investigator names.</h4>
+
+
+                    {# -------- #} {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #} {{ author_formset.management_form }} {{ author_formset.non_form_errors.as_ul }}
+                    <table id="author-formset" class="form" style="width: 100%;">
+                        {% for form in author_formset.forms %} {% if forloop.first %}
+                        <colgroup>
+                            <col class="col-xs-8">
+                            <col class="col-xs-4">
+                        </colgroup>
+                        {% endif %}
+                        <tr class="form-container">
+                            {% for field in form.visible_fields %}
+                            <td>
+                                {# Include the hidden fields in the form #} {% if forloop.first %} {% for hidden in form.hidden_fields %} {{ hidden }} {% endfor %} {% endif %}
+                                <div class="form-group">
+                                    {{ field.errors.as_ul }} {{ field }}
+                                </div>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {# ------- #}
+                </div>
+            </div>
+        </div>
+        </div>
+
+
+
         <div class="form-group">
             <div class="input-group{% if form.study_field.errors %} validate-has-error{% endif %}">
                 <div class="input-group-addon">
@@ -271,7 +394,29 @@
                 <label class='error' for='field' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
         </div>
-        
+        <div class="form-group">
+            <div class="input-group{% if form.study_design.errors %} validate-has-error{% endif %}">
+                <div class="input-group-addon">
+                    <i class="entypo-clipboard"></i>
+                </div>
+                <select {% if form.study_design.value and not form.study_design.errors %}value="{{ form.study_design.value }}" {% endif %}class="form-control" id="study-design-list" title="{{ form.study_design.label }}" required="required">
+                    <option value="">{{ form.study_design.label }}</option>
+                    <option value="Meta-analysis study">Meta-analysis study</option>
+                    <option value="Systematic review">Systematic review</option>
+                    <option value="Randomized controlled trial">Randomized controlled trial</option>
+                    <option value="Non-randomized controlled trial">Non-randomized controlled trial</option>
+                    <option value="Uncontrolled trials">Uncontrolled trials</option>
+                    <option value="Cohort study">Cohort study</option>
+                    <option value="Case control study">Case control study</option>
+                    <option value="Prospective study">Prospective study</option>
+                    <option value="Cross-sectional study">Cross-sectional study</option>
+                    <option value="Retrospective study">Retrospective study</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input {% if form.study_design.value and not form.study_design.errors %}value="{{ form.study_design.value }}" {% endif %}type="text" class="form-control" id="study-design-text" placeholder="Write your Study Design" style="display: none" /> {% if form.study_design.errors %} {% for error in form.study_design.errors %}
+                <label class='error' for='field' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+            </div>
+        </div>
         <div class="form-group">
             <div class="input-group{% if form.collection_method.errors %} validate-has-error{% endif %}">
                 <div class="input-group-addon">
@@ -289,26 +434,7 @@
             </div>
         </div>
 
-        <div class="form-group">
-            <div class="english-field input-group{% if form.email.errors %} validate-has-error{% endif %}">
-                <div class="input-group-addon">
-                    <i class="entypo-mail"></i>
-                </div>
 
-                <input {% if form.email.value and not form.email.errors %}value="{{ form.email.value }}" {% endif %}type="text" class="form-control english-field" name="email" id="email" {% if not form.email.errors %}placeholder="Email address" {% endif %} required="required" /> {% if form.email.errors %} {% for error in form.email.errors %}
-                <label class='error' for='email' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="english-field input-group{% if form.phone.errors %} validate-has-error{% endif %}">
-                <div class="input-group-addon">
-                    <i class="entypo-mobile"></i>
-                </div>
-
-                <input {% if form.phone.value and not form.phone.errors %}value="{{ form.phone.value }}" {% endif %}type="text" class="form-control english-field" name="phone" id="phone" placeholder="Contact number" required="required" data-mask="[\d\+]+" data-is-regex="true" /> {% if form.phone.errors %} {% for error in form.phone.errors %}
-                <label class='error' for='phone' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
-            </div>
-        </div>
         <div class="form-group" id="presentation_preference-group">
             <div class="input-group{% if form.presentation_preference.errors %} validate-has-error{% endif %}">
                 <div class="input-group-addon">
@@ -326,47 +452,32 @@
             <h3 class="english-field">Post your abstract</h3>
             <p class="text-center" style="margin-bottom: 30px">In the {{ event.english_name }}, abstracts are divided into four sections: <b>background, methods, results, and conclusion. Maximum words are 300</b> without the title and authors’ names.</p>
 
+    <h4 class="english-field" style="color:white">Background:</h4>
         <div class="form-group">
-            <div class="input-group{% if form.introduction.errors %} validate-has-error{% endif %}">
+            <div class="input-group{% if form.background.errors %} validate-has-error{% endif %}">
                 <div class="">
                 </div>
-
-                <textarea {% if form.introduction.value and not form.introduction.errors %}value="{{ form.introduction.value }}" {% endif %}type="text" class="form-control english-field" name="introduction" id="introduction" placeholder="Abstract's introduction" required="required"></textarea> {% if form.introduction.errors %} {% for error in form.introduction.errors %}
-                <label class='error' for='introduction' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+                <textarea {% if form.background.value and not form.background.errors %}value="{{ form.background.value }}" {% endif %}type="text" class="form-control english-field" name="background" id="background" placeholder="Abstract's background" required="required" rows="5" cols="50"></textarea> {% if form.introduction.errors %} {% for error in form.introduction.errors %}
+                <label class='error' for='background' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
         </div>
 
-        <h4 class="english-field" style="color:white">Methodology:</h4>
-
+        <h4 class="english-field" style="color:white">Methods:</h4>
         <div class="form-group">
-            <div class="input-group{% if form.methodology.errors %} validate-has-error{% endif %}">
-
-
-                <textarea {% if form.methodology.value and not form.methodology.errors %}value="{{ form.methodology.value }}" {% endif %}type="text" class="form-control english-field" name="methodology" id="methodology" placeholder="Abstract's methodology" required="required"></textarea> {% if form.methodology.errors %} {% for error in form.methodology.errors %}
-                <label class='error' for='methodology' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+            <div class="input-group{% if form.methods.errors %} validate-has-error{% endif %}">
+                <textarea {% if form.methods.value and not form.methods.errors %}value="{{ form.methods.value }}" {% endif %}type="text" class="form-control english-field" name="methods" id="methods" placeholder="Abstract's methods" required="required" rows="5" cols="50"></textarea> {% if form.methods.errors %} {% for error in form.methods.errors %}
+                <label class='error' for='methods' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
         </div>
 
         <h4 class="english-field" style="color:white">Results:</h4>
         <div class="form-group">
             <div class="input-group{% if form.results.errors %} validate-has-error{% endif %}">
-
-
-                <textarea {% if form.results.value and not form.results.errors %}value="{{ form.results.value }}" {% endif %}type="text" class="form-control english-field" name="results" id="results" placeholder="Abstract's results" required="required"></textarea> {% if form.results.errors %} {% for error in form.results.errors %}
+                <textarea {% if form.results.value and not form.results.errors %}value="{{ form.results.value }}" {% endif %}type="text" class="form-control english-field" name="results" id="results" placeholder="Abstract's results" required="required" rows="5" cols="50"></textarea> {% if form.results.errors %} {% for error in form.results.errors %}
                 <label class='error' for='results' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
         </div>
 
-        <h4 class="english-field" style="color:white">Discussion (Optional):</h4>
-
-        <div class="form-group">
-            <div class="input-group{% if form.discussion.errors %} validate-has-error{% endif %}">
-
-
-                <textarea {% if form.discussion.value and not form.discussion.errors %}value="{{ form.discussion.value }}" {% endif %}type="text" class="form-control english-field" name="discussion" id="discussion" placeholder="Abstract's discussion"></textarea> {% if form.discussion.errors %} {% for error in form.discussion.errors %}
-                <label class='error' for='discussion' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
-            </div>
-        </div>
 
         <h4 class="english-field" style="color:white">Conclusion:</h4>
         <div class="form-group">
@@ -375,59 +486,76 @@
                 <label class='error' for='conclusion' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
         </div>
-        <h3 class="english-field">Previous participations and publications</h3>
-        <div class="form-group" style="text-align: justify;">
-            <div class="checkbox">
-                <label>
-                        <input type="checkbox" name="was_published">I have published this research.
-                    </label>
+
+            <div class="form-group">
+                <p class="form-question">How is your study going to affect current practice?</p>
+                <div class="input-group{% if form.significance.errors %} validate-has-error{% endif %}">
+                    <textarea {% if form.significance.value and not form.significance.errors %}value="{{ form.significance.value }}" {% endif %}type="text" class="form-control english-field" name="significance" id="significance" required="required" rows="5" cols="50"></textarea> {% if form.significance.errors %} {% for error in form.significance.errors %}
+                    <label class='error' for='significance' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+                </div>
             </div>
+        </div>
+        <div class="english-field registration-form">
+            <h3 class="english-field" style="margin-bottom: 30px">Previous participations and publications</h3>
         </div>
         <div class="form-group" style="text-align: justify;">
             <div class="checkbox">
                 <label>
-                        <input type="checkbox" name="was_presented_previously">I have presented this research in one of the previous editions of Health Professions Confrence.
-                    </label>
-            </div>
-        </div>
-        <div class="form-group" style="text-align: justify;">
-            <div class="checkbox">
-                <label>
-                        <input type="checkbox" name="was_presented_at_others">I have presented this research in other conferences before.
-                    </label>
+                        <input type="checkbox" name="was_presented_at_conference">I have presented this research in another Conference before.
+                </label>
             </div>
         </div>
 
-        <h3>Attach your figures</h3>
-        <p>One figure is allowed with each abstract submission.</p>
-        {# -------- #} {# Following snippet (slightly modified) from https://djangosnippets.org/snippets/1442/ #} {{ figure_formset.management_form }} {{ figure_formset.non_form_errors.as_ul }}
-        <table id="figure-formset" class="form" style="width: 100%;">
-            {% for form in figure_formset.forms %} {% if forloop.first %}
-            <colgroup>
-                <col class="col-xs-8">
-                <col class="col-xs-4">
-            </colgroup>
-            {% endif %}
-            <tr class="form-container">
-                {% for field in form.visible_fields %}
-                <td>
-                    {# Include the hidden fields in the form #} {% if forloop.first %} {% for hidden in form.hidden_fields %} {{ hidden }} {% endfor %} {% endif %}
-                    <div class="form-group">
-                        {{ field.errors.as_ul }} {{ field }}
+        <div class="english-field registration-form">
+            <div class="form-group">
+                <div class="english-field input-group{% if form.conference_presented_at.errors %} validate-has-error{% endif %}">
+                    <div class="input-group-addon">
+                        <i class="entypo-sound"></i>
                     </div>
-                </td>
-                {% endfor %}
-            </tr>
-            {% endfor %}
-        </table>
-        {# ------- #}
+                    <input {% if form.conference_presented_at.value and not form.conference_presented_at.errors %}value="{{ form.conference_presented_at.value }}" {% endif %}type="text" class="form-control english-field" name="conference_presented_at" id="conference_presented_at" placeholder="Name of the conference"/> {% if form.conference_presented_at.errors %} {% for error in form.conference_presented_at.errors %}
+                    <label class='error' for='conference_presented_at' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+                </div>
+            </div>
+        </div>
 
+        <p class="form-question">{{ form.irb_approval.label }}</p>
+        <div class="form-group" id="submitted_to_journal-group">
+            <div class="input-group{% if form.irb_approval.errors %} validate-has-error{% endif %}">
+                <div class="input-group-addon">
+                    <i class="entypo-book"></i>
+                </div>
+                <select {% if form.irb_approval.value and not form.irb_approval.errors %}value="{{ form.irb_approval.value }}" {% endif %}class="form-control english-field" id="irb_approval" name="irb_approval" required title="IRB Approval">
+                    <option value="N">no</option>
+                    <option value="Y">Yes</option>
+					</select> {% if form.irb_approval.errors %} {% for error in form.irb_approval.errors %}
+                <label class='error' for='irb_approval' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+            </div>
+        </div>
+        <p class="form-question">Have you submitted the manuscript of this study to a journal before?</p>
+        <div class="form-group" id="submitted_to_journal-group">
+            <div class="input-group{% if form.submitted_to_journal.errors %} validate-has-error{% endif %}">
+                <div class="input-group-addon">
+                    <i class="entypo-book"></i>
+                </div>
+                <select {% if form.submitted_to_journal.value and not form.submitted_to_journal.errors %}value="{{ form.submitted_to_journal.value }}" {% endif %}class="form-control english-field" id="submitted_to_journal" name="submitted_to_journal" required title="Submitted to Journal">
+                    <option value="N">no</option>
+                    <option value="P">Yes, Published</option>
+                    <option value="U">Yes, under revision</option>
+					</select> {% if form.submitted_to_journal.errors %} {% for error in form.submitted_to_journal.errors %}
+                <label class='error' for='submitted_to_journal' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+            </div>
+        </div>
+        {# ------- #}
         <div class="form-group" style="text-align: justify;">
             <div class="checkbox">
                 <label>
-                        <input type="checkbox" id="agree">I read the guidelines and I certify that all provided information on this application is vild and correct. I understand that withholding of information or giving false information
-will result in a refusal of my application.
-                    </label>
+                        <input type="checkbox">I hereby, take full responsibility for approval of co-authors to be the presenting author for this abstract.</label>
+            </div>
+        </div>
+        <div class="form-group" style="text-align: justify;">
+            <div class="checkbox">
+                <label>
+                        <input type="checkbox" id="agree">I have read the instructions and guidelines of abstract submission to Health Professions Conference 2020.</label>
             </div>
         </div>
         <input type="hidden" name="university">
@@ -510,232 +638,7 @@ will result in a refusal of my application.
             ]
         });
     </script>
-    <script>
-        CKEDITOR.replace('conclusion', {
-            toolbar: [{
-                    name: 'document',
-                    groups: ['mode', 'document', 'doctools'],
-                    items: ['-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates']
-                },
-                {
-                    name: 'clipboard',
-                    groups: ['clipboard', 'undo'],
-                    items: ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']
-                },
-                {
-                    name: 'editing',
-                    groups: ['find', 'selection', 'spellchecker'],
-                    items: ['Find', 'Replace', '-', 'SelectAll', '-', 'Scayt']
-                },
-                {
-                    name: 'forms',
-                    items: ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField']
-                },
-                '/',
-                {
-                    name: 'basicstyles',
-                    groups: ['basicstyles', 'cleanup'],
-                    items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']
-                },
-                {
-                    name: 'paragraph',
-                    groups: ['list', 'indent', 'blocks', 'align', 'bidi'],
-                    items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language']
-                },
-                {
-                    name: 'links',
-                    items: ['Link', 'Unlink', 'Anchor']
-                },
-                {
-                    name: 'insert',
-                    items: ['Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']
-                },
-                '/',
-                {
-                    name: 'styles',
-                    items: ['Styles', 'Format', 'Font', 'FontSize']
-                },
-                {
-                    name: 'colors',
-                    items: ['TextColor', 'BGColor']
-                },
-                {
-                    name: 'others',
-                    items: ['-']
-                },
-            ]
-        });
-    </script>
-    </script>
-    <script>
-        CKEDITOR.replace('results', {
-            toolbar: [{
-                    name: 'document',
-                    groups: ['mode', 'document', 'doctools'],
-                    items: ['-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates']
-                },
-                {
-                    name: 'clipboard',
-                    groups: ['clipboard', 'undo'],
-                    items: ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']
-                },
-                {
-                    name: 'editing',
-                    groups: ['find', 'selection', 'spellchecker'],
-                    items: ['Find', 'Replace', '-', 'SelectAll', '-', 'Scayt']
-                },
-                {
-                    name: 'forms',
-                    items: ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField']
-                },
-                '/',
-                {
-                    name: 'basicstyles',
-                    groups: ['basicstyles', 'cleanup'],
-                    items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']
-                },
-                {
-                    name: 'paragraph',
-                    groups: ['list', 'indent', 'blocks', 'align', 'bidi'],
-                    items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language']
-                },
-                {
-                    name: 'links',
-                    items: ['Link', 'Unlink', 'Anchor']
-                },
-                {
-                    name: 'insert',
-                    items: ['Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']
-                },
-                '/',
-                {
-                    name: 'styles',
-                    items: ['Styles', 'Format', 'Font', 'FontSize']
-                },
-                {
-                    name: 'colors',
-                    items: ['TextColor', 'BGColor']
-                },
-                {
-                    name: 'others',
-                    items: ['-']
-                },
-            ]
-        });
-    </script>
-    <script>
-        CKEDITOR.replace('discussion', {
-            toolbar: [{
-                    name: 'document',
-                    groups: ['mode', 'document', 'doctools'],
-                    items: ['-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates']
-                },
-                {
-                    name: 'clipboard',
-                    groups: ['clipboard', 'undo'],
-                    items: ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']
-                },
-                {
-                    name: 'editing',
-                    groups: ['find', 'selection', 'spellchecker'],
-                    items: ['Find', 'Replace', '-', 'SelectAll', '-', 'Scayt']
-                },
-                {
-                    name: 'forms',
-                    items: ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField']
-                },
-                '/',
-                {
-                    name: 'basicstyles',
-                    groups: ['basicstyles', 'cleanup'],
-                    items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']
-                },
-                {
-                    name: 'paragraph',
-                    groups: ['list', 'indent', 'blocks', 'align', 'bidi'],
-                    items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language']
-                },
-                {
-                    name: 'links',
-                    items: ['Link', 'Unlink', 'Anchor']
-                },
-                {
-                    name: 'insert',
-                    items: ['Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']
-                },
-                '/',
-                {
-                    name: 'styles',
-                    items: ['Styles', 'Format', 'Font', 'FontSize']
-                },
-                {
-                    name: 'colors',
-                    items: ['TextColor', 'BGColor']
-                },
-                {
-                    name: 'others',
-                    items: ['-']
-                },
-            ]
-        });
-    </script>
 
-    <script>
-        CKEDITOR.replace('introduction', {
-            toolbar: [{
-                    name: 'document',
-                    groups: ['mode', 'document', 'doctools'],
-                    items: ['-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates']
-                },
-                {
-                    name: 'clipboard',
-                    groups: ['clipboard', 'undo'],
-                    items: ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']
-                },
-                {
-                    name: 'editing',
-                    groups: ['find', 'selection', 'spellchecker'],
-                    items: ['Find', 'Replace', '-', 'SelectAll', '-', 'Scayt']
-                },
-                {
-                    name: 'forms',
-                    items: ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField']
-                },
-                '/',
-                {
-                    name: 'basicstyles',
-                    groups: ['basicstyles', 'cleanup'],
-                    items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']
-                },
-                {
-                    name: 'paragraph',
-                    groups: ['list', 'indent', 'blocks', 'align', 'bidi'],
-                    items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language']
-                },
-                {
-                    name: 'links',
-                    items: ['Link', 'Unlink', 'Anchor']
-                },
-                {
-                    name: 'insert',
-                    items: ['Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']
-                },
-                '/',
-                {
-                    name: 'styles',
-                    items: ['Styles', 'Format', 'Font', 'FontSize']
-                },
-                {
-                    name: 'colors',
-                    items: ['TextColor', 'BGColor']
-                },
-                {
-                    name: 'others',
-                    items: ['-']
-                },
-            ]
-        });
-    </script>
 </body>
 
 </html>
@@ -764,13 +667,6 @@ will result in a refusal of my application.
             deleteCssClass: 'delete-row btn btn-xs btn-danger',
         });
 
-        $("#figure-formset .form-container").formset({
-            prefix: '{{ figure_formset.prefix }}',
-            addText: 'Add a figure',
-            deleteText: 'Delete',
-            addCssClass: 'add-row btn btn-xs btn-primary',
-            deleteCssClass: 'delete-row btn btn-xs btn-danger',
-        });
 
 
         $('#agree').change(function() {
@@ -836,10 +732,26 @@ will result in a refusal of my application.
                 $('input[name=collection_method]').val(value);
             }
         });
-        $('#collection-method-text').change(function() {
+        $('#study-design-text').change(function() {
             value = $(this).val();
-            $('input[name=collection_method]').val(value);
+            $('input[name=study_design]').val(value);
         })
+        $('#study-design-list').change(function() {
+            value = $(this).val();
+            if ($('#study-design-list option[value=Other]:checked').length) {
+                $('#study-design-text').show();
+                $('#study-design-text').attr('required', 'required');
+            } else {
+                $('#study-design-text').hide();
+                $('#study-design-text').removeAttr('required');
+                $('input[name=study_design]').val(value);
+            }
+        });
+        $('#study-design-text').change(function() {
+            value = $(this).val();
+            $('input[name=study_design]').val(value);
+        })
+
 
     });
 </script>

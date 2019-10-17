@@ -53,23 +53,18 @@ def submit_abstract(request, event_code_name):
         form = forms.AbstractForm(request.POST, request.FILES,
                             instance=instance)
 
-        figure_formset = forms.AbstractFigureFormset(request.POST, request.FILES)
         author_formset = forms.AbsractAuthorFormset(request.POST, request.FILES)
 
-        if form.is_valid() and figure_formset.is_valid() and author_formset.is_valid():
+        if form.is_valid() and author_formset.is_valid():
             abstract = form.save()
-            figure_formset.instance = abstract
-            figure_formset.save()
             author_formset.instance = abstract
             author_formset.save()
             return HttpResponseRedirect(reverse('events:show_abstract',
                                                 args=(event.code_name, abstract.pk)))
     elif request.method == 'GET':
         form = forms.AbstractForm()
-        figure_formset = forms.AbstractFigureFormset()
         author_formset = forms.AbsractAuthorFormset()
     context['form'] = form
-    context['figure_formset'] = figure_formset
     context['author_formset'] = author_formset
 
     return render(request, 'events/abstracts/abstract_submission.html', context)

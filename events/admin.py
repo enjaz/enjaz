@@ -74,9 +74,11 @@ class AbstractAdmin(admin.ModelAdmin):
                     'date_submitted']
     inlines = [AuthorInline, AbstractFigureInline, AbstractPosterInline]
     filter_horizontal = ('evaluators',)
-    raw_id_fields = ['evaluators']
+    raw_id_fields = ['evaluators','user']
     introduction = forms.CharField(widget=CKEditorWidget())
 
+class CaseReportAdmin(admin.ModelAdmin):
+    raw_id_fields = ['user']
 
 class QuestionInline(admin.TabularInline):
     model = models.Question
@@ -191,7 +193,7 @@ class EventAdmin(admin.ModelAdmin):
     list_display = search_fields = ['official_name', 'english_name',
                                     'code_name']
 
-
+"""
 class SessionAdmin(admin.ModelAdmin):
     list_filter = ['event']
     list_display = ['name', 'event', 'date', 'start_time', 'end_time',
@@ -214,7 +216,7 @@ class SessionAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return utils.is_in_entry_team(request.user)  or \
                request.user.is_superuser
-
+"""
 
 
 class SessionRegistrationAdmin(admin.ModelAdmin):
@@ -318,8 +320,8 @@ class SurveyResponseAdmin(CertificateAdminPermission, ModelAdminReadOnly, admin.
 sessions_admin = SessionsAdminSite("Sessions Admin")
 
 admin.site.register(models.Event, EventAdmin)
-admin.site.register(models.Session, SessionAdmin)
-admin.site.register(models.CaseReport)
+#admin.site.register(models.Session, SessionAdmin)
+admin.site.register(models.CaseReport, CaseReportAdmin)
 admin.site.register(models.Registration, RegistrationAdmin)
 admin.site.register(models.NonUser, NonUserAdmin)
 admin.site.register(models.Abstract, AbstractAdmin)
@@ -336,6 +338,6 @@ admin.site.register(models.SurveyResponse, SurveyResponseAdmin)
 certificate_admin.register(models.Survey, SurveyAdmin)
 certificate_admin.register(models.SurveyResponse, SurveyResponseAdmin)
 admin.site.register(models.UserSurveyCategory)
-sessions_admin.register(models.Session , SessionAdmin)
+#sessions_admin.register(models.Session , SessionAdmin)
 admin.site.register(models.Booth, VoteAdmin)
 admin.site.register(models.Vote)

@@ -264,9 +264,9 @@ def known_user_category(user,event):
         return True
     else:
         return False
-"""
+
 def is_in_entry_team(user):
     team = Team.objects.get(code_name='hpc-entry')
     is_hpc_entry_team_member = team.members.filter(pk=user.pk).exists() or team.coordinator == user
     return is_hpc_entry_team_member
-"""
+

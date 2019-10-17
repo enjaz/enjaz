@@ -12,6 +12,6 @@ def riy_en_index(request):
     return render(request,'newhpc/english/riy_en_index.html',context)
 
 
-def riy_ar_research(request):
+def riy_en_research(request):
     context = {}
-    return render(request,'newhpc/arabic/arabic_research.html',context)
+    return render(request,'newhpc/english/riy_en_research.html',context)

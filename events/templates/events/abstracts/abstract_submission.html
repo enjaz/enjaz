@@ -218,12 +218,11 @@
         </div>
 
         <div class="form-group">
-            <p class="form-question">When did you graduate/ Expected year of graduation:</p>
             <div class="english-field input-group{% if form.graduation_year.errors %} validate-has-error{% endif %}">
                 <div class="input-group-addon">
                     <i class="entypo-graduation-cap"></i>
                 </div>
-                <input {% if form.graduation_year.value and not form.graduation_year.errors %}value="{{ form.graduation_year.value }}" {% endif %}type="text" class="form-control english-field" name="graduation_year" id="graduation_year" placeholder="Graduation Year" required="required" data-mask="[\d\+]+" data-is-regex="true"  /> {% if form.graduation_year.errors %} {% for error in form.graduation_year.errors %}
+                <input {% if form.graduation_year.value and not form.graduation_year.errors %}value="{{ form.graduation_year.value }}" {% endif %}type="text" class="form-control english-field" name="graduation_year" id="graduation_year" placeholder="Graduation Year. i.e. 2020" required="required" data-mask="[\d\+]+" data-is-regex="true"  /> {% if form.graduation_year.errors %} {% for error in form.graduation_year.errors %}
                 <label class='error' for='graduation_year' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
         </div>
@@ -243,7 +242,7 @@
                     <i class="entypo-mobile"></i>
                 </div>
 
-                <input {% if form.phone.value and not form.phone.errors %}value="{{ form.phone.value }}" {% endif %}type="text" class="form-control english-field" name="phone" id="phone" placeholder="Contact number" required="required" data-mask="[\d\+]+" data-is-regex="true" /> {% if form.phone.errors %} {% for error in form.phone.errors %}
+                <input {% if form.phone.value and not form.phone.errors %}value="{{ form.phone.value }}" {% endif %}type="text" class="form-control english-field" name="phone" id="phone" placeholder="Phone number. i.e. 0555555555" required="required" data-mask="[\d\+]+" data-is-regex="true" /> {% if form.phone.errors %} {% for error in form.phone.errors %}
                 <label class='error' for='phone' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
         </div>
@@ -417,22 +416,6 @@
                 <label class='error' for='field' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
         </div>
-        <div class="form-group">
-            <div class="input-group{% if form.collection_method.errors %} validate-has-error{% endif %}">
-                <div class="input-group-addon">
-                    <i class="entypo-flow-tree"></i>
-                </div>
-                <select {% if form.collection_method.value and not form.collection_method.errors %}value="{{ form.collection_method.value }}" {% endif %}class="form-control" id="collection-method-list" title="{{ form.collection_method.label }}" required="required">
-                    <option value="">{{ form.collection_method.label }}</option>
-                    <option value="Experimental">Experimental</option>
-                    <option value="Survey">Survey</option>
-                    <option value="Chart review">Chart review</option>
-                    <option value="Other">Other</option>
-                </select>
-                <input {% if form.collection_method.value and not form.collection_method.errors %}value="{{ form.collection_method.value }}" {% endif %}type="text" class="form-control" id="collection-method-text" placeholder="Write your data collection method" style="display: none" /> {% if form.collection_method.errors %} {% for error in form.collection_method.errors %}
-                <label class='error' for='field' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
-            </div>
-        </div>
 
 
         <div class="form-group" id="presentation_preference-group">
@@ -443,9 +426,22 @@
                 <select {% if form.presentation_preference.value and not form.presentation_preference.errors %}value="{{ form.presentation_preference.value }}" {% endif %}class="form-control english-field" id="presentation_preference" name="presentation_preference" required title="Presentation preference">
                     <option value="">Presentation preference</option>
                     <option value="O">Oral presentation</option>
-                    <option value="P">Poster</option>
+                    <option value="P">Poster presentation</option>
                 </select> {% if form.presentation_preference.errors %} {% for error in form.presentation_preference.errors %}
                 <label class='error' for='presentation_preference' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+            </div>
+        </div>
+        <p class="form-question">{{ form.irb_approval.label }}</p>
+        <div class="form-group" id="irb_approval-group">
+            <div class="input-group{% if form.irb_approval.errors %} validate-has-error{% endif %}">
+                <div class="input-group-addon">
+                    <i class="entypo-book"></i>
+                </div>
+                <select {% if form.irb_approval.value and not form.irb_approval.errors %}value="{{ form.irb_approval.value }}" {% endif %}class="form-control english-field" id="irb_approval" name="irb_approval" required title="IRB Approval">
+                    <option value="N">no</option>
+                    <option value="Y">Yes</option>
+					</select> {% if form.irb_approval.errors %} {% for error in form.irb_approval.errors %}
+                <label class='error' for='irb_approval' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
         </div>
         <div class="english-field registration-form">
@@ -495,42 +491,27 @@
                 </div>
             </div>
         </div>
+
         <div class="english-field registration-form">
             <h3 class="english-field" style="margin-bottom: 30px">Previous participations and publications</h3>
         </div>
-        <div class="form-group" style="text-align: justify;">
-            <div class="checkbox">
-                <label>
-                        <input type="checkbox" name="was_presented_at_conference">I have presented this research in another Conference before.
-                </label>
-            </div>
-        </div>
-
-        <div class="english-field registration-form">
-            <div class="form-group">
-                <div class="english-field input-group{% if form.conference_presented_at.errors %} validate-has-error{% endif %}">
-                    <div class="input-group-addon">
-                        <i class="entypo-sound"></i>
-                    </div>
-                    <input {% if form.conference_presented_at.value and not form.conference_presented_at.errors %}value="{{ form.conference_presented_at.value }}" {% endif %}type="text" class="form-control english-field" name="conference_presented_at" id="conference_presented_at" placeholder="Name of the conference"/> {% if form.conference_presented_at.errors %} {% for error in form.conference_presented_at.errors %}
-                    <label class='error' for='conference_presented_at' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <p class="form-question">{{ form.irb_approval.label }}</p>
-        <div class="form-group" id="submitted_to_journal-group">
-            <div class="input-group{% if form.irb_approval.errors %} validate-has-error{% endif %}">
+        <p class="form-question">{{ form.was_presented_at_conference.label }}</p>
+        <div class="form-group" id="was_presented_at_conference-group">
+            <div class="input-group{% if form.was_presented_at_conference.errors %} validate-has-error{% endif %}">
                 <div class="input-group-addon">
-                    <i class="entypo-book"></i>
+                    <i class="entypo-sound"></i>
                 </div>
-                <select {% if form.irb_approval.value and not form.irb_approval.errors %}value="{{ form.irb_approval.value }}" {% endif %}class="form-control english-field" id="irb_approval" name="irb_approval" required title="IRB Approval">
+                <select {% if form.was_presented_at_conference.value and not form.was_presented_at_conference.errors %}value="{{ form.was_presented_at_conference.value }}" {% endif %}class="form-control english-field" id="was_presented_at_conference" name="was_presented_at_conference" required title="Was it presented at a conference before?">
                     <option value="N">no</option>
                     <option value="Y">Yes</option>
-					</select> {% if form.irb_approval.errors %} {% for error in form.irb_approval.errors %}
-                <label class='error' for='irb_approval' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+					</select> {% if form.was_presented_at_conference.errors %} {% for error in form.was_presented_at_conference.errors %}
+                <label class='error' for='was_presented_at_conference' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
         </div>
+
+
+
+
         <p class="form-question">Have you submitted the manuscript of this study to a journal before?</p>
         <div class="form-group" id="submitted_to_journal-group">
             <div class="input-group{% if form.submitted_to_journal.errors %} validate-has-error{% endif %}">
@@ -555,7 +536,7 @@
         <div class="form-group" style="text-align: justify;">
             <div class="checkbox">
                 <label>
-                        <input type="checkbox" id="agree">I have read the instructions and guidelines of abstract submission to Health Professions Conference 2020.</label>
+                    <input type="checkbox" id="agree">I have read the <a target="_blank" href="{% url 'newhpc:riy_en_research' %}" style="text-decoration: underline">instructions and guidelines of abstract submission to Health Professions Conference 2020.</a></label>
             </div>
         </div>
         <input type="hidden" name="university">
@@ -721,17 +702,7 @@
             value = $(this).val();
             $('input[name=study_field]').val(value);
         });
-        $('#collection-method-list').change(function() {
-            value = $(this).val();
-            if ($('#collection-method-list option[value=Other]:checked').length) {
-                $('#collection-method-text').show();
-                $('#collection-method-text').attr('required', 'required');
-            } else {
-                $('#collection-method-text').hide();
-                $('#collection-method-text').removeAttr('required');
-                $('input[name=collection_method]').val(value);
-            }
-        });
+
         $('#study-design-text').change(function() {
             value = $(this).val();
             $('input[name=study_design]').val(value);

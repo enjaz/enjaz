@@ -80,11 +80,13 @@ class AbstractForm(forms.ModelForm):
         model = Abstract
         fields = ['title', 'university', 'college', 'collection_method',
                   'study_field', 'presenting_author', 'email',
-                  'phone', 'level', 'presentation_preference',
-                  'introduction','methodology', 'results',
-                  'discussion', 'conclusion', 'was_published',
-                  'was_presented_at_others',
-                  'was_presented_previously',]
+                  'phone', 'presentation_preference',
+                  'background','methods', 'results',
+                  'discussion', 'conclusion', 'gender',
+                  'was_presented_at_conference','principle_investigator',
+                  'study_design','significance','conference_presented_at',
+                  'submitted_to_journal','irb_approval','graduation_year',
+                  ]
 
 AbstractFigureFormset = inlineformset_factory(Abstract,
                                               AbstractFigure,
@@ -119,8 +121,10 @@ class CaseReportForm(forms.ModelForm):
     class Meta:
         model = CaseReport
         fields = ['title', 'authors', 'presenting_author','university', 'college', 'email',
-                    'phone', 'introduction', 'level', 'presentation_preference',
-                  'was_published', 'was_presented_at_others', 'was_presented_previously','study_field']
+                    'phone', 'background', 'presentation_preference',
+                  'was_presented_at_conference', 'gender','study_field',
+                  'principle_investigator','case_description','discussion','conclusion',
+                  'conference_presented_at','graduation_year']
 
 class EvaluationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):

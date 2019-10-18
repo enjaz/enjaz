@@ -480,10 +480,10 @@ class Abstract(models.Model):
     evaluators = models.ManyToManyField(User, blank=True, verbose_name=u"المقيمين")
     title = models.CharField(verbose_name="Title", max_length=255)
     authors = models.TextField(verbose_name=u"Name of authors", blank=True)
-    study_field = models.CharField(verbose_name="Field", max_length=255, default="")
+    study_field = models.CharField(verbose_name="Study Field", max_length=255, default="")
     collection_method = models.CharField(verbose_name="Data Collection Method", max_length=255, default="")
-    university = models.CharField(verbose_name="University", max_length=255)
-    college = models.CharField(verbose_name="College", max_length=255)
+    university = models.CharField(verbose_name="Institution/University", max_length=255)
+    college = models.CharField(verbose_name="Department/College", max_length=255)
     presenting_author = models.CharField(verbose_name="Presenting author", max_length=255)
     email = models.EmailField(verbose_name="Email")
     phone = models.CharField(verbose_name="Phone number", max_length=20)
@@ -492,7 +492,7 @@ class Abstract(models.Model):
         ('G', 'Graduate')
         )
     level = models.CharField(verbose_name="Level", max_length=1,
-                             default='', choices=level_choices)
+                             default='', choices=level_choices,blank=True)
     presentation_preference_choices = (
         ('O', 'Oral'),
         ('P', 'Poster')
@@ -503,14 +503,12 @@ class Abstract(models.Model):
         ('R','Rejected'),
         )
     presentation_preference = models.CharField(verbose_name="Presentation preference", max_length=1, choices=presentation_preference_choices)
-    introduction = models.TextField(u"Introduction", default="" )
-    methodology = models.TextField(u"Methodology", default="")
+    background = models.TextField(u"Background", default="")
+    methods = models.TextField(u"Methods", default="")
     results = models.TextField(u"Results", default="")
     discussion = models.TextField(u"Discussion", default="", blank=True)
     conclusion = models.TextField(u"Conclusion", default="")
-    was_published = models.BooleanField(u"Have you published this research?", default=False)
-    was_presented_at_others = models.BooleanField(u"Have you presented this research in any other conference before?", default=False)
-    was_presented_previously = models.BooleanField(u"Have you presented this research in a previous year of this conference?", default=False)
+    was_presented_at_conference = models.BooleanField(u"Has the study been presented in a conference before?", default=False)
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
@@ -521,6 +519,31 @@ class Abstract(models.Model):
     presentaion_date = models.DateField(u"تاريخ العرض", null=True, blank=True)
     did_presenter_attend = models.BooleanField(verbose_name=u"حضر المقدم؟", default=False)
     certificates = GenericRelation('certificates.Certificate', related_query_name="abstracts")
+    # HPC 2020 New fields
+    # Author information
+    gender_choices = (
+        ('F', 'Female'),
+        ('M', 'Male'),
+    )
+    gender = models.CharField(verbose_name="Gender",max_length=1,choices=gender_choices,null=True)
+    #Study Information
+    principle_investigator = models.CharField(verbose_name="Principle Investigator", max_length=255, default="")
+    study_design = models.CharField(verbose_name="Study Design", max_length=255, default="")
+    significance = models.TextField(u"How is your study going to affect current practice?", default="")
+    conference_presented_at = models.CharField(verbose_name="Name of the conference presented at",max_length=255,default="")
+    journal_submission_choices = (
+        ('N', 'No'),
+        ('P', 'Yes, Published'),
+        ('U','Yes, Under Revision'),
+        )
+    submitted_to_journal = models.CharField(verbose_name="Have you submitted the manuscript of this study to a journal before?",
+                                            max_length=1,choices=journal_submission_choices,null=True,default="N")
+    irb_approval_choices = (
+        ('N', 'No'),
+        ('Y','Yes')
+    )
+    irb_approval = models.CharField(verbose_name="Do you have an IRB Approval?", max_length=1, choices=irb_approval_choices,default="N")
+    graduation_year = models.CharField(verbose_name="when did you graduate/expected year of graduation",max_length=4,default="")
 
     def get_average_score(self):
         evaluation_number = self.evaluation_set.count()
@@ -615,9 +638,9 @@ class CaseReport(models.Model):
     title = models.CharField(verbose_name="Title", max_length=255)
     presenting_author = models.CharField(verbose_name="Presenting author", max_length=255, default="")
     authors = models.TextField(verbose_name=u"Name of authors")
-    study_field = models.CharField(verbose_name="Field", max_length=255, default="")
-    university = models.CharField(verbose_name="University", max_length=255)
-    college = models.CharField(verbose_name="College", max_length=255)
+    study_field = models.CharField(verbose_name="Study Field", max_length=255, default="")
+    university = models.CharField(verbose_name="Institution/University", max_length=255)
+    college = models.CharField(verbose_name="Department/College", max_length=255)
     email = models.EmailField(verbose_name="Email")
     phone = models.CharField(verbose_name="Phone number", max_length=20)
     level_choices = (
@@ -641,21 +664,26 @@ class CaseReport(models.Model):
     accepted_presentaion_preference = models.CharField(verbose_name="Accepted presentation preference",
                                                        max_length=1, choices=presentation_preference_choices,
                                                        blank=True)
-    introduction = models.TextField(u"Introduction", default="")
-    patient_info = models.TextField(u"Patient info", default="")
-    clinical_presentation = models.TextField(u"clinical presentation", default="")
-    diagnosis = models.TextField(u"Diagnosis", default="")
-    treatment = models.TextField(u"Treatment", default="")
-    outcome = models.TextField(u"Outcome", default="")
+    background = models.TextField(u"Background", default="")
+    case_description = models.TextField(u"Case Description", default="")
     discussion = models.TextField(u"Discussion", default="")
     conclusion = models.TextField(u"Conclusion", default="")
-    was_published = models.BooleanField(u"Have you published this research?", default=False)
-    was_presented_at_others = models.BooleanField(u"Have you presented this research in any other conference before?", default=False)
-    was_presented_previously = models.BooleanField(u"Have you presented this research in a previous year of this conference?", default=False)
+    was_presented_at_conference= models.BooleanField(u"Has the study been presented in a conference before?", default=False)
     presentaion_date = models.DateField(u"تاريخ العرض", null=True)
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
+    # HPC 2020 New fields
+    # Author information
+    gender_choices = (
+        ('F', 'Female'),
+        ('M', 'Male'),
+    )
+    gender = models.CharField(verbose_name="Gender",max_length=1,choices=gender_choices,default="M")
+    #Study Information
+    principle_investigator = models.CharField(verbose_name="Principle Investigator", max_length=255, default="")
+    conference_presented_at = models.CharField(verbose_name="Name of the conference presented at",max_length=255,default="")
+    graduation_year = models.CharField(verbose_name="when did you graduate/ expected year of graduation",max_length=4,default="")
 
     def __unicode__(self):
         return self.title

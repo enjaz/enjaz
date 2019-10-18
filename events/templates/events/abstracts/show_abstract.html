@@ -17,24 +17,17 @@ h4{
     font-size: 15px;
 }
 </style>
-{% if user|can_evaluate_abstracts:event or user.is_superuser %}
-    <div class="english-field">
-    {% if abstract.status == 'P' %}
-    <p class="alert alert-warning"><i class="fa fa-hourglass-half" aria-hidden="true"></i> This abstract is : {{ abstract.get_status_display }}</p>
-    {% endif %}
-    {% if abstract.status == 'A' %}
-    <p class="alert alert-success"> This abstract is : {{ abstract.get_status_display }}</p>
-    {% endif %}
-    {% if abstract.status == 'R' %}
-    <p class="alert alert-danger"> This abstract is : {{ abstract.get_status_display }}</p>
-    {% endif %}
-    {% endif %}
-    <div class="english-field">
-    {% if not user|can_evaluate_abstracts:event %}
-        <p class="alert alert-success"> Dear {{ abstract.presenting_author }}, Your abstract with the title of "{{ abstract.title }}" has been submitted successfully to Health Professions Conference 2020.
-            Your <b> abstract ID is #{{ abstract.pk }}</b>. If you have any concerns contact us on <a target="_blank" href="https://t.me/HPC2020">Telegram</a>, or send us an e-mail to <a target="_blank" href="mailto: HPC-notifications@enjazportal.com">HPC-notifications@enjazportal.com</a></p>
-    {% endif %}
-    {% include 'events/abstracts/partials/abstract_table.html' %}
+<div class="english-field">
+{% if abstract.status == 'P' %}
+<p class="alert alert-warning"><i class="fa fa-hourglass-half" aria-hidden="true"></i> This abstract is : {{ abstract.get_status_display }}</p>
+{% endif %}
+{% if abstract.status == 'A' %}
+<p class="alert alert-success"> This abstract is : {{ abstract.get_status_display }}</p>
+{% endif %}
+{% if abstract.status == 'R' %}
+<p class="alert alert-danger"> This abstract is : {{ abstract.get_status_display }}</p>
+{% endif %}
+{% include 'events/abstracts/partials/abstract_table.html' %}
 <div class="row" style="margin-left: 0; margin-bottom: 5px; ">
 {%  if abstract.status == 'A' %}
     {% if abstract.accepted_presentaion_preference == 'P' %}
@@ -122,12 +115,10 @@ h4{
 			<i class="entypo-pencil"></i>
 			Edit
 	</button> -->
-    {% if user|can_evaluate_abstracts:event or user.is_superuser %}
-        <button data-url="{% url 'events:delete_abstract' event.code_name abstract.pk %}" class="confirm-delete-abstract btn btn-icon btn-danger">
-                <i class="entypo-block"></i>
-                Delete
-        </button>
-    {% endif %}
+	<button data-url="{% url 'events:delete_abstract' event.code_name abstract.pk %}" class="confirm-delete-abstract btn btn-icon btn-danger">
+			<i class="entypo-block"></i>
+			Delete
+	</button>
 </div>
 </div>
 

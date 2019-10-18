@@ -39,8 +39,7 @@ urlpatterns = [
     url(r'^events/', include('events.urls', namespace="events")),
 
 
-    url(r'^oldhpc/', include('hpc.urls', namespace="hpc")),
-    url(r'^hpc/', include('newhpc.urls', namespace="newhpc")),
+    url(r'^hpc/', include('hpc.urls', namespace="hpc")),
 
     url(r'^researchhub/supervisors/signup/$', 'userena.views.signup', {'signup_form': ResearchHubSignupForm, 'template_name': 'researchhub/supervisor_signup_form.html'}, name="supervisor_signup"),
     url(r'^researchhub/', include('researchhub.urls', namespace="researchhub")),

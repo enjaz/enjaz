@@ -10,7 +10,7 @@ from .models import NonUser, Session, Registration, Abstract, \
     AbstractFigure, Initiative, InitiativeFigure, \
     Criterion, CriterionValue, Evaluation,CaseReport, \
     AbstractPoster, Attendance, Question, SurveyQuestion, \
-    SurveyResponse, SurveyAnswer, SessionRegistration,AbstractAuthor,UserSurveyCategory, Vote, CaseReportAuthor
+    SurveyResponse, SurveyAnswer, SessionRegistration,AbstractAuthor,UserSurveyCategory, Vote
 from django.forms.models import inlineformset_factory
 
 class NonUserForm(forms.ModelForm):
@@ -78,15 +78,13 @@ class RegistrationForm(forms.Form):
 class AbstractForm(forms.ModelForm):
     class Meta:
         model = Abstract
-        fields = ['title', 'university', 'college',
+        fields = ['title', 'university', 'college', 'collection_method',
                   'study_field', 'presenting_author', 'email',
-                  'phone', 'presentation_preference',
-                  'background','methods', 'results',
-                  'discussion', 'conclusion', 'gender',
-                  'was_presented_at_conference','principle_investigator',
-                  'study_design','significance',
-                  'submitted_to_journal','irb_approval','graduation_year',
-                  ]
+                  'phone', 'level', 'presentation_preference',
+                  'introduction','methodology', 'results',
+                  'discussion', 'conclusion', 'was_published',
+                  'was_presented_at_others',
+                  'was_presented_previously',]
 
 AbstractFigureFormset = inlineformset_factory(Abstract,
                                               AbstractFigure,
@@ -121,16 +119,8 @@ class CaseReportForm(forms.ModelForm):
     class Meta:
         model = CaseReport
         fields = ['title', 'authors', 'presenting_author','university', 'college', 'email',
-                    'phone', 'background', 'presentation_preference',
-                  'was_presented_at_conference', 'gender','study_field',
-                  'principle_investigator','case_description','discussion','conclusion',
-                  'graduation_year']
-
-CaseReportAuthorFormset = inlineformset_factory(CaseReport,
-                                             CaseReportAuthor,
-                                             fields=['name'],
-                                             validate_max=True)
-
+                    'phone', 'introduction', 'level', 'presentation_preference',
+                  'was_published', 'was_presented_at_others', 'was_presented_previously','study_field']
 
 class EvaluationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):

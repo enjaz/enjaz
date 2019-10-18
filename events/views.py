@@ -50,7 +50,7 @@ def submit_abstract(request, event_code_name):
 
     if request.method == 'POST':
         instance = Abstract(event=event,user=request.user)
-        form = forms.AbstractForm(request.POST, request.FILES,
+        form = forms.AbstractForm(request.POST,
                             instance=instance)
 
         figure_formset = forms.AbstractFigureFormset(request.POST, request.FILES)

@@ -47,6 +47,7 @@
                 <label class='error' for='presenting_author' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
         </div>
+    </div>
 
         <div class="form-group">
             <div class="input-group" style="width:100% !important; ">
@@ -87,59 +88,59 @@
                 </div>
 
                 <select {% if form.university.value and not form.university.errors %}value="{{ form.university.value }}" {% endif %}class="form-control" id="university-list" title="{{ form.university.label }}" required="required">
-                                <option value="">{{ form.university.label }}</option>
-        <option value="King Saud bin Abdulaziz University for Health Sciences">King Saud bin Abdulaziz University for Health Sciences</option>
-        <option value="King Abdullah International Medical Research Center">King Abdullah International Medical Research Center</option>
-        <option value="Al Baha University">Al Baha University</option>
-        <option value="Alfaisal University">Al Faisal University</option>
-        <option value="Al Farabi College of Dentistry and Nursing">Al Farabi College of Dentistry and Nursing</option>
-        <option value="Al Jawf University">Al Jawf University</option>
-        <option value="Almaarefa College for Science and Technology">Almaarefa College for Science and Technology</option>
-        <option value="Al Qassim Province">Al Qassim Province</option>
-        <option value="Al Yamamah University">Al Yamamah University</option>
-        <option value="Arab East Colleges">Arab East Colleges</option>
-        <option value="Arab Open University">Arab Open University</option>
-        <option value="Batterjee Medical College">Batterjee Medical College</option>
-        <option value="Dammam Community College">Dammam Community College</option>
-        <option value="Dar Al-Hekma College">Dar Al-Hekma College</option>
-        <option value="Dar Al Uloom University">Dar Al Uloom University</option>
-        <option value="Effat University">Effat University</option>
-        <option value="Fahd bin Sultan University">Fahd bin Sultan University</option>
-        <option value="Ibn Sina National College for Medical Studies">Ibn Sina National College for Medical Studies</option>
-        <option value="Imam Muhammad bin Saud Islamic University">Imam Muhammad bin Saud Islamic University</option>
-        <option value="Institute of Public Administration">Institute of Public Administration</option>
-        <option value="Islamic University of Medina">Islamic University of Medina</option>
-        <option value="Jazan University">Jazan University</option>
-        <option value="King Abdulaziz University">King Abdulaziz University</option>
-        <option value="King Abdullah University of Science and Technology">King Abdullah University of Science and Technology</option>
-        <option value="King Fahd University for Petroleum and Minerals">King Fahd University for Petroleum and Minerals</option>
-        <option value="King Faisal University">King Faisal University</option>
-        <option value="King Khalid University">King Khalid University</option>
-        <option value="King Saud University">King Saud University</option>
-        <option value="Majmaah University">Majmaah University</option>
-        <option value="Najran University">Najran University</option>
-        <option value="Northern Borders University">Northern Borders University</option>
-        <option value="Prince Mohammad University">Prince Mohammad University</option>
-        <option value="Prince Mugrin University">Prince Mugrin University</option>
-        <option value="Prince Sattam Bin Abdulaziz University">Prince Sattam Bin Abdulaziz University</option>
-        <option value="Princess Nora bint Abdulrahman University">Princess Nora bint Abdulrahman University</option>
-        <option value="Prince Sultan Military College of Health Sciences">Prince Sultan Military College of Health Sciences</option>
-        <option value="Prince Sultan University">Prince Sultan University</option>
-        <option value="Qassim University">Qassim University</option>
-        <option value="Riyadh College of Dentistry and Pharmacy">Riyadh College of Dentistry and Pharmacy</option>
-        <option value="Saudi Electronic University">Saudi Electronic University</option>
-        <option value="Shaqra University">Shaqra University</option>
-        <option value="Sulaiman Al Rajhi University">Sulaiman Al Rajhi University</option>
-        <option value="Tabuk University">Tabuk University</option>
-        <option value="Taibah University">Taibah University</option>
-        <option value="Taif University">Taif University</option>
-        <option value="Umm Al-Qura University">Umm Al-Qura University</option>
-        <option value="University of Dammam">University of Dammam</option>
-        <option value="University of Hafr al Batin">University of Hafr al Batin</option>
-        <option value="University of Hail">University of Hail</option>
-        <option value="University of Jeddah">University of Jeddah</option>
-        <option value="Other">Other</option>
-                            </select>
+                    <option value="">{{ form.university.label }}</option>
+                    <option value="King Saud bin Abdulaziz University for Health Sciences">King Saud bin Abdulaziz University for Health Sciences</option>
+                    <option value="King Abdullah International Medical Research Center">King Abdullah International Medical Research Center</option>
+                    <option value="Al Baha University">Al Baha University</option>
+                    <option value="Alfaisal University">Al Faisal University</option>
+                    <option value="Al Farabi College of Dentistry and Nursing">Al Farabi College of Dentistry and Nursing</option>
+                    <option value="Al Jawf University">Al Jawf University</option>
+                    <option value="Almaarefa College for Science and Technology">Almaarefa College for Science and Technology</option>
+                    <option value="Al Qassim Province">Al Qassim Province</option>
+                    <option value="Al Yamamah University">Al Yamamah University</option>
+                    <option value="Arab East Colleges">Arab East Colleges</option>
+                    <option value="Arab Open University">Arab Open University</option>
+                    <option value="Batterjee Medical College">Batterjee Medical College</option>
+                    <option value="Dammam Community College">Dammam Community College</option>
+                    <option value="Dar Al-Hekma College">Dar Al-Hekma College</option>
+                    <option value="Dar Al Uloom University">Dar Al Uloom University</option>
+                    <option value="Effat University">Effat University</option>
+                    <option value="Fahd bin Sultan University">Fahd bin Sultan University</option>
+                    <option value="Ibn Sina National College for Medical Studies">Ibn Sina National College for Medical Studies</option>
+                    <option value="Imam Muhammad bin Saud Islamic University">Imam Muhammad bin Saud Islamic University</option>
+                    <option value="Institute of Public Administration">Institute of Public Administration</option>
+                    <option value="Islamic University of Medina">Islamic University of Medina</option>
+                    <option value="Jazan University">Jazan University</option>
+                    <option value="King Abdulaziz University">King Abdulaziz University</option>
+                    <option value="King Abdullah University of Science and Technology">King Abdullah University of Science and Technology</option>
+                    <option value="King Fahd University for Petroleum and Minerals">King Fahd University for Petroleum and Minerals</option>
+                    <option value="King Faisal University">King Faisal University</option>
+                    <option value="King Khalid University">King Khalid University</option>
+                    <option value="King Saud University">King Saud University</option>
+                    <option value="Majmaah University">Majmaah University</option>
+                    <option value="Najran University">Najran University</option>
+                    <option value="Northern Borders University">Northern Borders University</option>
+                    <option value="Prince Mohammad University">Prince Mohammad University</option>
+                    <option value="Prince Mugrin University">Prince Mugrin University</option>
+                    <option value="Prince Sattam Bin Abdulaziz University">Prince Sattam Bin Abdulaziz University</option>
+                    <option value="Princess Nora bint Abdulrahman University">Princess Nora bint Abdulrahman University</option>
+                    <option value="Prince Sultan Military College of Health Sciences">Prince Sultan Military College of Health Sciences</option>
+                    <option value="Prince Sultan University">Prince Sultan University</option>
+                    <option value="Qassim University">Qassim University</option>
+                    <option value="Riyadh College of Dentistry and Pharmacy">Riyadh College of Dentistry and Pharmacy</option>
+                    <option value="Saudi Electronic University">Saudi Electronic University</option>
+                    <option value="Shaqra University">Shaqra University</option>
+                    <option value="Sulaiman Al Rajhi University">Sulaiman Al Rajhi University</option>
+                    <option value="Tabuk University">Tabuk University</option>
+                    <option value="Taibah University">Taibah University</option>
+                    <option value="Taif University">Taif University</option>
+                    <option value="Umm Al-Qura University">Umm Al-Qura University</option>
+                    <option value="University of Dammam">University of Dammam</option>
+                    <option value="University of Hafr al Batin">University of Hafr al Batin</option>
+                    <option value="University of Hail">University of Hail</option>
+                    <option value="University of Jeddah">University of Jeddah</option>
+                    <option value="Other">Other</option>
+                </select>
                 <input {% if form.university.value and not form.university.errors %}value="{{ form.university.value }}" {% endif %} type="text" class="form-control" id="university-text" placeholder="Write your university" style="display: none" /> {% if form.university.errors %} {% for error in form.university.errors %}
                 <label class='error' for='field' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
@@ -150,19 +151,22 @@
                 <div class="input-group-addon">
                     <i class="entypo-graduation-cap"></i>
                 </div>
-
                 <select {% if form.college.value and not form.college.errors %}value="{{ form.college.value }}" {% endif %}class="form-control" id="college-list" title="{{ form.college.label }}" required="required">
-                                <option value="">{{ form.college.label }}</option>
-        <option value="College of Medicine">College of Medicine</option>
-        <option value="College of Dentistry">College of Dentistry</option>
-        <option value="College of Pharmacy">College of Pharmacy</option>
-        <option value="College of Applied Medical Sciences">College of Applied Medical Sciences</option>
-        <option value="College of Nursing">College of Nursing</option>
-        <option value="College of Public Health and Health Informatics">College of Public Health and Health Informatics</option>
-        <option value="Other">Other</option>
-                            </select>
-                <input {% if form.college.value and not form.college.errors %}value="{{ form.college.value }}" {% endif %}type="text" class="form-control" id="college-text" placeholder="Write your college" style="display: none" /> {% if form.college.errors %} {% for error in form.college.errors %}
-                <label class='error' for='field' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
+                    <option value="">{{ form.college.label }}</option>
+                    <option value="College of Medicine">College of Medicine</option>
+                    <option value="College of Dentistry">College of Dentistry</option>
+                    <option value="College of Pharmacy">College of Pharmacy</option>
+                    <option value="College of Applied Medical Sciences">College of Applied Medical Sciences</option>
+                    <option value="College of Nursing">College of Nursing</option>
+                    <option value="College of Public Health and Health Informatics">College of Public Health and Health Informatics</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input {% if form.college.value and not form.college.errors %}value="{{ form.college.value }}" {% endif %}type="text" class="form-control" id="college-text" placeholder="Write your college" style="display: none" />
+                {% if form.college.errors %}
+                    {% for error in form.college.errors %}
+                        <label class='error' for='field' style='display: inline-block'>{{ error|escape }}</label>
+                    {% endfor %}
+                {% endif %}
             </div>
         </div>
 
@@ -179,91 +183,90 @@
         <div class="form-group">
             <div class="input-group{% if form.study_field.errors %} validate-has-error{% endif %}">
                 <div class="input-group-addon">
-                    <i class="entypo-graduation-cap"></i>
+                    <i class="entypo-users"></i>
                 </div>
-
                 <select {% if form.study_field.value and not form.study_field.errors %}value="{{ form.study_field.value }}" {% endif %}class="form-control" id="study-field-list" title="{{ form.study_field.label }}" required="required">
-                        <option value="">{{ form.study_field.label }}</option>
-<option value="Addiction Medicine">Addiction Medicine</option>
-<option value="Allergic Disease">Allergic Disease</option>
-<option value="Anatomy">Anatomy</option>
-<option value="Anesthesiology">Anesthesiology</option>
-<option value="Angiology">Angiology</option>
-<option value="Audiology">Audiology</option>
-<option value="Cardiology">Cardiology</option>
-<option value="Cardiovascular surgery">Cardiovascular surgery</option>
-<option value="Clinical laboratory sciences">Clinical laboratory sciences</option>
-<option value="Dentistry">Dentistry</option>
-<option value="Dermatology">Dermatology</option>
-<option value="Emergency medicine">Emergency medicine</option>
-<option value="Endocrinology">Endocrinology</option>
-<option value="Family medicine">Family medicine</option>
-<option value="Forensic medicine">Forensic medicine</option>
-<option value="Genetic Counselling">Genetic Counselling</option>
-<option value="Gastroenterology">Gastroenterology</option>
-<option value="Geriatrics">Geriatrics</option>
-<option value="Gynecology">Gynecology</option>
-<option value="Hematology">Hematology</option>
-<option value="Hepatology">Hepatology</option>
-<option value="Histology">Histology</option>
-<option value="Immunology">Immunology</option>
-<option value="Infectious Disease, including Virology">Infectious Disease, including Virology</option>
-<option value="Intensive care medicine">Intensive care medicine</option>
-<option value="Kinesiology, including Exercise Physiology">Kinesiology, including Exercise Physiology</option>
-<option value="Medical genetics">Medical genetics</option>
-<option value="Medical Physics">Medical Physics</option>
-<option value="Medical Technology">Medical Technology</option>
-<option value="Medicine">Medicine</option>
-<option value="Midwifery">Midwifery</option>
-<option value="Nephrology">Nephrology</option>
-<option value="Neuroscience">Neuroscience</option>
-<option value="Neurology">Neurology</option>
-<option value="Neuropsychology">Neuropsychology</option>
-<option value="Neurosurgery">Neurosurgery</option>
-<option value="Nursing">Nursing</option>
-<option value="Nutrition, including Dietetics">Nutrition, including Dietetics</option>
-<option value="Obstetrics">Obstetrics</option>
-<option value="Occupational Therapy">Occupational Therapy</option>
-<option value="Oncology">Oncology</option>
-<option value="Ophthalmology">Ophthalmology</option>
-<option value="Optometry">Optometry</option>
-<option value="Oral and maxillofacial surgery">Oral and maxillofacial surgery</option>
-<option value="Orthopedics">Orthopedics</option>
-<option value="Orthopedic surgery">Orthopedic surgery</option>
-<option value="Otorhinolaryngology">Otorhinolaryngology</option>
-<option value="Palliative care">Palliative care</option>
-<option value="Pathology">Pathology</option>
-<option value="Pediatrics">Pediatrics</option>
-<option value="Pediatric surgery">Pediatric surgery</option>
-<option value="Pharmacology">Pharmacology</option>
-<option value="Pharmacy">Pharmacy</option>
-<option value="Physical medicine and rehabilitation Or Physiatry">Physical medicine and rehabilitation Or Physiatry</option>
-<option value="Physical Therapy (Physiotherapy)">Physical Therapy (Physiotherapy)</option>
-<option value="Physiology">Physiology</option>
-<option value="Plastic surgery">Plastic surgery</option>
-<option value="Podiatry">Podiatry</option>
-<option value="Population health & Public Health, including Epidemiology">Population health & Public Health, including Epidemiology</option>
-<option value="Proctology">Proctology</option>
-<option value="Psychotherapy, including Cognitive Therapy">Psychotherapy, including Cognitive Therapy</option>
-<option value="Psychiatry">Psychiatry</option>
-<option value="Pulmonology">Pulmonology</option>
-<option value="Radiation therapy">Radiation therapy</option>
-<option value="Radiology">Radiology</option>
-<option value="Rheumatology">Rheumatology</option>
-<option value="Sleep Medicine">Sleep Medicine</option>
-<option value="Speech-Language Pathology">Speech-Language Pathology</option>
-<option value="Social Work">Social Work</option>
-<option value="Stomatology">Stomatology</option>
-<option value="Surgery">Surgery</option>
-<option value="Surgical oncology">Surgical oncology</option>
-<option value="Thoracic surgery">Thoracic surgery</option>
-<option value="Translational medicine">Translational medicine</option>
-<option value="Transplant surgery">Transplant surgery</option>
-<option value="Urology">Urology</option>
-<option value="Vascular surgery">Vascular surgery</option>
-<option value="Veterinary Medicine">Veterinary Medicine</option>
-<option value="Other">Other</option>
-					</select>
+                    <option value="">{{ form.study_field.label }}</option>
+                    <option value="Addiction Medicine">Addiction Medicine</option>
+                    <option value="Allergic Disease">Allergic Disease</option>
+                    <option value="Anatomy">Anatomy</option>
+                    <option value="Anesthesiology">Anesthesiology</option>
+                    <option value="Angiology">Angiology</option>
+                    <option value="Audiology">Audiology</option>
+                    <option value="Cardiology">Cardiology</option>
+                    <option value="Cardiovascular surgery">Cardiovascular surgery</option>
+                    <option value="Clinical laboratory sciences">Clinical laboratory sciences</option>
+                    <option value="Dentistry">Dentistry</option>
+                    <option value="Dermatology">Dermatology</option>
+                    <option value="Emergency medicine">Emergency medicine</option>
+                    <option value="Endocrinology">Endocrinology</option>
+                    <option value="Family medicine">Family medicine</option>
+                    <option value="Forensic medicine">Forensic medicine</option>
+                    <option value="Genetic Counselling">Genetic Counselling</option>
+                    <option value="Gastroenterology">Gastroenterology</option>
+                    <option value="Geriatrics">Geriatrics</option>
+                    <option value="Gynecology">Gynecology</option>
+                    <option value="Hematology">Hematology</option>
+                    <option value="Hepatology">Hepatology</option>
+                    <option value="Histology">Histology</option>
+                    <option value="Immunology">Immunology</option>
+                    <option value="Infectious Disease, including Virology">Infectious Disease, including Virology</option>
+                    <option value="Intensive care medicine">Intensive care medicine</option>
+                    <option value="Kinesiology, including Exercise Physiology">Kinesiology, including Exercise Physiology</option>
+                    <option value="Medical genetics">Medical genetics</option>
+                    <option value="Medical Physics">Medical Physics</option>
+                    <option value="Medical Technology">Medical Technology</option>
+                    <option value="Medicine">Medicine</option>
+                    <option value="Midwifery">Midwifery</option>
+                    <option value="Nephrology">Nephrology</option>
+                    <option value="Neuroscience">Neuroscience</option>
+                    <option value="Neurology">Neurology</option>
+                    <option value="Neuropsychology">Neuropsychology</option>
+                    <option value="Neurosurgery">Neurosurgery</option>
+                    <option value="Nursing">Nursing</option>
+                    <option value="Nutrition, including Dietetics">Nutrition, including Dietetics</option>
+                    <option value="Obstetrics">Obstetrics</option>
+                    <option value="Occupational Therapy">Occupational Therapy</option>
+                    <option value="Oncology">Oncology</option>
+                    <option value="Ophthalmology">Ophthalmology</option>
+                    <option value="Optometry">Optometry</option>
+                    <option value="Oral and maxillofacial surgery">Oral and maxillofacial surgery</option>
+                    <option value="Orthopedics">Orthopedics</option>
+                    <option value="Orthopedic surgery">Orthopedic surgery</option>
+                    <option value="Otorhinolaryngology">Otorhinolaryngology</option>
+                    <option value="Palliative care">Palliative care</option>
+                    <option value="Pathology">Pathology</option>
+                    <option value="Pediatrics">Pediatrics</option>
+                    <option value="Pediatric surgery">Pediatric surgery</option>
+                    <option value="Pharmacology">Pharmacology</option>
+                    <option value="Pharmacy">Pharmacy</option>
+                    <option value="Physical medicine and rehabilitation Or Physiatry">Physical medicine and rehabilitation Or Physiatry</option>
+                    <option value="Physical Therapy (Physiotherapy)">Physical Therapy (Physiotherapy)</option>
+                    <option value="Physiology">Physiology</option>
+                    <option value="Plastic surgery">Plastic surgery</option>
+                    <option value="Podiatry">Podiatry</option>
+                    <option value="Population health & Public Health, including Epidemiology">Population health & Public Health, including Epidemiology</option>
+                    <option value="Proctology">Proctology</option>
+                    <option value="Psychotherapy, including Cognitive Therapy">Psychotherapy, including Cognitive Therapy</option>
+                    <option value="Psychiatry">Psychiatry</option>
+                    <option value="Pulmonology">Pulmonology</option>
+                    <option value="Radiation therapy">Radiation therapy</option>
+                    <option value="Radiology">Radiology</option>
+                    <option value="Rheumatology">Rheumatology</option>
+                    <option value="Sleep Medicine">Sleep Medicine</option>
+                    <option value="Speech-Language Pathology">Speech-Language Pathology</option>
+                    <option value="Social Work">Social Work</option>
+                    <option value="Stomatology">Stomatology</option>
+                    <option value="Surgery">Surgery</option>
+                    <option value="Surgical oncology">Surgical oncology</option>
+                    <option value="Thoracic surgery">Thoracic surgery</option>
+                    <option value="Translational medicine">Translational medicine</option>
+                    <option value="Transplant surgery">Transplant surgery</option>
+                    <option value="Urology">Urology</option>
+                    <option value="Vascular surgery">Vascular surgery</option>
+                    <option value="Veterinary Medicine">Veterinary Medicine</option>
+                    <option value="Other">Other</option>
+                </select>
                 <input {% if form.study_field.value and not form.study_field.errors %}value="{{ form.study_field.value }}" {% endif %}type="text" class="form-control" id="study-field-text" placeholder="Write your field" style="display: none" /> {% if form.study_field.errors %} {% for error in form.study_field.errors %}
                 <label class='error' for='field' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
@@ -272,16 +275,15 @@
         <div class="form-group">
             <div class="input-group{% if form.collection_method.errors %} validate-has-error{% endif %}">
                 <div class="input-group-addon">
-                    <i class="entypo-graduation-cap"></i>
+                    <i class="entypo-flow-tree"></i>
                 </div>
-
                 <select {% if form.collection_method.value and not form.collection_method.errors %}value="{{ form.collection_method.value }}" {% endif %}class="form-control" id="collection-method-list" title="{{ form.collection_method.label }}" required="required">
-                                <option value="">{{ form.collection_method.label }}</option>
-        <option value="Experimental">Experimental</option>
-        <option value="Survey">Survey</option>
-        <option value="Chart review">Chart review</option>
-        <option value="Other">Other</option>
-                            </select>
+                    <option value="">{{ form.collection_method.label }}</option>
+                    <option value="Experimental">Experimental</option>
+                    <option value="Survey">Survey</option>
+                    <option value="Chart review">Chart review</option>
+                    <option value="Other">Other</option>
+                </select>
                 <input {% if form.collection_method.value and not form.collection_method.errors %}value="{{ form.collection_method.value }}" {% endif %}type="text" class="form-control" id="collection-method-text" placeholder="Write your data collection method" style="display: none" /> {% if form.collection_method.errors %} {% for error in form.collection_method.errors %}
                 <label class='error' for='field' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
@@ -310,19 +312,19 @@
         <div class="form-group" id="presentation_preference-group">
             <div class="input-group{% if form.presentation_preference.errors %} validate-has-error{% endif %}">
                 <div class="input-group-addon">
-                    <i class="entypo-doc"></i>
+                    <i class="entypo-mic"></i>
                 </div>
                 <select {% if form.presentation_preference.value and not form.presentation_preference.errors %}value="{{ form.presentation_preference.value }}" {% endif %}class="form-control english-field" id="presentation_preference" name="presentation_preference" required title="Presentation preference">
-                                                <option value="">Presentation preference</option>
-                                                <option value="O">Oral presentation</option>
-                                                <option value="P">Poster</option>
-					</select> {% if form.presentation_preference.errors %} {% for error in form.presentation_preference.errors %}
+                    <option value="">Presentation preference</option>
+                    <option value="O">Oral presentation</option>
+                    <option value="P">Poster</option>
+                </select> {% if form.presentation_preference.errors %} {% for error in form.presentation_preference.errors %}
                 <label class='error' for='presentation_preference' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
         </div>
-        <h3 class="english-field">Post your abstract</h3>
-        <p>In the {{ event.english_name }}, abstracts are divided into five sections: introduction, methodology, results, discussion and conclusion. Make sure that you have read <a target="_blank" href="{{ event.abstract_submission_instruction_url }}">the regulations carefully</a> and post your abstract below.</p>
-        <h4 class="english-field" style="color:white">Introduction:</h4>
+        <div class="english-field registration-form">
+            <h3 class="english-field">Post your abstract</h3>
+            <p class="text-center" style="margin-bottom: 30px">In the {{ event.english_name }}, abstracts are divided into four sections: <b>background, methods, results, and conclusion. Maximum words are 300</b> without the title and authors’ names.</p>
 
         <div class="form-group">
             <div class="input-group{% if form.introduction.errors %} validate-has-error{% endif %}">
@@ -346,7 +348,6 @@
         </div>
 
         <h4 class="english-field" style="color:white">Results:</h4>
-
         <div class="form-group">
             <div class="input-group{% if form.results.errors %} validate-has-error{% endif %}">
 
@@ -368,12 +369,9 @@
         </div>
 
         <h4 class="english-field" style="color:white">Conclusion:</h4>
-
         <div class="form-group">
             <div class="input-group{% if form.conclusion.errors %} validate-has-error{% endif %}">
-
-
-                <textarea {% if form.conclusion.value and not form.conclusion.errors %}value="{{ form.conclusion.value }}" {% endif %}type="text" class="form-control english-field" name="conclusion" id="conclusion" placeholder="Abstract's conclusion" required="required"></textarea> {% if form.conclusion.errors %} {% for error in form.conclusion.errors %}
+                <textarea {% if form.conclusion.value and not form.conclusion.errors %}value="{{ form.conclusion.value }}" {% endif %}type="text" class="form-control english-field" name="conclusion" id="conclusion" placeholder="Abstract's conclusion" required="required" rows="5" cols="50"></textarea> {% if form.conclusion.errors %} {% for error in form.conclusion.errors %}
                 <label class='error' for='conclusion' style='display: inline-block'>{{ error|escape }}</label> {% endfor %} {% endif %}
             </div>
         </div>
@@ -436,12 +434,14 @@ will result in a refusal of my application.
         <input type="hidden" name="college">
         <input type="hidden" name="study_field">
         <input type="hidden" name="collection_method">
+        <input type="hidden" name="study_design">
         <div class="form-group">
             <button disabled type="submit" class="btn btn-success btn-block btn-login">
 					<i class="entypo-right-open-mini"></i>
 					Submit
 				</button>
         </div>
+    </div>
     </div>
 </form>
 <html>

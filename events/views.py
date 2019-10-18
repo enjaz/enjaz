@@ -630,30 +630,36 @@ def submit_case_report(request, event_code_name):
 
     if request.method == 'POST':
         instance = CaseReport(event=event,user=request.user)
-        form = forms.CaseReportForm(request.POST, request.FILES,
+        form = forms.CaseReportForm(request.POST,
                              instance=instance)
-        if form.is_valid():
+        author_formset = forms.CaseReportAuthorFormset(request.POST)
+
+        if form.is_valid() and author_formset.is_valid():
             abstract = form.save()
+            author_formset.instance = abstract
+            author_formset.save()
             return HttpResponseRedirect(reverse('events:show_casereport',
                                                 args=(event.code_name, abstract.pk)))
     elif request.method == 'GET':
         form = forms.CaseReportForm()
+        author_formset = forms.CaseReportAuthorFormset()
     context['form'] = form
+    context['author_formset']=author_formset
 
     return render(request, 'events/abstracts/casereports/casereport_submission.html', context)
 
 @login_required
 def show_casereport(request, event_code_name, pk):
-    casereport = get_object_or_404(CaseReport, is_deleted=False, pk=pk)
-    event = casereport.event
+    abstract = get_object_or_404(CaseReport, is_deleted=False, pk=pk)
+    event = abstract.event
 
-    if not casereport.user == request.user and \
+    if not abstract.user == request.user and \
             not request.user.is_superuser and \
             not utils.can_evaluate_abstracts(request.user, event) and \
             not utils.is_organizing_team_member(request.user, event):
         raise PermissionDenied
 
-    context= {'event':event, 'casereport':casereport}
+    context= {'event':event, 'abstract':abstract}
     return render(request, "events/abstracts/casereports/show_casereport.html", context)
 
 

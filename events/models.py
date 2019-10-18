@@ -641,7 +641,7 @@ class CaseReport(models.Model):
     event = models.ForeignKey(Event, verbose_name=u"الحدث")
     title = models.CharField(verbose_name="Title", max_length=255)
     presenting_author = models.CharField(verbose_name="Presenting author", max_length=255, default="")
-    authors = models.TextField(verbose_name=u"Name of authors")
+    authors = models.TextField(verbose_name=u"Name of authors",blank=True)
     study_field = models.CharField(verbose_name="Study Field", max_length=255, default="")
     university = models.CharField(verbose_name="Institution/University", max_length=255)
     college = models.CharField(verbose_name="Department/College", max_length=255)
@@ -652,7 +652,7 @@ class CaseReport(models.Model):
         ('G', 'Graduate')
         )
     level = models.CharField(verbose_name="Level", max_length=1,
-                             default='', choices=level_choices)
+                             default='', choices=level_choices,blank=True)
     presentation_preference_choices = (
         ('O', 'Oral'),
         ('P', 'Poster'),
@@ -672,7 +672,11 @@ class CaseReport(models.Model):
     case_description = models.TextField(u"Case Description", default="")
     discussion = models.TextField(u"Discussion", default="")
     conclusion = models.TextField(u"Conclusion", default="")
-    was_presented_at_conference= models.BooleanField(u"Has the study been presented in a conference before?", default=False)
+    was_presented_at_conference_choices = (
+        ('N', 'No'),
+        ('Y','Yes')
+    )
+    was_presented_at_conference = models.CharField(verbose_name="Has the case report been presented in a conference before?", max_length=1, choices=was_presented_at_conference_choices,default="N")
     presentaion_date = models.DateField(u"تاريخ العرض", null=True)
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
@@ -691,6 +695,9 @@ class CaseReport(models.Model):
 
     def __unicode__(self):
         return self.title
+class CaseReportAuthor(models.Model):
+    case_report = models.ForeignKey(CaseReport, related_name='author')
+    name = models.CharField(verbose_name="Name of authors", max_length=255,blank=True)
 
 
 class Attendance(models.Model):

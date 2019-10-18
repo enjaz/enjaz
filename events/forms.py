@@ -10,7 +10,7 @@ from .models import NonUser, Session, Registration, Abstract, \
     AbstractFigure, Initiative, InitiativeFigure, \
     Criterion, CriterionValue, Evaluation,CaseReport, \
     AbstractPoster, Attendance, Question, SurveyQuestion, \
-    SurveyResponse, SurveyAnswer, SessionRegistration,AbstractAuthor,UserSurveyCategory, Vote
+    SurveyResponse, SurveyAnswer, SessionRegistration,AbstractAuthor,UserSurveyCategory, Vote, CaseReportAuthor
 from django.forms.models import inlineformset_factory
 
 class NonUserForm(forms.ModelForm):
@@ -124,7 +124,13 @@ class CaseReportForm(forms.ModelForm):
                     'phone', 'background', 'presentation_preference',
                   'was_presented_at_conference', 'gender','study_field',
                   'principle_investigator','case_description','discussion','conclusion',
-                  'conference_presented_at','graduation_year']
+                  'graduation_year']
+
+CaseReportAuthorFormset = inlineformset_factory(CaseReport,
+                                             CaseReportAuthor,
+                                             fields=['name'],
+                                             validate_max=True)
+
 
 class EvaluationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):

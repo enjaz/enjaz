@@ -76,9 +76,14 @@ class AbstractAdmin(admin.ModelAdmin):
     filter_horizontal = ('evaluators',)
     raw_id_fields = ['evaluators','user']
     introduction = forms.CharField(widget=CKEditorWidget())
+class CaseReportAuthorInline(admin.TabularInline):
+    model = models.CaseReportAuthor
+    form = OptionalForm
+    extra = 1
 
 class CaseReportAdmin(admin.ModelAdmin):
     raw_id_fields = ['user']
+    inlines = [CaseReportAuthorInline]
 
 class QuestionInline(admin.TabularInline):
     model = models.Question

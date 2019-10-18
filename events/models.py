@@ -508,7 +508,11 @@ class Abstract(models.Model):
     results = models.TextField(u"Results", default="")
     discussion = models.TextField(u"Discussion", default="", blank=True)
     conclusion = models.TextField(u"Conclusion", default="")
-    was_presented_at_conference = models.BooleanField(u"Has the study been presented in a conference before?", default=False)
+    was_presented_at_conference_choices = (
+        ('N', 'No'),
+        ('Y','Yes')
+    )
+    was_presented_at_conference = models.CharField(verbose_name="Has the study been presented in a conference before?", max_length=1, choices=was_presented_at_conference_choices,default="N")
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")

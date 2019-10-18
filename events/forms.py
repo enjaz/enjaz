@@ -78,13 +78,13 @@ class RegistrationForm(forms.Form):
 class AbstractForm(forms.ModelForm):
     class Meta:
         model = Abstract
-        fields = ['title', 'university', 'college', 'collection_method',
+        fields = ['title', 'university', 'college',
                   'study_field', 'presenting_author', 'email',
                   'phone', 'presentation_preference',
                   'background','methods', 'results',
                   'discussion', 'conclusion', 'gender',
                   'was_presented_at_conference','principle_investigator',
-                  'study_design','significance','conference_presented_at',
+                  'study_design','significance',
                   'submitted_to_journal','irb_approval','graduation_year',
                   ]
 

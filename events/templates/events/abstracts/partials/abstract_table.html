@@ -11,13 +11,16 @@
     <tbody>
         {% if not user|can_evaluate_abstracts:event or user.is_superuser %}
         <tr>
-            <th class="text-center">Authors</th>
-            <td class="activity-description">{% for author in abstract.author.all %}{{ author.name }} | {% endfor %} </td>
-
-        </tr>
-        <tr>
             <th class="text-center">Presenting author</th>
             <td>{{ abstract.presenting_author }}</td>
+        </tr>
+        <tr>
+            <th class="text-center">Principle Investigator</th>
+            <td>{{ abstract.principle_investigator }}</td>
+        </tr>
+            <tr>
+            <th class="text-center">Co-Authors</th>
+            <td class="activity-description">{% for author in abstract.author.all %}{{ author.name }} | {% endfor %} </td>
         </tr>
         <tr>
             <th class="text-center">Email</th>
@@ -27,39 +30,42 @@
             <th class="text-center">Phone</th>
             <td>{{ abstract.phone }}</td>
         </tr>
+        {% endif %}
+        {% if user|can_evaluate_abstracts:event or user.is_superuser  %}
         <tr>
             <th class="text-center">University</th>
             <td>{{ abstract.university }}</td>
         </tr>
-        {% endif %}
+
         <tr>
             <th class="text-center">College</th>
             <td>{{ abstract.college }}</td>
         </tr>
         <tr>
-            <th class="text-center">Level</th>
-            <td>{{ abstract.get_level_display }}</td>
+            <th class="text-center">Graduation year</th>
+            <td>{{ abstract.graduation_year }}</td>
         </tr>
         <tr>
             <th class="text-center">Study field</th>
             <td>{{ abstract.study_field }}</td>
         </tr>
         <tr>
-            <th class="text-center">Data collection method</th>
-            <td>{{ abstract.collection_method }}</td>
+            <th class="text-center">Study Design</th>
+            <td>{{ abstract.study_design }}</td>
         </tr>
         <tr>
-  					<th class="text-center">Puplished?</th>
-  					<td>{{ abstract.was_published|yesno:"Yes,No" }}</td>
+        <tr>
+            <th class="text-center">Have you submitted the manuscript to a journal?</th>
+            <td>{{ abstract.get_submitted_to_journal_display }}</td>
+        </tr>
+  					<th class="text-center">Do you have an IRB Approval?</th>
+  					<td>{{ abstract.get_irb_approval_display }}</td>
   			</tr>
   			<tr>
-  					<th class="text-center">Presented previously at HPC?</th>
-  					<td>{{ abstract.was_presented_previously|yesno:"Yes,No" }}</td>
+  					<th class="text-center">Has the study been presented in a conference before?</th>
+  					<td>{{ abstract.was_presented_at_conference|yesno:"Yes,No" }}</td>
   			</tr>
-  			<tr>
-  					<th class="text-center">Presented previously at others?</th>
-  					<td>{{ abstract.was_presented_at_others|yesno:"Yes,No" }}</td>
-  			</tr>
+        {% endif %}
         {%  if abstract.status == 'A' %}
         <tr>
             <th class="text-center">Accepted Presentation</th>
@@ -150,13 +156,11 @@
     </tbody>
 </table>
 
-<h3>Introduction</h3>
-{{ abstract.introduction|safe }}
-<h3>Methodology</h3>
-{{ abstract.methodology|safe }}
+<h3>Background</h3>
+{{ abstract.background|safe }}
+<h3>Methods</h3>
+{{ abstract.methods|safe }}
 <h3>Results</h3>
 {{ abstract.results|safe }}
-<h3>Discussion</h3>
-{{ abstract.discussion|safe }}
 <h3>Conclusion</h3>
 {{ abstract.conclusion|safe }}

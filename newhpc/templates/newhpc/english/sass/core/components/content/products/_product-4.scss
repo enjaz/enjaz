@@ -1,0 +1,102 @@
+// Product 4
+
+// BEGIN: General Mode
+
+.c-content-product-4 {
+	@include reset-padmar(); // call mixing reset default padding and margin
+	height: 500px;
+
+	&.c-content-bg-1 {
+		background-color: #eff3f5;
+	}
+
+	&.c-content-bg-2 {
+		background-color: #f0ece8;
+	}
+
+	.c-content {
+
+		.c-title {
+			margin: 0 0 25px;
+			font-weight: 500;
+		}
+
+		.c-price {
+			margin-top: 20px;
+		}
+
+		.btn {
+			margin-top: 15px;
+		}
+
+		&.c-align-right {
+			padding: 100px 100px 0 0;
+			text-align: right;
+		}
+
+		&.c-align-left {
+			padding: 100px 0 0 100px;
+		}
+	}
+
+	.c-border-padding {
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		top: 20px;
+		bottom: 20px;
+		left: 20px;
+		right: 20px;
+		position: absolute;
+		z-index: 1;
+	}
+
+	.c-side-image {
+		height: 500px;
+		background-size: 80%;
+		background-repeat: no-repeat;
+		background-position: bottom;
+	}
+}
+
+// END
+
+// BEGIN: Mobile Mode
+
+@media (max-width: $screen-sm-max) {
+	/* 991px */
+
+	.c-content-product-4 {
+
+		.c-side-image {
+			background-size: contain;
+		}
+
+		.c-content {
+
+			&.c-align-right {
+				padding: 40px 20px 0 0;
+			}
+
+			&.c-align-left {
+				padding: 40px 0 0 20px;
+			}
+		}
+	}
+}
+
+@media (max-width: $screen-xs-max) {
+	/* 767px */
+
+	.c-content-product-4 {
+		height: 760px;
+
+		.c-wrapper {
+			padding-top: 30px;
+		}
+
+		.c-side-image {
+			height: 350px;
+		}
+	}
+}
+
+// END

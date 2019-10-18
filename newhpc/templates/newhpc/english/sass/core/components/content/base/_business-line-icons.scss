@@ -1,0 +1,37 @@
+
+.c-content-business-line-icon {
+	background-image: url(../../../base/img/content/business-line-icons/default.png);
+
+	&.c-white {
+		background-image: url(../../../base/img/content/business-line-icons/white.png);
+	}
+
+	display: inline-block;
+	width:60px;
+	height:60px;
+	background-size: cover;
+
+	&.c-business-icon-md {
+		width: 40px;
+		height: 40px;
+	}
+
+	&.c-business-icon-sm {
+		width: 30px;
+		height: 30px;
+	}
+
+	&.c-business-icon-xs {
+		width: 20px;
+		height: 20px;
+	}	
+
+	$per: '%';
+
+	@for $i from 1 through 36 {
+	    &.c-business-icon-#{$i} { 
+	        background-position: 0px  #{($i - 1) * 100)}#{$per};
+	    }   
+	}
+
+}

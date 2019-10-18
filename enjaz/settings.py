@@ -77,6 +77,7 @@ INSTALLED_APPS = (
     'tedx',
     'userena',
     'wkhtmltopdf',
+    'newhpc',
 )
 
 MIDDLEWARE_CLASSES = (

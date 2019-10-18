@@ -1,0 +1,21 @@
+{
+  "name": "jango",
+  "version": "1.0.0",
+  "description": "Jango by Themehats",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "directory-list": "^1.1.1",
+    "gulp": "^3.9.0",
+    "gulp-prettify": "^0.3.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.5.4",
+    "gulp-rtlcss": "^1.0.0",
+    "gulp-sass": "^2.0.4",
+    "gulp-sourcemaps": "^1.5.2"
+  }
+}

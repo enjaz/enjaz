@@ -1,0 +1,80 @@
+// SUBSCRIBE FORM 3
+
+.c-content-subscribe-form-3{
+	display: table;
+	margin: 10px auto;
+	width:500px;
+	border-radius: 25px;
+	box-shadow: 0 0 30px 0 rgba(0,0,0,0.08);
+	overflow: hidden;
+	padding: 0 15px;
+	vertical-align: middle;
+
+	.c-content-subscribe-form-3-input,
+	.c-content-subscribe-form-3-btn{
+		display: table-cell;
+		vertical-align: middle;
+		color:#fff;
+		letter-spacing: 0.5px;
+		font-weight: 300;
+	}
+
+	.c-content-subscribe-form-3-input{
+		border:none;
+		color: #fff;
+		font-family: $general-font-family;
+		font-size: 12px;
+		font-weight: 300;
+
+		&::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+			color: #fff;
+			font-family: $general-font-family;
+			font-size: 12px;
+			font-weight: 300;
+		}
+		&::-moz-placeholder { /* Firefox 19+ */
+			color: #fff;
+			font-family: $general-font-family;
+			font-size: 12px;
+			font-weight: 300;
+		}
+		&:-ms-input-placeholder { /* IE 10+ */
+			color: #fff;
+			font-family: $general-font-family;
+			font-size: 12px;
+			font-weight: 300;
+		}
+		&:-moz-placeholder { /* Firefox 18- */
+			color: #fff;
+			font-family: $general-font-family;
+			font-size: 12px;
+			font-weight: 300;
+		}
+	}
+
+	.c-content-subscribe-form-3-btn{
+		width: 28px;
+		padding-right: 15px;
+
+		.btn{
+			padding: 0;
+
+			&:hover,
+			&:active{
+				background-color: transparent;
+				border-color: transparent;
+			}
+		}
+	}
+	
+	div[aria-hidden="true"]{
+		display: none;
+	}
+}
+
+@media (max-width: $screen-xs-min) { /* 480px */
+	.c-content-subscribe-form-3{
+		width:100%;
+	}
+
+}

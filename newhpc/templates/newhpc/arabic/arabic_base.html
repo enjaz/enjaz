@@ -1,0 +1,346 @@
+<!DOCTYPE html>{% load staticfiles %}
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ar" dir="rtl">
+    <!--<![endif]-->
+    <!-- BEGIN HEAD -->
+
+    <head>
+        <meta charset="utf-8" />
+        <title>{% block title %}{% endblock %}</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <meta content="" name="description" />
+        <meta content="" name="author" />
+        <!-- BEGIN GLOBAL MANDATORY STYLES -->
+        <link rel="shortcut icon" href="{% static 'newhpc/images/favicon2.ico' %}" type="image/x-icon">
+        <link rel="icon" href="{% static 'newhpc/images/favicon2.ico' %}" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css?family=Tajawal:300,400,700&display=swap&subset=arabic" rel="stylesheet">
+        <link href="{% static 'newhpc/arabic/assets/plugins/socicon/socicon.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'newhpc/arabic/assets/plugins/bootstrap-social/bootstrap-social.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'newhpc/arabic/assets/plugins/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'newhpc/arabic/assets/plugins/simple-line-icons/simple-line-icons.min.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'newhpc/arabic/assets/plugins/animate/animate.min.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'newhpc/arabic/assets/plugins/bootstrap/css/bootstrap-rtl.min.css' %}" rel="stylesheet" type="text/css" />
+        <!-- END GLOBAL MANDATORY STYLES -->
+        <!-- BEGIN: BASE PLUGINS  -->
+        <link href="{% static 'newhpc/arabic/assets/plugins/revo-slider/css/settings.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'newhpc/arabic/assets/plugins/revo-slider/css/layers.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'newhpc/arabic/assets/plugins/revo-slider/css/navigation.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'newhpc/arabic/assets/plugins/cubeportfolio/css/cubeportfolio.min.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'newhpc/arabic/assets/plugins/owl-carousel/assets/owl.carousel.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'newhpc/arabic/assets/plugins/fancybox/jquery.fancybox.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'newhpc/arabic/assets/plugins/slider-for-bootstrap/css/slider.css' %}" rel="stylesheet" type="text/css" />
+        <!-- END: BASE PLUGINS -->
+        <!-- BEGIN: PAGE STYLES -->
+        <link href="{% static 'newhpc/arabic/assets/plugins/ilightbox/css/ilightbox.css' %}" rel="stylesheet" type="text/css" />
+        <!-- END: PAGE STYLES -->
+        <!-- BEGIN THEME STYLES -->
+        <link href="{% static 'newhpc/arabic/assets/demos/index/css/plugins-rtl.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'newhpc/arabic/assets/demos/index/css/components-rtl.css' %}" id="style_components" rel="stylesheet" type="text/css" />
+        <link href="{% static 'newhpc/arabic/assets/demos/index/css/themes/hpc-colors-rtl.css' %}" rel="stylesheet" id="style_theme" type="text/css" />
+        <link href="{% static 'newhpc/arabic/assets/demos/index/css/custom-rtl.css' %}" rel="stylesheet" type="text/css" />
+        <!-- END THEME STYLES -->
+        <link rel="shortcut icon" href="favicon.ico" />
+        <!-- Custom style to improve header on mobile and desktop -->
+        <style>
+            body {
+                font-family: 'Tajawal', sans-serif !important;
+            }
+            #simple-footer {
+            left: 0;
+            bottom: 0;
+            width: 100%;
+        }
+            .white-footer {
+            color: #fafefe;
+        }
+            @media (max-width: 1199px) {
+            #hpcnav {
+            }
+            .c-desktop-logo {
+                height: 55px;
+            }
+            .c-layout-header .c-navbar .c-mega-menu.c-fonts-uppercase > .nav.navbar-nav > li > .c-link {
+                font-size: 15px;
+            }
+            .c-layout-header .c-navbar .c-mega-menu.c-fonts-uppercase > .nav.navbar-nav > li .dropdown-menu > li > a {
+                font-size: 13px;
+            }}
+            @media (max-width: 991px) {
+            #hpcnav {
+                margin-top: -13px;
+            }
+            }
+            @media (max-width: 767px) {
+            #hpcnav {
+
+            }}
+            @media (max-width: 370px) {
+            #hpcnav {
+            }}
+            @media (min-width: 1200px) {
+            #hpcnav {
+            }
+            .c-layout-header .c-navbar .c-mega-menu.c-fonts-uppercase > .nav.navbar-nav > li > .c-link {
+                font-size: 18px;
+                text-transform: uppercase;
+                color: #242b2c;
+            }
+            .c-layout-header .c-navbar .c-mega-menu.c-fonts-uppercase > .nav.navbar-nav > li .dropdown-menu > li > a {
+                font-size: 15px;
+                text-transform: uppercase;
+            }
+            .c-desktop-logo {
+                height: 55px;
+            }
+            }
+            {% block style %}
+            {% endblock %}
+        </style>
+    </head>
+
+    <body class="c-layout-header-fixed c-layout-header-mobile-fixed c-layout-header-topbar c-layout-header-topbar-collapse c-topbar-expanded">
+	    <!-- BEGIN: LAYOUT/HEADERS/HEADER-1 -->
+        <!-- BEGIN: HEADER -->
+        <header class="c-layout-header c-layout-header-4 c-layout-header-default-mobile" data-minimize-offset="80">
+		    <div class="c-topbar c-topbar-light">
+		        <div class="container">
+                    <!-- BEGIN: INLINE NAV -->
+                    <nav class="c-top-menu c-pull-left">
+                        <ul class="c-icons c-theme-ul">
+                            <li><a href="#"><i class="icon-social-twitter"></i></a></li>
+                            <li><a href="#"><i class="icon-social-facebook"></i></a></li>
+                            <li><a href="#"><i class="icon-social-dribbble"></i></a></li>
+                        </ul>
+                    </nav>
+                    <!-- END: INLINE NAV -->
+                    <!-- BEGIN: INLINE NAV -->
+                    <nav class="c-top-menu c-pull-right">
+                        <ul class="c-links c-theme-ul">
+                            <li><a href="#">الأسئلة الشائعة</a></li>
+                            <li class="c-divider">|</li>
+                            <li><a href="#">تواصل معنا</a></li>
+                        </ul>
+                        <ul class="c-ext c-theme-ul">
+                            <li class="c-lang dropdown c-last">
+                                <a href="#">AR</a>
+                                <ul class="dropdown-menu pull-right" role="menu">
+                                    <li class="active"><a href="#">العربيّة</a></li>
+                                    <li><a href="{% url 'newhpc:riy_en_index' %}">English</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </nav>
+			        <!-- END: INLINE NAV -->
+		        </div>
+	        </div>
+            <div class="c-navbar">
+                <div class="container">
+                    <!-- BEGIN: BRAND -->
+                    <div class="c-navbar-wrapper clearfix">
+                        <div class="c-brand c-pull-left" style="">
+                            <a href="index.html" class="c-logo">
+                                <img style="" src="{% static 'newhpc/arabic/assets/base/img/layout/logos/hpc-logo-3.png' %}" alt="مؤتمر التخصّصات الصحّية" class="c-desktop-logo">
+                                <img style="height: 50px;margin-top: -15px;" src="{% static 'newhpc/arabic/assets/base/img/layout/logos/hpc-logo-3.png' %}" alt="مؤتمر التخصّصات الصحّية" class="c-desktop-logo-inverse">
+                                <img style="height: 50px; margin-top: -12px" src="{% static 'newhpc/arabic/assets/base/img/layout/logos/hpc-logo-3.png' %}" alt="مؤتمر التخصّصات الصحّية" class="c-mobile-logo">
+                            </a>
+                            <button class="c-hor-nav-toggler" type="button" data-target=".c-mega-menu">
+                            <span class="c-line"></span>
+                            <span class="c-line"></span>
+                            <span class="c-line"></span>
+                            </button>
+                        </div>
+                        <!-- END: BRAND -->
+
+                        <!-- BEGIN: HOR NAV -->
+                        <!-- BEGIN: LAYOUT/HEADERS/MEGA-MENU -->
+                        <!-- BEGIN: MEGA MENU -->
+                        <!-- Dropdown menu toggle on mobile: c-toggler class can be applied to the link arrow or link itself depending on toggle mode -->
+                        <nav class="c-mega-menu c-pull-right c-mega-menu-dark c-mega-menu-dark-mobile c-fonts-uppercase c-fonts-bold" id="hpcnav" style="">
+                            <ul class="nav navbar-nav c-theme-nav">
+
+                                <li class="c-onepage-link">
+                                    <a href="#" class="c-link ">التسجيل</a>
+                                </li>
+                                <li class="c-onepage-link">
+                                    <a href="#" class="c-link ">مسار الأبحاث</a>
+                                </li>
+                                <li class="{% block ar_programs_active %}{% endblock %}c-menu-type-classic">
+                                    <a href="javascript:;" class="c-link dropdown-toggle">برامج المؤتمر<span class="c-arrow c-toggler"></span></a>
+                                    <ul class="dropdown-menu c-menu-type-classic c-pull-left">
+                                        <li>
+                                            <a href="#">المعرض</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">مسار الأبحاث</a>
+                                        </li>
+                                        <li class="dropdown-submenu">
+                                            <a href="#">المحاضرات وورش العمل<span class="c-arrow c-toggler"></span></a>
+                                            <ul class="dropdown-menu c-pull-right">
+                                                <li><a href="#">البرنامج العام</a></li>
+                                                <li><a href="#">برامج الكلّيات</a></li>
+                                                <li><a href="{% url 'newhpc:riy_ar_research' %}">برنامج الأبحاث</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="c-onepage-link"><a href="#" class="c-link ">المركز الإعلامي</a></li>
+
+                                <li class="c-onepage-link"><a href="#" class="c-link ">عن المؤتمر</a></li>
+
+                                <li class="c-onepage-link"><a href="#" class="c-link ">النسخ السابقة</a></li>
+                            </ul>
+                        </nav>
+
+                        <!-- END: MEGA MENU -->
+                        <!-- END: LAYOUT/HEADERS/MEGA-MENU -->
+                        <!-- END: HOR NAV -->
+			        </div>
+		        </div>
+	        </div>
+        </header>
+        <!-- END: HEADER -->
+        <!-- END: LAYOUT/HEADERS/HEADER-1 -->
+        {% block content %}
+        {% endblock %}
+
+	<!-- BEGIN: LAYOUT/FOOTERS/FOOTER-1 -->
+        <footer id="simple-footer" class="c-layout-footer c-layout-footer-1">
+            <div class="c-postfooter">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6" style="width: 100%;">
+                            <p style="text-align: center" class=" white-footer c-font-15 c-font-bold">بني بأيدٍ طلابيّة.<br><a href="https://github.com/enjaz/enjaz" target="_blank" class="white-footer c-link c-font-bold c-font-15">&copy; فريق إنجاز 2020</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- END: LAYOUT/FOOTERS/FOOTER-1 -->
+
+        <!-- BEGIN: LAYOUT/FOOTERS/GO2TOP -->
+        <div class="c-layout-go2top">
+            <i class="icon-arrow-up"></i>
+        </div><!-- END: LAYOUT/FOOTERS/GO2TOP -->
+
+        <!-- BEGIN: LAYOUT/BASE/BOTTOM -->
+        <!-- BEGIN: CORE PLUGINS -->
+        <!--[if lt IE 9]>
+        <script src="{% static 'newhpc/arabic/assets/global/plugins/excanvas.min.js' %}"></script>
+        <![endif]-->
+        <script src="{% static 'newhpc/arabic/assets/plugins/jquery.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/jquery-migrate.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/bootstrap/js/bootstrap.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/jquery.easing.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/reveal-animate/wow.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/demos/index/js/scripts/reveal-animate/reveal-animate.js' %}" type="text/javascript"></script>
+        <!-- END: CORE PLUGINS -->
+        <!-- BEGIN: LAYOUT PLUGINS -->
+        <script src="{% static 'newhpc/arabic/assets/plugins/revo-slider/js/jquery.themepunch.tools.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/revo-slider/js/jquery.themepunch.revolution.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/revo-slider/js/extensions/revolution.extension.slideanims.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/revo-slider/js/extensions/revolution.extension.layeranimation.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/revo-slider/js/extensions/revolution.extension.navigation.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/revo-slider/js/extensions/revolution.extension.video.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/revo-slider/js/extensions/revolution.extension.parallax.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/cubeportfolio/js/jquery.cubeportfolio.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/owl-carousel/owl.carousel.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/counterup/jquery.waypoints.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/counterup/jquery.counterup.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/fancybox/jquery.fancybox.pack.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/smooth-scroll/jquery.smooth-scroll.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/typed/typed.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/slider-for-bootstrap/js/bootstrap-slider.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/plugins/js-cookie/js.cookie.js' %}" type="text/javascript"></script>
+        <!-- END: LAYOUT PLUGINS -->
+        <!-- BEGIN: THEME SCRIPTS -->
+        <script src="{% static 'newhpc/arabic/assets/base/js/components.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/base/js/components-shop.js' %}" type="text/javascript"></script>
+        <script src="{% static 'newhpc/arabic/assets/base/js/app.js' %}" type="text/javascript"></script>
+        <script>
+            $(document).ready(function()
+            {
+                App.init(); // init core
+            });
+        </script>
+        <!-- END: THEME SCRIPTS -->
+        <!-- BEGIN: PAGE SCRIPTS -->
+        <script>
+			$(document).ready(function() {
+
+    var slider = $('.c-layout-revo-slider .tp-banner');
+    var cont = $('.c-layout-revo-slider .tp-banner-container');
+    var height = (App.getViewPort().width < App.getBreakpoint('md') ? 400 : 620);
+
+    var api = slider.show().revolution({
+        sliderType:"standard",
+        sliderLayout:"fullwidth",
+        delay: 15000,
+        autoHeight: 'off',
+        gridheight:500,
+
+        navigation: {
+            keyboardNavigation:"off",
+            keyboard_direction: "horizontal",
+            mouseScrollNavigation:"off",
+            onHoverStop:"on",
+            arrows: {
+                style:"circle",
+                enable:true,
+                hide_onmobile:false,
+                hide_onleave:false,
+                tmp:'',
+                left: {
+                    h_align:"left",
+                    v_align:"center",
+                    h_offset:30,
+                    v_offset:0
+                },
+                right: {
+                    h_align:"right",
+                    v_align:"center",
+                    h_offset:30,
+                    v_offset:0
+                }
+            },
+            touch:{
+                touchenabled:"on",
+                swipe_threshold: 75,
+                swipe_min_touches: 1,
+                swipe_direction: "horizontal",
+                drag_block_vertical: false
+            },
+        },
+        viewPort: {
+            enable:true,
+            outof:"pause",
+            visible_area:"80%"
+        },
+
+        shadow: 0,
+
+        spinner: "spinner2",
+
+        disableProgressBar:"on",
+
+        fullScreenOffsetContainer: '.tp-banner-container',
+
+        hideThumbsOnMobile: "on",
+        hideNavDelayOnMobile: 1500,
+        hideBulletsOnMobile: "on",
+        hideArrowsOnMobile: "on",
+        hideThumbsUnderResolution: 0,
+
+    });
+}); //ready
+        </script>
+        {% block script %}
+        {% endblock %}
+        <!-- END: PAGE SCRIPTS -->
+        <!-- END: LAYOUT/BASE/BOTTOM -->
+    </body>
+</html>

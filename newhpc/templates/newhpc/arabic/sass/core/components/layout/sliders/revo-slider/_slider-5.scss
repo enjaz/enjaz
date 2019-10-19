@@ -1,0 +1,24 @@
+.c-layout-revo-slider-5 {
+	min-height:500px;
+}
+
+@media (max-width: $screen-sm-max) { /* 991px */
+
+	.c-layout-revo-slider-5 {
+		min-height:380px;
+	}
+}
+
+@media (max-width: $screen-xs-min) { /* 480px */
+
+	.c-layout-revo-slider-5 {
+		min-height:215px;
+	}
+}
+
+@media (max-width: 360px) { /* 480px */
+
+	.c-layout-revo-slider-5 {
+		min-height:165px;
+	}
+}

@@ -1,0 +1,26 @@
+// FEATURE 13 - PAGE ABOUT 3
+
+.c-content-feature-13{
+
+	.c-feature-13-container{
+		padding:80px; 
+	}
+
+	.c-feature-13-tile{
+		padding:20px;
+
+		> i{
+			float:left;
+		}
+
+		> .c-feature-13-content{
+			padding-left: 45px;
+
+			>h4{
+				margin-top: 0;
+				font-size:18px;
+			}
+		}
+	}
+
+}

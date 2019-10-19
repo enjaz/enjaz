@@ -74,9 +74,16 @@ class AbstractAdmin(admin.ModelAdmin):
                     'date_submitted']
     inlines = [AuthorInline, AbstractFigureInline, AbstractPosterInline]
     filter_horizontal = ('evaluators',)
-    raw_id_fields = ['evaluators']
+    raw_id_fields = ['evaluators','user']
     introduction = forms.CharField(widget=CKEditorWidget())
+class CaseReportAuthorInline(admin.TabularInline):
+    model = models.CaseReportAuthor
+    form = OptionalForm
+    extra = 1
 
+class CaseReportAdmin(admin.ModelAdmin):
+    raw_id_fields = ['user']
+    inlines = [CaseReportAuthorInline]
 
 class QuestionInline(admin.TabularInline):
     model = models.Question
@@ -319,7 +326,7 @@ sessions_admin = SessionsAdminSite("Sessions Admin")
 
 admin.site.register(models.Event, EventAdmin)
 admin.site.register(models.Session, SessionAdmin)
-admin.site.register(models.CaseReport)
+admin.site.register(models.CaseReport, CaseReportAdmin)
 admin.site.register(models.Registration, RegistrationAdmin)
 admin.site.register(models.NonUser, NonUserAdmin)
 admin.site.register(models.Abstract, AbstractAdmin)

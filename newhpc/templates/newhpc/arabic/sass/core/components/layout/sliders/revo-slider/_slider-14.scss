@@ -1,0 +1,51 @@
+// REVO SLIDER 14
+
+.c-layout-revo-slider-14 {
+
+	.c-slider-14-title{
+		border:1px solid;
+		padding: 40px 45px;
+		border-color:rgba(255,255,255,0.12);
+
+		h3{
+			font-size:71px;
+		}
+
+		p{
+			margin-bottom:25px;
+		}
+	}
+
+	.c-main-title {
+		line-height: 28px;
+	}
+
+}
+
+@media (max-width: $screen-sm-max) { /* 991px */
+
+	.c-layout-revo-slider-14 {
+
+		.c-slider-14-title{
+			border:1px solid;
+			padding: 40px 45px;
+			border-color:rgba(255,255,255,0.12);
+
+			span{
+				font-size:71px;
+			}
+
+		}
+
+		.c-main-title {
+			line-height: 28px;
+		}
+
+		.c-action-btn.btn,
+		.c-action-btn.btn.c-btn-border-2x.c-btn-uppercase.btn-lg {
+			margin-top: 20px;
+			padding: 7px 22px 5px 22px;
+			font-size: 14px;    
+		}
+	}
+}

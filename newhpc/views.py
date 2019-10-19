@@ -16,3 +16,11 @@ def riy_en_index(request):
 def riy_en_research(request):
     context = {}
     return render(request,'newhpc/english/riy_en_research.html',context)
+
+def show_about(request, lang):
+    if lang == 'ar':
+        lang2 = 'arabic'
+    elif lang == 'en':
+        lang2 = 'english'
+    return render(request, 'newhpc/'+lang2+'/riy_'+lang+'_about.html')
+    # return render(request, 'newhpc/english/riy_en_about.html')

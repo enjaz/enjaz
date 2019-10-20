@@ -1,0 +1,23 @@
+{% extends 'newhpc/english/english_base.html'%} {% load staticfiles %}
+{% block title %}Add a Previous Statistic | HPC2020 Riyadh{% endblock %}
+
+{% block content %}
+<div style="padding: 170px; padding-bottom:570px">
+<form method="post" enctype="multipart/form-data">
+    <h1>Add a Previous Statistic</h1>
+    <div class="col-sm-8">
+        {% csrf_token %}
+        {{ form.as_p}}
+<div class="form-group">
+<div class="row">
+    <div class="col-sm-12">
+    <input id="submit" type="submit" value="Save">
+    </div>
+</div>
+<br><a href="{% url 'newhpc:admin_prev_versions' %}">Back to Quick Navigation</a>
+</div>
+</div>
+</form>
+</div>
+
+{% endblock %}

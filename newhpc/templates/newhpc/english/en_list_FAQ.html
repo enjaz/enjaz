@@ -1,0 +1,40 @@
+{% extends 'newhpc/english/english_base.html'%} {% load staticfiles %}
+{% block title %}FAQs | HPC2020{% endblock %}
+
+{% block content %}
+<div class="c-content-box c-size-md " style="padding-top:170px">
+	<div class="container">
+	    <div class="cbp-panel">
+	        <div id="filters-container" class="cbp-l-filters-underline">
+	            {% for cat in categories %}
+                <div data-filter="*" class="cbp-filter-item-active cbp-filter-item">
+	                {{ cat.english_title }}
+	            </div>
+				{% endfor %}
+	        </div>
+
+	        <div id="grid-container" class="cbp cbp-l-grid-faq">
+                {% for cat in categories %}
+				{% for q in cat.faq_category.all %}
+                <div class="cbp-item">
+	                <div class="cbp-caption">
+	                    <div class="cbp-caption-defaultWrap">
+	                        <i class="fa fa-check-circle-o"></i> {{ q.english_question }}
+	                    </div>
+	                    <div class="cbp-caption-activeWrap">
+	                        <div class="cbp-l-caption-body">
+	                            {{ q.english_answer }}
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+                {% endfor %}{% endfor %}
+	        </div>
+	    </div>
+	</div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'newhpc/english/assets/demos/default/js/scripts/pages/faq.js' %}" type="text/javascript"></script>
+{% endblock %}

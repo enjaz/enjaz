@@ -1,0 +1,14 @@
+{% extends 'newhpc/english/english_base.html'%} {% load staticfiles %}
+{% block title %}Admin Previous Versions | HPC2020 Riyadh{% endblock %}
+
+{% block content %}
+<div style="padding: 170px">
+    <h1>Quick Navigation</h1>
+    <a href="{% url 'newhpc:add_version' %}">Add a HPC version</a><br>
+    <a href="{% url 'newhpc:add_leader' %}">Add a leader</a><br>
+    <a href="{% url 'newhpc:add_sponsor' %}">Add a sponsor</a><br>
+    <a href="{% url 'newhpc:add_statistic' %}">Add a statistic</a><br>
+    <a href="{% url 'newhpc:add_winner' %}">Add a winner</a>
+</div>
+
+{% endblock %}

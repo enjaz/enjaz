@@ -1,5 +1,7 @@
 # -*- coding: utf-8  -*-
 from django.shortcuts import render
+from .models import FaqCategory, FaqQuestion
+from .forms import FaqCategoryForm, FaqQuestionForm
 
 # Create your views here.
 # enjazportal.com/riyadh/ar HPC Riyadh arabic and english homepage:
@@ -23,4 +25,25 @@ def show_about(request, lang):
     elif lang == 'en':
         lang2 = 'english'
     return render(request, 'newhpc/'+lang2+'/riy_'+lang+'_about.html')
-    # return render(request, 'newhpc/english/riy_en_about.html')
+
+def add_FaqCategory(request):
+    if request.method == 'POST':
+        instance = FaqCategory()
+        form = FaqCategoryForm(request.POST, instance=instance)
+        if form.is_valid():
+            instance = form.save()
+    elif request.method == 'GET':
+        form = FaqCategoryForm()
+    context = {'form' : form}
+    return render(request, 'newhpc/english/administrative/add_faq_category.html', context)
+
+def add_FaqQuestion(request):
+    if request.method == 'POST':
+        instance = FaqQuestion()
+        form = FaqQuestionForm(request.POST, instance=instance)
+        if form.is_valid():
+            instance = form.save()
+    elif request.method == 'GET':
+        form = FaqQuestionForm()
+    context = {'form' : form}
+    return render(request, 'newhpc/english/administrative/add_faq_question.html', context)

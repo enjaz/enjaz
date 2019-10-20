@@ -1,0 +1,32 @@
+{% extends 'newhpc/english/english_base.html'%} {% load staticfiles %}
+{% block title %}Add FAQ Category | HPC2020 Riyadh{% endblock %}
+
+{% block content %}
+<div style="padding: 170px">
+<form method="post" enctype="multipart/form-data">
+    <h1>Add a FAQ Category</h1>
+    <div class="col-sm-8">
+        {% csrf_token %}
+        <div class="row">
+            <div class="form-group">
+                Arabic Tile: {{ form.arabic_title }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group">
+                English Title: {{ form.english_title }}
+            </div>
+        </div>
+
+<div class="form-group">
+<div class="row">
+    <div class="col-sm-12">
+    <input id="submit" type="submit" value="Save">
+    </div>
+</div>
+</div>
+</div>
+</form>
+</div>
+
+{% endblock %}

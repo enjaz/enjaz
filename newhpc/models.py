@@ -64,7 +64,7 @@ class HpcLeader(models.Model):
         return self.arabic_name
 
 class PreviousStatistics(models.Model):
-    version = models.ForeignKey(PreviousVersion)
+    version = models.ForeignKey(PreviousVersion, verbose_name="النسخة المتعلقة")
     number_of_signs = models.IntegerField(default=0,verbose_name="عدد تسجيلات الدخول والخروج خلال أيّام المؤتمر الثلاث")
     number_of_workshops = models.IntegerField(default=0,verbose_name="عدد ورش العمل")
     number_of_lectures = models.IntegerField(default=0,verbose_name="عدد المحاضرات")
@@ -76,7 +76,7 @@ class PreviousStatistics(models.Model):
     number_of_winners = models.IntegerField(default=0,verbose_name="عدد الفائزين بالأبحاث")
     number_of_universities = models.IntegerField(default=0,verbose_name="عدد الجامعات المشاركة")
     def __unicode__(self):
-        return self.version
+        return 'statistics of ' + self.version.english_title
 
 class Speaker(models.Model):
     version = models.ForeignKey(PreviousVersion)
@@ -90,6 +90,10 @@ class Speaker(models.Model):
 class Winner(models.Model):
     version = models.ForeignKey(PreviousVersion)
     arabic_name = models.CharField(max_length=255,default="",verbose_name="الاسم باللغة العربيّة")
+    edu_level_choices = (
+        ('B', 'مرحلة البكالوريوس'),
+        ('P', 'الدراسات العليا')
+    )
     presentation_type_choices = (
         ('O', 'Oral'),
         ('P', 'Poster')
@@ -106,6 +110,7 @@ class Winner(models.Model):
         ('9', 'المركز التاسع'),
         ('10', 'المركز العاشر')
         )
+    edu_level = models.CharField(verbose_name="المستوى الدراسي", max_length=1, choices=edu_level_choices, default="")
     presentation_type = models.CharField(verbose_name="نوع البحث", max_length=1, choices=presentation_type_choices,default="")
     rank = models.CharField(max_length=1,choices=rank_choices,default="",verbose_name="المركز")
     image = models.ImageField(upload_to='newhpc/previous/winner/', blank=True, null=True, verbose_name="صورة الفائز غير مطلوبة في حال عدم التوفّر")

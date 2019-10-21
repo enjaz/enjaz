@@ -141,7 +141,9 @@ def admin_prev_versions(request):
     return render(request, 'newhpc/english/administrative/prev_versions.html')
 
 def list_prev_versions(request):
-    pass
+    versions = PreviousVersion.objects.all()
+    context = {'versions': versions}
+    return render(request, 'newhpc/arabic/ar_prev_versions.html', context)
 
 def show_prev_version(request, version_id):
     pass

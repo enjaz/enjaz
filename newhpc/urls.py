@@ -14,7 +14,7 @@ urlpatterns = [
     url(r'^general/FAQ/question/add$', views.add_FaqQuestion, name="add_faq_question"),
     url(r'^(?P<lang>(ar|en))/general/FAQ/list$', views.list_FAQs, name="list_faqs"),
     # Previous Versions-Related Pages
-    url(r'^riyadh/en/previous_versions/$', views.list_prev_versions, name="list_prev_versions"),
+    url(r'^riyadh/ar/previous_versions/$', views.list_prev_versions, name="list_prev_versions"),
     url(r'^riyadh/en/previous_versions/(?P<version_id>\d+)$', views.show_prev_version, name="show_prev_version"),
     url(r'^riyadh/en/previous_versions/admin$', views.admin_prev_versions, name="admin_prev_versions"),
     url(r'^riyadh/en/previous_versions/version/add$', views.add_prev_version, name="add_version"),

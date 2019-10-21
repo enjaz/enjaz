@@ -145,5 +145,7 @@ def list_prev_versions(request):
     context = {'versions': versions}
     return render(request, 'newhpc/arabic/ar_prev_versions.html', context)
 
-def show_prev_version(request, version_id):
-    pass
+def show_version(request, version_id):
+    version = PreviousVersion.objects.get(pk=version_id)
+    context = {'version': version}
+    return render(request, 'newhpc/arabic/ar_show_version.html', context)

@@ -1,0 +1,102 @@
+{% extends 'newhpc/arabic/arabic_base.html' %}
+{% load staticfiles %}
+{% block title %}{{version.arabic_title}}{% endblock %}
+
+{% block style %}
+    .c-font-white {
+        color: #3f444a !important;
+    }
+{% endblock %}
+
+{% block content %}
+<!--Start of Counter-->
+<div class="c-content-box c-size-md c-bg-parallax" style="background-image:; padding-top:200px">
+	<div class="container">
+		<div class="c-content-counter-1">
+			{% for stat in version.previousstatistics_set.all %}
+            {% if stat.number_of_signs != 0 %}
+			<div class="c-content-title-1">
+				<h3 class="c-center c-font-uppercase c-font-white c-font-bold">{{stat.number_of_signs}}</h3>
+				<div class="c-line-center c-bg-white">تسجيلات الدخول والخروج خلال أيّام المؤتمر الثلاث</div>
+			</div>
+            {% endif %}
+			{% if version.previousstatistics_set.number_of_workshops != 0 %}
+			<div class="c-content-title-1">
+				<h3 class="c-center c-font-uppercase c-font-white c-font-bold">{{version.previousstatistics_set.number_of_workshops}}</h3>
+				<div class="c-line-center c-bg-white">عدد ورش العمل</div>
+			</div>
+            {% endif %}
+            {% if version.previousstatistics_set.number_of_lectures != 0 %}
+			<div class="c-content-title-1">
+				<h3 class="c-center c-font-uppercase c-font-white c-font-bold">{{version.previousstatistics_set.number_of_lectures}}</h3>
+				<div class="c-line-center c-bg-white">عدد المحاضرات</div>
+			</div>
+            {% endif %}
+            {% if version.previousstatistics_set.number_of_speakers != 0 %}
+			<div class="c-content-title-1">
+				<h3 class="c-center c-font-uppercase c-font-white c-font-bold">{{version.previousstatistics_set.number_of_speakers}}</h3>
+				<div class="c-line-center c-bg-white">عدد المتحدّثين</div>
+			</div>
+            {% endif %}
+            {% if version.previousstatistics_set.number_of_abstracts != 0 %}
+			<div class="c-content-title-1">
+				<h3 class="c-center c-font-uppercase c-font-white c-font-bold">{{version.previousstatistics_set.number_of_abstracts}}</h3>
+				<div class="c-line-center c-bg-white">عدد الأبحاث المتقدّمة</div>
+			</div>
+            {% endif %}
+            {% if version.previousstatistics_set.number_of_accepted_abstracts != 0 %}
+			<div class="c-content-title-1">
+				<h3 class="c-center c-font-uppercase c-font-white c-font-bold">{{version.previousstatistics_set.number_of_accepted_abstracts}}</h3>
+				<div class="c-line-center c-bg-white">عدد الأبحاث المقبولة</div>
+			</div>
+            {% endif %}
+            {% if version.previousstatistics_set.oral_presentations != 0 %}
+			<div class="c-content-title-1">
+				<h3 class="c-center c-font-uppercase c-font-white c-font-bold">{{version.previousstatistics_set.oral_presentations}}</h3>
+				<div class="c-line-center c-bg-white">العروض البحثيّة</div>
+			</div>
+            {% endif %}
+            {% if version.previousstatistics_set.poster_presentations != 0 %}
+			<div class="c-content-title-1">
+				<h3 class="c-center c-font-uppercase c-font-white c-font-bold">{{version.previousstatistics_set.poster_presentations}}</h3>
+				<div class="c-line-center c-bg-white">الملصقات البحثيّة</div>
+			</div>
+            {% endif %}
+            {% if version.previousstatistics_set.number_of_winners != 0 %}
+			<div class="c-content-title-1">
+				<h3 class="c-center c-font-uppercase c-font-white c-font-bold">{{version.previousstatistics_set.number_of_winners}}</h3>
+				<div class="c-line-center c-bg-white">عدد الفائزين بالأبحاث</div>
+			</div>
+            {% endif %}
+            {% if version.previousstatistics_set.number_of_universities != 0 %}
+			<div class="c-content-title-1">
+				<h3 class="c-center c-font-uppercase c-font-white c-font-bold">{{version.previousstatistics_set.number_of_universities}}</h3>
+				<div class="c-line-center c-bg-white">عدد الجامعات المشاركة</div>
+			</div>
+            {% endif %}
+			{% endfor %}
+		</div>
+	</div>
+</div>
+<!--End of Counter-->
+
+<div class="container" style="padding-bottom:100px">
+		<div class="c-content-tab-4 c-opt-5" role="tabpanel">
+			<ul class="nav nav-justified" role="tablist">
+				<li role="presentation" >
+					<a href="#tab-1" role="tab" data-toggle="tab">مؤتمر التخصصات الصحية<br>2016<br>النسخة الأولى</a>
+				</li>
+				<li role="presentation">
+					<a href="#tab-2" role="tab" data-toggle="tab">مؤتمر التخصصات الصحية<br>2017<br>النسخة الثانية</a>
+				</li>
+				<li role="presentation">
+					<a href="#tab-3" role="tab" data-toggle="tab">مؤتمر التخصصات الصحية<br>2018<br>النسخة الثالثة</a>
+				</li>
+				<li role="presentation">
+					<a href="#tab-4" role="tab" data-toggle="tab">مؤتمر التخصصات الصحية<br>2019<br>النسخة الرابعة</a>
+				</li>
+			</ul>
+        </div>
+</div>
+
+{% endblock %}

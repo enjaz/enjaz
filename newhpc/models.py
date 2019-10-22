@@ -65,18 +65,18 @@ class HpcLeader(models.Model):
 
 class PreviousStatistics(models.Model):
     version = models.ForeignKey(PreviousVersion)
-    number_of_signs = models.IntegerField(default=0,verbose_name="عدد تسجيلات الدخول والخروج خلال أيّام المؤتمر الثلاث")
-    number_of_workshops = models.IntegerField(default=0,verbose_name="عدد ورش العمل")
-    number_of_lectures = models.IntegerField(default=0,verbose_name="عدد المحاضرات")
-    number_of_speakers = models.IntegerField(default=0,verbose_name="عدد المتحدّثين")
-    number_of_abstracts = models.IntegerField(default=0,verbose_name="عدد الأبحاث المتقدّمة")
-    number_of_accepted_abstracts = models.IntegerField(default=0,verbose_name="عدد الأبحاث المقبولة")
-    oral_presentations = models.IntegerField(default=0,verbose_name="العروض البحثيّة")
-    poster_presentations = models.IntegerField(default=0,verbose_name="الملصقات البحثيّة")
-    number_of_winners = models.IntegerField(default=0,verbose_name="عدد الفائزين بالأبحاث")
-    number_of_universities = models.IntegerField(default=0,verbose_name="عدد الجامعات المشاركة")
+    number_of_signs = models.PositiveSmallIntegerField(default=0,verbose_name="عدد تسجيلات الدخول والخروج خلال أيّام المؤتمر الثلاث")
+    number_of_workshops = models.PositiveSmallIntegerField(default=0,verbose_name="عدد ورش العمل")
+    number_of_lectures = models.PositiveSmallIntegerField(default=0,verbose_name="عدد المحاضرات")
+    number_of_speakers = models.PositiveSmallIntegerField(default=0,verbose_name="عدد المتحدّثين")
+    number_of_abstracts = models.PositiveSmallIntegerField(default=0,verbose_name="عدد الأبحاث المتقدّمة")
+    number_of_accepted_abstracts = models.PositiveSmallIntegerField(default=0,verbose_name="عدد الأبحاث المقبولة")
+    oral_presentations = models.PositiveSmallIntegerField(default=0,verbose_name="العروض البحثيّة")
+    poster_presentations = models.PositiveSmallIntegerField(default=0,verbose_name="الملصقات البحثيّة")
+    number_of_winners = models.PositiveSmallIntegerField(default=0,verbose_name="عدد الفائزين بالأبحاث")
+    number_of_universities = models.PositiveSmallIntegerField(default=0,verbose_name="عدد الجامعات المشاركة")
     def __unicode__(self):
-        return self.version
+        return"%s Statistics" % self.version.english_title
 
 class Speaker(models.Model):
     version = models.ForeignKey(PreviousVersion)
@@ -107,7 +107,7 @@ class Winner(models.Model):
         ('10', 'المركز العاشر')
         )
     presentation_type = models.CharField(verbose_name="نوع البحث", max_length=1, choices=presentation_type_choices,default="")
-    rank = models.CharField(max_length=1,choices=rank_choices,default="",verbose_name="المركز")
+    rank = models.CharField(max_length=2,choices=rank_choices,default="",verbose_name="المركز")
     image = models.ImageField(upload_to='newhpc/previous/winner/', blank=True, null=True, verbose_name="صورة الفائز غير مطلوبة في حال عدم التوفّر")
     def __unicode__(self):
         return self.arabic_name

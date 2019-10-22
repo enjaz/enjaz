@@ -42,6 +42,7 @@ class FaqQuestion(models.Model):
 
 # Information regarding previous editions of HPC to be shown at /previous
 class PreviousVersion(models.Model):
+    year = models.CharField(max_length=4, default="", verbose_name="السنة")
     arabic_title = models.CharField(max_length=255, default="", verbose_name="اسم النسخة باللغة العربيّة")
     english_title = models.CharField(max_length=255,default="", verbose_name="اسم النسخة باللغة الانجليزيّة")
     arabic_vision = models.TextField(default="", blank=True,verbose_name="الرؤية باللغة العربيّة غير مطلوب")
@@ -59,6 +60,7 @@ class Gallery(models.Model):
 class HpcLeader(models.Model):
     version = models.ForeignKey(PreviousVersion)
     arabic_name = models.CharField(max_length=255,default="")
+    arabic_title = models.CharField(max_length=255,default="")
     image = models.ImageField(upload_to='newhpc/previous/HpcLeader', blank=True, null=True,verbose_name="الصورة الشخصيّة")
     def __unicode__(self):
         return self.arabic_name

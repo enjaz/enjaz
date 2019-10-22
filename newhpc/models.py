@@ -112,7 +112,7 @@ class Winner(models.Model):
         )
     edu_level = models.CharField(verbose_name="المستوى الدراسي", max_length=1, choices=edu_level_choices, default="")
     presentation_type = models.CharField(verbose_name="نوع البحث", max_length=1, choices=presentation_type_choices,default="")
-    rank = models.CharField(max_length=1,choices=rank_choices,default="",verbose_name="المركز")
+    rank = models.CharField(max_length=2,choices=rank_choices,default="",verbose_name="المركز")
     image = models.ImageField(upload_to='newhpc/previous/winner/', blank=True, null=True, verbose_name="صورة الفائز غير مطلوبة في حال عدم التوفّر")
     def __unicode__(self):
         return self.arabic_name

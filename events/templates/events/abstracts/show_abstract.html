@@ -41,15 +41,12 @@ h4{
                     Your <b> abstract ID is #{{ abstract.pk }}</b>. If you have any concerns contact us on <a target="_blank" href="https://t.me/HPC2020">Telegram</a>, or send us an e-mail to <a target="_blank" href="mailto: HPC-notifications@enjazportal.com">HPC-notifications@enjazportal.com</a></p>
             {% endif %}
         {% endif %}
-
     {% endif %}
-    {% if user|can_evaluate_abstracts:event or user.is_superuser %}
     {% if abstract.status == 'A' %}
-    <p class="alert alert-success"> This abstract is : {{ abstract.get_status_display }}</p>
+    <p class="alert alert-success"> This abstract is : {{ abstract.get_status_display }} in {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %}</p>
     {% endif %}
     {% if abstract.status == 'R' %}
-    <p class="alert alert-danger"> This abstract is : {{ abstract.get_status_display }}</p>
-    {% endif %}
+    <p class="alert alert-danger"> This abstract is : {{ abstract.get_status_display }} {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %}</p>
     {% endif %}
 
     {% include 'events/abstracts/partials/abstract_table.html' %}

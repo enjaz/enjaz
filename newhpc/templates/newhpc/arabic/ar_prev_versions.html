@@ -1,0 +1,101 @@
+{% extends 'newhpc/arabic/arabic_base.html' %}
+{% load staticfiles %}
+{% block title %}مؤتمر التخصّصات الصحّية 2020 | النسخ السابقة{% endblock %}
+
+{% block style %}
+    .c-font-white {
+        color: #3f444a !important;
+    }
+{% endblock %}
+
+{% block content %}
+<!--Start of Counter-->
+<div class="c-content-box c-size-md c-bg-parallax" style="background-image:; padding-top:200px">
+	<div class="container">
+		<div class="c-content-counter-1">
+			<div class="c-content-title-1">
+				<div style="font-size:44px" class="c-center c-font-uppercase c-font-white c-font-bold">مؤتمر التخصصات الصحية</div>
+				<div class="c-line-center c-bg-white"></div>
+			</div>
+			<div class="row c-margin-t-60">
+				<div class="col-md-4">
+					<img src="{% static 'newhpc/images/icons/sign.png' %}" style="width:40%">
+					<div class="c-counter" data-counter="counterup">33398</div>
+					<h4 class="c-title c-first c-font-white c-font-uppercase c-font-bold">مجموع عدد تسجيلات الدخول والخروج خلال أيام المؤتمر الثلاث</h4>
+				</div>
+				<div class="col-md-4">
+					<img src="{% static 'newhpc/images/icons/workshop.png' %}" style="width:40%">
+					<div class="c-counter" data-counter="counterup">169</div>
+					<h4 class="c-title c-font-white c-font-uppercase c-font-bold">مجموع عدد ورش العمل</h4>
+				</div>
+				<div class="col-md-4">
+					<img src="{% static 'newhpc/images/icons/lecture.png' %}" style="width:40%">
+					<div class="c-counter" data-counter="counterup">278</div>
+					<h4 class="c-title c-font-white c-font-uppercase c-font-bold">مجموع عدد المحاضرات</h4>
+				</div>
+            </div>
+            <div class="row c-margin-t-60">
+                <div class="col-md-4">
+					<img src="{% static 'newhpc/images/icons/ab_sub.png' %}" style="width:40%">
+					<div class="c-counter" data-counter="counterup">2949</div>
+					<h4 class="c-title c-font-white c-font-uppercase c-font-bold">مجموع عدد الأبحاث المُقدمة</h4>
+				</div>
+                <div class="col-md-4">
+					<img src="{% static 'newhpc/images/icons/ab_acc.png' %}" style="width:40%">
+					<div class="c-counter" data-counter="counterup">1119</div>
+					<h4 class="c-title c-font-white c-font-uppercase c-font-bold">مجموع عدد الأبحاث المقبولة</h4>
+				</div>
+                <div class="col-md-4">
+					<img src="{% static 'newhpc/images/icons/o_pres.png' %}" style="width:40%">
+					<div class="c-counter" data-counter="counterup">92</div>
+					<h4 class="c-title c-font-white c-font-uppercase c-font-bold">مجموع عدد الفائزين بالأبحاث بجميع نسخ المؤتمر</h4>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--End of Counter-->
+
+<!--<ul class="nav nav-justified" role="tablist">-->
+				<!--<li role="presentation" class="">-->
+					<!--<a href="#tab-1" role="tab" data-toggle="tab" aria-expanded="false">ABOUT US</a>-->
+				<!--</li>-->
+				<!--<li role="presentation" class="">-->
+					<!--<a href="#tab-2" role="tab" data-toggle="tab" aria-expanded="false">TECHNOLOGIES</a>-->
+				<!--</li>-->
+				<!--<li role="presentation" class="">-->
+					<!--<a href="#tab-3" role="tab" data-toggle="tab" aria-expanded="false">MARKET SHARE</a>-->
+				<!--</li>-->
+				<!--<li role="presentation" class="">-->
+					<!--<a href="#tab-4" role="tab" data-toggle="tab" aria-expanded="false">PRODUCTS</a>-->
+				<!--</li>-->
+				<!--<li role="presentation" class="">-->
+					<!--<a href="#tab-5" role="tab" data-toggle="tab" aria-expanded="false">INNOVATIONS</a>-->
+				<!--</li>-->
+				<!--<li role="presentation" class="active">-->
+					<!--<a href="#tab-6" role="tab" data-toggle="tab" aria-expanded="true">SCHOOL</a>-->
+				<!--</li>-->
+<!--</ul>-->
+
+<!--TODO: ***** Fix Hard Code in href *****-->
+
+<div class="container" style="padding-bottom:100px">
+		<div class="c-content-tab-4 c-opt-5" role="tabpanel">
+			<ul class="nav nav-justified" role="tablist">
+				<li role="presentation" >
+					<a style="color:#3f444a" href="{% url 'newhpc:show_version' '2016' %}" role="tab">مؤتمر التخصصات الصحية<br>2016<br>النسخة الأولى</a>
+				</li>
+				<li role="presentation">
+					<a style="color:#3f444a" href="{% url 'newhpc:show_version' '2017' %}" role="tab">مؤتمر التخصصات الصحية<br>2017<br>النسخة الثانية</a>
+				</li>
+				<li role="presentation">
+					<a style="color:#3f444a" href="{% url 'newhpc:show_version' '2018' %}" role="tab">مؤتمر التخصصات الصحية<br>2018<br>النسخة الثالثة</a>
+				</li>
+				<li role="presentation">
+					<a style="color:#3f444a" href="{% url 'newhpc:show_version' '2019' %}" role="tab">مؤتمر التخصصات الصحية<br>2019<br>النسخة الرابعة</a>
+				</li>
+			</ul>
+        </div>
+</div>
+
+{% endblock %}

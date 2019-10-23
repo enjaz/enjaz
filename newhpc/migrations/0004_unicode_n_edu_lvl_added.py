@@ -1,0 +1,24 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('newhpc', '0003_previous_event_gallery_link'),
+    ]
+
+    operations = [
+        migrations.AddField(
+            model_name='winner',
+            name='edu_level',
+            field=models.CharField(default=b'', max_length=1, verbose_name=b'\xd8\xa7\xd9\x84\xd9\x85\xd8\xb3\xd8\xaa\xd9\x88\xd9\x89 \xd8\xa7\xd9\x84\xd8\xaf\xd8\xb1\xd8\xa7\xd8\xb3\xd9\x8a', choices=[(b'B', b'\xd9\x85\xd8\xb1\xd8\xad\xd9\x84\xd8\xa9 \xd8\xa7\xd9\x84\xd8\xa8\xd9\x83\xd8\xa7\xd9\x84\xd9\x88\xd8\xb1\xd9\x8a\xd9\x88\xd8\xb3'), (b'P', b'\xd8\xa7\xd9\x84\xd8\xaf\xd8\xb1\xd8\xa7\xd8\xb3\xd8\xa7\xd8\xaa \xd8\xa7\xd9\x84\xd8\xb9\xd9\x84\xd9\x8a\xd8\xa7')]),
+        ),
+        migrations.AlterField(
+            model_name='previousstatistics',
+            name='version',
+            field=models.ForeignKey(verbose_name=b'\xd8\xa7\xd9\x84\xd9\x86\xd8\xb3\xd8\xae\xd8\xa9 \xd8\xa7\xd9\x84\xd9\x85\xd8\xaa\xd8\xb9\xd9\x84\xd9\x82\xd8\xa9', to='newhpc.PreviousVersion'),
+        ),
+    ]

@@ -18,15 +18,25 @@
 
 {% block style %}
 
+#form{
+  margin:100px
+};
+
+@media only screen and (max-width: 991px) {
+  #form {
+    margin:0px;
+    width:700px
+  }
+}
 {% endblock %}
 
 {% block content %}
 <body class="login-page sidebar-collapse">
 
   <div class="page-header header-filter" style="background-image:url({% static 'science_olympiad/images/header.jpg' %}) ; background-size: cover; background-position: top center;">
-    <div class="container" style="">
+    <div class="container" style="padding:100px; ">
 
-      <div align="center"><div id="terms" class="card card-login" style="width:800px">
+      <div align="center"><div id="terms" class="card card-login" style="width:90%;">
         <p align="right" style="padding-right:30px; padding-top:15px">الشروط هنا</p>
         <ul style="text-align:right">
           <li>أبجد هوز حطي كلمن</li>
@@ -43,7 +53,7 @@
       <button id="button" class="btn btn-raised">أوافق على الشروط</button>
       </div>
 
-      <div id="form" style="padding-top:80px">
+      <div id="form" style="width:80%; margin-top:700px; border-bottom:300px; padding-bottom:500px">
       <div class="row">
       <!--Very nice way to embed, but is not working on most browsers-->
       <!--<embed src="https://forms.gle/DkX9hNxj535DXmNNA" style="width:100% ; height: 600px;"></embed>-->

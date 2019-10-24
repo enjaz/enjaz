@@ -113,6 +113,8 @@
             <!-- BEGIN: INLINE NAV -->
                 <nav class="c-top-menu c-pull-left">
                     <ul class="c-icons c-theme-ul">
+                        <li><a href="https://twitter.com/ksau_events"><i class="icon-social-twitter"></i></a></li>
+                        <li><a href="https://www.youtube.com/channel/UCQBBGI264nZhFqC4sh9L04w"><i class="icon-social-youtube"></i></a></li>
                     </ul>
                 </nav>
             <!-- END: INLINE NAV -->
@@ -120,14 +122,15 @@
                 <nav class="c-top-menu c-pull-right">
                     <ul class="c-links c-theme-ul">
                         <li><a href="mailto: HPC-notifications@enjazportal.com">Contact Us</a></li>
-
                     </ul>
 
                     <ul class="c-ext c-theme-ul">
                         <li class="c-lang dropdown c-last">
-                            <a href="#">en</a>
+                            <a href="{% url 'newhpc:riy_ar_index' %}">AR</a>
                             <ul class="dropdown-menu pull-right" role="menu">
-                                <li class="active"><a href="{% url 'newhpc:riy_en_research' %}">English</a></li></ul>
+                                <li class="active"><a href="{% url 'newhpc:riy_en_index' %}">English</a></li>
+                                <li><a href="{% url 'newhpc:riy_ar_index' %}" style="letter-spacing: 0;">العربيّة</a></li>
+                            </ul>
                         </li>
                     </ul>
 
@@ -141,9 +144,9 @@
             <div class="c-navbar-wrapper clearfix">
                 <div class="c-brand c-pull-left">
                     <a href="" class="c-logo">
-                        <img style="height: 55px;" src="{% static 'newhpc/english/assets/base/img/layout/logos/hpc-logo-3.png' %}" alt="Health Professions Conference" class="c-desktop-logo">
-                        <img style="height: 50px;margin-top: -12px;" src="{% static 'newhpc/english/assets/base/img/layout/logos/hpc-logo-3.png' %}" alt="Health Professions Conference" class="c-desktop-logo-inverse">
-                        <img style="height: 50px;margin-top: -12px;" src="{% static 'newhpc/english/assets/base/img/layout/logos/hpc-logo-3.png' %}" alt="Health Professions Conference" class="c-mobile-logo">
+                        <img style="height: 55px;" src="{% static 'newhpc/english/assets/base/img/layout/logos/hpc-logo-en.png' %}" alt="Health Professions Conference" class="c-desktop-logo">
+                        <img style="height: 50px;margin-top: -12px;" src="{% static 'newhpc/english/assets/base/img/layout/logos/hpc-logo-en.png' %}" alt="Health Professions Conference" class="c-desktop-logo-inverse">
+                        <img style="height: 50px;margin-top: -12px;" src="{% static 'newhpc/english/assets/base/img/layout/logos/hpc-logo-en.png' %}" alt="Health Professions Conference" class="c-mobile-logo">
                     </a>
                     <button class="c-hor-nav-toggler" type="button" data-target=".c-mega-menu">
                     <span class="c-line"></span>
@@ -158,10 +161,18 @@
                 <!-- Dropdown menu toggle on mobile: c-toggler class can be applied to the link arrow or link itself depending on toggle mode -->
                 <nav class="c-mega-menu c-pull-right c-mega-menu-dark c-mega-menu-dark-mobile c-fonts-uppercase c-fonts-bold">
                     <ul class="nav navbar-nav c-theme-nav">
-                                <li class="c-onepage-link">
-                                    <a href="#" class="c-link" >Research</a>
-                                </li>
-                                <li class="c-onepage-link"><a href="{% url 'newhpc:riy_about' 'en' %}" class="c-link ">About HPC</a></li>
+                        <li class="c-onepage-link">
+                            <a href="#" class="c-link" >Research</a>
+                        </li>
+
+                        <li class="c-onepage-link">
+                            <a href="{% url 'newhpc:list_prev_versions' %}" class="c-link" >Previous Versions</a>
+                        </li>
+                        <li class="c-onepage-link">
+                            <a href="{% url 'newhpc:riy_about' 'en' %}" class="c-link" >About Us</a>
+                        </li>
+
+
                             </ul>
                         </nav>
                     <!-- END: MEGA MENU -->

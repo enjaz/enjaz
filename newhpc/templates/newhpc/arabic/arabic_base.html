@@ -110,25 +110,22 @@
                     <!-- BEGIN: INLINE NAV -->
                     <nav class="c-top-menu c-pull-left">
                         <ul class="c-icons c-theme-ul">
-                            <li><a href="#"><i class="icon-social-twitter"></i></a></li>
-                            <li><a href="#"><i class="icon-social-facebook"></i></a></li>
-                            <li><a href="#"><i class="icon-social-dribbble"></i></a></li>
+                            <li><a href="https://twitter.com/ksau_events"><i class="icon-social-twitter"></i></a></li>
+                            <li><a href="https://www.youtube.com/channel/UCQBBGI264nZhFqC4sh9L04w"><i class="icon-social-youtube"></i></a></li>
                         </ul>
                     </nav>
                     <!-- END: INLINE NAV -->
                     <!-- BEGIN: INLINE NAV -->
                     <nav class="c-top-menu c-pull-right">
                         <ul class="c-links c-theme-ul">
-                            <li><a href="#">الأسئلة الشائعة</a></li>
-                            <li class="c-divider">|</li>
-                            <li><a href="#">تواصل معنا</a></li>
+                            <li><a href="mailto: HPC-notifications@enjazportal.com">تواصل معنا</a></li>
                         </ul>
                         <ul class="c-ext c-theme-ul">
                             <li class="c-lang dropdown c-last">
-                                <a href="#">AR</a>
+                                <a href="{% url 'newhpc:riy_en_index' %}">EN</a>
                                 <ul class="dropdown-menu pull-right" role="menu">
-                                    <li class="active"><a href="#">العربيّة</a></li>
-                                    <li><a href="">English</a></li>
+                                    <li class="active"><a href="{% url 'newhpc:riy_ar_index' %}">العربيّة</a></li>
+                                    <li><a href="{% url 'newhpc:riy_en_index' %}">English</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -161,37 +158,16 @@
                         <nav class="c-mega-menu c-pull-right c-mega-menu-dark c-mega-menu-dark-mobile c-fonts-uppercase c-fonts-bold" id="hpcnav" style="">
                             <ul class="nav navbar-nav c-theme-nav">
 
+
                                 <li class="c-onepage-link">
-                                    <a href="#" class="c-link ">التسجيل</a>
+                                    <a href="{% url 'newhpc:riy_en_research' %}" class="c-link ">مسار الأبحاث</a>
                                 </li>
                                 <li class="c-onepage-link">
-                                    <a href="#" class="c-link ">مسار الأبحاث</a>
+                                    <a href="{% url 'newhpc:list_prev_versions' %}" class="c-link ">النسخ السابقة</a>
                                 </li>
-                                <li class="{% block ar_programs_active %}{% endblock %}c-menu-type-classic">
-                                    <a href="javascript:;" class="c-link dropdown-toggle">برامج المؤتمر<span class="c-arrow c-toggler"></span></a>
-                                    <ul class="dropdown-menu c-menu-type-classic c-pull-left">
-                                        <li>
-                                            <a href="#">المعرض</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">مسار الأبحاث</a>
-                                        </li>
-                                        <li class="dropdown-submenu">
-                                            <a href="#">المحاضرات وورش العمل<span class="c-arrow c-toggler"></span></a>
-                                            <ul class="dropdown-menu c-pull-right">
-                                                <li><a href="#">البرنامج العام</a></li>
-                                                <li><a href="#">برامج الكلّيات</a></li>
-                                                <li><a href="">برنامج الأبحاث</a></li>
-                                            </ul>
-                                        </li>
-                                    </ul>
+                                <li class="c-onepage-link">
+                                    <a href="{% url 'newhpc:riy_about' 'ar' %}" class="c-link ">عن المؤتمر</a>
                                 </li>
-
-                                <li class="c-onepage-link"><a href="#" class="c-link ">المركز الإعلامي</a></li>
-
-                                <li class="c-onepage-link"><a href="{% url 'newhpc:riy_about' 'ar' %}" class="c-link ">عن المؤتمر</a></li>
-
-                                <li class="c-onepage-link"><a href="#" class="c-link ">النسخ السابقة</a></li>
                             </ul>
                         </nav>
 

@@ -48,6 +48,8 @@ class PreviousVersion(models.Model):
     arabic_vision = models.TextField(default="", blank=True,verbose_name="الرؤية باللغة العربيّة غير مطلوب")
     english_vision = models.TextField(default="", blank= True,verbose_name="الرؤية باللغة الانجليزيّة غير مطلوب")
     logo = models.ImageField(upload_to="newhpc/prevous/logo",null=True,blank=True,verbose_name="شعار النسخة")
+    speaker_file = models.ImageField(upload_to="newhpc/previous/speaker/file",null=True,blank=True,verbose_name="ملف المتحدثين")
+    winner_file = models.ImageField(upload_to="newhpc/previous/winner/file",null=True,blank=True,verbose_name="ملف الفائزين")
     show_more = models.URLField(verbose_name="Gallery Show more pictures link",default="",blank=True)
 
     def __unicode__(self):
@@ -119,3 +121,16 @@ class Winner(models.Model):
     def __unicode__(self):
         return self.arabic_name
 
+class NewsletterMembership(models.Model):
+    user = models.OneToOneField(User, verbose_name=u"المستخدم",
+                                related_name="hpc_newsletter_membership",
+                                null=True, blank=True)
+    email = models.EmailField(default="", blank=True)
+    submission_date = models.DateTimeField(u"تاريخ الإرسال",
+                                       auto_now_add=True)
+
+    def get_email(self):
+        return self.email or self.user.email
+
+    def __unicode__(self):
+        return self.email or self.user.username

@@ -6,24 +6,67 @@
     .c-font-white {
         color: #3f444a !important;
     }
+
+{% if version.year == '2016' %}
+
+	@media only screen and (max-width: 536px) {
+		#logo {
+			width: 80%;
+		}
+	}
+	@media only screen and (min-width: 537px) {
+		#logo {
+			width: 30%;
+		}
+	}
+
+{% elif version.year == '2017' %}
+
+	@media only screen and (max-width: 420px) {
+		#logo {
+			width: 80%;
+		}
+	}
+	@media only screen and (min-width: 421px) {
+		#logo {
+			width: 30%;
+		}
+	}
+
+{% elif version.year == '2018' or '2019' %}
+
+	@media only screen and (max-width: 800px) {
+		#logo {
+			width: 90%;
+		}
+	}
+	@media only screen and (min-width: 801px) {
+		#logo {
+			width: 50%;
+		}
+	}
+{% endif %}
+
+	}
 {% endblock %}
 
 {% block content %}
 <!--Start of Counter-->
 <div class="c-content-box c-size-md c-bg-parallax" style="background-image:; padding-top:200px">
-	<div class="container">
+	<div class="container" align="center">
 		<div class="c-content-counter-1">
 			<div style="font-size:44px" class="c-center c-font-uppercase c-font-white c-font-bold">{{version.arabic_title}}</div>
 			
-			<div class="row"><div class="col-lg-12"><img style="width:70%" src="{{ version.logo.url }}"></div></div>
+			<div class="row"><div class="col-lg-12">
+				<img id="logo" src="{{ version.logo.url }}"></div></div>
 
 			<div class="c-content-title-1">
-				<div style="padding-bottom:20px; padding-top:60px; text-align:center; font-size:28px">قادة {{version.arabic_title}}</div>
+				<div class="c-font-bold" style="padding-bottom:20px; padding-top:60px; text-align:center; font-size:28px">قادة {{version.arabic_title}}</div>
 				<div class="c-line-center c-theme-bg"></div>
 			</div>
 			<div class="row">
 			{% for leader in version.hpcleader_set.all %}
-				<div class="col-lg-4">
+				<div class="col-lg-3">
 					<img src="{{leader.image.url}}" style="height:200px">
 					<h3>{{leader.arabic_name}}</h3>
 					{{leader.arabic_title}}
@@ -32,82 +75,98 @@
 			</div>
 
 			<div class="c-content-title-1">
-				<div style="padding-top:60px; padding-bottom:20px; text-align:center; font-size:28px">الإحصائيات</div>
+				<div class="c-font-bold" style="padding-top:60px; padding-bottom:20px; text-align:center; font-size:28px">الإحصائيات</div>
 				<div class="c-line-center c-theme-bg"></div>
 			</div>
+
 			<div class="row">
-				{% for stat in version.previousstatistics_set.all %}
+			{% for stat in version.previousstatistics_set.all %}
 				{% if stat.number_of_signs != 0 %}
-				<div class="col-md-4">
-					<div class="c-counter c-font-white c-bordered c-border-green c-font-white" data-counter="counterup">{{stat.number_of_signs}}</div>
-					<h4 class="c-title c-first c-font-white c-font-uppercase c-font-bold">تسجيلات الدخول والخروج خلال أيّام المؤتمر الثلاث</h4>
+				<div class="col-md-2 col-md-offset-1">
+					<img src="{% static 'newhpc/images/icons/sign.png' %}" style="width:40%">
+					<div class="c-counter" data-counter="counterup" style="padding-top:0px;padding-bottom: 0px;margin-bottom: -145px;">{{stat.number_of_signs}}</div>
+					<h4 class="c-title c-first c-font-white c-font-uppercase c-font-bold" style="margin-bottom:50px">تسجيلات الدخول والخروج خلال أيّام المؤتمر الثلاث</h4>
 				</div>
 				{% endif %}
 				{% if stat.number_of_workshops != 0 %}
-				<div class="col-md-4">
-					<div class="c-counter c-font-white c-bordered c-border-green c-font-white" data-counter="counterup">{{stat.number_of_workshops}}</div>
-					<h4 class="c-title c-font-white c-font-uppercase c-font-bold">ورش العمل</h4>
+				<div class="col-md-2">
+					<img src="{% static 'newhpc/images/icons/workshop.png' %}" style="width:40%">
+					<div class="c-counter" data-counter="counterup" style="padding-top:0px;padding-bottom: 0px;margin-bottom: -145px;">{{stat.number_of_workshops}}</div>
+					<h4 class="c-title c-font-white c-font-uppercase c-font-bold" style="margin-bottom:50px">ورش العمل</h4>
 				</div>
 				{% endif %}
 				{% if stat.number_of_lectures != 0 %}
-				<div class="col-md-4">
-					<div class="c-counter c-font-white c-bordered c-border-green c-font-white" data-counter="counterup">{{stat.number_of_lectures}}</div>
-					<h4 class="c-title c-font-white c-font-uppercase c-font-bold">المحاضرات</h4>
+				<div class="col-md-2">
+					<img src="{% static 'newhpc/images/icons/lecture.png' %}" style="width:40%">
+					<div class="c-counter" data-counter="counterup" style="padding-top:0px;padding-bottom: 0px;margin-bottom: -145px;">{{stat.number_of_lectures}}</div>
+					<h4 class="c-title c-font-white c-font-uppercase c-font-bold" style="margin-bottom:50px">المحاضرات</h4>
 				</div>
 				{% endif %}
 				{% if stat.number_of_speakers != 0 %}
-				<div class="col-md-4">
-					<div class="c-counter c-font-white c-bordered c-border-green c-font-white" data-counter="counterup">{{stat.number_of_speakers}}</div>
-					<h4 class="c-title c-font-white c-font-uppercase c-font-bold">المتحدّثين</h4>
+				<div class="col-md-2">
+					<img src="{% static 'newhpc/images/icons/speak.png' %}" style="width:40%">
+					<div class="c-counter" data-counter="counterup" style="padding-top:0px;padding-bottom: 0px;margin-bottom: -145px;">{{stat.number_of_speakers}}</div>
+					<h4 class="c-title c-font-white c-font-uppercase c-font-bold" style="margin-bottom:50px">المتحدّثين</h4>
 				</div>
 				{% endif %}
 				{% if stat.number_of_abstracts != 0 %}
-				<div class="col-md-4">
-					<div class="c-counter c-font-white c-bordered c-border-green c-font-white" data-counter="counterup">{{stat.number_of_abstracts}}</div>
-					<h4 class="c-title c-font-white c-font-uppercase c-font-bold">الأبحاث المتقدّمة</h4>
+				<div class="col-md-2">
+					<img src="{% static 'newhpc/images/icons/ab_sub.png' %}" style="width:40%">
+					<div class="c-counter" data-counter="counterup" style="padding-top:0px;padding-bottom: 0px;margin-bottom: -145px;">{{stat.number_of_abstracts}}</div>
+					<h4 class="c-title c-font-white c-font-uppercase c-font-bold" style="margin-bottom:50px">الأبحاث المتقدّمة</h4>
 				</div>
 				{% endif %}
+			</div>
+			<div class="row">
 				{% if stat.number_of_accepted_abstracts != 0 %}
-				<div class="col-md-4">
-					<div class="c-counter c-font-white c-bordered c-border-green c-font-white" data-counter="counterup">{{stat.number_of_accepted_abstracts}}</div>
-					<h4 class="c-title c-font-white c-font-uppercase c-font-bold">الأبحاث المقبولة</h4>
+				<div class="col-md-2 col-md-offset-1">
+					<img src="{% static 'newhpc/images/icons/ab_acc.png' %}" style="width:40%">
+					<div class="c-counter" data-counter="counterup" style="padding-top:0px;padding-bottom: 0px;margin-bottom: -145px;">{{stat.number_of_accepted_abstracts}}</div>
+					<h4 class="c-title c-font-white c-font-uppercase c-font-bold" style="margin-bottom:50px">الأبحاث المقبولة</h4>
 				</div>
 				{% endif %}
+
 				{% if stat.oral_presentations != 0 %}
-				<div class="col-md-4">
-					<div class="c-counter c-font-white c-bordered c-border-green c-font-white" data-counter="counterup">{{stat.oral_presentations}}</div>
-					<h4 class="c-title c-font-white c-font-uppercase c-font-bold">العروض البحثيّة</h4>
+				<div class="col-md-2">
+					<img src="{% static 'newhpc/images/icons/o_pres.png' %}" style="width:40%">
+					<div class="c-counter" data-counter="counterup" style="padding-top:0px;padding-bottom: 0px;margin-bottom: -145px;">{{stat.oral_presentations}}</div>
+					<h4 class="c-title c-font-white c-font-uppercase c-font-bold" style="margin-bottom:50px">العروض البحثيّة</h4>
 				</div>
 				{% endif %}
 				{% if stat.poster_presentations != 0 %}
-				<div class="col-md-4">
-					<div class="c-counter c-font-white c-bordered c-border-green c-font-white" data-counter="counterup">{{stat.poster_presentations}}</div>
-					<h4 class="c-title c-font-white c-font-uppercase c-font-bold">الملصقات البحثيّة</h4>
+				<div class="col-md-2">
+					<img src="{% static 'newhpc/images/icons/p_pres.png' %}" style="width:40%">
+					<div class="c-counter" data-counter="counterup" style="padding-top:0px;padding-bottom: 0px;margin-bottom: -145px;">{{stat.poster_presentations}}</div>
+					<h4 class="c-title c-font-white c-font-uppercase c-font-bold" style="margin-bottom:50px">الملصقات البحثيّة</h4>
 				</div>
 				{% endif %}
 				{% if stat.number_of_winners != 0 %}
-				<div class="col-md-4">
-					<div class="c-counter c-font-white c-bordered c-border-green c-font-white" data-counter="counterup">{{stat.number_of_winners}}</div>
-					<h4 class="c-title c-font-white c-font-uppercase c-font-bold">الفائزين بالأبحاث</h4>
+				<div class="col-md-2">
+					<img src="{% static 'newhpc/images/icons/quality.png' %}" style="width:40%">
+					<div class="c-counter" data-counter="counterup" style="padding-top:0px;padding-bottom: 0px;margin-bottom: -145px;">{{stat.number_of_winners}}</div>
+					<h4 class="c-title c-font-white c-font-uppercase c-font-bold" style="margin-bottom:50px">الفائزين بالأبحاث</h4>
 				</div>
 				{% endif %}
+
 				{% if stat.number_of_universities != 0 %}
-				<div class="col-md-4">
-					<div class="c-counter c-font-white c-bordered c-border-green c-font-white" data-counter="counterup">{{stat.number_of_universities}}</div>
-					<h4 class="c-title c-font-white c-font-uppercase c-font-bold">الجامعات المشاركة</h4>
+				<div class="col-md-2">
+					<img src="{% static 'newhpc/images/icons/univ.png' %}" style="width:40%">
+					<div class="c-counter" data-counter="counterup" style="padding-top:0px;padding-bottom: 0px;margin-bottom: -145px;">{{stat.number_of_universities}}</div>
+					<h4 class="c-title c-font-white c-font-uppercase c-font-bold" style="margin-bottom:50px">الجامعات المشاركة</h4>
 				</div>
 				{% endif %}
 			{% endfor %}
 			</div>
-
+			<div class="row"><br><br>
 			<div class="c-content-title-1">
-				<div style="padding-top:60px; padding-bottom:20px; text-align:center; font-size:28px">المتحدثين</div>
+				<div class="c-font-bold" style="padding-top:60px; padding-bottom:20px; text-align:center; font-size:28px">المتحدثين</div>
 				<div class="c-line-center c-theme-bg"></div>
+			</div>
 			</div>
 			<div class="row">
 			{% for speaker in version.speaker_set.all %}
 				{% if speaker.is_top_speaker %}
-				<div class="col-lg-4">
+				<div class="col-md-4">
 					<img src="{{speaker.image.url}}" style="height:200px">
 					<h3>{{speaker.name}}</h3>
 					{{speaker.position}}
@@ -115,51 +174,96 @@
 				{% endif %}
 			{% endfor %}
 			</div>
-			<div class="row" align="center" style="padding:40px"><a>اضغط هنا لتفاصيل أكثر عن متحدثي {{version.arabic_title}}</a></div>
+
+			{% if version.speaker_file %}
+			<div class="row" align="center" style="padding:40px"><a target="_blank" href="{{version.speaker_file.url }}" >اضغط هنا لتفاصيل أكثر عن متحدثي {{version.arabic_title}}</a></div>
+			{% endif %}
 
 			<div class="c-content-title-1">
-				<div style="padding-top:60px; padding-bottom:20px; text-align:center; font-size:28px">
+				<div class="c-font-bold" style="padding-top:60px; padding-bottom:20px; text-align:center; font-size:28px">
 					الفائزين بالمراكز الأولى بالأبحاث ب{{version.arabic_title}}</div>
 				<div class="c-line-center c-theme-bg"></div>
 			</div>
 			<div class="row">
 				<div class="col-lg-6">
 					<h3>العروض البحثيّة</h3>
+					<br><h4>الدراسات العليا</h4>
 					{% for winner in version.winner_set.all %}
 						{% if winner.presentation_type == 'O' %}
-							{% if winner.rank == '1' %}
-							{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
-							المركز الأوّل: {{ winner.arabic_name }}<br>
-							{% elif winner.rank == '2' %}
-							{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
-							المركز الثاني: {{ winner.arabic_name }}<br>
-							{% elif winner.rank == '3' %}
-							{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
-							المركز الثالث: {{ winner.arabic_name }}<br>
+							{% if winner.edu_level == 'P' %}
+								{% if winner.rank == '1' %}
+								{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
+								المركز الأوّل: {{ winner.arabic_name }}<br>
+								{% elif winner.rank == '2' %}
+								{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
+								المركز الثاني: {{ winner.arabic_name }}<br>
+								{% elif winner.rank == '3' %}
+								{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
+								المركز الثالث: {{ winner.arabic_name }}<br>
+								{% endif %}
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+					<br><h4>مرحلة البكالوريوس</h4>
+					{% for winner in version.winner_set.all %}
+						{% if winner.presentation_type == 'O' %}
+							{% if winner.edu_level == 'B' %}
+								{% if winner.rank == '1' %}
+								{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
+								المركز الأوّل: {{ winner.arabic_name }}<br>
+								{% elif winner.rank == '2' %}
+								{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
+								المركز الثاني: {{ winner.arabic_name }}<br>
+								{% elif winner.rank == '3' %}
+								{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
+								المركز الثالث: {{ winner.arabic_name }}<br>
+								{% endif %}
 							{% endif %}
 						{% endif %}
 					{% endfor %}
 				</div>
 				<div class="col-lg-6">
 					<h3>الملصقات البحثيّة</h3>
+					<br><h4>الدراسات العليا</h4>
 					{% for winner in version.winner_set.all %}
 						{% if winner.presentation_type == 'P' %}
-							{% if winner.rank == '1' %}
-							{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
-							المركز الأوّل: {{ winner.arabic_name }}<br>
-							{% elif winner.rank == '2' %}
-							{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
-							المركز الثاني: {{ winner.arabic_name }}<br>
-							{% elif winner.rank == '3' %}
-							{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
-							المركز الثالث: {{ winner.arabic_name }}<br>
+							{% if winner.edu_level == 'P' %}
+								{% if winner.rank == '1' %}
+								{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
+								المركز الأوّل: {{ winner.arabic_name }}<br>
+								{% elif winner.rank == '2' %}
+								{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
+								المركز الثاني: {{ winner.arabic_name }}<br>
+								{% elif winner.rank == '3' %}
+								{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
+								المركز الثالث: {{ winner.arabic_name }}<br>
+								{% endif %}
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+					<br><h4>مرحلة البكالوريوس</h4>
+					{% for winner in version.winner_set.all %}
+						{% if winner.presentation_type == 'P' %}
+							{% if winner.edu_level == 'B' %}
+								{% if winner.rank == '1' %}
+								{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
+								المركز الأوّل: {{ winner.arabic_name }}<br>
+								{% elif winner.rank == '2' %}
+								{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
+								المركز الثاني: {{ winner.arabic_name }}<br>
+								{% elif winner.rank == '3' %}
+								{% if winner.image %}<img src="{{winner.image.url}}" style="height:200px; padding-top:30px">{% endif %}<br>
+								المركز الثالث: {{ winner.arabic_name }}<br>
+								{% endif %}
 							{% endif %}
 						{% endif %}
 					{% endfor %}
 				</div>
 
 			</div>
-			<div class="row" align="center" style="padding:40px"><a>اضغط هنا لتفاصيل أكثر عن الفائزين بالأبحاث ب{{version.arabic_title}}</a></div>
+			{% if version.winner_file %}
+			<div class="row" align="center" style="padding:40px"><a href="{{version.winner_file.url }}" target="_blank">اضغط هنا لتفاصيل أكثر عن الفائزين بالأبحاث ب{{version.arabic_title}}</a></div>
+			{% endif %}
 
 
 			<div class="c-content-box c-size-md c-bg-img-center" style="">

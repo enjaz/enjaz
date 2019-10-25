@@ -1,0 +1,21 @@
+{% extends 'newhpc/english/english_base.html'%} {% load staticfiles %}
+{% block title %}Newsletter Members | HPC2020 Riyadh{% endblock %}
+
+{% block content %}
+<div style="padding-top: 170px">
+<h3>Newsletter Members</h3>
+<br>
+    <ul>
+        {% for m in members %}
+        <li>{% if m.user %}
+                {{ m.user.email }}
+            {% else %}
+                {{ m.email }}
+            {% endif %}
+            ; {{ m.submission_date }}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}

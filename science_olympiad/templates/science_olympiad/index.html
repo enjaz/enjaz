@@ -81,13 +81,15 @@
     <div class="row">
     <div class="col col-sm-12 col-md-3"><a href="{% url 'science_olympiad:view_section' 'lectures' %}">
         <img height="130px" src="{% static 'science_olympiad/images/sections/white/lectures_white.png' %}">
-        <br><h4>المحاضرات</h4></a></div>
+        <br><h4>المحاضرات<br>
+        <!--<p id="demo"></p> COUNTDOWN-->
+        </h4></a></div>
     <div class="col col-sm-12 col-md-3"><a href="{% url 'science_olympiad:view_section' 'contest' %}">
         <img height="130px" src="{% static 'science_olympiad/images/sections/white/contest_white.png' %}">
         <br><h4>المسابقة العلمية</h4></a></div>
     <div class="col col-sm-12 col-md-3"><a href="{% url 'science_olympiad:view_section' 'gallery' %}">
         <img height="130px" src="{% static 'science_olympiad/images/sections/white/gallery_white.png' %}">
-        <br><h4>المعرض الابتكاري</h4></a></div>
+        <br><h4>معرض الدَيْجُور</h4></a></div>
     <div class="col col-sm-12 col-md-3"><a href="{% url 'science_olympiad:view_section' 'hackathon' %}">
         <img height="130px" src="{% static 'science_olympiad/images/sections/white/hackathon_white.png' %}">
         <br><h4>الهاكاثون التقني</h4></a></div>
@@ -109,12 +111,48 @@
           <div class="card-body">
             <div align="center">
                 <br><br><br><br><br><br>
-            <p class="card-text" style="font-size:20px;">معرض المخترعين</p>
-            <a href="{% url 'science_olympiad:gallery_form' %}" class="btn" style="font-size:20px">سجّلـ/ـي الآن!</a></div>
+            <p class="card-text" style="font-size:24px;">المخترعين</p>
+            <a href="{% url 'science_olympiad:add_inventor' %}" class="btn" style="font-size:20px">للتسجيل</a></div>
           </div>
         </div>
       </div>
+
+
+
   </div>
 </div>
 </div>
+{% endblock %}
+
+{% block customscript %}
+<script>
+// Set the date we're counting down to
+var countDownDate = new Date("Jan 5, 2021 15:37:25").getTime();
+
+// Update the count down every 1 second
+var x = setInterval(function() {
+
+  // Get today's date and time
+  var now = new Date().getTime();
+
+  // Find the distance between now and the count down date
+  var distance = countDownDate - now;
+
+  // Time calculations for days, hours, minutes and seconds
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  // Output the result in an element with id="demo"
+  document.getElementById("demo").innerHTML = days + " يوم " + hours + "ساعة  "
+  + minutes + " دقيقة " + seconds + " ثانية ";
+
+  // If the count down is over, write some text
+  if (distance < 0) {
+    clearInterval(x);
+    document.getElementById("demo").innerHTML = "EXPIRED";
+  }
+}, 1000);
+</script>
 {% endblock %}

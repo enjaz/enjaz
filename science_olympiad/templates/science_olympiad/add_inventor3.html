@@ -1,0 +1,178 @@
+<!--
+ =========================================================
+ * Material Kit - v2.0.6
+ =========================================================
+
+ * Product Page: https://www.creative-tim.com/product/material-kit
+ * Copyright 2019 Creative Tim (http://www.creative-tim.com)
+   Licensed under MIT (https://github.com/creativetimofficial/material-kit/blob/master/LICENSE.md)
+
+
+ =========================================================
+
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. -->
+
+{% extends 'science_olympiad/base.html' %}{% load static %}
+
+{% block title %}تسجيل المخترعين{% endblock %}
+
+{% block style %}
+
+#form{
+  margin:100px
+};
+
+@media only screen and (max-width: 991px) {
+  #form {
+    margin:0px;
+    width:100%;
+    padding-top:100px;
+  }
+}
+{% endblock %}
+
+{% block content %}
+   <div class="page-header header-filter" style="background-image:url({% static 'science_olympiad/images/header.jpg' %}) ; background-size: cover; background-position: top center;">
+    <div class="container">
+      <div class="row">
+      <div class="col-lg-12">
+        <div id="terms" class="card card-login" style="border:200px;">
+        <p align="right" style="padding-right:15px; padding-top:20px">ضوابط التسجيل:</p>
+        <ol style="text-align:right">
+          <li>أن يكون المشارك/المشاركة سعودي الجنسية.</li>
+          <li>أن يكون عمر المشارك/المشاركة ١٨ سنة فما فوق.</li>
+          <li>الحضور الشخصي للمشارك/المشاركة لكافة أيام المعرض.</li>
+          <li>لإدارة المسابقة الحق في استبعاد أي مشارك إذا ثبت إدخال أية معلومات غير صحيحة.</li>
+        </ol>
+        <p align="right" style="padding-right:15px; padding-top:20px">شروط المشاركة بالابتكار:</p>
+        <ol style="text-align:right">
+          <li>أن يكون التسجيل بالابتكار فردي، ولن يسمح بالمشاريع الجماعية.</li>
+          <li> يشترط أن يحتوي ملخص المشروع على حل مشكلة و أهداف الابتكار، الأصالة، والتنفيذ.</li>
+          <li>يحق لإدارة المسابقة استبعاد المشاريع التي لا تتوفر فيها معلومات علمية أساسية في ملخص المشروع.</li>
+          <li>أن يكون العمل ذو أصالة ومن ابتكار المشارك/المشاركة.</li>
+          <li>أن تكون المشاركة ضمن مجالات المسابقة المذكورة أدناه.</li>
+          <li>استيفاء العمل لكافة شروط الأخلاقيات العلمية ومعايير الأمن والسلامة المعمول بها في المملكة العربية السعودية.</li>
+          <li>في حال وجود نموذج للابتكار يرجى إحضاره بشرط الالتزام بالقياسات المحددة: (الطول ٥٠سم، العرض ٤٠سم، الارتفاع ٢٠سم)، ولن يُسمح بعرض أكبر من تلك القياسات، ويمكن الاستعانة بعرض مقطع فيديو للنموذج.</li>
+          <li>يتطلب إعداد لوحة عرض (بوستر) لعرض الابتكار في المعرض.</li>
+        </ol>
+        <p align="right" style="padding-right:15px; padding-top:20px">في حال وجود أية أسئلة يرجى التواصل عبر: so.ksauhs@gmail.com</p>
+      </div>
+      </div>
+      </div>
+      <div class="row">
+      <button id="button" class="btn btn-raised">لقد قمت بقراءة شروط التسجيل و أوافق عليها</button>
+      </div>
+
+
+
+
+
+    </div>
+   </div>
+
+
+      <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 ml-auto mr-auto">
+          <div class="card card-login" align="right">
+            <form id="form" class="form" method="post" action="">
+                <ul>{{form.as_p}}</ul>
+
+
+            <!--<div class="card-header card-header-primary text-center">-->
+            <!--<h4 class="card-title">تسجيل المخترعين في معرض الدَيْجُور 💡</h4>-->
+            <!--</div>-->
+
+            <!--<div class="card-body">-->
+                <!--{% for field in form %}-->
+                <!--<div class="input-group">-->
+                  <!--<div class="input-group-prepend" style="padding-left:10px; padding-rightt:10px">-->
+                    <!--{% if field.name == 'ar_name' %}-->
+                    <!--الاسم الثلاثي باللغة العربية:-->
+                  <!--</div>-->
+                  <!--<input type="text" class="form-control">-->
+                    <!--{% elif field.name == 'en_name' %}-->
+                    <!--الاسم الثلاثي باللغة الإنجليزية:-->
+                  <!--</div>-->
+                  <!--<input type="text" class="form-control">-->
+                    <!--{% elif field.name == 'job' %}-->
+                    <!--الوظيفة:-->
+                  <!--</div>-->
+                  <!--<input type="text" class="form-control">-->
+                    <!--{% elif field.name == 'workplace' %}-->
+                    <!--جهة العمل/الدراسة:-->
+                  <!--</div>-->
+                  <!--<input type="text" class="form-control">-->
+                    <!--{% elif field.name == 'invention_name' %}-->
+                    <!--اسم الاختراع:-->
+                  <!--</div>-->
+                  <!--<input type="text" class="form-control">-->
+                    <!--{% elif field.name == 'inv_category' %}-->
+                    <!--<div class="row" align="right">-->
+                    <!--التصنيف (يمكن اختيار أكثر من تصنيف):-->
+                    <!--<div class="col-lg-12">-->
+                    <!--{% for x,y in form.fields.inv_category.choices %}-->
+                        <!--<div class="form-check">-->
+                            <!--<label class="form-check-label">-->
+                              <!--<input class="form-check-input" type="checkbox" value=""> {{y}}-->
+                              <!--<span class="form-check-sign">-->
+                                <!--<span class="check"></span>-->
+                              <!--</span>-->
+                            <!--</label>-->
+                          <!--</div>-->
+                    <!--{% endfor %}-->
+                    <!--</div></div>-->
+                    <!--{% elif field.name == 'other_category' %}-->
+                    <!--إذا اخترت 'تصنيف آخر'، اذكره هنا:-->
+                    <!--</div>-->
+                    <!--<input type="text" class="form-control">-->
+                    <!--{% elif field.name == 'summary' %}-->
+                    <!--ملخص الاختراع:-->
+                    <!--</div>-->
+                    <!--<input type="text" class="form-control">-->
+                    <!--{% elif field.name == 'is_prototype' %}-->
+                    <!--هل يوجد لديك نموذج أولي؟-->
+                    <!--</div>-->
+                    <!--<input type="text" class="form-control">-->
+                    <!--{% elif field.name == 'prototype_file' %}-->
+                    <!--الرجاء إرفاق النموذج الأولي كملف PDF إن وجد:-->
+                    <!--</div>-->
+                    <!--<input type="file" class="form-control">-->
+                    <!--{% endif %}-->
+                    <!--</div>-->
+                    <!--{% endfor %}-->
+
+            <!--</div>-->
+          </form>
+        </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}
+
+{% block customscript %}
+<script type="text/javascript">
+$("#form").hide();
+$("#button").click(function(){
+    $("#button").hide();
+    $("#form").show();
+    });
+</script>
+{% endblock %}

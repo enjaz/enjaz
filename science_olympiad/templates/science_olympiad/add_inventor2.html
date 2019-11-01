@@ -1,0 +1,60 @@
+<!--
+ =========================================================
+ * Material Kit - v2.0.6
+ =========================================================
+
+ * Product Page: https://www.creative-tim.com/product/material-kit
+ * Copyright 2019 Creative Tim (http://www.creative-tim.com)
+   Licensed under MIT (https://github.com/creativetimofficial/material-kit/blob/master/LICENSE.md)
+
+
+ =========================================================
+
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. -->
+
+{% extends 'science_olympiad/base.html' %}{% load static %}
+
+{% block title %}تسجيل المخترعين{% endblock %}
+
+{% block style %}
+
+#form{
+  margin:100px
+};
+
+@media only screen and (max-width: 991px) {
+  #form {
+    margin:0px;
+    width:100%;
+    padding-top:100px;
+  }
+}
+{% endblock %}
+
+{% block content %}
+  <div class="profile-page sidebar-collapse">
+  <div class="page-header header-filter" style="background-image:url({% static 'science_olympiad/images/header.jpg' %}) ; background-size: cover; background-position: top center;"></div>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-10 ml-auto mr-auto">
+            <div class="profile">
+              <div align="center">
+                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSejYFk3X_3ierUxmH3IxvB9c4Ql5vJTxW6ky_Tv7Ccx5TL-gw/viewform?embedded=true" width="100%" height="600px" frameborder="0" marginheight="0" marginwidth="0">جاري التحميل</iframe>
+              </div>
+              </div>
+          </div>
+        </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block customscript %}
+<script type="text/javascript">
+$("#form").hide();
+$("#button").click(function(){
+    $("#button").hide();
+    $("#form").show();
+    });
+</script>
+{% endblock %}

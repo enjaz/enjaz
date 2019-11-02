@@ -23,6 +23,23 @@ class BlogPostEnglish(models.Model):
     def __unicode__(self):
         return self.title
 
+class BlogVideo(models.Model):
+    ar_title = models.CharField(max_length=400, verbose_name="عنوان اختياري باللغة العربية",
+                                blank=True, null=True)
+    en_title = models.CharField(max_length=400, verbose_name="عنوان اختياري باللغة الانجليزية",
+                                blank=True, null=True)
+    file = models.FileField("رفع الفيديو كملف (اختياري)", blank=True, null=True)
+    external_link = models.CharField("رابط خارجي للفيديو (اختياري)", max_length=400, blank=True, null=True)
+    def __unicode__(self):
+        if self.ar_title:
+            return self.ar_title
+        elif self.en_title:
+            return self.en_title
+        elif self.file:
+            return self.file.url
+        elif self.external_link:
+            return self.external_link
+
 #FAQ Questions and answers en/faq or ar/faq
 class FaqCategory(models.Model):
     arabic_title = models.CharField(max_length=255, default="",verbose_name="اسم التصنيف باللغة العربيّة")

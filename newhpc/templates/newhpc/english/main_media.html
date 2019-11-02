@@ -46,6 +46,20 @@
 			<div class="col-md-3">
 			</div>
 		</div>
+		<div class="row">
+			<div style="font-size:30px" class="c-title c-font-bold c-font-uppercase">Video Clips</div><br>
+			{% for vid in videos %}
+			<div class="col-lg-3">
+				{% if vid.en_title %} {{vid.en_title }} {% endif %}
+				<div class="c-media">
+					<iframe src="{% if vid.external_link %} {{vid.external_link}}
+					             {% elif vid.file %} {{vid.file.url}} {%endif%}"
+							width="100%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen>
+					</iframe>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
 	</div>
 </div>
 {% endblock %}

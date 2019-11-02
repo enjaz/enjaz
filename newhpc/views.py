@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators import csrf
 from django.shortcuts import render
 from core import decorators
-from .models import FaqCategory, FaqQuestion, BlogPostArabic, BlogPostEnglish, NewsletterMembership
+from .models import FaqCategory, FaqQuestion, BlogPostArabic, BlogPostEnglish, NewsletterMembership, BlogVideo
 from .forms import *
 
 # Create your views here.
@@ -171,7 +171,8 @@ def main_media(request, lang):
     elif lang == 'en':
         lang2 = 'english'
         posts = BlogPostEnglish.objects.all()
-    context = {'posts': posts,}
+    videos = BlogVideo.objects.all()
+    context = {'posts': posts, 'videos': videos}
     return render(request, 'newhpc/'+lang2+'/main_media.html', context)
 
 def show_post(request, lang, post_id):

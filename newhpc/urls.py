@@ -6,7 +6,10 @@ urlpatterns = [
     # Index Pages
     url(r'^riyadh/ar/$', views.riy_ar_index, name="riy_ar_index"),
     url(r'^riyadh/en/$', views.riy_en_index, name="riy_en_index"),
+    # Research Guidelines
     url(r'^riyadh/en/research$', views.riy_en_research, name="riy_en_research"),
+    url(r'^jeddah/en/research$', views.jed_en_research, name="jed_en_research"),
+    url(r'^alahsa/en/research$', views.ahs_en_research, name="ahs_en_research"),
     # About Pages
     url(r'^riyadh/(?P<lang>(ar|en))/about$', views.show_about, name="riy_about"),
     # FAQ-Related Pages

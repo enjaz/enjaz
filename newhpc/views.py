@@ -24,6 +24,14 @@ def riy_en_research(request):
     context = {}
     return render(request,'newhpc/english/riy_en_research.html',context)
 
+def jed_en_research(request):
+    context = {}
+    return render(request,'newhpc/english/jed_en_research.html',context)
+
+def ahs_en_research(request):
+    context = {}
+    return render(request,'newhpc/english/ahs_en_research.html',context)
+
 def show_about(request, lang):
     if lang == 'ar':
         lang2 = 'arabic'

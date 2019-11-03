@@ -481,7 +481,7 @@
         <div class="form-group" style="text-align: justify;">
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" id="agree">I have read the <a target="_blank" href="{% url 'newhpc:riy_en_research' %}" style="text-decoration: underline">instructions and guidelines of abstract submission to Health Professions Conference 2020.</a></label>
+                    <input type="checkbox" id="agree">I have read the <a target="_blank" href="{{ event.abstract_submission_instruction_url }}" style="text-decoration: underline">instructions and guidelines of abstract submission to Health Professions Conference 2020.</a></label>
             </div>
         </div>
         <input type="hidden" name="university">

@@ -131,9 +131,11 @@ class Winner(models.Model):
         ('9', 'المركز التاسع'),
         ('10', 'المركز العاشر')
         )
-    edu_level = models.CharField(verbose_name="المستوى الدراسي", max_length=1, choices=edu_level_choices, default="")
+    edu_level = models.CharField(verbose_name="المستوى الدراسي", max_length=1, choices=edu_level_choices, default="",
+                                 null=True, blank=True)
     presentation_type = models.CharField(verbose_name="نوع البحث", max_length=1, choices=presentation_type_choices,default="")
     rank = models.CharField(max_length=2,choices=rank_choices,default="",verbose_name="المركز")
+    is_joint = models.BooleanField("هل المركز مكرر؟", default=False)
     image = models.ImageField(upload_to='newhpc/previous/winner/', blank=True, null=True, verbose_name="صورة الفائز غير مطلوبة في حال عدم التوفّر")
     def __unicode__(self):
         return self.arabic_name

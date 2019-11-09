@@ -150,19 +150,16 @@ def list_prev_versions(request):
 
 def show_version(request, version_year):
     version = PreviousVersion.objects.get(year=version_year)
-    col = 0
-    row2 = False
-    row3 = False
-    row4 = False
-    col_mod = col % 3
+    speakers = version.speaker_set.filter(is_top_speaker=True)
     context = {'version': version,
-               'col': col,
-               'row2': row2,
-               'row3': row3,
-               'row4': row4,
-               'col_mod': col_mod,
-    }
+               'speakers': speakers}
     return render(request, 'newhpc/arabic/ar_show_version.html', context)
+
+def show_speakers(request, version_year):
+    version = PreviousVersion.objects.get(year=version_year)
+    context = {'version': version,
+               'range': range(2)}
+    return render(request, 'newhpc/arabic/all_speakers.html', context)
 
 def main_media(request, lang):
     if lang == 'ar':

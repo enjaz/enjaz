@@ -19,6 +19,7 @@ urlpatterns = [
     # Previous Versions-Related Pages
     url(r'^riyadh/ar/previous_versions/$', views.list_prev_versions, name="list_prev_versions"),
     url(r'^riyadh/ar/previous_versions/(?P<version_year>\d+)/$', views.show_version, name="show_version"),
+    url(r'^riyadh/ar/previous_versions/(?P<version_year>\d+)/speakers/$', views.show_speakers, name="show_speakers"),
     url(r'^riyadh/en/previous_versions/admin/$', views.admin_prev_versions, name="admin_prev_versions"),
     url(r'^riyadh/en/previous_versions/version/add/$', views.add_prev_version, name="add_version"),
     url(r'^riyadh/en/previous_versions/leader/add/$', views.add_leader, name="add_leader"),

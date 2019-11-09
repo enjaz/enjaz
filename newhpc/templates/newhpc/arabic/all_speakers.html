@@ -1,0 +1,104 @@
+{% extends 'newhpc/arabic/arabic_base.html' %}
+{% load staticfiles %}
+{% load newhpc_tags %}
+{% block title %}متحدثي {{version.arabic_title}}{% endblock %}
+
+{% block content %}
+<div class="c-content-box c-size-md c-bg-parallax" style="background-image:; padding-top:200px">
+	<div class="container" align="center">
+		<div class="c-content-counter-1">
+			<div style="font-size:44px; margin-bottom:50px" class="c-center c-font-uppercase c-font-bold">
+                {% if version.year == '2016' %}
+                أبرز
+                {% endif %}
+                متحدثي {{ version.arabic_title }}
+            </div>
+
+            <!--Terrible hard code but what to do-->
+            {% if version.year == '2017' %}
+                <img src="{% static 'newhpc/images/schedules/2017/1.jpeg' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2017/2.jpeg' %}" style="width:70%">\
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2017/3.jpeg' %}" style="width:70%">
+
+            {% elif version.year == '2018' %}
+                <img src="{% static 'newhpc/images/schedules/2018/1.jpeg' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2018/2.jpeg' %}" style="width:70%">\
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2018/3.jpeg' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2018/4.jpeg' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2018/5.jpeg' %}" style="width:70%">\
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2018/6.jpeg' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2018/7.jpeg' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2018/8.jpeg' %}" style="width:70%">\
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2018/9.jpeg' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2018/10.jpeg' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2018/11.jpeg' %}" style="width:70%">\
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2018/12.jpeg' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2018/13.jpeg' %}" style="width:70%">
+
+            {% elif version.year == '2019' %}
+                <img src="{% static 'newhpc/images/schedules/2019/1.jpg' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2019/2.png' %}" style="width:70%">\
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2019/3.png' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2019/4.png' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2019/5.png' %}" style="width:70%">\
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2019/6.png' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2019/7.png' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2019/8.png' %}" style="width:70%">\
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2019/9.png' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2019/10.png' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2019/11.png' %}" style="width:70%">\
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2019/12.png' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2019/13.png' %}" style="width:70%">
+                <br><br><br>
+                <img src="{% static 'newhpc/images/schedules/2019/14.png' %}" style="width:70%">
+
+            {% else %}
+
+                {% for speaker in version.speaker_set.all %}
+                {% if forloop.counter|modulo:3 == 1 %}
+                <div class="row">
+                {% endif %}
+                    <div class="col-lg-4" style="margin-bottom:50px">
+                    <img src="{{speaker.image.url}}" style="height:200px">
+                        <h3>{{speaker.name}}</h3>
+                        {% if speaker.position %}
+                            {{ speaker.position }}
+                        {% endif %}
+                    </div>
+                    {% if forloop.last or forloop.counter|modulo:3 == 0 %}
+                </div>
+                {% endif %}
+                {% endfor %}
+
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

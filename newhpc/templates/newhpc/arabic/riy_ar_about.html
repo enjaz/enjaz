@@ -2,6 +2,8 @@
 {% load staticfiles %}
 {% block title %}مؤتمر التخصّصات الصحّية 2020 | عن المؤتمر{% endblock %}
 
+{% block lang %}{% url 'newhpc:riy_about' 'en' %}{% endblock %}
+
 {% block content %}
 <div align="center" style="padding-bottom:200px">
 
@@ -13,18 +15,25 @@
     <div class="col-xs-12"><img width="350px" style="margin:50px" src="{% static 'newhpc/images/logos/KSAUHS.png' %}">
     </div></div>
 
-    <div class="row" style="width:80%"><h2>وهو تحت إشراف عمادة شؤون الطلاب</h2></div>
+    <div class="row" style="width:80%"><h2 style="font-weight:bold">وهو تحت إشراف عمادة شؤون الطلاب</h2></div>
     <div class="row">
     <div class="col-xs-12"><img width="350px" src="{% static 'newhpc/images/logos/student_club.png' %}">
     </div></div>
 <div class="row">
     <div class="col-xs-6"><img width="40%" src="{% static 'newhpc/images/people/Dr. Suliman eye.png' %}">
-        <br><div style="font-weight:700; margin-bottom:-20px">د. سليمان القويفلي</div><br>عميد شؤون الطلاب</div>
+        <br><div style="font-weight:700; margin-bottom:-20px">د. سليمان القويفلي</div><br>مسؤول شؤون طلاب أول</div>
     <div class="col-xs-6"><img width="40%" src="{% static 'newhpc/images/people/Dr. Bader eye.png' %}">
-        <br><div style="font-weight:700; margin-bottom:-20px">د. بدر المقبل</div><br>العميد المشارك بعمادة شؤون الطلاب</div>
+        <br><div style="font-weight:700; margin-bottom:-20px">د. بدر المقبل</div><br>مساعد إداري ثالث</div>
 </div>
 <br><br><br>
-    <div class="row"><h2>مؤتمر التخصصات الصحية 2020 تحت قيادة كل من</h2></div>
+<div class="row">
+    <div class="col-xs-6"><img width="40%" src="{% static 'newhpc/images/people/Abdulelah eye.png' %}">
+    <br><div style="font-weight:700; margin-bottom:-20px">أ. عبدالإله العليوه</div><br>Student Affairs Officer I</div>
+    <div class="col-xs-6"><img width="40%" src="{% static 'newhpc/images/people/Female eye.png' %}">
+    <br><div style="font-weight:700; margin-bottom:-20px">أ. لمى العمرو</div><br>Administrative Assistant III</div>
+</div>
+<br><br><br>
+    <div class="row"><h2 style="font-weight:bold">مؤتمر التخصصات الصحية 2020 تحت قيادة كل من</h2></div>
 <br>
 <div class="row">
     <div class="col-xs-4"><img width="60%" src="{% static 'newhpc/images/people/Nawaf Eye.png' %}">
@@ -35,11 +44,11 @@
         <br><div style="font-weight:700; margin-bottom:-20px">منار المطيري</div><br> نائبة قادة مؤتمر التخصصات الصحية 2020</div>
 </div>
 <br><br><br>
-    <div class="row"><h2>هيكلة مؤتمر التخصصات الصحية</h2></div>
+    <div class="row"><h2 style="font-weight:bold">هيكلة مؤتمر التخصصات الصحية</h2></div>
     <br>
     <div class="col-xs-12"><img width="60%" src="{% static 'newhpc/images/logos/structure.png' %}"></div>
 <div class="row" style="padding:40px"></div>
-    <div class="row" style="width:80%; border-top:30px"><h2>قام بإنشاء الموقع والعمل عليه بالتعاون مع بوابة انجاز  الفريق التقني بمؤتمر التخصصات الصحية  2020 تحت قيادة كل من</h2></div>
+    <div class="row" style="width:80%; border-top:30px"><h2 style="font-weight:bold">قام بإنشاء الموقع والعمل عليه بالتعاون مع بوابة انجاز  الفريق التقني بمؤتمر التخصصات الصحية  2020 تحت قيادة كل من</h2></div>
 <br>
 <div class="row">
 <div class="col-xs-6"><img width="40%" src="{% static 'newhpc/images/people/Abdlurahman eye.png' %}">
@@ -48,7 +57,7 @@
         <br><div style="font-weight:700; margin-bottom:-20px">صالحة الخيري</div><br>قائدة الفريق التقني</div>
 </div>
 <br>
-    <div class="row"><h2>وبإشراف من</h2></div>
+    <div class="row"><h2 style="font-weight:bold">وبإشراف من</h2></div>
 <br>
 <div class="col-xs-12"><img width="20%" src="{% static 'newhpc/images/people/Female eye.png' %}">
     <br><div style="font-weight:700; margin-bottom:-20px">زها الجمعان</div><br>قائدة بوابة إنجاز</div>

@@ -126,10 +126,10 @@
 
                     <ul class="c-ext c-theme-ul">
                         <li class="c-lang dropdown c-last">
-                            <a href="{% url 'newhpc:riy_ar_index' %}">AR</a>
+                            <a href="#">AR</a>
                             <ul class="dropdown-menu pull-right" role="menu">
                                 <li class="active"><a href="{% url 'newhpc:riy_en_index' %}">English</a></li>
-                                <li><a href="{% url 'newhpc:riy_ar_index' %}" style="letter-spacing: 0;">العربيّة</a></li>
+                                <li><a href="{% block lang %}{% endblock %}" style="letter-spacing: 0;">العربيّة</a></li>
                             </ul>
                         </li>
                     </ul>

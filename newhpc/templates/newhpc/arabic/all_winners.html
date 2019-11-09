@@ -1,0 +1,34 @@
+{% extends 'newhpc/arabic/arabic_base.html' %}
+{% load staticfiles %}
+{% load newhpc_tags %}
+{% block title %}الفائزين بالأبحاث ب {{version.arabic_title}}{% endblock %}
+
+{% block content %}
+<div class="c-content-box c-size-md c-bg-parallax" style="background-image:; padding-top:200px">
+	<div class="container" align="center">
+		<div class="c-content-counter-1">
+			<div style="font-size:44px; margin-bottom:50px" class="c-center c-font-uppercase c-font-bold">
+                الفائزين بالأبحاث ب{{ version.arabic_title }}
+            </div>
+                {% for winner in version.winner_set.all %}
+                {% if forloop.counter|modulo:3 == 1 %}
+                <div class="row">
+                {% endif %}
+                    <div class="col-lg-4" style="margin-bottom:50px">
+                    <img src="{{speaker.image.url}}" style="height:200px">
+                        <h3>{{speaker.name}}</h3>
+                        {% if speaker.position %}
+                            {{ speaker.position }}
+                        {% endif %}
+                    </div>
+                    {% if forloop.last or forloop.counter|modulo:3 == 0 %}
+                </div>
+                {% endif %}
+                {% endfor %}
+
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -14,7 +14,7 @@
 
 {% extends 'science_olympiad/base.html' %}{% load static %}
 
-{% block title %}سجّلـ/ـي في المعرض!{% endblock %}
+{% block title %}تسجيل المخترعين{% endblock %}
 
 {% block style %}
 
@@ -32,13 +32,11 @@
 {% endblock %}
 
 {% block content %}
-<body class="login-page sidebar-collapse">
-
    <div class="page-header header-filter" style="background-image:url({% static 'science_olympiad/images/header.jpg' %}) ; background-size: cover; background-position: top center;">
     <div class="container">
       <div class="row">
       <div class="col-lg-12">
-        <div id="terms" class="card card-login" style="border:200px">
+        <div id="terms" class="card card-login" style="border:200px;">
         <p align="right" style="padding-right:15px; padding-top:20px">ضوابط التسجيل:</p>
         <ol style="text-align:right">
           <li>أن يكون المشارك/المشاركة سعودي الجنسية.</li>
@@ -65,26 +63,114 @@
       <button id="button" class="btn btn-raised">لقد قمت بقراءة شروط التسجيل و أوافق عليها</button>
       </div>
 
-      <div id="form" style="width:95%; margin-top:700px; border-bottom:300px; padding-bottom:500px">
-      <div class="row" style="height:550px">
-      <!--Very nice way to embed, but is not working on most browsers-->
-      <!--<embed src="https://forms.gle/DkX9hNxj535DXmNNA" style="width:100% ; height: 600px;"></embed>-->
-      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSejYFk3X_3ierUxmH3IxvB9c4Ql5vJTxW6ky_Tv7Ccx5TL-gw/viewform?embedded=true" width="100%" height="auto" frameborder="0" marginheight="0" marginwidth="0">جاري التحميل</iframe>
-      </div>
-      </div>
 
-      </div>
+
+
+
     </div>
-  <br><br>
    </div>
-</body>
+
+
+      <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 ml-auto mr-auto">
+          <div class="card card-login" align="right">
+            <form id="form" class="form" method="post" action="">
+                <!--<ul>{{form.as_p}}</ul>-->
+
+
+            <div class="card-header card-header-primary text-center">
+            <h4 class="card-title">تسجيل المخترعين في معرض الدَيْجُور 💡</h4>
+            </div>
+
+            <div class="card-body">
+                {% for field in form %}
+                <div class="input-group">
+                  <div class="input-group-prepend" style="padding-left:10px; padding-rightt:10px">
+                    {% if field.name == 'ar_name' %}
+                    الاسم الثلاثي باللغة العربية:
+                  </div>
+                  <input type="text" class="form-control">
+                    {% elif field.name == 'en_name' %}
+                    الاسم الثلاثي باللغة الإنجليزية:
+                  </div>
+                  <input type="text" class="form-control">
+                    {% elif field.name == 'job' %}
+                    الوظيفة:
+                  </div>
+                  <input type="text" class="form-control">
+                    {% elif field.name == 'workplace' %}
+                    جهة العمل/الدراسة:
+                  </div>
+                  <input type="text" class="form-control">
+                    {% elif field.name == 'invention_name' %}
+                    اسم الاختراع:
+                  </div>
+                  <input type="text" class="form-control">
+                    {% elif field.name == 'inv_category' %}
+                    <div class="row" align="right">
+                    التصنيف (يمكن اختيار أكثر من تصنيف):
+                    <div class="col-lg-12">
+                    {% for x,y in form.fields.inv_category.choices %}
+                        <div class="form-check">
+                            <label class="form-check-label">
+                              <input class="form-check-input" type="checkbox" value=""> {{y}}
+                              <span class="form-check-sign">
+                                <span class="check"></span>
+                              </span>
+                            </label>
+                          </div>
+                    {% endfor %}
+                    </div></div>
+                    {% elif field.name == 'other_category' %}
+                    إذا اخترت 'تصنيف آخر'، اذكره هنا:
+                    </div>
+                    <input type="text" class="form-control">
+                    {% elif field.name == 'summary' %}
+                    ملخص الاختراع:
+                    </div>
+                    <input type="text" class="form-control">
+                    {% elif field.name == 'is_prototype' %}
+                    هل يوجد لديك نموذج أولي؟
+                    </div>
+                    <input type="text" class="form-control">
+                    {% elif field.name == 'prototype_file' %}
+                    الرجاء إرفاق النموذج الأولي كملف PDF إن وجد:
+                    </div>
+                    <input type="file" class="form-control">
+                    {% endif %}
+                    </div>
+                    {% endfor %}
+
+            </div>
+          </form>
+        </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {% endblock %}
 
 {% block customscript %}
 <script type="text/javascript">
 $("#form").hide();
 $("#button").click(function(){
-    $("#terms").hide();
     $("#button").hide();
     $("#form").show();
     });

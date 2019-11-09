@@ -62,6 +62,7 @@ INSTALLED_APPS = (
     'hpc',
     'matching_program',
     'media',
+    'multiselectfield',
     'niqati',
     'post_office',
     'questions',

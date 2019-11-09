@@ -29,7 +29,21 @@
 
 {% block content %}
 <div class="profile-page sidebar-collapse">
-  <div class="page-header header-filter" data-parallax="true" style="background-image: url({% static 'science_olympiad/images/header.jpg' %});"></div>
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url({% static 'science_olympiad/images/header.jpg' %});">
+     <!------------------------Navbar Start------------------>
+          <nav style="height:100px" class="navbar navbar-transparent navbar-expand-lg" id="sectionsNav">
+
+          <div class="container">
+            <div  class="navbar-translate">
+              <a class="navbar-brand" href="{% url 'science_olympiad:index'%}">
+                  <img id="logo" height="130px" style="margin-bottom:0px; margin-top:-100px; margin-right:0px"
+                       src="{% static 'science_olympiad/images/logo_white.png' %}">
+              </a>
+            </div>
+          </div>
+          </nav>
+          <!----------------------Navbar End---------------->
+  </div>
   <div class="main ">
     <div class="profile-content">
       <div class="container">
@@ -50,14 +64,14 @@
         <div class="row">
             نهدف إلى تمكين أكبر عدد ممكن من الطلاب والطالبات من دخول عالم الإبداع في مختلف المجالات؛ لذا قررنا الجمع بين الرغبة والخبرة. رغبة الحضور  بتوسعة مداركهم، وخبرة الأشخاص الملهمين التي كونت منهم قادة مبدعين في المجتمع.
         </div>
-        <div class="row" style="padding-top:50px">
-          <div class="col-6">title<br>picture<br>description</div>
-          <div class="col-6">title<br>picture<br>description</div>
-        </div>
-        <div class="row" style="padding-top:50px">
-          <div class="col-6">title<br>picture<br>description</div>
-          <div class="col-6">title<br>picture<br>description</div>
-        </div>
+        <!--<div class="row" style="padding-top:50px">-->
+          <!--<div class="col-6">title<br>picture<br>description</div>-->
+          <!--<div class="col-6">title<br>picture<br>description</div>-->
+        <!--</div>-->
+        <!--<div class="row" style="padding-top:50px">-->
+          <!--<div class="col-6">title<br>picture<br>description</div>-->
+          <!--<div class="col-6">title<br>picture<br>description</div>-->
+        <!--</div>-->
 
         </div>
         </div>

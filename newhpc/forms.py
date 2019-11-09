@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from newhpc.models import FaqCategory, FaqQuestion, PreviousVersion, PreviousStatistics, HpcLeader, Winner
+from newhpc.models import FaqCategory, FaqQuestion, PreviousVersion, PreviousStatistics, HpcLeader, Winner, NewsletterMembership
 
 class FaqCategoryForm(ModelForm):
     class Meta:
@@ -36,3 +36,8 @@ class WinnerForm(ModelForm):
         model = Winner
         fields = ['version', 'arabic_name', 'presentation_type',
                   'rank','image']
+
+class NewsletterMembershipForm(ModelForm):
+    class Meta:
+        model = NewsletterMembership
+        fields = ['email']

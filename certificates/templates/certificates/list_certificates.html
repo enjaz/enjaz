@@ -8,6 +8,7 @@
         <th class="not-mobile">الرمز</th>
         <th class="not-mobile">التاريخ</th>
         <th class="always">تنزيل</th>
+        <th class="always">الإستبيان</th>
     </thead>
     <tbody>
         {% for certificate in certificates %}
@@ -33,11 +34,17 @@
                 {% endif %}
 
             </td>
+            <!-- google forms survey for HPC RUH 2019 certificates -->
+            {% if certificate.object_id == 467 %}
+            <td>
+                <a class="btn btn-success" href="https://goo.gl/forms/uYC3QD5aw9cTwOUH3" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> الإستبيان</a>
+            </td>
+            {% endif %}
+            <!-- end of form -->
         </tr>
         {% endfor %}
     </tbody>
 </table>
-
 
 {% endblock %}
 {% block customscript %}

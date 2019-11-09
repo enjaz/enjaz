@@ -1,0 +1,98 @@
+        <header class="c-layout-header c-layout-header-4 c-layout-header-default-mobile" data-minimize-offset="80">
+		    <div class="c-topbar c-topbar-light">
+		        <div class="container">
+                    <!-- BEGIN: INLINE NAV -->
+                    <nav class="c-top-menu c-pull-left">
+                        <ul class="c-icons c-theme-ul">
+                            <li><a href="#"><i class="icon-social-twitter"></i></a></li>
+                            <li><a href="#"><i class="icon-social-facebook"></i></a></li>
+                            <li><a href="#"><i class="icon-social-dribbble"></i></a></li>
+                        </ul>
+                    </nav>
+                    <!-- END: INLINE NAV -->
+                    <!-- BEGIN: INLINE NAV -->
+                    <nav class="c-top-menu c-pull-right">
+                        <ul class="c-links c-theme-ul">
+                            <li><a href="#">الأسئلة الشائعة</a></li>
+                            <li class="c-divider">|</li>
+                            <li><a href="#">تواصل معنا</a></li>
+                        </ul>
+                        <ul class="c-ext c-theme-ul">
+                            <li class="c-lang dropdown c-last">
+                                <a href="#">AR</a>
+                                <ul class="dropdown-menu pull-right" role="menu">
+                                    <li class="active"><a href="#">العربيّة</a></li>
+                                    <li><a href="">English</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </nav>
+			        <!-- END: INLINE NAV -->
+		        </div>
+	        </div>
+            <div class="c-navbar">
+                <div class="container">
+                    <!-- BEGIN: BRAND -->
+                    <div class="c-navbar-wrapper clearfix">
+                        <div class="c-brand c-pull-left" style="">
+                            <a href="index.html" class="c-logo">
+                                <img style="" src="{% static 'newhpc/arabic/assets/base/img/layout/logos/hpc-logo-3.png' %}" alt="مؤتمر التخصّصات الصحّية" class="c-desktop-logo">
+                                <img style="height: 50px;margin-top: -15px;" src="{% static 'newhpc/arabic/assets/base/img/layout/logos/hpc-logo-3.png' %}" alt="مؤتمر التخصّصات الصحّية" class="c-desktop-logo-inverse">
+                                <img style="height: 50px; margin-top: -12px" src="{% static 'newhpc/arabic/assets/base/img/layout/logos/hpc-logo-3.png' %}" alt="مؤتمر التخصّصات الصحّية" class="c-mobile-logo">
+                            </a>
+                            <button class="c-hor-nav-toggler" type="button" data-target=".c-mega-menu">
+                            <span class="c-line"></span>
+                            <span class="c-line"></span>
+                            <span class="c-line"></span>
+                            </button>
+                        </div>
+                        <!-- END: BRAND -->
+
+                        <!-- BEGIN: HOR NAV -->
+                        <!-- BEGIN: LAYOUT/HEADERS/MEGA-MENU -->
+                        <!-- BEGIN: MEGA MENU -->
+                        <!-- Dropdown menu toggle on mobile: c-toggler class can be applied to the link arrow or link itself depending on toggle mode -->
+                        <nav class="c-mega-menu c-pull-right c-mega-menu-dark c-mega-menu-dark-mobile c-fonts-uppercase c-fonts-bold" id="hpcnav" style="">
+                            <ul class="nav navbar-nav c-theme-nav">
+
+                                <li class="c-onepage-link">
+                                    <a href="#" class="c-link ">التسجيل</a>
+                                </li>
+                                <li class="c-onepage-link">
+                                    <a href="#" class="c-link ">مسار الأبحاث</a>
+                                </li>
+                                <li class="{% block ar_programs_active %}{% endblock %}c-menu-type-classic">
+                                    <a href="javascript:;" class="c-link dropdown-toggle">برامج المؤتمر<span class="c-arrow c-toggler"></span></a>
+                                    <ul class="dropdown-menu c-menu-type-classic c-pull-left">
+                                        <li>
+                                            <a href="#">المعرض</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">مسار الأبحاث</a>
+                                        </li>
+                                        <li class="dropdown-submenu">
+                                            <a href="#">المحاضرات وورش العمل<span class="c-arrow c-toggler"></span></a>
+                                            <ul class="dropdown-menu c-pull-right">
+                                                <li><a href="#">البرنامج العام</a></li>
+                                                <li><a href="#">برامج الكلّيات</a></li>
+                                                <li><a href="">برنامج الأبحاث</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="c-onepage-link"><a href="#" class="c-link ">المركز الإعلامي</a></li>
+
+                                <li class="c-onepage-link"><a href="{% url 'newhpc:riy_about' 'ar' %}" class="c-link ">عن المؤتمر</a></li>
+
+                                <li class="c-onepage-link"><a href="#" class="c-link ">النسخ السابقة</a></li>
+                            </ul>
+                        </nav>
+
+                        <!-- END: MEGA MENU -->
+                        <!-- END: LAYOUT/HEADERS/MEGA-MENU -->
+                        <!-- END: HOR NAV -->
+			        </div>
+		        </div>
+	        </div>
+        </header>

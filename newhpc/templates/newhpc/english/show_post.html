@@ -1,0 +1,46 @@
+{% extends 'newhpc/english/english_base.html'%} {% load staticfiles %}
+{% block title %}{{post.title}} | HPC2020{% endblock %}
+
+{% block content %}
+<div class="c-content-box c-size-md" style="padding-top:200px">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-9">
+				<div class="c-content-blog-post-1-view">
+					<div class="c-content-blog-post-1">
+						{% if post.image %}
+						<div class="c-media">
+							<div class="c-content-media-2-slider" data-slider="owl">
+								<img src="{{ post.image.url }}" style="width:100%">
+							</div>
+						</div>
+						{% endif %}
+
+						<div class="c-title c-font-bold c-font-uppercase">
+							<a href="#">{{ post.title }}</a>
+						</div>
+
+						<div class="c-panel c-margin-b-30">
+							<div class="c-author"><a href="#">By <span class="c-font-uppercase">{{ post.author }}</span></a></div>
+							<div class="c-date"><span class="c-font-uppercase">{{ post.date_submitted }}</span></div>
+							<!--<ul class="c-tags c-theme-ul-bg">-->
+								<!--<li>ux</li>-->
+								<!--<li>marketing</li>-->
+								<!--<li>events</li>-->
+							<!--</ul>-->
+							<!--<div class="c-comments"><a href="#"><i class="icon-speech"></i> 30 comments</a></div>-->
+						</div>
+
+						<div class="c-desc">
+							<p>{{ post.text }}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

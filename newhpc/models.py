@@ -23,6 +23,23 @@ class BlogPostEnglish(models.Model):
     def __unicode__(self):
         return self.title
 
+class BlogVideo(models.Model):
+    ar_title = models.CharField(max_length=400, verbose_name="عنوان اختياري باللغة العربية",
+                                blank=True, null=True)
+    en_title = models.CharField(max_length=400, verbose_name="عنوان اختياري باللغة الانجليزية",
+                                blank=True, null=True)
+    file = models.FileField("رفع الفيديو كملف (اختياري)", blank=True, null=True)
+    external_link = models.CharField("رابط خارجي للفيديو (اختياري)", max_length=400, blank=True, null=True)
+    def __unicode__(self):
+        if self.ar_title:
+            return self.ar_title
+        elif self.en_title:
+            return self.en_title
+        elif self.file:
+            return self.file.url
+        elif self.external_link:
+            return self.external_link
+
 #FAQ Questions and answers en/faq or ar/faq
 class FaqCategory(models.Model):
     arabic_title = models.CharField(max_length=255, default="",verbose_name="اسم التصنيف باللغة العربيّة")
@@ -48,6 +65,8 @@ class PreviousVersion(models.Model):
     arabic_vision = models.TextField(default="", blank=True,verbose_name="الرؤية باللغة العربيّة غير مطلوب")
     english_vision = models.TextField(default="", blank= True,verbose_name="الرؤية باللغة الانجليزيّة غير مطلوب")
     logo = models.ImageField(upload_to="newhpc/prevous/logo",null=True,blank=True,verbose_name="شعار النسخة")
+    speaker_file = models.ImageField(upload_to="newhpc/previous/speaker/file",null=True,blank=True,verbose_name="ملف المتحدثين")
+    winner_file = models.ImageField(upload_to="newhpc/previous/winner/file",null=True,blank=True,verbose_name="ملف الفائزين")
     show_more = models.URLField(verbose_name="Gallery Show more pictures link",default="",blank=True)
 
     def __unicode__(self):
@@ -112,10 +131,25 @@ class Winner(models.Model):
         ('9', 'المركز التاسع'),
         ('10', 'المركز العاشر')
         )
-    edu_level = models.CharField(verbose_name="المستوى الدراسي", max_length=1, choices=edu_level_choices, default="")
+    edu_level = models.CharField(verbose_name="المستوى الدراسي", max_length=1, choices=edu_level_choices, default="",
+                                 null=True, blank=True)
     presentation_type = models.CharField(verbose_name="نوع البحث", max_length=1, choices=presentation_type_choices,default="")
     rank = models.CharField(max_length=2,choices=rank_choices,default="",verbose_name="المركز")
+    is_joint = models.BooleanField("هل المركز مكرر؟", default=False)
     image = models.ImageField(upload_to='newhpc/previous/winner/', blank=True, null=True, verbose_name="صورة الفائز غير مطلوبة في حال عدم التوفّر")
     def __unicode__(self):
         return self.arabic_name
 
+class NewsletterMembership(models.Model):
+    user = models.OneToOneField(User, verbose_name=u"المستخدم",
+                                related_name="hpc_newsletter_membership",
+                                null=True, blank=True)
+    email = models.EmailField(default="", blank=True)
+    submission_date = models.DateTimeField(u"تاريخ الإرسال",
+                                       auto_now_add=True)
+
+    def get_email(self):
+        return self.email or self.user.email
+
+    def __unicode__(self):
+        return self.email or self.user.username

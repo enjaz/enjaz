@@ -11,7 +11,7 @@ from post_office import mail
 import unicodecsv
 
 from activities.models import Activity
-from clubs.utils import is_coordinator, is_coordinator_or_member, is_member, is_coordinator_or_deputy, is_deanship_of_students_affairs_coordinator_or_member
+from clubs.utils import is_coordinator, is_coordinator_or_member, is_member, is_coordinator_or_deputy, is_deanship_of_students_affairs_coordinator_or_member,is_presidency_coordinator_or_deputy
 from activities.utils import can_view_assessments
 from core import decorators
 from clubs.forms import DisabledClubForm, ClubForm
@@ -30,8 +30,10 @@ FORMS_CURRENT_APP = "club_forms"
 def list_clubs(request):
     clubs = Club.objects.visible().current_year()
     if not request.user.is_superuser and \
-       not is_deanship_of_students_affairs_coordinator_or_member(request.user):
+       not is_deanship_of_students_affairs_coordinator_or_member(request.user) and not is_presidency_coordinator_or_deputy(request.user):
         clubs = clubs.for_user_gender(request.user).for_user_city(request.user)
+    if is_presidency_coordinator_or_deputy(request.user):
+       clubs = clubs.for_user_city(request.user) 
 
     def get_club_points(club):
         return club.get_total_points()

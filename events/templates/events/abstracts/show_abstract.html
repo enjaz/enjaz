@@ -17,23 +17,38 @@ h4{
     font-size: 15px;
 }
 </style>
-{% if user|can_evaluate_abstracts:event or user.is_superuser %}
+
     <div class="english-field">
     {% if abstract.status == 'P' %}
-    <p class="alert alert-warning"><i class="fa fa-hourglass-half" aria-hidden="true"></i> This abstract is : {{ abstract.get_status_display }}</p>
+        {% if user|can_evaluate_abstracts:event or user.is_superuser  %}
+            <p class="alert alert-warning"><i class="fa fa-hourglass-half" aria-hidden="true"></i> This abstract is : {{ abstract.get_status_display }}</p>
+        {% endif %}
+        <!--
+            If the event is not the current year event, user will be shown that the abstract has been rejected. Just change 2020 to current year
+        -->
+        {% if abstract.event.end_date.year < 2020 %}
+            {% if user.is_superuser or user|can_evaluate_abstracts:event %}
+                <p class="alert alert-danger"><i class="fa fa-hourglass-half" aria-hidden="true"></i> Abstract has been submitted to {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %} and have not been sorted or evaluated</p>
+            {% elif not user|can_evaluate_abstracts:event %}
+                <p class="alert alert-danger"><i class="fa fa-hourglass-half" aria-hidden="true"></i> This abstract has been rejected in {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %}</p>
+            {% endif %}
+        <!--
+            If the abstract is submitted to this year version of HPC, user will be shown a successful submission banner with contact us urls.
+        -->
+        {% else %}
+            {% if user.is_superuser or not user|can_evaluate_abstracts:event %}
+                <p class="alert alert-success"> Dear {{ abstract.presenting_author }}, Your abstract with the title of "{{ abstract.title }}" has been submitted successfully to {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %}
+                    Your <b> abstract ID is #{{ abstract.pk }}</b>. If you have any concerns contact us on <a target="_blank" href="https://t.me/HPC2020">Telegram</a>, or send us an e-mail to <a target="_blank" href="mailto: HPC-notifications@enjazportal.com">HPC-notifications@enjazportal.com</a></p>
+            {% endif %}
+        {% endif %}
     {% endif %}
     {% if abstract.status == 'A' %}
-    <p class="alert alert-success"> This abstract is : {{ abstract.get_status_display }}</p>
+    <p class="alert alert-success"> This abstract is : {{ abstract.get_status_display }} in {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %}</p>
     {% endif %}
     {% if abstract.status == 'R' %}
-    <p class="alert alert-danger"> This abstract is : {{ abstract.get_status_display }}</p>
+    <p class="alert alert-danger"> This abstract is : {{ abstract.get_status_display }} {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %}</p>
     {% endif %}
-    {% endif %}
-    <div class="english-field">
-    {% if not user|can_evaluate_abstracts:event %}
-        <p class="alert alert-success"> Dear {{ abstract.presenting_author }}, Your abstract with the title of "{{ abstract.title }}" has been submitted successfully to Health Professions Conference 2020.
-            Your <b> abstract ID is #{{ abstract.pk }}</b>. If you have any concerns contact us on <a target="_blank" href="https://t.me/HPC2020">Telegram</a>, or send us an e-mail to <a target="_blank" href="mailto: HPC-notifications@enjazportal.com">HPC-notifications@enjazportal.com</a></p>
-    {% endif %}
+
     {% include 'events/abstracts/partials/abstract_table.html' %}
 <div class="row" style="margin-left: 0; margin-bottom: 5px; ">
 {%  if abstract.status == 'A' %}
@@ -58,7 +73,7 @@ h4{
 
                 <li>Both the PPT and JPEG should be uploaded to the enjaz system. <b>Files MUST be named: <span style= "color: red">"{{ abstract.event.code_name }}_{{ abstract.pk }}"</span></b>.</li>
 
-                <li>Please upload your poster before the <b>{% if abstract.event.code_name == 'hpc2019-j' %}12th{% elif abstract.event.code_name == 'hpc2019-a' %}12th{% else %}12th{% endif %} of January 2019</b> as we will not accept any posters after that date.</li>
+                <li>Please upload your poster before the <b>{% if abstract.event.code_name == 'hpc2019-j' %}12th{% elif abstract.event.code_name == 'hpc2019-a' %}14th{% else %}12th{% endif %} of January 2019</b> as we will not accept any posters after that date.</li>
                
                 <li>Please do not hesitate to contact us for any further assistance hpc-notifications@enjazportal.com</li></h4>
             <div class="submit" style="margin-left: 9%; margin-bottom: 10px; margin-right: 9%;">
@@ -92,7 +107,7 @@ h4{
             <h2>Accepted as {{ abstract.get_accepted_presentaion_preference_display }}</h2>
                 <h3 class="english-field"><b>Congratulations!</b><br> Your abstract has been accepted to be presented on {{ abstract.event.english_name }} | {{ abstract.presentaion_date|date:"Y-n-j" }}.  We require all accepted abstract submitters to upload their presntation file: </h3>
     
-                <h4><li>Please upload your presntation before the <b>{% if abstract.event.code_name == 'hpc2019-j' %}13th{% elif abstract.event.code_name == 'hpc2019-a' %}12th{% else %}12th{% endif %} of January 2019</b> as we will not accept any presntation after that date.</li>
+                <h4><li>Please upload your presntation before the <b>{% if abstract.event.code_name == 'hpc2019-j' %}13th{% elif abstract.event.code_name == 'hpc2019-a' %}14th{% else %}12th{% endif %} of January 2019</b> as we will not accept any presntation after that date.</li>
                 <li><b>File MUST be named: <span style= "color: red">"{{ abstract.event.code_name }}_{{ abstract.pk }}"</span></b></li>
                 <li>File MUST be on PowePoint format</li>
                 {% if abstract.event.code_name == 'hpc2019-a' %}<li><a href="https://enjazportal.com/media/files/events/oral-HPC-AHSA-2019.pptx">Use this trmplate</a></li>{% endif %}

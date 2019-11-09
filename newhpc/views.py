@@ -1,13 +1,16 @@
 # -*- coding: utf-8  -*-
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
+from django.views.decorators import csrf
 from django.shortcuts import render
-from .models import FaqCategory, FaqQuestion
+from core import decorators
+from .models import FaqCategory, FaqQuestion, BlogPostArabic, BlogPostEnglish, NewsletterMembership, BlogVideo
 from .forms import *
 
 # Create your views here.
 # enjazportal.com/riyadh/ar HPC Riyadh arabic and english homepage:
-"""
+
 def riy_ar_index(request):
     context = {}
     return render(request,'newhpc/arabic/riy_ar_index.html',context)
@@ -15,11 +18,19 @@ def riy_ar_index(request):
 def riy_en_index(request):
     context = {}
     return render(request,'newhpc/english/riy_en_index.html',context)
-"""
+
 
 def riy_en_research(request):
     context = {}
     return render(request,'newhpc/english/riy_en_research.html',context)
+
+def jed_en_research(request):
+    context = {}
+    return render(request,'newhpc/english/jed_en_research.html',context)
+
+def ahs_en_research(request):
+    context = {}
+    return render(request,'newhpc/english/ahs_en_research.html',context)
 
 def show_about(request, lang):
     if lang == 'ar':
@@ -147,5 +158,65 @@ def list_prev_versions(request):
 
 def show_version(request, version_year):
     version = PreviousVersion.objects.get(year=version_year)
-    context = {'version': version}
+    speakers = version.speaker_set.filter(is_top_speaker=True)
+    context = {'version': version,
+               'speakers': speakers}
     return render(request, 'newhpc/arabic/ar_show_version.html', context)
+
+def show_speakers(request, version_year):
+    version = PreviousVersion.objects.get(year=version_year)
+    context = {'version': version,
+               'range': range(2)}
+    return render(request, 'newhpc/arabic/all_speakers.html', context)
+
+def main_media(request, lang):
+    if lang == 'ar':
+        lang2 = 'arabic'
+        posts = BlogPostArabic.objects.all()
+    elif lang == 'en':
+        lang2 = 'english'
+        posts = BlogPostEnglish.objects.all()
+    videos = BlogVideo.objects.all()
+    context = {'posts': posts, 'videos': videos}
+    return render(request, 'newhpc/'+lang2+'/main_media.html', context)
+
+def show_post(request, lang, post_id):
+    if lang == 'ar':
+        lang2 = 'arabic'
+        post = get_object_or_404(BlogPostArabic, pk=post_id)
+    elif lang == 'en':
+        lang2 = 'english'
+        post = get_object_or_404(BlogPostEnglish, pk=post_id)
+    context = {'post': post}
+    return render(request, 'newhpc/'+lang2+'/show_post.html', context)
+
+@decorators.post_only
+@decorators.ajax_only
+@csrf.csrf_exempt
+def handle_newsletter_signup(request):
+    if request.user.is_authenticated():
+        previous_membership = NewsletterMembership.objects.filter(user=request.user).exists()
+        if previous_membership:
+            raise Exception("previous")
+        else:
+            NewsletterMembership.objects.create(user=request.user)
+    else:
+        form = NewspaperSignupForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            previous_membership = NewsletterMembership.objects.filter(email=email).exists()
+            if previous_membership:
+                raise Exception("previous")
+            else:
+                form.save()
+        else:
+            raise Exception("invalid")
+    return {}
+
+@login_required
+def list_newsletter_members(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    members = NewsletterMembership.objects.all()
+    context = {'members': members}
+    return render(request, 'newhpc/english/administrative/list_news_members.html', context)

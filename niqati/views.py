@@ -93,12 +93,12 @@ def student_report(request, username=None,year=None):
     # Only the superuser can see a specific user.  Coordinators will
     # get an introduction page to Niqati becaues they are not supposed
     # to register any codes.
-    if username and not request.user.has_perm('niqati.view_code'):
-        raise PermissionDenied
-    elif request.user.coordination.current_year().exists():
-        user_club = request.user.coordination.current_year().first()
-        context = {'user_club': user_club}
-        return render(request, "niqati/submit_coordinators.html", context)
+#    if username and not request.user.has_perm('niqati.view_code'):
+#        raise PermissionDenied
+#     if request.user.coordination.current_year().exists():
+#        user_club = request.user.coordination.current_year().first()
+#        context = {'user_club': user_club}
+#        return render(request, "niqati/submit_coordinators.html", context)
 
     if username:
         niqati_user = get_object_or_404(User, username=username)
@@ -115,13 +115,15 @@ def student_report(request, username=None,year=None):
             current_year = StudentClubYear.objects.get(pk=2)
         elif year == '2015':
             current_year = StudentClubYear.objects.get(pk=1)
-        total_points = niqati_user.code_set.filter(year=current_year).aggregate(total_points=Sum('points'))['total_points']
+        codes = niqati_user.code_set.filter(year=current_year)
+        total_points = codes.aggregate(total_points=Sum('points'))['total_points']
     else:
         # TODO: sort codes
-        total_points = niqati_user.code_set.current_year().aggregate(total_points=Sum('points'))['total_points']
+        codes = niqati_user.code_set.current_year()
+        total_points = codes.aggregate(total_points=Sum('points'))['total_points']
     if total_points is None:
         total_points = 0
-    context = {'total_points': total_points, 'niqati_user': niqati_user}
+    context = {'codes':codes,'total_points': total_points, 'niqati_user': niqati_user}
     return render(request, 'niqati/student_report.html', context)
 
 # Club Views

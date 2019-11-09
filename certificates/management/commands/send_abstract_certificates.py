@@ -7,6 +7,7 @@ from django.utils import translation
 
 from events.models import Event, Abstract
 from post_office import mail
+from certificates.models import Certificate
 
 
 class Command(BaseCommand):

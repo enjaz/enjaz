@@ -94,12 +94,12 @@
 		<div class="row">
 			<div class="col-sm-offset-2 col-sm-10">
                     <ul class="user-details">{# if the user is privileged, show them the internal description #}
-                        {% if user|has_coordination_to_activity:activity or user|can_assess_any_club or user|is_deanship_of_students_affairs_coordinator_or_member %}
+                        {# {% if user|has_coordination_to_activity:activity or user|can_assess_any_club or user|is_deanship_of_students_affairs_coordinator_or_member %} #}
                         <li dir="auto" class="activity-description">
                             <i class="entypo-info-circled"></i>
                             {{ activity.description|linebreaksbr }}
                         </li>
-                        {% endif %}
+                       {# {% endif %} #}
                         <li class="activity-description">
                             <i dir="auto" class="entypo-megaphone"></i>
                             {{ activity.public_description|linebreaksbr }}

@@ -68,7 +68,7 @@
 
 
 
-        $(".sign").click(function () {
+        $("tbody").on('click','.sign',function () {
              var btn = this;
             $.ajax({
                     data: {registration_pk: $(this).data('registrationid'),},

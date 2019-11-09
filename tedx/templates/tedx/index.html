@@ -48,7 +48,7 @@
 
                                 </div>
                                 <div class="form-group">
-                                    <label class="sr-only" for="id_gender">الجندر</label>
+                                    <label class="sr-only" for="id_gender">الجنس</label>
                                         <select {% if form.gender.value and not form.gender.errors %}value="{{ form.gender.value }}" {% endif %}class="form-control" id="id_gender" name="gender"  title="{{ form.gender.label }}"  required="required">
                                                 <option value="">{{ form.gender.label }}</option>
                                                 {% for value, label in form.fields.gender.widget.choices %}{% if value %}

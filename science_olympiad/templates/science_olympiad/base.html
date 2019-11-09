@@ -56,11 +56,19 @@
 
     element.style {
     }
+    @media only screen and (max-width: 676px) {
+		#logo {
+			margin-bottom: 100px;
+            margin-top: 0px;
+            margin-right: -70px;
+		}
+	}
     @media (max-width: 991px)
     .navbar .dropdown-menu .dropdown-item {
         margin-left: 1.5rem;
         margin-right: 1.5rem;
     }
+
     .dropdown-menu .dropdown-item:hover, .dropdown-menu .dropdown-item:focus, .dropdown-menu a:hover, .dropdown-menu a:focus, .dropdown-menu a:active {
         background-color:#aba7ac;
         box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(218, 218, 218, 0.4);
@@ -115,21 +123,6 @@
     </head>
 
     <body class="index-page sidebar-collapse">
-
-    <!------------------------Navbar Start------------------>
-    <!--<nav style="height:100px" class="navbar navbar-transparent fixed-top navbar-expand-lg" id="sectionsNav">-->
-
-    <!--<div class="container">-->
-      <!--<div  class="navbar-translate">-->
-        <!--<a class="navbar-brand" href="{% url 'science_olympiad:index'%}">-->
-            <!--<img id="logo" height="130px" style="margin-bottom:100px; margin-top:50px; margin-right:-170px"-->
-                 <!--src="{% static 'science_olympiad/images/logo_white.png' %}">-->
-        <!--</a>-->
-      <!--</div>-->
-    <!--</div>-->
-    <!--</nav>-->
-    <!------------------------Navbar End------------------>
-
 
      {% block content %}{% endblock %}
     <footer class="footer main-footer">

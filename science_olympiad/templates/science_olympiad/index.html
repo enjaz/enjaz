@@ -57,7 +57,7 @@
 
 <div class="page-header header-filter" data-parallax="true" style="background-image: url({% static 'science_olympiad/images/header.jpg' %}); ">
     <div class="container">
-    <div class="row">
+        <div class="row">
       <div class="col-md-8 ml-auto mr-auto">
         <div class="brand text-center">
             <div class="text-center"><img style="padding-top:80px" class="rounded-circle img-fluid" width="100%" src="{% static 'science_olympiad/images/logo_white.png' %}"></div>
@@ -71,7 +71,7 @@
   <div class="container">
     <div class="section text-center">
       <p style="margin: 20px; line-height: 40px; font-size: 20px; text-align:justify; text-align-last: center" class="title" id="about">
-          الأولمبياد العلمي ،  هو أحد البرامج الكبرى التابعة لجامعة الملك سعود بن عبد العزيز للعلوم الصحية. يهدف للتوعية بمعنى وقيمة الإبداع العلمي، وتحقيق منصة حاضنة تلائم آمال وطموحات شباب الجيل الصاعد من المهتمين بالعلم والابتكار وصناعة الفكرة وأدواتها من داخل الجامعة وخارجها من خلال مساراته المتعددة.
+          الأولمبياد العلمي ، هو أحد البرامج الكبرى التابعة لجامعة الملك سعود بن عبد العزيز للعلوم الصحية. يهدف للتوعية بمعنى وقيمة الإبداع العلمي، وخلق منصة حاضنة تلائم آمال وطموحات شباب الجيل الصاعد، من المهتمين بالعلم والابتكار وصناعة الفكرة وأدواتها من داخل الجامعة وخارجها من خلال مساراته المتعددة.
       </p>
       <h3>____________________________________________________________________</h3>
     </div>
@@ -82,17 +82,23 @@
     <div class="col col-sm-12 col-md-3"><a href="{% url 'science_olympiad:view_section' 'lectures' %}">
         <img height="130px" src="{% static 'science_olympiad/images/sections/white/lectures_white.png' %}">
         <br><h4>المحاضرات<br>
-        <!--<p id="demo"></p> COUNTDOWN-->
+        <!--COUNTDOWN--><p id="demo1"></p>
         </h4></a></div>
     <div class="col col-sm-12 col-md-3"><a href="{% url 'science_olympiad:view_section' 'contest' %}">
         <img height="130px" src="{% static 'science_olympiad/images/sections/white/contest_white.png' %}">
-        <br><h4>المسابقة العلمية</h4></a></div>
+        <br><h4>المسابقة العلمية<br>
+        <!--COUNTDOWN--><p id="demo2"></p>
+        </h4></a></div>
     <div class="col col-sm-12 col-md-3"><a href="{% url 'science_olympiad:view_section' 'gallery' %}">
         <img height="130px" src="{% static 'science_olympiad/images/sections/white/gallery_white.png' %}">
-        <br><h4>معرض الدَيْجُور</h4></a></div>
+        <br><h4>معرض الدَيْجُور<br>
+        <!--COUNTDOWN--><p id="demo3"></p>
+        </h4></a></div>
     <div class="col col-sm-12 col-md-3"><a href="{% url 'science_olympiad:view_section' 'hackathon' %}">
         <img height="130px" src="{% static 'science_olympiad/images/sections/white/hackathon_white.png' %}">
-        <br><h4>الهاكاثون التقني</h4></a></div>
+        <br><h4>الهاكاثون التقني<br>
+        <!--COUNTDOWN--><p id="demo4"></p>
+        </h4></a></div>
     </div>
 
     <h3>____________________________________________________________________</h3>
@@ -127,7 +133,9 @@
 {% block customscript %}
 <script>
 // Set the date we're counting down to
-var countDownDate = new Date("Jan 5, 2021 15:37:25").getTime();
+var countDownDate1 = new Date("Mar 4, 2020 18:00:00").getTime();
+var countDownDate2 = new Date("Feb 10, 2020 18:00:00").getTime();
+var countDownDate4 = new Date("Jan 26, 2020 18:00:00").getTime();
 
 // Update the count down every 1 second
 var x = setInterval(function() {
@@ -136,7 +144,7 @@ var x = setInterval(function() {
   var now = new Date().getTime();
 
   // Find the distance between now and the count down date
-  var distance = countDownDate - now;
+  var distance = countDownDate1 - now;
 
   // Time calculations for days, hours, minutes and seconds
   var days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -145,14 +153,44 @@ var x = setInterval(function() {
   var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
   // Output the result in an element with id="demo"
-  document.getElementById("demo").innerHTML = days + " يوم " + hours + "ساعة  "
-  + minutes + " دقيقة " + seconds + " ثانية ";
+  document.getElementById("demo1").innerHTML = days + " يوم - " + hours + " :  "
+  + minutes + " : " + seconds + "";
+
+  // Find the distance between now and the count down date
+  var distance = countDownDate2 - now;
+
+  // Time calculations for days, hours, minutes and seconds
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  // Output the result in an element with id="demo"
+  document.getElementById("demo2").innerHTML = days + " يوم - " + hours + " :  "
+  + minutes + " : " + seconds + "";
+
+  // Find the distance between now and the count down date
+  var distance = countDownDate4 - now;
+
+  // Time calculations for days, hours, minutes and seconds
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  // Output the result in an element with id="demo"
+  document.getElementById("demo4").innerHTML = days + " يوم - " + hours + " :  "
+  + minutes + " : " + seconds + "";
 
   // If the count down is over, write some text
   if (distance < 0) {
     clearInterval(x);
-    document.getElementById("demo").innerHTML = "EXPIRED";
+    document.getElementById("demo1").innerHTML = "";
   }
+
+  //demo1 is equal to demo3
+  document.getElementById("demo3").innerHTML = demo1.innerHTML
+
 }, 1000);
 </script>
 {% endblock %}

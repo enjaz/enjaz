@@ -1,0 +1,114 @@
+{% extends 'newhpc/english/english_base.html' %}
+{% load staticfiles %}
+{% block title %}Registration | HPC 2020{% endblock %}
+{% block style %}
+    .listitem44 {
+      display: inline-block;
+      font-size: 1.5em;
+      list-style-type: none;
+      padding: 1em;
+      text-transform: uppercase;
+    }
+
+    .listitem44 span {
+      display: block;
+      font-size: 4.5rem;
+    }
+    #title {
+        font-size: 32px;
+        color: #9d0051;
+    }
+    .sub-title {
+        font-size: 26px!important;
+    }
+    .hpc-text {
+        color: #242b2c;
+        margin-top: 30px
+    }
+{% endblock %}
+{% block lang %}
+{% url 'newhpc:riy_ar_registration' %}
+{% endblock %}
+{% block lang2 %}
+{% url 'newhpc:riy_ar_registration' %}
+{% endblock %}
+{% block content %}
+    <div class="c-layout-page">
+        <!-- BEGIN: PAGE CONTENT -->
+		<!-- BEGIN: CONTENT/STATS/COUNTER-1 -->
+        <div class="c-content-box c-size-md c-bg-white">
+            <div class="container">
+                <div class="c-content-counter-1 c-opt-1">
+                    <div class="c-content-title-1">
+                        <h3 class="c-center c-font-uppercase c-font-bold" id="title">HPC Programs</h3>
+                        <div class="c-line-center"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="{% static 'newhpc/images/icons/registration/general-icon.png' %}" style="width: 200px;margin-bottom: 20px">
+                            <h3 class="c-title c-first c-font-uppercase c-font-bold sub-title">General Program</h3>
+                            <p class="c-content hpc-text">The General Programs aims through its lectures, panel discussions and workshops to offer topics that concern all
+                                healthcare professionals and students. It also aims to discuss the National Transformation Program 2020 in the health field and its effort
+                                to accomplish vision 2030.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <img src="{% static 'newhpc/images/icons/registration/research-icon.png' %}" style="width: 200px;margin-bottom: 20px">
+                            <h3 class="c-title c-font-uppercase c-font-bold sub-title">Research Program</h3>
+                            <p class="c-content hpc-text">Research is the basis upon which healthcare grows. An imperative area to the success, quality, and advancement of
+                                healthcare. Research provides opportunities that help individuals to pursue and enhance their knowledge in different aspects of the healthcare field.
+                                Health Profession Conference 2020 provides variety of workshops and lectures on how to conduct and build a scientific paper through the Research Program</p>
+                        </div>
+                        <div class="col-md-4">
+                            <img src="{% static 'newhpc/images/icons/registration/colleges-icon.png' %}" style="width: 200px;margin-bottom: 20px">
+                            <h3 class="c-title c-font-uppercase c-font-bold sub-title">Collages’ Programs</h3>
+                            <p class="c-content hpc-text">Pursuing power in health leadership and in solidarity with National Transformation Program. We offer our collages’
+                                programs that will host series of lectures and workshops that will touch the essence of each specialty (Collage of Medicine, Collage of Dentistry,
+                                Collage of Pharmacy, Collage of Applied Medical Sciences, Collage of Nursing and Collage of Public Health).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END: CONTENT/STATS/COUNTER-1 -->
+        <!-- BEGIN: CONTENT/BARS/BAR-4 -->
+        <div class="c-content-box c-size-md c-bg-parallax" style="background-color: #242b2c ">
+            <div class="container">
+                <div class="c-content-bar-4">
+                    <h3 class="c-font-uppercase c-font-bold" id="head" style="margin: 0px!important;border: 0px!important;direction: ltr!important;">HPC 2020 Countdown</h3>
+                      <ul style="color: white!important;padding: 0px!important;font-weight: 700!important;margin-top: -15px!important;direction: ltr!important;">
+                        <li class="listitem44"><span id="days"></span>Days</li>
+                        <li class="listitem44"><span id="hours"></span>Hours</li>
+                        <li class="listitem44"><span id="minutes"></span>Minutes</li>
+                        <li class="listitem44"><span id="seconds"></span>Seconds</li>
+                      </ul>
+                </div>
+            </div>
+        </div>
+        <!-- END: CONTENT/BARS/BAR-4 -->
+    </div>
+{% endblock %}
+{% block script %}
+    const second = 1000,
+    minute = second * 60,
+    hour = minute * 60,
+    day = hour * 24;
+
+    let countDown = new Date('Jan 28, 2020 00:00:00').getTime(),
+    x = setInterval(function() {
+
+    let now = new Date().getTime(),
+      distance = countDown - now;
+
+    document.getElementById('days').innerText = Math.floor(distance / (day)),
+    document.getElementById('hours').innerText = Math.floor((distance % (day)) / (hour)),
+    document.getElementById('minutes').innerText = Math.floor((distance % (hour)) / (minute)),
+    document.getElementById('seconds').innerText = Math.floor((distance % (minute)) / second);
+
+    //do something later when date is reached
+    //if (distance < 0) {
+    //  clearInterval(x);
+    //  'IT'S MY BIRTHDAY!;
+    //}
+
+    }, second)
+{% endblock %}

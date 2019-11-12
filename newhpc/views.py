@@ -22,6 +22,12 @@ def riy_en_index(request):
 def riy_coming_soon(request):
     context = {}
     return render(request,'newhpc/arabic/riy_coming_soon.html',context)
+def riy_ar_registration(request):
+    context = {}
+    return render(request,'newhpc/arabic/riy_ar_registeration.html',context)
+def riy_en_registration(request):
+    context = {}
+    return render(request,'newhpc/english/riy_en_registeration.html',context)
 
 def riy_en_research(request):
     context = {}

@@ -1,69 +1,56 @@
 {% extends 'newhpc/english/english_base.html' %}{% load staticfiles %}
 {% block title %}Research Guidelines HPC 2020 | Riyadh{% endblock %}
 {% block style %}
-    @media (min-width: 992px) {
-    #slide1h3 {
-        margin-top:55px
+    .listitem44 {
+      display: inline-block;
+      font-size: 1.5em;
+      list-style-type: none;
+      padding: 1em;
+      text-transform: uppercase;
     }
-    #slide1p {
-        margin:60px 0 30px 0;
+    .listitem44 span {
+      display: block;
+      font-size: 4.5rem;
     }
-    #our-vision.c-feature-15-container {
-        margin: 0 -30px 0 350px;
-    }
-    }
-    @media
-    (max-width: 1200px) {
-    #slide2h3.c-font-48 {
-        font-size:43px !important;
-    }
-    #slide1h3.c-font-70 {
-        font-size: 50px !important;
-    }
-    #slide1p.c-font-40 {
-        font-size: 30px !important;
-    }
-    @media (max-width: 991px) {
-    #slide2h3.c-font-48 {
-        font-size:19px !important;
-    }
-    #slide1h3.c-font-70 {
-        font-size: 25px !important;
-    }
-    #slide1p.c-font-40 {
-        font-size: 14px !important;
-    }
-    #slide1p{
-        margin:0 !important;
-    }
-    #slide1h3 {
-        margin-top: 15px !important;
-    }
-    #our-vision.c-feature-15-container {
-        margin: 0 !important;
-    }
-    .c-content-list-1 > li {
-        font-size:20px;
-        margin-top:15px;
-    }
-    .c-btn-blue {
-        background: #33b2c1 !important;
-        border-color: #33b2c1 !important;
-    }
-    .c-btn-blue:hover {
-        background: #9d0051 !important;
-        border-color: #9d0051 !important;
+    @media (min-width: 693px) {
+    #soon {
+        background-image : url({% static 'newhpc/images/slides/research-slide.jpg' %});
     }
     }
+    @media (max-width: 692px) {
+    #soon {
+        background-image : url({% static 'newhpc/images/slides/research-slide-mobile.jpg' %});
+    }
+    }
+
+{% endblock %}
+{% block lang %}
+{% url 'newhpc:riy_coming_soon' %}
+{% endblock %}
+{% block lang2 %}
+{% url 'newhpc:riy_coming_soon' %}
 {% endblock %}
 {% block content %}
+        <div class="c-layout-page">
+<!-- BEGIN: CONTENT/BARS/BAR-5 -->
+<div class="c-content-box c-size-md c-bg-parallax" id="soon" style="background-attachment: scroll!important;">
+	<div class="container">
+		<div class="c-content-bar-4">
+			<h3 class="c-font-uppercase c-font-bold" style="direction: ltr;color: #ffffff00;border: 2px solid rgba(255, 255, 255, 0);">HPC 2020<br/>Coming Soon...</h3>
+			<div class="c-actions">
+				<a href="#" class="btn btn-md c-btn-border-2x c-btn-square c-btn-white c-btn-uppercase c-btn-bold c-margin-b-100" style="color: #ffffff00;background: none;border-color: #ffffff00;">الصفحة الرئيسيّة</a>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- END: CONTENT/BARS/BAR-5 -->
     <!-- BEGIN: CONTENT/FEATURES/FEATURES-15-3 -->
     <div id="feature-15-1" class="c-bg-parallax c-content-feature-15 c-bg-img-center" style="">
         <div class="container">
             <div class="row">
                 <div class="col-md-12 col-xs-12">
-                    <div class="c-feature-15-container c-bg-white">
-                        <h2 class="c-feature-15-title c-font-bold c-font-uppercase c-theme-border c-font-40" style="margin-top: 80px">HPC 2020 Abstract Instructions and Guidelines:</h2>
+                    <div class="c-feature-15-container c-bg-white" style="margin-top: 80px;padding: 0 60px 60px 60px;">
+                        <h2 class="c-feature-15-title c-font-bold c-font-uppercase c-theme-border c-font-40" style="margin-top: 0px">HPC 2020 Abstract Instructions and Guidelines:</h2>
                         <ul class="c-content-list-1 c-theme c-separator-dot">
                             <li>We encourage you to send an informative abstract that is a brief structured summary of the paper stating the <b>purpose</b> together with the <b>background, methods, results and conclusion.</b></li>
                             <li><b>WORDS:</b> Word limit for the abstract is 300 words, please adhere to the word limit to avoid rejection of your abstract.</li>
@@ -107,4 +94,45 @@
         </div>
     </div>
     <!-- END: CONTENT/FEATURES/FEATURES-15-3 -->
+        <!-- BEGIN: CONTENT/BARS/BAR-4 -->
+<div class="c-content-box c-size-md c-bg-parallax" style="background-color: #242b2c ">
+	<div class="container">
+		<div class="c-content-bar-4">
+			<h3 class="c-font-uppercase c-font-bold" id="head" style="margin: 0px!important;border: 0px!important;direction: ltr!important;">Abstract Submission Deadline Countdown</h3>
+              <ul style="color: white!important;padding: 0px!important;font-weight: 700!important;margin-top: -15px!important;direction: ltr!important;">
+                <li class="listitem44"><span id="days"></span>Days</li>
+                <li class="listitem44"><span id="hours"></span>Hours</li>
+                <li class="listitem44"><span id="minutes"></span>Minutes</li>
+                <li class="listitem44"><span id="seconds"></span>Seconds</li>
+              </ul>
+		</div>
+	</div>
+</div>
+<!-- END: CONTENT/BARS/BAR-4 -->
+        </div>
+{% endblock %}
+{% block script %}
+    const second = 1000,
+    minute = second * 60,
+    hour = minute * 60,
+    day = hour * 24;
+
+    let countDown = new Date('Nov 17, 2019 11:59:59').getTime(),
+    x = setInterval(function() {
+
+    let now = new Date().getTime(),
+      distance = countDown - now;
+
+    document.getElementById('days').innerText = Math.floor(distance / (day)),
+    document.getElementById('hours').innerText = Math.floor((distance % (day)) / (hour)),
+    document.getElementById('minutes').innerText = Math.floor((distance % (hour)) / (minute)),
+    document.getElementById('seconds').innerText = Math.floor((distance % (minute)) / second);
+
+    //do something later when date is reached
+    //if (distance < 0) {
+    //  clearInterval(x);
+    //  'IT'S MY BIRTHDAY!;
+    //}
+
+    }, second)
 {% endblock %}

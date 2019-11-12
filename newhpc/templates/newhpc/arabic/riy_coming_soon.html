@@ -1,0 +1,31 @@
+{% extends 'newhpc/english/english_base.html' %}
+{% load staticfiles %}
+{% block title %}مؤتمر التخصّصات الصحّية 2020 | Coming Soon{% endblock %}
+{% block style %}
+    #soon {
+        background-image : url({% static 'newhpc/images/slides/hpc-students.jpg' %});
+    }
+
+{% endblock %}
+{% block lang %}
+{% url 'newhpc:riy_coming_soon' %}
+{% endblock %}
+{% block lang2 %}
+{% url 'newhpc:riy_coming_soon' %}
+{% endblock %}
+{% block content %}
+    <div class="c-layout-page">
+<!-- BEGIN: CONTENT/BARS/BAR-5 -->
+<div class="c-content-box c-size-md c-bg-parallax" id="soon">
+	<div class="container">
+		<div class="c-content-bar-4">
+			<h3 class="c-font-uppercase c-font-bold" style="direction: ltr">HPC 2020<br/>Coming Soon...</h3>
+			<div class="c-actions">
+				<a href="{% url 'newhpc:riy_ar_index' %}" class="btn btn-md c-btn-border-2x c-btn-square c-btn-white c-btn-uppercase c-btn-bold c-margin-b-100">الصفحة الرئيسيّة</a>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- END: CONTENT/BARS/BAR-5 -->
+    </div>
+{% endblock %}

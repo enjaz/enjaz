@@ -37,7 +37,26 @@
         font-size:15px;
     }
     }
+    @media (max-width: 415px) {
+    #slide2h3.c-font-48 {
+        font-size:16px !important;
+    }
+    }
+    .listitem44 {
+      display: inline-block;
+      font-size: 1.5em;
+      list-style-type: none;
+      padding: 1em;
+      text-transform: uppercase;
+    }
+
+    .listitem44 span {
+      display: block;
+      font-size: 4.5rem;
+    }
 {% endblock %}
+{% block lang %}{% url 'newhpc:riy_en_index' %}{% endblock %}
+{% block lang2 %}{% url 'newhpc:riy_en_index' %}{% endblock %}
 {% block content %}
     <!-- BEGIN: PAGE CONTAINER -->
 	<div class="c-layout-page">
@@ -142,12 +161,11 @@
                         <p class="c-feature-15-desc c-font-20" style="margin-bottom:40px ">
                             الابتكار والتميز في طرق التبادل المعرفي التي يتبناها المؤتمر في مجال التعليم الصحي و البحث العلمي على الصعيد الوطني والدولي.
                         </p>
-                        <h2 class="c-feature-15-title c-font-bold c-font-uppercase c-theme-border c-font-40" style="margin-top: 130px;border-color: #9d0051 !important;">مفهوم مؤتمر التخصّصات الصحّية</h2>
+                        <h2 class="c-feature-15-title c-font-bold c-font-uppercase c-theme-border c-font-40" style="margin-top: 130px;border-color: #9d0051 !important;">ما هو مؤتمر التخصّصات الصحّية؟</h2>
                         <p class="c-feature-15-desc c-font-20">
 مؤتمر التخصصات الصحیّة، هو أول مؤتمر طلابي اُعتمد من الهيئة السعودية للتخصصات الصحية. ويعد ضمن البرامج الكبرى السنوية لدى جامعة الملك سعود بن عبدالعزيز للعلوم الصحية  التي يقيمها نادي الطلاب تحت إشراف عمادة شؤون الطلاب. يتم في المؤتمر عرض محاضرات وورش عمل متنوعة تهم الممارسين الصحيين، كما يُعرض فيه نخبة من الأبحاث التي تنافس على المراكز الأولى في المؤتمر.                        </p>
                     </div>
                 </div>
-
             </div>
 
         </div>
@@ -171,6 +189,259 @@
         </div>
     </div>
     <!-- END: CONTENT/FEATURES/FEATURES-15-1 -->
+    <!-- BEGIN: CONTENT/SLIDERS/TEAM-1 -->
+<div class="c-content-box c-size-md c-bg-white">
+	<div class="container">
+		<!-- Begin: Testimonals 1 component -->
+		<div class="c-content-person-1-slider" data-slider="owl">
+			<!-- Begin: Title 1 component -->
+			<div class="c-content-title-1">
+				<h3 class="c-center c-font-uppercase c-font-bold">أبرز المتحدّثين</h3>
+				<div class="c-line-center c-theme-bg"></div>
+			</div>
+			<!-- End-->
+
+			<!-- Begin: Owlcarousel -->
+			<div class="owl-carousel owl-theme c-theme c-owl-nav-center" data-rtl="true" data-items="3" data-slide-speed="8000">
+
+
+			  	<div class="item">
+			  		<div class="c-content-person-1">
+			  			<div class="c-caption c-content-overlay">
+			  				<div class="c-overlay-wrapper">
+				  				<div class="c-overlay-content">
+					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
+					  			</div>
+			  				</div>
+			  				<img src="{% static 'newhpc/images/speakerstop/new/Yaseen_Arabi.jpg' %}" class="img-responsive c-overlay-object" alt="">
+			  			</div>
+			  			<div class="c-body">
+					  		<p style="text-align: center; font-size: 20px; font-weight: 700;">
+                                د. ياسين عرابي
+                            </p>
+		                </div>
+	                </div>
+			  	</div>
+
+			  	<div class="item">
+			  		<div class="c-content-person-1">
+			  			<div class="c-caption c-content-overlay">
+			  				<div class="c-overlay-wrapper">
+				  				<div class="c-overlay-content">
+					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
+					  			</div>
+			  				</div>
+			  				<img src="{% static 'newhpc/images/speakerstop/new/BassemKurdi.png' %}" class="img-responsive c-overlay-object" alt="">
+			  			</div>
+			  			<div class="c-body">
+				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
+                                د. باسم كردي
+                            </p>
+		                </div>
+	                </div>
+			  	</div>
+                <div class="item">
+			  		<div class="c-content-person-1">
+			  			<div class="c-caption c-content-overlay">
+			  				<div class="c-overlay-wrapper">
+				  				<div class="c-overlay-content">
+					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
+					  			</div>
+			  				</div>
+			  				<img src="{% static 'newhpc/images/speakerstop/new/DrAhmedBalkhair.jpg' %}" class="img-responsive c-overlay-object" alt="">
+			  			</div>
+			  			<div class="c-body">
+				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
+                                د. أحمد بالخير
+                            </p>
+		                </div>
+	                </div>
+			  	</div>
+                <div class="item">
+			  		<div class="c-content-person-1">
+			  			<div class="c-caption c-content-overlay">
+			  				<div class="c-overlay-wrapper">
+				  				<div class="c-overlay-content">
+					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
+					  			</div>
+			  				</div>
+			  				<img src="{% static 'newhpc/images/speakerstop/new/DrMohamedalmoamary.jpg' %}" class="img-responsive c-overlay-object" alt="">
+			  			</div>
+			  			<div class="c-body">
+				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
+                                د. محمد المعمري
+                            </p>
+		                </div>
+	                </div>
+			  	</div>
+                <div class="item">
+			  		<div class="c-content-person-1">
+			  			<div class="c-caption c-content-overlay">
+			  				<div class="c-overlay-wrapper">
+				  				<div class="c-overlay-content">
+					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
+					  			</div>
+			  				</div>
+			  				<img src="{% static 'newhpc/images/speakerstop/new/DrZiadNakshabandi.jpg' %}" class="img-responsive c-overlay-object" alt="">
+			  			</div>
+			  			<div class="c-body">
+				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
+                                د. زياد نقشبندي
+                            </p>
+		                </div>
+	                </div>
+			  	</div>
+                <div class="item">
+			  		<div class="c-content-person-1">
+			  			<div class="c-caption c-content-overlay">
+			  				<div class="c-overlay-wrapper">
+				  				<div class="c-overlay-content">
+					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
+					  			</div>
+			  				</div>
+			  				<img src="{% static 'newhpc/images/speakerstop/new/DrRaedAlhazme.jpg' %}" class="img-responsive c-overlay-object" alt="">
+			  			</div>
+			  			<div class="c-body">
+				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
+                                د. رائد الحازمي
+                            </p>
+		                </div>
+	                </div>
+			  	</div>
+                <div class="item">
+			  		<div class="c-content-person-1">
+			  			<div class="c-caption c-content-overlay">
+			  				<div class="c-overlay-wrapper">
+				  				<div class="c-overlay-content">
+					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
+					  			</div>
+			  				</div>
+			  				<img src="{% static 'newhpc/images/speakerstop/new/DrKhalidAlodhaibi.jpg' %}" class="img-responsive c-overlay-object" alt="">
+			  			</div>
+			  			<div class="c-body">
+				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
+                                د. خالد العضيبي
+                            </p>
+		                </div>
+	                </div>
+			  	</div>
+                <div class="item">
+			  		<div class="c-content-person-1">
+			  			<div class="c-caption c-content-overlay">
+			  				<div class="c-overlay-wrapper">
+				  				<div class="c-overlay-content">
+					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
+					  			</div>
+			  				</div>
+			  				<img src="{% static 'newhpc/images/speakerstop/new/AbdulelahAlhawsawi.jpg' %}" class="img-responsive c-overlay-object" alt="">
+			  			</div>
+			  			<div class="c-body">
+				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
+                                د. عبدالإله الهوساوي
+                            </p>
+		                </div>
+	                </div>
+			  	</div>
+                <div class="item">
+			  		<div class="c-content-person-1">
+			  			<div class="c-caption c-content-overlay">
+			  				<div class="c-overlay-wrapper">
+				  				<div class="c-overlay-content">
+					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
+					  			</div>
+			  				</div>
+			  				<img src="{% static 'newhpc/images/speakerstop/new/AbdulhameedAlHabeeb.jpg' %}" class="img-responsive c-overlay-object" alt="">
+			  			</div>
+			  			<div class="c-body">
+				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
+                                د. عبدالحميد الحبيب
+                            </p>
+		                </div>
+	                </div>
+			  	</div>
+                <div class="item">
+			  		<div class="c-content-person-1">
+			  			<div class="c-caption c-content-overlay">
+			  				<div class="c-overlay-wrapper">
+				  				<div class="c-overlay-content">
+					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
+					  			</div>
+			  				</div>
+			  				<img src="{% static 'newhpc/images/speakerstop/new/DrMajdahShugdar.jpg' %}" class="img-responsive c-overlay-object" alt="">
+			  			</div>
+			  			<div class="c-body">
+				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
+                                د. ماجدة شقدار
+                            </p>
+		                </div>
+	                </div>
+			  	</div>
+                <div class="item">
+			  		<div class="c-content-person-1">
+			  			<div class="c-caption c-content-overlay">
+			  				<div class="c-overlay-wrapper">
+				  				<div class="c-overlay-content">
+					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
+					  			</div>
+			  				</div>
+			  				<img src="{% static 'newhpc/images/speakerstop/new/DrNezarBahabri.jpg' %}" class="img-responsive c-overlay-object" alt="">
+			  			</div>
+			  			<div class="c-body">
+				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
+                                د. نزار باهبري
+                            </p>
+		                </div>
+	                </div>
+			  	</div>
+                <div class="item">
+			  		<div class="c-content-person-1">
+			  			<div class="c-caption c-content-overlay">
+			  				<div class="c-overlay-wrapper">
+				  				<div class="c-overlay-content">
+					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
+					  			</div>
+			  				</div>
+			  				<img src="{% static 'newhpc/images/speakerstop/new/AbdullaAASayyari.jpg' %}" class="img-responsive c-overlay-object" alt="">
+			  			</div>
+			  			<div class="c-body">
+				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
+                                د. عبدالله السياري
+                            </p>
+		                </div>
+	                </div>
+			  	</div>
+			</div>
+	        <!-- End-->
+	    </div>
+	    <!-- End-->
+	</div>
+</div><!-- END: CONTENT/SLIDERS/TEAM-1 -->
+<!-- BEGIN: CONTENT/BARS/BAR-4 -->
+<div class="c-content-box c-size-md c-bg-parallax" style="background-image: url({% static 'newhpc/images/slides/main-color.jpg' %});margin-top: -50px">
+	<div class="container">
+		<div class="c-content-bar-4">
+			<div class="c-actions">
+				<a href="{% url 'newhpc:riy_coming_soon' %}" class="btn btn-md c-btn-border-2x c-btn-square c-btn-white c-btn-uppercase c-btn-bold">اضغط هنا لمعرفة المزيد</a></div>
+		</div>
+	</div>
+</div>
+<!-- END: CONTENT/BARS/BAR-4 -->
+<!-- BEGIN: CONTENT/BARS/BAR-4 -->
+<div class="c-content-box c-size-md c-bg-parallax" style="background-color: #242b2c ">
+	<div class="container">
+		<div class="c-content-bar-4">
+			<h3 class="c-font-uppercase c-font-bold" id="head" style="margin: 0px!important;border: 0px!important;">باقي على المؤتمر:</h3>
+              <ul style="color: white!important;padding: 0px!important;font-weight: 700!important;margin-top: -15px!important;">
+                <li class="listitem44"><span id="days"></span>يوم</li>
+                <li class="listitem44"><span id="hours"></span>ساعة</li>
+                <li class="listitem44"><span id="minutes"></span>دقيقة</li>
+                <li class="listitem44"><span id="seconds"></span>ثانية</li>
+              </ul>
+		</div>
+	</div>
+</div>
+<!-- END: CONTENT/BARS/BAR-4 -->
+
 
     <!--&lt;!&ndash; BEGIN: CONTENT/MISC/SUBSCRIBE-FORM-1 &ndash;&gt;-->
 <!--<div class="c-content-box c-size-sm c-bg-dark">-->
@@ -197,4 +468,29 @@
 		<!--</div>-->
 	<!--</div>-->
 <!--</div>&lt;!&ndash; END: CONTENT/MISC/SUBSCRIBE-FORM-1 &ndash;&gt;-->
+{% endblock %}
+{% block script %}
+    const second = 1000,
+    minute = second * 60,
+    hour = minute * 60,
+    day = hour * 24;
+
+    let countDown = new Date('Jan 28, 2020 00:00:00').getTime(),
+    x = setInterval(function() {
+
+    let now = new Date().getTime(),
+      distance = countDown - now;
+
+    document.getElementById('days').innerText = Math.floor(distance / (day)),
+    document.getElementById('hours').innerText = Math.floor((distance % (day)) / (hour)),
+    document.getElementById('minutes').innerText = Math.floor((distance % (hour)) / (minute)),
+    document.getElementById('seconds').innerText = Math.floor((distance % (minute)) / second);
+
+    //do something later when date is reached
+    //if (distance < 0) {
+    //  clearInterval(x);
+    //  'IT'S MY BIRTHDAY!;
+    //}
+
+    }, second)
 {% endblock %}

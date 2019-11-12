@@ -126,7 +126,7 @@
 
                     <ul class="c-ext c-theme-ul">
                         <li class="c-lang dropdown c-last">
-                            <a href="#">AR</a>
+                            <a href="{% block lang2 %}{% endblock %}">AR</a>
                             <ul class="dropdown-menu pull-right" role="menu">
                                 <li class="active"><a href="{% url 'newhpc:riy_en_index' %}">English</a></li>
                                 <li><a href="{% block lang %}{% endblock %}" style="letter-spacing: 0;">العربيّة</a></li>
@@ -143,7 +143,7 @@
             <!-- BEGIN: BRAND -->
             <div class="c-navbar-wrapper clearfix">
                 <div class="c-brand c-pull-left">
-                    <a href="" class="c-logo">
+                    <a href="{% url 'newhpc:riy_en_index' %}" class="c-logo">
                         <img style="height: 55px;" src="{% static 'newhpc/english/assets/base/img/layout/logos/hpc-logo-en.png' %}" alt="Health Professions Conference" class="c-desktop-logo">
                         <img style="height: 50px;margin-top: -12px;" src="{% static 'newhpc/english/assets/base/img/layout/logos/hpc-logo-en.png' %}" alt="Health Professions Conference" class="c-desktop-logo-inverse">
                         <img style="height: 50px;margin-top: -12px;" src="{% static 'newhpc/english/assets/base/img/layout/logos/hpc-logo-en.png' %}" alt="Health Professions Conference" class="c-mobile-logo">
@@ -162,7 +162,7 @@
                 <nav class="c-mega-menu c-pull-right c-mega-menu-dark c-mega-menu-dark-mobile c-fonts-uppercase c-fonts-bold">
                     <ul class="nav navbar-nav c-theme-nav">
                         <li class="c-onepage-link">
-                            <a href="#" class="c-link" >Research</a>
+                            <a href="{% url 'newhpc:riy_en_research' %}" class="c-link" >Research</a>
                         </li>
 
                         <li class="c-onepage-link">
@@ -317,9 +317,14 @@
             hideThumbsUnderResolution: 0,
         
         });
-    }); //ready	
+    }); //ready
                 </script>
+    <script>
         {% block script %}
+
+        {% endblock %}
+    </script>
+        {% block script2 %}
         {% endblock %}
         <!-- END: PAGE SCRIPTS -->
 		<!-- END: LAYOUT/BASE/BOTTOM -->

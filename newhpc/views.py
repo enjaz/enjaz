@@ -19,6 +19,9 @@ def riy_en_index(request):
     context = {}
     return render(request,'newhpc/english/riy_en_index.html',context)
 
+def riy_coming_soon(request):
+    context = {}
+    return render(request,'newhpc/arabic/riy_coming_soon.html',context)
 
 def riy_en_research(request):
     context = {}

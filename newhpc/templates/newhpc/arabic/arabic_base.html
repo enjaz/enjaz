@@ -122,10 +122,10 @@
                         </ul>
                         <ul class="c-ext c-theme-ul">
                             <li class="c-lang dropdown c-last">
-                                <a href="#">EN</a>
+                                <a href="{% block lang %}{% endblock %}">EN</a>
                                 <ul class="dropdown-menu pull-right" role="menu">
                                     <li class="active"><a href="{% url 'newhpc:riy_ar_index' %}">العربيّة</a></li>
-                                    <li><a href="{% block lang %}{% endblock %}">English</a></li>
+                                    <li><a href="{% block lang2 %}{% endblock %}">English</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -138,7 +138,7 @@
                     <!-- BEGIN: BRAND -->
                     <div class="c-navbar-wrapper clearfix">
                         <div class="c-brand c-pull-left" style="">
-                            <a href="index.html" class="c-logo">
+                            <a href="{% url 'newhpc:riy_ar_index' %}" class="c-logo">
                                 <img style="" src="{% static 'newhpc/arabic/assets/base/img/layout/logos/hpc-logo-3.png' %}" alt="مؤتمر التخصّصات الصحّية" class="c-desktop-logo">
                                 <img style="height: 50px;margin-top: -15px;" src="{% static 'newhpc/arabic/assets/base/img/layout/logos/hpc-logo-3.png' %}" alt="مؤتمر التخصّصات الصحّية" class="c-desktop-logo-inverse">
                                 <img style="height: 50px; margin-top: -12px" src="{% static 'newhpc/arabic/assets/base/img/layout/logos/hpc-logo-3.png' %}" alt="مؤتمر التخصّصات الصحّية" class="c-mobile-logo">
@@ -313,9 +313,10 @@
 
     });
 }); //ready
-        </script>
         {% block script %}
         {% endblock %}
+        </script>
+
         <!-- END: PAGE SCRIPTS -->
         <!-- END: LAYOUT/BASE/BOTTOM -->
     </body>

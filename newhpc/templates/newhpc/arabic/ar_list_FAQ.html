@@ -4,10 +4,15 @@
 
 {% block lang %}{% url 'newhpc:list_faqs' 'en' %}{% endblock %}
 
-{% block content %}
+{% block lang2 %}
+{% url 'newhpc:list_faqs' 'en' %}
+{% endblock %}
 
+
+{% block content %}
+<div class="c-layout-page">
 <div class="c-content-box c-size-md ">
-	<div class="container" style="margin-top:80px">
+	<div class="container" style="">
 
         <div class="c-content-title-1">
 			<div style="font-size:44px" class="c-center c-font-uppercase c-font-dark c-font-bold">الأسئلة الشائعة</div>
@@ -48,7 +53,7 @@
 
 	</div>
 </div>
-
+</div>
 
 <!-- Below, find all my failed attempts </3 -->
 

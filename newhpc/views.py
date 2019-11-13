@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.views.decorators import csrf
+from django.http import JsonResponse
 from django.shortcuts import render
 from core import decorators
 from .models import FaqCategory, FaqQuestion, BlogPostArabic, BlogPostEnglish, NewsletterMembership, BlogVideo
@@ -73,9 +74,12 @@ def list_FAQs(request, lang):
     elif lang == 'en':
         lang2 = 'english'
     categories = FaqCategory.objects.all()
+    tech_qs = FaqQuestion.objects.filter(is_tech=True)
+    non_tech_qs = FaqQuestion.objects.filter(is_tech=False)
     faqs = FaqQuestion.objects.all()
     context = {'categories': categories,
-               'faqs': faqs}
+               'tech_qs': tech_qs,
+               'non_tech_qs': non_tech_qs}
     return render(request, 'newhpc/'+lang2+'/'+lang+'_list_FAQ.html', context)
 
 @login_required
@@ -194,24 +198,21 @@ def show_post(request, lang, post_id):
 @decorators.ajax_only
 @csrf.csrf_exempt
 def handle_newsletter_signup(request):
-    if request.user.is_authenticated():
-        previous_membership = NewsletterMembership.objects.filter(user=request.user).exists()
+    form = NewsletterMembershipForm(request.POST)
+    response_data = {}
+    if form.is_valid():
+        email = form.cleaned_data['email']
+        previous_membership = NewsletterMembership.objects.filter(email=email).exists()
         if previous_membership:
+            response_data['message'] = 'previous'
             raise Exception("previous")
         else:
-            NewsletterMembership.objects.create(user=request.user)
+            response_data['message'] = 'success'
+            form.save()
     else:
-        form = NewspaperSignupForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            previous_membership = NewsletterMembership.objects.filter(email=email).exists()
-            if previous_membership:
-                raise Exception("previous")
-            else:
-                form.save()
-        else:
-            raise Exception("invalid")
-    return {}
+        response_data['message'] = 'invalid'
+        raise Exception("invalid")
+    return JsonResponse(response_data)
 
 @login_required
 def list_newsletter_members(request):

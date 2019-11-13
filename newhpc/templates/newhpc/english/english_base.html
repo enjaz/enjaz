@@ -98,6 +98,23 @@
                 margin-top: -7px;
             }
             }
+            footer {
+                color:#fafefe!important;
+            }
+            footer p {
+                color:#fafefe!important;
+            }
+            .c-layout-footer.c-layout-footer-3 .c-prefooter .c-container .c-links > li {
+                list-style: none;
+                padding: 5px 0;
+                border-bottom: 1px solid #515152;
+            }
+            .c-layout-footer.c-layout-footer-3 .c-prefooter .c-container .c-links > li > a {
+                color: #b0b1b3;
+            }
+            .c-layout-footer.c-layout-footer-3 .c-prefooter .c-container .c-blog > .c-post > .c-post-content > .c-post-title a {
+                color: #b0b1b3;
+            }
         {% block style %}
         {% endblock %}
     </style>
@@ -165,13 +182,19 @@
                             <a href="{% url 'newhpc:riy_en_registration' %}" class="c-link" >Registration</a>
                         </li>
 
-                        <li class="c-onepage-link {% block active_exhib %}{% endblock %}">
-                            <a href="{% url 'newhpc:riy_en_registration' %}" class="c-link" >Exhibition</a>
-                        </li>
-
                         <li class="c-onepage-link {% block active_research %}{% endblock %}">
                             <a href="{% url 'newhpc:riy_en_research' %}" class="c-link" >Research</a>
                         </li>
+
+                        <li class="c-onepage-link {% block active_exhib %}{% endblock %}">
+                            <a href="{% url 'newhpc:riy_en_exhibition' %}" class="c-link" >Exhibition</a>
+                        </li>
+
+                        <li class="c-onepage-link {% block active_media %}{% endblock %}">
+                            <a href="{% url 'newhpc:riy_media' 'en' %}" class="c-link" >Media Center</a>
+                        </li>
+
+
 
                         <li class="c-menu-type-classic {% block active_previous %}{% endblock %}">
                             <a href="{% url 'newhpc:list_prev_versions' %}" class="c-link dropdown-toggle">Previous Versions<span class="c-arrow c-toggler"></span></a>
@@ -207,6 +230,89 @@
         </header>
         {% block content %}
         {% endblock %}
+
+    	<!-- BEGIN: LAYOUT/FOOTERS/FOOTER-5 -->
+<a name="footer"></a>
+<footer class="c-layout-footer c-layout-footer-3 c-bg-dark">
+	<div class="c-prefooter">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-3">
+					<div class="c-container c-first">
+						<div class="c-content-title-1">
+                            <img src="{% static 'newhpc/images/logos/hpc-logo-white2.png' %}"href="{% url 'newhpc:riy_ar_index' %}" style="width: 150px;">
+							<div class="c-line-left hide"></div>
+							<p class="c-text">
+							King Saud Bin Abdulaziz University for Health Sciences, Riyadh. 28-30 January 2020</p>
+						</div>
+						<ul class="c-links">
+							<li><a href="{% url 'newhpc:riy_en_index' %}">Homepage</a></li>
+							<li><a href="{% url 'newhpc:riy_en_registration' %}">Registration</a></li>
+							<li><a href="{% url 'newhpc:riy_en_research' %}">Research</a></li>
+							<li><a href="{% url 'newhpc:riy_ar_index' %}">Exhibition</a></li>
+							<li><a href="{% url 'newhpc:list_prev_versions' %}">Previous Versions</a></li>
+                            <li><a href="{% url 'newhpc:riy_about' 'ar' %}">About us</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="c-container">
+						<div class="c-content-title-1">
+							<h3 class="c-font-uppercase c-font-bold c-font-white">Latest News</h3>
+							<div class="c-line-left hide"></div>
+						</div>
+						<div class="c-blog">
+							<div class="c-post">
+								<div class="c-post-img"><img src="https://enjazportal.com/media/files/newhpc/blog/arabic/_%D9%85%D8%B9%D8%AF%D9%84_-_%D8%A7%D9%86%D9%81%D9%88_%D8%A7%D9%84%D9%87%D9%88%D9%8A%D8%A9.png" alt="" class="img-responsive"/></div>
+								<div class="c-post-content">
+									<h4 class="c-post-title"><a href="https://enjazportal.com/hpc/riyadh/ar/media/show_post/2">مؤتمر التخصصات الصحية بحُلةٍ فريدة..</a></h4>
+									<p class="c-text">‏تحت رعاية معالي مدير جامعة الملك سعود بن عبد العزيز للعلوم الصحية الدكتور بندر بن عبد المحسن القناوي، تُنظم عمادة شؤون الطلاب مؤتمر التخصصات الصحية في نسخته الخامسة لهذا العام 2020 بقيادة نخبة من الطلاب والطالبات، حيثُ تم إِطلاق الهوية الجديدة بشعارٍ مختلف عنوانُه " الماضي أساسُنا، والحاضِرُ ينيرُ مستقبلنا ".</p>
+								</div>
+							</div>
+                            <!--
+							<div class="c-post c-last">
+								<div class="c-post-img"><img src="../../assets/base/img/content/stock/14.jpg" alt="" class="img-responsive"/></div>
+								<div class="c-post-content">
+									<h4 class="c-post-title"><a href="#" style="color: #b0b1b3">Dedicated Support</a></h4>
+									<p class="c-text">Lorem ipsum dolor ipsum sit ipsum amet, consectetuer sit adipiscing elit ipsum elit elit ipsum elit</p>
+								</div>
+							</div>
+							-->
+							<a href="#" class="btn btn-md c-btn-border-1x c-theme-btn c-btn-uppercase c-btn-square c-btn-bold c-read-more hide">Read More</a>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="c-container">
+						<div class="c-content-title-1">
+							<h3 class="c-font-uppercase c-font-bold c-font-white">Follow us on twitter</h3>
+							<div class="c-line-left hide"></div>
+						</div>
+						<ul class="c-works">
+                            <a class="twitter-timeline" data-width="450" data-height="500" data-theme="dark" data-link-color="#2B7BB9" href="https://twitter.com/ksau_events?ref_src=twsrc%5Etfw">Tweets by ksau_events</a>
+                            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+						</ul>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="c-container c-last">
+						<div class="c-content-title-1">
+							<h3 class="c-font-uppercase c-font-bold c-font-white">Contact us</h3>
+							<div class="c-line-left hide"></div>
+							<!--<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed elit diam nonummy ad minim.</p>-->
+						</div>
+						<ul class="c-socials">
+							<li><a href="https://twitter.com/ksau_events"><i class="icon-social-twitter"></i></a></li>
+							<li><a href="https://www.youtube.com/channel/UCQBBGI264nZhFqC4sh9L04w"><i class="icon-social-youtube"></i></a></li>
+                            <li><a href="mailto: HPC-notifications@enjazportal.com"><i class="icon-envelope"></i></a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</footer><!-- END: LAYOUT/FOOTERS/FOOTER-5 -->
+
         <!-- BEGIN: LAYOUT/FOOTERS/FOOTER-1 -->
         <footer class="c-layout-footer c-layout-footer-1" id="simple-footer">
             <div class="c-postfooter">

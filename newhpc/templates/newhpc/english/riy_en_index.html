@@ -493,77 +493,74 @@
 
 
 
-    <!--&lt;!&ndash; BEGIN: CONTENT/MISC/SUBSCRIBE-FORM-1 &ndash;&gt;-->
-<!--{% if not user.hpc_newsletter_membership %}-->
-<!--<div class="c-content-box c-size-sm c-bg-dark">-->
-	<!--<div class="container">-->
-		<!--<div class="c-content-subscribe-form-1">-->
-			<!--<div class="row">-->
-				<!--<div class="col-sm-12">-->
-					<!--<h3 class="c-title c-font-30 c-font-uppercase c-font-bold">Subscribe to our newsletter</h3>-->
-					<!--&lt;!&ndash;<div class="c-body c-font-16 c-font-uppercase c-font-sbold">For latest news and updates</div>&ndash;&gt;-->
-				<!--</div>-->
-            <!--</div>-->
-            <!--<div class="row">-->
-				<!--<div class="col-sm-12">-->
-					<!--<form action="post" id="newsletter_signup">-->
-						<!--<div class="input-group input-group-lg">-->
-                            <!--{% if not user.is_authenticated  %}-->
-                            <!--<input id="email" type="text" class="form-control input-lg" placeholder="Your Email Here">-->
-                            <!--{% endif %}-->
-							<!--<span class="input-group-btn">-->
-								<!--<button id="signup_btn" type="submit" class="btn c-theme-btn c-btn-uppercase btn-lg c-btn-bold c-btn-square">SUBSCRIBE</button>-->
-							<!--</span>-->
-						<!--</div>-->
-					<!--</form>-->
-                    <!--<h2 id="success_msg" style="color:#fff">You've successfully subscribed to our newsletter. Thank you.</h2>-->
-				<!--</div>-->
-			<!--</div>-->
-		<!--</div>-->
-	<!--</div>-->
-<!--</div>&lt;!&ndash; END: CONTENT/MISC/SUBSCRIBE-FORM-1 &ndash;&gt;-->
-<!--{% endif %}-->
-    </div>
+    <!-- BEGIN: CONTENT/MISC/SUBSCRIBE-FORM-1 -->
+<div class="c-content-box c-size-sm c-bg-dark">
+	<div class="container">
+		<div class="c-content-subscribe-form-1">
+			<div class="row">
+				<div class="col-sm-12">
+					<h3 class="c-title c-font-30 c-font-uppercase c-font-bold">Subscribe to our newsletter</h3>
+					<!--<div class="c-body c-font-16 c-font-uppercase c-font-sbold">For latest news and updates</div>-->
+				</div>
+            </div>
+            <div class="row">
+				<div class="col-sm-12">
+					<form action="/create_post/" id="newsletter_signup">
+						<div class="input-group input-group-lg">
+                            <input id="email" type="text" class="form-control input-lg" placeholder="Your Email Here">
+							<span class="input-group-btn">
+								<button id="signup_btn" type="submit" class="btn c-theme-btn c-btn-uppercase btn-lg c-btn-bold c-btn-square">SUBSCRIBE</button>
+							</span>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div><!-- END: CONTENT/MISC/SUBSCRIBE-FORM-1 -->
 
 {% endblock %}
 
 {% block script2 %}
 <script src="{% static 'newhpc/english/assets/demos/default/js/scripts/pages/modals.js' %}" type="text/javascript"></script>
+
 <script type="application/javascript">
-    $("#success_msg").hide()
-    $("#newsletter_signup").submit(function (event) {
-        event.preventDefault();
-        var formData = {
-            {% if not user.is_authenticated %}
-            email: $("#email").val(),
-            {% endif %}
-                       };
-        $.ajax({
-            url: "{% url 'newhpc:handle_newsletter_signup' %}",
-            type: 'POST',
-            data: formData,
-            cache: false,
-            success: function (data) {
-                if (data.success == 1) {
-                    <!--toastr.success("أضفت للنشرة البريدية. شكرا لك!");-->
-                    {# We will only hide the button after signup for authenticated users #}
-                    {% if not user.is_authenticated %}
-                    $("#newsletter_signup").hide();
-                    {% endif %}
-                } else {
-                    if (data.message == 'previous'){
-                        toastr.error("سبق أن سجلت في نشرتنا البريدية,");
-                    } else if(data.message == 'invalid'){
-                        toastr.error("البريد الذي أدخل غير صحيح.");
-                    }
-                }}
-                    <!--$("#signup_btn").hide();-->
-                    <!--$("#success_msg").show();-->
+// AJAX for posting
+function create_post() {
+    $.ajax({
+        url : "{% url 'newhpc:handle_newsletter_signup' %}", // the endpoint
+        type : "POST", // http method
+        data : { email : $('#email').val() }, // data sent with the post request
 
-        });
+        // handle a successful response
+        success : function(json) {
+            $('#email').val(''); // remove the value from the input
+            console.log(json.message)
+            if (json.message == 'success') {
+                alert("Thank you. You have successfully joined our newsletter.");
+            } else if (json.message == 'previous'){
+                alert("You are already subscribed.");
+            } else if(json.message == 'invalid'){
+                alert("The email address is invalid.");
+            };
 
+        },
 
-    })
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+};
+
+// Submit post on submit
+$('#newsletter_signup').on('submit', function(event){
+    event.preventDefault();
+    console.log("form submitted!")  // sanity check
+    create_post();
+});
 
 </script>
 {% endblock %}

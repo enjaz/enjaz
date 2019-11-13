@@ -19,7 +19,7 @@ urlpatterns = [
     # FAQ-Related Pages
     url(r'^general/FAQ/category/add$', views.add_FaqCategory, name="add_faq_category"),
     url(r'^general/FAQ/question/add$', views.add_FaqQuestion, name="add_faq_question"),
-    url(r'^(?P<lang>(ar|en))/general/FAQ/list/$', views.list_FAQs, name="list_faqs"),
+    url(r'^(?P<lang>(ar|en))/FAQs/$', views.list_FAQs, name="list_faqs"),
     # Previous Versions-Related Pages
     url(r'^riyadh/ar/previous_versions/$', views.list_prev_versions, name="list_prev_versions"),
     url(r'^riyadh/ar/previous_versions/(?P<version_year>\d+)/$', views.show_version, name="show_version"),

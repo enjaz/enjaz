@@ -442,32 +442,32 @@
 </div>
 <!-- END: CONTENT/BARS/BAR-4 -->
 
+<!-- BEGIN: CONTENT/MISC/SUBSCRIBE-FORM-1 -->
+<div class="c-content-box c-size-sm c-bg-dark">
+	<div class="container">
+		<div class="c-content-subscribe-form-1">
+			<div class="row">
+				<div class="col-sm-12">
+					<h3 class="c-title c-font-30 c-font-uppercase c-font-bold">سجّل في نشرتنا البريدية</h3>
+					<!--<div class="c-body c-font-16 c-font-uppercase c-font-sbold">For latest news and updates</div>-->
+				</div>
+            </div>
+            <div class="row">
+				<div class="col-sm-12">
+					<form action="/create_post/" id="newsletter_signup">
+						<div class="input-group input-group-lg">
+                            <input id="email" type="text" class="form-control input-lg" placeholder="بريدك الإلكتروني">
+							<span class="input-group-btn">
+								<button id="signup_btn" type="submit" class="btn c-theme-btn c-btn-uppercase btn-lg c-btn-bold c-btn-square">التسجيل</button>
+							</span>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div><!-- END: CONTENT/MISC/SUBSCRIBE-FORM-1 -->
 
-    <!--&lt;!&ndash; BEGIN: CONTENT/MISC/SUBSCRIBE-FORM-1 &ndash;&gt;-->
-<!--<div class="c-content-box c-size-sm c-bg-dark">-->
-	<!--<div class="container">-->
-		<!--<div class="c-content-subscribe-form-1">-->
-			<!--<div class="row">-->
-				<!--<div class="col-sm-12">-->
-					<!--<h3 class="c-title c-font-30 c-font-uppercase c-font-bold">سجّل في نشرتنا البريدية</h3>-->
-					<!--&lt;!&ndash;<div class="c-body c-font-16 c-font-uppercase c-font-sbold">For latest news and updates</div>&ndash;&gt;-->
-				<!--</div>-->
-            <!--</div>-->
-            <!--<div class="row">-->
-				<!--<div class="col-sm-12">-->
-					<!--<form action="#">-->
-						<!--<div class="input-group input-group-lg">-->
-							<!--<input type="text" class="form-control input-lg" placeholder="بريدك الإلكتروني">-->
-							<!--<span class="input-group-btn">-->
-								<!--<button type="submit" class="btn c-theme-btn c-btn-uppercase btn-lg c-btn-bold c-btn-square">سجّلني</button>-->
-							<!--</span>-->
-						<!--</div>-->
-					<!--</form>-->
-				<!--</div>-->
-			<!--</div>-->
-		<!--</div>-->
-	<!--</div>-->
-<!--</div>&lt;!&ndash; END: CONTENT/MISC/SUBSCRIBE-FORM-1 &ndash;&gt;-->
 {% endblock %}
 {% block script %}
     const second = 1000,
@@ -493,4 +493,44 @@
     //}
 
     }, second)
+
+
+// AJAX for posting
+function create_post() {
+    $.ajax({
+        url : "{% url 'newhpc:handle_newsletter_signup' %}", // the endpoint
+        type : "POST", // http method
+        data : { email : $('#email').val() }, // data sent with the post request
+
+        // handle a successful response
+        success : function(json) {
+            $('#email').val(''); // remove the value from the input
+            console.log(json.message)
+            if (json.message == 'success') {
+                alert("شكرا، لقد اشتركت في نشرتنا البريدية بنجاح.");
+            } else if (json.message == 'previous'){
+                alert("سبق أن سجلت في نشرتنا البريدية.");
+            } else if(json.message == 'invalid'){
+                alert("البريد الذي أُدخِل غير صحيح.");
+            };
+
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+};
+
+// Submit post on submit
+$('#newsletter_signup').on('submit', function(event){
+    event.preventDefault();
+    console.log("form submitted!")  // sanity check
+    create_post();
+});
+
+
 {% endblock %}

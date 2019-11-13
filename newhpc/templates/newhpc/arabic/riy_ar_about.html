@@ -4,10 +4,19 @@
 
 {% block lang %}{% url 'newhpc:riy_about' 'en' %}{% endblock %}
 
+{% block lang2 %}
+{% url 'newhpc:riy_about' 'en' %}
+{% endblock %}
+
+{% block active_about %}
+c-active
+{% endblock %}
+
 {% block content %}
+    <div class="c-layout-page">
 <div align="center" style="padding-bottom:200px">
 
-    <div style="padding-top:150px; padding-bottom:30px; font-size:44px; color:#000000 !important" class="c-center c-font-uppercase c-font-white c-font-bold">عن المؤتمر</div>
+    <div style="padding-top:60px; padding-bottom:30px; font-size:44px; color:#000000 !important" class="c-center c-font-uppercase c-font-white c-font-bold">عن المؤتمر</div>
 
     <div class="row" style="width:80%"><h1>يقام مؤتمر التخصصات الصحية 2020 <br>بجامعة الملك سعود بن عبدالعزيز للعلوم الصحية</h1></div>
 
@@ -63,4 +72,5 @@
     <br><div style="font-weight:700; margin-bottom:-20px">زها الجمعان</div><br>قائدة بوابة إنجاز</div>
 <br><br>
 </div>
+    </div>
 {% endblock %}

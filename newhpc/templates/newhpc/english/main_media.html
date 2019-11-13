@@ -1,6 +1,17 @@
 {% extends 'newhpc/english/english_base.html'%} {% load staticfiles %}
 {% block title %}Media Center | HPC2020{% endblock %}
 
+{% block lang %}
+{% url 'newhpc:riy_media' 'ar' %}
+{% endblock %}
+{% block lang2 %}
+{% url 'newhpc:riy_media' 'ar' %}
+{% endblock %}
+
+{% block active_media %}
+c-active
+{% endblock %}
+
 {% block content %}
 <div class="c-content-box c-size-md" style="padding-top:200px">
 	<div class="container">

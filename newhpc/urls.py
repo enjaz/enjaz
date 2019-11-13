@@ -10,6 +10,9 @@ urlpatterns = [
     # Registration Pages
     url(r'^riyadh/ar/register$', views.riy_ar_registration, name="riy_ar_registration"),
     url(r'^riyadh/en/register$', views.riy_en_registration, name="riy_en_registration"),
+    # Exhibition pages
+    url(r'^riyadh/ar/exhibition$', views.riy_ar_exhibition, name="riy_ar_exhibition"),
+    url(r'^riyadh/en/exhibition$', views.riy_en_exhibition, name="riy_en_exhibition"),
     # Research Guidelines
     url(r'^riyadh/en/research$', views.riy_en_research, name="riy_en_research"),
     url(r'^jeddah/en/research$', views.jed_en_research, name="jed_en_research"),

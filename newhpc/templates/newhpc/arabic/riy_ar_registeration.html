@@ -10,8 +10,10 @@
         font-size: 26px!important;
     }
     .hpc-text {
-        color: #242b2c;
-        margin-top: 30px
+        color: #242b2c!important;
+        margin-top: 30px;
+        text-align: justify;
+        text-align-last: center;
     }
     .listitem44 {
       display: inline-block;
@@ -32,6 +34,7 @@
 {% block lang2 %}
 {% url 'newhpc:riy_en_registration' %}
 {% endblock %}
+{% block active_register %}c-active{% endblock %}
 {% block content %}
     <div class="c-layout-page">
         <!-- BEGIN: PAGE CONTENT -->
@@ -57,7 +60,7 @@
                         </div>
                         <div class="col-md-4">
                             <img src="{% static 'newhpc/images/icons/registration/colleges-icon.png' %}" style="width: 200px;margin-bottom: 20px">
-                            <h3 class="c-title c-font-uppercase c-font-bold sub-title">برنامج الكلّيات</h3>
+                            <h3 class="c-title c-font-uppercase c-font-bold sub-title">برامج الكلّيات</h3>
                             <p class="c-content hpc-text">سعيًا لتمكين القوة في الريادة الصحية و تضامنًا مع برنامج التطور الوطني تمكّنا من إنتاج البرامج السبعة للتخصصات الصحية التالية: كلية الطب ، كلية طب الأسنان، كلية الصيدلة، كلية العلوم الطبية التطبيقية، كلية التمريض، كلية الصحة العامة . وذلك عن طريق طرح مجموعة من المحاضرات وورش العمل التي تلامس تخصصاتكم الإنسانية.</p>
                         </div>
                     </div>

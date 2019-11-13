@@ -22,8 +22,10 @@
         font-size: 26px!important;
     }
     .hpc-text {
-        color: #242b2c;
-        margin-top: 30px
+        color: #242b2c!important;
+        margin-top: 30px;
+        text-align: justify;
+        text-align-last: center;
     }
 {% endblock %}
 {% block lang %}
@@ -32,6 +34,7 @@
 {% block lang2 %}
 {% url 'newhpc:riy_ar_registration' %}
 {% endblock %}
+{% block active_register %}c-active{% endblock %}
 {% block content %}
     <div class="c-layout-page">
         <!-- BEGIN: PAGE CONTENT -->

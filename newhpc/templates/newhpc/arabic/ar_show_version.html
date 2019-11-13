@@ -56,6 +56,18 @@
 
 {% endblock %}
 
+{% block lang %}
+{% url 'newhpc:list_prev_versions' %}
+{% endblock %}
+{% block lang2 %}
+{% url 'newhpc:list_prev_versions' %}
+{% endblock %}
+
+
+{% block active_previous %}
+c-active
+{% endblock %}
+
 {% block content %}
 <div class="c-content-box c-size-md c-bg-parallax" style="background-image:; padding-top:200px">
 	<div class="container" align="center">

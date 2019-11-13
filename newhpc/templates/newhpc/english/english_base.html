@@ -161,19 +161,38 @@
                 <!-- Dropdown menu toggle on mobile: c-toggler class can be applied to the link arrow or link itself depending on toggle mode -->
                 <nav class="c-mega-menu c-pull-right c-mega-menu-dark c-mega-menu-dark-mobile c-fonts-uppercase c-fonts-bold">
                     <ul class="nav navbar-nav c-theme-nav">
-                        <li class="c-onepage-link">
+                        <li class="c-onepage-link {% block active_register %}{% endblock %}">
                             <a href="{% url 'newhpc:riy_en_registration' %}" class="c-link" >Registration</a>
                         </li>
 
-                        <li class="c-onepage-link">
+                        <li class="c-onepage-link {% block active_exhib %}{% endblock %}">
+                            <a href="{% url 'newhpc:riy_en_registration' %}" class="c-link" >Exhibition</a>
+                        </li>
+
+                        <li class="c-onepage-link {% block active_research %}{% endblock %}">
                             <a href="{% url 'newhpc:riy_en_research' %}" class="c-link" >Research</a>
                         </li>
 
-                        <li class="c-onepage-link">
-                            <a href="{% url 'newhpc:list_prev_versions' %}" class="c-link" >Previous Versions</a>
+                        <li class="c-menu-type-classic {% block active_previous %}{% endblock %}">
+                            <a href="{% url 'newhpc:list_prev_versions' %}" class="c-link dropdown-toggle">Previous Versions<span class="c-arrow c-toggler"></span></a>
+                            <ul class="dropdown-menu c-menu-type-classic c-pull-left">
+                                <li>
+                                    <a href="https://enjazportal.com/hpc/riyadh/ar/previous_versions/2016/">HPC 2016</a>
+                                </li>
+                                <li>
+                                    <a href="https://enjazportal.com/hpc/riyadh/ar/previous_versions/2017/">HPC 2017</a>
+                                </li>
+                                <li>
+                                    <a href="https://enjazportal.com/hpc/riyadh/ar/previous_versions/2018/">HPC 2018</a>
+                                </li>
+                                <li>
+                                    <a href="https://enjazportal.com/hpc/riyadh/ar/previous_versions/2019/">HPC 2019</a>
+                                </li>
+                            </ul>
                         </li>
 
-                        <li class="c-onepage-link">
+
+                        <li class="c-onepage-link {% block active_about %}{% endblock %}">
                             <a href="{% url 'newhpc:riy_about' 'en' %}" class="c-link" >About Us</a>
                         </li>
 

@@ -54,6 +54,14 @@
       display: block;
       font-size: 4.5rem;
     }
+    .king-vision {
+        background-image: url({% static 'newhpc/images/backgrounds/king-vision.jpg' %});
+    }
+    @media (max-width: 692px) {
+    .king-vision {
+        background-image : url({% static 'newhpc/images/backgrounds/king-vision-mobile.jpg' %});
+    }
+    }
 {% endblock %}
 {% block lang %}{% url 'newhpc:riy_en_index' %}{% endblock %}
 {% block lang2 %}{% url 'newhpc:riy_en_index' %}{% endblock %}
@@ -174,7 +182,7 @@
 
 
     <!-- BEGIN: CONTENT/FEATURES/FEATURES-15-1 -->
-    <div id="feature-15-1" class="c-content-feature-15 c-bg-img-center" style="background-image: url({% static 'newhpc/images/backgrounds/king-vision.jpg' %});direction: rtl">
+    <div id="feature-15-1" class="c-content-feature-15 c-bg-img-center king-vision" style="direction: rtl">
         <div class="container">
             <div class="row">
                 <div class="col-md-8 col-xs-12" style="opacity: 0.97;">
@@ -342,74 +350,7 @@
 		                </div>
 	                </div>
 			  	</div>
-                <div class="item">
-			  		<div class="c-content-person-1">
-			  			<div class="c-caption c-content-overlay">
-			  				<div class="c-overlay-wrapper">
-				  				<div class="c-overlay-content">
-					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
-					  			</div>
-			  				</div>
-			  				<img src="{% static 'newhpc/images/speakerstop/new/AbdulhameedAlHabeeb.jpg' %}" class="img-responsive c-overlay-object" alt="">
-			  			</div>
-			  			<div class="c-body">
-				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
-                                د. عبدالحميد الحبيب
-                            </p>
-		                </div>
-	                </div>
-			  	</div>
-                <div class="item">
-			  		<div class="c-content-person-1">
-			  			<div class="c-caption c-content-overlay">
-			  				<div class="c-overlay-wrapper">
-				  				<div class="c-overlay-content">
-					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
-					  			</div>
-			  				</div>
-			  				<img src="{% static 'newhpc/images/speakerstop/new/DrMajdahShugdar.jpg' %}" class="img-responsive c-overlay-object" alt="">
-			  			</div>
-			  			<div class="c-body">
-				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
-                                د. ماجدة شقدار
-                            </p>
-		                </div>
-	                </div>
-			  	</div>
-                <div class="item">
-			  		<div class="c-content-person-1">
-			  			<div class="c-caption c-content-overlay">
-			  				<div class="c-overlay-wrapper">
-				  				<div class="c-overlay-content">
-					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
-					  			</div>
-			  				</div>
-			  				<img src="{% static 'newhpc/images/speakerstop/new/DrNezarBahabri.jpg' %}" class="img-responsive c-overlay-object" alt="">
-			  			</div>
-			  			<div class="c-body">
-				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
-                                د. نزار باهبري
-                            </p>
-		                </div>
-	                </div>
-			  	</div>
-                <div class="item">
-			  		<div class="c-content-person-1">
-			  			<div class="c-caption c-content-overlay">
-			  				<div class="c-overlay-wrapper">
-				  				<div class="c-overlay-content">
-					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
-					  			</div>
-			  				</div>
-			  				<img src="{% static 'newhpc/images/speakerstop/new/AbdullaAASayyari.jpg' %}" class="img-responsive c-overlay-object" alt="">
-			  			</div>
-			  			<div class="c-body">
-				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
-                                د. عبدالله السياري
-                            </p>
-		                </div>
-	                </div>
-			  	</div>
+
 			</div>
 	        <!-- End-->
 	    </div>
@@ -448,7 +389,7 @@
 		<div class="c-content-subscribe-form-1">
 			<div class="row">
 				<div class="col-sm-12">
-					<h3 class="c-title c-font-30 c-font-uppercase c-font-bold">سجّل في نشرتنا البريدية</h3>
+					<h3 class="c-title c-font-30 c-font-uppercase c-font-bold">سجل في نشرتنا البريدية ليصلك كل جديد عن المؤتمر</h3>
 					<!--<div class="c-body c-font-16 c-font-uppercase c-font-sbold">For latest news and updates</div>-->
 				</div>
             </div>

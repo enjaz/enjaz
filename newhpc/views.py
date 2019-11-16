@@ -238,3 +238,6 @@ def list_newsletter_members(request):
     members = NewsletterMembership.objects.all()
     context = {'members': members}
     return render(request, 'newhpc/english/administrative/list_news_members.html', context)
+
+def show_media_file(request, lang):
+    return render(request,'newhpc/arabic/riy_coming_soon.html')

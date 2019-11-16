@@ -39,5 +39,8 @@ urlpatterns = [
     # Newsletter
     url(r'^riyadh/administrative/media/newsletter/members/list/$', views.list_newsletter_members, name="riy_list_members"),
     url(r'^riyadh/media/newsletter/signup/$', views.handle_newsletter_signup, name="handle_newsletter_signup"),
+    # Media file
+    url(r'^riyadh/(?P<lang>(ar|en))/media/file/$', views.show_media_file, name="media_file"),
+
 ]
 

@@ -1,6 +1,9 @@
 {% extends 'newhpc/english/english_base.html' %}{% load staticfiles %}
 {% block title %}Health Professions Conference 2020 | Riyadh{% endblock %}
 {% block style %}
+    .king-vision {
+    background-image: url({% static 'newhpc/images/backgrounds/king-vision.jpg' %});
+    }
     .listitem44 {
       display: inline-block;
       font-size: 1.5em;
@@ -77,8 +80,10 @@
         font-size: 32px;
     }
     }
+    @media (min-width: 693px){
     .king-vision {
-        background-image: url({% static 'newhpc/images/backgrounds/king-vision.jpg' %});
+    background-image: url({% static 'newhpc/images/backgrounds/king-vision.jpg' %});
+    }
     }
     @media (max-width: 692px) {
     .king-vision {

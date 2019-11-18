@@ -9,8 +9,7 @@ from core import decorators
 from .models import FaqCategory, FaqQuestion, BlogPostArabic, BlogPostEnglish, NewsletterMembership, BlogVideo
 from .forms import *
 
-# Create your views here.
-# enjazportal.com/riyadh/ar HPC Riyadh arabic and english homepage:
+# enjazportal.com/riyadh HPC Riyadh :
 
 def riy_ar_index(request):
     context = {}
@@ -41,14 +40,6 @@ def riy_en_exhibition(request):
 def riy_en_research(request):
     context = {}
     return render(request,'newhpc/english/riy_en_research.html',context)
-
-def jed_en_research(request):
-    context = {}
-    return render(request,'newhpc/english/jed_en_research.html',context)
-
-def ahs_en_research(request):
-    context = {}
-    return render(request,'newhpc/english/ahs_en_research.html',context)
 
 def show_about(request, lang):
     if lang == 'ar':
@@ -241,3 +232,16 @@ def list_newsletter_members(request):
 
 def show_media_file(request, lang):
     return render(request,'newhpc/arabic/riy_coming_soon.html')
+
+
+# enjazportal.com/jeddah HPC Jeddah :
+def jed_en_research(request):
+    context = {}
+    return render(request,'newhpc/english/jeddah/jed_en_research.html',context)
+
+
+
+# enjazportal.com/alahsa HPC Al Ahsa :
+def ahs_en_research(request):
+    context = {}
+    return render(request,'newhpc/english/alahsa/ahs_en_research.html',context)

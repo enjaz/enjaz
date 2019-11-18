@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from . import views
 
 urlpatterns = [
+    #Riyadh Pages
+
     # Index Pages
     url(r'^riyadh/ar/$', views.riy_ar_index, name="riy_ar_index"),
     url(r'^riyadh/en/$', views.riy_en_index, name="riy_en_index"),
@@ -15,8 +17,6 @@ urlpatterns = [
     url(r'^riyadh/en/exhibition$', views.riy_en_exhibition, name="riy_en_exhibition"),
     # Research Guidelines
     url(r'^riyadh/en/research$', views.riy_en_research, name="riy_en_research"),
-    url(r'^jeddah/en/research$', views.jed_en_research, name="jed_en_research"),
-    url(r'^alahsa/en/research$', views.ahs_en_research, name="ahs_en_research"),
     # About Pages
     url(r'^riyadh/(?P<lang>(ar|en))/about$', views.show_about, name="riy_about"),
     # FAQ-Related Pages
@@ -41,6 +41,20 @@ urlpatterns = [
     url(r'^riyadh/media/newsletter/signup/$', views.handle_newsletter_signup, name="handle_newsletter_signup"),
     # Media file
     url(r'^riyadh/(?P<lang>(ar|en))/media/file/$', views.show_media_file, name="media_file"),
+
+
+    # Jeddah Pages
+    # Index Pages
+    # Registration Pages
+    # Research Guidelines
+    url(r'^jeddah/en/research$', views.jed_en_research, name="jed_en_research"),
+
+
+    #Al Ahsaa Pages
+    # Index Pages
+    # Registration Pages
+    # Research Guidelines
+    url(r'^alahsa/en/research$', views.ahs_en_research, name="ahs_en_research"),
 
 ]
 

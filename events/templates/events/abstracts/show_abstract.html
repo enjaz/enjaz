@@ -28,7 +28,7 @@ h4{
         -->
         {% if abstract.event.end_date.year < 2020 %}
             {% if user.is_superuser or user|can_evaluate_abstracts:event %}
-                <p class="alert alert-danger"><i class="fa fa-hourglass-half" aria-hidden="true"></i> Abstract has been submitted to {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %} and have not been sorted or evaluated</p>
+                <p class="alert alert-danger"><i class="fa fa-hourglass-half" aria-hidden="true"></i> Abstract has been submitted to {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %} and has not been sorted or evaluated</p>
             {% elif not user|can_evaluate_abstracts:event %}
                 <p class="alert alert-danger"><i class="fa fa-hourglass-half" aria-hidden="true"></i> This abstract has been rejected in {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %}</p>
             {% endif %}

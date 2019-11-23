@@ -586,6 +586,16 @@ class Evaluation(models.Model):
     def get_total_score(self):
         return self.criterion_values.aggregate(Sum('value'))['value__sum'] or 0
 
+class Sorting(models.Model):
+    abstract = models.ForeignKey(Abstract)
+    sorter = models.ForeignKey(User, related_name="event_abstract_sortings")
+    score_value = models.IntegerField(verbose_name=u"القيمة")
+    date_submitted = models.DateTimeField(auto_now_add=True)
+    date_edited = models.DateTimeField(auto_now=True)
+
+    def get_sorting_score(self):
+        return self.value
+
 class Criterion(models.Model):
     events = models.ManyToManyField(Event, verbose_name=u"الحدث")
     human_name = models.CharField(max_length=200,

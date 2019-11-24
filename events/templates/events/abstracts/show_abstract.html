@@ -28,7 +28,7 @@ h4{
         -->
         {% if abstract.event.end_date.year < 2020 %}
             {% if user.is_superuser or user|can_evaluate_abstracts:event %}
-                <p class="alert alert-danger"><i class="fa fa-hourglass-half" aria-hidden="true"></i> Abstract has been submitted to {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %} and has not been sorted or evaluated</p>
+                <p class="alert alert-danger"><i class="fa fa-hourglass-half" aria-hidden="true"></i> Abstract has been submitted to {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %} and have not been sorted or evaluated</p>
             {% elif not user|can_evaluate_abstracts:event %}
                 <p class="alert alert-danger"><i class="fa fa-hourglass-half" aria-hidden="true"></i> This abstract has been rejected in {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %}</p>
             {% endif %}
@@ -144,6 +144,38 @@ h4{
         </button>
     {% endif %}
 </div>
+
+<div style="float: left">
+    <button id="sorting_btn" class="btn btn-icon btn-primary">
+                <i class="entypo-check"></i>
+                Sort
+    </button>
+    <form id="sorting_form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <a href=""><p>Sorting Criteria</p></a>
+            <form method="post" enctype="multipart/form-data">
+    <div class="col-sm-12">
+        {% csrf_token %}
+        {% for field in sorting_form %}
+        <div class="row">
+            <div class="form-group">
+            {{ field.label }} : {{field}}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-sm-12">
+            <input id="submit" class="btn btn-btn-success" type="submit" value="Submit">
+            </div>
+        </div>
+
+    </div>
+</form>
+
+    </form>
+</div>
 </div>
 
 
@@ -154,6 +186,12 @@ h4{
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
 <script type="text/javascript">
 $(function(){
+    $("#sorting_form").hide();
+
+    $("button#sorting_btn").click(function () {
+        $("#sorting_form").show()
+    });
+
     $('#edit-abstract-modal').modal({
       keyboard: false,
       backdrop: 'static',

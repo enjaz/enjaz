@@ -589,12 +589,20 @@ class Evaluation(models.Model):
 class Sorting(models.Model):
     abstract = models.ForeignKey(Abstract)
     sorter = models.ForeignKey(User, related_name="event_abstract_sortings")
-    score_value = models.IntegerField(verbose_name=u"القيمة")
-    date_submitted = models.DateTimeField(auto_now_add=True)
-    date_edited = models.DateTimeField(auto_now=True)
+    study_design = models.IntegerField(verbose_name=u"Study Design", choices=[(i,i) for i in range(1,7)])
+    data_recency = models.IntegerField(verbose_name=u"Data Recency", choices=[(i,i) for i in range(4)])
+    status = models.IntegerField(verbose_name=u"Presentation Status", choices=[(i,i) for i in range(1,3)])
+    pres_author_affiliation = models.IntegerField(verbose_name=u"Presenter Author Affiliation", choices=[(i,i) for i in [0,2,3]])
+    research_value = models.IntegerField(verbose_name=u"Research Value", choices=[(i,i) for i in [1,3,5]])
+    pub_status = models.IntegerField(verbose_name=u"Publication Status", choices=[(i,i) for i in range(3)])
+    sorting_score = models.IntegerField(verbose_name=u"Sorting Score Value")
+    date_submitted = models.DateTimeField(auto_now_add=True, verbose_name=u"Date of Sorting")
 
     def get_sorting_score(self):
-        return self.value
+        return self.study_design+self.data_recency+self.status+self.pres_author_affiliation+self.research_value+self.pub_status
+
+    def __unicode__(self):
+        return 'Sorting of abstract no. '+ str(self.abstract.pk)
 
 class Criterion(models.Model):
     events = models.ManyToManyField(Event, verbose_name=u"الحدث")

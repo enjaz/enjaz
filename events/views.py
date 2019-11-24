@@ -21,7 +21,8 @@ from .models import Event, Session, Abstract, AbstractFigure,\
                           Evaluation, TimeSlot,\
                           SessionRegistration, Initiative,\
                           SessionGroup,CaseReport, Attendance,\
-                          QuestionSession, Question, Survey,SurveyResponse,UserSurveyCategory, Booth, Vote
+                          QuestionSession, Question, Survey,SurveyResponse,UserSurveyCategory, Booth, Vote,\
+                          Sorting
 from . import utils, forms
 import core.utils
 import clubs.utils
@@ -266,7 +267,8 @@ def list_my_abstracts(request, event_code_name=None, user_pk=None):
 def show_abstract(request, event_code_name, pk):
     abstract = get_object_or_404(Abstract, is_deleted=False, pk=pk)
     event = abstract.event
-    context = {'event': event, 'abstract': abstract}
+    sorting_form = forms.SortingForm()
+    context = {'event': event, 'abstract': abstract, 'sorting_form':sorting_form}
 
     if not abstract.user == request.user and \
             not request.user.is_superuser and \
@@ -283,9 +285,12 @@ def show_abstract(request, event_code_name, pk):
 
              return HttpResponseRedirect(reverse('events:show_abstract',
                                              args=(event.code_name,abstract.pk)))
+         instance = Sorting(abstract=abstract, sorter=request.user)
+         sorting_form = forms.SortingForm(request.POST, instance=instance)
     elif request.method == 'GET':
         poster_form = forms.AbstractPosterForm()
     context['form'] = poster_form
+    context['sorting_form']= sorting_form
 
     return render(request, "events/abstracts/show_abstract.html", context)
 
@@ -1260,3 +1265,21 @@ def list_booths(request, event_code_name):
 
         context = {'event': event, 'booths':booths, 'form': form,'booths_list':booths_list}
         return render(request, 'events/list_booths.html', context)
+
+@login_required
+def add_sorting(request, event_code_name, abstract_id):
+    if request.method == 'POST':
+        abstract = get_object_or_404(Abstract, pk=abstract_id)
+        instance = Sorting(abstract=abstract,sorter=request.user)
+        form = forms.SortingForm(request.POST, instance=instance)
+
+        if form.is_valid():
+            instance.sorting_score = instance.get_sorting_score()
+            sorting = form.save()
+            return HttpResponseRedirect(reverse('events:sorting_submission_completed',))
+                                                # args=(event.code_name, abstract.pk)
+    elif request.method == 'GET':
+        form = forms.SortingForm()
+        context = {'form' : form }
+        return render(request, 'events/abstracts/add_sorting.html', context)
+

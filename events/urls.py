@@ -62,6 +62,9 @@ urlpatterns = patterns('',
     url(r'^(?P<event_code_name>[\d\w_\-]+)/stats/timeslot/(?P<pk>\d+)/info/$', views.timeslot_info ,name="timeslot_info"),
     url(r'^(?P<event_code_name>[\d\w_\-]+)/booths/$', views.list_booths, name="list_booths"),
 
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/(?P<abstract_id>\d+)/sort/$', views.add_sorting,name="add_sorting"),
+    url(r'^abstracts/sort/done/$', TemplateView.as_view(template_name='events/abstracts/sorting_done.html'),name="sorting_submission_completed"),
+
                        # Has to be the last URL so it doesn't catch unintended patterns.
     url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<code_name>[\d\w\-]+)/$', views.show_session_group,name="show_session_group"),
 

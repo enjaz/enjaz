@@ -89,6 +89,12 @@ class Event(models.Model):
                                          verbose_name=u"على تلغرام؟")
     organizing_team = models.ForeignKey(Team, null=True, blank=True,
                                         verbose_name=u"فريق التنظيم")
+    evaluating_team = models.ForeignKey(Team, null=True, blank=True,
+                                        verbose_name=u"لجنة تقييم الأبحاث",
+                                        related_name="evaluating_team_events")
+    oral_poster_team = models.ForeignKey(Team, null=True, blank=True,
+                                        verbose_name=u"لجنة العروض والملصقات البحثية",
+                                        related_name="oralposter_team_events")
     priorities = models.PositiveSmallIntegerField(default=1)
     notification_email = models.EmailField(u'البريد الإلكتروني للتنبيهات', blank=True)
     city = models.CharField(u"المدينة", max_length=20,
@@ -516,6 +522,7 @@ class Abstract(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
+    why_deleted = models.TextField(u"Justification for Deletion", default="", blank=True)
     status=models.CharField(verbose_name="acceptance status", max_length=1, choices=status_choices, default='P')
     accepted_presentaion_preference = models.CharField(verbose_name="Accepted presentation preference",
                                                        max_length=1, choices=presentation_preference_choices,
@@ -587,7 +594,7 @@ class Evaluation(models.Model):
         return self.criterion_values.aggregate(Sum('value'))['value__sum'] or 0
 
 class Sorting(models.Model):
-    abstract = models.ForeignKey(Abstract)
+    abstract = models.OneToOneField(Abstract)
     sorter = models.ForeignKey(User, related_name="event_abstract_sortings")
     study_design = models.IntegerField(verbose_name=u"Study Design", choices=[(i,i) for i in range(1,7)])
     data_recency = models.IntegerField(verbose_name=u"Data Recency", choices=[(i,i) for i in range(4)])

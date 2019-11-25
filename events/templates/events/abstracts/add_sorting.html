@@ -1,29 +1,60 @@
-<!DOCTYPE html>{% load bootstrap3 %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Add sorting</title>
-</head>
-<body>
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %}{% load bootstrap3 %} {% load events_tags %}
 
-<form method="post" enctype="multipart/form-data">
-    <div class="col-sm-8">
-        {% csrf_token %}
-        {% for field in form %}
-        <div class="row">
-            <div class="form-group">
-            {% bootstrap_field field %}
+{% block title %}{{ abstract.event.english_name }}: {{ abstract.title }}{% endblock %}
+
+{% block content %}
+<style>
+h2{
+  font-size: 20px;
+  border: 1px solid #ebebeb;
+  background-color: #f5f5f6;
+  color: #a6a7aa;
+  padding: 10px;
+  text-align: center;
+}
+h4{
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 15px;
+}
+</style>
+
+<div class="english-field">
+{% include 'events/abstracts/partials/abstract_table.html' %}
+
+{% if already_sorted == True %}
+    <h2>This abstract is already sorted</h2>
+    <ul style="color:#000">
+        <li>Abstract ID: {{ abstract.pk }}</li>
+        <li>Study Design: {{ abstract.sorting.study_design }}</li>
+        <li>Data Recency: {{ abstract.sorting.data_recency }}</li>
+        <li>Presentation Status: {{ abstract.sorting.status }}</li>
+        <li>Presenter Author Affiliation: {{ abstract.sorting.pres_author_affiliation }}</li>
+        <li>Research Value: {{ abstract.sorting.research_value }}</li>
+        <li>Publication Status: {{ abstract.sorting.pub_status }}</li>
+        <li>Sorting Score Value: {{ abstract.sorting.sorting_score }} / 21</li>
+    </ul>
+{% else %}
+    <h2>Sorting</h2>
+    <form method="post" enctype="multipart/form-data">
+        <div class="col-sm-12">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="row">
+                <div class="form-group">
+                {% bootstrap_field field %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-12">
+                <input id="submit" class="btn btn-btn-success" type="submit" value="Submit">
+                </div>
             </div>
         </div>
-        {% endfor %}
-    </div>
-    <div class="form-group">
-        <div class="row">
-            <div class="col-sm-12">
-            <input id="submit" class="btn btn-btn-success" type="submit" value="Submit">
-            </div>
-        </div>
-    </div>
-</form>
-</body>
-</html>
+    </form>
+{% endif %}
+</div>
+
+{% endblock %}

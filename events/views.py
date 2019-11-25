@@ -132,6 +132,8 @@ def delete_abstract(request, event_code_name, pk):
         raise Exception(u"انتهت المدة المتاحة لحذف الملخص ")
 
     abstract.is_deleted = True
+    # TODO: ask for deletion justification. How does it work?
+    # abstract.why_deleted = request.POST('why-deleted')
     abstract.save()
     list_my_abstracts_url = reverse('events:list_my_abstracts')
     full_url = request.build_absolute_uri(list_my_abstracts_url)
@@ -145,7 +147,8 @@ def list_abstracts(request, event_code_name):
     if not utils.is_organizing_team_member(request.user, event):
         raise PermissionDenied
 
-    pending_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=1)
+    pending_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=1).annotate(num_s=Count('sorting')).filter(num_s__lt=1)
+    sorted_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=2).annotate(num_s=Count('sorting')).exclude(num_s__lt=1)
     one_evaluator = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=1, num_b__lt=2)
     evaluated_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=2)
     deleted_abstracts = Abstract.objects.filter(event=event, is_deleted=True)
@@ -159,6 +162,7 @@ def list_abstracts(request, event_code_name):
 
     context = {'event': event,
                'pending_abstracts': pending_abstracts,
+               'sorted_abstracts': sorted_abstracts,
                'one_evaluator': one_evaluator,
                'evaluated_abstracts': evaluated_abstracts,
                'deleted_abstracts': deleted_abstracts,
@@ -1268,18 +1272,23 @@ def list_booths(request, event_code_name):
 
 @login_required
 def add_sorting(request, event_code_name, abstract_id):
-    if request.method == 'POST':
-        abstract = get_object_or_404(Abstract, pk=abstract_id)
-        instance = Sorting(abstract=abstract,sorter=request.user)
-        form = forms.SortingForm(request.POST, instance=instance)
+    abstract = get_object_or_404(Abstract, pk=abstract_id)
+    try:
+        sorting = Sorting.objects.get(abstract=abstract)
+        already_sorted = True
+        form = forms.SortingForm(request.GET, instance=sorting)
+    except Sorting.DoesNotExist:
+        already_sorted = False
+        if request.method == 'POST':
+            instance = Sorting(abstract=abstract, sorter=request.user)
+            form = forms.SortingForm(request.POST, instance=instance)
 
-        if form.is_valid():
-            instance.sorting_score = instance.get_sorting_score()
-            sorting = form.save()
-            return HttpResponseRedirect(reverse('events:sorting_submission_completed',))
-                                                # args=(event.code_name, abstract.pk)
-    elif request.method == 'GET':
-        form = forms.SortingForm()
-        context = {'form' : form }
-        return render(request, 'events/abstracts/add_sorting.html', context)
+            if form.is_valid():
+                instance.sorting_score = instance.get_sorting_score()
+                sorting = form.save()
 
+        elif request.method == 'GET':
+            form = forms.SortingForm()
+
+    context = {'abstract': abstract, 'form': form, 'already_sorted': already_sorted}
+    return render(request, 'events/abstracts/add_sorting.html', context)

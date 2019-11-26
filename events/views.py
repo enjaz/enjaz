@@ -21,7 +21,8 @@ from .models import Event, Session, Abstract, AbstractFigure,\
                           Evaluation, TimeSlot,\
                           SessionRegistration, Initiative,\
                           SessionGroup,CaseReport, Attendance,\
-                          QuestionSession, Question, Survey,SurveyResponse,UserSurveyCategory, Booth, Vote
+                          QuestionSession, Question, Survey,SurveyResponse,UserSurveyCategory, Booth, Vote,\
+                          Sorting
 from . import utils, forms
 import core.utils
 import clubs.utils
@@ -120,7 +121,8 @@ def delete_abstract(request, event_code_name, pk):
 
     if not abstract.user == request.user and \
        not request.user.is_superuser and \
-       not utils.is_organizing_team_member(request.user, event):
+       not utils.is_organizing_team_member(request.user, event) and \
+       request.user not in event.oral_poster_team.members.all():
         raise PermissionDenied
 
     if event.abstract_submission_closing_date and timezone.now() > event.abstract_submission_closing_date and \
@@ -131,6 +133,7 @@ def delete_abstract(request, event_code_name, pk):
         raise Exception(u"انتهت المدة المتاحة لحذف الملخص ")
 
     abstract.is_deleted = True
+    abstract.why_deleted = request.POST.get("why_deleted", None)
     abstract.save()
     list_my_abstracts_url = reverse('events:list_my_abstracts')
     full_url = request.build_absolute_uri(list_my_abstracts_url)
@@ -141,10 +144,13 @@ def list_abstracts(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name,
                               receives_abstract_submission=True)
 
-    if not utils.is_organizing_team_member(request.user, event):
+    if not utils.is_organizing_team_member(request.user, event) and \
+            request.user not in event.oral_poster_team.members.all() and \
+            request.user not in event.evaluating_team.members.all():
         raise PermissionDenied
 
-    pending_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=1)
+    pending_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=1).annotate(num_s=Count('sorting')).filter(num_s__lt=1)
+    sorted_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=2).annotate(num_s=Count('sorting')).exclude(num_s__lt=1)
     one_evaluator = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=1, num_b__lt=2)
     evaluated_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=2)
     deleted_abstracts = Abstract.objects.filter(event=event, is_deleted=True)
@@ -158,6 +164,7 @@ def list_abstracts(request, event_code_name):
 
     context = {'event': event,
                'pending_abstracts': pending_abstracts,
+               'sorted_abstracts': sorted_abstracts,
                'one_evaluator': one_evaluator,
                'evaluated_abstracts': evaluated_abstracts,
                'deleted_abstracts': deleted_abstracts,
@@ -266,12 +273,14 @@ def list_my_abstracts(request, event_code_name=None, user_pk=None):
 def show_abstract(request, event_code_name, pk):
     abstract = get_object_or_404(Abstract, is_deleted=False, pk=pk)
     event = abstract.event
-    context = {'event': event, 'abstract': abstract}
+    sorting_form = forms.SortingForm()
+    context = {'event': event, 'abstract': abstract, 'sorting_form':sorting_form}
 
     if not abstract.user == request.user and \
             not request.user.is_superuser and \
             not utils.can_evaluate_abstracts(request.user, event) and \
-            not utils.is_organizing_team_member(request.user, event):
+            not utils.is_organizing_team_member(request.user, event) and \
+            request.user not in event.oral_poster_team.members.all():
         raise PermissionDenied
 
     if request.method == 'POST':
@@ -283,9 +292,12 @@ def show_abstract(request, event_code_name, pk):
 
              return HttpResponseRedirect(reverse('events:show_abstract',
                                              args=(event.code_name,abstract.pk)))
+         instance = Sorting(abstract=abstract, sorter=request.user)
+         sorting_form = forms.SortingForm(request.POST, instance=instance)
     elif request.method == 'GET':
         poster_form = forms.AbstractPosterForm()
     context['form'] = poster_form
+    context['sorting_form']= sorting_form
 
     return render(request, "events/abstracts/show_abstract.html", context)
 
@@ -1260,3 +1272,32 @@ def list_booths(request, event_code_name):
 
         context = {'event': event, 'booths':booths, 'form': form,'booths_list':booths_list}
         return render(request, 'events/list_booths.html', context)
+
+@login_required
+def add_sorting(request, event_code_name, abstract_id):
+    event = get_object_or_404(Event, code_name=event_code_name)
+    abstract = get_object_or_404(Abstract, pk=abstract_id)
+
+    if not utils.is_organizing_team_member(request.user, event) and \
+            request.user not in event.oral_poster_team.members.all():
+        raise PermissionDenied
+
+    try:
+        sorting = Sorting.objects.get(abstract=abstract)
+        already_sorted = True
+        form = forms.SortingForm(request.GET, instance=sorting)
+    except Sorting.DoesNotExist:
+        already_sorted = False
+        if request.method == 'POST':
+            instance = Sorting(abstract=abstract, sorter=request.user)
+            form = forms.SortingForm(request.POST, instance=instance)
+
+            if form.is_valid():
+                instance.sorting_score = instance.get_sorting_score()
+                sorting = form.save()
+
+        elif request.method == 'GET':
+            form = forms.SortingForm()
+
+    context = {'abstract': abstract, 'form': form, 'already_sorted': already_sorted}
+    return render(request, 'events/abstracts/add_sorting.html', context)

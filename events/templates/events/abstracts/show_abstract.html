@@ -137,12 +137,44 @@ h4{
 			<i class="entypo-pencil"></i>
 			Edit
 	</button> -->
-    {% if user|can_evaluate_abstracts:event or user.is_superuser %}
+    {% if user|can_evaluate_abstracts:event or user in event.oral_poster_team.members.all or user.is_superuser %}
         <button data-url="{% url 'events:delete_abstract' event.code_name abstract.pk %}" class="confirm-delete-abstract btn btn-icon btn-danger">
                 <i class="entypo-block"></i>
                 Delete
         </button>
     {% endif %}
+</div>
+
+<div style="float: left">
+    <button id="sorting_btn" class="btn btn-icon btn-primary">
+        <a style="color:#fff" href="{% url 'events:add_sorting' event.code_name abstract.pk %}">
+            <i class="entypo-check"></i>
+            Sort
+        </a>
+    </button>
+    <!--<form id="sorting_form" method="post" enctype="multipart/form-data">-->
+        <!--{% csrf_token %}-->
+        <!--<a href=""><p>Sorting Criteria</p></a>-->
+            <!--<form method="post" enctype="multipart/form-data">-->
+    <!--<div class="col-sm-12">-->
+        <!--{% csrf_token %}-->
+        <!--{% for field in sorting_form %}-->
+        <!--<div class="row">-->
+            <!--<div class="form-group">-->
+            <!--{{ field.label }} : {{field}}-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--{% endfor %}-->
+    <!--</div>-->
+    <!--<div class="form-group">-->
+        <!--<div class="row">-->
+            <!--<div class="col-sm-12">-->
+            <!--<input id="submit" class="btn btn-btn-success" type="submit" value="Submit">-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--</form>-->
+    <!--</form>-->
 </div>
 </div>
 
@@ -154,6 +186,12 @@ h4{
 <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
 <script type="text/javascript">
 $(function(){
+    <!--$("#sorting_form").hide();-->
+
+    <!--$("button#sorting_btn").click(function () {-->
+        <!--$("#sorting_form").show()-->
+    <!--});-->
+
     $('#edit-abstract-modal').modal({
       keyboard: false,
       backdrop: 'static',

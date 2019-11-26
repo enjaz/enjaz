@@ -133,7 +133,7 @@ def delete_abstract(request, event_code_name, pk):
         raise Exception(u"انتهت المدة المتاحة لحذف الملخص ")
 
     abstract.is_deleted = True
-    # abstract.why_deleted = request.POST["why_deleted"]
+    abstract.why_deleted = request.POST.get("why_deleted", None)
     abstract.save()
     list_my_abstracts_url = reverse('events:list_my_abstracts')
     full_url = request.build_absolute_uri(list_my_abstracts_url)

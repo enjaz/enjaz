@@ -7,12 +7,12 @@
       </div>
       <div class="modal-body">
           Are you sure that you want to delete this {{ model }}?
-        <!--<br><br>-->
-          <!--<form method="post" enctype="multipart/form-data">-->
-            <!--{% csrf_token %}-->
-            <!--Please mention the reason for deletion:-->
-            <!--<input type="text" name="why-deleted" id="why-deleted">-->
-          <!--</form>-->
+        <br><br>
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            Please mention the reason for deletion:
+            <input type="text" name="why-deleted" id="why-deleted">
+          </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -22,7 +22,6 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-
 <script type="text/javascript">
 $(function() {
     $("button.confirm-delete-{{ model }}").click(function(){
@@ -31,25 +30,57 @@ $(function() {
         $("#confirm-delete-{{ model }}-modal").modal('show');
     });
     $("#delete-{{ model }}").click(function () {
-        /* get some values from elements on the page: */
         var url = $(this).data('url');
-        <!--var why_deleted = document.getElementById('why-deleted').value;-->
-        /* Send the data using post */
-        var posting = $.post(url);
-        <!--var posting2 = $.post(why_deleted);-->
-        <!--posting2.done(function (data) {});-->
-        posting.done(function (data) {
-            if (data.message == "success") {
-                // show success message (using toastr)
-                toastr.options.positionClass = "toast-top-left";
-                toastr.info("The {{ model }} has been successfully deleted.");
+        var why_deleted = document.getElementById('why-deleted').value;
+        console.log(why_deleted);
+        $.ajax({
+            url: "{% url 'events:delete_abstract' event.code_name abstract.pk %}",
+            data: {why_deleted:why_deleted, url:url},
+            method: "POST",
+            success: (function(data){
+                  if (data.message == "success") {
+                      // show success message (using toastr)
+                      toastr.options.positionClass = "toast-top-left";
+                      toastr.info("The {{ model }} has been successfully deleted.");
 
-                // return to the group list page.
-                window.location.href = data.list_url;
-            } else {
-                $('#confirm-delete-{{ model }}-modal .modal-body').html(data);
-            }
+                      // return to the group list page.
+                      window.location.href = data.list_url;
+                  } else {
+                      $('#confirm-delete-{{ model }}-modal .modal-body').html(data);
+                  }
+
+            })
         });
+
     });
 });
 </script>
+
+<!-- ------------Previous Working Code---------------------- -->
+<!--<script type="text/javascript">-->
+<!--$(function() {-->
+    <!--$("button.confirm-delete-{{ model }}").click(function(){-->
+        <!--var url = $(this).data('url');-->
+        <!--$("#delete-{{ model }}").data('url', url);-->
+        <!--$("#confirm-delete-{{ model }}-modal").modal('show');-->
+    <!--});-->
+    <!--$("#delete-{{ model }}").click(function () {-->
+        <!--/* get some values from elements on the page: */-->
+        <!--var url = $(this).data('url');-->
+        <!--/* Send the data using post */-->
+        <!--var posting = $.post(url);-->
+        <!--posting.done(function (data) {-->
+            <!--if (data.message == "success") {-->
+                <!--// show success message (using toastr)-->
+                <!--toastr.options.positionClass = "toast-top-left";-->
+                <!--toastr.info("The {{ model }} has been successfully deleted.");-->
+
+                <!--// return to the group list page.-->
+                <!--window.location.href = data.list_url;-->
+            <!--} else {-->
+                <!--$('#confirm-delete-{{ model }}-modal .modal-body').html(data);-->
+            <!--}-->
+        <!--});-->
+    <!--});-->
+<!--});-->
+<!--</script>-->

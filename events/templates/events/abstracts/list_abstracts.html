@@ -21,7 +21,8 @@
                     {% csrf_token %}
                     <select name="action">
                       <option>Choose Action</option>
-                      <option value="delete">Delete</option>
+                      <!-- No mass deleting -->
+                      <!--<option value="delete">Delete</option>-->
                     </select>
                     <div class="row">
                         <table id="pending" class="display datatable dt-responsive">

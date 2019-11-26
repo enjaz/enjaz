@@ -11,7 +11,7 @@
           <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             Please mention the reason for deletion:
-            <input type="text" name="why-deleted" id="why-deleted">
+            <input required="required" type="text" name="why-deleted" id="why-deleted">
           </form>
       </div>
       <div class="modal-footer">
@@ -32,25 +32,27 @@ $(function() {
     $("#delete-{{ model }}").click(function () {
         var url = $(this).data('url');
         var why_deleted = document.getElementById('why-deleted').value;
-        console.log(why_deleted);
-        $.ajax({
-            url: "{% url 'events:delete_abstract' event.code_name abstract.pk %}",
-            data: {why_deleted:why_deleted, url:url},
-            method: "POST",
-            success: (function(data){
-                  if (data.message == "success") {
-                      // show success message (using toastr)
-                      toastr.options.positionClass = "toast-top-left";
-                      toastr.info("The {{ model }} has been successfully deleted.");
+        if (why_deleted != ""){
+            $.ajax({
+                url: "{% url 'events:delete_abstract' event.code_name abstract.pk %}",
+                data: {why_deleted:why_deleted, url:url},
+                method: "POST",
+                success: (function(data){
+                      if (data.message == "success") {
+                          // show success message (using toastr)
+                          toastr.options.positionClass = "toast-top-left";
+                          toastr.info("The {{ model }} has been successfully deleted.");
 
-                      // return to the group list page.
-                      window.location.href = data.list_url;
-                  } else {
-                      $('#confirm-delete-{{ model }}-modal .modal-body').html(data);
-                  }
+                          // return to the group list page.
+                          window.location.href = data.list_url;
+                      } else {
+                          $('#confirm-delete-{{ model }}-modal .modal-body').html(data);
+                      }
 
-            })
-        });
+                })
+            });
+        }
+
 
     });
 });

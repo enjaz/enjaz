@@ -10,7 +10,8 @@ from .models import NonUser, Session, Registration, Abstract, \
     AbstractFigure, Initiative, InitiativeFigure, \
     Criterion, CriterionValue, Evaluation,CaseReport, \
     AbstractPoster, Attendance, Question, SurveyQuestion, \
-    SurveyResponse, SurveyAnswer, SessionRegistration,AbstractAuthor,UserSurveyCategory, Vote, CaseReportAuthor
+    SurveyResponse, SurveyAnswer, SessionRegistration,AbstractAuthor,UserSurveyCategory, Vote, CaseReportAuthor, \
+    Sorting
 from django.forms.models import inlineformset_factory
 
 class NonUserForm(forms.ModelForm):
@@ -313,3 +314,9 @@ class UserSurveyCategoryForm (forms.ModelForm):
     class Meta:
         model = UserSurveyCategory
         fields = ['category']
+
+class SortingForm(forms.ModelForm):
+    class Meta:
+        model = Sorting
+        fields = ['study_design', 'data_recency', 'status',
+                  'pres_author_affiliation', 'research_value', 'pub_status']

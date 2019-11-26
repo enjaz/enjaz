@@ -121,7 +121,8 @@ def delete_abstract(request, event_code_name, pk):
 
     if not abstract.user == request.user and \
        not request.user.is_superuser and \
-       not utils.is_organizing_team_member(request.user, event):
+       not utils.is_organizing_team_member(request.user, event) and \
+       request.user not in event.oral_poster_team.members.all():
         raise PermissionDenied
 
     if event.abstract_submission_closing_date and timezone.now() > event.abstract_submission_closing_date and \
@@ -132,8 +133,7 @@ def delete_abstract(request, event_code_name, pk):
         raise Exception(u"انتهت المدة المتاحة لحذف الملخص ")
 
     abstract.is_deleted = True
-    # TODO: ask for deletion justification. How does it work?
-    # abstract.why_deleted = request.POST('why-deleted')
+    # abstract.why_deleted = request.POST["why_deleted"]
     abstract.save()
     list_my_abstracts_url = reverse('events:list_my_abstracts')
     full_url = request.build_absolute_uri(list_my_abstracts_url)
@@ -144,7 +144,9 @@ def list_abstracts(request, event_code_name):
     event = get_object_or_404(Event, code_name=event_code_name,
                               receives_abstract_submission=True)
 
-    if not utils.is_organizing_team_member(request.user, event):
+    if not utils.is_organizing_team_member(request.user, event) and \
+            request.user not in event.oral_poster_team.members.all() and \
+            request.user not in event.evaluating_team.members.all():
         raise PermissionDenied
 
     pending_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=1).annotate(num_s=Count('sorting')).filter(num_s__lt=1)
@@ -277,7 +279,8 @@ def show_abstract(request, event_code_name, pk):
     if not abstract.user == request.user and \
             not request.user.is_superuser and \
             not utils.can_evaluate_abstracts(request.user, event) and \
-            not utils.is_organizing_team_member(request.user, event):
+            not utils.is_organizing_team_member(request.user, event) and \
+            request.user not in event.oral_poster_team.members.all():
         raise PermissionDenied
 
     if request.method == 'POST':
@@ -1272,7 +1275,13 @@ def list_booths(request, event_code_name):
 
 @login_required
 def add_sorting(request, event_code_name, abstract_id):
+    event = get_object_or_404(Event, code_name=event_code_name)
     abstract = get_object_or_404(Abstract, pk=abstract_id)
+
+    if not utils.is_organizing_team_member(request.user, event) and \
+            request.user not in event.oral_poster_team.members.all():
+        raise PermissionDenied
+
     try:
         sorting = Sorting.objects.get(abstract=abstract)
         already_sorted = True

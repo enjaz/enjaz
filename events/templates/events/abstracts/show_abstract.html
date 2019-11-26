@@ -137,7 +137,7 @@ h4{
 			<i class="entypo-pencil"></i>
 			Edit
 	</button> -->
-    {% if user|can_evaluate_abstracts:event or user.is_superuser %}
+    {% if user|can_evaluate_abstracts:event or user in event.oral_poster_team.members.all or user.is_superuser %}
         <button data-url="{% url 'events:delete_abstract' event.code_name abstract.pk %}" class="confirm-delete-abstract btn btn-icon btn-danger">
                 <i class="entypo-block"></i>
                 Delete

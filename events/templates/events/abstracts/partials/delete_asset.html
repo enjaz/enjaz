@@ -33,8 +33,11 @@ $(function() {
     $("#delete-{{ model }}").click(function () {
         /* get some values from elements on the page: */
         var url = $(this).data('url');
+        <!--var why_deleted = document.getElementById('why-deleted').value;-->
         /* Send the data using post */
         var posting = $.post(url);
+        <!--var posting2 = $.post(why_deleted);-->
+        <!--posting2.done(function (data) {});-->
         posting.done(function (data) {
             if (data.message == "success") {
                 // show success message (using toastr)

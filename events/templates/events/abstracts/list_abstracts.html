@@ -5,6 +5,7 @@
         <h2 class="mentor-section-header">All Abstracts</h2>
     </div>
 </div>
+{% if not request.user in event.evaluating_team.members.all or request.user.is_superuser  %}
 <div class="english-field">
     <div class="panel panel-warning">
         <div class="panel-heading">
@@ -74,6 +75,8 @@
         </div>
     </div>
 </div>
+{% endif %}
+{% if not request.user in event.oral_poster_team.members.all or request.user.is_superuser %}
 <div class="english-field">
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -123,6 +126,7 @@
         </div>
     </div>
 </div>
+{% if not request.user in event.evaluating_team.members.all or request.user.is_superuser %}
 <div class="english-field">
     <div class="panel panel-info">
         <div class="panel-heading">
@@ -203,6 +207,10 @@
         </div>
     </div>
 </div>
+{% endif %}
+{% endif %}
+{% if not request.user in event.evaluating_team.members.all or request.user.is_superuser %}
+{% if not request.user in event.oral_poster_team.members.all %}
 <div class="english-field">
     <div class="panel panel-success">
         <div class="panel-heading">
@@ -338,6 +346,8 @@
         </div>
     </div>
 </div>
+{% endif %}
+{% endif %}
 <div class="row">
         <br>
     <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">

@@ -1,5 +1,5 @@
-{% extends 'newhpc/english/english_base.html' %}{% load staticfiles %}
-{% block title %}Health Professions Conference 2020 | Riyadh{% endblock %}
+{% extends 'newhpc/english/jed_english_base.html' %}{% load staticfiles %}
+{% block title %}Health Professions Conference 2020 | Jeddah{% endblock %}
 {% block style %}
     .listitem44 {
       display: inline-block;
@@ -11,7 +11,6 @@
     .listitem44 span {
       display: block;
       font-size: 4.5rem;
-
     }
     @media (min-width: 992px) {
     #slide1h3 {
@@ -87,8 +86,8 @@
     }
     }
 {% endblock %}
-{% block lang %}{% url 'newhpc:riy_ar_index' %}{% endblock %}
-{% block lang2 %}{% url 'newhpc:riy_ar_index' %}{% endblock %}
+{% block lang %}{% url 'newhpc:jed_ar_index' %}{% endblock %}
+{% block lang2 %}{% url 'newhpc:jed_ar_index' %}{% endblock %}
 {% block content %}
     <!-- BEGIN: PAGE CONTAINER -->
 	<div class="c-layout-page">
@@ -102,7 +101,7 @@
                         <li data-transition="fade" data-slotamount="1" data-masterspeed="1000">
                             <img
                                 alt=""
-                                src="{% static 'newhpc/images/slides/KSAUHS-TOWER4.jpg' %}"
+                                src="{% static 'newhpc/images/slides/jeddah-campus.jpg' %}"
                                 data-bgposition="center bottom"
                                 data-bgfit="cover"
                                 data-bgrepeat="no-repeat"
@@ -126,7 +125,7 @@
                                     Health Professions Conference 2020
                                 </h3>
                                 <p id="slide1p" class="c-font-40 c-font-bold c-font-center c-font-uppercase c-font-white c-block">
-                                   King Saud Bin Abdulaziz University for Health Sciences Riyadh,
+                                   King Saud Bin Abdulaziz University for Health Sciences Jeddah,
                                 </p>
                                 <h2 class="c-font-40 c-font-bold c-font-center c-font-uppercase c-font-white c-block" id="slide1h2">
                                     28-30 January 2020
@@ -172,7 +171,7 @@
                                 data-transform_idle="o:1;"
                                 data-transform_in="x:100;y:100;rX:120;scaleX:0.75;scaleY:0.75;o:0;s:500;e:Back.easeInOut;"
                                 data-transform_out="x:100;y:100;rX:120;scaleX:0.75;scaleY:0.75;o:0;s:600;e:Back.easeInOut;">
-                                <a href="{% url 'newhpc:riy_en_research' %}" class="c-action-btn btn btn-lg c-btn-square c-theme-btn c-btn-bold c-btn-uppercase">Learn More</a>
+                                <a href="{% url 'newhpc:jed_en_research' %}" class="c-action-btn btn btn-lg c-btn-square c-theme-btn c-btn-bold c-btn-uppercase">Learn More</a>
                             </div>
                         </li>
                         <!--END -->
@@ -260,7 +259,7 @@
 			  			<div class="c-caption c-content-overlay">
 			  				<div class="c-overlay-wrapper">
 				  				<div class="c-overlay-content">
-					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
+					  				<a href="{% url 'newhpc:jed_coming_soon' %}"><i class="icon-link"></i></a>
 					  			</div>
 			  				</div>
 			  				<img src="{% static 'newhpc/images/speakerstop/new/BassemKurdi.png' %}" class="img-responsive c-overlay-object" alt="">
@@ -388,7 +387,7 @@
 	<div class="container">
 		<div class="c-content-bar-4">
 			<div class="c-actions">
-				<a href="{% url 'newhpc:riy_coming_soon' %}" class="btn btn-md c-btn-border-2x c-btn-square c-btn-white c-btn-uppercase c-btn-bold">Click here to learn more about speakers</a></div>
+				<a href="{% url 'newhpc:jed_coming_soon' %}" class="btn btn-md c-btn-border-2x c-btn-square c-btn-white c-btn-uppercase c-btn-bold">Click here to learn more about speakers</a></div>
 		</div>
 	</div>
 </div>

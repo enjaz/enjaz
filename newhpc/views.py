@@ -41,10 +41,40 @@ def riy_en_exhibition(request):
 def riy_en_research(request):
     context = {}
     return render(request,'newhpc/english/riy_en_research.html',context)
+# jeddah
+
+
+def jed_ar_index(request):
+    context = {}
+    return render(request,'newhpc/arabic/jed_ar_index.html',context)
+
+def jed_en_index(request):
+    context = {}
+    return render(request,'newhpc/english/jed_en_index.html',context)
+
+def jed_coming_soon(request):
+    context = {}
+    return render(request,'newhpc/arabic/jed_coming_soon.html',context)
+
+def jed_ar_registration(request):
+    context = {}
+    return render(request,'newhpc/arabic/jed_ar_registeration.html',context)
+def jed_en_registration(request):
+    context = {}
+    return render(request,'newhpc/english/jed_en_registeration.html',context)
+
+def jed_ar_exhibition(request):
+    context = {}
+    return render(request,'newhpc/arabic/jed_ar_exhibition.html',context)
+def jed_en_exhibition(request):
+    context = {}
+    return render(request,'newhpc/english/jed_ar_exhibition.html',context)
 
 def jed_en_research(request):
     context = {}
     return render(request,'newhpc/english/jed_en_research.html',context)
+
+# ah
 
 def ahs_en_research(request):
     context = {}

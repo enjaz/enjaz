@@ -9,7 +9,7 @@
         </tr>
     </thead>
     <tbody>
-        {% if not user|can_evaluate_abstracts:event or user.is_superuser %}
+        {% if not user|can_evaluate_abstracts:event or user in event.oral_poster_team.members.all or user|is_organizing_team_member:event or user.is_superuser %}
         <tr>
             <th class="text-center">Presenting author</th>
             <td>{{ abstract.presenting_author }}</td>
@@ -31,7 +31,7 @@
             <td>{{ abstract.phone }}</td>
         </tr>
         {% endif %}
-        {% if user|can_evaluate_abstracts:event or user|is_organizing_team_member:event or user.is_superuser  %}
+        {% if user|can_evaluate_abstracts:event or user|is_organizing_team_member:event or user in event.oral_poster_team.members.all or user.is_superuser  %}
         <tr>
             <th class="text-center">University</th>
             <td>{{ abstract.university }}</td>
@@ -52,6 +52,10 @@
         <tr>
             <th class="text-center">Study Design</th>
             <td>{{ abstract.study_design }}</td>
+        </tr>
+        <tr>
+            <th class="text-center">How is your study going to affect current practice?</th>
+            <td>{{ abstract.significance }}</td>
         </tr>
         <tr>
         <tr>

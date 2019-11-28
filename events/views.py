@@ -1295,7 +1295,8 @@ def add_sorting(request, event_code_name, abstract_id):
             if form.is_valid():
                 instance.sorting_score = instance.get_sorting_score()
                 sorting = form.save()
-
+                return HttpResponseRedirect(reverse('events:list_abstracts',
+                                                    args=(event.code_name,)))
         elif request.method == 'GET':
             form = forms.SortingForm()
 

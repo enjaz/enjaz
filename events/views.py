@@ -126,7 +126,8 @@ def delete_abstract(request, event_code_name, pk):
         raise PermissionDenied
 
     if event.abstract_submission_closing_date and timezone.now() > event.abstract_submission_closing_date and \
-        not utils.is_organizing_team_member(request.user, event):
+        not utils.is_organizing_team_member(request.user, event) and \
+        request.user not in event.oral_poster_team.members.all():
         raise Exception(u"انتهت المدة المتاحة لحذف الملخص ")
 
     if Abstract.objects.annotate(num_b=Count('evaluation')).filter(pk=pk, num_b__gte=1):
@@ -136,6 +137,8 @@ def delete_abstract(request, event_code_name, pk):
     abstract.why_deleted = request.POST.get("why_deleted", None)
     abstract.save()
     list_my_abstracts_url = reverse('events:list_my_abstracts')
+    # TODO: Make the below url work >.<
+    # list_abstracts_url = reverse('events:list_abstracts', args=event.code_name)
     full_url = request.build_absolute_uri(list_my_abstracts_url)
     return {"message": "success", "list_url": full_url}
 

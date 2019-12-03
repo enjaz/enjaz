@@ -97,8 +97,10 @@
                                     <th class="all">ID</th>
                                     <th class="all">Principle investigator</th>
                                     <th class="all">1st Evaluator</th>
+                                    <th class="all">1st Evaluation score</th>
                                     <th class="all">2nd Evaluator</th>
-                                    <th class="all">Sorting score</th>
+                                    <th class="all">2nd Evaluation score</th>
+                                    <!--<th class="all">Sorting score</th>-->
                                     <th class="all">Sorting date</th>
                                 </tr>
                             </thead>
@@ -106,17 +108,18 @@
                                 {% for abstract in sorted_abstracts %}
                                 <tr>
                                     <td><input type="checkbox" value="1" name="pk_{{ abstract.pk }}"></td>
-                                    <td>{{ abstract.pk }}</td>
+                                    <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.pk }}</a></td>
                                     <td>{{ abstract.principle_investigator }}</td>
                                     {% if abstract.evaluators.all %}
                                         {% for evaluator in abstract.evaluators.all %}
                                             <td>{{ evaluator.common_profile.en_last_name|default:evaluator.username }}</td>
+                                            <td>{{ evaluator.evaluation.get_total_score }}</td>
                                         {% endfor %}
                                     {% else %}
-                                    <td> - </td><td> - </td>
+                                    <td> - </td><td> - </td><td> - </td><td> - </td>
                                     {% endif %}
                                     <!--TODO: Make maximum sorting score (21) a variable-->
-                                    <td>{{ abstract.sorting.sorting_score }}/21</td>
+                                    <!--<td>{{ abstract.sorting.sorting_score }}/21</td>-->
                                     <td data-order="{{ abstract.sorting.date_submitted|date:" U " }}">{{ abstract.sorting.date_submitted }}</td>
                                 </tr>
                                 {% endfor %}

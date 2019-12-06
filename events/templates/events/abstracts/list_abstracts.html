@@ -108,15 +108,18 @@
                                 {% for abstract in sorted_abstracts %}
                                 <tr>
                                     <td><input type="checkbox" value="1" name="pk_{{ abstract.pk }}"></td>
-                                    <td class="not-mobile"><a href="{% url 'events:assign_evaluator_m' event.code_name abstract.pk %}">{{ abstract.pk }}</a></td>
+                                    <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.pk }}</a></td>
                                     <td>{{ abstract.principle_investigator }}</td>
                                     {% if abstract.evaluators.all %}
                                         {% for evaluator in abstract.evaluators.all %}
-                                            <td>{{ evaluator.common_profile.en_last_name|default:evaluator.username }}</td>
+                                            <td><a href="{% url 'events:assign_evaluator_m' event.code_name abstract.pk %}">{{ evaluator.common_profile.en_last_name|default:evaluator.username }}</a></td>
                                             <td>{{ evaluator.evaluation.get_total_score }}</td>
                                         {% endfor %}
                                     {% else %}
-                                    <td> - </td><td> - </td><td> - </td><td> - </td>
+                                    <td class="not-mobile"><a href="{% url 'events:assign_evaluator_m' event.code_name abstract.pk %}">Assign</a></td>
+                                    <td> - </td>
+                                    <td class="not-mobile"><a href="{% url 'events:assign_evaluator_m' event.code_name abstract.pk %}">Assign</a></td>
+                                    <td> - </td>
                                     {% endif %}
                                     <!--TODO: Make maximum sorting score (21) a variable-->
                                     <!--<td>{{ abstract.sorting.sorting_score }}/21</td>-->

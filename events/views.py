@@ -778,9 +778,9 @@ def evaluators_homepage(request,event_code_name):
                                                     event=event)\
                                             .exclude(evaluation__user=user_evaluations)\
                                             .distinct()
-    riyadh_evaluators = Team.objects.get(code_name='hpc2019-r-e')
-    jeddah_evaluators = Team.objects.get(code_name='hpc2019-j-e')
-    alahsa_evaluators = Team.objects.get(code_name='hpc2019-a-e')
+    riyadh_evaluators = Team.objects.get(code_name='hpc2020-r-e')
+    jeddah_evaluators = Team.objects.get(code_name='hpc2020-j-e')
+    alahsa_evaluators = Team.objects.get(code_name='hpc2020-a-e')
     context = {'riyadh_evaluators': riyadh_evaluators,
                'jeddah_evaluators':jeddah_evaluators,
                'alahsa_evaluators':alahsa_evaluators,
@@ -1351,6 +1351,7 @@ def assign_evaluator_manually(request, event_code_name, abstract_id):
                                             args=(event.code_name,)))
     elif request.method == 'GET':
         form = forms.AssignEvaluatorForm(instance=abstract)
+        form.fields["evaluators"].queryset = evaluators
 
     context = {'abstract':abstract,
                'event': event, 'evaluators': evaluators,

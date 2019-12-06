@@ -1305,3 +1305,62 @@ def add_sorting(request, event_code_name, abstract_id):
 
     context = {'abstract': abstract, 'form': form, 'already_sorted': already_sorted}
     return render(request, 'events/abstracts/add_sorting.html', context)
+
+@login_required
+def assign_evaluator_manually(request, event_code_name, abstract_id):
+    event = get_object_or_404(Event, code_name=event_code_name)
+
+    if not request.user.is_superuser and \
+       not utils.is_organizing_team_member(request.user, event) and \
+       request.user not in event.evaluating_team.members.all():
+        raise PermissionDenied
+
+    # abstracts = Abstract.objects.filter(event=event)
+
+    abstract = get_object_or_404(Abstract, pk=abstract_id)
+    evaluators = event.abstract_revision_team.members.all()
+
+    # form = forms.AssignEvaluatorForm()
+
+    # abstract_count = Abstract.objects.filter(event=event, is_deleted=False).count()
+    # evaluation_team_members_count = event.abstract_revision_team.members.count()
+    # target_abstracts_per_evaluator = float(abstract_count) * event.evaluators_per_abstract / evaluation_team_members_count
+    # target_abstracts_per_evaluator = math.ceil(target_abstracts_per_evaluator)
+    # target_abstracts_per_evaluator = int(target_abstracts_per_evaluator)
+    #
+    # overworked_evaluators = event.abstract_revision_team.members \
+    #     .annotate(abstract_count=Count('abstract')) \
+    #     .filter(abstract_count__gt=target_abstracts_per_evaluator)
+    #
+    # # for evaluator in overworked_evaluators:
+    # #     extra_abstract_count = evaluator.abstract_count - target_abstracts_per_evaluator
+    # #     # Exclude already-evaluated abstracts
+    # #     extra_abstracts = evaluator.abstract_set.exclude(evaluation__evaluator=evaluator).distinct()[
+    # #                       :extra_abstract_count]
+    #
+    # unassigned_abstracts = Abstract.objects.annotate(evaluator_count=Count('evaluators')) \
+    #     .filter(event=event, is_deleted=False,
+    #             evaluator_count__lt=event.evaluators_per_abstract)
+
+    if request.method == 'POST':
+        instance = abstract
+        form = forms.AssignEvaluatorForm(request.POST, instance=instance)
+        if form.is_valid():
+            abstract = form.save()
+            return HttpResponseRedirect(reverse('events:list_abstracts',
+                                            args=(event.code_name,)))
+    elif request.method == 'GET':
+        form = forms.AssignEvaluatorForm(instance=abstract)
+
+    context = {'abstract':abstract,
+               'event': event, 'evaluators': evaluators,
+               'form':form,
+               # 'abstracts': abstracts,
+               # 'form': form, 'abstract_count': abstract_count,
+               # 'evaluation_team_members_count': evaluation_team_members_count,
+               # 'target_abstracts_per_evaluator': target_abstracts_per_evaluator,
+               # 'overworked_evaluators': overworked_evaluators,
+               # 'unassigned_abstracts': unassigned_abstracts
+    }
+
+    return render(request, "events/abstracts/assign_evaluator_manually.html", context)

@@ -71,6 +71,7 @@ class Event(models.Model):
     abstract_submission_opening_date = models.DateTimeField(u"تاريخ فتح استقبال الملخصات البحثية", null=True, blank=True)
     abstract_submission_closing_date = models.DateTimeField(u"تاريخ انتهاء إغلاق استقبال الملخصات البحثية", null=True, blank=True)
     abstract_submission_instruction_url = models.URLField(u"رابط تعليمات إرسال الأبحاث", max_length=255, blank=True, default="")
+    # The actual evaluators of the abstracts are in this team:
     abstract_revision_team = models.ForeignKey(Team, null=True, blank=True,
                                                related_name="abstract_revision_events")
     evaluators_per_abstract = models.PositiveSmallIntegerField(u"عدد المقيمين والمقيمات لكل ملخص بحثي",
@@ -89,6 +90,9 @@ class Event(models.Model):
                                          verbose_name=u"على تلغرام؟")
     organizing_team = models.ForeignKey(Team, null=True, blank=True,
                                         verbose_name=u"فريق التنظيم")
+    # Don't be confused, this evaluating team -in real life- is a sub-team of the research team.
+    # ****This is NOT the team of evaluators who will evaluate the abstracts*****
+    # The actual EVALUATORS are in the abstract_revision_team
     evaluating_team = models.ForeignKey(Team, null=True, blank=True,
                                         verbose_name=u"لجنة تقييم الأبحاث",
                                         related_name="evaluating_team_events")

@@ -63,7 +63,7 @@ urlpatterns = patterns('',
     url(r'^(?P<event_code_name>[\d\w_\-]+)/booths/$', views.list_booths, name="list_booths"),
 
     url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/(?P<abstract_id>\d+)/sort/$', views.add_sorting,name="add_sorting"),
-
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/abstracts/(?P<abstract_id>\d+)/assign_evaluator/$', views.assign_evaluator_manually,name="assign_evaluator_m"),
                        # Has to be the last URL so it doesn't catch unintended patterns.
     url(r'^(?P<event_code_name>[\d\w_\-]+)/(?P<code_name>[\d\w\-]+)/$', views.show_session_group,name="show_session_group"),
 

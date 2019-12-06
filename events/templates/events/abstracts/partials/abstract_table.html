@@ -31,7 +31,7 @@
             <td>{{ abstract.phone }}</td>
         </tr>
         {% endif %}
-        {% if user|can_evaluate_abstracts:event or user|is_organizing_team_member:event or user in event.oral_poster_team.members.all or user.is_superuser  %}
+        {% if not user|can_evaluate_abstracts:event or user|is_organizing_team_member:event or user in event.oral_poster_team.members.all or user.is_superuser  %}
         <tr>
             <th class="text-center">University</th>
             <td>{{ abstract.university }}</td>

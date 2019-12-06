@@ -1,0 +1,29 @@
+{% extends 'events_evaluation_base.html' %}{% load staticfiles %} {% load events_tags %} {% block title %}{{ event.english_name }}: Assign Evaluators{% endblock %} {% block content %}
+<div class="row">
+        <br>
+    <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
+        <h2 class="mentor-section-header">Assign Abstracts to Evaluators</h2>
+    </div>
+</div>
+
+<div class="english-field">
+<div style="width:70%">
+<div class="row" align="center">
+    <div class="col-lg-2">
+        <form action="{% url 'events:assign_evaluator_m' event.code_name abstract.pk %}" method="post">
+            {% csrf_token %}
+            <label>Assigned evaluators: </label><br><br>
+            {{ form.evaluators }}<br><br>
+            <input class="btn btn-success" type="submit" value="Save">
+        </form>
+    </div>
+    <div class="col-lg-2">
+        Principle investigator:<br><br> {{ abstract.principle_investigator }}
+    </div>
+    <div class="col-lg-2">
+        Abstract ID:<br><br> {{ abstract.pk }}
+    </div>
+</div><br><br><br><br><br>
+</div>
+</div>
+{% endblock %}

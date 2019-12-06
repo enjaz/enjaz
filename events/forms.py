@@ -320,3 +320,8 @@ class SortingForm(forms.ModelForm):
         model = Sorting
         fields = ['study_design', 'data_recency', 'status',
                   'pres_author_affiliation', 'research_value', 'pub_status']
+
+class AssignEvaluatorForm(forms.ModelForm):
+    class Meta:
+        model = Abstract
+        fields = ['evaluators']

@@ -108,7 +108,7 @@
                                 {% for abstract in sorted_abstracts %}
                                 <tr>
                                     <td><input type="checkbox" value="1" name="pk_{{ abstract.pk }}"></td>
-                                    <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.pk }}</a></td>
+                                    <td class="not-mobile"><a href="{% url 'events:assign_evaluator_m' event.code_name abstract.pk %}">{{ abstract.pk }}</a></td>
                                     <td>{{ abstract.principle_investigator }}</td>
                                     {% if abstract.evaluators.all %}
                                         {% for evaluator in abstract.evaluators.all %}

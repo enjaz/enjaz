@@ -527,6 +527,7 @@ class Abstract(models.Model):
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
     why_deleted = models.TextField(u"Justification for Deletion", default="", blank=True)
+    who_deleted = models.OneToOneField(User, null=True, blank=True, related_name='deleted_abstracts')
     status=models.CharField(verbose_name="acceptance status", max_length=1, choices=status_choices, default='P')
     accepted_presentaion_preference = models.CharField(verbose_name="Accepted presentation preference",
                                                        max_length=1, choices=presentation_preference_choices,

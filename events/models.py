@@ -623,6 +623,7 @@ class Criterion(models.Model):
     code_name = models.CharField(max_length=200,
                                  verbose_name=u"اسم المعيار البرمجي")
     instructions = models.TextField(u"تعليمات", default="")
+    highest_value = models.IntegerField(u"أعلى درجة يمكن نيلها", default=10)
 
     def __unicode__(self):
         return self.code_name

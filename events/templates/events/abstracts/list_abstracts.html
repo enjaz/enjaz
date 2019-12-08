@@ -365,6 +365,8 @@
 </div>
 {% endif %}
 {% endif %}
+
+{% if request.user in event.organizing_team.members.all or request.user.is_superuser %}
 <div class="row">
         <br>
     <div class="col-sm-6 col-sm-offset-3 mentor-section-intro">
@@ -453,6 +455,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 <div class="english-field">
     <div class="panel panel-info">
         <div class="panel-heading">

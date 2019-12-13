@@ -254,8 +254,8 @@
                                     <th class="all">Presenting author</th>
                                     <th class="all">University</th>
                                     <th class="all">Presentation preference</th>
-                                    <th class="all">Score</th>
-                                    <th class="all">Accepted presentation preference</th>
+                                    <th class="all">Total precentage</th>
+                                    <th class="none">Accepted presentation preference</th>
                                     <th class="none">Evaluators</th>
                                     <th class="none">Study field</th>
                                     <th class="none">Collection method</th>
@@ -274,7 +274,7 @@
                                     <td><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></td>
                                     <td>{{ abstract.university }}</td>
                                     <td>{{ abstract.get_presentation_preference_display }}</td>
-                                    <td>ِ{{ abstract.get_average_score }}</td>
+                                    <td>ِ{{ abstract.get_total_percentage|floatformat:2 }} %</td>
                                     {% if abstract.get_accepted_presentaion_preference_display %}
                                     <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
                                     {% else %}
@@ -378,7 +378,7 @@
         <div class="panel-heading">
             <h4 class="panel-title">
                 <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseFive-2" class="english-field collapsed">
-                    Pending abstracts ({{ evaluated_abstracts_pending.count }})
+                    Accepted abstracts ({{ evaluated_abstracts_pending.count }})
                 </a>
             </h4>
         </div>
@@ -388,10 +388,10 @@
                     {% csrf_token %}
                     <select name="action">
                         <option>Choose Action</option>
-                        <option value="delete">Delete</option>
+                        <!--<option value="delete">Delete</option>-->
                         <option value="accepte_as_oral">Accept As Oral</option>
                         <option value="accepte_as_poster">Accept As Poster</option>
-                        <option value="regect">Regect</option>
+                        <!--<option value="regect">Regect</option>-->
                     </select>
                     <div class="row">
                         <table id="pending_evaluated" class="display datatable dt-responsive">
@@ -401,11 +401,11 @@
                                     <th class="all">ID</th>
                                     <th class="all">Title</th>
                                     <th class="all">Presenting author</th>
-                                    <th class="all">Presentation preference</th>
-                                    <th class="all">Score</th>
                                     <th class="all">University</th>
-                                    <th class="all">Accepted presentation preference</th>
-                                    <th class="all">Presentation date</th>
+                                    <th class="all">Presentation preference</th>
+                                    <!--<th class="all">Presentation date</th>-->
+                                    <th class="all">Total precentage</th>
+                                    <th class="none">Accepted presentation preference</th>
                                     <th class="none">Evaluators</th>
                                     <th class="none">Study field</th>
                                     <th class="none">Collection method</th>
@@ -422,15 +422,15 @@
                                     <td>{{ abstract.pk }}</td>
                                     <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
                                     <td><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></td>
-                                    <td>{{ abstract.get_presentation_preference_display }}</td>
-                                    <td>ِ{{ abstract.get_average_score }}</td>
                                     <td>{{ abstract.university }}</td>
+                                    <td>{{ abstract.get_presentation_preference_display }}</td>
+                                    <!--<td>{{ abstract.presentaion_date }}</td>-->
+                                    <td>ِ{{ abstract.get_total_percentage|floatformat:2 }} %</td>
                                     {% if abstract.get_accepted_presentaion_preference_display %}
                                     <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
                                     {% else %}
                                     <td>{{ abstract.get_status_display }}</td>
                                     {% endif %}
-                                    <td>{{ abstract.presentaion_date }}</td>
                                     <td>
                                         <ul>
                                             {% for evaluator in abstract.evaluators.all %}
@@ -761,6 +761,9 @@
 <link rel="stylesheet" href="{% static 'js/datatables/responsive/css/responsive.dataTables.min.css' %}">
 <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'js/datatables/responsive/js/dataTables.responsive.min.js' %}"></script>
+<!--MathJax-->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <style type="text/css">
     th,
     td {

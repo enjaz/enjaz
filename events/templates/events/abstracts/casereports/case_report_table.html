@@ -23,6 +23,10 @@
             <td class="activity-description">{% for author in abstract.author.all %}{{ author.name }} | {% endfor %} </td>
         </tr>
         <tr>
+            <th class="text-center">Presentation preference</th>
+            <td>{{ abstract.presentation_preference }}</td>
+        </tr>
+        <tr>
             <th class="text-center">Email</th>
             <td><a href="mailto:{{ abstract.email }}">{{ abstract.email }}</a></td>
         </tr>
@@ -31,7 +35,7 @@
             <td>{{ abstract.phone }}</td>
         </tr>
         {% endif %}
-        {% if user|can_evaluate_abstracts:event or user.is_superuser  %}
+        {% if user|can_evaluate_abstracts:event or user in event.oral_poster_team.members.all or user in event.evaluating_team.members.all or user|is_organizing_team_member:event or user.is_superuser  %}
         <tr>
             <th class="text-center">University</th>
             <td>{{ abstract.university }}</td>
@@ -51,10 +55,14 @@
         </tr>
         <tr>
 
-  			<tr>
-  					<th class="text-center">Has the study been presented in a conference before?</th>
-  					<td>{{ abstract.was_presented_at_conference|yesno:"Yes,No" }}</td>
-  			</tr>
+        <tr>
+                <th class="text-center">Has the study been presented in a conference before?</th>
+                <td>{{ abstract.was_presented_at_conference|yesno:"Yes,No" }}</td>
+        </tr>
+        <tr>
+            <th class="text-center">Name of the conference presented at</th>
+            <td>{{ abstract.conference_presented_at}}</td>
+        </tr>
         {% endif %}
         {%  if abstract.status == 'A' %}
         <tr>

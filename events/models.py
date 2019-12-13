@@ -560,6 +560,7 @@ class Abstract(models.Model):
     )
     irb_approval = models.CharField(verbose_name="Do you have an IRB Approval?", max_length=1, choices=irb_approval_choices,default="N")
     graduation_year = models.CharField(verbose_name="when did you graduate/expected year of graduation",max_length=4,default="")
+    is_statistically_excluded = models.BooleanField(default=False)
 
     def get_average_score(self):
         evaluation_number = self.evaluation_set.count()
@@ -567,6 +568,22 @@ class Abstract(models.Model):
             return 0
         total_score = CriterionValue.objects.filter(evaluation__in=self.evaluation_set.all()).aggregate(Sum('value'))['value__sum']
         return total_score / evaluation_number
+
+    # ToDo: make the highest value obtainable a calculatable variable instead of 21 and 30
+    def get_sorting_percentage(self):
+        try:
+            Sorting.objects.get(abstract=self)
+        except ObjectDoesNotExist:
+            return 0
+        sorting_score = self.sorting.get_sorting_score() / 21.00
+        return (20*sorting_score)
+
+    def get_evaluation_percentage(self):
+        evaluation_score = self.get_average_score() / 30.00
+        return (80*evaluation_score)
+
+    def get_total_percentage(self):
+        return self.get_sorting_percentage() + self.get_evaluation_percentage()
 
     def __unicode__(self):
         return self.title
@@ -582,8 +599,6 @@ class AbstractPoster (models.Model):
     poster_powerpoint= models.FileField(verbose_name=u"Attach the poster powerpoint", upload_to="events/poster_powerpoints/")
     date_submitted = models.DateTimeField(auto_now_add=True)
     presentation_file = models.FileField(verbose_name=u"Attach the presentation", upload_to="events/presentations/")
-
-
 
 class AbstractFigure(models.Model):
     abstract = models.ForeignKey(Abstract, related_name='figures', null=True)

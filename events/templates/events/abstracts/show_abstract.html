@@ -20,7 +20,8 @@ h4{
 
     <div class="english-field">
     {% if abstract.status == 'P' %}
-        {% if user|can_evaluate_abstracts:event or user in event.oral_poster_team.members.all or user in event.organizing_team.members.all or user.is_superuser  %}
+        <!--{% if user|can_evaluate_abstracts:event or user in event.oral_poster_team.members.all or user in event.organizing_team.members.all or user.is_superuser  %}{% endif %}-->
+        {% if user.is_superuser  %}
             <p class="alert alert-warning"><i class="fa fa-hourglass-half" aria-hidden="true"></i> This abstract is : {{ abstract.get_status_display }}</p>
         {% endif %}
         <!--
@@ -28,7 +29,7 @@ h4{
         -->
         {% if abstract.event.end_date.year < 2020 %}
             {% if user.is_superuser or user in event.organizing_team.members.all or user in event.oral_poster_team.members.all or user|can_evaluate_abstracts:event %}
-                <p class="alert alert-danger"><i class="fa fa-hourglass-half" aria-hidden="true"></i> Abstract has been submitted to {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %} and has not been sorted or evaluated</p>
+                <p class="alert alert-danger"><i class="fa fa-hourglass-half" aria-hidden="true"></i> Abstract has been submitted to {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %} and has not been {% if not already_sorted %} sorted or{% endif %} evaluated</p>
             {% elif not user|can_evaluate_abstracts:event %}
                 <p class="alert alert-danger"><i class="fa fa-hourglass-half" aria-hidden="true"></i> This abstract has been rejected in {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %}</p>
             {% endif %}
@@ -132,6 +133,7 @@ h4{
 {% endif %}
 </div>
 
+{% if not already_sorted %}
 <div style="float: right;">
 	<!-- <button id="edit-abstract" class="btn btn-icon btn-success">
 			<i class="entypo-pencil"></i>
@@ -176,6 +178,8 @@ h4{
     <!--</form>-->
     <!--</form>-->
 </div>
+{% endif %}
+
 </div>
 
 

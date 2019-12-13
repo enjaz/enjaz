@@ -70,6 +70,16 @@
   					<td>{{ abstract.was_presented_at_conference|yesno:"Yes,No" }}</td>
   			</tr>
         {% endif %}
+        {% if already_sorted  %}
+            <tr>
+                <th class="text-center">Sorting Percentage (highest value = 20%)</th>
+                <td>{{ abstract.get_sorting_percentage|floatformat:2  }} %</td>
+            </tr>
+            <tr>
+                <th class="text-center">Evaluation Percentage (highest value = 80%)</th>
+                <td>{{ abstract.get_evaluation_percentage|floatformat:2  }} %</td>
+            </tr>
+        {% endif %}
         {%  if abstract.status == 'A' %}
         <tr>
             <th class="text-center">Accepted Presentation</th>

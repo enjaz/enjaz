@@ -153,16 +153,16 @@ def list_abstracts(request, event_code_name):
             request.user not in event.evaluating_team.members.all():
         raise PermissionDenied
 
-    pending_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=1).annotate(num_s=Count('sorting')).filter(num_s__lt=1)
-    sorted_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__lt=2).annotate(num_s=Count('sorting')).exclude(num_s__lt=1)
-    one_evaluator = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=1, num_b__lt=2)
-    evaluated_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=2)
-    deleted_abstracts = Abstract.objects.filter(event=event, is_deleted=True)
+    pending_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False, num_b__lt=1).annotate(num_s=Count('sorting')).filter(num_s__lt=1)
+    sorted_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False, is_statistically_excluded=False, num_b__lt=2).annotate(num_s=Count('sorting')).exclude(num_s__lt=1)
+    one_evaluator = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False, is_statistically_excluded=False, num_b__gte=1, num_b__lt=2)
+    evaluated_abstracts = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False, is_statistically_excluded=False, num_b__gte=2)
+    deleted_abstracts = Abstract.objects.filter(event=event, is_deleted=True, is_statistically_excluded=False,)
 
-    evaluated_abstracts_pending = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=2, status='P')
-    accepted_poster_abstracts = Abstract.objects.filter(event=event, is_deleted=False, accepted_presentaion_preference= 'P')
-    accepted_oral_abstracts = Abstract.objects.filter(event=event, is_deleted=False, accepted_presentaion_preference= 'O')
-    evaluated_abstracts_regected = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False,num_b__gte=2, status='R')
+    evaluated_abstracts_pending = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False, is_statistically_excluded=False, num_b__gte=2, status='P')
+    accepted_poster_abstracts = Abstract.objects.filter(event=event, is_deleted=False, is_statistically_excluded=False, accepted_presentaion_preference= 'P')
+    accepted_oral_abstracts = Abstract.objects.filter(event=event, is_deleted=False, is_statistically_excluded=False, accepted_presentaion_preference= 'O')
+    evaluated_abstracts_regected = Abstract.objects.annotate(num_b=Count('evaluation')).filter(event=event, is_deleted=False, is_statistically_excluded=False, num_b__gte=2, status='R')
 
     casereports = CaseReport.objects.filter(event=event, is_deleted=False)
 
@@ -254,13 +254,14 @@ def list_my_abstracts(request, event_code_name=None, user_pk=None):
                                   receives_abstract_submission=True)
         abstract_user = get_object_or_404(User, pk=user_pk)
 
-        abstracts = Abstract.objects.filter(event__code_name=event_code_name, is_deleted=False, user=abstract_user)
+        abstracts = Abstract.objects.filter(event__code_name=event_code_name, is_deleted=False,
+                                            is_statistically_excluded=False, user=abstract_user)
         casereports = CaseReport.objects.filter(event__code_name=event_code_name, is_deleted=False, user=abstract_user)
     else:
         event = None
         abstract_user = request.user
 
-        abstracts = Abstract.objects.filter(is_deleted=False, user=request.user)
+        abstracts = Abstract.objects.filter(is_deleted=False, is_statistically_excluded=False, user=request.user)
         casereports = CaseReport.objects.filter(is_deleted=False, user=request.user)
 
     if not abstract_user == request.user and \
@@ -286,6 +287,13 @@ def show_abstract(request, event_code_name, pk):
             not utils.is_organizing_team_member(request.user, event) and \
             request.user not in event.oral_poster_team.members.all():
         raise PermissionDenied
+
+    try:
+        sorting = Sorting.objects.get(abstract=abstract)
+        already_sorted = True
+    except Sorting.DoesNotExist:
+        already_sorted = False
+    context['already_sorted'] = already_sorted
 
     if request.method == 'POST':
          poster_form = forms.AbstractPosterForm(request.POST, request.FILES)
@@ -672,7 +680,9 @@ def show_casereport(request, event_code_name, pk):
     if not abstract.user == request.user and \
             not request.user.is_superuser and \
             not utils.can_evaluate_abstracts(request.user, event) and \
-            not utils.is_organizing_team_member(request.user, event):
+            not utils.is_organizing_team_member(request.user, event) and \
+            not request.user in event.evaluating_team.members.all() and \
+            not request.user in event.oral_poster_team.members.all():
         raise PermissionDenied
 
     context= {'event':event, 'abstract':abstract}

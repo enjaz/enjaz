@@ -147,6 +147,7 @@ h4{
     {% endif %}
 </div>
 
+{% if user in event.oral_poster_team.members.all or user in event.organizing_team.members.all or user.is_superuser %}
 <div style="float: left">
     <button id="sorting_btn" class="btn btn-icon btn-primary">
         <a style="color:#fff" href="{% url 'events:add_sorting' event.code_name abstract.pk %}">
@@ -178,6 +179,8 @@ h4{
     <!--</form>-->
     <!--</form>-->
 </div>
+{% endif %}
+
 {% endif %}
 
 </div>

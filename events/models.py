@@ -534,6 +534,8 @@ class Abstract(models.Model):
                                                        max_length=1, choices=presentation_preference_choices,
                                                        blank=True)
     presentaion_date = models.DateField(u"تاريخ العرض", null=True, blank=True)
+    presentaion_time = models.TimeField(u"وقت العرض", null=True, blank=True)
+    presentaion_location = models.CharField(u"مكان العرض", null=True, blank=True, max_length=300)
     did_presenter_attend = models.BooleanField(verbose_name=u"حضر المقدم؟", default=False)
     certificates = GenericRelation('certificates.Certificate', related_query_name="abstracts")
     # HPC 2020 New fields
@@ -577,11 +579,11 @@ class Abstract(models.Model):
         except ObjectDoesNotExist:
             return 0
         sorting_score = self.sorting.get_sorting_score() / 21.00
-        return (20*sorting_score)
+        return (25*sorting_score)
 
     def get_evaluation_percentage(self):
         evaluation_score = self.get_average_score() / 30.00
-        return (80*evaluation_score)
+        return (75*evaluation_score)
 
     def get_total_percentage(self):
         return self.get_sorting_percentage() + self.get_evaluation_percentage()

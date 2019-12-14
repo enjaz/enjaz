@@ -240,6 +240,7 @@
                     <select name="action">
                         <option>Choose Action</option>
                         <option value="delete">Delete</option>
+                        <option value="accept_generally">Accept</option>
                         <option value="accepte_as_oral">Accept As Oral</option>
                         <option value="accepte_as_poster">Accept As Poster</option>
                         <option value="regect">Regect</option>
@@ -394,7 +395,7 @@
                         <!--<option value="regect">Regect</option>-->
                     </select>
                     <div class="row">
-                        <table id="pending_evaluated" class="display datatable dt-responsive">
+                        <table id="accepted_evaluated" class="display datatable dt-responsive">
                             <thead>
                                 <tr>
                                     <th></th>
@@ -485,11 +486,11 @@
                                     <th class="all">ID</th>
                                     <th class="all">Title</th>
                                     <th class="all">Presenting author</th>
-                                    <th class="all">Presentation preference</th>
-                                    <th class="all">Score</th>
                                     <th class="all">University</th>
-                                    <th class="all">Accepted presentation preference</th>
-                                    <th class="all">Presentation date</th>
+                                    <!--<th class="all">Accepted presentation preference</th>-->
+                                    <th class="all">Date</th>
+                                    <th class="all">Time</th>
+                                    <th class="all">Screen</th>
                                     <th class="none">Evaluators</th>
                                     <th class="none">Study field</th>
                                     <th class="none">Collection method</th>
@@ -506,14 +507,12 @@
                                     <td>{{ abstract.pk }}</td>
                                     <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
                                     <td><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></td>
-                                    <td>{{ abstract.get_presentation_preference_display }}</td>
-                                    <td>ِ{{ abstract.get_average_score }}</td>
                                     <td>{{ abstract.university }}</td>
-                                    {% if abstract.get_accepted_presentaion_preference_display %}
-                                    <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
-                                    {% else %}
-                                    <td>{{ abstract.get_status_display }}</td>
-                                    {% endif %}
+                                    <!--{% if abstract.get_accepted_presentaion_preference_display %}-->
+                                    <!--<td>{{ abstract.get_accepted_presentaion_preference_display }}</td>-->
+                                    <!--{% else %}-->
+                                    <!--<td>{{ abstract.get_status_display }}</td>-->
+                                    <!--{% endif %}-->
                                     <td>{{ abstract.presentaion_date }}</td>
                                     <td>
                                         <ul>
@@ -544,7 +543,7 @@
         <div class="panel-heading">
             <h4 class="panel-title">
                 <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseSeven-2" class="english-field collapsed">
-                    Oral abstracts ({{ accepted_oral_abstracts.count }})
+                    Oral presentations ({{ accepted_oral_abstracts.count }})
                 </a>
             </h4>
         </div>
@@ -568,11 +567,11 @@
                                     <th class="all">ID</th>
                                     <th class="all">Title</th>
                                     <th class="all">Presenting author</th>
-                                    <th class="all">Presentation preference</th>
-                                    <th class="all">Score</th>
                                     <th class="all">University</th>
-                                    <th class="all">Accepted presentation preference</th>
+                                    <!--<th class="all">Accepted presentation preference</th>-->
                                     <th class="all">Presentation date</th>
+                                    <th class="all">Presentation time</th>
+                                    <th class="all">Presentation location</th>
                                     <th class="none">Evaluators</th>
                                     <th class="none">Study field</th>
                                     <th class="none">Collection method</th>
@@ -589,15 +588,15 @@
                                     <td>{{ abstract.pk }}</td>
                                     <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
                                     <td><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></td>
-                                    <td>{{ abstract.get_presentation_preference_display }}</td>
-                                    <td>ِ{{ abstract.get_average_score }}</td>
                                     <td>{{ abstract.university }}</td>
-                                    {% if abstract.get_accepted_presentaion_preference_display %}
-                                    <td>{{ abstract.get_accepted_presentaion_preference_display }}</td>
-                                    {% else %}
-                                    <td>{{ abstract.get_status_display }}</td>
-                                    {% endif %}
+                                    <!--{% if abstract.get_accepted_presentaion_preference_display %}-->
+                                    <!--<td>{{ abstract.get_accepted_presentaion_preference_display }}</td>-->
+                                    <!--{% else %}-->
+                                    <!--<td>{{ abstract.get_status_display }}</td>-->
+                                    <!--{% endif %}-->
                                     <td>{{ abstract.presentaion_date }}</td>
+                                    <td>{{ abstract.presentaion_time }}</td>
+                                    <td>{{ abstract.presentaion_location }}</td>
                                     <td>
                                         <ul>
                                             {% for evaluator in abstract.evaluators.all %}
@@ -799,6 +798,11 @@
             ]
         });
         $("#pending_evaluated").dataTable({
+            "order": [
+                [1, "desc"]
+            ]
+        });
+        $("#accepted_evaluated").dataTable({
             "order": [
                 [1, "desc"]
             ]

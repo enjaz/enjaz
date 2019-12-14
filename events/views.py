@@ -249,19 +249,20 @@ def list_presenter_attendance(request, event_code_name):
 
 @login_required
 def list_my_abstracts(request, event_code_name=None, user_pk=None):
+    # New edit: Show abstracts even if deleted from our side
     if user_pk and event_code_name:
         event = get_object_or_404(Event, code_name=event_code_name,
                                   receives_abstract_submission=True)
         abstract_user = get_object_or_404(User, pk=user_pk)
 
-        abstracts = Abstract.objects.filter(event__code_name=event_code_name, is_deleted=False,
+        abstracts = Abstract.objects.filter(event__code_name=event_code_name,
                                             is_statistically_excluded=False, user=abstract_user)
-        casereports = CaseReport.objects.filter(event__code_name=event_code_name, is_deleted=False, user=abstract_user)
+        casereports = CaseReport.objects.filter(event__code_name=event_code_name, user=abstract_user)
     else:
         event = None
         abstract_user = request.user
 
-        abstracts = Abstract.objects.filter(is_deleted=False, is_statistically_excluded=False, user=request.user)
+        abstracts = Abstract.objects.filter(is_statistically_excluded=False, user=request.user)
         casereports = CaseReport.objects.filter(is_deleted=False, user=request.user)
 
     if not abstract_user == request.user and \
@@ -276,7 +277,7 @@ def list_my_abstracts(request, event_code_name=None, user_pk=None):
 
 @login_required
 def show_abstract(request, event_code_name, pk):
-    abstract = get_object_or_404(Abstract, is_deleted=False, pk=pk)
+    abstract = get_object_or_404(Abstract, is_statistically_excluded=False, pk=pk)
     event = abstract.event
     sorting_form = forms.SortingForm()
     context = {'event': event, 'abstract': abstract, 'sorting_form':sorting_form}

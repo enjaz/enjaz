@@ -65,21 +65,44 @@
   					<th class="text-center">Do you have an IRB Approval?</th>
   					<td>{{ abstract.get_irb_approval_display }}</td>
         </tr>
+        {% if user.is_superuser or user in event.organizing_team.members.all or user in event.oral_poster_team.members.all or user in event.evaluating_team.members.all %}
         <tr>
                 <th class="text-center">Has the study been presented in a conference before?</th>
                 <td>{{ abstract.get_was_presented_at_conference_display }}</td>
         </tr>
         {% endif %}
 
+        {% endif %}
+
         {% if user in event.oral_poster_team.members.all or user|is_organizing_team_member:event or user.is_superuser %}
             {% if already_sorted  %}
                 <tr>
-                    <th class="text-center">Sorting Percentage (highest value = 20%)</th>
-                    <td>{{ abstract.get_sorting_percentage|floatformat:2  }} %</td>
+                    <th class="text-center">Sorting Score</th>
+                    <td>{{ abstract.sorting.get_sorting_score }} </td>
                 </tr>
                 <tr>
-                    <th class="text-center">Evaluation Percentage (highest value = 80%)</th>
-                    <td>{{ abstract.get_evaluation_percentage|floatformat:2  }} %</td>
+                    <th class="text-center">Sorting Percentage (highest value = 25%)</th>
+                    <td>{{ abstract.get_sorting_percentage|floatformat:2 }} %</td>
+                </tr>
+            {% endif %}
+            {% if abstract.evaluators.all %}
+                {% for evaluator in abstract.evaluators.all %}
+                <tr>
+                    <th class="text-center">Evaluator</th>
+                    <td>{{ evaluator.common_profile.en_last_name|default:evaluator.username }}</td>
+                </tr>
+                    {% for evaluation in abstract.evaluation_set.all %}
+                        {% if evaluation.evaluator == evaluator %}
+                            <tr>
+                                <th class="text-center">Evaluation Score</th>
+                                <td>{{ evaluation.get_total_score }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+                <tr>
+                    <th class="text-center">Evaluation Percentage (highest value = 75%)</th>
+                    <td>{{ abstract.get_evaluation_percentage|floatformat:2 }} %</td>
                 </tr>
             {% endif %}
         {% endif %}

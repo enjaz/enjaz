@@ -345,7 +345,7 @@
                                     <td>{{ abstract.pk }}</td>
                                     <td class="not-mobile"><a href="{% url 'events:show_abstract' event.code_name abstract.pk %}">{{ abstract.title }}</a></td>
                                     <td>{{ abstract.why_deleted }}</td>
-                                    <td>{{ abstract.who_deleted.username }}</td>
+                                    <td>{{ abstract.who_deleted_abstract.username }}</td>
                                     <th><a href="{% url 'events:list_user_abstracts' event.code_name abstract.user.pk %}">{{ abstract.presenting_author }}</a></th>
                                     <td>{{ abstract.get_presentation_preference_display }}</td>
                                     <td>{{ abstract.was_published|yesno:"Yes,No" }}</td>

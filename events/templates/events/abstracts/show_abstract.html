@@ -25,9 +25,9 @@ h4{
             <p class="alert alert-warning"><i class="fa fa-hourglass-half" aria-hidden="true"></i> This abstract is : {{ abstract.get_status_display }}</p>
         {% endif %}
         <!--
-            If the event is not the current year event, user will be shown that the abstract has been rejected. Just change 2020 to current year
+            If the event is not the current year event, user will be shown that the abstract has been rejected.
         -->
-        {% if abstract.event.end_date.year < 2020 %}
+        {% if abstract.event.end_date.year < current_studentclub_year %}
             {% if user.is_superuser or user in event.organizing_team.members.all or user in event.oral_poster_team.members.all or user|can_evaluate_abstracts:event %}
                 <p class="alert alert-danger"><i class="fa fa-hourglass-half" aria-hidden="true"></i> Abstract has been submitted to {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %} and has not been {% if not already_sorted %} sorted or{% endif %} evaluated</p>
             {% elif not user|can_evaluate_abstracts:event %}
@@ -39,8 +39,17 @@ h4{
         {% else %}
             {% if user.is_superuser or not user|can_evaluate_abstracts:event %}
                 <p class="alert alert-success"> Dear {{ abstract.presenting_author }}, Your abstract with the title of "{{ abstract.title }}" has been submitted successfully to {% if abstract.event.is_official_name_english %}{{ abstract.event.english_name }}{% else %}{{ abstract.event.official_name }}{% endif %}
-                    Your <b> abstract ID is #{{ abstract.pk }}</b>. If you have any concerns contact us on <a target="_blank" href="https://t.me/HPC2020">Telegram</a>, or send us an e-mail to <a target="_blank" href="mailto: HPC-notifications@enjazportal.com">HPC-notifications@enjazportal.com</a></p>
-            {% endif %}
+                    Your <b> abstract ID is #{{ abstract.pk }}</b>
+                    . If you have any concerns contact us on
+                    {% if abstract.event.city == "الرياض" %}
+                        <a target="_blank" href="https://t.me/HPC2020">Telegram</a>, or send us an e-mail to <a target="_blank" href="mailto: HPC-notifications@enjazportal.com">HPC-notifications@enjazportal.com.</a>
+                    {% elif abstract.event.city == "جدة" %}
+                        <a target="_blank" href="https://twitter.com/Ksauh_Jedevents">Twitter.</a>
+                    {% elif abstract.event.city == "الأحساء" %}
+                        <a target="_blank" href="https://twitter.com/Ksau_AhsaEvents">Twitter.</a>
+                    {% endif %}
+                </p>
+                {% endif %}
         {% endif %}
     {% endif %}
     {% if abstract.status == 'A' %}

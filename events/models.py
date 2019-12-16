@@ -563,6 +563,8 @@ class Abstract(models.Model):
     )
     irb_approval = models.CharField(verbose_name="Do you have an IRB Approval?", max_length=1, choices=irb_approval_choices,default="N")
     graduation_year = models.CharField(verbose_name="when did you graduate/expected year of graduation",max_length=4,default="")
+    # If the research is duplicated or there is no justification or test. It will be excluded
+    # form abstract list without deleting it from the database
     is_statistically_excluded = models.BooleanField(default=False)
 
     def get_average_score(self):

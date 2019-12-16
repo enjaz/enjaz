@@ -23,7 +23,7 @@ from niqati.models import Order, Code
 from media.models import FollowUpReport, Story
 import accounts.utils
 import clubs.utils
-
+from events.models import Abstract,Event
 
 def portal_home(request):
     # If the user is logged in, return the admin dashboard;
@@ -55,7 +55,10 @@ def portal_home(request):
         context['book_sample'] = Book.objects.current_year().for_user_city(request.user).available().order_by("?")[:6]
         context['book_count'] = Book.objects.current_year().undeleted().count()
         context['my_book_count'] = request.user.book_giveaways.current_year().undeleted().count()
-        
+
+        # Abstracts
+        context['current_studentclub_year'] = StudentClubYear.objects.get_current().end_date.year
+
         return render(request, 'home.html', context) # the dashboard
     else:
         return render(request, 'front/home_front.html')

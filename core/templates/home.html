@@ -81,7 +81,7 @@
 
 					<tbody>
 						{% for abstract in user.event_abstracts.all %}
-            # If the abstract is submitted to current year HPC
+            <!-- If the abstract is submitted to current year HPC -->
             {% if not abstract.is_statistically_excluded and abstract.event.end_date.year >= current_studentclub_year %}
 						<tr>
 							<td dir="auto" class="english-field"><a href="{% url 'events:show_abstract' abstract.event.code_name abstract.pk %}">{{ abstract.title }}</a></td>

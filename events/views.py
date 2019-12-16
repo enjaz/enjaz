@@ -280,7 +280,8 @@ def show_abstract(request, event_code_name, pk):
     abstract = get_object_or_404(Abstract, is_statistically_excluded=False, pk=pk)
     event = abstract.event
     sorting_form = forms.SortingForm()
-    context = {'event': event, 'abstract': abstract, 'sorting_form':sorting_form}
+    current_studentclub_year = StudentClubYear.objects.get_current().end_date.year
+    context = {'event': event, 'abstract': abstract, 'sorting_form':sorting_form,'current_studentclub_year':current_studentclub_year}
 
     if not abstract.user == request.user and \
             not request.user.is_superuser and \

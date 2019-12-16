@@ -570,7 +570,7 @@ class Abstract(models.Model):
         if not evaluation_number:
             return 0
         total_score = CriterionValue.objects.filter(evaluation__in=self.evaluation_set.all()).aggregate(Sum('value'))['value__sum']
-        return total_score / evaluation_number
+        return (total_score*1.0) / evaluation_number
 
     # ToDo: make the highest value obtainable a calculatable variable instead of 21 and 30
     def get_sorting_percentage(self):

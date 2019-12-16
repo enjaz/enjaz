@@ -26,6 +26,7 @@ from .models import Event, Session, Abstract, AbstractFigure,\
 from . import utils, forms
 import core.utils
 import clubs.utils
+from core.models import StudentClubYear
 
 
 def redirect_home(request, event_code_name):

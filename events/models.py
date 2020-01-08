@@ -732,6 +732,8 @@ class CaseReport(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False,
                                      verbose_name=u"محذوف؟")
+    why_deleted = models.TextField(u"Justification for Deletion", default="", blank=True)
+    who_deleted = models.ForeignKey(User, null=True, blank=True, related_name='deleted_casereports')
     # HPC 2020 New fields
     # Author information
     gender_choices = (

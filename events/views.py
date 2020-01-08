@@ -142,7 +142,7 @@ def delete_abstract(request, event_code_name, pk):
     # TODO: Make the below url work >.<
     # list_abstracts_url = reverse('events:list_abstracts', args=event.code_name)
     full_url = request.build_absolute_uri(list_my_abstracts_url)
-    return {"message": "success", "list_url": full_url}
+    return {"message": "success", "list_url": full_url, "asset": "abstract"}
 
 @login_required
 def list_abstracts(request, event_code_name):
@@ -709,10 +709,12 @@ def delete_casereport(request, event_code_name, pk):
         raise Exception(u"انتهت المدة المتاحة لحذف الملخص ")
 
     casereport.is_deleted = True
+    casereport.who_deleted = request.user
+    casereport.why_deleted = request.POST.get("why_deleted", None)
     casereport.save()
     list_my_abstracts_url = reverse('events:list_my_abstracts')
     full_url = request.build_absolute_uri(list_my_abstracts_url)
-    return {"message": "success", "list_url": full_url}
+    return {"message": "success", "list_url": full_url, "asset": "casereport"}
 
 @login_required
 def evaluate(request, event_code_name, pk):

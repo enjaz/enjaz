@@ -45,3 +45,7 @@ def add_inventor3(request):
         form = InventorForm()
     context = {'form': form}
     return render(request, 'science_olympiad/add_inventor3.html', context)
+
+def begin_contest(request):
+    context = {}
+    return render(request, 'science_olympiad/begin_contest.html', context)

@@ -1,0 +1,223 @@
+<!--
+ =========================================================
+ * Material Kit - v2.0.6
+ =========================================================
+
+ * Product Page: https://www.creative-tim.com/product/material-kit
+ * Copyright 2019 Creative Tim (http://www.creative-tim.com)
+   Licensed under MIT (https://github.com/creativetimofficial/material-kit/blob/master/LICENSE.md)
+
+
+ =========================================================
+
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. -->
+
+{% extends 'science_olympiad/base.html' %}{% load static %}
+
+{% block title %}المسابقة العلمية{% endblock %}
+
+{% block style %}
+body{
+    text-align: center;
+}
+
+.header-filter::before {
+    background: rgba(0, 0, 0, 0);
+}
+
+.profile-page .profile img{
+  max-width: 200px;
+}
+
+<!--Counter CSS-->
+span#jqcd_count {
+  font-size: 20pt;
+  font-weight: bold;
+}
+input#jqcd_start,
+input#jqcd_stop,
+input#jqcd_reset {
+  font-size: 12pt;
+  font-weight: bold;
+}
+input#jqcd_start,
+input#jqcd_stop,
+input#jqcd_reset {
+  width: 100px;
+}
+<!--span#jqcd_count {-->
+  <!--font-family: "Lucida Console", Monaco, "Courier New", Courier, monospace !IMPORTANT;-->
+<!--}-->
+<!--End of Counter CSS-->
+
+{% endblock %}
+
+{% block content %}
+<!--<div class="profile-page sidebar-collapse">-->
+  <!--<div class="page-header header-filter" data-parallax="true" style="background-image: url({% static 'science_olympiad/images/header.jpg' %});">-->
+       <!--&lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;Navbar Start&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;-->
+          <!--<nav style="height:100px" class="navbar navbar-transparent navbar-expand-lg" id="sectionsNav">-->
+
+          <!--<div class="container">-->
+            <!--<div  class="navbar-translate">-->
+              <!--<a class="navbar-brand" href="">-->
+                  <!--<img id="logo" height="130px" style="margin-bottom:0px; margin-top:-100px; margin-right:0px"-->
+                       <!--src="{% static 'science_olympiad/images/logo_white.png' %}">-->
+              <!--</a>-->
+            <!--</div>-->
+          <!--</div>-->
+          <!--</nav>-->
+          <!--&lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;Navbar End&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;-->
+  <!--</div>-->
+  <!--<div class="main ">-->
+    <!--<div class="profile-content">-->
+      <!--<div class="container">-->
+        <!--<div class="row">-->
+          <!--<div class="col-md-6 ml-auto mr-auto">-->
+            <!--<div class="profile">-->
+              <!--<div class="avatar">-->
+                  <!--<img style="background-color:#fff; padding:15px" src="{% static 'science_olympiad/images/sections/black/contest_black.png' %}" class="rounded-circle img-fluid">-->
+              <!--</div>-->
+              <!--<div class="name">-->
+                <!--<h3 class="title">المسابقة العلمية</h3>-->
+              <!--</div>-->
+            <!--</div>-->
+          <!--</div>-->
+        <!--</div>-->
+          <!--<div style="padding-bottom:100px" class="description text-center">-->
+
+        <!--<div class="row" style="text-align:justify; text-align-last: center">-->
+            <!--هي مسابقة علمية ثقافية وتنافسية تنص على رؤية، وقياس المدى العلمي و الثقافي بين طلبة الجامعة من مختلف الكليات، في مختلف العلوم، وتهدف لخلق بيئة تؤمن بالتنافس الودِّي، لتعزز من أهمية اطلاع الفرد على جميع العلوم. حيث يمثل كل كلية فريق مُكون من أربعة طلاب وطالبات.-->
+<!--كوني/كن جزءًا منها!-->
+        <!--</div>-->
+        <!--<div class="section text-center">-->
+        <!--<p style="text-align:center"></p>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
+
+
+
+<div class="row" style="width:100%; padding-top:100px; padding-right:70px; margin-bottom:340px">
+    <div class="col-lg-4">
+        <span id="jqcd_count" style="text-align:center; font-size:40px">00:50</span><br><br>
+        <input type="button" id="jqcd_start" value="بدء" onClick="jqcd('start')" />
+        <input type="button" id="jqcd_stop" value="انتهاء" onClick="jqcd('stop')" />
+        <input type="button" id="jqcd_reset" value="إعادة تعيين" onClick="jqcd('reset')" /><br><br>
+        <input type="text" id="jqcd_time" value="00:10" />
+    </div>
+    <div class="col-lg-8" style="padding-left:70px">
+        <div><h2>نص السؤال هنا: أبجد هوز حطي كلمن صعفس قرشت ثخذ ضظغ</h2></div>
+        <div class="row" align="rtl">
+            <div class="col" style="border: 3px solid white; padding:5px; margin:10px">نص الجواب هنا</div>
+            <div class="col" style="border: 3px solid white; padding:5px; margin:10px">نص الجواب هنا</div>
+        </div>
+        <div class="row">
+            <div class="col" style="border: 3px solid white; padding:5px; margin:10px">نص الجواب هنا</div>
+            <div class="col" style="border: 3px solid white; padding:5px; margin:10px">نص الجواب هنا</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block customscript %}
+
+<script type="text/javascript">
+<!--Start Timer-->
+var jqcd_start_id = 'input#jqcd_start';
+var jqcd_time_id = 'input#jqcd_time';
+var jqcd_count_id = 'span#jqcd_count';
+var jqcd_end_message = 'انتهى الوقت!';
+
+var jqcd_countdown = '';
+var jqcd_status = 'stopped';
+var jqcd_current = '';
+function jqcd(action){
+
+  if (action == 'start') {
+    if (jqcd_status == 'stopped') {
+      jqcd_updtv(jqcd_start_id, 'توقف');
+      jqcd_status = 'running';
+      jqcd_current = jqcd_countdown;
+      jqcd_updtt(jqcd_count_id, jqcd_countdown);
+    }
+    else if (jqcd_status == 'running') {
+      jqcd_updtv(jqcd_start_id, 'استئناف');
+      jqcd_status = 'paused';
+    }
+    else if (jqcd_status == 'paused') {
+      jqcd_updtv(jqcd_start_id, 'توقف');
+      jqcd_status = 'running';
+    }
+  }
+  else if (action == 'stop') {
+    jqcd_updtv(jqcd_start_id, 'Start');
+    jqcd_status = 'stopped';
+    jqcd_updtt(jqcd_count_id, jqcd_end_message);
+  }
+  else if (action == 'reset') {
+    jqcd_updtv(jqcd_start_id, 'Start');
+    jqcd_status = 'stopped';
+    jqcd_updtt(jqcd_count_id, jqcd_countdown);
+  }
+
+  var a =  jqcd_current.split(":");
+  var m = a[0];
+  var s = (a[1] - 1);
+
+  if (s < 0) {
+    if (parseInt(m) == 0) {
+      jqcd_updtv(jqcd_start_id, 'Start');
+      jqcd_status = 'stopped';
+      jqcd_updtt(jqcd_count_id, jqcd_end_message);
+    }
+    else {
+      m = m - 1;
+      s = 59;
+    }
+  }
+
+  if(s >= 0){
+    setTimeout(function(){
+      if (jqcd_status == 'running') {
+        m = (parseInt(m) < 10)? "0" + parseInt(m): m;
+        s = (parseInt(s) < 10)? "0" + parseInt(s): s;
+        jqcd_updtt(jqcd_count_id, m + ":" + s);
+        jqcd_current = m + ":" + s;
+        jqcd('');
+      }
+    }, 1000);
+  }
+}
+
+function jqcd_updtv(selector, value) {
+  if (selector != '') {
+    $(selector).val(value);
+  }
+}
+function jqcd_updtt(selector, value) {
+  if (selector != '') {
+    $(selector).text(value);
+  }
+}
+
+$(document).ready(function() {
+  jqcd_countdown = $(jqcd_time_id).val();
+  jqcd_updtt(jqcd_count_id, jqcd_countdown);
+
+  $(jqcd_time_id).keyup(function() {
+    jqcd_countdown = $(jqcd_time_id).val();
+    jqcd_updtt(jqcd_count_id, jqcd_countdown);
+    jqcd_updtv(jqcd_start_id, 'Start');
+    jqcd_status = 'stopped';
+  });
+});
+<!--End Timer-->
+</script>
+
+{% endblock %}
+
+

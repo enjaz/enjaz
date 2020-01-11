@@ -52,3 +52,27 @@ class Inventor(models.Model):
 
     def __unicode__(self):
         return self.invention_name
+
+class ContestQuestion(models.Model):
+    text = models.TextField(u'نص السؤال')
+    category = models.CharField(u'نص السؤال', max_length=100)
+    olympiad_version = models.CharField(u'نسخة الأولمبياد', max_length=100, null=True) #May be used later in life
+
+    class Meta:
+        verbose_name = u"سؤال"
+        verbose_name_plural = u"أسئلة"
+
+    def __unicode__(self):
+        return self.text
+
+class ContestAnswer(models.Model):
+    question = models.ForeignKey(ContestQuestion, verbose_name=u'السؤال')
+    text = models.TextField(u'نص الجواب')
+    is_correct = models.BooleanField(u'هل الجواب صحيح؟', default=False)
+
+    class Meta:
+        verbose_name = u"جواب"
+        verbose_name_plural = u"أجوبة"
+
+    def __unicode__(self):
+        return self.text

@@ -12,4 +12,5 @@ urlpatterns = [
     # url(r'^inventors/add/$', views.add_inventor, name='add_inventor'),
     url(r'^inventors/register/$', views.add_inventor2, name='add_inventor'),
     # url(r'^inventors/add/3/$', views.add_inventor3, name='add_inventor2'),
+    url(r'^contest/begin/$', views.begin_contest, name='begin_contest'),
 ]

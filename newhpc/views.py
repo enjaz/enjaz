@@ -6,7 +6,7 @@ from django.views.decorators import csrf
 from django.http import JsonResponse
 from django.shortcuts import render
 from core import decorators
-from .models import FaqCategory, FaqQuestion, BlogPostArabic, BlogPostEnglish, NewsletterMembership, BlogVideo
+from .models import FaqCategory, FaqQuestion, BlogPostArabic, BlogPostEnglish, NewsletterMembership, BlogVideo, Speaker
 from .forms import *
 
 # enjazportal.com/riyadh HPC Riyadh :
@@ -233,6 +233,15 @@ def list_newsletter_members(request):
 def show_media_file(request, lang):
     return render(request,'newhpc/arabic/riy_coming_soon.html')
 
+def list_speakers(request, lang):
+    if lang == 'ar':
+        lang2 = 'arabic'
+    elif lang == 'en':
+        lang2 = 'english'
+    # TODO: FIx hard code in defining current year for filter
+    speakers = Speaker.objects.filter(version__year="2020")
+    context = {'speakers': speakers, 'year': '2020'}
+    return render(request, 'newhpc/'+lang2+'/riy_list_speakers.html', context)
 
 # enjazportal.com/jeddah HPC Jeddah :
 def jed_en_research(request):

@@ -19,6 +19,8 @@ urlpatterns = [
     url(r'^riyadh/en/research$', views.riy_en_research, name="riy_en_research"),
     # About Pages
     url(r'^riyadh/(?P<lang>(ar|en))/about$', views.show_about, name="riy_about"),
+    # Speakers' Page
+    url(r'^riyadh/(?P<lang>(ar|en))/speakers/$', views.list_speakers, name="riy_list_speakers"),
     # FAQ-Related Pages
     url(r'^general/FAQ/category/add$', views.add_FaqCategory, name="add_faq_category"),
     url(r'^general/FAQ/question/add$', views.add_FaqQuestion, name="add_faq_question"),

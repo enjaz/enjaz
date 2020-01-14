@@ -43,8 +43,6 @@ urlpatterns = [
     url(r'^riyadh/media/newsletter/signup/$', views.handle_newsletter_signup, name="handle_newsletter_signup"),
     # Media file
     url(r'^riyadh/(?P<lang>(ar|en))/media/file/$', views.show_media_file, name="media_file"),
-    url(r'^riyadh/(?P<lang>(ar|en))/media/file/testing$', views.show_media_file2, name="media_file2"),
-
 
     # Jeddah Pages
     # Index Pages

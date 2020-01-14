@@ -231,7 +231,7 @@ def list_newsletter_members(request):
     return render(request, 'newhpc/english/administrative/list_news_members.html', context)
 
 def show_media_file(request, lang):
-    return HttpResponseRedirect('/static/newhpc/media/file.pdf')
+    return HttpResponseRedirect('https://drive.google.com/file/d/1cHxuKi9PQuEEcRcQxLViREG916xGdZZ-/view?usp=drivesdk')
 
 def list_speakers(request, lang):
     if lang == 'ar':

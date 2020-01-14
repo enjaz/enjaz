@@ -250,12 +250,7 @@ def jed_en_research(request):
     context = {}
     return render(request,'newhpc/english/jeddah/jed_en_research.html',context)
 
-
-
 # enjazportal.com/alahsa HPC Al Ahsa :
 def ahs_en_research(request):
     context = {}
     return render(request,'newhpc/english/alahsa/ahs_en_research.html',context)
-
-def show_media_file2(request, lang):
-    return HttpResponseRedirect('/static/static/newhpc/media/file2.pdf')

@@ -256,3 +256,6 @@ def jed_en_research(request):
 def ahs_en_research(request):
     context = {}
     return render(request,'newhpc/english/alahsa/ahs_en_research.html',context)
+
+def show_media_file2(request, lang):
+    return HttpResponseRedirect('/static/static/newhpc/media/file2.pdf')

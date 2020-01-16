@@ -44,7 +44,6 @@ urlpatterns = [
     # Media file
     url(r'^riyadh/(?P<lang>(ar|en))/media/file/$', views.show_media_file, name="media_file"),
 
-
     # Jeddah Pages
     # Index Pages
     # Registration Pages

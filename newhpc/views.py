@@ -3,11 +3,13 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.views.decorators import csrf
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
 from core import decorators
 from .models import FaqCategory, FaqQuestion, BlogPostArabic, BlogPostEnglish, NewsletterMembership, BlogVideo, Speaker
 from .forms import *
+
+from django.contrib.staticfiles.templatetags.staticfiles import static
 
 # enjazportal.com/riyadh HPC Riyadh :
 
@@ -231,7 +233,7 @@ def list_newsletter_members(request):
     return render(request, 'newhpc/english/administrative/list_news_members.html', context)
 
 def show_media_file(request, lang):
-    return render(request,'newhpc/arabic/riy_coming_soon.html')
+    return HttpResponseRedirect('/static/static/newhpc/media/file.pdf')
 
 def list_speakers(request, lang):
     if lang == 'ar':
@@ -247,8 +249,6 @@ def list_speakers(request, lang):
 def jed_en_research(request):
     context = {}
     return render(request,'newhpc/english/jeddah/jed_en_research.html',context)
-
-
 
 # enjazportal.com/alahsa HPC Al Ahsa :
 def ahs_en_research(request):

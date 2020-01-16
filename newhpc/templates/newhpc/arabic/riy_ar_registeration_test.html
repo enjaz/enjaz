@@ -1,0 +1,112 @@
+{% extends 'newhpc/arabic/arabic_base.html' %}
+{% load staticfiles %}
+{% block title %}مؤتمر التخصّصات الصحّية 2020 | التسجيل{% endblock %}
+{% block style %}
+    #title {
+        font-size: 32px;
+        color: #9d0051;
+    }
+    .sub-title {
+        font-size: 26px!important;
+    }
+    .hpc-text {
+        color: #242b2c!important;
+        margin-top: 30px;
+        text-align: justify;
+        text-align-last: center;
+    }
+    .listitem44 {
+      display: inline-block;
+      font-size: 1.5em;
+      list-style-type: none;
+      padding: 1em;
+      text-transform: uppercase;
+    }
+
+    .listitem44 span {
+      display: block;
+      font-size: 4.5rem;
+    }
+{% endblock %}
+{% block lang %}
+{% url 'newhpc:riy_en_registration' %}
+{% endblock %}
+{% block lang2 %}
+{% url 'newhpc:riy_en_registration' %}
+{% endblock %}
+{% block active_register %}c-active{% endblock %}
+{% block content %}
+    <div class="c-layout-page">
+        <!-- BEGIN: PAGE CONTENT -->
+		<!-- BEGIN: CONTENT/STATS/COUNTER-1 -->
+        <div class="c-content-box c-size-md c-bg-white">
+            <div class="container">
+                <div class="c-content-counter-1 c-opt-1">
+                    <div class="c-content-title-1">
+                        <h3 class="c-center c-font-uppercase c-font-bold" id="title">برامج المؤتمر</h3>
+                        <div class="c-line-center"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="{% static 'newhpc/images/icons/registration/general-icon.png' %}" style="width: 200px;margin-bottom: 20px">
+                            <h3 class="c-title c-first c-font-uppercase c-font-bold sub-title">البرنامج العام</h3>
+                            <p class="c-content hpc-text">يرتكز البرنامج العام على المحاضرات والندوات النقاشية وورش العمل التي يتم من خلالها مناقشة مواضيع تهم الطلاب والطالبات ومقدمي الرعاية الصحية بمختلف المجالات والتخصصات. ويهدف البرنامج العام إلى مناقشة برنامج التحول الوطني 2020 بالقطاع الصحي وجهوده في تحقيق رؤية 2030.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <img src="{% static 'newhpc/images/icons/registration/research-icon.png' %}" style="width: 200px;margin-bottom: 20px">
+                            <h3 class="c-title c-font-uppercase c-font-bold sub-title">برنامج الأبحاث</h3>
+                            <p class="c-content hpc-text">الأبحاث هي الركيزه الأساسية لجميع أنظمة الرعاية الصحية، كما أنها تثري المعرفة المهنية لدى مقدمي الرعاية الصحية وتمكنهم من الاطلاع على آخر التحديثات في المجال الصحي وتساعدهم على تحسين جودة العلاج.
+                                ومن هذا المنطلق يقيم مؤتمر التخصصات الصحية ٢٠٢٠ من خلال برنامج الأبحاث سلسلة ثرية من المحاضرات وورش العمل تهدف إلى التثقيف بكيفية العمل على البحث العلمي.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <img src="{% static 'newhpc/images/icons/registration/colleges-icon.png' %}" style="width: 200px;margin-bottom: 20px">
+                            <h3 class="c-title c-font-uppercase c-font-bold sub-title">برامج الكلّيات</h3>
+                            <p class="c-content hpc-text">سعيًا لتمكين القوة في الريادة الصحية و تضامنًا مع برنامج التطور الوطني تمكّنا من إنتاج البرامج السبعة للتخصصات الصحية التالية: كلية الطب ، كلية طب الأسنان، كلية الصيدلة، كلية العلوم الطبية التطبيقية، كلية التمريض، كلية الصحة العامة . وذلك عن طريق طرح مجموعة من المحاضرات وورش العمل التي تلامس تخصصاتكم الإنسانية.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END: CONTENT/STATS/COUNTER-1 -->
+        <!-- BEGIN: CONTENT/BARS/BAR-4 -->
+        <div class="c-content-box c-size-md c-bg-parallax" style="background-color: #242b2c ">
+            <div class="container">
+                <div class="c-content-bar-4">
+                    <h3 class="c-font-uppercase c-font-bold" id="head" style="margin: 0px!important;border: 0px!important;">باقي على المؤتمر:</h3>
+                      <ul style="color: white!important;padding: 0px!important;font-weight: 700!important;margin-top: -15px!important;">
+                        <li class="listitem44"><span id="days"></span>يوم</li>
+                        <li class="listitem44"><span id="hours"></span>ساعة</li>
+                        <li class="listitem44"><span id="minutes"></span>دقيقة</li>
+                        <li class="listitem44"><span id="seconds"></span>ثانية</li>
+                      </ul>
+                </div>
+            </div>
+        </div>
+        <!-- END: CONTENT/BARS/BAR-4 -->
+    </div>
+{% endblock %}
+{% block script %}
+    const second = 1000,
+    minute = second * 60,
+    hour = minute * 60,
+    day = hour * 24;
+
+    let countDown = new Date('Jan 28, 2020 00:00:00').getTime(),
+    x = setInterval(function() {
+
+    let now = new Date().getTime(),
+      distance = countDown - now;
+
+    document.getElementById('days').innerText = Math.floor(distance / (day)),
+    document.getElementById('hours').innerText = Math.floor((distance % (day)) / (hour)),
+    document.getElementById('minutes').innerText = Math.floor((distance % (hour)) / (minute)),
+    document.getElementById('seconds').innerText = Math.floor((distance % (minute)) / second);
+
+    //do something later when date is reached
+    //if (distance < 0) {
+    //  clearInterval(x);
+    //  'IT'S MY BIRTHDAY!;
+    //}
+
+    }, second)
+{% endblock %}

@@ -72,7 +72,7 @@ h4{
 
                 <h4><li>Each poster can have maximally two slides (dont crowd everything in one slide, you have enough space with two slides).</li>
 
-                    <li>Size and dimensions of the slide are already set in {% if abstract.event.code_name == 'hpc2020-a' %}<a href="//ahsa link//">{% else %}<a href="//riyadh link//">{% endif %} the template</a>, so PLEASE, don't make any changes of size and dimensions of the slides.AND PLEASE do not add any additonal logos.</li>
+                    <li>Size and dimensions of the slide are already set in {% if abstract.event.code_name == 'hpc2020-a' %}<a href="https://enjazportal.com/media/files/HPC2020PosterPresesntationTemplate.pptx">{% else %}<a href="//riyadh link//">{% endif %} the template</a>, so PLEASE, don't make any changes of size and dimensions of the slides.AND PLEASE do not add any additonal logos.</li>
 
                     <li>The least acceptable font size in the body texts is 40.</li>
 
@@ -119,7 +119,7 @@ h4{
             <h2>Accepted as {{ abstract.get_accepted_presentaion_preference_display }}</h2>
                 <h3 class="english-field"><b>Congratulations!</b><br> Your abstract has been accepted to be presented on {{ abstract.event.english_name }} | {{ abstract.presentaion_date|date:"Y-n-j" }}.  We require all accepted abstract submitters to upload their presntation file: </h3>
     
-                <h4><li>Please upload your presntation before the <b>{% if abstract.event.code_name == 'hpc2019-j' %}{% elif abstract.event.code_name == 'hpc2019-a' %}-{% else %}-{% endif %} of January 2020</b> as we will not accept any presntation after that date.</li>
+                <h4><li>Please upload your presntation before the <b>{% if abstract.event.code_name == 'hpc2019-j' %}{% elif abstract.event.code_name == 'hpc2020-a' %}22{% else %}-{% endif %} of January 2020</b> as we will not accept any presntation after that date.</li>
                 <li><b>File MUST be named: <span style= "color: red">"{{ abstract.event.code_name }}_{{ abstract.pk }}"</span></b></li>
                 <li>File MUST be on PowePoint format</li>
                 {% if abstract.event.code_name == 'hpc2019-a' %}<li><a href="https://enjazportal.com/media/files/events/oral-HPC-AHSA-2019.pptx">Use this trmplate</a></li>{% endif %}

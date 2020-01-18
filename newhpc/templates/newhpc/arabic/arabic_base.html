@@ -366,6 +366,7 @@
         <script src="{% static 'newhpc/arabic/assets/base/js/components.js' %}" type="text/javascript"></script>
         <script src="{% static 'newhpc/arabic/assets/base/js/components-shop.js' %}" type="text/javascript"></script>
         <script src="{% static 'newhpc/arabic/assets/base/js/app.js' %}" type="text/javascript"></script>
+        <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
         <script>
             $(document).ready(function()
             {
@@ -445,6 +446,8 @@
         {% block script %}
         {% endblock %}
         </script>
+        {% block customscript %}
+        {% endblock %}
 
         <!-- END: PAGE SCRIPTS -->
         <!-- END: LAYOUT/BASE/BOTTOM -->

@@ -56,6 +56,8 @@ urlpatterns = [
     # Registration Pages
     # Research Guidelines
     url(r'^alahsa/en/research$', views.ahs_en_research, name="ahs_en_research"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/timeslots/(?P<pk>\d+)/$', views.list_sessions, name="list_sessions"),
+    url(r'^riyadh/general/register$', views.register_general_program, name="register_general_program"),
 
 ]
 

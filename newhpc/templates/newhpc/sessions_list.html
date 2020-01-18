@@ -62,22 +62,17 @@
 		<!-- BEGIN: CONTENT/STATS/COUNTER-1 -->
 
         <div class="c-content-box c-size-md c-bg-white">
-            {% for timeslot in timeslots %}
-                <div class="container">
-
-                        <br>
-                        <div class="c-content-counter-1 c-opt-1">
-                        <div class="c-content-title-1">
-
+            <div class="container">
+                <div class="c-content-counter-1 c-opt-1">
+                    <div class="c-content-title-1">
                         <h3 class="c-center c-font-uppercase c-font-bold" id="title">{{ timeslot.name }}</h3>
+                        <div class="c-line-center"></div>
                         {% if timeslot.limit %}
                             <strong style="text-align:center !important;" id="counter">  الحد الأقصى للتسجيل هو {{ limit }}  </strong>
                         {% endif %}
-                        <div class="c-line-center"></div>
+                    </div>
+                    <div class="row">
 
-                        </div>
-                        <br>
-                        <div class="row">
                         {% for child_timeslot in timeslot.children.all %}
                             <div class="col-md-4">
                                 {% if child_timeslot.event.logo %}
@@ -87,14 +82,14 @@
                                 {% endif %}
                                 <h3 class="c-title c-first c-font-uppercase c-font-bold sub-title">{{ child_timeslot.name }} </h3>
                                 <p class="c-content hpc-text">وصف القروب  </p>
-                                <a href="{% url 'newhpc:list_sessions' child_timeslot.event.code_name child_timeslot.pk %}"> <button class="btn btn-success">المزيد</button></a>
+                                <a href="{% url 'newhpc:list_sessions' child_timeslot.event.code_name child_timeslot.pk %}"> <button style="float: left" class="btn btn-success">المزيد</button></a>
+
                             </div>
                         {% endfor %}
-
                         {% for session in timeslot.session_set.all %}
                             <div class="col-md-4">
                                 <img src="{% static 'newhpc/images/icons/registration/general-icon.png' %}" style="width: 200px;margin-bottom: 20px">
-                                <h3 class="c-title c-first  c-font-bold sub-title" style="text-align: center !important;"><a {% if user|is_organizing_team_member:event or user|is_regestrations_team_member:event %} href="{% url 'events:review_registrations' session.event.code_name session.pk %}" {% endif %}> {{ session.name }}</a> </h3>
+                                <h3 class="c-title c-first c-font-uppercase c-font-bold sub-title"><a {% if user|is_organizing_team_member:event or user|is_regestrations_team_member:event %} href="{% url 'events:review_registrations' session.event.code_name session.pk %}" {% endif %}> {{ session.name }}</a> </h3>
                                 <p class="c-content hpc-text">
                                  <div>
                                     <i class="entypo-calendar"></i>
@@ -150,13 +145,12 @@
                                     </div>
                                 </p>
                             </div>
-
+                            </div>
                         {% endfor %}
-                        </div>
-                        </div>
 
+                    </div>
+                </div>
             </div>
-            {% endfor %}
         </div>
         <!-- END: CONTENT/STATS/COUNTER-1 -->
         <!-- BEGIN: CONTENT/BARS/BAR-4 -->

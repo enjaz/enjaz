@@ -3,13 +3,18 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.views.decorators import csrf
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import render
 from core import decorators
 from .models import FaqCategory, FaqQuestion, BlogPostArabic, BlogPostEnglish, NewsletterMembership, BlogVideo, Speaker
 from .forms import *
+from events.models import Event, Session, TimeSlot,SessionRegistration
+from django.utils import timezone
+from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.core.urlresolvers import reverse
+import events.utils
 
-from django.contrib.staticfiles.templatetags.staticfiles import static
+
 
 # enjazportal.com/riyadh HPC Riyadh :
 
@@ -25,9 +30,80 @@ def riy_coming_soon(request):
     context = {}
     return render(request,'newhpc/arabic/riy_coming_soon.html',context)
 
+# def riy_ar_registration(request):
+#     context = {}
+#     return render(request,'newhpc/arabic/riy_ar_registeration.html',context)
+event = Event.objects.get(code_name = 'hpc2-r')
+
+@login_required
 def riy_ar_registration(request):
-    context = {}
-    return render(request,'newhpc/arabic/riy_ar_registeration.html',context)
+
+    timeslots = TimeSlot.objects.filter(event=event ,parent__isnull=True)
+    session = Session.objects.get(event=event, code_name='general')
+    registration = SessionRegistration.objects.filter(session=session, user=request.user,is_deleted=False).first()
+    if registration:
+        registred_to_program = True
+    else :
+        registred_to_program = False
+
+    if timeslots.filter(image__isnull=False):
+        have_image = True
+    else:
+        have_image = False
+
+    context = {'timeslots': timeslots,
+               'event': event,
+               'have_image': have_image,
+               'registred_to_program': registred_to_program}
+
+    if event.registration_opening_date and timezone.now() < event.registration_opening_date and not request.user.is_superuser and not events.utils.is_organizing_team_member(request.user, event) and not events.utils.is_in_entry_team(request.user):
+        raise Http404
+    elif event.registration_closing_date and timezone.now() > event.registration_closing_date:
+        return HttpResponseRedirect(reverse('events:registration_closed',
+                                                args=(event.code_name,)))
+
+    return render(request, 'newhpc/arabic/riy_ar_eng_registeration_test.html', context)
+
+@login_required
+def register_general_program(request):
+    session = Session.objects.get(event=event, code_name='general')
+    registration = SessionRegistration.objects.filter(session=session, user=request.user).first()
+    if not registration:
+        registration = SessionRegistration.objects.create(session=session,
+                                                          user=request.user,
+                                                          is_approved=True)
+    return HttpResponseRedirect(reverse('newhpc:riy_ar_registration',
+                                        ))
+
+
+
+@login_required
+def list_sessions(request, event_code_name, pk):
+    event = get_object_or_404(Event, code_name=event_code_name)
+    timeslot = TimeSlot.objects.get(event=event, pk=pk)
+    children_total = timeslot.session_set.count() + timeslot.children.count()
+    if timeslot.limit:
+        remaining_number = timeslot.limit - request.user.session_registrations.filter(session__time_slot=timeslot,is_deleted=False).count()
+    else:
+        remaining_number = 1
+    limit = events.utils.get_timeslot_limit(timeslot)
+    context = {'timeslot': timeslot,
+               'event': event,
+               'children_total':children_total,
+               'remaining_number':remaining_number,
+               'limit':limit}
+
+    if event.registration_opening_date and timezone.now() < event.registration_opening_date and \
+        not request.user.is_superuser and \
+        not events.utils.is_organizing_team_member(request.user, event) and \
+        not events.utils.is_in_entry_team(request.user):
+        raise Http404
+    elif event.registration_closing_date and timezone.now() > event.registration_closing_date:
+        return HttpResponseRedirect(reverse('events:registration_closed',
+                                                args=(event.code_name,)))
+
+    return render(request,  'newhpc/sessions_list.html', context)
+
 def riy_en_registration(request):
     context = {}
     return render(request,'newhpc/english/riy_en_registeration.html',context)

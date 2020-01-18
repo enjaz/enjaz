@@ -29,10 +29,10 @@
     }
 {% endblock %}
 {% block lang %}
-{% url 'newhpc:riy_ar_registration' %}
+{% url 'newhpc:riy_ar_registration' event_city='riyadh' %}
 {% endblock %}
 {% block lang2 %}
-{% url 'newhpc:riy_ar_registration' %}
+{% url 'newhpc:riy_ar_registration' event_city='riyadh' %}
 {% endblock %}
 {% block active_register %}c-active{% endblock %}
 {% block content %}
@@ -142,7 +142,7 @@
                                             hpc-notifications@enjazportal.com
 
 </p>
-                                        <a href="{% url 'newhpc:register_general_program' %}" class="btn btn-info session-info"><span style="color:white">ســـجـــلــنـــي</span> </a>
+                                        <a href="{% url 'newhpc:register_general_program' event_city='riyadh' %}" class="btn btn-info"><span style="color:white">ســـجـــلــنـــي</span> </a>
 									</div>
 								</li>
 							</ul>
@@ -175,7 +175,7 @@
                     </div>
                     <div class="row">
                         {% for child_timeslot in timeslot.children.all %}
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 {% if child_timeslot.event.logo %}
                                     <img src="{{ child_timeslot.event.logo.url }}"style="width: 200px;margin-bottom: 20px">
                                 {% else %}
@@ -188,7 +188,7 @@
                             </div>
                         {% endfor %}
                         {% for session in timeslot.session_set.all %}
-                            <div class="col-md-4">
+                            <div class="col-md-3">
 
                                 <img src="{% static 'newhpc/images/icons/registration/general-icon.png' %}" style="width: 200px;margin-bottom: 20px">
 
@@ -321,6 +321,7 @@
                         toastr.error("ألغي تسجيلك");
 
                           $(button).html('سجلني!');
+                          $(button).data('action', 'signup');
                           $(button).data('action', 'signup');
                           $(button).addClass('btn-success');
                           $(button).removeClass('btn-danger');

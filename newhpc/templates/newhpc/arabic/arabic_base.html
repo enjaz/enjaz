@@ -178,7 +178,7 @@
                         <nav class="c-mega-menu c-pull-right c-mega-menu-dark c-mega-menu-dark-mobile c-fonts-uppercase c-fonts-bold" id="hpcnav" style="">
                             <ul class="nav navbar-nav c-theme-nav">
                                 <li class="c-onepage-link {% block active_register %}{% endblock %}">
-                                    <a href="{% url 'newhpc:riy_ar_registration' %}" class="c-link" >التسجيل</a>
+                                    <a href="{% url 'newhpc:riy_ar_registration' event_city='riyadh' %}" class="c-link" >التسجيل</a>
                                 </li>
 
                                 <li class="c-onepage-link {% block active_exhib %}{% endblock %}">
@@ -245,7 +245,7 @@
 						</div>
 						<ul class="c-links">
 							<li><a href="{% url 'newhpc:riy_ar_index' %}">الصفحة الرئيسة</a></li>
-							<li><a href="{% url 'newhpc:riy_ar_registration' %}">التسجيل</a></li>
+							<li><a href="{% url 'newhpc:riy_ar_registration' event_city='riyadh' %}">التسجيل</a></li>
 							<li><a href="{% url 'newhpc:riy_en_research' %}">الأبحاث</a></li>
 							<li><a href="{% url 'newhpc:riy_ar_index' %}">المعرض</a></li>
 							<li><a href="{% url 'newhpc:list_prev_versions' %}">النسخ السابقة</a></li>
@@ -366,6 +366,7 @@
         <script src="{% static 'newhpc/arabic/assets/base/js/components.js' %}" type="text/javascript"></script>
         <script src="{% static 'newhpc/arabic/assets/base/js/components-shop.js' %}" type="text/javascript"></script>
         <script src="{% static 'newhpc/arabic/assets/base/js/app.js' %}" type="text/javascript"></script>
+        <script src="{% static 'neon/assets/js/toastr.js' %}"></script>
         <script>
             $(document).ready(function()
             {
@@ -445,6 +446,8 @@
         {% block script %}
         {% endblock %}
         </script>
+        {% block customscript %}
+        {% endblock %}
 
         <!-- END: PAGE SCRIPTS -->
         <!-- END: LAYOUT/BASE/BOTTOM -->

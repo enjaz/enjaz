@@ -102,3 +102,7 @@ def known_user_category(user,event):
 @register.filter
 def has_mandatory_child_survey_to_fill(session, user):
     return session.has_mandatory_child_survey_to_fill(user)
+
+@register.filter
+def get_timeslot_limit(timeslot):
+    return utils.get_timeslot_limit(timeslot)

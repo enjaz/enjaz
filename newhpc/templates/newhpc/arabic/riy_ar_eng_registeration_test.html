@@ -1,0 +1,392 @@
+{% extends 'newhpc/english/english_base.html' %}
+{% load staticfiles %}{% load events_tags %}
+{% block title %}Registration | HPC 2020{% endblock %}
+{% block style %}
+    .listitem44 {
+      display: inline-block;
+      font-size: 1.5em;
+      list-style-type: none;
+      padding: 1em;
+      text-transform: uppercase;
+    }
+
+    .listitem44 span {
+      display: block;
+      font-size: 4.5rem;
+    }
+    #title {
+        font-size: 32px;
+        color: #9d0051;
+    }
+    .sub-title {
+        font-size: 26px!important;
+    }
+    .hpc-text {
+        color: #242b2c!important;
+        margin-top: 30px;
+        text-align: justify;
+        text-align-last: center;
+    }
+{% endblock %}
+{% block lang %}
+{% url 'newhpc:riy_ar_registration' event_city='riyadh' %}
+{% endblock %}
+{% block lang2 %}
+{% url 'newhpc:riy_ar_registration' event_city='riyadh' %}
+{% endblock %}
+{% block active_register %}c-active{% endblock %}
+{% block content %}
+<div class="c-layout-page">
+        <!-- BEGIN: PAGE CONTENT -->
+		<!-- BEGIN: CONTENT/STATS/COUNTER-1 -->
+{% if not registred_to_program %}
+<div class="c-content-box c-size-md c-bg-grey-1" dir="rtl">
+	<div class="container" style="padding-bottom:10px !important;">
+		<div class="c-content-title-1 c-opt-1 wow fadeInDown" style="visibility: visible; animation-name: fadeInDown; opacity: 1;">
+			<h3 class="c-font-34 c-font-center c-font-bold c-margin-b-30">
+				Health Professions Conference 2020 Instructions
+			</h3>
+			<div class="c-line-center c-theme-bg"></div>
+		</div>
+		<div class="c-content-tab-6" role="tabpanel">
+			<div class="row">
+				<div class="col-md-3">
+					<ul class="nav" role="tablist">
+						<li role="presentation" class="wow fadeInLeft active" data-wow-delay="0s" style="visibility: visible; animation-delay: 0s; animation-name: fadeInLeft; opacity: 1;">
+							<a href="#tab-1" role="tab" data-toggle="tab" aria-expanded="true">التعليمات العامة</a>
+						</li>
+						<li role="presentation" class="wow fadeInLeft" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInLeft; opacity: 1;">
+							<a href="#tab-2" role="tab" data-toggle="tab" aria-expanded="false"> الشهادات </a>
+						</li>
+						<li role="presentation" class="wow fadeInLeft" data-wow-delay="0.4s" style="visibility: visible; animation-delay: 0.4s; animation-name: fadeInLeft; opacity: 1;">
+							<a href="#tab-3" role="tab" data-toggle="tab" aria-expanded="false">قوانين الشهادات</a>
+						</li>
+
+					</ul>
+				</div>
+				<div class="col-md-9" >
+					<div class="tab-content c-bg-white wow fadeInRight" style="visibility: visible; animation-name: fadeInRight; opacity: 1;">
+						<div role="tabpanel" class="tab-pane fade active in" id="tab-1">
+							<ul class="c-tab-items">
+								<li style="padding-bottom:10px !important;" class="row" >
+									<div class="col-sm-4 col-xs-12">
+									</div>
+									<div class="col-sm-8 col-xs-12">
+										<h4>التعليمات العامة</h4>
+										<p><p><span >-&nbsp; &nbsp; &nbsp; &nbsp; التسجيل في مؤتمر التخصصات الصحية الخامس مجاني ومتاح لجميع الطلبة ومنسوبي التخصصات الصحية.</span></p>
+<p><span >-&nbsp; &nbsp; &nbsp; &nbsp; يقام المؤتمر في المدن الجامعية الثلاث: الرياض، جدة والأحساء.</span></p>
+<p><span >-&nbsp; &nbsp; &nbsp; &nbsp; يجب إنشاء عضوية في بوابة إنجاز للتسجيل في المؤتمر.</span></p>
+<p><span >-&nbsp; &nbsp; &nbsp; &nbsp; يجب إحضار ما يثبت هوية الشخص: الهوية الوطنية أو البطاقة الجامعية أو بطاقة المستشفى.&nbsp;</span></p>
+<p><span >-&nbsp; &nbsp; </span><span >&nbsp;&nbsp;&nbsp;&nbsp;التسجيل متاح لبرامج المؤتمر (البرنامج&nbsp; العام و برامج الكليات ) و ورش العمل المصاحبة للمؤتمر.&nbsp;</span></p>
+<p><span >-&nbsp; &nbsp; &nbsp; &nbsp; برامج الكليات تشمل على</span><span >:</span></p>
+<ul>
+<li >برنامج كلية الطب</li>
+<li >برنامج كلية الأسنان</li>
+<li >برنامج كلية الصيدلة</li>
+<li >برنامج كلية العلوم الطبية التطبيقية</li>
+<li >برنامج كلية التمريض</li>
+<li >برنامج كلية الصحة العامة</li>
+<li >برنامج كلية العلوم والمهن الصحية</li>
+</ul>
+<p><span>* يكتفى بحضور أحد هذه البرامج.</span></p>
+<p>- برامج الكليات ستقام يوم الثلاثاء الموافق 28 يناير 2020</p>
+<p>- البرنامج العام وبرنامج الأبحاث والمعرض العام بالمؤتمر ستقام يومي الأربعاء والخميس الموافق 29-30 يناير 2020</p>
+<p><span >- سيكون الحفل الختامي بالمؤتمر والإعلان عن الأبحاث الفائزة يوم الخميس الموافق 30 يناير 2020، في تمام الساعة الثانية ظهراً.</span></p>
+<p><br /><br /></p></p>
+									</div>
+								</li>
+							</ul>
+						</div>
+						<div role="tabpanel" class="tab-pane fade" id="tab-2">
+							<ul class="c-tab-items">
+								<li class="row">
+									<div class="col-sm-4 col-xs-12">
+									</div>
+									<div class="col-sm-8 col-xs-12">
+										<h4> الشهادات: </h4>
+										<p>شهادة حضور مؤتمر التخصصات الصحية  2020 باعتماد عدد ٢٢ ساعة (CME) من الهيئة
+      يمكن الحصول على الشهادة من خلال تسجيل الدخول و تسجيل الخروج بالمؤتمر 5 مرات على الأقل  من أصل 7 مرات متاحة خلال أيام المؤتمر الثلاث ( 28-29-30 يناير 2020 ) كالتالي :
+</p>
+                                <ul>
+										<li>تسجيل دخول بداية اليوم الأول وتسجيل خروج نهاية اليوم الأول (يعتمد على بداية ونهاية  جدول برنامج كل كلية)
+</li>
+                                        <li>تسجيل دخول بداية اليوم الثاني، تسجيل دخول آخر في منتصف اليوم الثاني، وتسجيل خروج نهاية اليوم الثاني.</li>
+                                        <li>تسجيل دخول بداية اليوم الثالث وتسجيل خروج نهاية اليوم الثالث بعد الحفل الختامي للمؤتمر.</li>
+                                </ul>
+                                        <br>
+                                        <strong>   -     شهادة حضور ورش العمل ، و ورش عمل برامج الكليات إعتماد بواقع 8 (CME) ساعات من الهيئة  ( الاعتماد يشمل البرامج التالية : برنامج كلية الطب،  برنامج كلية الأسنان ، برنامج كلية العلوم الطبية التطبيقية ، برنامج كلية التمريض)   : </strong>
+                                        <br>
+                                        <ul><li>يُشترط للحصول عليها: تسجيل الدخول وتسجيل الخروج المتاح في الموعد والموقع المحدد لكل ورشة عمل بالجداول الموضحة  في صفحة التسجيل .</li></ul>
+                                    </div>
+								</li>
+							</ul>
+						</div>
+						<div role="tabpanel" class="tab-pane fade" id="tab-3">
+							<ul class="c-tab-items">
+								<li class="row">
+									<div class="col-sm-4 col-xs-12">
+									</div>
+									<div class="col-sm-8 col-xs-12">
+										<h4>قوانين للشهادات:</h4>
+										<p> - للراغبين بالحصول على الشهادة و ساعات الاعتماد من الهيئة (CME):
+ يجب إدخال رقم الرخصة (بطاقة هيئة التخصصات الصحية) قبل التسجيل بالمؤتمر.
+</p>
+                                        <p> يجب إدخال رقم الرخصة (بطاقة هيئة التخصصات الصحية) قبل التسجيل بالمؤتمر.
+*نرجو التأكد من تحديث بياناتكم في بوابة إنجاز.
+</p>
+                                        <p>-        يمكن الحصول على الشهادات من خلال بوابة إنجاز و ذلك عبر : حسابي —> شهاداتي</p>
+                                        <p>  *ستكون متاحة في مدة لا تتجاوز 60 يوم بعد انتهاء المؤتمر. </p>
+                                        <p>سيتم الإعلان عن توفرها عبر: البريد الإلكتروني وحساب المؤتمر في تويتر. </p>
+                                        <p>-     في حال وجود أية مشاكل أو عدم توفر الشهادة خلال المدة الزمنية الموضحة،  فريق مؤتمر التخصصات الصحية 2020 يخلي مسؤوليته عن توفير الشهادات للمستحقين بعد 90 يوم من انتهاء المؤتمر و  نرجو التواصل عبر البريد الإلكتروني للمؤتمر الخاص بالمشاكل التقنية:
+                                            <br>
+                                            hpc-notifications@enjazportal.com
+
+</p>
+                                        <a href="{% url 'newhpc:register_general_program' event_city='riyadh' %}" class="btn btn-info"><span style="color:white">ســـجـــلــنـــي</span> </a>
+									</div>
+								</li>
+							</ul>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% else %}
+        <!-- END: CONTENT/STATS/COUNTER-1 -->
+        <!-- BEGIN: CONTENT/STATS/COUNTER-2 -->
+
+        <div class="c-content-box c-size-md c-bg-white">
+        {% for timeslot in timeslots %}
+            <br>
+            <div class="container">
+                <div class="c-content-counter-1 c-opt-1">
+                    <div class="c-content-title-1">
+                        <div class="c-line-center"></div>
+                        <h3 class="c-center c-font-uppercase c-font-bold" id="title">{{ timeslot.name }}</h3>
+
+                        {% if timeslot.limit %}
+                            <p class="hpc-text" ><strong id="counter">  Maxium registration limit is: {{ timeslot|get_timeslot_limit }} </strong> </p>
+                        {% endif %}
+                        <div class="c-line-center"></div>
+                    </div>
+                    <div class="row">
+                        {% for child_timeslot in timeslot.children.all %}
+                            <div class="col-md-3" style="text-align: center!important;">
+                                {% if child_timeslot.event.logo %}
+                                    <img src="{{ child_timeslot.event.logo.url }}"style="width: 200px;margin-bottom: 20px">
+                                {% else %}
+                                <img src="{% static 'newhpc/images/icons/registration/general-icon.png' %}" style="width: 200px;margin-bottom: 20px">
+                                {% endif %}
+                                <h3 class="c-title c-first c-font-uppercase c-font-bold sub-title">{{ child_timeslot.name }}</h3>
+                                <p class="c-content hpc-text"></p>
+                                <a href="{% url 'newhpc:list_sessions' child_timeslot.event.code_name child_timeslot.pk %}"> <button class="btn btn-success">المزيد</button></a>
+
+                            </div>
+                        {% endfor %}
+                        {% for session in timeslot.session_set.all %}
+                            <div class="col-md-3"  style="text-align: center!important;">
+
+                                <img src="{% static 'newhpc/images/icons/registration/general-icon.png' %}" style="width: 200px;margin-bottom: 20px">
+
+                                <h3 class="c-title c-first c-font-uppercase c-font-bold sub-title"><a {% if user|is_organizing_team_member:event or user|is_regestrations_team_member:event %} href="{% url 'events:review_registrations' session.event.code_name session.pk %}" {% endif %}> {{ session.name }}</a></h3>
+                                <p class="c-content hpc-text">
+                                    <div>
+                                    <i class="entypo-calendar"></i>
+                                          {{ session.date|date:"l j F Y" }}
+                                 </div>
+                                {% if session.start_time and session.end_time %}
+                                    <div>
+                                        <i class="entypo-clock"></i>
+                                        {{ session.start_time }}
+                                        -
+                                        {{ session.end_time }}
+                                    </div>
+                                {% endif %}
+                                {% if session.location %}
+                                    <div>
+                                      <i class="entypo-location"></i>
+                                      {{ session.location }}
+                                      </div>
+                                {% endif %}
+                                {% if session.acceptance_method == 'M' %}
+                                     <br>
+                                {% elif session.limit != None %}
+                                    <h5>عدد المقاعد المتبقية: <span id="count-{{ session.pk}}">{{ session.get_remaining_seats }}</span></h5>
+                                {% else %}
+                                    <br>
+                                {% endif %}
+                                {% if user.is_authenticated and not user|is_registered:session %}
+                                    {% if not user|has_remaining_sessions:timeslot  %}
+                                        <button class="btn btn-warning signup" data-action="signup" data-pk="{{ session.pk }}" data-timeslot-pk="{{ timeslot.pk }}" disabled>وصلت الحد الأقصى للجلسات المسموح بها</button>
+                                    {% else %}
+                                        <button class="btn btn-success signup" data-action="signup" data-pk="{{ session.pk }}" data-timeslot-pk="{{ timeslot.pk }}">سجلني!</button>
+                                    {% endif %}
+                                {% elif user.is_authenticated and user|is_registered:session %}
+                                    <button class="btn btn-danger cancel" data-action="cancel" data-pk="{{ session.pk }}" data-timeslot-pk="{{ timeslot.pk }}">ألغِ تسجيلي!</button>
+                                {% else %}
+                                    <a href="{% url 'userena_signin' %}?next={{ request.path }}" style="color: white;" class="btn btn-lg btn-success">أدخلني لإنجاز كي أؤكد الحضور</a>
+                                {% endif %}
+                                {% if session.image or session.description %}
+                                    <button type="button" data-name="{{ session.name }}" data-url="{% url 'events:session_info' session.time_slot.event.code_name session.pk %}" class="btn btn-info session-info"> <i class="entypo-info"></i>التفاصيل </button>
+                                {% endif %}
+                                    <br>
+                                {% if session.acceptance_method == 'M' and user.is_authenticated %}
+                                    <div {% if not user|is_registered:session %}style="display: none;" {% endif %} id="status-{{ session.pk }}" class="btn btn-xs {% if user|get_status:session == True %}
+                                            btn-success">معتمد
+                                        {% elif user|get_status:session == None %}
+                                            btn-warning">معلق
+                                        {% else %}
+                                             btn-danger">مرفوض
+                                        {% endif %}
+                                    {% else %}
+                                    <br>
+                                    {% endif %}
+                                    </div>
+                                </p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+
+        <!-- END: CONTENT/STATS/COUNTER-2 -->
+{% endif %}
+        <!-- BEGIN: CONTENT/BARS/BAR-4 -->
+        <div class="c-content-box c-size-md c-bg-parallax" style="background-color: #242b2c ">
+            <div class="container">
+                <div class="c-content-bar-4">
+                    <h3 class="c-font-uppercase c-font-bold" id="head" style="margin: 0px!important;border: 0px!important;direction: ltr!important;">HPC 2020 Countdown</h3>
+                      <ul style="color: white!important;padding: 0px!important;font-weight: 700!important;margin-top: -15px!important;direction: ltr!important;">
+                        <li class="listitem44"><span id="days"></span>Days</li>
+                        <li class="listitem44"><span id="hours"></span>Hours</li>
+                        <li class="listitem44"><span id="minutes"></span>Minutes</li>
+                        <li class="listitem44"><span id="seconds"></span>Seconds</li>
+                      </ul>
+                </div>
+            </div>
+        </div>
+        <!-- END: CONTENT/BARS/BAR-4 -->
+    </div>
+{% endblock %}
+{% block script %}
+
+
+    const second = 1000,
+    minute = second * 60,
+    hour = minute * 60,
+    day = hour * 24;
+
+    let countDown = new Date('Jan 28, 2020 00:00:00').getTime(),
+    x = setInterval(function() {
+
+    let now = new Date().getTime(),
+      distance = countDown - now;
+
+    document.getElementById('days').innerText = Math.floor(distance / (day)),
+    document.getElementById('hours').innerText = Math.floor((distance % (day)) / (hour)),
+    document.getElementById('minutes').innerText = Math.floor((distance % (hour)) / (minute)),
+    document.getElementById('seconds').innerText = Math.floor((distance % (minute)) / second);
+
+    //do something later when date is reached
+    //if (distance < 0) {
+    //  clearInterval(x);
+    //  'IT'S MY BIRTHDAY!;
+    //}
+
+    }, second);
+
+
+
+    $(".signup, .cancel").click(function(){
+        console.log('hello1');
+        button = this;
+            pk = $(this).data("pk");
+            action = $(this).data("action");
+        timeslot_pk = $(this).data("timeslot-pk");
+            $.ajax("{% url 'events:handle_ajax' %}", {
+                method: "POST",
+                data: {pk: pk, action: action},
+            success: function(data){
+                if (data['success'] == 1){
+                    $("#count-" + pk).html(data['remaining_seats']);
+                      status_button = $("#status-" + pk);
+                      timeslot_buttons = $("button[data-timeslot-pk=" + timeslot_pk + "]");
+                        if (action == 'cancel'){
+                        toastr.error("ألغي تسجيلك");
+
+                          $(button).html('سجلني!');
+                          $(button).data('action', 'signup');
+                          $(button).data('action', 'signup');
+                          $(button).addClass('btn-success');
+                          $(button).removeClass('btn-danger');
+
+                          timeslot_buttons.removeAttr("disabled", "disabled");
+                          timeslot_buttons.removeClass('btn-warning');
+                          timeslot_buttons.html('سجلني!');
+                          timeslot_buttons.addClass('btn-success');
+
+
+                          status_button.hide();
+
+                      } else if (action == 'signup'){
+                        toastr.success("تمّ تسجيلك!");
+                          if (data['remaining'] == false) {
+                                timeslot_buttons.attr("disabled", "disabled");
+                                timeslot_buttons.removeClass('btn-success');
+                                timeslot_buttons.addClass('btn-warning');
+                                timeslot_buttons.html("وصلت الحد الأقصى للجلسات المسموح بها");
+
+
+                          }
+
+                          $(button).html('ألغِ تسجيلي!');
+                          $(button).data('action', 'cancel');
+                          $(button).addClass('btn-danger');
+                          $(button).removeClass('btn-success');
+                          $(button).removeAttr("disabled", "disabled");
+
+                          status_button.show();
+                          status_button.removeClass("btn-danger");
+                          status_button.html(data['status']);
+                          if (data['status'] == "معلق"){
+                            status_button.addClass("btn-warning");
+                          } else if (data['status'] == "معتمد"){
+                            status_button.addClass("btn-success");
+                          }
+                      }
+                } else if (data['success'] == 0){
+                  toastr.error(data['message']);
+                }
+            }
+        });
+    });
+
+    $('#session-details-modal').modal({
+      keyboard: false,
+      backdrop: 'static',
+      show    : false,
+    });
+    $(".session-info").click(function () {
+        console.log('hello1');
+        url = $(this).data("url");
+        name = $(this).data("name");
+
+        $("#session-details-modal").modal('show');
+        $("#session-details-modal .modal-title").html(name);
+        $("#session-details-modal .modal-title").addClass('english-field');
+            $("#session-details-modal .modal-body").load(url);
+    });
+
+{% endblock %}
+
+{% block customscript %}
+    {% with modal_id='session-details-modal' no_footer=True %}
+        {% include "bulb/groups/common_edit_modal.html" %}
+    {% endwith %}
+{% endblock %}

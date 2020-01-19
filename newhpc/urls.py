@@ -10,7 +10,8 @@ urlpatterns = [
     url(r'^riyadh/en/$', views.riy_en_index, name="riy_en_index"),
     url(r'^riyadh/en/soon$', views.riy_coming_soon, name="riy_coming_soon"),
     # Registration Pages
-    url(r'^riyadh/ar/register$', views.riy_ar_registration, name="riy_ar_registration"),
+    # url(r'^riyadh/ar/register$', views.riy_ar_registration, name="riy_ar_registration"),
+    url(r'^(?P<event_city>[\d\w_\-]+)/ar/register$', views.riy_ar_registration, name="riy_ar_registration"),
     url(r'^riyadh/en/register$', views.riy_en_registration, name="riy_en_registration"),
     # Exhibition pages
     url(r'^riyadh/ar/exhibition$', views.riy_ar_exhibition, name="riy_ar_exhibition"),
@@ -56,6 +57,8 @@ urlpatterns = [
     # Registration Pages
     # Research Guidelines
     url(r'^alahsa/en/research$', views.ahs_en_research, name="ahs_en_research"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/timeslots/(?P<pk>\d+)/$', views.list_sessions, name="list_sessions"),
+    url(r'^(?P<event_city>[\d\w_\-]+)/general/register$', views.register_general_program, name="register_general_program"),
 
 ]
 

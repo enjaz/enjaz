@@ -15,7 +15,6 @@ from django.core.urlresolvers import reverse
 import events.utils
 
 
-
 # enjazportal.com/riyadh HPC Riyadh :
 
 def riy_ar_index(request):
@@ -34,13 +33,12 @@ def riy_coming_soon(request):
 #     context = {}
 #     return render(request,'newhpc/arabic/riy_ar_registeration.html',context)
 
-event = Event.objects.get(code_name = 'hpc2-r')
 
 @login_required
 def riy_ar_registration(request,event_city):
 
     if event_city == 'riyadh':
-        event = Event.objects.get(code_name='hpc2-r')
+        event = Event.objects.get(code_name='hpc2020-r')
     elif event_city == 'jeddah':
         event = Event.objects.get(code_name='hpc2020-j')
     elif event_city == 'ahsa':
@@ -65,7 +63,7 @@ def riy_ar_registration(request,event_city):
                'registred_to_program': registred_to_program}
 
     if event.registration_opening_date and timezone.now() < event.registration_opening_date and not request.user.is_superuser and not events.utils.is_organizing_team_member(request.user, event) and not events.utils.is_in_entry_team(request.user):
-        raise Http404
+        return render(request, 'newhpc/arabic/riy_ar_registeration.html', context)
     elif event.registration_closing_date and timezone.now() > event.registration_closing_date:
         return HttpResponseRedirect(reverse('events:registration_closed',
                                                 args=(event.code_name,)))
@@ -75,7 +73,7 @@ def riy_ar_registration(request,event_city):
 @login_required
 def register_general_program(request,event_city):
     if event_city == 'riyadh':
-        event = Event.objects.get(code_name='hpc2-r')
+        event = Event.objects.get(code_name='hpc2020-r')
     elif event_city == 'jeddah':
         event = Event.objects.get(code_name='hpc2020-j')
     elif event_city == 'ahsa':
@@ -112,7 +110,7 @@ def list_sessions(request, event_code_name, pk):
         not request.user.is_superuser and \
         not events.utils.is_organizing_team_member(request.user, event) and \
         not events.utils.is_in_entry_team(request.user):
-        raise
+        return render(request,'newhpc/arabic/riy_ar_registeration.html',context)
     elif event.registration_closing_date and timezone.now() > event.registration_closing_date:
         return HttpResponseRedirect(reverse('events:registration_closed',
                                                 args=(event.code_name,)))

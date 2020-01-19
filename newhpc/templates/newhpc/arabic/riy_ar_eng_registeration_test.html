@@ -169,13 +169,13 @@
                         <h3 class="c-center c-font-uppercase c-font-bold" id="title">{{ timeslot.name }}</h3>
 
                         {% if timeslot.limit %}
-                            <p class="hpc-text" ><strong id="counter">  Maxium registration limit is: {{ timeslot.limit }} </strong> </p>
+                            <p class="hpc-text" ><strong id="counter">  Maxium registration limit is: {{ timeslot|get_timeslot_limit }} </strong> </p>
                         {% endif %}
                         <div class="c-line-center"></div>
                     </div>
                     <div class="row">
                         {% for child_timeslot in timeslot.children.all %}
-                            <div class="col-md-3">
+                            <div class="col-md-3" style="text-align: center!important;">
                                 {% if child_timeslot.event.logo %}
                                     <img src="{{ child_timeslot.event.logo.url }}"style="width: 200px;margin-bottom: 20px">
                                 {% else %}
@@ -188,7 +188,7 @@
                             </div>
                         {% endfor %}
                         {% for session in timeslot.session_set.all %}
-                            <div class="col-md-3">
+                            <div class="col-md-3"  style="text-align: center!important;">
 
                                 <img src="{% static 'newhpc/images/icons/registration/general-icon.png' %}" style="width: 200px;margin-bottom: 20px">
 

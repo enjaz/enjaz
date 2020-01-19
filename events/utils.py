@@ -234,30 +234,41 @@ def has_user_adminstrative_events (user):
 def has_remaining_sessions(user, timeslot):
 
     if timeslot.limit:
-        user_sessions = user.session_registrations.filter(session__time_slot=timeslot, is_deleted=False).count()
-        if user_sessions < timeslot.limit:
-            return True
-        elif user_sessions == timeslot.limit:
-            return False
+        if timeslot.children:
+            timeslot_pks= timeslot.children.filter(limit__isnull=True).values_list('pk',flat=True)
+            list_timeslot_pks = list(timeslot_pks)
+            list_timeslot_pks.append(timeslot.pk)
+
+            user_sessions = user.session_registrations.filter(session__time_slot__pk__in=list_timeslot_pks,
+                                                              is_deleted=False).count()
+            if user_sessions < timeslot.limit:
+                return True
+            elif user_sessions >= timeslot.limit:
+                return False
+        else:
+            user_sessions = user.session_registrations.filter(session__time_slot=timeslot, is_deleted=False).count()
+            if user_sessions < timeslot.limit:
+                return True
+            elif user_sessions >= timeslot.limit:
+                return False
     elif timeslot.parent and timeslot.parent.limit:
         user_sessions = user.session_registrations.filter(session__time_slot__pk__in=[timeslot.parent.pk,timeslot.pk], is_deleted=False).count()
         if user_sessions < timeslot.parent.limit:
             return True
-        elif user_sessions == timeslot.parent.limit:
+        elif user_sessions >= timeslot.parent.limit:
             return False
     else:
         # if there is no limit assume there is no limit.
         return True
-
 
 def get_timeslot_limit(timeslot):
 
     if timeslot.limit:
         return timeslot.limit
     elif timeslot.parent and timeslot.parent.limit:
-        return u"تابع للقسم السابق %s" % (timeslot.parent.limit)
+        return timeslot.parent.limit
     else:
-        return 1
+        return ""
 
 def known_user_category(user,event):
     if UserSurveyCategory.objects.filter(user=user,event=event).exists():

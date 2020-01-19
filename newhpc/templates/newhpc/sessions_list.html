@@ -1,4 +1,4 @@
-{% extends 'newhpc/arabic/arabic_base.html' %}
+{% extends 'newhpc/english/english_base.html' %}
 {% load staticfiles %}{% load events_tags %}
 {% block title %}مؤتمر التخصّصات الصحّية 2020 | التسجيل{% endblock %}
 {% block style %}
@@ -37,27 +37,7 @@
 {% block active_register %}c-active{% endblock %}
 {% block content %}
     <div class="c-layout-page">
-        <!-- BEGIN: PAGE CONTENT -->
-{% if not registred_to_program %}
-    <!-- BEGIN: CONTENT/STATS/COUNTER-2 -->
-        <div class="c-content-box c-size-md c-bg-white">
-            <div class="container">
-                <div class="c-content-counter-1 c-opt-1">
-                    <div class="c-content-title-1">
-                        <h3 class="c-center c-font-uppercase c-font-bold" id="title">برامج المؤتمر</h3>
-                        <div class="c-line-center"></div>
-                    </div>
-                    <div class="row">
-                         الرجاء التسجيل في المؤتمر
 
-
-
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- END: CONTENT/STATS/COUNTER-2 -->
-{% endif %}
 
 		<!-- BEGIN: CONTENT/STATS/COUNTER-1 -->
 
@@ -66,28 +46,31 @@
                 <div class="c-content-counter-1 c-opt-1">
                     <div class="c-content-title-1">
                         <h3 class="c-center c-font-uppercase c-font-bold" id="title">{{ timeslot.name }}</h3>
-                        <div class="c-line-center"></div>
+
                         {% if timeslot.limit %}
-                            <strong style="text-align:center !important;" id="counter">  الحد الأقصى للتسجيل هو {{ limit }}  </strong>
+                            <p class="hpc-text" ><strong style="text-align:center !important;" id="counter">  Maxium registration limit is:  {{ timeslot|get_timeslot_limit }}  </strong></p>
                         {% endif %}
+                        <div class="c-line-center"></div>
                     </div>
                     <div class="row">
 
                         {% for child_timeslot in timeslot.children.all %}
-                            <div class="col-md-4">
+                            <div class="column">
                                 {% if child_timeslot.event.logo %}
 			                        <img src="{{ child_timeslot.event.logo.url }}" style="width: 200px;margin-bottom: 20px">
                                 {% else %}
                                 <img src="{% static 'newhpc/images/icons/registration/general-icon.png' %}" style="width: 200px;margin-bottom: 20px">
                                 {% endif %}
                                 <h3 class="c-title c-first c-font-uppercase c-font-bold sub-title">{{ child_timeslot.name }} </h3>
-                                <p class="c-content hpc-text">وصف القروب  </p>
+                                {% if child_timeslot.limit %}
+                                <p class="c-content hpc-text"> {{ child_timeslot|get_timeslot_limit }} </p>
+                                {% endif %}
                                 <a href="{% url 'newhpc:list_sessions' child_timeslot.event.code_name child_timeslot.pk %}"> <button style="float: left" class="btn btn-success">المزيد</button></a>
 
                             </div>
                         {% endfor %}
                         {% for session in timeslot.session_set.all %}
-                            <div class="col-md-4">
+                            <div class="column" style="text-align: center!important;">
                                 <img src="{% static 'newhpc/images/icons/registration/general-icon.png' %}" style="width: 200px;margin-bottom: 20px">
                                 <h3 class="c-title c-first c-font-uppercase c-font-bold sub-title"><a {% if user|is_organizing_team_member:event or user|is_regestrations_team_member:event %} href="{% url 'events:review_registrations' session.event.code_name session.pk %}" {% endif %}> {{ session.name }}</a> </h3>
                                 <p class="c-content hpc-text">

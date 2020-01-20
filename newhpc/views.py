@@ -39,10 +39,13 @@ def riy_ar_registration(request,event_city):
 
     if event_city == 'riyadh':
         event = Event.objects.get(code_name='hpc2020-r')
+        template = 'newhpc/arabic/riy_ar_eng_registeration_test.html'
     elif event_city == 'jeddah':
         event = Event.objects.get(code_name='hpc2020-j')
-    elif event_city == 'ahsa':
+        template = 'newhpc/english/jeddah/jed_en_registration.html'
+    elif event_city == 'alahsa':
         event = Event.objects.get(code_name='hpc2020-a')
+        template ='newhpc/english/alahsa/ahs_en_registration.html'
 
     timeslots = TimeSlot.objects.filter(event=event ,parent__isnull=True)
     session = Session.objects.get(event=event, code_name='general')
@@ -63,12 +66,12 @@ def riy_ar_registration(request,event_city):
                'registred_to_program': registred_to_program}
 
     if event.registration_opening_date and timezone.now() < event.registration_opening_date and not request.user.is_superuser and not events.utils.is_organizing_team_member(request.user, event) and not events.utils.is_in_entry_team(request.user):
-        return render(request, 'newhpc/arabic/riy_ar_registeration.html', context)
+        raise  Http404
     elif event.registration_closing_date and timezone.now() > event.registration_closing_date:
         return HttpResponseRedirect(reverse('events:registration_closed',
                                                 args=(event.code_name,)))
 
-    return render(request, 'newhpc/arabic/riy_ar_eng_registeration_test.html', context)
+    return render(request, template, context)
 
 @login_required
 def register_general_program(request,event_city):
@@ -93,6 +96,14 @@ def register_general_program(request,event_city):
 @login_required
 def list_sessions(request, event_code_name, pk):
     event = get_object_or_404(Event, code_name=event_code_name)
+
+    if event.code_name == 'hpc2020-r':
+        template = 'newhpc/sessions_list.html'
+    elif event.code_name == 'hpc2020-j':
+        template = 'newhpc/english/jeddah/session_list.html'
+    elif event.code_name == 'hpc2020-a' :
+        template = 'newhpc/english/alahsa/session_list.html'
+
     timeslot = TimeSlot.objects.get(event=event, pk=pk)
     children_total = timeslot.session_set.count() + timeslot.children.count()
     if timeslot.limit:
@@ -110,12 +121,12 @@ def list_sessions(request, event_code_name, pk):
         not request.user.is_superuser and \
         not events.utils.is_organizing_team_member(request.user, event) and \
         not events.utils.is_in_entry_team(request.user):
-        return render(request,'newhpc/arabic/riy_ar_registeration.html',context)
+        raise Http404
     elif event.registration_closing_date and timezone.now() > event.registration_closing_date:
         return HttpResponseRedirect(reverse('events:registration_closed',
                                                 args=(event.code_name,)))
 
-    return render(request,  'newhpc/sessions_list.html', context)
+    return render(request, template , context)
 
 def riy_en_registration(request):
     context = {}

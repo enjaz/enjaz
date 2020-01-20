@@ -328,9 +328,7 @@
                                       {{ session.location }}
                                       </div>
                                 {% endif %}
-                                {% if session.acceptance_method == 'M' %}
-                                     <br>
-                                {% elif session.limit != None %}
+                                {% if session.limit != None %}
                                     <h5>عدد المقاعد المتبقية: <span id="count-{{ session.pk}}">{{ session.get_remaining_seats }}</span></h5>
                                 {% else %}
                                     <br>

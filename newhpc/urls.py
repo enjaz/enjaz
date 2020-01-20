@@ -11,8 +11,8 @@ urlpatterns = [
     url(r'^riyadh/en/soon$', views.riy_coming_soon, name="riy_coming_soon"),
     # Registration Pages
     # url(r'^riyadh/ar/register$', views.riy_ar_registration, name="riy_ar_registration"),
-    url(r'^(?P<event_city>[\d\w_\-]+)/ar/register$', views.riy_ar_registration, name="riy_ar_registration"),
-    url(r'^riyadh/en/register$', views.riy_en_registration, name="riy_en_registration"),
+    url(r'^(?P<event_city>[\d\w_\-]+)/en/register$', views.riy_ar_registration, name="riy_ar_registration"),
+    url(r'^riyadh/en/s/register$', views.riy_en_registration, name="riy_en_registration"),
     # Exhibition pages
     url(r'^riyadh/ar/exhibition$', views.riy_ar_exhibition, name="riy_ar_exhibition"),
     url(r'^riyadh/en/exhibition$', views.riy_en_exhibition, name="riy_en_exhibition"),

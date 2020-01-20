@@ -79,7 +79,7 @@ def register_general_program(request,event_city):
         event = Event.objects.get(code_name='hpc2020-r')
     elif event_city == 'jeddah':
         event = Event.objects.get(code_name='hpc2020-j')
-    elif event_city == 'ahsa':
+    elif event_city == 'alahsa':
         event = Event.objects.get(code_name='hpc2020-a')
 
     session = Session.objects.get(event=event, code_name='general')

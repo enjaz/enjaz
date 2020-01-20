@@ -258,7 +258,7 @@
 		                <!--</div>-->
 	                <!--</div>-->
 			  	<!--</div>-->
-
+                {% for speaker in speakers %}
 			  	<div class="item">
 			  		<div class="c-content-person-1">
 			  			<div class="c-caption c-content-overlay">
@@ -267,15 +267,18 @@
 					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
 					  			</div>
 			  				</div>
-			  				<img src="{% static 'newhpc/images/speakerstop/new/BassemKurdi.png' %}" class="img-responsive c-overlay-object" alt="">
+                            {% if speaker.image %}
+			  				<img src="{{speaker.image.url}}" class="img-responsive c-overlay-object" alt="">
+                            {% endif %}
 			  			</div>
 			  			<div class="c-body">
 				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
-                                Dr. Bassem Kurdi
+                                {% if speaker.en_name %}{{ speaker.en_name }}{% endif %}
                             </p>
 		                </div>
 	                </div>
 			  	</div>
+                {% endfor %}
                 <!--<div class="item">-->
 			  		<!--<div class="c-content-person-1">-->
 			  			<!--<div class="c-caption c-content-overlay">-->
@@ -293,40 +296,40 @@
 		                <!--</div>-->
 	                <!--</div>-->
 			  	<!--</div>-->
-                <div class="item">
-			  		<div class="c-content-person-1">
-			  			<div class="c-caption c-content-overlay">
-			  				<div class="c-overlay-wrapper">
-				  				<div class="c-overlay-content">
-					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
-					  			</div>
-			  				</div>
-			  				<img src="{% static 'newhpc/images/speakerstop/new/DrMohamedalmoamary.jpg' %}" class="img-responsive c-overlay-object" alt="">
-			  			</div>
-			  			<div class="c-body">
-				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
-                                Dr. Mohamed Almoamary
-                            </p>
-		                </div>
-	                </div>
-			  	</div>
-                <div class="item">
-			  		<div class="c-content-person-1">
-			  			<div class="c-caption c-content-overlay">
-			  				<div class="c-overlay-wrapper">
-				  				<div class="c-overlay-content">
-					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
-					  			</div>
-			  				</div>
-			  				<img src="{% static 'newhpc/images/speakerstop/new/DrZiadNakshabandi.jpg' %}" class="img-responsive c-overlay-object" alt="">
-			  			</div>
-			  			<div class="c-body">
-				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
-                                Dr.Ziad Nakshabandi
-                            </p>
-		                </div>
-	                </div>
-			  	</div>
+                <!--<div class="item">-->
+			  		<!--<div class="c-content-person-1">-->
+			  			<!--<div class="c-caption c-content-overlay">-->
+			  				<!--<div class="c-overlay-wrapper">-->
+				  				<!--<div class="c-overlay-content">-->
+					  				<!--<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>-->
+					  			<!--</div>-->
+			  				<!--</div>-->
+			  				<!--<img src="{% static 'newhpc/images/speakerstop/new/DrMohamedalmoamary.jpg' %}" class="img-responsive c-overlay-object" alt="">-->
+			  			<!--</div>-->
+			  			<!--<div class="c-body">-->
+				  			<!--<p style="text-align: center; font-size: 20px; font-weight: 700;">-->
+                                <!--Dr. Mohamed Almoamary-->
+                            <!--</p>-->
+		                <!--</div>-->
+	                <!--</div>-->
+			  	<!--</div>-->
+                <!--<div class="item">-->
+			  		<!--<div class="c-content-person-1">-->
+			  			<!--<div class="c-caption c-content-overlay">-->
+			  				<!--<div class="c-overlay-wrapper">-->
+				  				<!--<div class="c-overlay-content">-->
+					  				<!--<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>-->
+					  			<!--</div>-->
+			  				<!--</div>-->
+			  				<!--<img src="{% static 'newhpc/images/speakerstop/new/DrZiadNakshabandi.jpg' %}" class="img-responsive c-overlay-object" alt="">-->
+			  			<!--</div>-->
+			  			<!--<div class="c-body">-->
+				  			<!--<p style="text-align: center; font-size: 20px; font-weight: 700;">-->
+                                <!--Dr.Ziad Nakshabandi-->
+                            <!--</p>-->
+		                <!--</div>-->
+	                <!--</div>-->
+			  	<!--</div>-->
                 <!--<div class="item">-->
 			  		<!--<div class="c-content-person-1">-->
 			  			<!--<div class="c-caption c-content-overlay">-->

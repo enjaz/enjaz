@@ -102,7 +102,8 @@ class PreviousStatistics(models.Model):
 class Speaker(models.Model):
     version = models.ForeignKey(PreviousVersion)
     is_top_speaker = models.BooleanField(default=False,verbose_name="هل هو من المتحدّثين البارزين الذين سيتم عرضهم في الصفحة الرئيسيّة")
-    name = models.CharField(max_length=255, default="",blank=True, verbose_name="اسم المتحدّث باللغة المتوفّرة")
+    name = models.CharField(max_length=255, default="",blank=True, verbose_name="اسم المتحدّث باللغة العربية أو اللغة المتوفّرة")
+    en_name = models.CharField(max_length=255, default="",blank=True, verbose_name="اسم المتحدّث باللغة الإنجليزية")
     position = models.CharField(max_length=255, default="",blank=True, verbose_name="منصب المتحدّث مطلوب في حال كان المتحدّث بارز")
     image = models.ImageField(upload_to='newhpc/previous/speaker', blank=True, null=True,verbose_name="الصورة مطلوبة في حال كون المتحدّث بارز")
     def __unicode__(self):

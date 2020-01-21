@@ -18,11 +18,13 @@ import events.utils
 # enjazportal.com/riyadh HPC Riyadh :
 
 def riy_ar_index(request):
-    context = {}
+    speakers = Speaker.objects.filter(is_top_speaker=True, version__year='2020')
+    context = {'speakers':speakers,}
     return render(request,'newhpc/arabic/riy_ar_index.html',context)
 
 def riy_en_index(request):
-    context = {}
+    speakers = Speaker.objects.filter(is_top_speaker=True, version__year='2020')
+    context = {'speakers': speakers, }
     return render(request,'newhpc/english/riy_en_index.html',context)
 
 def riy_coming_soon(request):

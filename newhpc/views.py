@@ -50,6 +50,7 @@ def riy_ar_registration(request,event_city):
     timeslots = TimeSlot.objects.filter(event=event ,parent__isnull=True)
     session = Session.objects.get(event=event, code_name='general')
     registration = SessionRegistration.objects.filter(session=session, user=request.user,is_deleted=False).first()
+
     if registration:
         registred_to_program = True
     else :
@@ -60,16 +61,30 @@ def riy_ar_registration(request,event_city):
     else:
         have_image = False
 
+    barcode_user = request.user
+
+    text = ("{:0%s}" % events.utils.BARCODE_LENGTH).format(barcode_user.pk)
+    qrcode_value = events.utils.get_barcode(text)
+    user_registrations = request.user.session_registrations.filter(session__event=event,is_deleted=False)
+
+
     context = {'timeslots': timeslots,
                'event': event,
                'have_image': have_image,
-               'registred_to_program': registred_to_program}
+               'registred_to_program': registred_to_program,
+               'qrcode_value': qrcode_value,
+               'text': text,
+               'barcode_user': barcode_user,
+               'user_registrations':user_registrations
+               }
+
 
     if event.registration_opening_date and timezone.now() < event.registration_opening_date and not request.user.is_superuser and not events.utils.is_organizing_team_member(request.user, event) and not events.utils.is_in_entry_team(request.user):
         raise  Http404
     elif event.registration_closing_date and timezone.now() > event.registration_closing_date:
         return HttpResponseRedirect(reverse('events:registration_closed',
                                                 args=(event.code_name,)))
+
 
     return render(request, template, context)
 
@@ -354,3 +369,4 @@ def jed_en_research(request):
 def ahs_en_research(request):
     context = {}
     return render(request,'newhpc/english/alahsa/ahs_en_research.html',context)
+

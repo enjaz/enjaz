@@ -6,7 +6,11 @@
 {% block content %}
 
 <div class="text-center">
+{% if session.event.logo %}
+    <img src="{{ child_timeslot.event.logo.url }}"style="max-width: 750px;">
+    {% else  %}
    <img src="https://enjazportal.com/static/static/logo/HPC_2018.png" style="max-width: 750px;">
+{% endif  %}
 </div>
 
 <h1 class="text-center">التحضير ل{{ session.name }}</h1>

@@ -144,8 +144,6 @@
                                             <br>
                                             hpc-notifications@enjazportal.com
 
-                                        </p><a href="https://enjazportal.com/static/static/newhpc/media/file.pdf" class="btn btn-primary"><span style="background-color:#9d0051;color:white">تفاصيل المؤتمر</span> </a>
-                                        <a href="{% url 'newhpc:register_general_program' event_city='riyadh' %}" class="btn btn-info"><span style="color:white">ســـجـــلــنـــي</span> </a>
 									</div>
 								</li>
 							</ul>
@@ -156,7 +154,19 @@
 			</div>
 		</div>
 	</div>
+    <br>
+    <br>
+    <div class="c-content-title-1 c-opt-1 wow fadeInDown" >
+                                        <h4 class="c-font-34 c-font-center c-font-bold c-margin-b-30"> للتسجيل في البرنامج العام وبرامج الكليات  </h4>
+                                        <div class="c-line-center c-theme-bg"></div>
+        <div class="c-center">
+                                        <a href="https://enjazportal.com/static/static/newhpc/media/file.pdf" class="btn btn-primary"><span style="background-color:#9d0051;color:white">تفاصيل المؤتمر</span> </a>
+                                        <a href="{% url 'newhpc:register_general_program' event_city='riyadh' %}" class="btn btn-info"><span style="color:white">سجلني في البرنامج العام وبرامج الكليات</span> </a>
+        <p>  *الضغط على سجلني يعد موافقة على التعليمات  </p>
+        </div>
+    </div>
 </div>
+
 
 {% else %}
     <div class="c-content-box c-size-md c-bg-grey-1" dir="rtl">
@@ -171,7 +181,7 @@
 			<div class="row">
 				<div class="col-md-3">
 					<ul class="nav" role="tablist">
-						<li role="presentation" class="wow fadeInLeft active" data-wow-delay="0s" style="visibility: visible; animation-delay: 0s; animation-name: fadeInLeft; opacity: 1;">
+						<li role="presentation" class="wow fadeInLeft" data-wow-delay="0s" style="visibility: visible; animation-delay: 0s; animation-name: fadeInLeft; opacity: 1;">
 							<a href="#tab-1" role="tab" data-toggle="tab" aria-expanded="true">التعليمات العامة</a>
 						</li>
 						<li role="presentation" class="wow fadeInLeft" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInLeft; opacity: 1;">
@@ -180,12 +190,15 @@
 						<li role="presentation" class="wow fadeInLeft" data-wow-delay="0.4s" style="visibility: visible; animation-delay: 0.4s; animation-name: fadeInLeft; opacity: 1;">
 							<a href="#tab-3" role="tab" data-toggle="tab" aria-expanded="false">قوانين الشهادات</a>
 						</li>
+                        <li role="presentation" class="wow fadeInLeft active" data-wow-delay="0.4s" style="visibility: visible; animation-delay: 0.4s; animation-name: fadeInLeft; opacity: 1;">
+							<a href="#tab-4" role="tab" data-toggle="tab" aria-expanded="false">بطاقتي</a>
+						</li>
 
 					</ul>
 				</div>
 				<div class="col-md-9" >
 					<div class="tab-content c-bg-white wow fadeInRight" style="visibility: visible; animation-name: fadeInRight; opacity: 1;">
-						<div role="tabpanel" class="tab-pane fade active in" id="tab-1">
+						<div role="tabpanel" class="tab-pane fade " id="tab-1">
 							<ul class="c-tab-items">
 								<li style="padding-bottom:10px !important;" class="row" >
 									<div class="col-sm-4 col-xs-12">
@@ -262,6 +275,14 @@
 
                                         </p><a href="https://enjazportal.com/static/static/newhpc/media/file.pdf" class="btn btn-primary "><span style="color:white">تفاصيل المؤتمر</span> </a>
 									</div>
+								</li>
+							</ul>
+						</div>
+
+                        <div role="tabpanel" class="tab-pane fade active in" id="tab-4">
+							<ul class="c-tab-items">
+								<li class="row">
+									{% include 'newhpc/partials/registration_list.html' %}
 								</li>
 							</ul>
 						</div>

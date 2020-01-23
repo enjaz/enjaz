@@ -372,3 +372,5 @@ def ahs_en_research(request):
     context = {}
     return render(request,'newhpc/english/alahsa/ahs_en_research.html',context)
 
+def show_abstracts_booklet(request, lang):
+    return HttpResponseRedirect('/static/static/newhpc/media/abstracts booklet.pdf')

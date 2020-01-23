@@ -51,7 +51,7 @@ def riy_ar_registration(request,event_city):
 
     timeslots = TimeSlot.objects.filter(event=event ,parent__isnull=True)
     session = Session.objects.get(event=event, code_name='general')
-    registration = SessionRegistration.objects.filter(session=session, user=request.user,is_deleted=False).first()
+    registration = request.user.session_registrations.filter(session__event=event, session__code_name='general').first()
 
     if registration:
         registred_to_program = True

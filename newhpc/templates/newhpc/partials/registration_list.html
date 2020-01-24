@@ -1,0 +1,49 @@
+{% load staticfiles %}
+<div class="col-sm-4 col-xs-12">
+     <table style="text-align: center;">
+
+          <tr style="text-align: center;width: 100%;" colspan="2" >
+
+                 <td><img src="{% static 'newhpc/images/icons/registration/general-icon.png' %}" style="width: 200px;margin-bottom: 20px"></td>
+                 <td></td>
+          </tr>
+
+          <tr>
+
+                <td>
+                    <p style="width: 100%; ">
+                    <img src='https://barcode.tec-it.com/barcode.ashx?data={{ text }}&code=Code128&dpi=96&dataseparator=' alt='Barcode Generator TEC-IT'/>
+{#                        <img src="https://barcode.tec-it.com/barcode.ashx?data={{ barcode_user.pk }}%0A&code=QRCode&multiplebarcodes=true&translate-esc=false&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&bgcolor=%23ffffff&qunit=Mm&quiet=0&eclevel=L#}
+">
+                    </p>
+                    <p style="background-color: gainsboro;border-radius: 3px; font-family: 'Markazi Text', serif;">
+                        <strong>NAME</strong><br> {{ barcode_user.common_profile.get_en_short_name|default:barcode_user.username }}
+                    </p>
+
+                                  <p style="background-color: gainsboro;border-radius: 3px; font-family: 'Markazi Text', serif;">
+                    <strong>EMAIL</strong><br>  {{ barcode_user.email }}
+
+                                  </p>
+                </td>
+          </tr>
+    </table>
+
+</div>
+<div class="col-sm-8 col-xs-12">
+    <h4>تسجيلاتي</h4>
+
+    {% for registration in user_registrations %}
+        <div class="c-section">
+            <div class="c-content-label c-font-uppercase c-font-bold c-theme-bg">{{ registration.session }}</div>
+            <p>
+                {{ registration.get_status }}<br>
+                {{ registration.session.location  }}<br>
+                {{ registration.session.date }}<br>
+                {{ registration.session.start_time  }}<br>
+                {{ registration.session.end_time  }}<br>
+            </p>
+        </div>
+
+    {% endfor %}
+
+</div>

@@ -59,26 +59,26 @@
               <div class="body-containter"><h3 class="english-field session-title"> <a {% if user|is_organizing_team_member:event or user|is_regestrations_team_member:event %} href="{% url 'events:review_registrations' session.event.code_name session.pk %}" {% endif %}> {{ session.name }}</a> </h3>
                 <h4 style="color: grey;"> <strong>{{ session.presenter }}</strong></h4></div>
                 <div>
-  								<i class="entypo-calendar"></i>
-                                  {{ session.date|date:"l j F Y" }}
-  							</div>
+                    <i class="entypo-calendar"></i>
+                          {{ session.date|date:"l j F Y" }}
+                    </div>
                 {% if session.start_time and session.end_time %}
-  							<div>
-  								<i class="entypo-clock"></i>
-  								{{ session.start_time }}
-  								-
-  								{{ session.end_time }}
-  							</div>
+                    <div>
+                        <i class="entypo-clock"></i>
+                        {{ session.start_time }}
+                        -
+                        {{ session.end_time }}
+                    </div>
                 {% endif %}
-  							{% if session.location %}
-  							<div>
-  							  <i class="entypo-location"></i>
-  							  {{ session.location }}
-  							  </div>
-  							{% endif %}
+                {% if session.location %}
+                    <div>
+                      <i class="entypo-location"></i>
+                      {{ session.location }}
+                      </div>
+                {% endif %}
                 {% if session.acceptance_method == 'M' %}
                      <br>
-                 {% elif session.limit != None %}
+                {% elif session.limit != None %}
                 <h5>عدد المقاعد المتبقية: <span id="count-{{ session.pk}}">{{ session.get_remaining_seats }}</span></h5>
                 {% else %}
                 <br>

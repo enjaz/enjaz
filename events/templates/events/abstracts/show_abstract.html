@@ -67,26 +67,26 @@ h4{
         {% else %}
             <h2>Accepted as {{ abstract.get_accepted_presentaion_preference_display }}</h2>
             <h3 class="english-field"><b>Congratulations!</b><br> Your abstract has been accepted to be presented on {{ abstract.event.english_name }} | {{ abstract.presentaion_date|date:"Y-n-j" }}.
-            {% if abstract.event.code_name != 'hpc2020-j' %}    We require all accepted abstract submitters to upload their poster image and powerpoint,make sure you have follow the guidlines : </h3>
+            {% if abstract.event.code_name != 'hpc2020-j' %}
+                We require all accepted abstract submitters to upload their poster image and powerpoint,make sure you have follow the guidlines : </h3>
 
+                <h4><li>Each poster can have maximally two slides (dont crowd everything in one slide, you have enough space with two slides).</li>
 
-            <h4><li>Each poster can have maximally two slides (dont crowd everything in one slide, you have enough space with two slides).</li>
+                    <li>Size and dimensions of the slide are already set in {% if abstract.event.code_name == 'hpc2020-a' %}<a href="https://enjazportal.com/media/files/HPC2020PosterPresesntationTemplate.pptx">{% else %}<a href="//riyadh link//">{% endif %} the template</a>, so PLEASE, don't make any changes of size and dimensions of the slides.AND PLEASE do not add any additonal logos.</li>
 
-                <li>Size and dimensions of the slide are already set in {% if abstract.event.code_name == 'hpc2019-a' %}<a href="https://enjazportal.com/media/files/events/HPC-AHSA-2019-Poster-Template.pptx">{% else %}<a href="https://enjazportal.com/media/files/events/HPC_2019_Poster_Template.pptx">{% endif %} the template</a>, so PLEASE, don't make any changes of size and dimensions of the slides.AND PLEASE do not add any additonal logos.</li>
+                    <li>The least acceptable font size in the body texts is 40.</li>
 
-                <li>The least acceptable font size in the body texts is 40.</li>
+                    <li>No sounds or videos can be uploaded with the eposter, only pictures and graphs (make sure, that you use big enough graphs).</li>
 
-                <li>No sounds or videos can be uploaded with the eposter, only pictures and graphs (make sure, that you use big enough graphs).</li>
+                    <li>When you paste a picture or a graph on the slide, choose "keep source formatting". (mandatory)</li>
 
-                <li>When you paste a picture or a graph on the slide, choose <a href="https://enjazportal.com/media/files/events/posters/Note_for_E-Poster__How_to_Paste_.png"> "keep source formatting"</a>. (mandatory)</li>
+                    <li>Each eposter should be saved into two formats PPT and JPEG (make sure that the picture in  JPEG format is not distorted after you export the file).</li>
 
-                <li>Each eposter should be saved into two formats PPT and JPEG (make sure that the picture in  JPEG format is not distorted after you export the file).</li>
+                    <li>Both the PPT and JPEG should be uploaded to the enjaz system. <b>Files MUST be named: <span style= "color: red">"{{ abstract.event.code_name }}_{{ abstract.pk }}"</span></b>.</li>
 
-                <li>Both the PPT and JPEG should be uploaded to the enjaz system. <b>Files MUST be named: <span style= "color: red">"{{ abstract.event.code_name }}_{{ abstract.pk }}"</span></b>.</li>
+                    <li>Please upload your poster before the <b>{% if abstract.event.code_name == 'hpc2020-j' %} //jeddah deadline// {% elif abstract.event.code_name == 'hpc2020-a' %} 24 {% else %}//riyadh deadline//{% endif %} of January 2020</b> as we will not accept any posters after that date.</li>
 
-                <li>Please upload your poster before the <b>{% if abstract.event.code_name == 'hpc2019-j' %}12th{% elif abstract.event.code_name == 'hpc2019-a' %}14th{% else %}12th{% endif %} of January 2019</b> as we will not accept any posters after that date.</li>
-               
-                <li>Please do not hesitate to contact us for any further assistance hpc-notifications@enjazportal.com</li></h4>
+                    <li>Please do not hesitate to contact us for any further assistance{% if abstract.event.code_name == 'hpc2020-a' %} Almulhim048@ksau-hs.edu.sa {% else %} hpc-notifications@enjazportal.com {% endif %}</li></h4>
             <div class="submit" style="margin-left: 9%; margin-bottom: 10px; margin-right: 9%;">
             <form method="post" action="{% url 'events:show_abstract' event.code_name abstract.pk %}" enctype="multipart/form-data">
                 {% csrf_token %}
@@ -119,10 +119,10 @@ h4{
             <h2>Accepted as {{ abstract.get_accepted_presentaion_preference_display }}</h2>
                 <h3 class="english-field"><b>Congratulations!</b><br> Your abstract has been accepted to be presented on {{ abstract.event.english_name }} | {{ abstract.presentaion_date|date:"Y-n-j" }}.  We require all accepted abstract submitters to upload their presntation file: </h3>
     
-                <h4><li>Please upload your presntation before the <b>{% if abstract.event.code_name == 'hpc2019-j' %}{% elif abstract.event.code_name == 'hpc2019-a' %}-{% else %}-{% endif %} of January 2020</b> as we will not accept any presntation after that date.</li>
+                <h4><li>Please upload your presntation before the <b>{% if abstract.event.code_name == 'hpc2019-j' %}{% elif abstract.event.code_name == 'hpc2020-a' %}24{% else %}-{% endif %} of January 2020</b> as we will not accept any presntation after that date.</li>
                 <li><b>File MUST be named: <span style= "color: red">"{{ abstract.event.code_name }}_{{ abstract.pk }}"</span></b></li>
                 <li>File MUST be on PowePoint format</li>
-                {% if abstract.event.code_name == 'hpc2019-a' %}<li><a href="https://enjazportal.com/media/files/events/oral-HPC-AHSA-2019.pptx">Use this trmplate</a></li>{% endif %}
+                {% if abstract.event.code_name == 'hpc2020-a' %}<li><a href="https://enjazportal.com/media/files/events/HPC2020OralPresesntationTemplate.pptx">Use this template</a></li>{% endif %}
                 <li>You have 7 minutes for the presentation and 3 minutes for the discussion</li>
                 <li>Please do not hesitate to contact us for any further assistance hpc-notifications@enjazportal.com</li></h4>
                 <div class="submit" style="margin-left: 9%; margin-bottom: 10px; margin-right: 9%;">

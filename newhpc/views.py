@@ -6,26 +6,145 @@ from django.views.decorators import csrf
 from django.http import JsonResponse
 from django.shortcuts import render
 from core import decorators
-from .models import FaqCategory, FaqQuestion, BlogPostArabic, BlogPostEnglish, NewsletterMembership, BlogVideo
+from .models import FaqCategory, FaqQuestion, BlogPostArabic, BlogPostEnglish, NewsletterMembership, BlogVideo, Speaker
 from .forms import *
+from events.models import Event, Session, TimeSlot,SessionRegistration
+from django.utils import timezone
+from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.core.urlresolvers import reverse
+import events.utils
+
 
 # enjazportal.com/riyadh HPC Riyadh :
 
 def riy_ar_index(request):
-    context = {}
+    speakers = Speaker.objects.filter(is_top_speaker=True, version__year='2020')
+    context = {'speakers':speakers,}
     return render(request,'newhpc/arabic/riy_ar_index.html',context)
 
 def riy_en_index(request):
-    context = {}
+    speakers = Speaker.objects.filter(is_top_speaker=True, version__year='2020')
+    context = {'speakers': speakers, }
     return render(request,'newhpc/english/riy_en_index.html',context)
 
 def riy_coming_soon(request):
     context = {}
     return render(request,'newhpc/arabic/riy_coming_soon.html',context)
 
-def riy_ar_registration(request):
-    context = {}
-    return render(request,'newhpc/arabic/riy_ar_registeration.html',context)
+# def riy_ar_registration(request):
+#     context = {}
+#     return render(request,'newhpc/arabic/riy_ar_registeration.html',context)
+
+
+@login_required
+def riy_ar_registration(request,event_city):
+
+    if event_city == 'riyadh':
+        event = Event.objects.get(code_name='hpc2020-r')
+        template = 'newhpc/arabic/riy_ar_eng_registeration_test.html'
+    elif event_city == 'jeddah':
+        event = Event.objects.get(code_name='hpc2020-j')
+        template = 'newhpc/english/jeddah/jed_en_registration.html'
+    elif event_city == 'alahsa':
+        event = Event.objects.get(code_name='hpc2020-a')
+        template ='newhpc/english/alahsa/ahs_en_registration.html'
+
+    timeslots = TimeSlot.objects.filter(event=event ,parent__isnull=True)
+    session = Session.objects.get(event=event, code_name='general')
+    registration = SessionRegistration.objects.filter(session=session, user=request.user,is_deleted=False).first()
+
+    if registration:
+        registred_to_program = True
+    else :
+        registred_to_program = False
+
+    if timeslots.filter(image__isnull=False):
+        have_image = True
+    else:
+        have_image = False
+
+    barcode_user = request.user
+
+    text = ("{:0%s}" % events.utils.BARCODE_LENGTH).format(barcode_user.pk)
+    qrcode_value = events.utils.get_barcode(text)
+    user_registrations = request.user.session_registrations.filter(session__event=event,is_deleted=False)
+
+
+    context = {'timeslots': timeslots,
+               'event': event,
+               'have_image': have_image,
+               'registred_to_program': registred_to_program,
+               'qrcode_value': qrcode_value,
+               'text': text,
+               'barcode_user': barcode_user,
+               'user_registrations':user_registrations
+               }
+
+
+    if event.registration_opening_date and timezone.now() < event.registration_opening_date and not request.user.is_superuser and not events.utils.is_organizing_team_member(request.user, event) and not events.utils.is_in_entry_team(request.user):
+        raise  Http404
+    elif event.registration_closing_date and timezone.now() > event.registration_closing_date:
+        return HttpResponseRedirect(reverse('events:registration_closed',
+                                                args=(event.code_name,)))
+
+
+    return render(request, template, context)
+
+@login_required
+def register_general_program(request,event_city):
+    if event_city == 'riyadh':
+        event = Event.objects.get(code_name='hpc2020-r')
+    elif event_city == 'jeddah':
+        event = Event.objects.get(code_name='hpc2020-j')
+    elif event_city == 'alahsa':
+        event = Event.objects.get(code_name='hpc2020-a')
+
+    session = Session.objects.get(event=event, code_name='general')
+    registration = SessionRegistration.objects.filter(session=session, user=request.user).first()
+    if not registration:
+        registration = SessionRegistration.objects.create(session=session,
+                                                          user=request.user,
+                                                          is_approved=True)
+    return HttpResponseRedirect(reverse('newhpc:riy_ar_registration',
+                                        args=(event_city,)))
+
+
+
+@login_required
+def list_sessions(request, event_code_name, pk):
+    event = get_object_or_404(Event, code_name=event_code_name)
+
+    if event.code_name == 'hpc2020-r':
+        template = 'newhpc/sessions_list.html'
+    elif event.code_name == 'hpc2020-j':
+        template = 'newhpc/english/jeddah/session_list.html'
+    elif event.code_name == 'hpc2020-a' :
+        template = 'newhpc/english/alahsa/session_list.html'
+
+    timeslot = TimeSlot.objects.get(event=event, pk=pk)
+    children_total = timeslot.session_set.count() + timeslot.children.count()
+    if timeslot.limit:
+        remaining_number = timeslot.limit - request.user.session_registrations.filter(session__time_slot=timeslot,is_deleted=False).count()
+    else:
+        remaining_number = 1
+    limit = events.utils.get_timeslot_limit(timeslot)
+    context = {'timeslot': timeslot,
+               'event': event,
+               'children_total':children_total,
+               'remaining_number':remaining_number,
+               'limit':limit}
+
+    if event.registration_opening_date and timezone.now() < event.registration_opening_date and \
+        not request.user.is_superuser and \
+        not events.utils.is_organizing_team_member(request.user, event) and \
+        not events.utils.is_in_entry_team(request.user):
+        raise Http404
+    elif event.registration_closing_date and timezone.now() > event.registration_closing_date:
+        return HttpResponseRedirect(reverse('events:registration_closed',
+                                                args=(event.code_name,)))
+
+    return render(request, template , context)
+
 def riy_en_registration(request):
     context = {}
     return render(request,'newhpc/english/riy_en_registeration.html',context)
@@ -231,17 +350,27 @@ def list_newsletter_members(request):
     return render(request, 'newhpc/english/administrative/list_news_members.html', context)
 
 def show_media_file(request, lang):
-    return render(request,'newhpc/arabic/riy_coming_soon.html')
+    return HttpResponseRedirect('/static/static/newhpc/media/file.pdf')
 
+def list_speakers(request, lang):
+    if lang == 'ar':
+        lang2 = 'arabic'
+    elif lang == 'en':
+        lang2 = 'english'
+    # TODO: FIx hard code in defining current year for filter
+    speakers = Speaker.objects.filter(version__year="2020")
+    context = {'speakers': speakers, 'year': '2020'}
+    return render(request, 'newhpc/'+lang2+'/riy_list_speakers.html', context)
 
 # enjazportal.com/jeddah HPC Jeddah :
 def jed_en_research(request):
     context = {}
     return render(request,'newhpc/english/jeddah/jed_en_research.html',context)
 
-
-
 # enjazportal.com/alahsa HPC Al Ahsa :
 def ahs_en_research(request):
     context = {}
     return render(request,'newhpc/english/alahsa/ahs_en_research.html',context)
+
+def show_abstracts_booklet(request, lang):
+    return HttpResponseRedirect('/static/static/newhpc/media/abstracts booklet.pdf')

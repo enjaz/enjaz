@@ -797,11 +797,13 @@ def evaluators_homepage(request,event_code_name):
     riyadh_evaluators = Team.objects.get(code_name='hpc2020-r-e')
     jeddah_evaluators = Team.objects.get(code_name='hpc2020-j-e')
     alahsa_evaluators = Team.objects.get(code_name='hpc2020-a-e')
+    evaluations = request.user.event_abstract_evaluations.filter(abstract__event=event)
     context = {'riyadh_evaluators': riyadh_evaluators,
                'jeddah_evaluators':jeddah_evaluators,
                'alahsa_evaluators':alahsa_evaluators,
                'pending_abstracts':pending_abstracts,
-               'event': event}
+               'event': event,
+               'evaluations':evaluations}
     return render(request, 'events/abstracts/evaluator_homepage.html', context)
 
 @login_required

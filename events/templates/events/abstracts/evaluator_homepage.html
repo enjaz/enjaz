@@ -101,7 +101,7 @@
             <div class="panel-heading">
                 <h4 class="panel-title">
                 <a data-toggle="collapse" data-parent="#activities-accordion" href="#collapseTwo-2" class="english-field collapsed">
-                    Your Evaluated abstracts ({{ user.event_abstract_evaluations.count }} )
+                    Your Evaluated abstracts ({{ evaluations.count }} )
                 </a>
             </h4>
             </div>
@@ -118,7 +118,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for evaluation in user.event_abstract_evaluations.all %}
+                                {% for evaluation in evaluations  %}
                                 <tr>
                                     <td><a href="{% url 'events:edit_evaluation' evaluation.abstract.event.code_name evaluation.abstract.pk evaluation.id %}">{{ evaluation.abstract.title }}</a></td>
 

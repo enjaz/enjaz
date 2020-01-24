@@ -10,8 +10,9 @@ urlpatterns = [
     url(r'^riyadh/en/$', views.riy_en_index, name="riy_en_index"),
     url(r'^riyadh/en/soon$', views.riy_coming_soon, name="riy_coming_soon"),
     # Registration Pages
-    url(r'^riyadh/ar/register$', views.riy_ar_registration, name="riy_ar_registration"),
-    url(r'^riyadh/en/register$', views.riy_en_registration, name="riy_en_registration"),
+    # url(r'^riyadh/ar/register$', views.riy_ar_registration, name="riy_ar_registration"),
+    url(r'^(?P<event_city>[\d\w_\-]+)/en/register$', views.riy_ar_registration, name="riy_ar_registration"),
+    url(r'^riyadh/en/s/register$', views.riy_en_registration, name="riy_en_registration"),
     # Exhibition pages
     url(r'^riyadh/ar/exhibition$', views.riy_ar_exhibition, name="riy_ar_exhibition"),
     url(r'^riyadh/en/exhibition$', views.riy_en_exhibition, name="riy_en_exhibition"),
@@ -19,6 +20,8 @@ urlpatterns = [
     url(r'^riyadh/en/research$', views.riy_en_research, name="riy_en_research"),
     # About Pages
     url(r'^riyadh/(?P<lang>(ar|en))/about$', views.show_about, name="riy_about"),
+    # Speakers' Page
+    url(r'^riyadh/(?P<lang>(ar|en))/speakers/$', views.list_speakers, name="riy_list_speakers"),
     # FAQ-Related Pages
     url(r'^general/FAQ/category/add$', views.add_FaqCategory, name="add_faq_category"),
     url(r'^general/FAQ/question/add$', views.add_FaqQuestion, name="add_faq_question"),
@@ -41,7 +44,8 @@ urlpatterns = [
     url(r'^riyadh/media/newsletter/signup/$', views.handle_newsletter_signup, name="handle_newsletter_signup"),
     # Media file
     url(r'^riyadh/(?P<lang>(ar|en))/media/file/$', views.show_media_file, name="media_file"),
-
+    # Abstracts Booklet
+    url(r'^riyadh/(?P<lang>(ar|en))/media/abstracts_booklet/$', views.show_abstracts_booklet, name="abstracts_booklet"),
 
     # Jeddah Pages
     # Index Pages
@@ -55,6 +59,8 @@ urlpatterns = [
     # Registration Pages
     # Research Guidelines
     url(r'^alahsa/en/research$', views.ahs_en_research, name="ahs_en_research"),
+    url(r'^(?P<event_code_name>[\d\w_\-]+)/timeslots/(?P<pk>\d+)/$', views.list_sessions, name="list_sessions"),
+    url(r'^(?P<event_city>[\d\w_\-]+)/general/register$', views.register_general_program, name="register_general_program"),
 
 ]
 

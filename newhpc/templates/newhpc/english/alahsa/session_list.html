@@ -1,0 +1,186 @@
+{% extends 'newhpc/english/alahsa/ahs_english_base.html' %}{% load staticfiles %}
+{% block title %}HPC 2020 | Al Ahsa{% endblock %}
+{% block style %}
+    .hpc-text {
+        color: #242b2c!important;
+        margin-top: 30px;
+        text-align: justify;
+        text-align-last: center;
+    }
+    @media (min-width: 992px) {
+    #slide1h3 {
+        margin-top:55px
+    }
+    #slide1p {
+        margin:60px 0 30px 0;
+    }
+    #our-vision.c-feature-15-container {
+        margin: 0 -30px 0 350px;
+    }
+    }
+    @media
+    (max-width: 1200px) {
+    #slide2h3.c-font-48 {
+        font-size:43px !important;
+    }
+    #slide1h3.c-font-70 {
+        font-size: 50px !important;
+    }
+    #slide1p.c-font-40 {
+        font-size: 30px !important;
+    }
+    @media (max-width: 991px) {
+    #slide2h3.c-font-48 {
+        font-size:19px !important;
+    }
+    #slide1h3.c-font-70 {
+        font-size: 25px !important;
+    }
+    #slide1p.c-font-40 {
+        font-size: 14px !important;
+    }
+    #slide1p{
+        margin:0 !important;
+    }
+    #slide1h3 {
+        margin-top: 15px !important;
+    }
+    #our-vision.c-feature-15-container {
+        margin: 0 !important;
+    }
+    .c-content-list-1 > li {
+        font-size:20px;
+        margin-top:15px;
+    }
+    .c-btn-blue {
+        background: #33b2c1 !important;
+        border-color: #33b2c1 !important;
+    }
+    .c-btn-blue:hover {
+        background: #9d0051 !important;
+        border-color: #9d0051 !important;
+    }
+
+    }
+{% endblock %}
+{% block content %}
+    <!-- BEGIN: CONTENT/FEATURES/FEATURES-15-3 -->
+    {% include 'newhpc/partials/timeslot_detials.html' %}
+
+{% endblock %}
+
+{% block script %}
+
+
+    const second = 1000,
+    minute = second * 60,
+    hour = minute * 60,
+    day = hour * 24;
+
+    let countDown = new Date('Jan 28, 2020 00:00:00').getTime(),
+    x = setInterval(function() {
+
+    let now = new Date().getTime(),
+      distance = countDown - now;
+
+    document.getElementById('days').innerText = Math.floor(distance / (day)),
+    document.getElementById('hours').innerText = Math.floor((distance % (day)) / (hour)),
+    document.getElementById('minutes').innerText = Math.floor((distance % (hour)) / (minute)),
+    document.getElementById('seconds').innerText = Math.floor((distance % (minute)) / second);
+
+    //do something later when date is reached
+    //if (distance < 0) {
+    //  clearInterval(x);
+    //  'IT'S MY BIRTHDAY!;
+    //}
+
+    }, second);
+
+
+
+    $(".signup, .cancel").click(function(){
+        console.log('hello1');
+        button = this;
+            pk = $(this).data("pk");
+            action = $(this).data("action");
+        timeslot_pk = $(this).data("timeslot-pk");
+            $.ajax("{% url 'events:handle_ajax' %}", {
+                method: "POST",
+                data: {pk: pk, action: action},
+            success: function(data){
+                if (data['success'] == 1){
+                    $("#count-" + pk).html(data['remaining_seats']);
+                      status_button = $("#status-" + pk);
+                      timeslot_buttons = $("button[data-timeslot-pk=" + timeslot_pk + "]");
+                        if (action == 'cancel'){
+                        toastr.error("ألغي تسجيلك");
+
+                          $(button).html('سجلني!');
+                          $(button).data('action', 'signup');
+                          $(button).addClass('btn-success');
+                          $(button).removeClass('btn-danger');
+
+                          timeslot_buttons.removeAttr("disabled", "disabled");
+                          timeslot_buttons.removeClass('btn-warning');
+                          timeslot_buttons.html('سجلني!');
+                          timeslot_buttons.addClass('btn-success');
+
+
+                          status_button.hide();
+
+                      } else if (action == 'signup'){
+                        toastr.success("تمّ تسجيلك!");
+                          if (data['remaining'] == false) {
+                                timeslot_buttons.attr("disabled", "disabled");
+                                timeslot_buttons.removeClass('btn-success');
+                                timeslot_buttons.addClass('btn-warning');
+                                timeslot_buttons.html("وصلت الحد الأقصى للجلسات المسموح بها");
+
+
+                          }
+
+                          $(button).html('ألغِ تسجيلي!');
+                          $(button).data('action', 'cancel');
+                          $(button).addClass('btn-danger');
+                          $(button).removeClass('btn-success');
+                          $(button).removeAttr("disabled", "disabled");
+
+                          status_button.show();
+                          status_button.removeClass("btn-danger");
+                          status_button.html(data['status']);
+                          if (data['status'] == "معلق"){
+                            status_button.addClass("btn-warning");
+                          } else if (data['status'] == "معتمد"){
+                            status_button.addClass("btn-success");
+                          }
+                      }
+                } else if (data['success'] == 0){
+                  toastr.error(data['message']);
+                }
+            }
+        });
+    });
+
+    $('#session-details-modal').modal({
+      keyboard: false,
+      backdrop: 'static',
+      show    : false,
+    });
+    $(".session-info").click(function () {
+        url = $(this).data("url");
+        name = $(this).data("name");
+
+        $("#session-details-modal").modal('show');
+        $("#session-details-modal .modal-title").html(name);
+        $("#session-details-modal .modal-title").addClass('english-field');
+            $("#session-details-modal .modal-body").load(url);
+    });
+
+{% endblock %}
+
+{% block customscript %}
+    {% with modal_id='session-details-modal' no_footer=True %}
+        {% include "bulb/groups/common_edit_modal.html" %}
+    {% endwith %}
+{% endblock %}
+

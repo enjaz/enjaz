@@ -12,9 +12,11 @@
 
                 <td>
                     <p style="width: 100%; ">
-                    <img src='https://barcode.tec-it.com/barcode.ashx?data={{ text }}&code=Code128&dpi=96&dataseparator=' alt='Barcode Generator TEC-IT'/>
-{#                        <img src="https://barcode.tec-it.com/barcode.ashx?data={{ barcode_user.pk }}%0A&code=QRCode&multiplebarcodes=true&translate-esc=false&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&bgcolor=%23ffffff&qunit=Mm&quiet=0&eclevel=L#}
-">
+                    
+                     <img src="https://barcode.tec-it.com/barcode.ashx?data={{ barcode_user.pk }}%0A&code=QRCode&multiplebarcodes=true&translate-esc=false&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&bgcolor=%23ffffff&qunit=Mm&quiet=0&eclevel=L">
+
+<img style="margin-top:8%;margin-right:8%;margin-left:8%" src='https://barcode.tec-it.com/barcode.ashx?data={{ text }}&code=Code128&dpi=96&dataseparator=' alt='Barcode Generator TEC-\
+IT'/>
                     </p>
                     <p style="background-color: gainsboro;border-radius: 3px; font-family: 'Markazi Text', serif;">
                         <strong>NAME</strong><br> {{ barcode_user.common_profile.get_en_short_name|default:barcode_user.username }}

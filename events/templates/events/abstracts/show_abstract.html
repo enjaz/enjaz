@@ -63,7 +63,7 @@ h4{
 <div class="row" style="margin-left: 0; margin-bottom: 5px; ">
 {%  if abstract.status == 'A' %}
     {% if abstract.accepted_presentaion_preference == 'P' %}
-        {% if  abstract.posters.exists %}
+        {% if abstract.posters.exists %}
         {% else %}
             <h2>Accepted as {{ abstract.get_accepted_presentaion_preference_display }}</h2>
             <h3 class="english-field"><b>Congratulations!</b><br> Your abstract has been accepted to be presented on {{ abstract.event.english_name }} | {{ abstract.presentaion_date|date:"Y-n-j" }}.

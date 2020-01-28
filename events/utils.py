@@ -179,7 +179,7 @@ def render_badge_pdf(user):
     qrcode_value = get_barcode(text)
     # TODO: Fix this situation
     # image_url = "https://enjazportal.com/static/static/img/hpc.png"
-    image_url = "https://drive.google.com/file/d/16nu7V_YgwDM3hGcRfj6X7-qaTNvwJfQf/view"
+    image_url = "https://enjazportal.com/static/static/newhpc/images/logos/hpc2020.png"
     context = {'qrcode_value': qrcode_value,
                'image_url': image_url,
                'text': text,

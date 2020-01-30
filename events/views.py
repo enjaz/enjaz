@@ -1229,7 +1229,10 @@ def list_attendance(request, event_code_name,user_pk=None):
                                   has_attendance = True)
     user = get_object_or_404(User, pk=user_pk)
 
-    if not request.user.is_superuser and not utils.is_organizing_team_member(request.user,event):
+    if not request.user.is_superuser and \
+       not utils.is_organizing_team_member(request.user, event) and \
+       not utils.is_attendance_team_member(request.user, event) and\
+            not utils.is_regestrations_team_member(request.user,event):
         raise PermissionDenied
 
     attendances = Attendance.objects.filter(session_registration__user=user)

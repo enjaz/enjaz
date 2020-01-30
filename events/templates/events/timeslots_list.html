@@ -4,6 +4,13 @@
 <div class="text-center">
     <h1>التسجيل في {{ event.official_name }} <a style="float: left; background-color: #009549; color: white;" class="btn btn-Success" href="{% url 'events:list_my_registration' %}">تسجيلاتي </a> </h1>
 
+    <!--TODO: Fix hardcode; also Jeddah's page has some error so no url for them .. sorry-->
+    {% if event.code_name == 'hpc2020-a' %}
+    <a style="float: left; background-color: #009549; color: white;" class="btn btn-Success" href="{% url 'newhpc:register_general_program' 'alahsa' %}">التسجيل في البرنامج العام </a>
+    {% elif event.code_name == 'hpc2020-r' %}
+    <a style="float: left; background-color: #009549; color: white;" class="btn btn-Success" href="{% url 'newhpc:register_general_program' 'riyadh' %}">التسجيل في البرنامج العام </a>
+    {% endif %}
+
 {% if not user.social_auth.exists %}
 <a style="margin-top: 5px; background-color: #1da1f3; color: white;" align="center" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}" class="btn btn-sm"><i class="fa fa-twitter"></i> اربط حسابي بتويتر</a>
 {% endif %}

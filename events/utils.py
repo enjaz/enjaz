@@ -177,7 +177,9 @@ def get_user_sidebar_events(user):
 def render_badge_pdf(user):
     text = ("{:0%s}" % BARCODE_LENGTH).format(user.pk)
     qrcode_value = get_barcode(text)
-    image_url = "https://enjazportal.com/static/static/img/hpc.png"
+    # TODO: Fix this situation
+    # image_url = "https://enjazportal.com/static/static/img/hpc.png"
+    image_url = "https://enjazportal.com/static/static/newhpc/images/logos/hpc2020.png"
     context = {'qrcode_value': qrcode_value,
                'image_url': image_url,
                'text': text,

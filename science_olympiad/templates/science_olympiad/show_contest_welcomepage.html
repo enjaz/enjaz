@@ -134,7 +134,7 @@ a, a:hover, a:focus{
           {% endif %}
 
           <br>
-          <a href="{% url 'science_olympiad:begin_contest' contest_id %}" class="btn btn-primary" style="font-size:24px; background-color:#fd3576; border-color:#fd3576; align-text:center">بدء المسابقة</a>
+          <a href="{% url 'science_olympiad:show_question' contest_id question.pk %}" class="btn btn-primary" style="font-size:24px; background-color:#fd3576; border-color:#fd3576; align-text:center">بدء المسابقة</a>
       </div>
 
 </div>

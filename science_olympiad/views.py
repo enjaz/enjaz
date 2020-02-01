@@ -52,8 +52,11 @@ def begin_contest(request, contest_id):
     context = {'contest':contest, 'questions':questions}
     return render(request, 'science_olympiad/begin_contest.html', context)
 
-def show_contest_welcomepage(request, contest_id):
-    context = {'contest_id': contest_id}
+def show_contest_welcomepage(request, contest_id, question_id):
+    contest = get_object_or_404(Contest, pk=contest_id)
+    questions = ContestQuestion.objects.filter(contest=contest)
+    question = questions.get(pk=question_id)
+    context = {'contest_id': contest_id, 'question':question,}
     return render(request, 'science_olympiad/show_contest_welcomepage.html', context)
 
 def show_contest_endpage(request):

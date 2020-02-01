@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from .models import Inventor
+from django.shortcuts import render, get_object_or_404
+from .models import Inventor, Contest, ContestQuestion, ContestAnswer
 from .forms import InventorForm
 
 
@@ -46,6 +46,46 @@ def add_inventor3(request):
     context = {'form': form}
     return render(request, 'science_olympiad/add_inventor3.html', context)
 
-def begin_contest(request):
-    context = {}
+def begin_contest(request, contest_id):
+    contest = get_object_or_404(Contest, pk=contest_id)
+    questions = ContestQuestion.objects.filter(contest=contest)
+    context = {'contest':contest, 'questions':questions}
     return render(request, 'science_olympiad/begin_contest.html', context)
+
+def show_contest_welcomepage(request, contest_id):
+    context = {'contest_id': contest_id}
+    return render(request, 'science_olympiad/show_contest_welcomepage.html', context)
+
+def show_contest_endpage(request):
+    return render(request, 'science_olympiad/show_contest_endpage.html')
+
+def walkthrough_contest(request, contest_id):
+    contest = get_object_or_404(Contest, pk=contest_id)
+    questions = ContestQuestion.objects.filter(contest=contest)
+    context = {'contest': contest, 'questions': questions}
+    return render(request, 'science_olympiad/walkthrough_contest.html', context)
+
+def handle_walkthrough(request, contest_id):
+    contest = Contest.objects.get(pk=contest_id)
+    question_pool = ContestQuestion.objects.filter(contest=contest)
+    next_question = question_pool.first()
+    if next_question:
+        choices = []
+        for choice in next_question.contestanswer_set.all():
+            choice = {'pk': choice.pk,
+                      'text': choice.text,}
+            choices.append(choice)
+        return {"question_text": next_question.text,
+                "question_pk": next_question.pk,
+                "choices": choices}
+    else:
+        return {'done': 1}
+
+def walkthrough_contest1(request):
+    contest = get_object_or_404(Contest, pk=1)
+    questions = ContestQuestion.objects.filter(contest=contest)
+    context = {'contest': contest, 'questions': questions}
+    return render(request, 'science_olympiad/walkthrough_contest1.html', context)
+
+def test_wheel(request):
+    return render(request, 'science_olympiad/test_wheel.html')

@@ -1,0 +1,150 @@
+<!--
+ =========================================================
+ * Material Kit - v2.0.6
+ =========================================================
+
+ * Product Page: https://www.creative-tim.com/product/material-kit
+ * Copyright 2019 Creative Tim (http://www.creative-tim.com)
+   Licensed under MIT (https://github.com/creativetimofficial/material-kit/blob/master/LICENSE.md)
+
+
+ =========================================================
+
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. -->
+
+{% extends 'science_olympiad/base.html' %}{% load static %}
+
+{% block title %}المسابقة العلمية | الصفحة الترحيبية{% endblock %}
+
+{% block style %}
+body{
+    text-align: center;
+    background-image: url("{% static 'science_olympiad/images/bg_uni.png' %}");
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Do not repeat the image */
+    background-size: cover; /* Resize the background image to cover the entire container */
+
+}
+
+.header-filter::before {
+    background: rgba(0, 0, 0, 0);
+}
+
+.profile-page .profile img{
+  max-width: 200px;
+}
+
+a, a:hover, a:focus{
+    color: #fd3576;
+}
+
+{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+<!--<div class="profile-page sidebar-collapse">-->
+  <!--<div class="page-header header-filter" data-parallax="true" style="background-image: url({% static 'science_olympiad/images/header.jpg' %});">-->
+       <!--&lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;Navbar Start&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;-->
+          <!--<nav style="height:100px" class="navbar navbar-transparent navbar-expand-lg" id="sectionsNav">-->
+
+          <!--<div class="container">-->
+            <!--<div  class="navbar-translate">-->
+              <!--<a class="navbar-brand" href="">-->
+                  <!--<img id="logo" height="130px" style="margin-bottom:0px; margin-top:-100px; margin-right:0px"-->
+                       <!--src="{% static 'science_olympiad/images/logo_white.png' %}">-->
+              <!--</a>-->
+            <!--</div>-->
+          <!--</div>-->
+          <!--</nav>-->
+          <!--&lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;Navbar End&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;-->
+  <!--</div>-->
+  <!--<div class="main ">-->
+    <!--<div class="profile-content">-->
+      <!--<div class="container">-->
+        <!--<div class="row">-->
+          <!--<div class="col-md-6 ml-auto mr-auto">-->
+            <!--<div class="profile">-->
+              <!--<div class="avatar">-->
+                  <!--<img style="background-color:#fff; padding:15px" src="{% static 'science_olympiad/images/sections/black/contest_black.png' %}" class="rounded-circle img-fluid">-->
+              <!--</div>-->
+              <!--<div class="name">-->
+                <!--<h3 class="title">المسابقة العلمية</h3>-->
+              <!--</div>-->
+            <!--</div>-->
+          <!--</div>-->
+        <!--</div>-->
+          <!--<div style="padding-bottom:100px" class="description text-center">-->
+
+        <!--<div class="row" style="text-align:justify; text-align-last: center">-->
+            <!--هي مسابقة علمية ثقافية وتنافسية تنص على رؤية، وقياس المدى العلمي و الثقافي بين طلبة الجامعة من مختلف الكليات، في مختلف العلوم، وتهدف لخلق بيئة تؤمن بالتنافس الودِّي، لتعزز من أهمية اطلاع الفرد على جميع العلوم. حيث يمثل كل كلية فريق مُكون من أربعة طلاب وطالبات.-->
+<!--كوني/كن جزءًا منها!-->
+        <!--</div>-->
+        <!--<div class="section text-center">-->
+        <!--<p style="text-align:center"></p>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
+
+
+
+<div class="row" style="width:100%; padding-top:100px; padding-right:70px; margin-bottom:0px">
+
+      <div class="container" align="center">
+          <!--<h1 style="margin-top:-70px">الأولمبياد العلمي-->
+              <!--<br> <h2>2020</h2>-->
+          <!--</h1>-->
+          <img src="{% static 'science_olympiad/images/so_title_white.png' %}" style="">
+          <br>
+
+          <img style="padding:30px" src="{% static 'science_olympiad/images/sections/icons/contest.png' %}">
+          <br>
+          <h2>الفِرق المنافِسة:</h2>
+          {% if contest_id == '1' %}
+          <h2>كلية طب الأسنان - كلية الصحة العامة</h2>
+          <h2>2 فبراير</h2>
+          {% elif contest_id == '2' %}
+          <h2>كلية الطب - كلية الصيدلة</h2>
+          <h2>5 فبراير</h2>
+          {% elif contest_id == '3' %}
+          <h2>كلية الصيدلة - كلية الصحة العامة</h2>
+          <h2>9 فبراير</h2>
+          {% elif contest_id == '4' %}
+          <h2>كلية التمريض - كلية العلوم والمهن الصحية</h2>
+          <h2>12 فبراير</h2>
+          {% elif contest_id == '5' %}
+          <h2>كلية الطب - كلية طب الأسنان</h2>
+          <h2>16 فبراير</h2>
+          {% elif contest_id == '6' %}
+          <h2>كلية العلوم الطبية التطبيقية - كلية العلوم والمهن الصحية</h2>
+          <h2>19 فبراير</h2>
+          {% elif contest_id == '7' %}
+          <h2>كلية الطب - كلية الصحة العامة</h2>
+          <h2>23 فبراير</h2>
+          {% elif contest_id == '8' %}
+          <h2>كلية العلوم الطبية التطبيقية - كلية التمريض</h2>
+          <h2>26 فبراير</h2>
+          {% elif contest_id == '9' %}
+          <h2>كلية الصيدلة - كلية طب الأسنان</h2>
+          <h2>1 مارس</h2>
+          {% endif %}
+
+          <br>
+          <a href="{% url 'science_olympiad:begin_contest' contest_id %}" class="btn btn-primary" style="font-size:24px; background-color:#fd3576; border-color:#fd3576; align-text:center">بدء المسابقة</a>
+      </div>
+
+</div>
+{% endblock %}
+
+{% block footer %}
+    <div class="container" align="left">
+        <img src="{% static 'science_olympiad/images/logo_white.png' %}" style="height:100px">
+        <img src="{% static 'science_olympiad/images/ta_logo_white.png' %}" style="height:80px; padding-left:20px">
+        <img src="{% static 'science_olympiad/images/sc_logo_white.png' %}" style="height:80px; padding-left:20px">
+        <img src="{% static 'science_olympiad/images/uni_logo_white.png' %}" style="height:80px">
+    </div>
+{% endblock %}

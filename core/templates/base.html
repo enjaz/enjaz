@@ -203,12 +203,12 @@ you?
                         <span class="english-field">{{ event.get_html_name|safe }}</span>
                     </a>
                     <ul>
-<!--                        <li>
+                        <li>
                             <a href="{% url 'events:list_timeslots' event.code_name %}">
                                 <i class="fa fa-pencil"></i>
                                 <span>التسجيل</span>
                             </a>
-                        </li>-->
+                        </li>
                         <li>
                             <a href="{% url 'events:list_question_session' event.code_name %}">
                                 <i class="fa fa-question"></i>

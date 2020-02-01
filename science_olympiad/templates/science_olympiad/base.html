@@ -116,6 +116,10 @@
            color: #fff;
         }
 
+        a:hover, a:focus{
+            color: #fff;
+        }
+
     {% block style %}{% endblock %}
 
     </style>
@@ -126,7 +130,8 @@
 
      {% block content %}{% endblock %}
     <footer class="footer main-footer">
-            <strong>بُنيَ بأيدِ طلابية. <a style="color:#ffffff hover-color:#ff0099" href="https://github.com/enjaz/enjaz/" target="_blank">حقّك في النسخ مكفول</a> <i class="fa fa-heart"></i></strong>
+            <strong>بُنيَ بأيدِ طلابية. <a style="font-color:#ffffff hover-color:#ff0099" href="https://github.com/enjaz/enjaz/" target="_blank">حقّك في النسخ مكفول</a> <i class="fa fa-heart"></i></strong>
+            {% block footer %}{% endblock %}
     </footer>
 
     <!--Bootstrap's JS-->

@@ -1,0 +1,577 @@
+<!--
+ =========================================================
+ * Material Kit - v2.0.6
+ =========================================================
+
+ * Product Page: https://www.creative-tim.com/product/material-kit
+ * Copyright 2019 Creative Tim (http://www.creative-tim.com)
+   Licensed under MIT (https://github.com/creativetimofficial/material-kit/blob/master/LICENSE.md)
+
+
+ =========================================================
+
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. -->
+
+{% extends 'science_olympiad/base.html' %}{% load static %}
+
+{% block title %}المسابقة العلمية | أسئبة المسابقة{% endblock %}
+
+{% block style %}
+body{
+    text-align: center;
+    background-image: url("{% static 'science_olympiad/images/bg_uni.png' %}");
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Do not repeat the image */
+    background-size: cover; /* Resize the background image to cover the entire container */
+
+}
+
+.header-filter::before {
+    background: rgba(0, 0, 0, 0);
+}
+
+.profile-page .profile img{
+  max-width: 200px;
+}
+
+a, a:hover, a:focus{
+    color: #fd3576;
+}
+
+<!--Start Quiz copied-->
+@import url(https://fonts.googleapis.com/css?family=Work+Sans:300,600);
+
+body{
+	font-size: 20px;
+	font-family: 'Work Sans', sans-serif;
+	color: #333;
+  font-weight: 300;
+  text-align: center;
+  background-color: #f8f6f0;
+}
+h1{
+  font-weight: 300;
+  margin: 0px;
+  padding: 10px;
+  font-size: 20px;
+  background-color: #444;
+  color: #fff;
+}
+.question{
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+.answers {
+  margin-bottom: 20px;
+  text-align: left;
+  display: inline-block;
+}
+.answers label{
+  display: block;
+  margin-bottom: 10px;
+}
+button{
+	font-size: 22px;
+	background-color: #fd3576;
+	color: #fff;
+	border: 0px;
+	border-radius: 3px;
+	padding: 20px;
+	cursor: pointer;
+	margin-bottom: 20px;
+}
+button:hover{
+	background-color: #fd3576;
+}
+
+label{
+    size: 20px;
+    color: #fff;
+}
+
+
+
+.slide{
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.active-slide{
+  opacity: 1;
+  z-index: 2;
+}
+.quiz-container{
+  position: relative;
+  height: 200px;
+  margin-top: 40px;
+}
+<!--End quiz copied-->
+
+
+{% endblock %}
+
+{% block head %}
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="row" align="right">
+    <img style="padding:30px" src="{% static 'science_olympiad/images/sections/icons/contest.png' %}">
+</div>
+
+<div class="row" style="width:100%; padding-top:100px; padding-right:70px; margin-bottom:0px">
+      <div class="container" align="center">
+          <img src="{% static 'science_olympiad/images/so_title_white.png' %}" style="">
+          <br>
+
+<!--Start quiz copied-->
+            <div class="quiz-container">
+              <div id="quiz"></div>
+            </div>
+            <button id="previous">Previous Question</button>
+            <br><button id="next">السؤال التالي</button>
+            <button id="submit">Submit Quiz</button>
+            <div id="results"></div>
+<!--End quiz copied-->
+
+          <div id="wheel">
+          <button id="close-wheel">Close wheel</button>
+          </div>
+
+      </div>
+
+</div>
+{% endblock %}
+
+{% block footer %}
+    <div class="container" align="left">
+        <img src="{% static 'science_olympiad/images/logo_white.png' %}" style="height:100px">
+        <img src="{% static 'science_olympiad/images/ta_logo_white.png' %}" style="height:80px; padding-left:20px">
+        <img src="{% static 'science_olympiad/images/sc_logo_white.png' %}" style="height:80px; padding-left:20px">
+        <img src="{% static 'science_olympiad/images/uni_logo_white.png' %}" style="height:80px">
+    </div>
+{% endblock %}
+
+{% block customscript %}
+<!--Start quiz copied-->
+<script>
+$('#previous').hide();
+$('#next').hide();
+$('#submit').hide();
+$('#results').hide();
+$('#wheel').hide();
+
+(function(){
+  // Functions
+  function buildQuiz(){
+    $('#previous').hide();
+    $('#next').hide();
+    $('#submit').hide();
+    $('#results').hide();
+
+    // variable to store the HTML output
+    const output = [];
+
+    // for each question...
+    myQuestions.forEach(
+      (currentQuestion, questionNumber) => {
+
+        // variable to store the list of possible answers
+        const answers = [];
+
+        // and for each available answer...
+        for(letter in currentQuestion.answers){
+
+          // ...add an HTML radio button -edit: not radio btn anymore-
+          answers.push(
+            `<label>
+              <tex name="question${questionNumber}" value="${letter}">
+              ${letter} :
+              ${currentQuestion.answers[letter]}<br><br>
+            </label>`
+          );
+        }
+
+        // add this question and its answers to the output
+        output.push(
+          `<div class="slide">
+            <div class="question"> ${currentQuestion.question} </div>
+            <div class="answers"> ${answers.join("")} </div>
+          </div>`
+        );
+      }
+    );
+
+    // finally combine our output list into one string of HTML and put it on the page
+    quizContainer.innerHTML = output.join('');
+  }
+
+  function showResults(){
+    $('#previous').hide();
+    $('#next').hide();
+    $('#submit').hide();
+    $('#results').hide();
+
+    // gather answer containers from our quiz
+    const answerContainers = quizContainer.querySelectorAll('.answers');
+
+    // keep track of user's answers
+    let numCorrect = 0;
+
+    // for each question...
+    myQuestions.forEach( (currentQuestion, questionNumber) => {
+
+      // find selected answer
+      const answerContainer = answerContainers[questionNumber];
+      const selector = `input[name=question${questionNumber}]:checked`;
+      const userAnswer = (answerContainer.querySelector(selector) || {}).value;
+
+      // if answer is correct
+      if(userAnswer === currentQuestion.correctAnswer){
+        // add to the number of correct answers
+        numCorrect++;
+
+        // color the answers green
+        answerContainers[questionNumber].style.color = 'lightgreen';
+      }
+      // if answer is wrong or blank
+      else{
+        // color the answers red
+        answerContainers[questionNumber].style.color = 'red';
+      }
+    });
+
+    // show number of correct answers out of total
+    resultsContainer.innerHTML = `${numCorrect} out of ${myQuestions.length}`;
+  }
+
+  function showSlide(n) {
+    $('#previous').hide();
+    $('#next').hide();
+    $('#submit').hide();
+    $('#results').hide();
+
+    slides[currentSlide].classList.remove('active-slide');
+    slides[n].classList.add('active-slide');
+    currentSlide = n;
+    if(currentSlide === 0){
+      previousButton.style.display = 'none';
+    }
+    else{
+      previousButton.style.display = 'inline-block';
+    }
+    if(currentSlide === slides.length-1){
+      nextButton.style.display = 'none';
+      submitButton.style.display = 'inline-block';
+    }
+    else{
+      nextButton.style.display = 'inline-block';
+      submitButton.style.display = 'none';
+    }
+  }
+
+  function showNextSlide() {
+    showSlide(currentSlide + 1);
+    $('#previous').hide();
+    $('#submit').hide();
+    $('#results').hide();
+    $('#wheel').show();
+    $('#quiz').hide();
+  }
+
+  function showPreviousSlide() {
+    showSlide(currentSlide - 1);
+    $('#previous').hide();
+    $('#submit').hide();
+    $('#results').hide();
+  }
+
+  // Variables
+  const quizContainer = document.getElementById('quiz');
+  const resultsContainer = document.getElementById('results');
+  const submitButton = document.getElementById('submit');
+  const myQuestions = [
+    {
+      question: "كم عدد ساعات اليوم الواحد في كوكب المشتري؟",
+      answers: {
+        أ: "٢٤ ساعة",
+        ب: "١٠ ساعات",
+        ج: "٨ ساعات",
+        د: "٧٢ ساعة",
+      },
+      correctAnswer: "ب"
+    },
+    {
+      question: "ماهي أصغر دولة بالعالم؟",
+      answers: {
+        أ: "الفاتيكان",
+        ب: "البحرين",
+        ج: "كوبا",
+        د: "جرينلاند",
+      },
+      correctAnswer: "أ"
+    },
+    {
+      question: "ماهي أكبر عضلة في جسم الانسان؟?",
+      answers: {
+        أ: "العضلة الاولية الكبرى",
+        ب: "العضلة الخياطية",
+        ج: "عضلة القلب",
+        د: "العضلة العضدية",
+      },
+      correctAnswer: "أ"
+    },
+    {
+      question: "كم من الوقت تستغرق اشعة الشمس للوصول للأرض؟",
+      answers: {
+        أ: "٨ دقائق",
+        ب: "١٠ دقائق",
+        ج: "١٥ دقيقة",
+        د: "١٦ دقيقة",
+      },
+      correctAnswer: "أ"
+    },
+    {
+      question: "من الممثل الحاصل على أكثر جوائز اوسكار؟",
+      answers: {
+        أ: "توم هانكس",
+        ب: "كاثرين هيبورن",
+        ج: "دينزل واشنطن",
+        د: "كيت بلانشيت",
+      },
+      correctAnswer: "ب"
+    },
+    {
+      question: "ماهي أثقل مادة موجودة بالطبيعة؟",
+      answers: {
+        أ: "اليورانيوم",
+        ب: "الرصاص",
+        ج: "الكوبالت",
+        د: "الزئبق",
+      },
+      correctAnswer: "أ"
+    },
+    {
+      question: "أي مما يلي ليس مثالًا على المادة؟",
+      answers: {
+        أ: "هواء",
+        ب: "حرارة",
+        ج: "ماء",
+        د: "نار",
+      },
+      correctAnswer: "ب"
+    },
+    {
+      question: "من أول من ذهب إلى الفضاء؟ ",
+      answers: {
+        أ: "نيل ارمسترونغ",
+        ب: "بز الدرين",
+        ج: "يوري غاغارين",
+        د: "سلطان بن سلمان آل سعود",
+      },
+      correctAnswer: "ج"
+    },
+    {
+      question: "من الممثل الحاصل على أكثر جوائز اوسكار؟من اول شعب لعب الشطرنج؟",
+      answers: {
+        أ: "الهند",
+        ب: "الصين",
+        ج: "اليونان",
+        د: "مصر",
+      },
+      correctAnswer: "أ"
+    },
+    {
+      question: "ما هو الغاز المستخدم في اطفاء الحرائق؟",
+      answers: {
+        أ: "النيتروجين",
+        ب: "أول أكسيد الكربون",
+        ج: "ثاني أكسيد الكاربون",
+        د: "الهيدروجين",
+      },
+      correctAnswer: "ج"
+    },
+    {
+      question: "أحد العناصر الناتجة عن عملية انشطار اليورانيوم؟",
+      answers: {
+        أ: "بلوتونيوم",
+        ب: "باريوم",
+        ج: "رادون",
+        د: "بيزموث",
+      },
+      correctAnswer: "ب"
+    },
+    {
+      question: 'ما هو الجين من الجينات التالية الذي يكنى "بمثبط الأورام"؟',
+      answers: {
+        أ: "P53",
+        ب: "P450",
+        ج: "EGFR",
+        د: "ApoE",
+      },
+      correctAnswer: "أ"
+    },
+    {
+      question: "ما هو العنصر الذي إذا وجد في الحليب أصبح الحليب غذاء كاملاً؟",
+      answers: {
+        أ: "الفسفور",
+        ب: "الحديد",
+        ج: "الكلورين",
+        د: "البرومين",
+      },
+      correctAnswer: "ب"
+    },
+    {
+      question: "أي بطولة كأس عالم شهدت أول مشاركة سعودية؟",
+      answers: {
+        أ: "2006",
+        ب: "2002",
+        ج: "1994",
+        د: "1998",
+      },
+      correctAnswer: "ج"
+    },
+    {
+      question: "ما هو أول لقاح تم تطويره بالتاريخ؟",
+      answers: {
+        أ: "الجدري",
+        ب: "داء الكلب",
+        ج: "الحمى القرمزية",
+        د: "الكوليرا",
+      },
+      correctAnswer: "أ"
+    },
+    {
+      question: "ما هو أقوى الحيوانات ذاكرةً؟",
+      answers: {
+        أ: "الفيل",
+        ب: "الدولفين",
+        ج: "الجمل",
+        د: "السلحفاة",
+      },
+      correctAnswer: "ب"
+    },
+    {
+      question: "أي الحشرات التالية لسعتها أكثر سمية؟",
+      answers: {
+        أ: "العقرب السوداء",
+        ب: "العقرب الصفراء",
+        ج: "العنكبوت",
+        د: "النحلة",
+      },
+      correctAnswer: "ب"
+    },
+    {
+      question: "في أي عمر يستطيع الطفل أن يرسم دائرة كاملة بشكل صحيح؟",
+      answers: {
+        أ: "سنة ونصف",
+        ب: "3 سنوات",
+        ج: "4 سنوات",
+        د: "4 سنوات ونصف",
+      },
+      correctAnswer: "أ"
+    },
+    {
+      question: "ما أكثر أصابع الإنسان قوة في الإحساس؟",
+      answers: {
+        أ: "الإبهام",
+        ب: "السبابة",
+        ج: "الخنصر",
+        د: "الوسطى",
+      },
+      correctAnswer: "ب"
+    },
+    {
+      question: "يستخرج السكر من نبات قصب السكر، وأيضاً من نبات؟",
+      answers: {
+        أ: "الشوفان",
+        ب: "الصنوبر",
+        ج: "بنجر السكر",
+        د: "قنبر السكر",
+      },
+      correctAnswer: "ج"
+    },
+    {
+      question: "يستخرج الأسبيرين من:",
+      answers: {
+        أ: "البابونج",
+        ب: "الصفصاف",
+        ج: "الخشخاش",
+        د: "الكتان",
+      },
+      correctAnswer: "ب"
+    },
+    {
+      question: "إلى أي دولة تنتمي قبيلة الميان العتيقة؟ ",
+      answers: {
+        أ: "روسيا والشيشان",
+        ب: "كازاخستان والصين",
+        ج: "الهند وباكستان",
+        د: "هندوراس والمكسيك",
+      },
+      correctAnswer: "د"
+    },
+    {
+      question: "منذ متى و التماسيح موجودة؟",
+      answers: {
+        أ: "مليوني سنة",
+        ب: "خمسين مليون سنة",
+        ج: "مئة مليون سنة",
+        د: "مئتا مليون سنة",
+      },
+      correctAnswer: "د"
+    },
+    {
+      question: ' مدة أطول فلم بالعالم "logistics" ؟',
+      answers: {
+        أ: "240 ساعة",
+        ب: "9 ساعات",
+        ج: "857 ساعة",
+        د: "24 ساعة",
+      },
+      correctAnswer: "ج"
+    },
+    {
+      question: "من هو مخترع المسدس؟",
+      answers: {
+        أ: "صمويل كولت",
+        ب: "جون ووكر",
+        ج: "مورز",
+        د: "جيمس وات",
+      },
+      correctAnswer: "أ"
+    },
+  ];
+
+  // Kick things off
+  buildQuiz();
+
+  // Pagination
+  const previousButton = document.getElementById("previous");
+  const nextButton = document.getElementById("next");
+  const slides = document.querySelectorAll(".slide");
+  let currentSlide = 0;
+
+  // Show the first slide
+  showSlide(currentSlide);
+
+  // Event listeners
+  submitButton.addEventListener('click', showResults);
+  previousButton.addEventListener("click", showPreviousSlide);
+  nextButton.addEventListener("click", showNextSlide);
+})();
+
+<!--End quiz copied-->
+
+$('#close-wheel').click(function(){
+    $('#wheel').hide();
+    $('#quiz').show();
+});
+</script>
+{% endblock %}

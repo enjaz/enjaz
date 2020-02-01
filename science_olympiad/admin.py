@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Inventor, ContestQuestion, ContestAnswer
+from .models import Inventor, ContestQuestion, ContestAnswer, Contest
 
 class InventorAdmin(admin.ModelAdmin):
     list_filter = ['inv_category', 'is_prototype']
@@ -20,3 +20,4 @@ class ContestAnswerAdmin (admin.ModelAdmin):
 admin.site.register(Inventor, InventorAdmin)
 admin.site.register(ContestQuestion, ContestQuestionAdmin)
 admin.site.register(ContestAnswer, ContestAnswerAdmin)
+admin.site.register(Contest)

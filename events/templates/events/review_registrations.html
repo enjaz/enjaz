@@ -46,6 +46,7 @@
                                 <th class="not-mobile">Student ID</th>
 								<th class="not-mobile">Email</th>
                                 <th class="not-mobile">Registration date</th>
+<th class="not-mobile"> Time</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -58,7 +59,8 @@
                                 <td>{{ registration.user.common_profile.student_id }}</td>
 								<td>{{ registration.user.email }}</td>
                                 <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted|date:"Y-m-d" }}</td>
-                            </tr>
+<td>{{ registration.date_submitted|time }}</td>                           
+ </tr>
                         {% endfor %}
                         </tbody>
                     </table>
@@ -96,6 +98,7 @@
                                 <th class="not-mobile">Student ID</th>
 								<th class="not-mobile">Email</th>
                                 <th class="not-mobile">Registration date</th>
+<th class="not-mobile"> Time</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -108,7 +111,8 @@
                                 <td>{{ registration.user.common_profile.student_id }}</td>
 								<td>{{ registration.user.email }}</td>
                                 <td data-order="{{ registration.date_submitted|date:"U" }}">{{ registration.date_submitted|date:"Y-m-d" }}</td>
-                            </tr>
+<td>{{ registration.date_submitted|time }}</td>                              
+</tr>
                         {% endfor %}
                         </tbody>
                     </table>

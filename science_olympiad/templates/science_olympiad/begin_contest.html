@@ -17,9 +17,16 @@
 {% block title %}المسابقة العلمية{% endblock %}
 
 {% block style %}
+
 body{
     text-align: center;
+    background-image: url("{% static 'science_olympiad/images/bg_uni.png' %}");
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Do not repeat the image */
+    background-size: cover; /* Resize the background image to cover the entire container */
+
 }
+
 
 .header-filter::before {
     background: rgba(0, 0, 0, 0);
@@ -45,87 +52,124 @@ input#jqcd_stop,
 input#jqcd_reset {
   width: 100px;
 }
+
 <!--span#jqcd_count {-->
   <!--font-family: "Lucida Console", Monaco, "Courier New", Courier, monospace !IMPORTANT;-->
 <!--}-->
 <!--End of Counter CSS-->
 
+.rectangle {
+  width: 15px;
+  background-color: #284;
+}
+
+.btn.btn-primary:focus, .btn.btn-primary:active, .btn.btn-primary:hover{
+    font-size:24px;
+    background-color:#fd3576;
+    border-color:#fd3576;
+    align-text:center"
+}
+
+.triangle-down {
+	width: 0;
+	height: 0;
+	border-left: 25px solid transparent;
+	border-right: 25px solid transparent;
+	border-top: 50px solid #fd3576;
+}
+
+td.the_wheel{
+    background-image:url("");
+}
+
+
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'science_olympiad/javascript-winwheel-2.7.0/examples/basic_code_wheel/main.css' %}" type="text/css" />
+    <script type="text/javascript" src="{% static 'science_olympiad/javascript-winwheel-2.7.0/Winwheel.js' %}"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
 {% endblock %}
 
 {% block content %}
-<!--<div class="profile-page sidebar-collapse">-->
-  <!--<div class="page-header header-filter" data-parallax="true" style="background-image: url({% static 'science_olympiad/images/header.jpg' %});">-->
-       <!--&lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;Navbar Start&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;-->
-          <!--<nav style="height:100px" class="navbar navbar-transparent navbar-expand-lg" id="sectionsNav">-->
 
-          <!--<div class="container">-->
-            <!--<div  class="navbar-translate">-->
-              <!--<a class="navbar-brand" href="">-->
-                  <!--<img id="logo" height="130px" style="margin-bottom:0px; margin-top:-100px; margin-right:0px"-->
-                       <!--src="{% static 'science_olympiad/images/logo_white.png' %}">-->
-              <!--</a>-->
-            <!--</div>-->
-          <!--</div>-->
-          <!--</nav>-->
-          <!--&lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;Navbar End&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;-->
-  <!--</div>-->
-  <!--<div class="main ">-->
-    <!--<div class="profile-content">-->
-      <!--<div class="container">-->
-        <!--<div class="row">-->
-          <!--<div class="col-md-6 ml-auto mr-auto">-->
-            <!--<div class="profile">-->
-              <!--<div class="avatar">-->
-                  <!--<img style="background-color:#fff; padding:15px" src="{% static 'science_olympiad/images/sections/black/contest_black.png' %}" class="rounded-circle img-fluid">-->
-              <!--</div>-->
-              <!--<div class="name">-->
-                <!--<h3 class="title">المسابقة العلمية</h3>-->
-              <!--</div>-->
-            <!--</div>-->
-          <!--</div>-->
-        <!--</div>-->
-          <!--<div style="padding-bottom:100px" class="description text-center">-->
+<div class="row" align="right">
+    <img style="padding:30px" src="{% static 'science_olympiad/images/sections/icons/contest.png' %}">
+</div>
 
-        <!--<div class="row" style="text-align:justify; text-align-last: center">-->
-            <!--هي مسابقة علمية ثقافية وتنافسية تنص على رؤية، وقياس المدى العلمي و الثقافي بين طلبة الجامعة من مختلف الكليات، في مختلف العلوم، وتهدف لخلق بيئة تؤمن بالتنافس الودِّي، لتعزز من أهمية اطلاع الفرد على جميع العلوم. حيث يمثل كل كلية فريق مُكون من أربعة طلاب وطالبات.-->
-<!--كوني/كن جزءًا منها!-->
-        <!--</div>-->
-        <!--<div class="section text-center">-->
-        <!--<p style="text-align:center"></p>-->
-        <!--</div>-->
-        <!--</div>-->
-        <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
-<!--</div>-->
-
-
-
-<div class="row" style="width:100%; padding-top:100px; padding-right:70px; margin-bottom:340px">
-    <div class="col-lg-4">
-        <span id="jqcd_count" style="text-align:center; font-size:40px">00:50</span><br><br>
-        <input type="button" id="jqcd_start" value="بدء" onClick="jqcd('start')" />
-        <input type="button" id="jqcd_stop" value="انتهاء" onClick="jqcd('stop')" />
-        <input type="button" id="jqcd_reset" value="إعادة تعيين" onClick="jqcd('reset')" /><br><br>
-        <input type="text" id="jqcd_time" value="00:10" />
-    </div>
-    <div class="col-lg-8" style="padding-left:70px">
-        <div><h2>نص السؤال هنا: أبجد هوز حطي كلمن صعفس قرشت ثخذ ضظغ</h2></div>
+<div class="container" align="center" id="question_section">
+    <div id="question-text"><h1>نص السؤال هنا</h1></div>
+    <br>
+    <div class="col-lg-12" style="padding-left:70px">
+        <div></div>
         <div class="row" align="rtl">
-            <div class="col" style="border: 3px solid white; padding:5px; margin:10px">نص الجواب هنا</div>
-            <div class="col" style="border: 3px solid white; padding:5px; margin:10px">نص الجواب هنا</div>
+            <div class="col" style="border: 3px solid white; padding:5px; margin:10px">
+                 <img align="right" src="{% static 'science_olympiad/box_a.png' %}" style="height:100%; width: 25px"> أ) نص الجواب هنا
+            </div>
+            <div class="col" style="border: 3px solid white; padding:5px; margin:10px">
+                 <img align="right" src="{% static 'science_olympiad/box_b.png' %}" style="height:100%; width: 25px"> ب) نص الجواب هنا
+            </div>
         </div>
         <div class="row">
-            <div class="col" style="border: 3px solid white; padding:5px; margin:10px">نص الجواب هنا</div>
-            <div class="col" style="border: 3px solid white; padding:5px; margin:10px">نص الجواب هنا</div>
+            <div class="col" style="border: 3px solid white; padding:5px; margin:10px">
+                 <img align="right" src="{% static 'science_olympiad/box_c.png' %}" style="height:100%; width: 25px"> ج) نص الجواب هنا
+            </div>
+            <div class="col" style="border: 3px solid white; padding:5px; margin:10px">
+                 <img align="right" src="{% static 'science_olympiad/box_d.png' %}" style="height:100%; width: 25px"> د) نص الجواب هنا
+            </div>
         </div>
     </div>
+    <br><br>
+    <div class="col-lg-12">
+        <span id="jqcd_count" style="text-align:center; font-size:50px">00:30</span><br><br>
+        <input type="button" class="btn btn-primary" style="width:180px; background-color:#fd3576; border-color:#fd3576" id="jqcd_start" value="بدء" onClick="jqcd('start')" />
+        <input type="button" class="btn btn-primary" id="jqcd_stop" value="انتهاء" onClick="jqcd('stop')" />
+        <input type="button" class="btn btn-primary" style="width:140px" id="jqcd_reset" value="إعادة تعيين" onClick="jqcd('reset')" /><br><br>
+        <input type="text" id="jqcd_time" value="00:30" />
+    </div>
+    <button id="wheel">Wheel</button>
 </div>
+
+<div id="wheel_section" style="margin-top:-150px">
+    <div align="center">
+    <table cellpadding="0" cellspacing="0" border="0">
+        <div class="triangle-down"></div>
+        <tr>
+            <td width="438" height="582" class="the_wheel" align="center" valign="center">
+                <canvas id="canvas" width="434" height="434">
+                    <p style="{color: white}" align="center">Sorry, your browser doesn't support canvas. Please try another.</p>
+                </canvas>
+            </td>
+        </tr>
+    </table>
+        <div class="btn btn-primary" id="spin_button" onClick="startSpin();">إدارة العجلة</div>
+    </div>
+</div>
+
+<div id="time_up" style="margin-top:120px; margin-bottom:220px"><h1 style="font-size:80px">انتهى الوقت!</h1>
+</div>
+<br>
+
+{% endblock %}
+
+{% block footer %}
+    <div class="container" align="left">
+        <img src="{% static 'science_olympiad/images/logo_white.png' %}" style="height:100px">
+        <img src="{% static 'science_olympiad/images/ta_logo_white.png' %}" style="height:80px; padding-left:20px">
+        <img src="{% static 'science_olympiad/images/sc_logo_white.png' %}" style="height:80px; padding-left:20px">
+        <img src="{% static 'science_olympiad/images/uni_logo_white.png' %}" style="height:80px">
+    </div>
 {% endblock %}
 
 {% block customscript %}
 
 <script type="text/javascript">
+
+function contestDone(data){
+    $('#question_section').hide();
+    $('#time_up').show();
+}
+
 <!--Start Timer-->
 var jqcd_start_id = 'input#jqcd_start';
 var jqcd_time_id = 'input#jqcd_time';
@@ -136,30 +180,30 @@ var jqcd_countdown = '';
 var jqcd_status = 'stopped';
 var jqcd_current = '';
 function jqcd(action){
-
   if (action == 'start') {
     if (jqcd_status == 'stopped') {
-      jqcd_updtv(jqcd_start_id, 'توقف');
+      jqcd_updtv(jqcd_start_id, 'وسائل المساعدة');
       jqcd_status = 'running';
       jqcd_current = jqcd_countdown;
       jqcd_updtt(jqcd_count_id, jqcd_countdown);
     }
     else if (jqcd_status == 'running') {
-      jqcd_updtv(jqcd_start_id, 'استئناف');
+      jqcd_updtv(jqcd_start_id, ' استئناف المسابقة');
       jqcd_status = 'paused';
     }
     else if (jqcd_status == 'paused') {
-      jqcd_updtv(jqcd_start_id, 'توقف');
+      jqcd_updtv(jqcd_start_id, 'وسائل المساعدة');
       jqcd_status = 'running';
     }
   }
   else if (action == 'stop') {
-    jqcd_updtv(jqcd_start_id, 'Start');
+    jqcd_updtv(jqcd_start_id, 'بدء');
     jqcd_status = 'stopped';
     jqcd_updtt(jqcd_count_id, jqcd_end_message);
+    contestDone();
   }
   else if (action == 'reset') {
-    jqcd_updtv(jqcd_start_id, 'Start');
+    jqcd_updtv(jqcd_start_id, 'بدء');
     jqcd_status = 'stopped';
     jqcd_updtt(jqcd_count_id, jqcd_countdown);
   }
@@ -170,9 +214,10 @@ function jqcd(action){
 
   if (s < 0) {
     if (parseInt(m) == 0) {
-      jqcd_updtv(jqcd_start_id, 'Start');
+      jqcd_updtv(jqcd_start_id, 'بدء');
       jqcd_status = 'stopped';
       jqcd_updtt(jqcd_count_id, jqcd_end_message);
+      contestDone();
     }
     else {
       m = m - 1;
@@ -216,6 +261,182 @@ $(document).ready(function() {
   });
 });
 <!--End Timer-->
+
+$('#time_up').hide();
+$('#question_section').hide();
+$('#wheel_section').show();
+$(jqcd_time).hide()
+$(jqcd_stop).hide()
+$(jqcd_reset).hide()
+
+<!--Start WinWheel-->
+    // Create new wheel object specifying the parameters at creation time.
+            var theWheel = new Winwheel({
+                'numSegments'  : 4,     // Specify number of segments.
+                'outerRadius'  : 212,   // Set outer radius so wheel fits inside the background.
+                'textFontSize' : 36,    // Set font size as desired.
+                'segments'     :        // Define segments including colour and text.
+                [
+                   {'fillStyle' : '#fff', 'text' : 'علمي', 'textFontFamily' : 'GE Dinar One',},
+                   {'fillStyle' : '#fff', 'text' : 'ثقافي', 'textFontFamily' : 'GE Dinar One',},
+                   {'fillStyle' : '#fff', 'text' : 'صحي', 'textFontFamily' : 'GE Dinar One',},
+                   {'fillStyle' : '#fff', 'text' : 'ترفيهي', 'textFontFamily' : 'GE Dinar One',},
+                ],
+                'animation' :           // Specify the animation to use.
+                {
+                    'type'     : 'spinToStop',
+                    'duration' : 5,     // Duration in seconds.
+                    'spins'    : 8,     // Number of complete spins.
+                    'callbackFinished' : alertPrize
+                }
+            });
+
+            // Function with formula to work out stopAngle before spinning animation.
+            // Called from Click of the Spin button.
+            function calculatePrize(){
+                // This formula always makes the wheel stop somewhere inside prize 3 at least
+                // 1 degree away from the start and end edges of the segment.
+                let stopAt = (1 + Math.floor((Math.random() * 90)))
+
+                // Important thing is to set the stopAngle of the animation before stating the spin.
+                theWheel.animation.stopAngle = stopAt;
+
+                // May as well start the spin from here.
+                theWheel.startAnimation();
+            }
+
+            // Vars used by the code in this page to do power controls.
+            var wheelPower    = 0;
+            var wheelSpinning = false;
+
+            // -------------------------------------------------------
+            // Function to handle the onClick on the power buttons.
+            // -------------------------------------------------------
+            function powerSelected(powerLevel)
+            {
+                // Ensure that power can't be changed while wheel is spinning.
+                if (wheelSpinning == false)
+                {
+                    // Reset all to grey incase this is not the first time the user has selected the power.
+                    document.getElementById('pw1').className = "";
+                    document.getElementById('pw2').className = "";
+                    document.getElementById('pw3').className = "";
+
+                    // Now light up all cells below-and-including the one selected by changing the class.
+                    if (powerLevel >= 1)
+                    {
+                        document.getElementById('pw1').className = "pw1";
+                    }
+
+                    if (powerLevel >= 2)
+                    {
+                        document.getElementById('pw2').className = "pw2";
+                    }
+
+                    if (powerLevel >= 3)
+                    {
+                        document.getElementById('pw3').className = "pw3";
+                    }
+
+                    // Set wheelPower var used when spin button is clicked.
+                    wheelPower = powerLevel;
+
+                    // Light up the spin button by changing it's source image and adding a clickable class to it.
+                    document.getElementById('spin_button').src = "spin_on.png";
+                    document.getElementById('spin_button').className = "clickable";
+                }
+            }
+
+            // -------------------------------------------------------
+            // Click handler for spin button.
+            // -------------------------------------------------------
+            function startSpin()
+            {
+                // Ensure that spinning can't be clicked again while already running.
+                if (wheelSpinning == false)
+                {
+                    // Based on the power level selected adjust the number of spins for the wheel, the more times is has
+                    // to rotate with the duration of the animation the quicker the wheel spins.
+                    if (wheelPower == 1)
+                    {
+                        theWheel.animation.spins = 3;
+                    }
+                    else if (wheelPower == 2)
+                    {
+                        theWheel.animation.spins = 8;
+                    }
+                    else if (wheelPower == 3)
+                    {
+                        theWheel.animation.spins = 15;
+                    }
+
+                    // Disable the spin button so can't click again while wheel is spinning.
+                    document.getElementById('spin_button').src       = "spin_off.png";
+                    document.getElementById('spin_button').className = "";
+
+                    // Begin the spin animation by calling startAnimation on the wheel object.
+                    theWheel.startAnimation();
+
+                    // Set to true so that power can't be changed and spin button re-enabled during
+                    // the current animation. The user will have to reset before spinning again.
+                    wheelSpinning = true;
+                }
+            }
+
+            // -------------------------------------------------------
+            // Function for reset button.
+            // -------------------------------------------------------
+            function resetWheel()
+            {
+                theWheel.stopAnimation(false);  // Stop the animation, false as param so does not call callback function.
+                theWheel.rotationAngle = 0;     // Re-set the wheel angle to 0 degrees.
+                theWheel.draw();                // Call draw to render changes to the wheel.
+
+                document.getElementById('pw1').className = "";  // Remove all colours from the power level indicators.
+                document.getElementById('pw2').className = "";
+                document.getElementById('pw3').className = "";
+
+                wheelSpinning = false;          // Reset to false to power buttons and spin can be clicked again.
+            }
+
+            // -------------------------------------------------------
+            // Called when the spin animation has finished by the callback feature of the wheel because I specified callback in the parameters
+            // note the indicated segment is passed in as a parmeter as 99% of the time you will want to know this to inform the user of their prize.
+            // -------------------------------------------------------
+            function alertPrize(indicatedSegment)
+            {
+                // Do basic alert of the segment text. You would probably want to do something more interesting with this information.
+                <!--alert("You have won " + indicatedSegment.text);-->
+                $('#wheel_section').hide();
+                $('#question_section').fadeIn();
+            }
+<!-- End WinWheel -->
+
+function constructChoices(data){
+              var questionsLength = data.questions.length;
+              $('#container').html('');
+              for (var i = 0; i < questionsLength; i++) {
+                var question = data.questions[i];
+                $('question-text').append('<h1>question.text</h1>');
+
+                var choice_id = 'choice-' + nomination.pk;
+                $('#container').append(nominationsDiv);
+                nominationsDiv.append(box);
+                box.append(nomineeDiv);
+                nomineeDiv.append(radioBtn);
+                nomineeDiv.append(label);
+                }
+};
+
+$('#wheel').click(function(){
+    $('#question_section').hide();
+    $('#wheel_section').show();
+    <!--below not work why????-->
+    theWheel.resetWheel();
+
+});
+
+
 </script>
 
 {% endblock %}

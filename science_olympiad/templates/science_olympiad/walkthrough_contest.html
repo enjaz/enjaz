@@ -1,0 +1,146 @@
+<!--
+ =========================================================
+ * Material Kit - v2.0.6
+ =========================================================
+
+ * Product Page: https://www.creative-tim.com/product/material-kit
+ * Copyright 2019 Creative Tim (http://www.creative-tim.com)
+   Licensed under MIT (https://github.com/creativetimofficial/material-kit/blob/master/LICENSE.md)
+
+
+ =========================================================
+
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. -->
+
+{% extends 'science_olympiad/base.html' %}{% load static %}
+
+{% block title %}المسابقة العلمية | أسئبة المسابقة{% endblock %}
+
+{% block style %}
+body{
+    text-align: center;
+    background-image: url("{% static 'science_olympiad/images/bg_uni.png' %}");
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Do not repeat the image */
+    background-size: cover; /* Resize the background image to cover the entire container */
+
+}
+
+.header-filter::before {
+    background: rgba(0, 0, 0, 0);
+}
+
+.profile-page .profile img{
+  max-width: 200px;
+}
+
+a, a:hover, a:focus{
+    color: #fd3576;
+}
+
+{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+
+<div class="row" align="right">
+    <img style="padding:30px" src="{% static 'science_olympiad/images/sections/icons/contest.png' %}">
+</div>
+
+<div class="row" style="width:100%; padding-top:100px; padding-right:70px; margin-bottom:0px">
+      <div class="container" align="center">
+          <img src="{% static 'science_olympiad/images/so_title_white.png' %}" style="">
+          <br>
+          <div id="question-text"></div>
+          <div id="question-section">
+              <button id="start">Start</button>
+              <button id="next">Next</button>
+          </div>
+
+          <h2></h2>
+          <br>
+          <div id="done"><h1>Contest is done!</h1></div>
+      </div>
+
+</div>
+{% endblock %}
+
+{% block footer %}
+    <div class="container" align="left">
+        <img src="{% static 'science_olympiad/images/logo_white.png' %}" style="height:100px">
+        <img src="{% static 'science_olympiad/images/ta_logo_white.png' %}" style="height:80px; padding-left:20px">
+        <img src="{% static 'science_olympiad/images/sc_logo_white.png' %}" style="height:80px; padding-left:20px">
+        <img src="{% static 'science_olympiad/images/uni_logo_white.png' %}" style="height:80px">
+    </div>
+{% endblock %}
+
+{% block customscript %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+
+function constructChoices(data){
+              $('#done').hide();
+              $("#question-text").html(data.question_text);
+              var questionsLength = data.questions.length;
+              $('#container').html('');
+              for (var i = 0; i < questionsLength; i++) {
+                var question = data.questions[i];
+                var choices = question.contestanswer_set.all();
+                var questionsDiv = $('<div style="font-size:24px"></div>');
+                var box = $('<div class="statistic-box"></div>');
+                var choiceDiv = $('<div ></div>');
+                $('#container').append(questionsDiv);
+                questionsDiv.append(box);
+                box.append(choiceDiv);
+                choiceDiv.append(choices);
+                }
+}
+
+function contestDone(data){
+    $('#question-section').hide();
+    $('#done').show();
+}
+
+
+  $("#start").click(function(){
+      $.ajax({
+        url: "{% url 'science_olympiad:handle_walkthrough' 1 %}",
+        method: "POST",
+        success: function(data){
+              $("#question-section").hide();
+              if (data.done == 1){
+                votingDone(data);
+              }else if (data.success == 0){
+                toastr.danger(data.message);
+              }else{
+                constructChoices(data);}
+        }
+      });
+  });
+
+
+  $("#next").click(function(){
+      $.ajax({
+            url: "{% url 'science_olympiad:handle_walkthrough' 1 %}",
+            data: {},
+            method: "POST",
+            success: function(data){
+                if (data.done == 1){
+                    contestDone(data);
+                }else if (data.success == 0){
+                    toastr.danger(data.message);
+                } else {
+                    constructChoices(data);
+                }
+      }});
+  });
+
+
+});
+
+</script>
+
+{% endblock %}

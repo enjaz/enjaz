@@ -116,7 +116,6 @@ label{
 
 {% block head %}
     <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
-    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -127,7 +126,7 @@ label{
 
 <div class="row" style="width:100%; padding-top:100px; padding-right:70px; margin-bottom:0px">
       <div class="container" align="center">
-          <img src="{% static 'science_olympiad/images/so_title_white.png' %}" style="">
+          <img style="width:80%" src="{% static 'science_olympiad/images/so_title_white.png' %}" style="">
           <br>
 
 <!--Start quiz copied-->
@@ -135,7 +134,7 @@ label{
               <div id="quiz"></div>
             </div>
             <button id="previous">Previous Question</button>
-            <br><button id="next">السؤال التالي</button>
+            <br><br><br><br><button id="next">السؤال التالي</button>
             <button id="submit">Submit Quiz</button>
             <div id="results"></div>
 <!--End quiz copied-->
@@ -318,7 +317,7 @@ $('#results').hide();
       correctAnswer: "أ"
     },
     {
-      question: "ماهي أكبر عضلة في جسم الانسان؟?",
+      question: "ماهي أكبر عضلة في جسم الإنسان؟",
       answers: {
         أ: "العضلة الاولية الكبرى",
         ب: "العضلة الخياطية",
@@ -328,7 +327,7 @@ $('#results').hide();
       correctAnswer: "أ"
     },
     {
-      question: "كم من الوقت تستغرق اشعة الشمس للوصول للأرض؟",
+      question: "كم من الوقت تستغرق أشعة الشمس للوصول للأرض؟",
       answers: {
         أ: "٨ دقائق",
         ب: "١٠ دقائق",
@@ -338,7 +337,7 @@ $('#results').hide();
       correctAnswer: "أ"
     },
     {
-      question: "من الممثل الحاصل على أكثر جوائز اوسكار؟",
+      question: "من الممثل الحاصل على أكثر جوائز أوسكار؟",
       answers: {
         أ: "توم هانكس",
         ب: "كاثرين هيبورن",
@@ -378,7 +377,7 @@ $('#results').hide();
       correctAnswer: "ج"
     },
     {
-      question: "من الممثل الحاصل على أكثر جوائز اوسكار؟من اول شعب لعب الشطرنج؟",
+      question: "من أول شعب لعب الشطرنج؟",
       answers: {
         أ: "الهند",
         ب: "الصين",
@@ -388,7 +387,7 @@ $('#results').hide();
       correctAnswer: "أ"
     },
     {
-      question: "ما هو الغاز المستخدم في اطفاء الحرائق؟",
+      question: "ما هو الغاز المستخدم في إطفاء الحرائق؟",
       answers: {
         أ: "النيتروجين",
         ب: "أول أكسيد الكربون",

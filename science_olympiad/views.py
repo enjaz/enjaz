@@ -89,3 +89,19 @@ def walkthrough_contest1(request):
 
 def test_wheel(request):
     return render(request, 'science_olympiad/test_wheel.html')
+
+def show_question(request, contest_id, question_id):
+    contest = get_object_or_404(Contest, pk=contest_id)
+    questions = ContestQuestion.objects.filter(contest=contest)
+    question = questions.get(pk=question_id)
+    choices = question.contestanswer_set.all()
+    choice1 = choices.filter(choice_letter='a')
+    choice2 = choices.filter(choice_letter='b')
+    choice3 = choices.filter(choice_letter='c')
+    choice4 = choices.filter(choice_letter='d')
+    next_question_id = int(question_id) + 1
+    context = {'contest': contest, 'questions': questions, 'question':question,
+               'choice1':choice1, 'choice2':choice2,
+               'choice3':choice3, 'choice4':choice4,
+               'next_question_id':next_question_id}
+    return render(request, 'science_olympiad/show_question.html', context)

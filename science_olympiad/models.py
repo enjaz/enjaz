@@ -81,6 +81,14 @@ class ContestAnswer(models.Model):
     question = models.ForeignKey(ContestQuestion, verbose_name=u'السؤال')
     text = models.TextField(u'نص الجواب')
     is_correct = models.BooleanField(u'هل الجواب صحيح؟', default=False)
+    letter_choices = (
+        ('a', u'أ'),
+        ('b', u'ب'),
+        ('c', u'ج'),
+        ('d', u'د'),
+    )
+    choice_letter = models.CharField(max_length=1, choices=letter_choices,
+                    verbose_name=u"حرف الخيار", default="")
 
     class Meta:
         verbose_name = u"جواب"

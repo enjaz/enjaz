@@ -1,3 +1,4 @@
+{% load static %}
 <DOCTYPE html>
 <html>
 <head>
@@ -60,12 +61,25 @@ SOFTWARE.
         -webkit-transform:translate(0,-50%);
                 transform:translate(0,-50%);
     }
+
+    body{
+    text-align: center;
+    background-image: url("{% static 'science_olympiad/images/bg_uni.png' %}");
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Do not repeat the image */
+    background-size: cover; /* Resize the background image to cover the entire container */
+
+}
+
+
     </style>
 
 </head>
 <body>
-    <div id="chart"></div>
-    <div id="question"><h1></h1></div>
+    <div class="text" align="center">
+       <div id="chart"></div>
+        <div id="question"><h1></h1></div>
+    </div>
 
     <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script type="text/javascript" charset="utf-8">

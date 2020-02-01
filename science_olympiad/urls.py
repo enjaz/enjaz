@@ -18,4 +18,6 @@ urlpatterns = [
     url(r'^contest/(?P<contest_id>\d+)/walkthrough/$', views.walkthrough_contest, name='handle_walkthrough'),
     url(r'^contest/walkthrough/1/$', views.walkthrough_contest1, name='walkthrough_contest1'),
     url(r'^contest/test_wheel/$', views.test_wheel, name='test_wheel'),
+
+    url(r'^contest/(?P<contest_id>\d+)/question/(?P<question_id>\d+)/$', views.show_question, name='show_question'),
 ]

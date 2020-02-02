@@ -14,7 +14,7 @@ class ContestQuestionAdmin (admin.ModelAdmin):
 
 class ContestAnswerAdmin (admin.ModelAdmin):
     list_filter = ['question__olympiad_version']
-    list_display = ['__unicode__', 'question', 'is_correct']
+    list_display = ['__unicode__', 'question', 'choice_letter', 'is_correct']
     search_fields = ['__unicode__', 'question', 'is_correct', 'question.olympiad_version']
 
 admin.site.register(Inventor, InventorAdmin)

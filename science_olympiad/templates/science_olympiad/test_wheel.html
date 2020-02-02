@@ -1,252 +1,747 @@
-{% load static %}
-<DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Wheel of Fortune Bingo</title>
 
-<!--
+<!--&lt;!&ndash;-->
+ <!--=========================================================-->
+ <!--* Material Kit - v2.0.6-->
+ <!--=========================================================-->
 
-MIT License
-
-Copyright (c) 2017 Jeremy Rue
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
--->
-
-    <style type="text/css">
-    text{
-        font-family:Helvetica, Arial, sans-serif;
-        font-size:50px;
-        pointer-events:none;
-    }
-    #chart{
-        position:absolute;
-        width:500px;
-        height:500px;
-        top:0;
-        left:0;
-    }
-    #question{
-        position: absolute;
-        width:400px;
-        height:500px;
-        top:0;
-        left:520px;
-    }
-    #question h1{
-        font-size: 50px;
-        font-weight: bold;
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        position: absolute;
-        padding: 0;
-        margin: 0;
-        top:50%;
-        -webkit-transform:translate(0,-50%);
-                transform:translate(0,-50%);
-    }
-
-    body{
-    text-align: center;
-    background-image: url("{% static 'science_olympiad/images/bg_uni.png' %}");
-    background-position: center; /* Center the image */
-    background-repeat: no-repeat; /* Do not repeat the image */
-    background-size: cover; /* Resize the background image to cover the entire container */
-
-}
+ <!--* Product Page: https://www.creative-tim.com/product/material-kit-->
+ <!--* Copyright 2019 Creative Tim (http://www.creative-tim.com)-->
+   <!--Licensed under MIT (https://github.com/creativetimofficial/material-kit/blob/master/LICENSE.md)-->
 
 
-    </style>
+ <!--=========================================================-->
 
-</head>
-<body>
-    <div class="text" align="center">
-       <div id="chart"></div>
-        <div id="question"><h1></h1></div>
-    </div>
+ <!--* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. &ndash;&gt;-->
 
-    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script type="text/javascript" charset="utf-8">
-        var padding = {top:20, right:40, bottom:0, left:0},
-        w = 500 - padding.left - padding.right,
-        h = 500 - padding.top  - padding.bottom,
-        r = Math.min(w, h)/2,
-        rotation = 0,
-        oldrotation = 0,
-        picked = 100000,
-        oldpick = [],
-        color = d3.scale.category20();//category20c()
-        //randomNumbers = getRandomNumbers();
+<!--{% extends 'science_olympiad/base.html' %}{% load static %}-->
 
-        //http://osric.com/bingo-card-generator/?title=HTML+and+CSS+BINGO!&words=padding%2Cfont-family%2Ccolor%2Cfont-weight%2Cfont-size%2Cbackground-color%2Cnesting%2Cbottom%2Csans-serif%2Cperiod%2Cpound+sign%2C%EF%B9%A4body%EF%B9%A5%2C%EF%B9%A4ul%EF%B9%A5%2C%EF%B9%A4h1%EF%B9%A5%2Cmargin%2C%3C++%3E%2C{+}%2C%EF%B9%A4p%EF%B9%A5%2C%EF%B9%A4!DOCTYPE+html%EF%B9%A5%2C%EF%B9%A4head%EF%B9%A5%2Ccolon%2C%EF%B9%A4style%EF%B9%A5%2C.html%2CHTML%2CCSS%2CJavaScript%2Cborder&freespace=true&freespaceValue=Web+Design+Master&freespaceRandom=false&width=5&height=5&number=35#results
+<!--{% block title %}المسابقة العلمية{% endblock %}-->
 
-        var data = [
-                    {"label":"علمي",  "value":1,  "question":"What CSS property is used for specifying the area between the content and its border?"}, // padding
-                    {"label":"صحي",  "value":1,  "question":"What CSS property is used for changing the font?"}, //font-family
-                    {"label":"ثقافي",  "value":1,  "question":"What CSS property is used for changing the color of text?"}, //color
-                    {"label":"ترفيهي",  "value":1,  "question":"What CSS property is used for changing the boldness of text?"}, //font-weight
-        ];
+<!--{% block style %}-->
+
+<!--body{-->
+    <!--text-align: center;-->
+    <!--background-image: url("{% static 'science_olympiad/images/bg_uni.png' %}");-->
+    <!--background-position: center; /* Center the image */-->
+    <!--background-repeat: no-repeat; /* Do not repeat the image */-->
+    <!--background-size: cover; /* Resize the background image to cover the entire container */-->
+
+<!--}-->
 
 
-        var svg = d3.select('#chart')
-            .append("svg")
-            .data([data])
-            .attr("width",  w + padding.left + padding.right)
-            .attr("height", h + padding.top + padding.bottom);
+<!--.header-filter::before {-->
+    <!--background: rgba(0, 0, 0, 0);-->
+<!--}-->
 
-        var container = svg.append("g")
-            .attr("class", "chartholder")
-            .attr("transform", "translate(" + (w/2 + padding.left) + "," + (h/2 + padding.top) + ")");
-
-        var vis = container
-            .append("g");
-
-        var pie = d3.layout.pie().sort(null).value(function(d){return 1;});
-
-        // declare an arc generator function
-        var arc = d3.svg.arc().outerRadius(r);
-
-        // select paths, use arc generator to draw
-        var arcs = vis.selectAll("g.slice")
-            .data(pie)
-            .enter()
-            .append("g")
-            .attr("class", "slice");
+<!--.profile-page .profile img{-->
+  <!--max-width: 200px;-->
+<!--}-->
 
 
-        arcs.append("path")
-            .attr("fill", function(d, i){ return color(i); })
-            .attr("d", function (d) { return arc(d); });
+<!--.rectangle {-->
+  <!--width: 15px;-->
+  <!--background-color: #284;-->
+<!--}-->
 
-        // add the text
-        arcs.append("text").attr("transform", function(d){
-                d.innerRadius = 0;
-                d.outerRadius = r;
-                d.angle = (d.startAngle + d.endAngle)/2;
-                return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")translate(" + (d.outerRadius -10) +")";
-            })
-            .attr("text-anchor", "end")
-            .text( function(d, i) {
-                return data[i].label;
-            });
+<!--.btn.btn-primary:focus, .btn.btn-primary:active, .btn.btn-primary:hover{-->
+    <!--font-size:24px;-->
+    <!--background-color:#fd3576;-->
+    <!--border-color:#fd3576;-->
+    <!--align-text:center"-->
+<!--}-->
 
-        container.on("click", spin);
+<!--.triangle-down {-->
+	<!--width: 0;-->
+	<!--height: 0;-->
+	<!--border-left: 25px solid transparent;-->
+	<!--border-right: 25px solid transparent;-->
+	<!--border-top: 50px solid #fd3576;-->
+<!--}-->
 
-
-        function spin(d){
-
-            container.on("click", null);
-
-            //all slices have been seen, all done
-            console.log("OldPick: " + oldpick.length, "Data length: " + data.length);
-            if(oldpick.length == data.length){
-                console.log("done");
-                container.on("click", null);
-                return;
-            }
-
-            var  ps       = 360/data.length,
-                 pieslice = Math.round(1440/data.length),
-                 rng      = Math.floor((Math.random() * 1440) + 360);
-
-            rotation = (Math.round(rng / ps) * ps);
-
-            picked = Math.round(data.length - (rotation % 360)/ps);
-            picked = picked >= data.length ? (picked % data.length) : picked;
+<!--td.the_wheel{-->
+    <!--background-image:url("");-->
+<!--}-->
 
 
-            if(oldpick.indexOf(picked) !== -1){
-                d3.select(this).call(spin);
-                return;
-            } else {
-                oldpick.push(picked);
-            }
+<!--{% endblock %}-->
 
-            rotation += 90 - Math.round(ps/2);
+<!--{% block head %}-->
+    <!--<link rel="stylesheet" href="{% static 'science_olympiad/javascript-winwheel-2.7.0/examples/basic_code_wheel/main.css' %}" type="text/css" />-->
+    <!--<script type="text/javascript" src="{% static 'science_olympiad/javascript-winwheel-2.7.0/Winwheel.js' %}"></script>-->
+    <!--<script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>-->
+<!--{% endblock %}-->
 
-            vis.transition()
-                .duration(3000)
-                .attrTween("transform", rotTween)
-                .each("end", function(){
+<!--{% block content %}-->
 
-                    <!--//mark question as seen-->
-                    <!--d3.select(".slice:nth-child(" + (picked + 1) + ") path")-->
-                        <!--.attr("fill", "#111");-->
+<!--<div class="row" align="right">-->
+    <!--<a href="{% url 'science_olympiad:end_contest' %}">-->
+        <!--<img style="padding:30px" src="{% static 'science_olympiad/images/sections/icons/contest.png' %}">-->
+    <!--</a>-->
+<!--</div>-->
 
-                    //populate question
-                    d3.select("#question h1")
-                        .text(data[picked].question);
+<!--<div id="wheel_section" style="margin-top:-150px">-->
+    <!--<div align="center">-->
+    <!--<table cellpadding="0" cellspacing="0" border="0">-->
+        <!--<div class="triangle-down"></div>-->
+        <!--<tr>-->
+            <!--<td width="438" height="582" class="the_wheel" align="center" valign="center">-->
+                <!--<canvas id="canvas" width="434" height="434">-->
+                    <!--<p style="{color: white}" align="center">Sorry, your browser doesn't support canvas. Please try another.</p>-->
+                <!--</canvas>-->
+            <!--</td>-->
+        <!--</tr>-->
+    <!--</table>-->
+        <!--<div class="btn btn-primary" id="spin_button" onClick="startSpin();">إدارة العجلة</div>-->
+    <!--</div>-->
+<!--</div>-->
 
-                    oldrotation = rotation;
+<!--<br>-->
 
-                    container.on("click", spin);
-                });
-        }
+<!--{% endblock %}-->
 
-        //make arrow
-        svg.append("g")
-            .attr("transform", "translate(" + (w + padding.left + padding.right) + "," + ((h/2)+padding.top) + ")")
-            .append("path")
-            .attr("d", "M-" + (r*.15) + ",0L0," + (r*.05) + "L0,-" + (r*.05) + "Z")
-            .style({"fill":"#fd3576"});
+<!--{% block footer %}-->
+    <!--<div class="container" align="left">-->
+        <!--<img src="{% static 'science_olympiad/images/logo_white.png' %}" style="height:100px">-->
+        <!--<img src="{% static 'science_olympiad/images/ta_logo_white.png' %}" style="height:80px; padding-left:20px">-->
+        <!--<img src="{% static 'science_olympiad/images/sc_logo_white.png' %}" style="height:80px; padding-left:20px">-->
+        <!--<img src="{% static 'science_olympiad/images/uni_logo_white.png' %}" style="height:80px">-->
+    <!--</div>-->
+<!--{% endblock %}-->
 
-        //draw spin circle
-        container.append("circle")
-            .attr("cx", 0)
-            .attr("cy", 0)
-            .attr("r", 60)
-            .style({"fill":"white","cursor":"pointer"});
+<!--{% block customscript %}-->
 
-        //spin text
-        container.append("text")
-            .attr("x", 0)
-            .attr("y", 15)
-            .attr("text-anchor", "middle")
-            .text("إدارة العجلة")
-            .style({"font-weight":"bold", "font-size":"30px"});
-
-
-        function rotTween(to) {
-          var i = d3.interpolate(oldrotation % 360, rotation);
-          return function(t) {
-            return "rotate(" + i(t) + ")";
-          };
-        }
+<!--<script type="text/javascript">-->
 
 
-        function getRandomNumbers(){
-            var array = new Uint16Array(1000);
-            var scale = d3.scale.linear().range([360, 1440]).domain([0, 100000]);
+<!--&lt;!&ndash;Start WinWheel&ndash;&gt;-->
+    <!--// Create new wheel object specifying the parameters at creation time.-->
+            <!--var theWheel = new Winwheel({-->
+                <!--'numSegments'  : 4,     // Specify number of segments.-->
+                <!--'outerRadius'  : 212,   // Set outer radius so wheel fits inside the background.-->
+                <!--'textFontSize' : 36,    // Set font size as desired.-->
+                <!--'segments'     :        // Define segments including colour and text.-->
+                <!--[-->
+                   <!--{'fillStyle' : '#fff', 'text' : 'علمي', 'textFontFamily' : 'GE Dinar One',},-->
+                   <!--{'fillStyle' : '#fff', 'text' : 'ثقافي', 'textFontFamily' : 'GE Dinar One',},-->
+                   <!--{'fillStyle' : '#fff', 'text' : 'صحي', 'textFontFamily' : 'GE Dinar One',},-->
+                   <!--{'fillStyle' : '#fff', 'text' : 'ترفيهي', 'textFontFamily' : 'GE Dinar One',},-->
+                <!--],-->
+                <!--'animation' :           // Specify the animation to use.-->
+                <!--{-->
+                    <!--'type'     : 'spinToStop',-->
+                    <!--'duration' : 5,     // Duration in seconds.-->
+                    <!--'spins'    : 8,     // Number of complete spins.-->
+                    <!--'callbackFinished' : alertPrize-->
+                <!--}-->
+            <!--});-->
 
-            if(window.hasOwnProperty("crypto") && typeof window.crypto.getRandomValues === "function"){
-                window.crypto.getRandomValues(array);
-                console.log("works");
-            } else {
-                //no support for crypto, get silly random numbers
-                for(var i=0; i < 1000; i++){
-                    array[i] = Math.floor(Math.random() * 100000) + 1;
-                }
-            }
+            <!--// Function with formula to work out stopAngle before spinning animation.-->
+            <!--// Called from Click of the Spin button.-->
+            <!--function calculatePrize(){-->
+                <!--// This formula always makes the wheel stop somewhere inside prize 3 at least-->
+                <!--// 1 degree away from the start and end edges of the segment.-->
+                <!--let stopAt = 90;-->
 
-            return array;
-        }
+                <!--// Important thing is to set the stopAngle of the animation before stating the spin.-->
+                <!--theWheel.animation.stopAngle = stopAt;-->
 
-    </script>
-</body>
-</html>
+                <!--// May as well start the spin from here.-->
+                <!--theWheel.startAnimation();-->
+            <!--}-->
+
+            <!--// Vars used by the code in this page to do power controls.-->
+            <!--var wheelPower    = 0;-->
+            <!--var wheelSpinning = false;-->
+
+            <!--// -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+            <!--// Function to handle the onClick on the power buttons.-->
+            <!--// -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+            <!--function powerSelected(powerLevel)-->
+            <!--{-->
+                <!--// Ensure that power can't be changed while wheel is spinning.-->
+                <!--if (wheelSpinning == false)-->
+                <!--{-->
+                    <!--// Reset all to grey incase this is not the first time the user has selected the power.-->
+                    <!--document.getElementById('pw1').className = "";-->
+                    <!--document.getElementById('pw2').className = "";-->
+                    <!--document.getElementById('pw3').className = "";-->
+
+                    <!--// Now light up all cells below-and-including the one selected by changing the class.-->
+                    <!--if (powerLevel >= 1)-->
+                    <!--{-->
+                        <!--document.getElementById('pw1').className = "pw1";-->
+                    <!--}-->
+
+                    <!--if (powerLevel >= 2)-->
+                    <!--{-->
+                        <!--document.getElementById('pw2').className = "pw2";-->
+                    <!--}-->
+
+                    <!--if (powerLevel >= 3)-->
+                    <!--{-->
+                        <!--document.getElementById('pw3').className = "pw3";-->
+                    <!--}-->
+
+                    <!--// Set wheelPower var used when spin button is clicked.-->
+                    <!--wheelPower = powerLevel;-->
+
+                    <!--// Light up the spin button by changing it's source image and adding a clickable class to it.-->
+                    <!--document.getElementById('spin_button').src = "spin_on.png";-->
+                    <!--document.getElementById('spin_button').className = "clickable";-->
+                <!--}-->
+            <!--}-->
+
+            <!--// -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+            <!--// Click handler for spin button.-->
+            <!--// -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+            <!--function startSpin()-->
+            <!--{-->
+                <!--// Ensure that spinning can't be clicked again while already running.-->
+                <!--if (wheelSpinning == false)-->
+                <!--{-->
+                    <!--// Based on the power level selected adjust the number of spins for the wheel, the more times is has-->
+                    <!--// to rotate with the duration of the animation the quicker the wheel spins.-->
+                    <!--if (wheelPower == 1)-->
+                    <!--{-->
+                        <!--theWheel.animation.spins = 3;-->
+                    <!--}-->
+                    <!--else if (wheelPower == 2)-->
+                    <!--{-->
+                        <!--theWheel.animation.spins = 8;-->
+                    <!--}-->
+                    <!--else if (wheelPower == 3)-->
+                    <!--{-->
+                        <!--theWheel.animation.spins = 15;-->
+                    <!--}-->
+
+                    <!--// Disable the spin button so can't click again while wheel is spinning.-->
+                    <!--document.getElementById('spin_button').src       = "spin_off.png";-->
+                    <!--document.getElementById('spin_button').className = "";-->
+
+                    <!--// Begin the spin animation by calling startAnimation on the wheel object.-->
+                    <!--theWheel.startAnimation();-->
+
+                    <!--// Set to true so that power can't be changed and spin button re-enabled during-->
+                    <!--// the current animation. The user will have to reset before spinning again.-->
+                    <!--wheelSpinning = true;-->
+                <!--}-->
+            <!--}-->
+
+            <!--// -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+            <!--// Function for reset button.-->
+            <!--// -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+            <!--function resetWheel()-->
+            <!--{-->
+                <!--theWheel.stopAnimation(false);  // Stop the animation, false as param so does not call callback function.-->
+                <!--theWheel.rotationAngle = 0;     // Re-set the wheel angle to 0 degrees.-->
+                <!--theWheel.draw();                // Call draw to render changes to the wheel.-->
+
+                <!--document.getElementById('pw1').className = "";  // Remove all colours from the power level indicators.-->
+                <!--document.getElementById('pw2').className = "";-->
+                <!--document.getElementById('pw3').className = "";-->
+
+                <!--wheelSpinning = false;          // Reset to false to power buttons and spin can be clicked again.-->
+            <!--}-->
+
+            <!--// -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+            <!--// Called when the spin animation has finished by the callback feature of the wheel because I specified callback in the parameters-->
+            <!--// note the indicated segment is passed in as a parmeter as 99% of the time you will want to know this to inform the user of their prize.-->
+            <!--// -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+            <!--function alertPrize(indicatedSegment)-->
+            <!--{-->
+                <!--// Do basic alert of the segment text. You would probably want to do something more interesting with this information.-->
+                <!--&lt;!&ndash;alert("You have won " + indicatedSegment.text);&ndash;&gt;-->
+                            <!--}-->
+<!--&lt;!&ndash; End WinWheel &ndash;&gt;-->
+
+<!--function constructChoices(data){-->
+              <!--var questionsLength = data.questions.length;-->
+              <!--$('#container').html('');-->
+              <!--for (var i = 0; i < questionsLength; i++) {-->
+                <!--var question = data.questions[i];-->
+                <!--$('question-text').append('<h1>question.text</h1>');-->
+
+                <!--var choice_id = 'choice-' + nomination.pk;-->
+                <!--$('#container').append(nominationsDiv);-->
+                <!--nominationsDiv.append(box);-->
+                <!--box.append(nomineeDiv);-->
+                <!--nomineeDiv.append(radioBtn);-->
+                <!--nomineeDiv.append(label);-->
+                <!--}-->
+<!--};-->
+
+<!--</script>-->
+
+<!--{% endblock %}-->
+
+
+
+<!-------------------------------------------------------------------------------------------------->
+
+<!--&lt;!&ndash;-->
+ <!--=========================================================-->
+ <!--* Material Kit - v2.0.6-->
+ <!--=========================================================-->
+
+ <!--* Product Page: https://www.creative-tim.com/product/material-kit-->
+ <!--* Copyright 2019 Creative Tim (http://www.creative-tim.com)-->
+   <!--Licensed under MIT (https://github.com/creativetimofficial/material-kit/blob/master/LICENSE.md)-->
+
+
+ <!--=========================================================-->
+
+ <!--* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. &ndash;&gt;-->
+
+<!--{% extends 'science_olympiad/base.html' %}{% load static %}-->
+
+<!--{% block title %}المسابقة العلمية{% endblock %}-->
+
+<!--{% block style %}-->
+
+<!--body{-->
+    <!--text-align: center;-->
+    <!--background-image: url("{% static 'science_olympiad/images/bg_uni.png' %}");-->
+    <!--background-position: center; /* Center the image */-->
+    <!--background-repeat: no-repeat; /* Do not repeat the image */-->
+    <!--background-size: cover; /* Resize the background image to cover the entire container */-->
+
+<!--}-->
+
+
+<!--.header-filter::before {-->
+    <!--background: rgba(0, 0, 0, 0);-->
+<!--}-->
+
+<!--.profile-page .profile img{-->
+  <!--max-width: 200px;-->
+<!--}-->
+
+<!--&lt;!&ndash;Counter CSS&ndash;&gt;-->
+<!--span#jqcd_count {-->
+  <!--font-size: 20pt;-->
+  <!--font-weight: bold;-->
+<!--}-->
+<!--input#jqcd_start,-->
+<!--input#jqcd_stop,-->
+<!--input#jqcd_reset {-->
+  <!--font-size: 12pt;-->
+  <!--font-weight: bold;-->
+<!--}-->
+<!--input#jqcd_start,-->
+<!--input#jqcd_stop,-->
+<!--input#jqcd_reset {-->
+  <!--width: 100px;-->
+<!--}-->
+
+<!--&lt;!&ndash;span#jqcd_count {&ndash;&gt;-->
+  <!--&lt;!&ndash;font-family: "Lucida Console", Monaco, "Courier New", Courier, monospace !IMPORTANT;&ndash;&gt;-->
+<!--&lt;!&ndash;}&ndash;&gt;-->
+<!--&lt;!&ndash;End of Counter CSS&ndash;&gt;-->
+
+<!--.rectangle {-->
+  <!--width: 15px;-->
+  <!--background-color: #284;-->
+<!--}-->
+
+<!--.btn.btn-primary:focus, .btn.btn-primary:active, .btn.btn-primary:hover{-->
+    <!--font-size:24px;-->
+    <!--background-color:#fd3576;-->
+    <!--border-color:#fd3576;-->
+    <!--align-text:center"-->
+<!--}-->
+
+<!--.triangle-down {-->
+	<!--width: 0;-->
+	<!--height: 0;-->
+	<!--border-left: 25px solid transparent;-->
+	<!--border-right: 25px solid transparent;-->
+	<!--border-top: 50px solid #fd3576;-->
+<!--}-->
+
+<!--td.the_wheel{-->
+    <!--background-image:url("");-->
+<!--}-->
+
+
+<!--{% endblock %}-->
+
+<!--{% block head %}-->
+    <!--<link rel="stylesheet" href="{% static 'science_olympiad/javascript-winwheel-2.7.0/examples/basic_code_wheel/main.css' %}" type="text/css" />-->
+    <!--<script type="text/javascript" src="{% static 'science_olympiad/javascript-winwheel-2.7.0/Winwheel.js' %}"></script>-->
+    <!--<script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>-->
+<!--{% endblock %}-->
+
+<!--{% block content %}-->
+
+<!--<div class="row" align="right">-->
+    <!--<a href="{% url 'science_olympiad:end_contest' %}">-->
+        <!--<img style="padding:30px" src="{% static 'science_olympiad/images/sections/icons/contest.png' %}">-->
+    <!--</a>-->
+<!--</div>-->
+
+<!--<div class="container" align="center" id="question_section">-->
+    <!--<div id="question-text"><h1>{{question.text}}</h1></div>-->
+    <!--<br>-->
+    <!--<div class="col-lg-12" style="padding-left:70px">-->
+        <!--<div></div>-->
+        <!--<div class="row" align="rtl">-->
+            <!--<div class="col" style="border: 3px solid white; padding:5px; margin:10px">-->
+                 <!--<img align="right" src="{% static 'science_olympiad/box_a.png' %}" style="height:100%; width: 25px"> أ) {{choice1.text}}-->
+            <!--</div>-->
+            <!--<div class="col" style="border: 3px solid white; padding:5px; margin:10px">-->
+                 <!--<img align="right" src="{% static 'science_olympiad/box_b.png' %}" style="height:100%; width: 25px"> ب) {{choice2.text}}-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="row">-->
+            <!--<div class="col" style="border: 3px solid white; padding:5px; margin:10px">-->
+                 <!--<img align="right" src="{% static 'science_olympiad/box_c.png' %}" style="height:100%; width: 25px"> ج) {{choice3.text}}-->
+            <!--</div>-->
+            <!--<div class="col" style="border: 3px solid white; padding:5px; margin:10px">-->
+                 <!--<img align="right" src="{% static 'science_olympiad/box_d.png' %}" style="height:100%; width: 25px"> د) {{choice4.text}}-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--<br><br>-->
+    <!--<div class="col-lg-12">-->
+        <!--<span id="jqcd_count" style="text-align:center; font-size:50px">00:30</span><br><br>-->
+        <!--<input type="button" class="btn btn-primary" style="width:180px; background-color:#fd3576; border-color:#fd3576" id="jqcd_start" value="بدء" onClick="jqcd('start')" />-->
+        <!--<input type="button" class="btn btn-primary" id="jqcd_stop" value="انتهاء" onClick="jqcd('stop')" />-->
+        <!--<input type="button" class="btn btn-primary" style="width:140px" id="jqcd_reset" value="إعادة تعيين" onClick="jqcd('reset')" /><br><br>-->
+        <!--<input type="text" id="jqcd_time" value="00:30" />-->
+    <!--</div>-->
+<!--</div>-->
+<!--<div id="time_up" style="margin-top:120px; margin-bottom:220px"><h1 style="font-size:80px">انتهى الوقت!</h1></div>-->
+<!--<a id="next" style="font-size:24px;background-color:#fd3576;border-color:#fd3576" class="btn btn-primary" href="{% url 'science_olympiad:show_question' contest.pk next_question_id %}">السؤال التالي</a>-->
+<!--<div id="wheel_section" style="margin-top:-150px">-->
+    <!--<div align="center">-->
+    <!--<table cellpadding="0" cellspacing="0" border="0">-->
+        <!--<div class="triangle-down"></div>-->
+        <!--<tr>-->
+            <!--<td width="438" height="582" class="the_wheel" align="center" valign="center">-->
+                <!--<canvas id="canvas" width="434" height="434">-->
+                    <!--<p style="{color: white}" align="center">Sorry, your browser doesn't support canvas. Please try another.</p>-->
+                <!--</canvas>-->
+            <!--</td>-->
+        <!--</tr>-->
+    <!--</table>-->
+        <!--<div class="btn btn-primary" id="spin_button" onClick="startSpin();">إدارة العجلة</div>-->
+    <!--</div>-->
+<!--</div>-->
+
+<!--<br>-->
+
+<!--{% endblock %}-->
+
+<!--{% block footer %}-->
+    <!--<div class="container" align="left">-->
+        <!--<img src="{% static 'science_olympiad/images/logo_white.png' %}" style="height:100px">-->
+        <!--<img src="{% static 'science_olympiad/images/ta_logo_white.png' %}" style="height:80px; padding-left:20px">-->
+        <!--<img src="{% static 'science_olympiad/images/sc_logo_white.png' %}" style="height:80px; padding-left:20px">-->
+        <!--<img src="{% static 'science_olympiad/images/uni_logo_white.png' %}" style="height:80px">-->
+    <!--</div>-->
+<!--{% endblock %}-->
+
+<!--{% block customscript %}-->
+
+<!--<script type="text/javascript">-->
+
+<!--function contestDone(data){-->
+    <!--$('#question_section').hide();-->
+    <!--$('#time_up').show();-->
+    <!--$('#next').show();-->
+<!--}-->
+
+<!--&lt;!&ndash;to delay an action&ndash;&gt;-->
+<!--const add5SecondsDelay = () => {-->
+  <!--return new Promise(resolve => {-->
+    <!--setTimeout(() => {-->
+      <!--resolve('5 seconds');-->
+    <!--}, 50000);-->
+  <!--});-->
+<!--}-->
+
+<!--async function asyncFunctionCall() {-->
+
+  <!--console.log("stpe-1");-->
+  <!--const result = await add5SecondsDelay ();-->
+  <!--console.log("step-2 after 5 seconds delay");-->
+
+<!--}-->
+
+<!--&lt;!&ndash;end of delaying action&ndash;&gt;-->
+
+
+<!--&lt;!&ndash;Start Timer&ndash;&gt;-->
+<!--var jqcd_start_id = 'input#jqcd_start';-->
+<!--var jqcd_time_id = 'input#jqcd_time';-->
+<!--var jqcd_count_id = 'span#jqcd_count';-->
+<!--var jqcd_end_message = 'انتهى الوقت!';-->
+
+<!--var jqcd_countdown = '';-->
+<!--var jqcd_status = 'stopped';-->
+<!--var jqcd_current = '';-->
+<!--function jqcd(action){-->
+  <!--if (action == 'start') {-->
+    <!--if (jqcd_status == 'stopped') {-->
+      <!--jqcd_updtv(jqcd_start_id, 'وسائل المساعدة');-->
+      <!--jqcd_status = 'running';-->
+      <!--jqcd_current = jqcd_countdown;-->
+      <!--jqcd_updtt(jqcd_count_id, jqcd_countdown);-->
+    <!--}-->
+    <!--else if (jqcd_status == 'running') {-->
+      <!--jqcd_updtv(jqcd_start_id, ' استئناف المسابقة');-->
+      <!--jqcd_status = 'paused';-->
+    <!--}-->
+    <!--else if (jqcd_status == 'paused') {-->
+      <!--jqcd_updtv(jqcd_start_id, 'وسائل المساعدة');-->
+      <!--jqcd_status = 'running';-->
+    <!--}-->
+  <!--}-->
+  <!--else if (action == 'stop') {-->
+    <!--jqcd_updtv(jqcd_start_id, 'بدء');-->
+    <!--jqcd_status = 'stopped';-->
+    <!--jqcd_updtt(jqcd_count_id, jqcd_end_message);-->
+    <!--contestDone();-->
+  <!--}-->
+  <!--else if (action == 'reset') {-->
+    <!--jqcd_updtv(jqcd_start_id, 'بدء');-->
+    <!--jqcd_status = 'stopped';-->
+    <!--jqcd_updtt(jqcd_count_id, jqcd_countdown);-->
+  <!--}-->
+
+  <!--var a =  jqcd_current.split(":");-->
+  <!--var m = a[0];-->
+  <!--var s = (a[1] - 1);-->
+
+  <!--if (s < 0) {-->
+    <!--if (parseInt(m) == 0) {-->
+      <!--jqcd_updtv(jqcd_start_id, 'بدء');-->
+      <!--jqcd_status = 'stopped';-->
+      <!--jqcd_updtt(jqcd_count_id, jqcd_end_message);-->
+      <!--contestDone();-->
+    <!--}-->
+    <!--else {-->
+      <!--m = m - 1;-->
+      <!--s = 59;-->
+    <!--}-->
+  <!--}-->
+
+  <!--if(s >= 0){-->
+    <!--setTimeout(function(){-->
+      <!--if (jqcd_status == 'running') {-->
+        <!--m = (parseInt(m) < 10)? "0" + parseInt(m): m;-->
+        <!--s = (parseInt(s) < 10)? "0" + parseInt(s): s;-->
+        <!--jqcd_updtt(jqcd_count_id, m + ":" + s);-->
+        <!--jqcd_current = m + ":" + s;-->
+        <!--jqcd('');-->
+      <!--}-->
+    <!--}, 1000);-->
+  <!--}-->
+<!--}-->
+
+<!--function jqcd_updtv(selector, value) {-->
+  <!--if (selector != '') {-->
+    <!--$(selector).val(value);-->
+  <!--}-->
+<!--}-->
+<!--function jqcd_updtt(selector, value) {-->
+  <!--if (selector != '') {-->
+    <!--$(selector).text(value);-->
+  <!--}-->
+<!--}-->
+
+<!--$(document).ready(function() {-->
+  <!--jqcd_countdown = $(jqcd_time_id).val();-->
+  <!--jqcd_updtt(jqcd_count_id, jqcd_countdown);-->
+
+  <!--$(jqcd_time_id).keyup(function() {-->
+    <!--jqcd_countdown = $(jqcd_time_id).val();-->
+    <!--jqcd_updtt(jqcd_count_id, jqcd_countdown);-->
+    <!--jqcd_updtv(jqcd_start_id, 'Start');-->
+    <!--jqcd_status = 'stopped';-->
+  <!--});-->
+<!--});-->
+<!--&lt;!&ndash;End Timer&ndash;&gt;-->
+
+<!--$('#time_up').hide();-->
+<!--$('#question_section').hide();-->
+<!--$('#next').hide();-->
+<!--$('#wheel_section').show();-->
+<!--$(jqcd_time).hide()-->
+<!--$(jqcd_stop).hide()-->
+<!--$(jqcd_reset).hide()-->
+
+<!--&lt;!&ndash;Start WinWheel&ndash;&gt;-->
+    <!--// Create new wheel object specifying the parameters at creation time.-->
+            <!--var theWheel = new Winwheel({-->
+                <!--'numSegments'  : 4,     // Specify number of segments.-->
+                <!--'outerRadius'  : 212,   // Set outer radius so wheel fits inside the background.-->
+                <!--'textFontSize' : 36,    // Set font size as desired.-->
+                <!--'segments'     :        // Define segments including colour and text.-->
+                <!--[-->
+                   <!--{'fillStyle' : '#fff', 'text' : 'علمي', 'textFontFamily' : 'GE Dinar One',},-->
+                   <!--{'fillStyle' : '#fff', 'text' : 'ثقافي', 'textFontFamily' : 'GE Dinar One',},-->
+                   <!--{'fillStyle' : '#fff', 'text' : 'صحي', 'textFontFamily' : 'GE Dinar One',},-->
+                   <!--{'fillStyle' : '#fff', 'text' : 'ترفيهي', 'textFontFamily' : 'GE Dinar One',},-->
+                <!--],-->
+                <!--'animation' :           // Specify the animation to use.-->
+                <!--{-->
+                    <!--'type'     : 'spinToStop',-->
+                    <!--'duration' : 5,     // Duration in seconds.-->
+                    <!--'spins'    : 8,     // Number of complete spins.-->
+                    <!--'callbackFinished' : alertPrize-->
+                <!--}-->
+            <!--});-->
+
+            <!--// Function with formula to work out stopAngle before spinning animation.-->
+            <!--// Called from Click of the Spin button.-->
+            <!--function calculatePrize(){-->
+                <!--// This formula always makes the wheel stop somewhere inside prize 3 at least-->
+                <!--// 1 degree away from the start and end edges of the segment.-->
+                <!--let stopAt = (1 + Math.floor((Math.random() * 90)))-->
+
+                <!--// Important thing is to set the stopAngle of the animation before stating the spin.-->
+                <!--theWheel.animation.stopAngle = stopAt;-->
+
+                <!--// May as well start the spin from here.-->
+                <!--theWheel.startAnimation();-->
+            <!--}-->
+
+            <!--// Vars used by the code in this page to do power controls.-->
+            <!--var wheelPower    = 0;-->
+            <!--var wheelSpinning = false;-->
+
+            <!--// -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+            <!--// Function to handle the onClick on the power buttons.-->
+            <!--// -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+            <!--function powerSelected(powerLevel)-->
+            <!--{-->
+                <!--// Ensure that power can't be changed while wheel is spinning.-->
+                <!--if (wheelSpinning == false)-->
+                <!--{-->
+                    <!--// Reset all to grey incase this is not the first time the user has selected the power.-->
+                    <!--document.getElementById('pw1').className = "";-->
+                    <!--document.getElementById('pw2').className = "";-->
+                    <!--document.getElementById('pw3').className = "";-->
+
+                    <!--// Now light up all cells below-and-including the one selected by changing the class.-->
+                    <!--if (powerLevel >= 1)-->
+                    <!--{-->
+                        <!--document.getElementById('pw1').className = "pw1";-->
+                    <!--}-->
+
+                    <!--if (powerLevel >= 2)-->
+                    <!--{-->
+                        <!--document.getElementById('pw2').className = "pw2";-->
+                    <!--}-->
+
+                    <!--if (powerLevel >= 3)-->
+                    <!--{-->
+                        <!--document.getElementById('pw3').className = "pw3";-->
+                    <!--}-->
+
+                    <!--// Set wheelPower var used when spin button is clicked.-->
+                    <!--wheelPower = powerLevel;-->
+
+                    <!--// Light up the spin button by changing it's source image and adding a clickable class to it.-->
+                    <!--document.getElementById('spin_button').src = "spin_on.png";-->
+                    <!--document.getElementById('spin_button').className = "clickable";-->
+                <!--}-->
+            <!--}-->
+
+            <!--// -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+            <!--// Click handler for spin button.-->
+            <!--// -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+            <!--function startSpin()-->
+            <!--{-->
+                <!--// Ensure that spinning can't be clicked again while already running.-->
+                <!--if (wheelSpinning == false)-->
+                <!--{-->
+                    <!--// Based on the power level selected adjust the number of spins for the wheel, the more times is has-->
+                    <!--// to rotate with the duration of the animation the quicker the wheel spins.-->
+                    <!--if (wheelPower == 1)-->
+                    <!--{-->
+                        <!--theWheel.animation.spins = 3;-->
+                    <!--}-->
+                    <!--else if (wheelPower == 2)-->
+                    <!--{-->
+                        <!--theWheel.animation.spins = 8;-->
+                    <!--}-->
+                    <!--else if (wheelPower == 3)-->
+                    <!--{-->
+                        <!--theWheel.animation.spins = 15;-->
+                    <!--}-->
+
+                    <!--// Disable the spin button so can't click again while wheel is spinning.-->
+                    <!--document.getElementById('spin_button').src       = "spin_off.png";-->
+                    <!--document.getElementById('spin_button').className = "";-->
+
+                    <!--// Begin the spin animation by calling startAnimation on the wheel object.-->
+                    <!--theWheel.startAnimation();-->
+
+                    <!--// Set to true so that power can't be changed and spin button re-enabled during-->
+                    <!--// the current animation. The user will have to reset before spinning again.-->
+                    <!--wheelSpinning = true;-->
+                <!--}-->
+            <!--}-->
+
+            <!--// -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+            <!--// Function for reset button.-->
+            <!--// -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+            <!--function resetWheel()-->
+            <!--{-->
+                <!--theWheel.stopAnimation(false);  // Stop the animation, false as param so does not call callback function.-->
+                <!--theWheel.rotationAngle = 0;     // Re-set the wheel angle to 0 degrees.-->
+                <!--theWheel.draw();                // Call draw to render changes to the wheel.-->
+
+                <!--document.getElementById('pw1').className = "";  // Remove all colours from the power level indicators.-->
+                <!--document.getElementById('pw2').className = "";-->
+                <!--document.getElementById('pw3').className = "";-->
+
+                <!--wheelSpinning = false;          // Reset to false to power buttons and spin can be clicked again.-->
+            <!--}-->
+
+            <!--// -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+            <!--// Called when the spin animation has finished by the callback feature of the wheel because I specified callback in the parameters-->
+            <!--// note the indicated segment is passed in as a parmeter as 99% of the time you will want to know this to inform the user of their prize.-->
+            <!--// -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+            <!--function alertPrize(indicatedSegment)-->
+            <!--{-->
+                <!--// Do basic alert of the segment text. You would probably want to do something more interesting with this information.-->
+                <!--&lt;!&ndash;alert("You have won " + indicatedSegment.text);&ndash;&gt;-->
+                <!--$('#wheel_section').hide();-->
+                <!--$('#question_section').fadeIn();-->
+                <!--$('#next').fadeIn();-->
+            <!--}-->
+<!--&lt;!&ndash; End WinWheel &ndash;&gt;-->
+
+<!--function constructChoices(data){-->
+              <!--var questionsLength = data.questions.length;-->
+              <!--$('#container').html('');-->
+              <!--for (var i = 0; i < questionsLength; i++) {-->
+                <!--var question = data.questions[i];-->
+                <!--$('question-text').append('<h1>question.text</h1>');-->
+
+                <!--var choice_id = 'choice-' + nomination.pk;-->
+                <!--$('#container').append(nominationsDiv);-->
+                <!--nominationsDiv.append(box);-->
+                <!--box.append(nomineeDiv);-->
+                <!--nomineeDiv.append(radioBtn);-->
+                <!--nomineeDiv.append(label);-->
+                <!--}-->
+<!--};-->
+
+<!--&lt;!&ndash;$('#wheel').click(function(){&ndash;&gt;-->
+    <!--&lt;!&ndash;$('#question_section').hide();&ndash;&gt;-->
+    <!--&lt;!&ndash;$('#wheel_section').show();&ndash;&gt;-->
+    <!--&lt;!&ndash;&lt;!&ndash;below not work why????&ndash;&gt;&ndash;&gt;-->
+    <!--&lt;!&ndash;theWheel.resetWheel();&ndash;&gt;-->
+
+<!--&lt;!&ndash;});&ndash;&gt;-->
+
+
+<!--</script>-->
+
+<!--{% endblock %}-->
+
+

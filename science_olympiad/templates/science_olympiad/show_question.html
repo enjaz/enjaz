@@ -61,6 +61,7 @@ input#jqcd_reset {
 .rectangle {
   width: 15px;
   background-color: #284;
+
 }
 
 .btn.btn-primary:focus, .btn.btn-primary:active, .btn.btn-primary:hover{
@@ -82,6 +83,14 @@ td.the_wheel{
     background-image:url("");
 }
 
+.choice:hover {
+    background: #b0b0b8;
+}
+
+.choice{
+    font-size:35px;
+}
+
 {% endblock %}
 
 {% block head %}
@@ -98,25 +107,26 @@ td.the_wheel{
     </a>
 </div>
 
-<div class="container" align="center" id="question_section">
+<div class="container" align="center" id="question_section" style="margin-top:-80px;">
     <div id="question-text"><h1>{{question.text}}</h1></div>
-    <br>
+    <br><br>
     <div class="col-lg-12" style="padding-left:70px">
         <div></div>
         <div class="row" align="rtl">
-            <div id="choice1" class="choice col" style="border: 3px solid white; padding:5px; margin:10px">
-                 <img align="right" src="{% static 'science_olympiad/box_a.png' %}" style="height:100%; width: 25px">أ) {{choice1.text}}
+            <div id="choice1" class="choice col" style="border: 3px solid white; padding:15px; margin:10px">
+                 <img align="right" src="{% static 'science_olympiad/box_a.png' %}" style="width:25px; margin-left:15px;">أ) {{choice1.text}}
             </div>
-            <div id="choice2" class="choice col" style="border: 3px solid white; padding:5px; margin:10px">
-                 <img align="right" src="{% static 'science_olympiad/box_b.png' %}" style="height:100%; width: 25px"> ب) {{choice2.text}}
+            <div id="choice2" class="choice col" style="border: 3px solid white; padding:15px; margin:10px">
+                 <img align="right" src="{% static 'science_olympiad/box_b.png' %}" style="width:25px; margin-left:15px;"> ب) ناس ؤيلاس ؤثصاؤن سؤعاخى عاخشسى
             </div>
         </div>
+        <br>
         <div class="row">
-            <div id="choice3" class="choice col" style="border: 3px solid white; padding:5px; margin:10px">
-                 <img align="right" src="{% static 'science_olympiad/box_c.png' %}" style="height:100%; width: 25px"> ج) {{choice3.text}}
+            <div id="choice3" class="choice col" style="border: 3px solid white; padding:15px; margin:10px">
+                 <img align="right" src="{% static 'science_olympiad/box_c.png' %}" style="width:25px; margin-left:15px;"> ج) {{choice3.text}}
             </div>
-            <div id="choice4" class="choice col" style="border: 3px solid white; padding:5px; margin:10px">
-                 <img align="right" src="{% static 'science_olympiad/box_d.png' %}" style="height:100%; width: 25px"> د) {{choice4.text}}
+            <div id="choice4" class="choice col" style="border: 3px solid white; padding:15px; margin:10px">
+                 <img align="right" src="{% static 'science_olympiad/box_d.png' %}" style="width:25px; margin-left:15px;"> د) {{choice4.text}}
             </div>
         </div>
     </div>
@@ -129,8 +139,14 @@ td.the_wheel{
         <input type="text" id="jqcd_time" value="00:30" />
     </div>
 </div>
+<a id="exclude-choices" style="font-size:24px;background-color:#fd3576;border-color:#fd3576" class="btn btn-primary" href="#">حذف خيارات</a>
 <div id="time_up" style="margin-top:120px; margin-bottom:220px"><h1 style="font-size:80px">انتهى الوقت!</h1></div>
-<a id="next" style="font-size:24px;background-color:#fd3576;border-color:#fd3576" class="btn btn-primary" href="{% url 'science_olympiad:show_question' contest.pk next_question_id %}">السؤال التالي</a>
+{% if question.is_last_main %}
+    <a id="next" style="font-size:24px;background-color:#fd3576;border-color:#fd3576" class="btn btn-primary" href="{% url 'science_olympiad:end_contest' %}">
+{% else %}
+    <a id="next" style="font-size:24px;background-color:#fd3576;border-color:#fd3576" class="btn btn-primary" href="{% url 'science_olympiad:show_question' contest.pk next_question_id %}">
+{% endif %}
+{% if question.is_last_main %}انتهت المسابقة{% else %}السؤال التالي{% endif %}</a>
 <div id="wheel_section" style="margin-top:-150px">
     <div align="center">
     <!--<table cellpadding="0" cellspacing="0" border="0">-->
@@ -180,14 +196,15 @@ function contestDone(data){
     $('#question_section').hide();
     $('#time_up').show();
     $('#next').show();
+    $('#exclude-choices').hide();
 }
 
 $('#show-q').click(function(){
     $('#wheel_section').hide();
+    $('#exclude-choices').hide();
     $('#question_section').fadeIn();
     $('#next').fadeIn();
 });
-
 
 <!--Start Timer-->
 var jqcd_start_id = 'input#jqcd_start';
@@ -209,6 +226,7 @@ function jqcd(action){
     else if (jqcd_status == 'running') {
       jqcd_updtv(jqcd_start_id, ' استئناف المسابقة');
       jqcd_status = 'paused';
+      $('#exclude-choices').show();
     }
     else if (jqcd_status == 'paused') {
       jqcd_updtv(jqcd_start_id, 'وسائل المساعدة');
@@ -284,6 +302,7 @@ $(document).ready(function() {
 $('#time_up').hide();
 $('#question_section').hide();
 $('#next').hide();
+$('#exclude-choices').hide();
 $('#wheel_section').show();
 $(jqcd_time).hide()
 $(jqcd_stop).hide()
@@ -464,30 +483,67 @@ $('div.choice').click(function(){
     var c3 = "{{choice3}}";
     var c4 = "{{choice4}}";
    if( a == c3  ){
-    document.getElementById("choice3").style.color = "green";
-    document.getElementById("choice1").style.color = "red";
-    document.getElementById("choice2").style.color = "red";
-    document.getElementById("choice4").style.color = "red";
+    document.getElementById("choice3").style.background = "#41c941";
+    document.getElementById("choice1").style.background = "#dd2e2e";
+    document.getElementById("choice2").style.background = "#dd2e2e";
+    document.getElementById("choice4").style.background = "#dd2e2e";
 }
     if( a == c4  ){
-    document.getElementById("choice4").style.color = "green";
-    document.getElementById("choice1").style.color = "red";
-    document.getElementById("choice2").style.color = "red";
-    document.getElementById("choice3").style.color = "red";
+    document.getElementById("choice4").style.background= "#41c941";
+    document.getElementById("choice1").style.background = "#dd2e2e";
+    document.getElementById("choice2").style.background = "#dd2e2e";
+    document.getElementById("choice3").style.background = "#dd2e2e";
 }
     if( a == c2  ){
-    document.getElementById("choice2").style.color = "green";
-    document.getElementById("choice1").style.color = "red";
-    document.getElementById("choice3").style.color = "red";
-    document.getElementById("choice4").style.color = "red";
+    document.getElementById("choice2").style.background = "#41c941";
+    document.getElementById("choice1").style.background = "#dd2e2e";
+    document.getElementById("choice3").style.background = "#dd2e2e";
+    document.getElementById("choice4").style.background = "#dd2e2e";
 }
     if( a == c1  ){
-    document.getElementById("choice1").style.color = "green";
-    document.getElementById("choice3").style.color = "red";
-    document.getElementById("choice2").style.color = "red";
-    document.getElementById("choice4").style.color = "red";
+    document.getElementById("choice1").style.background = "#41c941";
+    document.getElementById("choice3").style.background = "#dd2e2e";
+    document.getElementById("choice2").style.background = "#dd2e2e";
+    document.getElementById("choice4").style.background = "#dd2e2e";
 }
 });
+
+
+$('#exclude-choices').click(function(data){
+   var e1 = "{{excludable_1}}";
+   var e2 = "{{excludable_2}}";
+
+   var c1 = "{{choice1}}";
+   var c2 = "{{choice2}}";
+   var c3 = "{{choice3}}";
+   var c4 = "{{choice4}}";
+
+   if( e1 == c1 ){
+    document.getElementById("choice1").style.background = "#fff";
+   }
+   if( e2 == c1 ){
+    document.getElementById("choice1").style.background = "#fff";
+   }
+   if( e1 == c2 ){
+    document.getElementById("choice2").style.background = "#fff";
+   }
+   if( e2 == c2  ){
+    document.getElementById("choice2").style.background = "#fff";
+   }
+   if( e1 == c3 ){
+    document.getElementById("choice3").style.background = "#fff";
+   }
+   if( e2 == c3  ){
+    document.getElementById("choice3").style.background = "#fff";
+   }
+   if( e1 == c4 ){
+    document.getElementById("choice4").style.background = "#fff";
+   }
+   if( e2 == c4  ){
+    document.getElementById("choice4").style.background = "#fff";
+   }
+});
+
 
 
 </script>

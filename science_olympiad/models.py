@@ -69,6 +69,8 @@ class ContestQuestion(models.Model):
     text = models.TextField(u'نص السؤال')
     category = models.CharField(u'الفئة', max_length=100)
     olympiad_version = models.CharField(u'نسخة الأولمبياد', max_length=100, null=True) #May be used later in life
+    is_last_main = models.BooleanField(u'هل هو السؤال الأخير من الأسئلة الأساسية؟', default=False)
+    is_extra = models.BooleanField(u'هل السؤال إضافي؟', default=False)
 
     class Meta:
         verbose_name = u"سؤال"
@@ -81,6 +83,7 @@ class ContestAnswer(models.Model):
     question = models.ForeignKey(ContestQuestion, verbose_name=u'السؤال')
     text = models.TextField(u'نص الجواب')
     is_correct = models.BooleanField(u'هل الجواب صحيح؟', default=False)
+    is_excludable = models.BooleanField(u'هل يمكن حذف الجواب؟', default=False)
     letter_choices = (
         ('a', u'أ'),
         ('b', u'ب'),

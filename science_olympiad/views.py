@@ -93,6 +93,9 @@ def walkthrough_contest1(request):
 def test_wheel(request):
     return render(request, 'science_olympiad/test_wheel.html')
 
+# TODO: Fix this whole file
+# the actual view for the game that works is show_question()
+
 def show_question(request, contest_id, question_id):
     contest = get_object_or_404(Contest, pk=contest_id)
     questions = ContestQuestion.objects.filter(contest=contest)
@@ -105,9 +108,14 @@ def show_question(request, contest_id, question_id):
     for choice in choices:
         if choice.is_correct:
             answer = choice
+    excludables = choices.filter(is_excludable=True)
+    if len(list(excludables)) == 2:
+        excludable_1 = list(excludables).pop()
+        excludable_2 = list(excludables).pop()
     next_question_id = int(question_id) + 1
     context = {'contest': contest, 'questions': questions, 'question':question,
                'choice1':choice1, 'choice2':choice2,
                'choice3':choice3, 'choice4':choice4,
-               'next_question_id':next_question_id, 'answer':answer}
+               'next_question_id':next_question_id, 'answer':answer,
+               'excludable_1':excludable_1, 'excludable_2':excludable_2}
     return render(request, 'science_olympiad/show_question.html', context)

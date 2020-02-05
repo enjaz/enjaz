@@ -117,7 +117,7 @@ td.the_wheel{
                  <img align="right" src="{% static 'science_olympiad/box_a.png' %}" style="width:25px; margin-left:15px;">أ) {{choice1.text}}
             </div>
             <div id="choice2" class="choice col" style="border: 3px solid white; padding:15px; margin:10px">
-                 <img align="right" src="{% static 'science_olympiad/box_b.png' %}" style="width:25px; margin-left:15px;"> ب) ناس ؤيلاس ؤثصاؤن سؤعاخى عاخشسى
+                 <img align="right" src="{% static 'science_olympiad/box_b.png' %}" style="width:25px; margin-left:15px;"> ب) {{choice2.text}}
             </div>
         </div>
         <br>
@@ -254,7 +254,7 @@ function jqcd(action){
       jqcd_updtv(jqcd_start_id, 'بدء');
       jqcd_status = 'stopped';
       jqcd_updtt(jqcd_count_id, jqcd_end_message);
-      contestDone();
+      setTimeout(contestDone, 5000);
     }
     else {
       m = m - 1;

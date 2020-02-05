@@ -108,10 +108,11 @@ def show_question(request, contest_id, question_id):
     for choice in choices:
         if choice.is_correct:
             answer = choice
-    excludables = choices.filter(is_excludable=True)
+    excludables = question.contestanswer_set.filter(is_excludable=True)
     if len(list(excludables)) == 2:
-        excludable_1 = list(excludables).pop()
-        excludable_2 = list(excludables).pop()
+        excludables = list(excludables)
+        excludable_1 = excludables.pop()
+        excludable_2 = excludables.pop()
     next_question_id = int(question_id) + 1
     context = {'contest': contest, 'questions': questions, 'question':question,
                'choice1':choice1, 'choice2':choice2,

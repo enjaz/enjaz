@@ -15,7 +15,7 @@ class InventorAdmin(admin.ModelAdmin):
     search_fields = ['ar_name', 'en_name', 'invention_name', 'inv_category', 'summary']
 
 class ContestQuestionAdmin (admin.ModelAdmin):
-    list_filter = ['category', 'olympiad_version']
+    list_filter = ['category', 'olympiad_version', 'Contest']
     list_display = ['__unicode__', 'category', 'olympiad_version']
     search_fields = list_display
 

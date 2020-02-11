@@ -1241,6 +1241,9 @@ def list_attendance(request, event_code_name,user_pk=None):
 
     return render(request, 'events/list_attendance.html', context)
 
+
+
+
 @login_required
 def list_session_attendance(request, event_code_name,session_pk=None):
 
@@ -1248,10 +1251,19 @@ def list_session_attendance(request, event_code_name,session_pk=None):
                                   has_attendance = True)
     session = get_object_or_404(Session, pk=session_pk)
 
-        
-    attendances = Attendance.objects.filter(session_registration__session=session)
 
-    context ={'event':event,'session':session,'attendances':attendances}
+    attendances = Attendance.objects.filter(session_registration__session=session)
+    signed_in = Attendance.objects.filter(session_registration__session=session, category='I')
+    signed_out = Attendance.objects.filter(session_registration__session=session, category='O')
+    # list_females = Attendance.objects.filter(session_registration__session=session.gender, category='F')
+    # list_males = Attendance.objects.filter(session_registration__session=session.gender, category='M')
+    list_females_in = signed_in.filter(session_registration__user__common_profile__gender='F')
+    list_males_in = signed_in.filter(session_registration__user__common_profile__gender='M')
+    list_females_out = signed_out.filter(session_registration__user__common_profile__gender='F')
+    list_males_out = signed_out.filter(session_registration__user__common_profile__gender='M')
+
+    context ={'event':event,'session':session,'attendances':attendances,
+              'signed_in':signed_in, 'signed_out':signed_out, 'list_females_in':list_females_in,'list_females_out': list_females_out, 'list_males_in': list_males_in, 'list_males_out': list_males_out}
 
     return render(request, 'events/list_attendance.html', context)
 

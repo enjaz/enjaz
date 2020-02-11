@@ -5,7 +5,19 @@
 
 {% block content %}
 <h1>حضور {{ event.get_html_name|safe }}</h1>
+    <h2 style="color: #000;">
+        {% if session %}
+        <br> عدد مسجلين الدخول <br>
+        <h2>مسجلات {{ list_females_in.count }}</h2>        <h3> مسجلين {{ list_males_in.count }}</h3>
+
+        <h2> عدد مسجلين الخروج</h2>
+        <h3> مسجلات {{ list_females_out.count }}</h3>        <h3>مسجلين {{ list_males_out.count }}</h3>
+
+
+        {% endif  %}
+    </h2>
 <table id="users" class="display datatable db-responsive">
+
     <thead>
         <tr>
             {% if session  %}
@@ -18,6 +30,7 @@
             <th>الشخص الذي حضر</th>
         </tr>
     </thead>
+
     <tbody>
     {% for attendance in attendances %}
         <tr>

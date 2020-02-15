@@ -46,7 +46,9 @@ urlpatterns = [
     url(r'^riyadh/(?P<lang>(ar|en))/media/file/$', views.show_media_file, name="media_file"),
     # Abstracts Booklet
     url(r'^riyadh/(?P<lang>(ar|en))/media/abstracts_booklet/$', views.show_abstracts_booklet, name="abstracts_booklet"),
-
+    # invite to ceremony
+    url(r'^invite/(?P<invitee_id>\w+)/$',views.invite_to_ceremony,
+        name='invite_to_ceremony'),
     # Jeddah Pages
     # Index Pages
     # Registration Pages

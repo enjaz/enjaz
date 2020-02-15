@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 import events.utils
+from django.contrib.auth.models import User
 
 
 # enjazportal.com/riyadh HPC Riyadh :
@@ -374,3 +375,9 @@ def ahs_en_research(request):
 
 def show_abstracts_booklet(request, lang):
     return HttpResponseRedirect('/static/static/newhpc/media/abstracts booklet.pdf')
+
+# invite to ceremony
+def invite_to_ceremony(request, invitee_id):
+    invitee = get_object_or_404(User, username=invitee_id)
+    context = {'invitee': invitee}
+    return render(request, 'newhpc/arabic/invite_ceremony.html', context)

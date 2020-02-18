@@ -139,7 +139,8 @@ td.the_wheel{
         <input type="text" id="jqcd_time" value="00:30" />
     </div>
 </div>
-<a id="exclude-choices" style="font-size:24px;background-color:#fd3576;border-color:#fd3576" class="btn btn-primary" href="#">حذف خيارات</a>
+<a id="exclude-choice1" style="font-size:24px;background-color:#fd3576;border-color:#fd3576" class="btn btn-primary" href="#">حذف خيارات</a>
+<a id="exclude-choice2" style="font-size:24px;background-color:#fd3576;border-color:#fd3576" class="btn btn-primary" href="#">حذف خيارات</a>
 <div id="time_up" style="margin-top:120px; margin-bottom:220px"><h1 style="font-size:80px">انتهى الوقت!</h1></div>
 {% if question.is_last_main %}
     <a id="next" style="font-size:24px;background-color:#fd3576;border-color:#fd3576" class="btn btn-primary" href="{% url 'science_olympiad:end_contest' %}">
@@ -196,12 +197,14 @@ function contestDone(data){
     $('#question_section').hide();
     $('#time_up').show();
     $('#next').show();
-    $('#exclude-choices').hide();
+    $('#exclude-choice1').hide();
+    $('#exclude-choice2').hide();
 }
 
 $('#show-q').click(function(){
     $('#wheel_section').hide();
-    $('#exclude-choices').hide();
+    $('#exclude-choice1').hide();
+    $('#exclude-choice2').hide();
     $('#question_section').fadeIn();
     $('#next').fadeIn();
 });
@@ -226,7 +229,8 @@ function jqcd(action){
     else if (jqcd_status == 'running') {
       jqcd_updtv(jqcd_start_id, ' استئناف المسابقة');
       jqcd_status = 'paused';
-      $('#exclude-choices').show();
+      $('#exclude-choice1').show();
+      $('#exclude-choice2').hide();
     }
     else if (jqcd_status == 'paused') {
       jqcd_updtv(jqcd_start_id, 'وسائل المساعدة');
@@ -302,7 +306,8 @@ $(document).ready(function() {
 $('#time_up').hide();
 $('#question_section').hide();
 $('#next').hide();
-$('#exclude-choices').hide();
+$('#exclude-choice1').hide();
+$('#exclude-choice2').hide();
 $('#wheel_section').show();
 $(jqcd_time).hide()
 $(jqcd_stop).hide()
@@ -509,9 +514,8 @@ $('div.choice').click(function(){
 });
 
 
-$('#exclude-choices').click(function(data){
+$('#exclude-choice1').click(function(data){
    var e1 = "{{excludable_1}}";
-   var e2 = "{{excludable_2}}";
 
    var c1 = "{{choice1}}";
    var c2 = "{{choice2}}";
@@ -521,23 +525,35 @@ $('#exclude-choices').click(function(data){
    if( e1 == c1 ){
     document.getElementById("choice1").style.background = "#fff";
    }
-   if( e2 == c1 ){
-    document.getElementById("choice1").style.background = "#fff";
-   }
    if( e1 == c2 ){
-    document.getElementById("choice2").style.background = "#fff";
-   }
-   if( e2 == c2  ){
     document.getElementById("choice2").style.background = "#fff";
    }
    if( e1 == c3 ){
     document.getElementById("choice3").style.background = "#fff";
    }
-   if( e2 == c3  ){
-    document.getElementById("choice3").style.background = "#fff";
-   }
    if( e1 == c4 ){
     document.getElementById("choice4").style.background = "#fff";
+   }
+   $('#exclude-choice1').hide();
+   $('#exclude-choice2').show();
+});
+
+$('#exclude-choice2').click(function(data){
+   var e2 = "{{excludable_2}}";
+
+   var c1 = "{{choice1}}";
+   var c2 = "{{choice2}}";
+   var c3 = "{{choice3}}";
+   var c4 = "{{choice4}}";
+
+   if( e2 == c1 ){
+    document.getElementById("choice1").style.background = "#fff";
+   }
+   if( e2 == c2  ){
+    document.getElementById("choice2").style.background = "#fff";
+   }
+   if( e2 == c3  ){
+    document.getElementById("choice3").style.background = "#fff";
    }
    if( e2 == c4  ){
     document.getElementById("choice4").style.background = "#fff";

@@ -7,9 +7,12 @@
         <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
         <title>مؤتمر التخصصات الصحية 2020 |
-            {% if invitee.common_profile.gender == 'F' %}أنتِ مدعوة!
-            {% else %}أنت مدعو!
-            {% endif%}</title>
+            {% if inv_exists %}
+                {% if invitee.common_profile.gender == 'F' %}أنتِ مدعوة!
+                {% else %}أنت مدعو!
+                {% endif%}
+            {% endif %}
+        </title>
         <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
         <link rel="icon" href="{% static 'academy/images/logo-black.png' %}">
 
@@ -126,20 +129,28 @@ element.style {
       <div class="row">
       <div class="col-xl-7 ml-auto mr-auto">
         <h1>
-            {% if invitee.username == 'queflies' or invitee.username == 'ajajim' %}
-            د. {{invitee.common_profile.get_ar_short_name}}
-            {% elif invitee.username == 'alewaha' or invitee.username == 'amrl' or invitee.username == 'marzooqh' or invitee.username == 'anazin' or invitee.username == 'alhumaidr' or invitee.username == 'harthio' or invitee.username == 'arjanim' %}
-            أ. {{invitee.common_profile.get_ar_short_name}}
-            {% elif invitee.username == 'elhamalmuzaini' %}
-            أ. إلهام المزيني
-            {% else %}
-            {{invitee.common_profile.get_ar_short_name}}
+            {% if inv_exists %}
+                {% if invitee.username == 'queflies' or invitee.username == 'ajajim' %}
+                د. {{invitee.common_profile.get_ar_short_name}}
+                {% elif invitee.username == 'alewaha' or invitee.username == 'amrl' or invitee.username == 'marzooqh' or invitee.username == 'anazin' or invitee.username == 'alhumaidr' or invitee.username == 'harthio' or invitee.username == 'arjanim' %}
+                أ. {{invitee.common_profile.get_ar_short_name}}
+                {% elif invitee.username == 'elhamalmuzaini' %}
+                أ. إلهام المزيني
+                {% else %}
+                {{invitee.common_profile.get_ar_short_name}}
+                {% endif %}
+            {% elif invitee == '435200963' %}
+                رند السيف
             {% endif %}
         </h1>
         <h2 style="color:#9d0051">
-            {% if invitee.common_profile.gender == 'F' or invitee.username == 'elhamalmuzaini'%}أنتِ مدعوّة!
-            {% else %}أنت مدعوّ!
-            {% endif%}
+            {% if inv_exists %}
+                {% if invitee.common_profile.gender == 'F' or invitee.username == 'elhamalmuzaini'%}أنتِ مدعوّة!
+                {% else %}أنت مدعوّ!
+                {% endif%}
+            {% elif invitee == '435200963' %}
+                أنتِ مدعوّة!
+            {% endif %}
             <br>
         لحضور الحفل الختامي الخاص لتكريم قادة مؤتمر التخصصات الصحية الخامس
         </h2>

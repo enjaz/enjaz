@@ -378,6 +378,11 @@ def show_abstracts_booklet(request, lang):
 
 # invite to ceremony
 def invite_to_ceremony(request, invitee_id):
-    invitee = get_object_or_404(User, username=invitee_id)
-    context = {'invitee': invitee}
+    try:
+        invitee = User.objects.get(username=invitee_id)
+        inv_exists = True
+    except:
+        invitee = invitee_id
+        inv_exists = False
+    context = {'invitee': invitee, 'inv_exists': inv_exists}
     return render(request, 'newhpc/arabic/invite_ceremony.html', context)

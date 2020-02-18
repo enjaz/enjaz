@@ -132,15 +132,34 @@ element.style {
             {% if inv_exists %}
                 {% if invitee.username == 'queflies' or invitee.username == 'ajajim' %}
                 د. {{invitee.common_profile.get_ar_short_name}}
-                {% elif invitee.username == 'alewaha' or invitee.username == 'amrl' or invitee.username == 'marzooqh' or invitee.username == 'anazin' or invitee.username == 'alhumaidr' or invitee.username == 'harthio' or invitee.username == 'arjanim' %}
+                {% elif invitee.username == 'alewaha' or invitee.username == 'amrl' or invitee.username == 'marzooqh' or invitee.username == 'alhumaidr' or invitee.username == 'harthio' or invitee.username == 'arjanim' %}
                 أ. {{invitee.common_profile.get_ar_short_name}}
                 {% elif invitee.username == 'elhamalmuzaini' %}
                 أ. إلهام المزيني
+                {% elif invitee.username == 'ajajim' %}
+                د. مي العجاجي
                 {% else %}
                 {{invitee.common_profile.get_ar_short_name}}
                 {% endif %}
             {% elif invitee == '435200963' %}
                 رند السيف
+            {% elif invitee == 'Arjanim' %}
+            أ. منيرة العرجاني
+            {% elif invitee == 'Ghumaiza' %}
+            Ahmed Al Ghomayz
+            {% elif invitee == 'alkhameesf' %}
+            Fay Alkhamees
+            {% elif invitee == 'hudaithyal' %}
+            Alaa Hudaithy
+            {% elif invitee == 'zeerh' %}
+            Heba Alzeer
+            {% elif invitee == 'sufayanf' %}
+            Fatimah Al Sufayan
+            {% elif invitee == 'Arjanim' %}
+            Moneera Al Arjani
+            {% elif invitee == 'Harbinaj' %}
+            Najla Al Harbi
+
             {% endif %}
         </h1>
         <h2 style="color:#9d0051">
@@ -148,8 +167,10 @@ element.style {
                 {% if invitee.common_profile.gender == 'F' or invitee.username == 'elhamalmuzaini'%}أنتِ مدعوّة!
                 {% else %}أنت مدعوّ!
                 {% endif%}
-            {% elif invitee == '435200963' %}
+            {% elif invitee == '435200963' or invitee == 'Arjanim' or invitee == 'alkhameesf' or invitee == 'hudaithyal' or invitee == 'zeerh' or invitee == 'sufayanf' or invitee == 'Arjanim' or invitee == 'Harbinaj'%}
                 أنتِ مدعوّة!
+            {% elif invitee == 'Ghumaiza' %}
+                أنت مدعوّ!
             {% endif %}
             <br>
         لحضور الحفل الختامي الخاص لتكريم قادة مؤتمر التخصصات الصحية الخامس

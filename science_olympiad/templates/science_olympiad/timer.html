@@ -14,7 +14,7 @@
 
 {% extends 'science_olympiad/base.html' %}{% load static %}
 
-{% block title %}المسابقة العلمية{% endblock %}
+{% block title %}الهاكاثون{% endblock %}
 
 {% block style %}
 
@@ -64,10 +64,11 @@ input#jqcd_reset {
 
 }
 
-.btn.btn-primary:focus, .btn.btn-primary:active, .btn.btn-primary:hover{
+.btn.btn-primary, .btn.btn-primary:focus, .btn.btn-primary:active, .btn.btn-primary:hover{
     font-size:24px;
-    background-color:#cca2d5;
-    border-color:#cca2d5;
+    color: #000;
+    background-color:#6DEDF2;
+    border-color:#6DEDF2;
     align-text:center"
 }
 
@@ -76,15 +77,11 @@ input#jqcd_reset {
 	height: 0;
 	border-left: 25px solid transparent;
 	border-right: 25px solid transparent;
-	border-top: 50px solid #cca2d5;
+	border-top: 50px solid #6DEDF2;
 }
 
 td.the_wheel{
     background-image:url("");
-}
-
-.choice:hover {
-    background: #b0b0b8;
 }
 
 .choice{
@@ -94,20 +91,17 @@ td.the_wheel{
 {% endblock %}
 
 {% block head %}
-    <link rel="stylesheet" href="{% static 'science_olympiad/javascript-winwheel-2.7.0/examples/basic_code_wheel/main.css' %}" type="text/css" />
-    <script type="text/javascript" src="{% static 'science_olympiad/javascript-winwheel-2.7.0/Winwheel.js' %}"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
 {% endblock %}
 
 {% block content %}
 
 <div class="row" align="right">
-    <a href="{% url 'science_olympiad:end_contest' %}">
-        <img style="padding:30px" src="{% static 'science_olympiad/images/sections/icons/contest.png' %}">
-    </a>
+
 </div>
 
-<div class="container" align="center" id="question_section" style="margin-top:-80px;">
+<div class="container" align="center" id="question_section" style="margin-top:50px;">
+    <img src="{% static 'science_olympiad/images/sections/icons/hackathon_title.png' %}">
     <div id="question-text"><h1>{{question.text}}</h1></div>
     <br><br>
     <div class="col-lg-12" style="padding-left:70px">
@@ -119,15 +113,12 @@ td.the_wheel{
     <br><br>
     <div class="col-lg-12">
         <span id="jqcd_count" style="text-align:center; font-size:50px">00:30</span><br><br>
-        <input type="button" class="btn btn-primary" style="width:180px; background-color:#cca2d5; border-color:#cca2d5" id="jqcd_start" value="بدء" onClick="jqcd('start')" />
-        <input type="button" class="btn btn-primary" id="jqcd_stop" value="انتهاء" onClick="jqcd('stop')" />
-        <input type="button" class="btn btn-primary" style="width:140px" id="jqcd_reset" value="إعادة تعيين" onClick="jqcd('reset')" /><br><br>
+        <input type="button" class="btn btn-primary" style="width:180px; background-color:#6DEDF2; border-color:#6DEDF2" id="jqcd_start" value="بدء" onClick="jqcd('start')" />
+        <input type="button" class="btn btn-primary" style="width:180px; background-color:#6DEDF2; border-color:#6DEDF2" id="jqcd_stop" value="انتهاء" onClick="jqcd('stop')" />
+        <input type="button" class="btn btn-primary" style="width:180px; background-color:#6DEDF2; border-color:#6DEDF2" id="jqcd_reset" value="إعادة تعيين" onClick="jqcd('reset')" /><br><br>
         <input type="text" id="jqcd_time" value="00:30" />
     </div>
 </div>
-
-<div id="time_up" style="margin-top:120px; margin-bottom:220px"><h1 style="font-size:80px">انتهى الوقت!</h1></div>
-
 
 
 <br>
@@ -147,21 +138,6 @@ td.the_wheel{
 
 <script type="text/javascript">
 
-function contestDone(data){
-    $('#question_section').hide();
-    $('#time_up').show();
-    $('#next').show();
-    $('#exclude-choice1').hide();
-    $('#exclude-choice2').hide();
-}
-
-$('#show-q').click(function(){
-    $('#wheel_section').hide();
-    $('#exclude-choice1').hide();
-    $('#exclude-choice2').hide();
-    $('#question_section').fadeIn();
-    $('#next').fadeIn();
-});
 
 <!--Start Timer-->
 var jqcd_start_id = 'input#jqcd_start';
@@ -204,15 +180,27 @@ function jqcd(action){
   }
 
   var a =  jqcd_current.split(":");
-  var m = a[0];
-  var s = (a[1] - 1);
+  var h = a[0]
+  var m = a[1];
+  var s = (a[2] - 1);
+
+  if (m < 0) {
+    h = h - 1;
+    m = 59;
+  }
 
   if (s < 0) {
     if (parseInt(m) == 0) {
-      jqcd_updtv(jqcd_start_id, 'بدء');
-      jqcd_status = 'stopped';
-      jqcd_updtt(jqcd_count_id, jqcd_end_message);
-      setTimeout(contestDone, 5000);
+      if (parseInt(h) == 0) {
+          jqcd_updtv(jqcd_start_id, 'بدء');
+          jqcd_status = 'stopped';
+          jqcd_updtt(jqcd_count_id, jqcd_end_message);
+      }
+      else {
+          h = h - 1;
+          m = 59;
+          s = 59;
+      }
     }
     else {
       m = m - 1;
@@ -223,10 +211,11 @@ function jqcd(action){
   if(s >= 0){
     setTimeout(function(){
       if (jqcd_status == 'running') {
+        h = (parseInt(h) < 10)? "0" + parseInt(h): h;
         m = (parseInt(m) < 10)? "0" + parseInt(m): m;
         s = (parseInt(s) < 10)? "0" + parseInt(s): s;
-        jqcd_updtt(jqcd_count_id, m + ":" + s);
-        jqcd_current = m + ":" + s;
+        jqcd_updtt(jqcd_count_id, h + ":" + m + ":" + s);
+        jqcd_current = h + ":" + m + ":" + s;
         jqcd('');
       }
     }, 1000);
@@ -251,16 +240,13 @@ $(document).ready(function() {
   $(jqcd_time_id).keyup(function() {
     jqcd_countdown = $(jqcd_time_id).val();
     jqcd_updtt(jqcd_count_id, jqcd_countdown);
-    jqcd_updtv(jqcd_start_id, 'Start');
+    jqcd_updtv(jqcd_start_id, 'بدء');
     jqcd_status = 'stopped';
   });
 });
 <!--End Timer-->
 
-$('#time_up').hide();
 $(jqcd_time)
-$(jqcd_stop).hide()
-$(jqcd_reset).hide()
 
 
 

@@ -1,0 +1,271 @@
+<!--
+ =========================================================
+ * Material Kit - v2.0.6
+ =========================================================
+
+ * Product Page: https://www.creative-tim.com/product/material-kit
+ * Copyright 2019 Creative Tim (http://www.creative-tim.com)
+   Licensed under MIT (https://github.com/creativetimofficial/material-kit/blob/master/LICENSE.md)
+
+
+ =========================================================
+
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. -->
+
+{% extends 'science_olympiad/base.html' %}{% load static %}
+
+{% block title %}المسابقة العلمية{% endblock %}
+
+{% block style %}
+
+body{
+    text-align: center;
+    background-image: url("{% static 'science_olympiad/images/bg_uni.png' %}");
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Do not repeat the image */
+    background-size: cover; /* Resize the background image to cover the entire container */
+
+}
+
+
+.header-filter::before {
+    background: rgba(0, 0, 0, 0);
+}
+
+.profile-page .profile img{
+  max-width: 200px;
+}
+
+<!--Counter CSS-->
+span#jqcd_count {
+  font-size: 20pt;
+  font-weight: bold;
+}
+input#jqcd_start,
+input#jqcd_stop,
+input#jqcd_reset {
+  font-size: 12pt;
+  font-weight: bold;
+}
+input#jqcd_start,
+input#jqcd_stop,
+input#jqcd_reset {
+  width: 100px;
+}
+
+<!--span#jqcd_count {-->
+  <!--font-family: "Lucida Console", Monaco, "Courier New", Courier, monospace !IMPORTANT;-->
+<!--}-->
+<!--End of Counter CSS-->
+
+.rectangle {
+  width: 15px;
+  background-color: #284;
+
+}
+
+.btn.btn-primary:focus, .btn.btn-primary:active, .btn.btn-primary:hover{
+    font-size:24px;
+    background-color:#cca2d5;
+    border-color:#cca2d5;
+    align-text:center"
+}
+
+.triangle-down {
+	width: 0;
+	height: 0;
+	border-left: 25px solid transparent;
+	border-right: 25px solid transparent;
+	border-top: 50px solid #cca2d5;
+}
+
+td.the_wheel{
+    background-image:url("");
+}
+
+.choice:hover {
+    background: #b0b0b8;
+}
+
+.choice{
+    font-size:35px;
+}
+
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'science_olympiad/javascript-winwheel-2.7.0/examples/basic_code_wheel/main.css' %}" type="text/css" />
+    <script type="text/javascript" src="{% static 'science_olympiad/javascript-winwheel-2.7.0/Winwheel.js' %}"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="row" align="right">
+    <a href="{% url 'science_olympiad:end_contest' %}">
+        <img style="padding:30px" src="{% static 'science_olympiad/images/sections/icons/contest.png' %}">
+    </a>
+</div>
+
+<div class="container" align="center" id="question_section" style="margin-top:-80px;">
+    <div id="question-text"><h1>{{question.text}}</h1></div>
+    <br><br>
+    <div class="col-lg-12" style="padding-left:70px">
+        <div></div>
+        <div class="row" align="rtl">
+
+        </div>
+    </div>
+    <br><br>
+    <div class="col-lg-12">
+        <span id="jqcd_count" style="text-align:center; font-size:50px">00:30</span><br><br>
+        <input type="button" class="btn btn-primary" style="width:180px; background-color:#cca2d5; border-color:#cca2d5" id="jqcd_start" value="بدء" onClick="jqcd('start')" />
+        <input type="button" class="btn btn-primary" id="jqcd_stop" value="انتهاء" onClick="jqcd('stop')" />
+        <input type="button" class="btn btn-primary" style="width:140px" id="jqcd_reset" value="إعادة تعيين" onClick="jqcd('reset')" /><br><br>
+        <input type="text" id="jqcd_time" value="00:30" />
+    </div>
+</div>
+
+<div id="time_up" style="margin-top:120px; margin-bottom:220px"><h1 style="font-size:80px">انتهى الوقت!</h1></div>
+
+
+
+<br>
+
+{% endblock %}
+
+{% block footer %}
+    <div class="container" align="left">
+        <img src="{% static 'science_olympiad/images/logo_white.png' %}" style="height:100px">
+        <img src="{% static 'science_olympiad/images/ta_logo_white.png' %}" style="height:80px; padding-left:20px">
+        <img src="{% static 'science_olympiad/images/sc_logo_white.png' %}" style="height:80px; padding-left:20px">
+        <img src="{% static 'science_olympiad/images/uni_logo_white.png' %}" style="height:80px">
+    </div>
+{% endblock %}
+
+{% block customscript %}
+
+<script type="text/javascript">
+
+function contestDone(data){
+    $('#question_section').hide();
+    $('#time_up').show();
+    $('#next').show();
+    $('#exclude-choice1').hide();
+    $('#exclude-choice2').hide();
+}
+
+$('#show-q').click(function(){
+    $('#wheel_section').hide();
+    $('#exclude-choice1').hide();
+    $('#exclude-choice2').hide();
+    $('#question_section').fadeIn();
+    $('#next').fadeIn();
+});
+
+<!--Start Timer-->
+var jqcd_start_id = 'input#jqcd_start';
+var jqcd_time_id = 'input#jqcd_time';
+var jqcd_count_id = 'span#jqcd_count';
+var jqcd_end_message = 'انتهى الوقت!';
+
+var jqcd_countdown = '';
+var jqcd_status = 'stopped';
+var jqcd_current = '';
+function jqcd(action){
+  if (action == 'start') {
+    if (jqcd_status == 'stopped') {
+      jqcd_updtv(jqcd_start_id, 'إيقاف');
+      jqcd_status = 'running';
+      jqcd_current = jqcd_countdown;
+      jqcd_updtt(jqcd_count_id, jqcd_countdown);
+    }
+    else if (jqcd_status == 'running') {
+      jqcd_updtv(jqcd_start_id, ' استئناف ');
+      jqcd_status = 'paused';
+      $('#exclude-choice1').show();
+      $('#exclude-choice2').hide();
+    }
+    else if (jqcd_status == 'paused') {
+      jqcd_updtv(jqcd_start_id, 'إيقاف');
+      jqcd_status = 'running';
+    }
+  }
+  else if (action == 'stop') {
+    jqcd_updtv(jqcd_start_id, 'بدء');
+    jqcd_status = 'stopped';
+    jqcd_updtt(jqcd_count_id, jqcd_end_message);
+    contestDone();
+  }
+  else if (action == 'reset') {
+    jqcd_updtv(jqcd_start_id, 'بدء');
+    jqcd_status = 'stopped';
+    jqcd_updtt(jqcd_count_id, jqcd_countdown);
+  }
+
+  var a =  jqcd_current.split(":");
+  var m = a[0];
+  var s = (a[1] - 1);
+
+  if (s < 0) {
+    if (parseInt(m) == 0) {
+      jqcd_updtv(jqcd_start_id, 'بدء');
+      jqcd_status = 'stopped';
+      jqcd_updtt(jqcd_count_id, jqcd_end_message);
+      setTimeout(contestDone, 5000);
+    }
+    else {
+      m = m - 1;
+      s = 59;
+    }
+  }
+
+  if(s >= 0){
+    setTimeout(function(){
+      if (jqcd_status == 'running') {
+        m = (parseInt(m) < 10)? "0" + parseInt(m): m;
+        s = (parseInt(s) < 10)? "0" + parseInt(s): s;
+        jqcd_updtt(jqcd_count_id, m + ":" + s);
+        jqcd_current = m + ":" + s;
+        jqcd('');
+      }
+    }, 1000);
+  }
+}
+
+function jqcd_updtv(selector, value) {
+  if (selector != '') {
+    $(selector).val(value);
+  }
+}
+function jqcd_updtt(selector, value) {
+  if (selector != '') {
+    $(selector).text(value);
+  }
+}
+
+$(document).ready(function() {
+  jqcd_countdown = $(jqcd_time_id).val();
+  jqcd_updtt(jqcd_count_id, jqcd_countdown);
+
+  $(jqcd_time_id).keyup(function() {
+    jqcd_countdown = $(jqcd_time_id).val();
+    jqcd_updtt(jqcd_count_id, jqcd_countdown);
+    jqcd_updtv(jqcd_start_id, 'Start');
+    jqcd_status = 'stopped';
+  });
+});
+<!--End Timer-->
+
+$('#time_up').hide();
+$(jqcd_time)
+$(jqcd_stop).hide()
+$(jqcd_reset).hide()
+
+
+
+</script>
+
+{% endblock %}
+
+

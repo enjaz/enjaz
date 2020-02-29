@@ -120,3 +120,6 @@ def show_question(request, contest_id, question_id):
                'next_question_id':next_question_id, 'answer':answer,
                'excludable_1':excludable_1, 'excludable_2':excludable_2}
     return render(request, 'science_olympiad/show_question.html', context)
+
+def timer(request):
+    return render(request, 'science_olympiad/timer.html')

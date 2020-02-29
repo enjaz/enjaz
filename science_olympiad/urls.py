@@ -20,4 +20,8 @@ urlpatterns = [
     url(r'^contest/test_wheel/$', views.test_wheel, name='test_wheel'),
 
     url(r'^contest/(?P<contest_id>\d+)/question/(?P<question_id>\d+)/$', views.show_question, name='show_question'),
+
+    url(r'^timer/$', views.timer, name='timer'),
+
 ]
+

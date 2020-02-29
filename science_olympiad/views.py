@@ -1,10 +1,14 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Inventor, Contest, ContestQuestion, ContestAnswer
+from django.shortcuts import render
+from .models import Inventor
 from .forms import InventorForm
 
 
 def index(request):
     return render(request, 'science_olympiad/index.html')
+
+def timer(request):
+    return render(request, 'science_olympiad/timer.html')
+
 
 def view_form(request):
     return render(request, 'science_olympiad/view_form.html')

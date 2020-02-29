@@ -64,4 +64,3 @@ urlpatterns = [
     url(r'^(?P<event_city>[\d\w_\-]+)/general/register$', views.register_general_program, name="register_general_program"),
 
 ]
-

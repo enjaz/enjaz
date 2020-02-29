@@ -1,0 +1,74 @@
+{% extends 'newhpc/english/jed_english_base.html'%} {% load staticfiles %}
+{% block title %}About | HPC2020 Jeddah{% endblock %}
+
+{% block lang %}{% url 'newhpc:jed_about' 'ar' %}{% endblock %}
+{% block lang2 %}
+{% url 'newhpc:jed_about' 'ar' %}
+{% endblock %}
+
+{% block active_about %}
+c-active
+{% endblock %}
+
+{% block content %}
+    <div class="c-layout-page">
+<div align="center" style="padding-bottom:200px">
+
+    <div style="padding-top:60px; padding-bottom:30px; font-size:44px; color:#000000 !important" class="c-center c-font-uppercase c-font-white c-font-bold">About HPC</div>
+
+    <div class="row" style="width:80%;"><h1>Health Professions Conference (HPC) 2020 is held<br>at King Saud bin Abdulaziz University for Health Sciences</h1></div>
+
+    <div class="row">
+    <div class="col-xs-12"><img width="350px" style="margin:50px" src="{% static 'newhpc/images/logos/KSAUHS.png' %}">
+    </div></div>
+
+    <div class="row" style="width:80%"><h2 style="font-weight:bold">Under the supervision of the Deanship of Student Affairs</h2></div>
+    <div class="row">
+    <div class="col-xs-12"><img width="350px" src="{% static 'newhpc/images/logos/student_club.png' %}">
+    </div></div>
+<div class="row">
+    <div class="col-xs-6"><img width="40%" src="{% static 'newhpc/images/people/Dr. Suliman eye.png' %}">
+    <br><div style="font-weight:700; margin-bottom:-20px">Dr. Sulaiman Al Queflie</div><br>Dean of Student Affairs</div>
+    <div class="col-xs-6"><img width="40%" src="{% static 'newhpc/images/people/Dr. Bader eye.png' %}">
+    <br><div style="font-weight:700; margin-bottom:-20px">Dr. Bader Al Muqbil</div><br>Associate Dean of Student Affairs</div>
+</div>
+<br><br><br>
+<!--<div class="row">-->
+    <!--<div class="col-xs-6"><img width="40%" src="{% static 'newhpc/images/people/Abdulelah eye.png' %}">-->
+    <!--<br><div style="font-weight:700; margin-bottom:-20px">Mr. Abdulelah Alolaywah</div><br>Student Affairs Officer I</div>-->
+    <!--<div class="col-xs-6"><img width="40%" src="{% static 'newhpc/images/people/Female eye.png' %}">-->
+    <!--<br><div style="font-weight:700; margin-bottom:-20px">Ms. Lama Alamr</div><br>Administrative Assistant III</div>-->
+<!--</div>-->
+<!--<br><br><br>-->
+    <div class="row"><h2 style="font-weight:bold">HPC 2020 is led by</h2></div>
+<br>
+<div class="row">
+    <div class="col-xs-4"><img width="60%" src="{% static 'newhpc/images/people/Nawaf Eye.png' %}">
+    <br><div style="font-weight:700; margin-bottom:-20px">Nawaf Alghamdi</div><br>Chief Director of HPC 2020</div>
+    <div class="col-xs-4"><img width="60%" src="{% static 'newhpc/images/people/Female eye.png' %}">
+    <br><div style="font-weight:700; margin-bottom:-20px">Lina Alsaadon</div><br>Chief Director of HPC 2020</div>
+    <div class="col-xs-4"><img width="60%" src="{% static 'newhpc/images/people/Female eye.png' %}">
+    <br><div style="font-weight:700; margin-bottom:-20px">Manar Almutairi</div><br>Vice Director of HPC 2020</div>
+</div>
+<br><br><br>
+    <div class="row"><h2 style="font-weight:bold">HPC Structure</h2></div>
+    <br>
+    <div class="col-xs-12"><img width="60%" src="{% static 'newhpc/images/logos/structure.png' %}"></div>
+<br>
+    <div class="row" style="width:80%; padding-top:30px"><h2 style="font-weight:bold">The website was developed and maintained in association with Enjaz Portal by the technical support team of HPC 2020 which is led by</h2></div>
+<br>
+<div class="row">
+<div class="col-xs-6"><img width="40%" src="{% static 'newhpc/images/people/Abdlurahman eye.png' %}">
+    <br><div style="font-weight:700; margin-bottom:-20px">Abdulrahman AlQumayzi</div><br>Technical Support Team Leader</div>
+    <div class="col-xs-6"><img width="40%" src="{% static 'newhpc/images/people/Female eye.png' %}">
+    <br><div style="font-weight:700; margin-bottom:-20px">Saleha Alkhairy</div><br>Technical Support Team Leader</div>
+</div>
+<br>
+    <div class="row"><h2 style="font-weight:bold">Under the supervision of</h2></div>
+<br>
+<div class="col-xs-12"><img width="20%" src="{% static 'newhpc/images/people/Female eye.png' %}">
+<br><div style="font-weight:700; margin-bottom:-20px">Zaha Jamaan</div><br>Leader of Enjaz Portal</div>
+<br><br>
+</div>
+    </div>
+{% endblock %}

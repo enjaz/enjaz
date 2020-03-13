@@ -190,6 +190,8 @@ def invite_to_ceremony(request, theme, invitee_id):
                 'invitee': invitee}
     return render(request, 'academy/invite_ceremony.html', context)
 
+def show_recording(request, course_name, course_version, session_id)
+
 # TODO: Work on the form: form-builder vs fobi-forms , who will prevail?
 
 # @login_required

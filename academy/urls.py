@@ -29,6 +29,7 @@ urlpatterns = [
         views.show_workshop, name='show_workshop'),
     url(r'^(?P<theme>\w+)/invite/(?P<invitee_id>\w+)/$',views.invite_to_ceremony,
         name='invite_to_ceremony'),
+    url(r'^(?P<recordings>\w+)/$',views.show_recording(), name='show_recording')
 ]
 
 # #delete these when fobi works -soon hopefully >_< -

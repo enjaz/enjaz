@@ -29,7 +29,7 @@ a{
     <div class="profile-content">
       <div class="container">
         <div class="row">
-          <div class="col-md-6 ml-auto mr-auto">
+          <div class="col-md-8 ml-auto mr-auto">
             <div class="profile">
               <div class="avatar">
                   {% if subcourse.logo %}
@@ -56,6 +56,21 @@ a{
 
 <br><br>
 
+          <div class="row">
+          <div class="col-md-6 ml-auto mr-auto">
+              <ul class="nav nav-justified" role="tablist">
+                {% if recorded_session.attachment %}
+                <li class="nav-item">
+                    <i class="material-icons" style="font-size:2em">description</i>
+                    <a  class="nav-link" target="_blank" href="{{ recorded_session.attachment.url }}">
+                        ملف مرفق للجلسة التدريبية
+                    </a>
+                </li>
+                {% endif %}
+              </ul>
+          </div>
+          </div>
+<br><br><br><br>
           </div>
       </div>
       </div>

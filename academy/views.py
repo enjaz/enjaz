@@ -190,6 +190,29 @@ def invite_to_ceremony(request, theme, invitee_id):
                 'invitee': invitee}
     return render(request, 'academy/invite_ceremony.html', context)
 
+def show_recording(request, course_name, batch_no, session_no):
+    for code, name in course_codes:
+        if name == course_name:
+            course_code = code
+            break
+        else:
+            continue
+    parent_course = get_object_or_404(Course, code=course_code)
+    context = {'course_name': course_name,
+               'parent_course': parent_course,}
+    try:
+        subcourse = parent_course.subcourse_set.get(batch_no=batch_no)
+        context['subcourse'] = subcourse
+    except ObjectDoesNotExist:
+        raise Http404
+    try:
+        recorded_session = subcourse.recorded_session.get(number=session_no)
+        context['recorded_session'] = recorded_session
+    except ObjectDoesNotExist:
+        raise Http404
+
+    return render(request, 'academy/show_recorded_session.html', context)
+
 # TODO: Work on the form: form-builder vs fobi-forms , who will prevail?
 
 # @login_required

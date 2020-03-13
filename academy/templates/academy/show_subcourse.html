@@ -101,6 +101,12 @@ a{
                             {% endfor %}
                         {% endfor %}
                 </ul>
+            <h3><i class="material-icons">video_library</i>  تسجيلات الجلسات</h3>
+                <ul>
+                        {% for session in subcourse.recorded_session.all %}
+                            <li><a href="{% url 'academy:show_recorded_session' course_name subcourse.batch_no session.number %}">{{ session.number }}: {{ session.title}}</a></li>
+                        {% endfor %}
+                </ul>
         </div>
 
         <ul class="nav nav-justified" style="padding-right:0px" role="tablist">

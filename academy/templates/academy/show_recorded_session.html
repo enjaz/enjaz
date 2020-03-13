@@ -1,0 +1,67 @@
+{% extends 'academy/base.html' %}{% load staticfiles %}
+{% block style %}
+.header-filter::before {
+    background: rgba(0, 0, 0, 0);
+}
+a{
+    color: #3C4858;
+}
+.nav-item:hover,a:hover{
+    color: {{subcourse.hex_colour}};
+}
+
+{% endblock %}
+{% block title %}جلسة رقم {{recorded_session.number}} {{ parent_course.name }}{% endblock %}
+{% block navbar %}
+    <li class="dropdown nav-item">
+      <a style="font-size:16px" href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">تسجيلات الجلسات</a>
+      <div class="dropdown-menu">
+      {% for session in subcourse.recorded_session.all %}
+            <div class="text-center"><a href="{% url 'academy:show_recorded_session' course_name subcourse.batch_no session.number %}" class="nav-link">الجلسة رقم {{session.number}}</a></div>
+      {% endfor %}
+      </div>
+    </li>
+{% endblock %}
+{% block content %}
+<div class="profile-page sidebar-collapse">
+  <div class="page-header header-filter" data-parallax="true" style=" {% if subcourse.background %} background-image: url({{ subcourse.background.url}}) {% endif %}; background-color:#000000 "></div>
+  <div class="main main-raised">
+    <div class="profile-content">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 ml-auto mr-auto">
+            <div class="profile">
+              <div class="avatar">
+                  {% if subcourse.logo %}
+                  <img style="background-color:#fff; padding:15px" src="{{ subcourse.logo.url}}" class="img-raised img-thumbnail img-fluid">
+                  {% endif %}
+              </div>
+              <div class="name">
+                <h3 class="title">{{ subcourse.official_name }}</h3>
+                <h3 class="title">تسجيل جلسة رقم {{recorded_session.number}}</h3>
+                <br><br>
+                {% if recorded_session.title %}
+                <h3>عنوان الجلسة: {{recorded_session.title}}</h3>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="description text-center">
+            <video width="100%" controls>
+              <source src="{{ recorded_session.recording.url }}" type="video/mp4">
+            </video>
+        </div>
+
+<br><br>
+
+          </div>
+      </div>
+      </div>
+</div>
+
+{% endblock %}
+
+{% block customscript %}
+{% endblock %}

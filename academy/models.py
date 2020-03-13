@@ -209,6 +209,20 @@ class NewStudent(models.Model):
     def __unicode__(self):
         return self.user.common_profile.get_ar_short_name()
 
+class RecordedSession(models.Model):
+    subcourse = models.ForeignKey(SubCourse, verbose_name=u"الدورة", related_name='recorded_session')
+    title = models.CharField(u'عنوان الجلسة ', max_length=200, blank=True, null=True)
+    number = models.CharField(u'رقم الجلسة', max_length=9, blank=True, null=True)
+    recording = models.FileField(verbose_name=u'تسجيل الجلسة', upload_to="academy/session_recordings",blank=True, null=True)
+    attachment = models.FileField(verbose_name=u'ملف مرفق', upload_to="academy/session_attachments",blank=True, null=True)
+
+    class Meta:
+        verbose_name = u"تسجيل جلسة"
+        verbose_name_plural = u"تسجيلات الجلسات"
+
+    def __unicode__(self):
+        return "تسجيل جلسة رقم " + self.number + " ل" + self.subcourse.official_name
+
 # for temporary convenience
 class IndexBG(models.Model):
     img = models.FileField(u'الصورة ', null=True, blank=True)

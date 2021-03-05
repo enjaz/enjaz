@@ -47,6 +47,15 @@
 	</div>
 </div>
 <br>
+<div class="panel minimal minimal-gray">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<h2>الترشيحات الطلابية للسنة الأكاديمية 2021-2022</h2>
+			<a href="{% url 'trabdportal:add_nominee' %}" style="color:red">فتح باب الترشح. ترشّحـ/ـي من هنا!</a>
+		</div>
+	</div>
+</div>
+<br>
 {% if user.event_abstracts.exists %}
 <div class="panel minimal minimal-gray">
 	<div class="panel-heading">

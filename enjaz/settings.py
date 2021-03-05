@@ -79,6 +79,7 @@ INSTALLED_APPS = (
     'userena',
     'wkhtmltopdf',
     'newhpc',
+    'trabd_temp',
 )
 
 MIDDLEWARE_CLASSES = (

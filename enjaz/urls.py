@@ -85,6 +85,8 @@ urlpatterns = [
     url(r'^academy/', include('academy.urls', namespace="academy")),
 
     url(r'^science_olympiad/', include('science_olympiad.urls', namespace="science_olympiad")),
+
+    url(r'^trabdportal/', include('trabd_temp.urls', namespace="trabdportal")),
 ]
 
 if settings.DEBUG:

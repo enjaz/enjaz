@@ -1,0 +1,422 @@
+<!DOCTYPE html>{% load staticfiles %}
+<html lang="ar" dir="rtl">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>بوابة ترابط | {% block title %}{% endblock %}</title>
+
+        <link href="{% static 'images/logos/icon.png' %}" rel="icon"/>
+
+        <!-- Start Global Mandatory Style
+        =====================================================================-->
+        <!-- jquery-ui css -->
+        <link href="{% static 'bdtask/assets/plugins/jquery-ui-1.12.1/jquery-ui.min.css' %}" rel="stylesheet" type="text/css"/>
+        <!-- Bootstrap -->
+        <link href="{% static 'bdtask/assets/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css"/>
+        <!-- Bootstrap rtl -->
+        <link href="{% static 'bdtask/assets/bootstrap-rtl/bootstrap-rtl.min.css' %}" rel="stylesheet" type="text/css"/>
+        <!-- Lobipanel css -->
+        <link href="{% static 'bdtask/assets/plugins/lobipanel/lobipanel.min.css' %}" rel="stylesheet" type="text/css"/>
+        <!-- Pace css -->
+        <link href="{% static 'bdtask/assets/plugins/pace/flash.css' %}" rel="stylesheet" type="text/css"/>
+        <!-- Font Awesome -->
+        <link href="{% static 'bdtask/assets/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css"/>
+        <!-- Pe-icon -->
+        <link href="{% static 'bdtask/assets/pe-icon-7-stroke/css/pe-icon-7-stroke.css' %}" rel="stylesheet" type="text/css"/>
+        <!-- Themify icons -->
+        <link href="{% static 'bdtask/assets/themify-icons/themify-icons.css' %}" rel="stylesheet" type="text/css"/>
+        <!-- End Global Mandatory Style
+        =====================================================================-->
+        <!-- Start page Label Plugins 
+        =====================================================================-->
+        <!-- Toastr css -->
+        <link href="{% static 'bdtask/assets/plugins/toastr/toastr.css' %}" rel="stylesheet" type="text/css"/>
+        <!-- Emojionearea -->
+        <link href="{% static 'bdtask/assets/plugins/emojionearea/emojionearea.min.css' %}" rel="stylesheet" type="text/css"/>
+        <!-- Monthly css -->
+        <link href="{% static 'bdtask/assets/plugins/monthly/monthly.css' %}" rel="stylesheet" type="text/css"/>
+        <!-- End page Label Plugins 
+        =====================================================================-->
+        <!-- Start Theme Layout Style
+        =====================================================================-->
+        <!-- Theme style -->
+        <link href="{% static 'bdtask/assets/dist/css/styleBD.css' %}" rel="stylesheet" type="text/css"/>
+        <!-- Theme style rtl -->
+        <link href="{% static 'bdtask/assets/dist/css/styleBD-rtl.css' %}" rel="stylesheet" type="text/css"/>
+        <!-- End Theme Layout Style
+        =====================================================================-->
+        <!-- Flot - jquery plugin -->
+        <link href="{% static 'bdtask/assets/plugins/flot/jquery.flot.min.js' %}" rel="stylesheet" type="text/css"/>
+<style>
+@font-face {
+    font-family: 'GE Dinar One';
+    font-weight: lighter;
+    font-size: xx-large;
+    src: url("{% static 'fonts/ge-dinar-one-light.woff' %}");
+}
+@font-face {
+    font-family: 'GE Dinar One';
+    font-weight: normal;
+    src: url("{% static 'fonts/ge-dinar-one-med.woff' %}");
+}
+
+body, h1, h2, h3, .info, .main-sidebar{
+    font-family: 'GE Dinar One';
+}
+
+.user-panel .info p, .sidebar-menu > li > a{
+ letter-spacing: 0;
+}
+
+footer a{
+ color: inherit;
+}
+
+</style>
+
+{% if request.get_host == 'trabdportal.com' or request.get_host == 'www.trabdportal.com' %}
+<!-- Piwik -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  {% if user.is_authenticated %}
+  _paq.push(['setUserId', '{{ user.username }}']);
+  {% endif %}
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//trabdportal.com/piwik/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', '1']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Piwik Code -->
+{% endif %}
+    </head>
+    <body class="hold-transition sidebar-mini">
+        <!-- Site wrapper -->
+        <div class="wrapper">
+            <header class="main-header"> 
+                <a href="{% url 'home' %}" class="logo"> <!-- Logo -->
+                    <span class="logo-mini">
+                        <!--<b>A</b>BD-->
+                        <img src="{% static 'images/logos/logo-no-text.png' %}" alt="">
+                    </span>
+                    <span class="logo-lg">
+                        <!--<b>Admin</b>BD-->
+                        <img src="{% static 'images/logos/logo-no-text.png' %}" alt="">
+                    </span>
+                </a>
+                <!-- Header Navbar -->
+                <nav class="navbar navbar-static-top">
+                    <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button"> <!-- Sidebar toggle button-->
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="pe-7s-keypad"></span>
+                    </a>
+
+                    <div class="navbar-custom-menu">
+                        <ul class="nav navbar-nav">
+                            <!-- settings -->
+                            <li class="dropdown dropdown-user">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown"> <i class="pe-7s-settings"></i></a>
+                                <ul class="dropdown-menu">
+                                    {% if user.is_authenticated %}
+                                    <li><a href="{% url 'loginas-logout' %}"><i class="pe-7s-key"></i> أخرجني</a></li>
+                                    {% else %}
+                                    <li><a href="{% url 'userena_signin' %}"><i class="pe-7s-key"></i> أدخلني</a></li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+            <!-- =============================================== -->
+            <!-- Left side column. contains the sidebar -->
+            <aside class="main-sidebar">
+                <!-- sidebar -->
+                <div class="sidebar">
+                    <!-- Sidebar user panel -->
+                    {% if user.is_authenticated %}
+                    <div class="user-panel text-center">
+                        <div class="info">
+                            <p>أهلا، {{ user.profile.ar_first_name|default:user.username }}!</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <!-- sidebar menu -->
+                    <ul class="sidebar-menu">
+                        {% if not user.is_authenticated %}
+                        <li class="treeview">
+                           <a href="{% url 'userena_signin' %}"><i class="pe-7s-key"></i> أدخلني</a>
+                        </li>
+                        {% endif %}
+                        <li class="active">
+                            <a href="{% url 'home' %}"><i class="ti-home"></i> <span>الرئيسية</span>
+                            </a>
+                        </li>
+
+
+                        <li class="treeview">
+                            <a href="{% url 'show_page' 'about' %}"><i class="ti-info"></i> <span>عن المجلس</span></a>
+                        </li>
+
+                        <li class="treeview">
+                            <a href="{% url 'show_page' 'structure' %}"><i class="ti-view-grid"></i> <span></span>الهيكلة</a>
+                        </li>
+
+                        <li class="treeview">
+                            <a href="{% url 'show_page' 'list' %}"><i class="ti-list"></i> <span>اللائحة</span></a>
+                        </li>
+
+                        <li class="treeview">
+                            <a href="{% url 'list_news' %}"><i class="ti-announcement"></i> <span>الأخبار</span></a>
+                        </li>
+
+                        <li class="treeview">
+                            <a href="">
+                                <i class="ti-star"></i> <span>الترشيحات الطلابية</span>
+                                <ul class="treeview-menu">
+
+                                    <li class="treeview">
+                                    <a href="{% url 'show_page' 'nom_about' %}"><i class=""></i> <span>عن الترشيحات الطلابية</span></a>
+                                    </li>
+
+                                    <li class="treeview">
+                                    <a href="{% url 'show_page' 'nom_conditions' %}"><i class=""></i> <span>شروط الترشّح</span></a>
+                                    </li>
+
+                                    {% if not sac_year.is_nomination_open %}
+                                    <a>
+                                        <i class="ti-receipt"></i> <span>تقديم ترشّح</span>
+                                        <span class="pull-right-container">
+                                            {% if sac_year.is_nomination_near %}
+                                            <small class="label pull-right bg-red">سيفتح باب الترشح قريبًا</small>
+                                            {% else %}
+                                            <small class="label pull-right bg-red">انتهى الترشح</small>
+                                            {% endif %}
+                                        </span>
+                                    </a>
+                                    {% else %}
+                                    <li class="treeview-menu">
+                                        <a href="#">
+                                            <i class="ti-receipt"></i> <span>تقديم ترشّح</span>
+                                            <span class="pull-right-container">
+                                                <i style="transform: none;" class="fa fa-angle-left pull-right"></i>
+                                            </span>
+
+                                        </a>
+                                        <li class="treeview-menu">
+                                                <li>
+                                                   <a href="{% url 'voting:list_positions' 'club' %}">ترشيحات نادي الطلاب</a>
+                                                </li>
+                                                <li>
+                                                  <a href="{% url 'voting:list_positions' 'council' %}">ترشيحات المجلس الاستشاري</a>
+                                                </li>
+                                        </li>
+                                    </li>
+                                    {% endif %}
+
+
+                                    {% if sac_year.has_voting_closed %}
+                                    <li class="treeview">
+                                        <a href="#">
+                                            <i class="ti-medall"></i> <span>ترشيّحات انتخابات {{ sac_year }}</span>
+                                            <span class="pull-right-container">
+                                                <i style="transform: none;" class="fa fa-angle-left pull-right"></i>
+                                            </span>
+
+                                        </a>
+                                        <ul class="treeview-menu">
+                                            <li>
+                                               <a href="{% url 'voting:announce_nominees' 'club' %}">ترشيحات نادي الطلاب</a>
+                                            </li>
+                                            <li>
+                                              <a href="{% url 'voting:announce_nominees' 'council' %}">ترشيحات المجلس الاستشاري</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    {% endif %}
+                                    <li class="treeview">
+                                        <a {% if sac_year.is_voting_open %}href="{% url 'voting:show_voting_index' %}"{% else %}{% endif %}>
+                                            <i class="ti-pencil-alt"></i> <span>التصويت!</span>
+
+                                                    <span class="pull-right-container">
+                                                       {% if sac_year.is_voting_open %}
+                                                        <small class="label pull-right bg-green">بدأ التصويت!</small>
+                                                       {% elif sac_year.has_voting_closed %}
+                                                        <small class="label pull-right bg-red">انتهى التصويت!</small>
+                                                       {% elif not sac_year.has_voting_started %}
+                                                        <small class="label pull-right bg-red">لم يبدأ بعد!</small>
+                                                       {% endif %}
+                                                    </span>
+                                        </a>
+                                    </li>
+                                    {% if request.user.is_superuser %}
+                                    <li class="treeview">
+                                        <a href="{% url 'voting:indicators' %}">
+                                            <i class="ti-stats-up"></i> <span>مؤشرات التصويت</span>
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </a>
+                        </li>
+
+                        <li class="treeview">
+                            <a href="{% url 'add_feedback' %}"><i class="ti-thought"></i> <span>المقترحات والملاحظات</span></a>
+                        </li>
+
+                    </ul>
+
+
+
+
+
+                            <!-------- OLD ORGANIZATIONAL CODE
+
+
+                                {% if not sac_year.is_nomination_open %}
+                        <li class="treeview">
+                            <a>
+                                <i class="ti-receipt"></i> <span>تقديم ترشّح</span>
+                                <span class="pull-right-container">
+                                    <small class="label pull-right bg-red">انتهى الترشح</small>
+                                </span>
+                            </a>
+                                {% else %}  
+                        <li class="treeview">
+                            <a href="#">
+                                <i class="ti-receipt"></i> <span>تقديم ترشّح</span>       
+                                <span class="pull-right-container">
+                                    <i style="transform: none;" class="fa fa-angle-left pull-right"></i>
+                                </span>
+
+                            </a>
+                            <ul class="treeview-menu">
+                                <li>
+                                   <a href="{% url 'voting:list_positions' 'club' %}">ترشيحات نادي الطلاب</a>
+                                </li>
+                                <li>
+                                  <a href="{% url 'voting:list_positions' 'council' %}">ترشيحات المجلس الاستشاري</a>
+                                </li>
+                            </ul>
+                                {% endif %}
+                        </li>
+                        {% if sac_year.has_voting_closed %}
+                        <li class="treeview">
+                            <a href="#">
+                                <i class="ti-medall"></i> <span>ترشيّحات انتخابات {{ sac_year }}</span>       
+                                <span class="pull-right-container">
+                                    <i style="transform: none;" class="fa fa-angle-left pull-right"></i>
+                                </span>
+
+                            </a>
+                            <ul class="treeview-menu">
+                                <li>
+                                   <a href="{% url 'voting:announce_nominees' 'club' %}">ترشيحات نادي الطلاب</a>
+                                </li>
+                                <li>
+                                  <a href="{% url 'voting:announce_nominees' 'council' %}">ترشيحات المجلس الاستشاري</a>
+                                </li>
+                            </ul>
+                        </li>
+                        {% endif %}
+                        <li class="treeview">
+                            <a {% if sac_year.is_voting_open %}href="{% url 'voting:show_voting_index' %}"{% else %}{% endif %}>
+                                <i class="ti-pencil-alt"></i> <span>التصويت!</span>
+
+                                        <span class="pull-right-container">
+                                           {% if sac_year.is_voting_open %}
+                                            <small class="label pull-right bg-green">بدأ التصويت!</small>
+                                           {% elif sac_year.has_voting_closed %}
+                                            <small class="label pull-right bg-red">انتهى التصويت!</small>
+                                           {% elif not sac_year.has_voting_started %}
+                                            <small class="label pull-right bg-red">لم يبدأ بعد!</small>
+                                           {% endif %}
+                                        </span>
+                            </a>
+                        </li>
+                        {% if request.user.is_superuser %}
+                        <li class="treeview">
+                            <a href="{% url 'voting:indicators' %}">
+                                <i class="ti-stats-up"></i> <span>مؤشرات التصويت</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul> ------------------------------ END OF OLD CODE -->
+                </div> <!-- /.sidebar -->
+            </aside>
+            <!-- =============================================== -->
+            <!-- Content Wrapper. Contains page content -->
+            <div class="content-wrapper">
+                <!-- Content Header (Page header) -->
+                <section class="content-header">
+                    <div class="header-icon">
+                        <i class="pe-7s-world"></i>
+                    </div>
+                    <div class="header-title">
+                        {% block header %} {% endblock %} 
+                    </div>
+                </section>
+                <!-- Main content -->
+                <section class="content">
+                    <div class="row">
+                        {% block content %} {% endblock %} 
+                    </div> <!-- /.row -->
+                </section> <!-- /.content -->
+            </div> <!-- /.content-wrapper -->
+            <footer class="main-footer">
+                <strong>بُنيَ بأيدٍ طلابيّة. <a href="https://github.com/SAlkhairy/trabd/" target="_blank">حقّك في النسخ مكفول</a>. <i class="fa fa-heart color-green"></i></strong>
+            </footer>
+        </div>
+        <!-- ./wrapper -->
+        <!-- Start Core Plugins
+        =====================================================================-->
+        <!-- jQuery -->
+        <script src="{% static 'bdtask/assets/plugins/jQuery/jquery-1.12.4.min.js' %}" type="text/javascript"></script>
+        <!-- jquery-ui --> 
+        <script src="{% static 'bdtask/assets/plugins/jquery-ui-1.12.1/jquery-ui.min.js' %}" type="text/javascript"></script>
+        <!-- Bootstrap -->
+        <script src="{% static 'bdtask/assets/bootstrap/js/bootstrap.min.js' %}" type="text/javascript"></script>
+        <!-- lobipanel -->
+        <script src="{% static 'bdtask/assets/plugins/lobipanel/lobipanel.min.js' %}" type="text/javascript"></script>
+        <!-- Pace js -->
+        <script src="{% static 'bdtask/assets/plugins/pace/pace.min.js' %}" type="text/javascript"></script>
+        <!-- SlimScroll -->
+        <script src="{% static 'bdtask/assets/plugins/slimScroll/jquery.slimscroll.min.js' %}" type="text/javascript"></script>
+        <!-- FastClick -->
+        <script src="{% static 'bdtask/assets/plugins/fastclick/fastclick.min.js' %}" type="text/javascript"></script>
+        <!-- AdminBD frame -->
+        <script src="{% static 'bdtask/assets/dist/js/frame.js' %}" type="text/javascript"></script>
+        <!-- End Core Plugins
+        =====================================================================-->
+        <!-- Start Page Lavel Plugins
+        =====================================================================-->
+        <!-- Toastr js -->
+        <script src="{% static 'bdtask/assets/plugins/toastr/toastr.min.js' %}" type="text/javascript"></script>
+        <!-- Sparkline js -->
+        <script src="{% static 'bdtask/assets/plugins/sparkline/sparkline.min.js' %}" type="text/javascript"></script>
+        <!-- Data maps js -->
+        <script src="{% static 'bdtask/assets/plugins/datamaps/d3.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'bdtask/assets/plugins/datamaps/topojson.min.js' %}" type="text/javascript"></script>
+        <script src="{% static 'bdtask/assets/plugins/datamaps/datamaps.all.min.js' %}" type="text/javascript"></script>
+        <!-- Counter js -->
+        <script src="{% static 'bdtask/assets/plugins/counterup/waypoints.js' %}" type="text/javascript"></script>
+        <script src="{% static 'bdtask/assets/plugins/counterup/jquery.counterup.min.js' %}" type="text/javascript"></script>
+        <!-- Emojionearea -->
+        <script src="{% static 'bdtask/assets/plugins/emojionearea/emojionearea.min.js' %}" type="text/javascript"></script>
+        <!-- Monthly js -->
+        <script src="{% static 'bdtask/assets/plugins/monthly/monthly.js' %}" type="text/javascript"></script>
+        <!-- End Page Lavel Plugins
+        =====================================================================-->
+        <!-- Start Theme label Script
+        =====================================================================-->
+        <!-- Dashboard js -->
+        <script src="{% static 'bdtask/assets/dist/js/dashboard.js' %}" type="text/javascript"></script>
+{% block customscript %}
+{% endblock %}
+    </body>
+</html>

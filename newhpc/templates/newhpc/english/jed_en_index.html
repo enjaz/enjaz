@@ -1,0 +1,534 @@
+{% extends 'newhpc/english/jed_english_base.html' %}{% load staticfiles %}
+{% block title %}Health Professions Conference 2020 | Jeddah{% endblock %}
+{% block style %}
+    .listitem44 {
+      display: inline-block;
+      font-size: 1.5em;
+      list-style-type: none;
+      padding: 1em;
+      text-transform: uppercase;
+    }
+    .listitem44 span {
+      display: block;
+      font-size: 4.5rem;
+    }
+    @media (min-width: 992px) {
+    #slide1h3 {
+        margin-top:55px
+    }
+    #slide1p {
+        margin:60px 0 30px 0;
+    }
+    #our-vision.c-feature-15-container {
+        margin: 0 -30px 0 350px;
+    }
+    }
+    @media
+    (max-width: 1200px) {
+    #slide2h3.c-font-48 {
+        font-size:43px !important;
+    }
+    #slide1h3.c-font-70 {
+        font-size: 50px !important;
+    }
+    #slide1p.c-font-40 {
+        font-size: 30px !important;
+    }
+    @media (max-width: 991px) {
+    #slide2h3.c-font-48 {
+        font-size:19px !important;
+    }
+    #slide1h3.c-font-70 {
+        font-size: 25px !important;
+    }
+    #slide1p.c-font-40 {
+        font-size: 14px !important;
+    }
+    #slide1p{
+        margin:0 !important;
+    }
+    #slide1h3 {
+        margin-top: 15px !important;
+    }
+    #our-vision.c-feature-15-container {
+        margin: 0 !important;
+    }
+    }
+    @media (max-width: 470px) {
+    #slide2h3.c-font-48 {
+        font-size:16px !important;
+    }
+    #slide1h3.c-font-70 {
+        font-size: 19px !important;
+    }
+    #slide1p.c-font-40 {
+        font-size: 10px !important;
+    }
+    #slide1p{
+        margin:0 !important;
+    }
+    #slide1h3 {
+        margin-top: 15px !important;
+    }
+    #our-vision.c-feature-15-container {
+        margin: 0 !important;
+    }
+    #slide1h2 {
+        font-size: 32px;
+    }
+    }
+    .king-vision {
+        background-image: url({% static 'newhpc/images/backgrounds/king-vision.jpg' %});
+    }
+    @media (max-width: 692px) {
+    .king-vision {
+        background-image : url({% static 'newhpc/images/backgrounds/king-vision-mobile.jpg' %});
+    }
+    }
+{% endblock %}
+{% block lang %}{% url 'newhpc:jed_ar_index' %}{% endblock %}
+{% block lang2 %}{% url 'newhpc:jed_ar_index' %}{% endblock %}
+{% block content %}
+    <!-- BEGIN: PAGE CONTAINER -->
+	<div class="c-layout-page">
+    <!-- BEGIN: PAGE CONTENT -->
+    <!-- BEGIN: LAYOUT/SLIDERS/REVO-SLIDER-4 -->
+        <section class="c-layout-revo-slider c-layout-revo-slider-4" dir="ltr">
+            <div class="tp-banner-container c-theme">
+                <div class="tp-banner rev_slider" data-version="5.0">
+                    <ul>
+                        <!--BEGIN: SLIDE #1 -->
+                        <li data-transition="fade" data-slotamount="1" data-masterspeed="1000">
+                            <img
+                                alt=""
+                                src="{% static 'newhpc/images/slides/jeddah-campus.jpg' %}"
+                                data-bgposition="center bottom"
+                                data-bgfit="cover"
+                                data-bgrepeat="no-repeat"
+                                >
+                            <div class="tp-caption customin customout"
+                                data-x="center"
+                                data-y="center"
+                                data-hoffset=""
+                                data-voffset="-50"
+                                data-speed="0"
+                                data-start="0"
+                                data-transform_idle="o:1;"
+                                data-transform_in="rX:0.5;scaleX:0.75;scaleY:0.75;o:0;s:500;e:Back.easeInOut;"
+                                data-transform_out="rX:0.5;scaleX:0.75;scaleY:0.75;o:0;s:500;e:Back.easeInOut;"
+                                data-splitin="none"
+                                data-splitout="none"
+                                data-elementdelay="0.1"
+                                data-endelementdelay="0.1"
+                                data-endspeed="600">
+                                <h3 style="" id="slide1h3" class="c-font-70 c-font-bold c-font-center c-font-uppercase c-font-white c-block">
+                                    Health Professions Conference 2020
+                                </h3>
+                                <p id="slide1p" class="c-font-40 c-font-bold c-font-center c-font-uppercase c-font-white c-block">
+                                   King Saud Bin Abdulaziz University for Health Sciences Jeddah,
+                                </p>
+                                <h2 class="c-font-40 c-font-bold c-font-center c-font-uppercase c-font-white c-block" id="slide1h2">
+                                    28-30 January 2020
+                                </h2>
+                            </div>
+                        </li>
+                        <!--END -->
+
+                        <!--BEGIN: SLIDE #2 -->
+                        <li data-transition="fade" data-slotamount="1" data-masterspeed="1000">
+                            <img
+                                alt=""
+                                src="{% static 'newhpc/images/slides/hpc-students.jpg' %}"
+                                data-bgposition="center center"
+                                data-bgfit="cover"
+                                data-bgrepeat="no-repeat"
+                                >
+                            <div class="tp-caption customin customout"
+                                data-x="center"
+                                data-y="center"
+                                data-hoffset=""
+                                data-voffset="-50"
+                                data-speed="0"
+                                data-start="0"
+                                data-transform_idle="o:1;"
+                                data-transform_in="rX:0.5;scaleX:0.75;scaleY:0.75;o:0;s:500;e:Back.easeInOut;"
+                                data-transform_out="rX:0.5;scaleX:0.75;scaleY:0.75;o:0;s:600;e:Back.easeInOut;"
+                                data-splitin="none"
+                                data-splitout="none"
+                                data-elementdelay="0.1"
+                                data-endelementdelay="0.1"
+                                data-endspeed="600">
+                                <h3 class="c-font-48 c-font-bold c-font-center c-font-white c-block" id="slide2h3">
+                                    Health professions conference 2020 is pleased <br>to announce that the submission of <br>research abstracts is now open.
+                                </h3>
+                            </div>
+                            <div class="tp-caption lft"
+                                data-x="center"
+                                data-y="center"
+                                data-voffset="110"
+                                data-speed="1000"
+                                data-start="1000"
+                                data-transform_idle="o:1;"
+                                data-transform_in="x:100;y:100;rX:120;scaleX:0.75;scaleY:0.75;o:0;s:500;e:Back.easeInOut;"
+                                data-transform_out="x:100;y:100;rX:120;scaleX:0.75;scaleY:0.75;o:0;s:600;e:Back.easeInOut;">
+                                <a href="{% url 'newhpc:jed_en_research' %}" class="c-action-btn btn btn-lg c-btn-square c-theme-btn c-btn-bold c-btn-uppercase">Learn More</a>
+                            </div>
+                        </li>
+                        <!--END -->
+
+                    </ul>
+                </div>
+            </div>
+        </section><!-- END: LAYOUT/SLIDERS/REVO-SLIDER-4 -->
+
+    <!-- BEGIN: CONTENT/FEATURES/FEATURES-15-3 -->
+    <div id="feature-15-1" class="c-bg-parallax c-content-feature-15 c-bg-img-center" style="">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <div class="c-feature-15-container c-bg-white">
+                        <h2 class="c-feature-15-title c-font-bold c-font-uppercase c-theme-border c-font-40">Our Vision</h2>
+                        <p class="c-feature-15-desc c-font-20" style="margin-bottom:40px ">
+                            To accomplish innovation and excel in the methods of knowledge exchange in health education and medical research nationally and internationally.
+                        </p>
+                        <h2 class="c-feature-15-title c-font-bold c-font-uppercase c-theme-border c-font-40" style="margin-top: 130px;border-color: #9d0051 !important;">Health Professions Conference Concept</h2>
+                        <p class="c-feature-15-desc c-font-20">
+                            The Health Professions Conference is the first students-based conference accredited by the Saudi Commission for Health Specialties. It is one of the major annual programs held at King Saud Bin Abdulaziz University for Health Sciences that is planned, organized, and executed by the students’ club under the supervision of deanship of students affairs. The Fifth Health Professions Conference offers multiple lectures and various workshops that interest health practitioners. Selection of the best researches are also presented competing for the top positions.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- END: CONTENT/FEATURES/FEATURES-15-3 -->
+
+
+    <!-- BEGIN: CONTENT/FEATURES/FEATURES-15-1 -->
+    <div id="feature-15-1" class="c-content-feature-15 c-bg-img-center king-vision" style="">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-xs-12" style="opacity: 0.97;">
+                    <div class="c-feature-15-container c-bg-white" id="our-vision">
+                        <h2 class="c-feature-15-title c-font-bold c-font-uppercase c-theme-border c-font-50">What is HPC 2020?</h2>
+                        <p class="c-feature-15-desc c-font-20">
+                            The 5th Health Professions Conference (HPC) aims to discuss the National Transformation Program 2020. The program seeks to identify the challenges facing governmental agencies and construct the necessary institutional capacity for realizing the ambitious goals of Vision 2030. Our objective in HPC 2020 is to highlight the main core of Health Sector National Transformation Program.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END: CONTENT/FEATURES/FEATURES-15-1 -->
+        <!-- BEGIN: CONTENT/SLIDERS/TEAM-1 -->
+<div class="c-content-box c-size-md c-bg-white">
+	<div class="container">
+		<!-- Begin: Testimonals 1 component -->
+		<div class="c-content-person-1-slider" data-slider="owl">
+			<!-- Begin: Title 1 component -->
+			<div class="c-content-title-1">
+				<h3 class="c-center c-font-uppercase c-font-bold">Top Speakers</h3>
+				<div class="c-line-center c-theme-bg"></div>
+			</div>
+			<!-- End-->
+
+			<!-- Begin: Owlcarousel -->
+			<div class="owl-carousel owl-theme c-theme c-owl-nav-center" data-items="3" data-slide-speed="8000">
+
+
+			  	<!--<div class="item">-->
+			  		<!--<div class="c-content-person-1">-->
+			  			<!--<div class="c-caption c-content-overlay">-->
+			  				<!--<div class="c-overlay-wrapper">-->
+				  				<!--<div class="c-overlay-content">-->
+					  				<!--<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>-->
+					  			<!--</div>-->
+			  				<!--</div>-->
+			  				<!--<img src="{% static 'newhpc/images/speakerstop/new/Yaseen_Arabi.jpg' %}" class="img-responsive c-overlay-object" alt="">-->
+			  			<!--</div>-->
+			  			<!--<div class="c-body">-->
+					  		<!--<p style="text-align: center; font-size: 20px; font-weight: 700;">-->
+                                <!--Dr. Yaseen Arabi-->
+                            <!--</p>-->
+		                <!--</div>-->
+	                <!--</div>-->
+			  	<!--</div>-->
+
+			  	<div class="item">
+			  		<div class="c-content-person-1">
+			  			<div class="c-caption c-content-overlay">
+			  				<div class="c-overlay-wrapper">
+				  				<div class="c-overlay-content">
+					  				<a href="{% url 'newhpc:jed_coming_soon' %}"><i class="icon-link"></i></a>
+					  			</div>
+			  				</div>
+			  				<img src="{% static 'newhpc/images/speakerstop/new/BassemKurdi.png' %}" class="img-responsive c-overlay-object" alt="">
+			  			</div>
+			  			<div class="c-body">
+				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
+                                Dr. Bassem Kurdi
+                            </p>
+		                </div>
+	                </div>
+			  	</div>
+                <!--<div class="item">-->
+			  		<!--<div class="c-content-person-1">-->
+			  			<!--<div class="c-caption c-content-overlay">-->
+			  				<!--<div class="c-overlay-wrapper">-->
+				  				<!--<div class="c-overlay-content">-->
+					  				<!--<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>-->
+					  			<!--</div>-->
+			  				<!--</div>-->
+			  				<!--<img src="{% static 'newhpc/images/speakerstop/new/DrAhmedBalkhair.jpg' %}" class="img-responsive c-overlay-object" alt="">-->
+			  			<!--</div>-->
+			  			<!--<div class="c-body">-->
+				  			<!--<p style="text-align: center; font-size: 20px; font-weight: 700;">-->
+                                <!--Dr. Ahmed Balkhair-->
+                            <!--</p>-->
+		                <!--</div>-->
+	                <!--</div>-->
+			  	<!--</div>-->
+                <div class="item">
+			  		<div class="c-content-person-1">
+			  			<div class="c-caption c-content-overlay">
+			  				<div class="c-overlay-wrapper">
+				  				<div class="c-overlay-content">
+					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
+					  			</div>
+			  				</div>
+			  				<img src="{% static 'newhpc/images/speakerstop/new/DrMohamedalmoamary.jpg' %}" class="img-responsive c-overlay-object" alt="">
+			  			</div>
+			  			<div class="c-body">
+				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
+                                Dr. Mohamed Almoamary
+                            </p>
+		                </div>
+	                </div>
+			  	</div>
+                <div class="item">
+			  		<div class="c-content-person-1">
+			  			<div class="c-caption c-content-overlay">
+			  				<div class="c-overlay-wrapper">
+				  				<div class="c-overlay-content">
+					  				<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>
+					  			</div>
+			  				</div>
+			  				<img src="{% static 'newhpc/images/speakerstop/new/DrZiadNakshabandi.jpg' %}" class="img-responsive c-overlay-object" alt="">
+			  			</div>
+			  			<div class="c-body">
+				  			<p style="text-align: center; font-size: 20px; font-weight: 700;">
+                                Dr.Ziad Nakshabandi
+                            </p>
+		                </div>
+	                </div>
+			  	</div>
+                <!--<div class="item">-->
+			  		<!--<div class="c-content-person-1">-->
+			  			<!--<div class="c-caption c-content-overlay">-->
+			  				<!--<div class="c-overlay-wrapper">-->
+				  				<!--<div class="c-overlay-content">-->
+					  				<!--<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>-->
+					  			<!--</div>-->
+			  				<!--</div>-->
+			  				<!--<img src="{% static 'newhpc/images/speakerstop/new/DrRaedAlhazme.jpg' %}" class="img-responsive c-overlay-object" alt="">-->
+			  			<!--</div>-->
+			  			<!--<div class="c-body">-->
+				  			<!--<p style="text-align: center; font-size: 20px; font-weight: 700;">-->
+                                <!--Dr. Raed Alhazme-->
+                            <!--</p>-->
+		                <!--</div>-->
+	                <!--</div>-->
+			  	<!--</div>-->
+                <!--<div class="item">-->
+			  		<!--<div class="c-content-person-1">-->
+			  			<!--<div class="c-caption c-content-overlay">-->
+			  				<!--<div class="c-overlay-wrapper">-->
+				  				<!--<div class="c-overlay-content">-->
+					  				<!--<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>-->
+					  			<!--</div>-->
+			  				<!--</div>-->
+			  				<!--<img src="{% static 'newhpc/images/speakerstop/new/DrKhalidAlodhaibi.jpg' %}" class="img-responsive c-overlay-object" alt="">-->
+			  			<!--</div>-->
+			  			<!--<div class="c-body">-->
+				  			<!--<p style="text-align: center; font-size: 20px; font-weight: 700;">-->
+                                <!--Dr. Khalid Alodhaibi-->
+                            <!--</p>-->
+		                <!--</div>-->
+	                <!--</div>-->
+			  	<!--</div>-->
+                <!--<div class="item">-->
+			  		<!--<div class="c-content-person-1">-->
+			  			<!--<div class="c-caption c-content-overlay">-->
+			  				<!--<div class="c-overlay-wrapper">-->
+				  				<!--<div class="c-overlay-content">-->
+					  				<!--<a href="{% url 'newhpc:riy_coming_soon' %}"><i class="icon-link"></i></a>-->
+					  			<!--</div>-->
+			  				<!--</div>-->
+			  				<!--<img src="{% static 'newhpc/images/speakerstop/new/AbdulelahAlhawsawi.jpg' %}" class="img-responsive c-overlay-object" alt="">-->
+			  			<!--</div>-->
+			  			<!--<div class="c-body">-->
+				  			<!--<p style="text-align: center; font-size: 20px; font-weight: 700;">-->
+                                <!--Dr. Abdulelah Alhawsawi-->
+                            <!--</p>-->
+		                <!--</div>-->
+	                <!--</div>-->
+			  	<!--</div>-->
+
+
+
+			</div>
+	        <!-- End-->
+	    </div>
+	    <!-- End-->
+	</div>
+</div><!-- END: CONTENT/SLIDERS/TEAM-1 -->
+<!-- BEGIN: CONTENT/BARS/BAR-4 -->
+<div class="c-content-box c-size-md c-bg-parallax" style="background-image: url({% static 'newhpc/images/slides/main-color.jpg' %});margin-top: -50px">
+	<div class="container">
+		<div class="c-content-bar-4">
+			<div class="c-actions">
+				<a href="{% url 'newhpc:jed_coming_soon' %}" class="btn btn-md c-btn-border-2x c-btn-square c-btn-white c-btn-uppercase c-btn-bold">Click here to learn more about speakers</a></div>
+		</div>
+	</div>
+</div>
+<!-- END: CONTENT/BARS/BAR-4 -->
+<!-- BEGIN: CONTENT/BARS/BAR-4 -->
+<div class="c-content-box c-size-md c-bg-parallax" style="background-color: #242b2c ">
+	<div class="container">
+		<div class="c-content-bar-4">
+			<h3 class="c-font-uppercase c-font-bold" id="head" style="margin: 0px!important;border: 0px!important;direction: ltr!important;">HPC 2020 Countdown</h3>
+              <ul style="color: white!important;padding: 0px!important;font-weight: 700!important;margin-top: -15px!important;direction: ltr!important;">
+                <li class="listitem44"><span id="days"></span>Days</li>
+                <li class="listitem44"><span id="hours"></span>Hours</li>
+                <li class="listitem44"><span id="minutes"></span>Minutes</li>
+                <li class="listitem44"><span id="seconds"></span>Seconds</li>
+              </ul>
+		</div>
+	</div>
+</div>
+<!-- END: CONTENT/BARS/BAR-4 -->
+
+
+
+<!--&lt;!&ndash; Small modal &ndash;&gt;-->
+				<!--<button type="button" class="btn c-btn-green c-btn-square c-btn-bold c-btn-uppercase" data-toggle="modal" data-target=".bs-example-modal-sm">Launch Small modal</button>-->
+				<!--<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">-->
+					<!--<div class="modal-dialog modal-sm">-->
+						<!--<div class="modal-content c-square">-->
+							<!--<div class="modal-header">-->
+								<!--<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>-->
+								<!--<h4 class="modal-title" id="mySmallModalLabel">Small modal</h4>-->
+							<!--</div>-->
+							<!--<div class="modal-body">-->
+								<!--<p>-->
+									<!--Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor-->
+									<!--incididunt ut labore et dolore magna aliqua.-->
+								<!--</p>-->
+							<!--</div>-->
+							<!--<div class="modal-footer">-->
+								<!--<button type="button" class="btn c-theme-btn c-btn-square c-btn-bold c-btn-uppercase">Submit</button>-->
+								<!--<button type="button" class="btn c-theme-btn c-btn-border-2x c-btn-square c-btn-bold c-btn-uppercase" data-dismiss="modal">Close</button>-->
+							<!--</div>-->
+						<!--</div>-->
+						<!--&lt;!&ndash; /.modal-content &ndash;&gt;-->
+					<!--</div>-->
+                <!--</div>-->
+
+
+
+    <!-- BEGIN: CONTENT/MISC/SUBSCRIBE-FORM-1 -->
+<div class="c-content-box c-size-sm c-bg-dark">
+	<div class="container">
+		<div class="c-content-subscribe-form-1">
+			<div class="row">
+				<div class="col-sm-12">
+					<h3 class="c-title c-font-30 c-font-uppercase c-font-bold">Subscribe to our newsletter to receive updates about the conference</h3>
+					<!--<div class="c-body c-font-16 c-font-uppercase c-font-sbold">For latest news and updates</div>-->
+				</div>
+            </div>
+            <div class="row">
+				<div class="col-sm-12">
+					<form action="/create_post/" id="newsletter_signup">
+						<div class="input-group input-group-lg">
+                            <input id="email" type="text" class="form-control input-lg" placeholder="Your Email Here">
+							<span class="input-group-btn">
+								<button id="signup_btn" type="submit" class="btn c-theme-btn c-btn-uppercase btn-lg c-btn-bold c-btn-square">SUBSCRIBE</button>
+							</span>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div><!-- END: CONTENT/MISC/SUBSCRIBE-FORM-1 -->
+
+{% endblock %}
+
+{% block script2 %}
+<script src="{% static 'newhpc/english/assets/demos/default/js/scripts/pages/modals.js' %}" type="text/javascript"></script>
+
+<script type="application/javascript">
+// AJAX for posting
+function create_post() {
+    $.ajax({
+        url : "{% url 'newhpc:handle_newsletter_signup' %}", // the endpoint
+        type : "POST", // http method
+        data : { email : $('#email').val() }, // data sent with the post request
+
+        // handle a successful response
+        success : function(json) {
+            $('#email').val(''); // remove the value from the input
+            console.log(json.message)
+            if (json.message == 'success') {
+                alert("Thank you. You have successfully joined our newsletter.");
+            } else if (json.message == 'previous'){
+                alert("You are already subscribed.");
+            } else if(json.message == 'invalid'){
+                alert("The email address is invalid.");
+            };
+
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+};
+
+// Submit post on submit
+$('#newsletter_signup').on('submit', function(event){
+    event.preventDefault();
+    console.log("form submitted!")  // sanity check
+    create_post();
+});
+
+</script>
+{% endblock %}
+{% block script %}
+    const second = 1000,
+    minute = second * 60,
+    hour = minute * 60,
+    day = hour * 24;
+
+    let countDown = new Date('Jan 28, 2020 00:00:00').getTime(),
+    x = setInterval(function() {
+
+    let now = new Date().getTime(),
+      distance = countDown - now;
+
+    document.getElementById('days').innerText = Math.floor(distance / (day)),
+    document.getElementById('hours').innerText = Math.floor((distance % (day)) / (hour)),
+    document.getElementById('minutes').innerText = Math.floor((distance % (hour)) / (minute)),
+    document.getElementById('seconds').innerText = Math.floor((distance % (minute)) / second);
+
+    //do something later when date is reached
+    //if (distance < 0) {
+    //  clearInterval(x);
+    //  'IT'S MY BIRTHDAY!;
+    //}
+
+    }, second)
+{% endblock %}

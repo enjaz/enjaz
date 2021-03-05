@@ -1,0 +1,93 @@
+{% extends 'base.html' %}{% load bootstrap3 %}
+{% load static %}
+{% block title %}ترشيحات 2021-2022{% endblock %}
+
+
+
+{% block content %}
+{% if not already_on %}
+
+<form method="post" enctype="multipart/form-data">
+    <div class="col-sm-8">
+        {% csrf_token %}
+        <div class="row">
+            <div class="form-group">
+                {% bootstrap_field form.city %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group">
+                {% bootstrap_field form.position %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group">
+                {% bootstrap_field form.plan %}
+                    <span class="help-block small"><a target="_blank">ملف الترشح</a> </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group">
+                {% bootstrap_field form.cv %}
+                <span class="help-block small"><a target="_blank" href="https://goo.gl/ceKPnM">نموذج السيرة الذاتية</a> </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group">
+                {% bootstrap_field form.certificates %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group">
+                {% bootstrap_field form.gpa %}
+            </div>
+        </div>
+
+        </div>
+<div class="form-group">
+<div class="col-sm-8 checkbox checkbox-success">
+     <input id="checkbox1" type="checkbox">
+     <label for="checkbox1">أقر بالموافقة على <a target="_blank" href="http://sac.ksau-hs.edu.sa/index.php/rules/13-%D9%84%D8%AC%D9%86%D8%A9-%D8%A7%D9%84%D8%A7%D9%86%D8%AA%D8%AE%D8%A7%D8%A8%D8%A7%D8%AA-%D8%A7%D9%84%D8%B7%D9%84%D8%A7%D8%A8%D9%8A%D8%A9">شروط الترشيحات والانتخابات.</a></label>
+</div>
+</div>
+<div class="form-group">
+<div class="col-sm-8 checkbox checkbox-success">
+     <input id="checkbox2" type="checkbox">
+     <label for="checkbox2">أقر بأن جميع المعلومات التي تم تعبئتها في نموذج التسجيل في البوابة وفي هذا النموذج صحيحة، وأنه في حال اكتشاف أي معلومات مغلوطة يحق للجنة الانتخابات استبعادي من الترشيحات الطلابية حتى بعد فوزي بالمنصب.</label>
+</div>
+</div>
+<div class="form-group">
+<div class="col-sm-8 checkbox checkbox-success">
+     <input id="checkbox3" type="checkbox">
+     <label for="checkbox3">أوافق على نشر السيرة الذاتية وملف الترشح.</label>
+</div>
+</div>
+<div class="form-group">
+<div class="col-sm-8">
+    <img width="100%" src="{% static 'images/guidelines.jpg' %}">
+</div>
+</div>    
+<div class="form-group">
+<div class="row">
+    <div class="col-sm-12">
+    <input id="submit" disabled class="btn btn-btn-success" type="submit" value="أرسل">
+    </div>
+</div>
+</div>
+</form>
+{% endif %}
+{% endblock %}
+{% block customscript %}
+<script>
+$(function(){
+   $("input[type=checkbox]").change(function(){
+      if ($("input[type=checkbox]:checked").length == 3){
+       $("#submit").removeAttr('disabled');
+      } else {
+       $("#submit").attr('disabled', 'disabled');
+      }
+   })
+});
+</script>
+{% endblock %}

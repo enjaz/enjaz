@@ -13,19 +13,24 @@ from .models import Nomination
 
 @login_required
 def add_nominee(request):
+    # such ugly hard code but no time for anything better
+    is_nominations_closed = True
     current_year ='2021-2022'
     user_nominations = Nomination.objects.filter(user=request.user)
-    if user_nominations.exists():
-        context = {'already_on': True}
-        return HttpResponseRedirect('thanks/')
-    if request.method == 'POST':
-            instance = Nomination(user=request.user)
-            form = NominationForm(request.POST, request.FILES, instance=instance)
-            if form.is_valid():
-                instance = form.save()
-                return HttpResponseRedirect('thanks/')
-    elif request.method == 'GET':
-            form = NominationForm()
-    context = {'form' : form}
+    if is_nominations_closed:
+        return HttpResponseRedirect('ended/')
+    else:
+        if user_nominations.exists():
+            context = {'already_on': True}
+            return HttpResponseRedirect('thanks/')
+        if request.method == 'POST':
+                instance = Nomination(user=request.user)
+                form = NominationForm(request.POST, request.FILES, instance=instance)
+                if form.is_valid():
+                    instance = form.save()
+                    return HttpResponseRedirect('thanks/')
+        elif request.method == 'GET':
+                form = NominationForm()
+        context = {'form' : form}
 
-    return render(request,'voting/add_nominee.html', context)
+        return render(request,'voting/add_nominee.html', context)
